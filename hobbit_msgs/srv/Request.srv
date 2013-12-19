@@ -1,0 +1,9 @@
+#Request Service. used for requesting input from user/mmui by modules or vice-versa
+
+Header header
+string sessionID
+string requestText # please enter a name for this place, etc.
+
+Parameter[] params  # Requestparams
+---
+Parameter[] params  # Responseparams
