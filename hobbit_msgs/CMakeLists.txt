@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.4.6)
 
 project(hobbit_msgs)
 
-find_package(catkin REQUIRED COMPONENTS roscpp std_msgs sensor_msgs message_generation)
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs sensor_msgs message_generation actionlib)
 
 #set the default path for built executables to the "bin" directory
 #set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
@@ -46,16 +46,16 @@ add_service_files(
   Translate.srv
 )
 
-#add_action_files(
-#  DIRECTORY action
-#  FILES
-#  ApproachUser.action
-#  BringObject.action
-#  CallUser.action
-#  LocateUser.action
-#)
+add_action_files(
+  DIRECTORY action
+  FILES
+  ApproachUser.action
+  BringObject.action
+  CallUser.action
+  LocateUser.action
+)
 
-generate_messages(DEPENDENCIES std_msgs sensor_msgs)
+generate_messages(DEPENDENCIES std_msgs sensor_msgs actionlib)
 
 catkin_package(
 
