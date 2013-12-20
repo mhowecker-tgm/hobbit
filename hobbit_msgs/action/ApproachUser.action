@@ -1,0 +1,9 @@
+# Define the goal
+std_msgs/String command
+geometry_msgs/Point point
+---
+# Define the result
+std_msgs/String result
+---
+# Define a feedback message
+float32 distance 

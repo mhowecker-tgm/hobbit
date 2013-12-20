@@ -1,0 +1,8 @@
+# Define the goal
+std_msgs/String goal
+---
+# Define the result
+std_msgs/String result
+---
+# Define a feedback message
+float32 minutes_left

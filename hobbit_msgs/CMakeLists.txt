@@ -46,6 +46,15 @@ add_service_files(
   Translate.srv
 )
 
+#add_action_files(
+#  DIRECTORY action
+#  FILES
+#  ApproachUser.action
+#  BringObject.action
+#  CallUser.action
+#  LocateUser.action
+#)
+
 generate_messages(DEPENDENCIES std_msgs sensor_msgs)
 
 catkin_package(
