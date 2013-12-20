@@ -1,3 +1,3 @@
 # object define by position names, Poses and the corresponding probabilities of the object to be there
 std_msgs/String name
-ObjectPosition[]  positions
+float32 probability

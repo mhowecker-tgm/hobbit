@@ -8,4 +8,9 @@ string place_name
 
 #int32 id
 
+# type of the place
+# object search, user search
+std_msgs/String place_type
 
+# array of possible objects
+hobbit_msgs/Object[] objects

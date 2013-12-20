@@ -1,0 +1,4 @@
+# Given an objects name return an array of positions (room, location, probability)
+std_msgs/String object_name
+---
+hobbit_msgs/ObjectLocationVector object_locations

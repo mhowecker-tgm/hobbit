@@ -1,0 +1,5 @@
+# Given the name of the room and the location the Pose is returned
+std_msgs/String room_name
+std_msgs/String location_name
+---
+geometry_msgs/Pose2D pose

@@ -1,0 +1,4 @@
+# Give a Point the corresponding room name is returned
+geometry_msgs/Point point
+---
+std_msgs/String room_name

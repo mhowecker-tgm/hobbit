@@ -17,8 +17,8 @@ add_message_files(
   Command.msg
   Event.msg
   Object.msg
+  ObjectLocationVector.msg
   ObjectPosition.msg
-  Objects.msg
   Parameter.msg
   Place.msg
   PlacesVector.msg
@@ -33,13 +33,17 @@ add_service_files(
   DIRECTORY srv
   FILES
   ClustersOnPlane.srv
+  GetCoordinates.srv
   GetName.srv
+  GetObjectLocations.srv
+  GetRobotsCurrentRoom.srv
+  GetRoomName.srv
   GetRooms.srv
+  GetUsersCurrentRoom.srv
   PointCloud2FeatureHistogram.srv
   Request.srv
   SingleShotPC.srv
   Translate.srv
-
 )
 
 generate_messages(DEPENDENCIES std_msgs sensor_msgs)
