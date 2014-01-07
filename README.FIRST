@@ -1,4 +1,22 @@
-Naming conventions for Hobbit PT2 are following the standard ROS naming conventions:
+SETUP HOBBIT WORKSPACE FOR PT2
+
+- install ROS HYDRO on your Ubuntu 12.04 operating system (wiki.ros.org/hydro/Installation/Ubuntu)
+- make a catkin workspace for hobbit PT2 (I have it at /opt/ros/):
+  >> mkdir -p ./hobbit_hydro_src
+  >> cd hobbit_hydro_src
+  >> catkin_init_workspace
+- checkout svn for Hobbit PT2:
+  >> svn checkout https://repo.acin.tuwien.ac.at/v4r/trunk/ros/hobbit_hydro_src/ ./src
+- you can execute a catkin_make in the workspace folder (hobbit_hydro_src) to generate build and devel files:
+  >> catkin_make
+  these build and devel folders and files should never be checked in to svn!!
+
+SUBMIT ROS PACKAGES TO HOBBIT PT2 REPOSITORY
+- all packages have to use catkin build system of ROS hydro
+- package name, description and maintainer has to be maintained in the package.xml file of the package
+
+
+NAMING CONVENTIONS for Hobbit PT2 are following the standard ROS naming conventions:
 http://wiki.ros.org/ROS/Patterns/Conventions  (please read it)
 
 
@@ -99,6 +117,3 @@ to create the project data that a project can be imported to eclipse
 then "import existing project into workspace"
 
  
-### Kinects
-please configure "base_camera.launch" and "top_camera.launch" according to your hardware ( set HW-id in launch file )
-standard-behaviour = first camera = top, second camera found = base
