@@ -17,6 +17,7 @@ add_message_files(
   Command.msg
   Event.msg
   Object.msg
+  ObjectLocation.msg
   ObjectLocationVector.msg
   ObjectPosition.msg
   Parameter.msg
