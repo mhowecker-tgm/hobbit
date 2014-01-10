@@ -1,0 +1,19 @@
+<package>
+
+  <name>sending_goals</name>
+  <version> 0.0.0</version>
+  <description> sending_goals</description>
+  <maintainer email="someone@todo.todo">someone</maintainer>
+  <license>BSD</license>
+  <url>http://ros.org/wiki/sending_goals</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>hobbit_msgs</build_depend>
+  <build_depend>move_base_msgs</build_depend>
+  <build_depend>tf</build_depend>
+  <build_depend>actionlib</build_depend>
+
+</package>
+
+

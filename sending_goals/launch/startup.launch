@@ -1,0 +1,4 @@
+<launch>
+  <node pkg="sending_goals" type="sending_goals" name="sending_goals" output="screen"/>
+</launch>
+
