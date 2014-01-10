@@ -1,0 +1,18 @@
+<package>
+  <name>pugixml</name>
+  <version> 0.0.0</version>
+  <description> pugixml</description>
+  <maintainer email="someone@todo.todo">someone</maintainer>
+  <license>BSD</license>
+  <url>http://ros.org/wiki/pugixml</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roscpp</build_depend>
+  
+  <export>
+        <cpp cflags="-I${prefix}/src/include" lflags="-L${prefix}/lib -lpugixml"/>
+  </export>
+
+
+</package>
+
