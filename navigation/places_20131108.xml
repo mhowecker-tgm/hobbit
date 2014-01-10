@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<rooms>
+	<room>
+		<name>Office</name>
+		<vertices>
+			<vertex x="-0.300000" y="1.950000" />
+			<vertex x="-1.500000" y="-1.450000" />
+			<vertex x="1.050000" y="-2.700000" />
+			<vertex x="2.400001" y="0.900000" />
+		</vertices>
+		<places>
+			<place place_name="default" x="1.248421" y="0.624635" theta="-3.029218" />
+		</places>
+	</room>
+	<room>
+		<name>Office2</name>
+		<vertices>
+			<vertex x="2.300000" y="-0.250000" />
+			<vertex x="1.400001" y="-2.700000" />
+			<vertex x="4.150001" y="-3.900001" />
+			<vertex x="5.100000" y="-1.050000" />
+		</vertices>
+		<places>
+			<place place_name="default" x="3.470170" y="-1.670832" theta="-1.695859" />
+		</places>
+	</room>
+	<room>
+		<name>LivingRoom</name>
+		<vertices>
+			<vertex x="3.200000" y="2.100000" />
+			<vertex x="2.550000" y="0.000000" />
+			<vertex x="5.200000" y="-0.750000" />
+			<vertex x="5.950000" y="1.500000" />
+		</vertices>
+		<places>
+			<place place_name="default" x="3.705623" y="-0.253660" theta="1.342869" />
+		</places>
+	</room>
+	<room>
+		<name>Corridor</name>
+		<vertices>
+			<vertex x="-1.300000" y="4.350000" />
+			<vertex x="-1.750000" y="3.000000" />
+			<vertex x="1.550000" y="1.800000" />
+			<vertex x="1.500000" y="1.500000" />
+			<vertex x="2.500000" y="1.099999" />
+			<vertex x="2.900001" y="2.300000" />
+			<vertex x="1.600000" y="2.800000" />
+			<vertex x="1.200000" y="3.350000" />
+		</vertices>
+		<places>
+			<place place_name="whatever" x="0.1011" y="3.0410" theta="2.7" />
+			<place place_name="place1" x="1.439127" y="2.338464" theta="2.443163" />
+		</places>
+	</room>
+	<room>
+		<name>Kitchen</name>
+		<vertices>
+			<vertex x="-3.600000" y="2.200000" />
+			<vertex x="-4.650000" y="-0.350000" />
+			<vertex x="-3.000000" y="-1.000000" />
+			<vertex x="-2.250000" y="1.900000" />
+		</vertices>
+	</room>
+</rooms>

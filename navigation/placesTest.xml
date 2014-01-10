@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<rooms>
+	<room>
+		<name>DinningRoom</name>
+		<vertices>
+			<vertex x="-1.475000" y="-1.525000" />
+			<vertex x="-1.425000" y="-3.000000" />
+			<vertex x="0.625000" y="-2.975000" />
+			<vertex x="0.550000" y="-1.425000" />
+		</vertices>
+		<places>
+			<place>
+				<name>default</name>
+				<type>searchable</type>
+               			<pose x="0.828000" y="-1.378056" theta="-1.158330"/>
+              			<objects>
+                    			<object name="mug" probability="0.4"/>
+                    			<object name="glasses" probability="0.1"/>
+                		</objects>
+            		</place>
+			<place>
+				<name>tv</name>
+				<type>default</type>
+               			<pose x="0.665330" y="-1.820597" theta="-2.418353"/>
+            		</place>
+		</places>
+	</room>
+	<room>
+		<name>LivingRoom</name>
+		<vertices>
+			<vertex x="-0.625000" y="1.100000" />
+			<vertex x="-0.600000" y="-0.150000" />
+			<vertex x="0.500000" y="-0.175000" />
+			<vertex x="0.600000" y="1.200000" />
+		</vertices>
+	</room>
+	<room>
+		<name>Bedroom</name>
+		<vertices>
+			<vertex x="-0.975000" y="1.200000" />
+			<vertex x="-0.950000" y="-0.025000" />
+			<vertex x="-2.150000" y="-0.150000" />
+			<vertex x="-2.250000" y="1.200000" />
+		</vertices>
+	</room>
+	<room>
+		<name>Kitchen</name>
+		<vertices>
+			<vertex x="-2.300000" y="-0.925000" />
+			<vertex x="-2.225000" y="-2.925000" />
+			<vertex x="-1.575000" y="-2.950000" />
+			<vertex x="-1.650000" y="-0.875000" />
+		</vertices>
+		<places>
+			<place>
+				<name>default</name>
+				<type>searchable</type>
+               			<pose x="2.640917" y="-0.492336" theta="-1.196047"/>
+            		</place>
+			<place>
+				<name>dishwasher</name>
+				<type>searchable</type>
+               			<pose x="3.573587" y="0.012761" theta="-0.639572"/>
+            		</place>
+		</places>
+	</room>
+	<room>
+		<name>Corridor</name>
+		<vertices>
+			<vertex x="-3.400000" y="-0.175000" />
+			<vertex x="-3.450000" y="-0.900000" />
+			<vertex x="-2.300000" y="-0.875000" />
+			<vertex x="-2.300000" y="-0.050000" />
+		</vertices>
+	</room>
+	<room>
+		<name>CentralHall</name>
+		<vertices>
+			<vertex x="0.525000" y="-0.250000" />
+			<vertex x="-1.500000" y="-0.225000" />
+			<vertex x="-1.525000" y="-1.400000" />
+			<vertex x="0.575000" y="-1.325000" />
+		</vertices>
+	</room>
+</rooms>

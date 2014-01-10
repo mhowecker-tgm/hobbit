@@ -1,0 +1,16 @@
+<launch>
+<!-- Run the map server -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find places_learning)/../navigation/hobbit_map_20131023_copy.yaml"/>
+
+ <group if="true">
+    <include file="$(find HobbitLaunch)/launch/basecam_xpc2.launch"></include>
+  </group>
+
+  <group if="true">
+    <include file="$(find virtual_laser)/launch/startup_xpc2.launch" />
+    <include file="$(find hobbit_launch)/../navigation/amcl_diff_hobbit.launch" />
+    <include file="$(find get_current_room)/launch/startup_get_current_room.launch" />
+    <include file="$(find places_learning)/launch/startup_places_learning.launch" />
+  </group>
+
+</launch>
