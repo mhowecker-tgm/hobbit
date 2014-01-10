@@ -1,0 +1,21 @@
+<launch>
+
+  <group if="true">
+    <include file="$(find HobbitLaunch)/launch/top_camera.launch"></include>
+<!--    <include file="$(find HobbitLaunch)/launch/base_camera.launch"></include>-->
+  </group>
+  
+  <group if="true">
+    <include file="$(find DecisionService)/launch/startup.launch" />
+    <include file="$(find Coordinator)/launch/startup.launch" />
+<!--    <include file="$(find Face)/launch/startup.launch" /> -->
+<!--    <include file="$(find Emotionator)/launch/startup.launch" /> --> 
+<!--    <include file="$(find ActionSequencer)/launch/startup.launch" /> -->
+    <include file="$(find Head)/launch/startup.launch" />
+    <include file="$(find ServicerBatteryState)/launch/startup.launch" />
+
+
+
+  </group>
+
+</launch>

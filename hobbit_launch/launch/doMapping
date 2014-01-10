@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+
+# requires xdotool, install via ubuntu package manager
+
+setxkbmap dvorak  # fixes wrong keyboard mapping
+
+xdotool sleep 2
+
+
+gnome-terminal -t "console3"
+
+xdotool key ctrl+shift+t
+xdotool sleep 1
+xdotool key alt+t
+xdotool sleep 0.1
+xdotool key s
+xdotool sleep 1
+xdotool type "Asus Base_Camera"
+xdotool key Return
+xdotool sleep 1
+xdotool type "roslaunch HobbitLaunch base_camera_xpc2.launch "
+xdotool key Return
+xdotool sleep 4
+
+
+xdotool key ctrl+shift+t
+xdotool key alt+t
+xdotool sleep 0.1
+xdotool sleep 1
+xdotool key s
+xdotool type "Joystick"
+xdotool key Return
+xdotool sleep 3
+xdotool type "roslaunch joy2twist startup.launch "
+xdotool key Return
+xdotool sleep 1
+
+xdotool key ctrl+shift+t
+xdotool key alt+t
+xdotool sleep 1
+xdotool key s
+xdotool sleep 1
+xdotool type "ROOT Joystick"
+xdotool key Return
+xdotool sleep 1
+xdotool type "sudo bash"
+xdotool key Return
+xdotool sleep 1
+xdotool type "hobbit"
+xdotool key Return
+xdotool sleep 1
+xdotool type "rosrun ps3joy ps3joy.py"
+xdotool key Return
+xdotool sleep 1
+
+
+

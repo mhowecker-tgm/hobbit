@@ -1,0 +1,18 @@
+<package>
+
+  <name>hobbit_launch</name>
+  <version> 0.0.0</version>
+  <description> hobbit_launch</description>
+  <maintainer email="someone@todo.todo">Walter</maintainer>
+  <license>BSD</license>
+  <url>http://ros.org/wiki/pugixml</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>message_generation</build_depend>
+  <run_depend>message_runtime</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>hobbit_msgs</run_depend>
+
+</package>
+
+
