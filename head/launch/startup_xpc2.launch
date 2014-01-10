@@ -1,0 +1,24 @@
+<launch>
+	<param 	name="/use_sim_time" 
+		value="false"/>
+
+	<node 	pkg="Head" 
+		type="headmove_xpc2.py" 
+		name="HeadMove" 
+		output="screen" 
+		args="">
+	</node>
+
+	<node 	pkg="tf" 
+		type="static_transform_publisher" 
+		name="base_to_camera_in_middle_center_pos" 
+		args="0.001 1.114 0.584 -1.511 -1.167 3.061  /topcamera_depth_optical_frame /hobbit_wrt_middle_center_cam 100">
+	</node>
+
+	<node 
+		pkg="tf" 
+		type="static_transform_publisher" 
+		name="base_to_camera_in_down_right_pos" 
+		args="-0.183 0.652 1.037 -0.367 0.889 -0.268 -0.059 /topcamera_rgb_optical_frame  /hobbit_wrt_down_right_cam 20">
+	</node>
+</launch>
