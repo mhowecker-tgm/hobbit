@@ -1,0 +1,10 @@
+SlowDown=2.0
+MinRelHeight=-0.04
+MaxRelHeight=0.04
+MinAngle=-30.0
+MaxAngle=30.0
+DeltaAngle=0.5
+LinkX=0.19
+LinkY=0.044
+LinkZ=0.44
+
