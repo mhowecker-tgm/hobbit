@@ -1,0 +1,17 @@
+<package>
+
+  <name>get_current_room</name>
+  <version> 0.0.0</version>
+  <description> GetCurrentRoom</description>
+  <maintainer email="someone@todo.todo">someone</maintainer>
+  <license>BSD</license>
+  <url>http://ros.org/wiki/get_current_room</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>pugixml</build_depend>
+  <build_depend>hobbit_msgs</build_depend>
+
+</package>
+
+
