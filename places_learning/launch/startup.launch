@@ -1,0 +1,4 @@
+<launch>
+  <node pkg="places_learning" type="places_learning" name="places_learning" args="$(find places_learning)/../navigation/places.xml" output="screen"/>
+</launch>
+

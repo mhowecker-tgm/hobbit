@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<rooms>
+	<room>
+		<name>Office</name>
+		<vertices>
+			<vertex x="1.575000" y="5.225000" />
+			<vertex x="1.550000" y="4.925000" />
+			<vertex x="0.050000" y="5.000000" />
+			<vertex x="-0.025000" y="4.700000" />
+			<vertex x="-0.425000" y="4.775000" />
+			<vertex x="-0.650000" y="2.950000" />
+			<vertex x="3.250000" y="2.075000" />
+			<vertex x="3.500000" y="5.075000" />
+		</vertices>
+		<places>
+			<place place_name="door" x="0.000000" y="0.000000" theta="0.000000" />
+			<place place_name="desk" x="0.000000" y="0.000000" theta="0.000000" />
+			<place place_name="default" x="0.000000" y="0.000000" theta="0.000000" />
+			<place place_name="chair" x="0.000000" y="0.000000" theta="0.000000" />
+		</places>
+	</room>
+	<room>
+		<name>Corridor</name>
+		<vertices>
+			<vertex x="4.450000" y="6.725000" />
+			<vertex x="5.650001" y="6.475000" />
+			<vertex x="5.400000" y="4.300000" />
+			<vertex x="4.825000" y="4.375000" />
+			<vertex x="4.750000" y="2.100000" />
+			<vertex x="3.550000" y="2.050000" />
+			<vertex x="3.525000" y="3.350000" />
+			<vertex x="3.875000" y="3.325000" />
+		</vertices>
+		<places>
+			<place place_name="door" x="0.000000" y="0.000000" theta="0.000000" />
+		</places>
+	</room>
+	<room>
+		<name>Office2</name>
+		<vertices>
+			<vertex x="-0.250000" y="2.400000" />
+			<vertex x="-0.275000" y="1.525000" />
+			<vertex x="-0.875000" y="1.525000" />
+			<vertex x="-0.950000" y="-0.350000" />
+			<vertex x="-0.525000" y="-0.350000" />
+			<vertex x="-0.575000" y="-0.825000" />
+			<vertex x="2.725000" y="-0.950000" />
+			<vertex x="2.350000" y="2.025000" />
+		</vertices>
+		<places>
+			<place place_name="door" x="0.000000" y="0.000000" theta="0.000000" />
+		</places>
+	</room>
+	<room>
+		<name>LivingRoom</name>
+		<vertices>
+			<vertex x="2.675000" y="1.825000" />
+			<vertex x="3.000000" y="-0.775001" />
+			<vertex x="4.825000" y="-0.900001" />
+			<vertex x="4.700000" y="1.825000" />
+		</vertices>
+		<places>
+			<place place_name="door" x="0.000000" y="0.000000" theta="0.000000" />
+			<place place_name="sofa" x="0.000000" y="0.000000" theta="0.000000" />
+		</places>
+	</room>
+</rooms>
