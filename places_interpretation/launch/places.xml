@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<rooms>
+	<room>
+		<name>Bedroom1</name>
+		<x_ref>0</x_ref>
+		<y_ref>0</y_ref>
+		<theta_ref>0</theta_ref>
+		<places>
+			<place place_name="door" x="3" y="1" theta="180" />
+			<place place_name="desk" x="0" y="1" theta="90" />
+		</places>
+	</room>
+	<room>
+		<name>Bedroom2</name>
+		<x_ref>0</x_ref>
+		<y_ref>4</y_ref>
+		<theta_ref>0</theta_ref>
+		<places>
+			<place place_name="door" x="3" y="5" theta="180" />
+			<place place_name="desk" x="0" y="5" theta="90" />
+		</places>
+	</room>
+</rooms>

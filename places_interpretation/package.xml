@@ -1,0 +1,17 @@
+<package>
+
+  <name>places_interpretation</name>
+  <version> 0.0.0</version>
+  <description> places_interpretation</description>
+  <maintainer email="someone@todo.todo">someone</maintainer>
+  <license>BSD</license>
+  <url>http://ros.org/wiki/places_interpretation</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>pugixml</build_depend>
+  <build_depend>hobbit_msgs</build_depend>
+
+</package>
+
+
