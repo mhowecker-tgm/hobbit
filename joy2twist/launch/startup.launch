@@ -1,0 +1,18 @@
+<launch>
+    <node   name="joy"
+            pkg="joy"
+            type="joy_node"
+            respawn="false"
+            output="screen">
+    </node>
+    <node   pkg="joy2twist"
+            type="joy2twist"
+            name="joy2twist"
+            output="screen">
+    </node>
+    <node   pkg="joy2twist"
+            type="joybutton.py" 
+            name="joybutton" 
+            output="screen">
+    </node>
+</launch>
