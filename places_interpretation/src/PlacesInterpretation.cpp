@@ -7,11 +7,17 @@
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 int main(int argc, char **argv)
 {
+
+  if (argc != 2)
+  {
+    printf("\nusage: %s name_of_the_xml_file\n\n", argv[0]);
+    return 0;
+  }
    
-  ros::init(argc, argv, "PlacesInterpretation");
+  ros::init(argc, argv, "places_interpretation");
   ros::NodeHandle n;
 
-  std::cout<<"Starting PlacesInterpretation..."<< std::endl;
+  std::cout<<"Starting places_interpretation..."<< std::endl;
   
   PlacesInterpretation::cPlacesInterpretation myPlacesInterpretation(argc, argv);
   myPlacesInterpretation.open(n);

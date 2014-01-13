@@ -132,7 +132,7 @@ void stopRequestCallback(const std_msgs::String::ConstPtr& msg)
 
 int main(int argc, char** argv)
 {
-	ros::init(argc, argv, "Sending goal");
+	ros::init(argc, argv, "sending_goals");
 	
 	ros::NodeHandle n;
 	

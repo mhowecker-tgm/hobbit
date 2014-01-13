@@ -286,7 +286,7 @@ bool cPlacesInterpretation::getRooms(hobbit_msgs::GetRooms::Request  &req, hobbi
 	res.rooms = known_rooms;
 
 	ROS_INFO("sending back rooms response");
-	ROS_INFO("number of rooms: [%d]", res.rooms.rooms_vector.size());
+//	ROS_INFO("number of rooms: [%d]", res.rooms.rooms_vector.size());
 
 
 	return true;
