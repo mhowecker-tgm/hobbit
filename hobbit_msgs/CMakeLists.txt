@@ -56,7 +56,7 @@ add_action_files(
   LocateUser.action
 )
 
-generate_messages(DEPENDENCIES std_msgs sensor_msgs actionlib)
+generate_messages(DEPENDENCIES std_msgs sensor_msgs actionlib geometry_msgs)
 
 catkin_package(
 

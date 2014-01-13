@@ -13,4 +13,5 @@ string place_name
 std_msgs/String place_type
 
 # array of possible objects
-hobbit_msgs/Object[] objects
+#hobbit_msgs/Object[] objects
+Object[] objects
