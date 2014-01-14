@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+
+<MCU>
+
+<!-- Thread for receiving data from the MCU -->
+  <ReaderThread type="object" interface="System" implementation="Thread" id="16"/>
+
+<!-- Parameters for the configuration of the serial port -->
+  <McuPort type="object" interface="CommunicationPort" implementation="Rs232Port" id="17">
+    <PortName>/dev/ttyUSB0</PortName>
+    <BaudRate>115200</BaudRate>
+    <DataBits>8</DataBits>
+    <HalfStopBits>2</HalfStopBits>
+    <bUseParity>false</bUseParity>
+    <bOddParity>false</bOddParity>
+    <ConnectDefaultTimeout>500</ConnectDefaultTimeout>
+    <ReadDefaultTimeout>500</ReadDefaultTimeout>
+    <WriteDefaultTimeout>500</WriteDefaultTimeout>
+  </McuPort>
+
+<!-- Thread for receiving data from the MCU -->
+  <WriterThread type="object" interface="System" implementation="Thread" id="18"/>
+
+<!-- Mutex for protecting the write buffer -->
+  <WriterMutex type="object" interface="System" implementation="Mutex" id="19" />
+
+</MCU>
+
