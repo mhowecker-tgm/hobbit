@@ -1,0 +1,8 @@
+# Engine id
+string id
+
+# Attribute name to get
+string name
+---
+# Attribute value (0.0 if failed)
+float64 attribute

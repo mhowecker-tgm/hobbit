@@ -1,0 +1,17 @@
+def DeviceRange {0, 1}
+def ButlerRange 2
+def CompanionRange {3, 4}
+
+stereotype Device : params.ROBOT.SocialRole in DeviceRange
+stereotype Butler : params.ROBOT.SocialRole = ButlerRange
+stereotype Companion : params.ROBOT.SocialRole in CompanionRange
+
+component TextId [
+	if Device then
+		activate params.ROBOT.CurrentText + "_Dev_" + random(3)
+	else if Butler then
+		activate params.ROBOT.CurrentText + "_But_" + random(3)
+	else [
+		activate params.ROBOT.CurrentText + "_Comp_" + random(3)
+	]
+]

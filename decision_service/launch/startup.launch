@@ -1,0 +1,8 @@
+<launch>
+
+
+<node pkg="decision_service" type="decision_service" name="DecisionService" output="screen" args="$(find decision_service)/bin/conf.ini $(find decision_service)/rules/profile.txt" cwd="node"></node>
+
+
+</launch>
+

@@ -1,0 +1,21 @@
+stereotype Man : params.user.male = true
+stereotype Caps : params.response.capslock = true
+
+component WhatAmI [
+	if Man then [
+		if Caps then [
+			activate "YOU ARE A MAN"
+		]
+		else [
+			activate "you are a man"
+		]
+	]
+	else [
+		if Caps then [
+			activate "YOU ARE A WOMAN"
+		]
+		else [
+			activate "you are a woman"
+		]
+	]
+]

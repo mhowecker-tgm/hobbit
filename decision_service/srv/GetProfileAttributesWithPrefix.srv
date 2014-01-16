@@ -1,0 +1,11 @@
+# Engine id
+string id
+
+# Prefix of parameter to retrieve
+string prefix
+
+# Return also type for each attribute? (1 == true, 0 == false)
+int32 type
+---
+# all name-(type)-value pairs whose name begins with prefix
+string[] names_values

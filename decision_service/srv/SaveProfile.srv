@@ -1,0 +1,8 @@
+# Engine id
+string id
+
+# Path to file in the file system that DecisionService runs
+string file
+---
+# Success == 1, Failure == 0
+int32 success

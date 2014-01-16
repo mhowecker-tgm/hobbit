@@ -1,0 +1,12 @@
+stereotype Blind : params.user.vision = false
+stereotype Deaf : params.user.hearing = false
+
+component ErrorReporting [
+	if Blind then
+		activate "sound error reporting"
+	else if Deaf then
+		activate "visual error reporting"
+	else [
+		activate "no error reporting"
+	]
+]

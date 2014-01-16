@@ -1,0 +1,11 @@
+# Engine id
+string id
+
+# Attribute name to set
+string attribute
+
+# Attribute value to set (1 == true, 2 == false)
+int32 value
+---
+# Success == 1, Failure == 0
+int32 success

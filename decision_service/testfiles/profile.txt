@@ -1,0 +1,4 @@
+#example 1
+user.vision = false
+user.hearing = true
+user.name = "Peter"

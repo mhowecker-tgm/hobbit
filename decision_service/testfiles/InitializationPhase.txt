@@ -1,0 +1,506 @@
+// ==========
+// Rules
+// ==========
+
+// ------------------------------------------------------------------------------------------------------------------------
+
+component Reaction
+[
+
+	//HOBBIT starts the initialisation phase in a sleeping mode (with a sleeping emoticon on the top screen, 
+	//HOBBIT’s head tilted down and a black touchscreen) waiting for the user to interact with HOBBIT. 
+	if params.ROBOT.State = "Sleeping" then	evaluate WakeUp
+
+	// --------------------------------
+	// HOBBIT's Initialization actions
+	// --------------------------------
+	if params.USER.HasConfiguredHobbit = false then
+	[
+		if 		params.ROBOT.State = "JustWokeUp"							then		evaluate JustWokeUp
+		else if params.ROBOT.State = "Hello"								then		evaluate Hello
+		else if params.ROBOT.State = "ConfigureVolumeUp"					then		evaluate ConfigureVolumeUp
+		else if params.ROBOT.State = "ConfigureVolumeDown"	 				then		evaluate ConfigureVolumeDown
+		else if params.ROBOT.State = "ConfigureVoiceType"					then		evaluate ConfigureVoiceType
+		else if params.ROBOT.State = "ConfigureVoiceSpeedDown"				then		evaluate ConfigureVoiceSpeedDown
+		else if params.ROBOT.State = "ConfigureVoiceSpeedUp"				then		evaluate ConfigureVoiceSpeedUp
+		else if params.ROBOT.State = "ConfigureHobbitName"					then		evaluate ConfigureHobbitName
+		else if params.ROBOT.State = "WaitForHobbitName"					then		evaluate RenameHobbit
+		else if params.ROBOT.State = "ConfigureMasterName"					then		evaluate ConfigureMasterName
+		else if params.ROBOT.State = "WaitForMasterName"					then		evaluate RenameMaster
+	]
+	//else do other actions, since initialization finished
+]
+
+// ------------------------------------------------------------------------------------------------------------------------
+
+component WakeUp
+[
+//MMUI COMMANDS FOR THESE??
+//Showing a neutral, a little tired or a very tired emoticon (depending on the battery level) on the top screen.
+//Tilting its head to a horizontal position.
+//Making a small rotating body movement back and forth (to show it can move and to try to detect the person and have the person in the centre of HOBBIT’s field of view). 
+//When successful or after a timeout HOBBIT continues: If successful, HOBBIT also shows a happy emoticon on its top screen for 4s.
+
+	activate	"Profiles,ROBOT.State=JustWokeUp"
+]
+
+// ------------------------------------------------------------------------------------------------------------------------
+
+component JustWokeUp
+[
+	//If the Speech volume setting has not been set, HOBBIT:
+	if params.ROBOT.VolumeSet = false then
+	[
+		//Says: "Hello, can you hear me?" (volume 5, female voice, speed of speech 3)
+		//Writes: "Hello, can you hear me?" on the touchscreen and shows Yes/No buttons.
+		activate	"MMUI,Type=D_YESNO,Text=T_CANYOUHEAR" + "--" +
+					"Profiles,ROBOT.State=Hello"
+	] else
+	[
+		//Volume has been configured, move to voice type setup.
+		activate	"Profiles,ROBOT.State=ConfigureVoiceType"
+	]
+]
+
+component Hello
+[
+	//HOBBIT waits for a response for 1-5s 
+	if params.ROBOT.UserResponse = "D_TIMEOUT" then
+	[
+		//If no response, HOBBIT increases the volume setting one step and repeats 
+		//the question until the user responds or max volume has been set. If still no 
+		//response at max volume, the volume is set to 0. The volume setting dialogue is done. 
+		if params.USER.Voice.Volume < 9 then
+		[
+			activate	"MMUI,Type=F_LOUDER" + "--" +
+						"MMUI,Type=D_YESNO,Text=T_CANYOUHEAR"
+		] else
+		[
+			activate	"MMUI,Type=ABSVOLUME,Value=0" + "--" +
+						"Profiles,ROBOT.VolumeSet=true" + "--" +
+						"Profiles,ROBOT.State=ConfigureVoiceType"
+		]
+	] else 
+	[//If the user is responding "No", "Yes" or "Hello", the volume configuration comes up next.
+		activate	"Profiles,ROBOT.State=ConfigureVolumeUp"
+	]
+
+]
+
+
+// ======================================================================
+//
+// ##     ##  #######  ####  ######  ########    ##     ##  #######  ##       ##     ## ##     ## ######## 
+// ##     ## ##     ##  ##  ##    ## ##          ##     ## ##     ## ##       ##     ## ###   ### ##       
+// ##     ## ##     ##  ##  ##       ##          ##     ## ##     ## ##       ##     ## #### #### ##       
+// ##     ## ##     ##  ##  ##       ######      ##     ## ##     ## ##       ##     ## ## ### ## ######   
+//  ##   ##  ##     ##  ##  ##       ##           ##   ##  ##     ## ##       ##     ## ##     ## ##       
+//   ## ##   ##     ##  ##  ##    ## ##            ## ##   ##     ## ##       ##     ## ##     ## ##       
+//    ###     #######  ####  ######  ########       ###     #######  ########  #######  ##     ## ######## 
+//
+// ======================================================================
+
+component ConfigureVolumeUp
+[
+	if params.ROBOT.VolumeSet = false then
+	[
+		if params.USER.Voice.Volume = 9 then
+		[
+			//Max volume has been set. The volume setting dialogue is done.
+			activate	"Profiles,ROBOT.VolumeSet=true"
+		] else if params.ROBOT.VolumeUpIntro = false then
+		[
+			//HOBBIT:
+			//Says: "Do you want me to speak louder?"
+			//Writes: "Do you want me to speak louder?" on the touchscreen and shows Yes/No buttons.
+			activate	"MMUI,Type=D_YESNO,Text=T_LOUDER" + "--" +
+						"Profiles,ROBOT.VolumeUpIntro=true"
+		]
+		//HOBBIT waits for a response for 1-5s (according to the settings).
+		//If the user is responding "Yes", HOBBIT increases the volume setting one step and repeats 
+		//the question until the user responds "No" or max volume has been set. The volume setting 
+		//dialogue is done.
+		else if params.ROBOT.UserResponse = "D_NO" then
+		[
+			//If the user is responding "No", HOBBIT will ask for quieter voice
+			activate	"Profiles,ROBOT.State=ConfigureVolumeDown"
+		] else if params.ROBOT.UserResponse = "D_YES" or params.ROBOT.UserResponse = "D_TIMEOUT" then
+		[
+			activate	"MMUI,Type=F_LOUDER" + "--" +
+						"MMUI,Type=D_YESNO,Text=T_LOUDER"
+		] else
+		[
+			//fallback
+			activate	"MMUI,Type=ERROR,Text=Expected D_YES|D_NO|D_TIMEOUT" + "--" +
+						"Profiles,ROBOT.State=ConfigureVoiceType"
+		]
+	] else
+	[
+		activate	"Profiles,ROBOT.State=ConfigureVoiceType"
+	]
+]
+
+// ------------------------------------------------------------------------------------------------------------------------
+
+component ConfigureVolumeDown
+[
+	if params.ROBOT.VolumeSet = false then
+	[
+		//HOBBIT:
+		//Says: "Do you want me to speak quieter?"
+		//Writes: "Do you want me to speak quieter?" on the touchscreen and shows Yes/No buttons.
+		if params.ROBOT.VolumeDownIntro = false then
+		[
+			activate	"MMUI,Type=D_YESNO,Text=T_QUIETER" + "--" +
+						"Profiles,ROBOT.VolumeDownIntro=true"
+		]
+		//HOBBIT waits for a response for 1-5s (according to the settings).
+		//If the user is responding "Yes", HOBBIT decreases the volume setting one step and repeats the question until the user responds "No" or min volume has been set. The volume setting dialogue is done.
+		//If the user is responding "No", the volume setting dialogue is done.
+		else if params.ROBOT.UserResponse = "D_NO" or params.ROBOT.UserResponse = "D_TIMEOUT" or params.USER.Voice.Volume < 1 then
+		[
+			activate	"MMUI,Type=D_PLAIN,Mood=Happy,Timeout=4" + "--" + // <-- HOBBIT shows a happy emoticon on its top screen for 4s. 
+						"MMUI,Type=D_OK,Text=T_CHANGEINFO" + "--" + // <-- HOBBIT says and writes on the touchscreen: "If you want to change the volume..." 
+						"Profiles,ROBOT.VolumeSet=true"
+		] else if params.ROBOT.UserResponse = "D_YES" then
+		[
+			activate	"MMUI,Type=F_QUIETER" + "--" +
+						"MMUI,Type=D_YESNO,Text=T_QUIETER"
+		] else
+		[
+			//fallback
+			activate	"MMUI,Type=ERROR,Text=Expected D_YES|D_NO|D_TIMEOUT" + "--" +
+						"Profiles,ROBOT.State=ConfigureVoiceType"
+		]
+	] else
+	[
+		activate	"Profiles,ROBOT.State=ConfigureVoiceType"
+	]
+]
+
+// ======================================================================
+//
+// ##     ##  #######  ####  ######  ########    ######## ##    ## ########  ######## 
+// ##     ## ##     ##  ##  ##    ## ##             ##     ##  ##  ##     ## ##       
+// ##     ## ##     ##  ##  ##       ##             ##      ####   ##     ## ##       
+// ##     ## ##     ##  ##  ##       ######         ##       ##    ########  ######   
+//  ##   ##  ##     ##  ##  ##       ##             ##       ##    ##        ##       
+//   ## ##   ##     ##  ##  ##    ## ##             ##       ##    ##        ##       
+//    ###     #######  ####  ######  ########       ##       ##    ##        ######## 
+//
+// ======================================================================
+
+component ConfigureVoiceType
+[
+	if params.ROBOT.VoiceTypeSet = false then
+	[
+		if params.ROBOT.VoiceTypeIntro = false then
+		[
+			//HOBBIT:
+			//Changes the setting from a female voice to a male voice.
+			//Says: "Do you rather want me to speak with a male voice?" 
+			//Writes: "Do you rather want me to speak with a male voice?" on the touchscreen and shows Yes/No buttons.
+			activate	"MMUI,Type=VOICE,Gender=MALE" + "--" +
+						"MMUI,Type=D_YESNO,Text=T_SPEAKMALE" + "--" +
+						"Profiles,ROBOT.VoiceTypeIntro=true"
+		]
+		//HOBBIT waits for a response for 1-5s (according to the settings).
+		else if params.ROBOT.UserResponse = "D_YES" or params.ROBOT.UserResponse = "D_TIMEOUT" then
+		[
+			//If the user is responding "Yes", the Male/female voice setting dialogue is done.
+			activate	"MMUI,Type=D_PLAIN,Mood=Happy,Timeout=4" + "--" + // <-- HOBBIT shows a happy emoticon on its top screen for 4s. 
+						"MMUI,Type=D_OK,Text=T_WILLUSETHISVOICE" + "--" + // <-- HOBBIT says and writes on the touchscreen: "OK, then I will use this voice".
+						"Profiles,ROBOT.VoiceTypeSet=true"
+		] else if params.ROBOT.UserResponse = "D_NO" then
+		[
+			//If the user is responding "No", HOBBIT changes the setting back to a female voice. The Male/female voice setting dialogue is done.
+			activate	"MMUI,Type=D_PLAIN,Mood=Happy,Timeout=4" + "--" + // <-- HOBBIT shows a happy emoticon on its top screen for 4s. 
+						"MMUI,Type=VOICE,Gender=FEMALE" + "--" +
+						"MMUI,Type=D_OK,Text=T_WILLUSETHISVOICE" + "--" + // <-- HOBBIT says and writes on the touchscreen: "OK, then I will use this voice".
+						"Profiles,ROBOT.VoiceTypeSet=true"
+		] else
+		[
+			//fallback
+			activate	"MMUI,Type=ERROR,Text=Expected D_YES|D_NO|D_TIMEOUT" + "--" +
+						"Profiles,ROBOT.State=ConfigureVoiceSpeedDown"
+		]
+	] else
+	[
+		activate	"Profiles,ROBOT.State=ConfigureVoiceSpeedDown"
+	]
+]
+
+// ======================================================================
+//
+// ##     ##  #######  ####  ######  ########     ######  ########  ######## ######## ########  
+// ##     ## ##     ##  ##  ##    ## ##          ##    ## ##     ## ##       ##       ##     ## 
+// ##     ## ##     ##  ##  ##       ##          ##       ##     ## ##       ##       ##     ## 
+// ##     ## ##     ##  ##  ##       ######       ######  ########  ######   ######   ##     ## 
+//  ##   ##  ##     ##  ##  ##       ##                ## ##        ##       ##       ##     ## 
+//   ## ##   ##     ##  ##  ##    ## ##          ##    ## ##        ##       ##       ##     ## 
+//    ###     #######  ####  ######  ########     ######  ##        ######## ######## ########  
+//
+// ======================================================================
+
+component ConfigureVoiceSpeedDown
+[
+	if params.ROBOT.VoiceSpeedSet = false then
+	[
+		if params.USER.Voice.Speed < 2 then
+		[
+			//Min speed has been set. Speed of speech dialogue ends.
+			activate	"MMUI,Type=D_PLAIN,Mood=Happy,Timeout=4" + "--" + // <-- HOBBIT shows a happy emoticon on its top screen for 4s. 
+						"MMUI,Type=D_OK,Text=T_WILLUSETHISSPEED" + "--" + // <-- HOBBIT says and writes on the touchscreen: "OK, then I will use this speed of speech".
+						"Profiles,ROBOT.VoiceSpeedSet=true"
+		] else if params.ROBOT.VoiceSpeedDownIntro = false then
+		[
+			//HOBBIT:
+			//Says: "Do you want me to speak slower?"
+			//Writes: "Do you want me to speak slower?" on the touchscreen and shows Yes/No buttons.
+			activate	"MMUI,Type=D_YESNO,Text=T_SLOWER" + "--" +
+						"Profiles,ROBOT.VoiceSpeedDownIntro=true"
+		]
+		//HOBBIT waits for a response for 1-5s (according to the settings).
+		else if params.ROBOT.UserResponse = "D_NO" then
+		[
+			activate	"Profiles,ROBOT.State=ConfigureVoiceSpeedUp"
+		] else if params.ROBOT.UserResponse = "D_YES" or params.ROBOT.UserResponse = "D_TIMEOUT" then
+		[
+			//If the user is responding "Yes", HOBBIT decreases the speed of speech setting one step and 
+			//repeats the question until the user responds “No” or min speed has been set. The speed of 
+			//speech setting dialogue is done.
+			activate	"MMUI,Type=F_SLOWER" + "--" +
+						"MMUI,Type=D_YESNO,Text=T_SLOWER"
+		] else
+		[
+			//fallback
+			activate	"MMUI,Type=ERROR,Text=Expected D_YES|D_NO|D_TIMEOUT" + "--" +
+						"Profiles,ROBOT.State=ConfigureHobbitName"
+		]
+	] else
+	[
+		activate	"Profiles,ROBOT.State=ConfigureHobbitName"
+	]
+]
+
+// ------------------------------------------------------------------------------------------------------------------------
+
+component ConfigureVoiceSpeedUp
+[
+	if params.ROBOT.VoiceSpeedSet = false then
+	[
+		if params.ROBOT.VoiceSpeedUpIntro = false then
+		[
+			//HOBBIT:
+			//Says: “Do you want me to speak faster?”
+			//Writes: “Do you want me to speak faster?” on the touchscreen and shows Yes/No buttons.
+			activate	"MMUI,Type=D_YESNO,Text=T_FASTER" + "--" +
+						"Profiles,ROBOT.VoiceSpeedUpIntro=true"
+		]
+		//HOBBIT waits for a response for 1-5s (according to the settings).
+		else if params.ROBOT.UserResponse = "D_NO" or params.ROBOT.UserResponse = "D_TIMEOUT" or params.USER.Voice.Speed > 4 then
+		[
+			//Max speech speed set, timeout, or user said no. The speed of speech setting dialogue is done.
+			activate	"MMUI,Type=D_PLAIN,Mood=Happy,Timeout=4" + "--" + // <-- HOBBIT shows a happy emoticon on its top screen for 4s. 
+						"MMUI,Type=D_OK,Text=T_WILLUSETHISSPEED" + "--" + // <-- HOBBIT says and writes on the touchscreen: “OK, then I will use this speed of speech”.
+						"Profiles,ROBOT.VoiceSpeedSet=true"
+		] else if params.ROBOT.UserResponse = "D_YES" then
+		[
+			//If the user is responding “Yes”, HOBBIT increases the speed of speech setting one step and repeats 
+			//the question until the user responds “No” or max speed has been set. The speed of speech setting dialogue is done.
+			activate	"MMUI,Type=F_FASTER" + "--" +
+						"MMUI,Type=D_YESNO,Text=T_FASTER"
+		] else
+		[
+			//fallback
+			activate	"MMUI,Type=ERROR,Text=Expected D_YES|D_NO|D_TIMEOUT" + "--" +
+						"Profiles,ROBOT.State=ConfigureHobbitName"
+		]
+	] else
+	[
+		activate	"Profiles,ROBOT.State=ConfigureHobbitName"
+	]
+]
+
+
+// ======================================================================
+//
+// ##     ##  #######  ########  ########  #### ########    ##    ##    ###    ##     ## ######## 
+// ##     ## ##     ## ##     ## ##     ##  ##     ##       ###   ##   ## ##   ###   ### ##       
+// ##     ## ##     ## ##     ## ##     ##  ##     ##       ####  ##  ##   ##  #### #### ##       
+// ######### ##     ## ########  ########   ##     ##       ## ## ## ##     ## ## ### ## ######   
+// ##     ## ##     ## ##     ## ##     ##  ##     ##       ##  #### ######### ##     ## ##       
+// ##     ## ##     ## ##     ## ##     ##  ##     ##       ##   ### ##     ## ##     ## ##       
+// ##     ##  #######  ########  ########  ####    ##       ##    ## ##     ## ##     ## ######## 
+//
+// ======================================================================
+
+component ConfigureHobbitName
+[
+	if params.ROBOT.HobbitNameSet = false then
+	[
+		if params.ROBOT.HobbitNameQuestionAsked = false then
+		[
+			if params.ROBOT.HobbitNameSetIntro = false then
+			[
+				//HOBBIT:
+				//Says: “You can give me a name if you want. You can use that name to call for me. Do you want to give me a name?”
+				//Writes: “You can give me a name if you want. You can use that name to call for me. Do you want to give me a name?” 
+				//on the touchscreen and shows Yes/No buttons.
+				activate	"MMUI,Type=D_YESNO,Text=T_GIVENAME" + "--" +
+							"Profiles,ROBOT.HobbitNameSetIntro=true"
+			]
+			//HOBBIT waits for a response for 1-5s (according to the settings).
+			else if params.ROBOT.UserResponse = "D_NO" or params.ROBOT.UserResponse = "D_TIMEOUT" then
+			[
+				//If the user is responding “No”, 
+				//HOBBIT says and writes on the touchscreen: “If you want to give me a name in the future, 
+				//you can ask me what my name is.”
+				activate	"MMUI,Type=D_OK,Text=T_NAMEINFOFUTURE" + "--" +
+							"Profiles,ROBOT.HobbitNameSet=true"
+			] else if params.ROBOT.UserResponse = "D_YES" then
+			[
+				activate	"Profiles,ROBOT.HobbitNameQuestionAsked=true"	
+			] else
+			[
+				//fallback
+				activate	"MMUI,Type=ERROR,Text=Expected D_YES|D_NO|D_TIMEOUT" + "--" +
+							"Profiles,ROBOT.State=ConfigureMasterName"
+			]
+		] else
+		[
+			//State for HOBBIT name input
+			activate	"Profiles,ROBOT.State=WaitForHobbitName"
+		]
+	] else
+	[
+		activate	"Profiles,ROBOT.State=ConfigureMasterName"
+	]
+]
+
+// ------------------------------------------------------------------------------------------------------------------------
+
+component RenameHobbit
+[
+	if params.ROBOT.HobbitRenamed = false then
+	[
+		if params.ROBOT.HobbitRenameIntro = false then
+		[
+			//HOBBIT says and writes on the touchscreen: “What do you want to call me?”
+			activate	"MMUI,Type=D_NAME,Text=T_HOBBITNAME" + "--" +
+						"Profiles,ROBOT.HobbitRenameIntro=true"
+		]
+		//HOBBIT waits for a response for 1-5s (according to the settings).
+		else if params.ROBOT.UserResponse = "D_NAME" then
+		[
+			//HOBBIT stores the <Name of HOBBIT> the user says
+			// ================ HOW CAN THIS BE IMPLEMENTED? ONLY SAMPLE BELOW ================
+			activate	"MMUI,Type=HOBBITNAME,Value=Name" + "--" +
+						"MMUI,Type=D_OK,Text=Now you can call for me by saying %s.,Value=Name" + "--" +
+						"MMUI,Type=D_PLAIN,Mood=Happy,Timeout=4" + "--" + // <-- HOBBIT shows a happy emoticon on its top screen for 4s. 
+						"MMUI,Type=D_OK,Text=T_NAMECHANGEFUTURE" + "--" + // <-- HOBBIT says and writes on the touchscreen: “If you want to change my name...”
+						"Profiles,ROBOT.HobbitRenamed=true"
+		] else if params.ROBOT.UserResponse = "D_CANCEL" or params.ROBOT.UserResponse = "D_TIMEOUT" then
+		[
+			activate	"Profiles,ROBOT.HobbitRenamed=true"
+		] else
+		[
+			activate	"MMUI,Type=ERROR,Text=Expected D_NAME|D_CANCEL|D_TIMEOUT" + "--" +
+						"Profiles,ROBOT.State=ConfigureMasterName"
+		]
+	] else
+	[
+		activate	"Profiles,ROBOT.State=ConfigureMasterName"
+	]
+]
+
+
+// ======================================================================
+//
+// ##    ##    ###    ##     ## ########     #######  ########    ########  ######## ########   ######   #######  ##    ## 
+// ###   ##   ## ##   ###   ### ##          ##     ## ##          ##     ## ##       ##     ## ##    ## ##     ## ###   ## 
+// ####  ##  ##   ##  #### #### ##          ##     ## ##          ##     ## ##       ##     ## ##       ##     ## ####  ## 
+// ## ## ## ##     ## ## ### ## ######      ##     ## ######      ########  ######   ########   ######  ##     ## ## ## ## 
+// ##  #### ######### ##     ## ##          ##     ## ##          ##        ##       ##   ##         ## ##     ## ##  #### 
+// ##   ### ##     ## ##     ## ##          ##     ## ##          ##        ##       ##    ##  ##    ## ##     ## ##   ### 
+// ##    ## ##     ## ##     ## ########     #######  ##          ##        ######## ##     ##  ######   #######  ##    ## 
+//
+// ======================================================================
+
+component ConfigureMasterName
+[
+	if params.ROBOT.MasterNameSet = false then
+	[
+		if params.ROBOT.MasterNameQuestionAsked = false then
+		[
+			if params.ROBOT.MasterNameSetIntro = false then
+			[
+				//HOBBIT:
+				//Says: “Do you want me to call you anything?”
+				//Writes: “Do you want me to call you anything?” on the touchscreen and shows Yes/No buttons.
+				activate	"MMUI,Type=D_YESNO,Text=T_CALLYOU" + "--" +
+							"Profiles,ROBOT.MasterNameSetIntro=true"
+			]
+			//HOBBIT waits for a response for 1-5s (according to the settings).
+			else if params.ROBOT.UserResponse = "D_NO" or params.ROBOT.UserResponse = "D_TIMEOUT" then
+			[
+				//If the user is responding “No”, 
+				//HOBBIT says and writes on the touchscreen: “OK. I will not call you anything.”
+				activate	"MMUI,Type=D_OK,Text=T_NOHOBBITNAME" + "--" +
+							"Profiles,ROBOT.MasterNameSet=true"
+			] else if params.ROBOT.UserResponse = "D_YES" then
+			[
+				activate	"Profiles,ROBOT.MasterNameQuestionAsked=true"	
+			] else
+			[
+				//fallback
+				activate	"MMUI,Type=ERROR,Text=Expected D_YES|D_NO|D_TIMEOUT" + "--" +
+							"Profiles,ROBOT.State=Idle"
+			]
+		] else
+		[
+			//State for Master name input
+			activate	"Profiles,ROBOT.State=WaitForMasterName"
+		]
+	] else
+	[
+		activate	"Profiles,ROBOT.State=Idle"
+	]
+]
+
+// ------------------------------------------------------------------------------------------------------------------------
+
+component RenameMaster
+[
+	if params.ROBOT.MasterRenamed = false then
+	[
+		if params.ROBOT.MasterRenameIntro = false then
+		[
+			//HOBBIT says and writes on the touchscreen: “What do you want me to call you?”
+			activate	"MMUI,Type=D_NAME,Text=T_USERNAME" + "--" +
+						"Profiles,ROBOT.MasterRenameIntro=true"
+		]
+		//HOBBIT waits for a response for 1-5s (according to the settings).
+		else if params.ROBOT.UserResponse = "D_NAME" then
+		[
+			//HOBBIT stores the <Name of Master> the user says
+			// ================ HOW CAN THIS BE IMPLEMENTED? ONLY SAMPLE BELOW ================
+			activate	"MMUI,Type=USERNAME,Value=Name" + "--" +
+						"MMUI,Type=D_OK,Text=OK.Hello%s!,Param=Name" + "--" +
+						"MMUI,Type=D_PLAIN,Mood=Happy,Timeout=4" + "--" + // <-- HOBBIT shows a happy emoticon on its top screen for 4s.
+						"Profiles,ROBOT.MasterRenamed=true"
+		] else if params.ROBOT.UserResponse = "D_CANCEL" or params.ROBOT.UserResponse = "D_TIMEOUT" then
+		[
+			activate	"Profiles,ROBOT.MasterRenamed=true"
+		] else
+		[
+			activate	"MMUI,Type=ERROR,Text=Expected D_NAME|D_CANCEL|D_TIMEOUT" + "--" +
+						"Profiles,ROBOT.State=Idle"
+		]
+	] else
+	[
+		//Initialization complete
+		activate	"Profiles,ROBOT.State=Idle"
+	]
+]
+

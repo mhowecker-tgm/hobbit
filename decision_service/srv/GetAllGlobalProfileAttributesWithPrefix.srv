@@ -1,0 +1,5 @@
+# Prefix of parameter to retrieve
+string prefix
+---
+# all name-value pairs whose name begins with prefix
+string[] names_values

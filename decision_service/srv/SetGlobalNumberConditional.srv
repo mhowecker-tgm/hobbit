@@ -1,0 +1,8 @@
+# Attribute name to set
+string attribute
+
+# Attribute value to set
+float64 value
+---
+# Success == 1, Failure == 0
+int32 success

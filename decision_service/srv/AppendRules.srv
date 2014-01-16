@@ -1,0 +1,8 @@
+# Engine id to append rules to
+string id
+
+# Path to rules file in the file system to append
+string file
+---
+# Success == 1, Failure == 0
+int32 success

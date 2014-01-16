@@ -1,0 +1,8 @@
+# Engine id
+string id
+
+# Component to evaluate
+string component
+---
+# Evaluation result (empty sting if error occured - call GetError)
+string evaluation

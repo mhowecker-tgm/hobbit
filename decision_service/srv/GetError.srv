@@ -1,0 +1,5 @@
+# Engine id
+string id
+---
+# Error string (empty string if no error)
+string error

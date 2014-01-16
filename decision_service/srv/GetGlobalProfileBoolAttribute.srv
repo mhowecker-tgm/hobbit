@@ -1,0 +1,5 @@
+# Attribute name to get
+string name
+---
+# Attribute value (1 == true, 0 == false)
+int32 attribute
