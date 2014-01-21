@@ -11,6 +11,11 @@ find_package(catkin REQUIRED COMPONENTS roscpp std_msgs sensor_msgs message_gene
 
 #uncomment if you have defined messages
 
+## Uncomment this if the package has a setup.py. This macro ensures
+## modules and global scripts declared therein get installed
+## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
+catkin_python_setup()
+
 add_message_files(
   DIRECTORY msg
   FILES
@@ -54,6 +59,7 @@ add_action_files(
   BringObject.action
   CallUser.action
   LocateUser.action
+  EndUserInteraction.action
 )
 
 generate_messages(DEPENDENCIES std_msgs sensor_msgs actionlib geometry_msgs)

@@ -124,7 +124,7 @@ class PlanPath(smach.State):
         self.shortest_path = 99999.99
 
     def execute(self, ud):
-    ### The next line of code is dangerous 
+    ### The next line of code is dangerous
     ### This will disable the obstacle detection
         self.shortest_path = 99999.99
         #self.pub_obstacle.publish('inactive')
@@ -145,7 +145,7 @@ class PlanPath(smach.State):
             if  position['room'] in ud.users_current_room.room_name:
                 print 'User is in %s . Let\'s start there.'%position['room']
                 position['penalty'] = 0
-            
+
             print position['room'], position['place_name']
             end_pose = PoseStamped()
             end_pose.header.frame_id = 'map'
@@ -153,7 +153,7 @@ class PlanPath(smach.State):
             end_pose.pose.orientation = Quaternion(*tf.transformations.quaternion_from_euler(0, 0, position['theta']))
             req = GetPlanRequest(ud.robot_current_pose, end_pose, 0.01)
             #print req
-            
+
             for visited in ud.visited_places:
                 if position['room'] == visited['room']:
                     if position['place_name'] == visited['place']:
