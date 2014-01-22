@@ -1,7 +1,7 @@
 <launch>
 
 <!-- Run the map server -->
-  <node name="map_server" pkg="map_server" type="map_server" args="$(find places_learning)/../navigation/hobbit_map_20131023_copy.yaml"/> 
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find places_learning)/../navigation/share/map.yaml"/> 
 
  <group if="true">
     <include file="$(find hobbit_launch)/launch/basecam_xpc2.launch"></include>
