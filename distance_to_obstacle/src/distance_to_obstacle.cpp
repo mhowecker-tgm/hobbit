@@ -17,17 +17,20 @@ Point2d origin;
 bool d2o(distance_to_obstacle::distance_to_obstacle::Request &req,
          distance_to_obstacle::distance_to_obstacle::Response &res)
 {
-    Point2d query;
-    query.x = req.p.x / resolution;
-    query.y = req.p.y / resolution;
+    Point2d query;    
+    query.x = req.p.x;
+    query.y = req.p.y;
+
     query -= origin;
 
-    cout << "Query point " << endl;
+    query.x /= resolution;
+    query.y /= resolution;
+
     Point2i query_px;
     query_px.x = (int)round(query.x);
-    query_px.y = (int)round(query.y);
+    query_px.y = distances.rows-(int)round(query.y);
 
-    res.d = distances.at<double>(query_px.y, query_px.x);
+    res.d = distances.at<float>(query_px.y, query_px.x);
     return true;
 }
 
@@ -139,7 +142,6 @@ int main(int argc, char **argv)
     }
 
     initializeDistances(map);
-
 
     ros::ServiceServer service = n.advertiseService("distance_to_obstacle", d2o);
 

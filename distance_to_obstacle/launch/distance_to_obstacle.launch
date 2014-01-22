@@ -1,0 +1,5 @@
+<launch>
+  <node name="distance_to_obstacle" pkg="distance_to_obstacle" type="distance_to_obstacle" output="screen">
+	<param name="pgmfile" type="str" value="$(find distance_to_obstacle)/../navigation/share/map.pgm" />	
+  </node>
+</launch>
