@@ -10,8 +10,14 @@
 using namespace cv;
 using namespace std;
 
+int width;
+int height;
 Mat distances;
+Mat occupancy;
+
 double resolution;
+double freeThresh;
+double occupiedThresh;
 Point2d origin;
 
 bool d2o(distance_to_obstacle::distance_to_obstacle::Request &req,
@@ -30,26 +36,39 @@ bool d2o(distance_to_obstacle::distance_to_obstacle::Request &req,
     query_px.x = (int)round(query.x);
     query_px.y = distances.rows-(int)round(query.y);
 
-    res.d = distances.at<float>(query_px.y, query_px.x);
+    // check if coordinate is outside of map
+    if(query_px.x < 0 || query_px.x >= width || query_px.y < 0 || query_px.y >= height)
+    {
+        res.d = -1;
+        ROS_INFO("Target point outside of map!");
+    }
+    else
+    {
+        res.d = distances.at<float>(query_px.y, query_px.x);
+        float occupancyValue = occupancy.at<float>(query_px.y, query_px.x);
+
+        if(occupancyValue > freeThresh && occupancyValue < occupiedThresh)
+        {
+            res.d *= -1.0;
+            ROS_INFO("Target point is in unexplored area.");
+        }
+    }
+
     return true;
 }
 
-void initializeDistances(Mat map)
+void initializeDistances(Mat mapimage)
 {
-    distanceTransform(map, distances, CV_DIST_L2, CV_DIST_MASK_PRECISE);
+    distanceTransform(mapimage, distances, CV_DIST_L2, CV_DIST_MASK_PRECISE);
 
     distances *= resolution;
 
-//    double m;
-//    minMaxLoc(distances, NULL, &m, NULL, NULL);
-//    cout << "MaxDistance = " << m << endl;
+    width = distances.cols;
+    height = distances.rows;
 
-//    namedWindow("Image", WINDOW_AUTOSIZE);
-//    namedWindow("Distances", WINDOW_AUTOSIZE);
-//    imshow("Image", map);
-//    imshow("Distances", distances/m);
-
-//    waitKey(0);
+    Mat tmp;
+    mapimage.convertTo(tmp, CV_32F);
+    occupancy = (255.0f - tmp) / 255.0;
 }
 
 bool loadYamlFile(string yamlfile)
@@ -65,15 +84,31 @@ bool loadYamlFile(string yamlfile)
     double x,y,z;
     bool res = false;
     bool ori = false;
+    bool othresh = false;
+    bool fthresh = false;
 
     while(ifs.good())
     {
-       ifs >> tmp;
+       if(!(ifs >> tmp))
+           break;
+
        if(tmp.compare("resolution:") == 0)
        {
            if(!(ifs >> setprecision(5) >> resolution))
                return false;
            res = true;
+       }
+       else if(tmp.compare("occupied_thresh:") == 0)
+       {
+           if(!(ifs >> setprecision(5) >> occupiedThresh))
+               return false;
+           othresh = true;
+       }
+       else if(tmp.compare("free_thresh:") == 0)
+       {
+           if(!(ifs >> setprecision(5) >> freeThresh))
+               return false;
+           fthresh = true;
        }
        else if(tmp.compare("origin:") == 0)
        {
@@ -98,13 +133,10 @@ bool loadYamlFile(string yamlfile)
            origin.y = y;
            ori = true;
        }
-
-       if(res && ori)
-           break;
     }
     ifs.close();
 
-    return (res && ori);
+    return (res && ori && othresh && fthresh);
 }
 
 int main(int argc, char **argv)
@@ -121,9 +153,9 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    Mat map = imread(pgmfile, CV_LOAD_IMAGE_GRAYSCALE);
+    Mat mapimage = imread(pgmfile, CV_LOAD_IMAGE_GRAYSCALE);
 
-    if(!map.data)
+    if(!mapimage.data)
     {
         string tmp = "Map file " + pgmfile + " could not be loaded!";
         ROS_ERROR(tmp.c_str());
@@ -141,7 +173,7 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    initializeDistances(map);
+    initializeDistances(mapimage);
 
     ros::ServiceServer service = n.advertiseService("distance_to_obstacle", d2o);
 
