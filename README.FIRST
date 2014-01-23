@@ -3,13 +3,16 @@ SETUP HOBBIT WORKSPACE FOR PT2
 - install ROS HYDRO on your Ubuntu 12.04 operating system (wiki.ros.org/hydro/Installation/Ubuntu)
 - install ros-hydro-qt-build:
   >> sudo apt-get install ros-hydro-qt-build
-- make a catkin workspace for hobbit PT2 (I have it at /opt/ros/):
-  >> mkdir -p ./hobbit_hydro_src
-  >> cd hobbit_hydro_src
-  >> catkin_init_workspace
-- checkout svn for Hobbit PT2:
+- checkout code and make a catkin workspace for hobbit PT2 (I have it at /opt/ros/):
+  >> cd /opt/ros/
+  >> mkdir ./hobbit_hydro
+  >> cd hobbit_hydro
+  (checkout svn for Hobbit PT2:)
   >> svn checkout https://repo.acin.tuwien.ac.at/v4r/trunk/ros/hobbit_hydro_src/ ./src
-- you can execute a catkin_make in the workspace folder (hobbit_hydro_src) to generate build and devel files:
+  >> cd src
+  >> catkin_init_workspace
+- you can execute a catkin_make in the workspace folder (hobbit_hydro) to generate build and devel files:
+  >> cd ..
   >> catkin_make
   these build and devel folders and files should never be checked in to svn!!
 
