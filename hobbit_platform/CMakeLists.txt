@@ -114,6 +114,7 @@ add_executable(hobbit_platform src/cCommunicationPort.cpp src/cException.cpp src
 ## Specify libraries to link a library or executable target against
 target_link_libraries(hobbit_platform
    ${catkin_LIBRARIES}
+   -lrt
  )
 
 #############

@@ -21,9 +21,9 @@ from hobbit_msgs.srv import Request, RequestRequest
 
 class MMUIInterface:
     def __init__(self):
-        self.cSub = rospy.Subscriber("/ActionSequence", Command, self.processCommand, queue_size=1)
+        #self.cSub = rospy.Subscriber("/ActionSequence", Command, self.processCommand, queue_size=1)
         #self.PubStatus = rospy.Publisher("/Status", Status)
-        self.stopSub = rospy.Subscriber("/Hobbit/Cancel", String, self.processStop, queue_size=1)
+        #self.stopSub = rospy.Subscriber("/Hobbit/Cancel", String, self.processStop, queue_size=1)
         self.dostop = False
 
 
