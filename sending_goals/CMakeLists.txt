@@ -15,6 +15,7 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 
 add_executable(sending_goals src/sendingGoals2.cpp)
 target_link_libraries(sending_goals ${catkin_LIBRARIES})
+add_dependencies(sending_goals ${catkin_EXPORTED_TARGETS})
 
 
 

@@ -108,13 +108,14 @@ add_executable(distance_to_obstacle src/distance_to_obstacle.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-# add_dependencies(distance_to_obstacle_node distance_to_obstacle_generate_messages_cpp)
+add_dependencies(distance_to_obstacle ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(distance_to_obstacle
   ${catkin_LIBRARIES}
   ${OpenCV_LIBS}
 )
+
 
 #############
 ## Install ##
