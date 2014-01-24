@@ -158,7 +158,7 @@ int main(int argc, char **argv)
     if(!mapimage.data)
     {
         string tmp = "Map file " + pgmfile + " could not be loaded!";
-        ROS_ERROR(tmp.c_str());
+        ROS_ERROR("%s", tmp.c_str());
         return 0;
     }
 
@@ -168,8 +168,8 @@ int main(int argc, char **argv)
 
     if(!loadYamlFile(yamlfile))
     {
-        string tmp = "Error reading map configuration file " + yamlfile;
-        ROS_ERROR(tmp.c_str());
+        string tmp = string("Error reading map configuration file ") + yamlfile;
+        ROS_ERROR("%s", tmp.c_str());
         return 0;
     }
 
