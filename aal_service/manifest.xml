@@ -1,0 +1,21 @@
+<package>
+  <description brief="aalservice">
+
+     aalservice
+
+  </description>
+  <author>testuser</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/aalservice</url>
+    <depend package="roslib"/>
+    <depend package="hobbit_msgs"/>
+    <depend package="decision_service"/>
+
+    <depend package="std_msgs"/>
+    <depend package="roscpp"/>
+
+
+</package>
+
+
