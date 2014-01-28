@@ -1,0 +1,7 @@
+<launch>
+
+<node pkg="sos_button" type="SosSerial.py" name="SosButton" output="screen" args=
+""></node>
+
+</launch>
+
