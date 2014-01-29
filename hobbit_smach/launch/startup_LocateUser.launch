@@ -1,0 +1,3 @@
+<launch>
+<node name="LocateUser" pkg="HobbitSmach" type="LocateUser.py" />
+</launch>
