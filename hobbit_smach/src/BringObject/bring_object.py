@@ -209,7 +209,7 @@ class MoveBase(smach.State):
             ud.visited_places.append(ud.robot_end_pose)
         return 'succeeded'
 
-class DummyObjectRecognition(smach.State):
+class DummyGrasp(smach.State):
     def __init__(self):
         smach.State.__init__(self, outcomes=['succeeded', 'failure', 'preempted'])
 
@@ -309,14 +309,11 @@ def main():
         smach.StateMachine.add('GET_POINT_CLOUD',
                                util.WaitForMsgState('/headcam/depth_registered/points', PointCloud2, point_cloud_cb, timeout=5, output_keys=['cloud']),
                                transitions={'succeeded':'START_OBJECT_RECOGNITION', 'aborted':'GET_POINT_CLOUD', 'preempted':'CLEAN_UP'})
-        #smach.StateMachine.add('START_OBJECT_RECOGNITION', DummyObjectRecognition(), transitions={'succeeded':'SET_SUCCESS', 'failure':'PLAN_PATH', 'preempted':'CLEAN_UP'})
         smach.StateMachine.add('START_OBJECT_RECOGNITION',
                                ServiceState('mp_recognition', recognize, request_slots=['cloud'], response_slots=['ids', 'transforms']),
                                transitions={'succeeded':'OBJECT_DETECTED', 'preempted':'CLEAN_UP'})
         smach.StateMachine.add('OBJECT_DETECTED', ObjectDetected(), transitions={'succeeded':'GRASP_OBJECT', 'failure':'MOVE_HEAD', 'preempted':'CLEAN_UP'})
-        smach.StateMachine.add('GRASP_OBJECT', DummyObjectRecognition(), transitions={'succeeded':'SET_SUCCESS', 'failure':'CLEAN_UP', 'preempted':'CLEAN_UP'})
-        #smach.StateMachine.add('LOCATE_USER', ServiceState('locate_user', LocateUser, response_key='result'), transitions={'succeeded':'USER_INTERACTION'})
-        #smach.StateMachine.add('USER_INTERACTION')
+        smach.StateMachine.add('GRASP_OBJECT', DummyGrasp(), transitions={'succeeded':'SET_SUCCESS', 'failure':'CLEAN_UP', 'preempted':'CLEAN_UP'})
         smach.StateMachine.add('SET_SUCCESS', SetSuccess(), transitions={'succeeded':'succeeded', 'preempted':'CLEAN_UP'})
         smach.StateMachine.add('CLEAN_UP', CleanUp(), transitions={'succeeded':'preempted'})
 
