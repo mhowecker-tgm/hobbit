@@ -15,6 +15,7 @@ from hobbit_msgs.msg import Command, Status
 from std_msgs.msg import String, Header
 #from hobbit_msgs.msg import Command, Status, Event, Parameter
 from hobbit_msgs.srv import Request, RequestRequest
+from hobbit_msgs.msg import Parameter
 
 
 

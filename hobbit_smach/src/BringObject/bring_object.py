@@ -1,11 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-PKG = 'hobbit_msgs'
+PKG = 'hobbit_smach'
 PROJECT = 'Hobbit'
 NAME = 'BringObject'
 
-import roslib; roslib.load_manifest(PKG)
+import roslib
+roslib.load_manifest(PKG)
 import rospy
 import smach
 import smach_ros
@@ -15,11 +16,11 @@ import math
 
 from std_msgs.msg import String
 from hobbit_msgs.msg import BringObjectAction
-from hobbit_msgs.srv import *
-from hobbit_msgs.msg import *
-from hobbit_msgs.srv import *
+from hobbit_msgs.srv import GetObjectLocations, GetCoordinates, GetCoordinatesRequest, GetName
 from smach_ros import ActionServerWrapper, SimpleActionState, ServiceState
-from actionlib import SimpleActionServer
+from sensor_msgs.msg import PointCloud2
+from recognizer_msg_and_services.srv import recognize
+#from actionlib import SimpleActionServer
 from move_base_msgs.msg import MoveBaseAction
 from nav_msgs.srv import GetPlan, GetPlanRequest
 from geometry_msgs.msg import Pose2D, PoseStamped, Point, Quaternion, Vector3Stamped, PoseWithCovarianceStamped, Pose
@@ -214,7 +215,39 @@ class DummyObjectRecognition(smach.State):
 
     def execute(self, ud):
         rospy.loginfo('Start DUMMY object recognition')
-        #return 'failure'
+        return 'succeeded'
+
+
+class MoveHead(smach.State):
+    def __init__(self):
+        smach.State.__init__(self, outcomes=['succeeded', 'preempted'])
+        self.run_counter = 0
+
+    def execute(self, ud):
+        rospy.loginfo('Moving Head')
+        return 'succeeded'
+
+
+class ObjectDetected(smach.State):
+    def __init__(self):
+        smach.State.__init__(self, outcomes=['succeeded', 'failure', 'preempted'],
+                             input_keys = ['ids', 'transforms'])
+
+    def execute(self, ud):
+        rospy.loginfo('Did we find the object?')
+        print(ud.ids)
+        if not ud.ids:
+            return 'failure'
+        return 'succeeded'
+
+
+class ObjectRecognition(smach.State):
+    def __init__(self):
+        smach.State.__init__(self, outcomes=['succeeded', 'failure', 'preempted'])
+        self.cloud_sub = rospy.Subscriber('')
+
+    def execute(self, ud):
+        rospy.loginfo('Start object recognition')
         return 'succeeded'
 
 
@@ -242,11 +275,19 @@ def get_robot_pose_cb(msg, ud):
         print bcolors.FAIL + 'no robot pose message received.'+ bcolors.ENDC
         return False
 
+
+def point_cloud_cb(msg, ud):
+    print 'point_cloud_cb'
+    print(type(msg))
+    ud.cloud= msg
+    return True
+
+
 def main():
     rospy.init_node(NAME)
 
     bo_sm = smach.StateMachine(
-        outcomes=['succeeded','aborted','preempted'],
+        outcomes=['succeeded', 'aborted', 'preempted'],
         input_keys = ['object_name'],
         output_keys = ['result'])
 
@@ -263,9 +304,17 @@ def main():
         smach.StateMachine.add('PLAN_PATH', PlanPath(), transitions={'success':'MOVE_BASE_GO', 'preempted':'CLEAN_UP', 'failure':'CLEAN_UP'})
         smach.StateMachine.add('MOVE_BASE_GO', MoveBase(), transitions={'succeeded':'LOCATION_REACHED', 'preempted':'CLEAN_UP', 'failure':'CLEAN_UP'})
         smach.StateMachine.add('LOCATION_REACHED',
-                util.WaitForMsgState('/goal_status', String, goal_reached_cb, timeout=10), transitions={'aborted':'LOCATION_REACHED', 'succeeded':'START_OBJECT_RECOGNITION', 'preempted':'CLEAN_UP'})
-        smach.StateMachine.add('START_OBJECT_RECOGNITION', DummyObjectRecognition(), transitions={'succeeded':'SET_SUCCESS', 'failure':'PLAN_PATH', 'preempted':'CLEAN_UP'})
-        #smach.StateMachine.add('GRASP_OBJECT', DummyObjectRecognition(), transitions={'succeeded':'LOCATE_USER', 'failure':'LOCATE_USER', 'preempted':'CLEAN_UP'})
+                util.WaitForMsgState('/goal_status', String, goal_reached_cb, timeout=10), transitions={'aborted':'LOCATION_REACHED', 'succeeded':'MOVE_HEAD', 'preempted':'CLEAN_UP'})
+        smach.StateMachine.add('MOVE_HEAD', MoveHead(), transitions={'succeeded':'GET_POINT_CLOUD', 'preempted':'CLEAN_UP'})
+        smach.StateMachine.add('GET_POINT_CLOUD',
+                               util.WaitForMsgState('/headcam/depth_registered/points', PointCloud2, point_cloud_cb, timeout=5, output_keys=['cloud']),
+                               transitions={'succeeded':'START_OBJECT_RECOGNITION', 'aborted':'GET_POINT_CLOUD', 'preempted':'CLEAN_UP'})
+        #smach.StateMachine.add('START_OBJECT_RECOGNITION', DummyObjectRecognition(), transitions={'succeeded':'SET_SUCCESS', 'failure':'PLAN_PATH', 'preempted':'CLEAN_UP'})
+        smach.StateMachine.add('START_OBJECT_RECOGNITION',
+                               ServiceState('mp_recognition', recognize, request_slots=['cloud'], response_slots=['ids', 'transforms']),
+                               transitions={'succeeded':'OBJECT_DETECTED', 'preempted':'CLEAN_UP'})
+        smach.StateMachine.add('OBJECT_DETECTED', ObjectDetected(), transitions={'succeeded':'GRASP_OBJECT', 'failure':'MOVE_HEAD', 'preempted':'CLEAN_UP'})
+        smach.StateMachine.add('GRASP_OBJECT', DummyObjectRecognition(), transitions={'succeeded':'SET_SUCCESS', 'failure':'CLEAN_UP', 'preempted':'CLEAN_UP'})
         #smach.StateMachine.add('LOCATE_USER', ServiceState('locate_user', LocateUser, response_key='result'), transitions={'succeeded':'USER_INTERACTION'})
         #smach.StateMachine.add('USER_INTERACTION')
         smach.StateMachine.add('SET_SUCCESS', SetSuccess(), transitions={'succeeded':'succeeded', 'preempted':'CLEAN_UP'})

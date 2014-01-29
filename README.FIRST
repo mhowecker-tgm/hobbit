@@ -3,6 +3,8 @@ SETUP HOBBIT WORKSPACE FOR PT2
 - install ROS HYDRO on your Ubuntu 12.04 operating system (wiki.ros.org/hydro/Installation/Ubuntu)
 - install ros-hydro-qt-build:
   >> sudo apt-get install ros-hydro-qt-build
+- If you want to use smach_viewer install dotx
+  >> sudo apt-get install ros-hydro-xdot
 - checkout code and make a catkin workspace for hobbit PT2 (I have it at /opt/ros/):
   >> cd /opt/ros/
   >> mkdir ./hobbit_hydro
