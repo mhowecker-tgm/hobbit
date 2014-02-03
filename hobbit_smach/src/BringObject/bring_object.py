@@ -20,7 +20,6 @@ from hobbit_msgs.srv import GetObjectLocations, GetCoordinates, GetCoordinatesRe
 from smach_ros import ActionServerWrapper, SimpleActionState, ServiceState
 from sensor_msgs.msg import PointCloud2
 from recognizer_msg_and_services.srv import recognize
-#from actionlib import SimpleActionServer
 from move_base_msgs.msg import MoveBaseAction
 from nav_msgs.srv import GetPlan, GetPlanRequest
 from geometry_msgs.msg import Pose2D, PoseStamped, Point, Quaternion, Vector3Stamped, PoseWithCovarianceStamped, Pose
@@ -88,9 +87,10 @@ class SetSuccess(smach.State):
         rospy.loginfo(ud.result)
         return 'succeeded'
 
+
 class CleanPositions(smach.State):
-    """Class for removing unneeded positions from the rooms. Only use the default 'user search' positions. \
-            Remove the waiting, 'object search' and recharge positions"""
+    """Class for removing unneeded positions from the rooms.
+    Remove the waiting, 'object search' and recharge positions"""
     def __init__(self):
         smach.State.__init__(self, outcomes=['succeeded', 'preempted', 'failure'], input_keys=['response', 'positions'], output_keys=['positions', 'plan', 'visited_places'])
         self.getCoordinates = rospy.ServiceProxy('/Hobbit/ObjectService/get_coordinates', GetCoordinates, persistent=True)
@@ -111,15 +111,14 @@ class CleanPositions(smach.State):
                 pose.header.frame_id = 'map'
                 pose.pose.position = Point(resp.pose.x, resp.pose.y, 0.0)
                 pose.pose.orientation = Quaternion(*tf.transformations.quaternion_from_euler(0, 0, resp.pose.theta))
-                ud.positions.append({'pose': pose, 'room': pos.room, 'distance': 'None', 'place_name':pos.location, 'penalty':1})
+                ud.positions.append({'pose': pose, 'room': pos.room, 'distance': 'None', 'place_name': pos.location, 'penalty':1})
             except rospy.ServiceException:
                 self.getCoordinates.close()
                 return 'failure'
-        #ud.plan = None
         return 'succeeded'
 
 class PlanPath(smach.State):
-    """Class to determine the shortest path to all possible positions, start in the users last known room"""
+    """Class to determine the shortest path to all possible positions of the desired object"""
     def __init__(self):
         smach.State.__init__(self, outcomes=['success', 'preempted', 'failure'],
                 input_keys=['robot_current_pose', 'pose', 'positions', 'detection', 'plan', 'users_current_room', 'visited_places'],
@@ -169,8 +168,8 @@ class PlanPath(smach.State):
                     print bcolors.WARNING + 'distance to %s in %s is %.2f meter'%(position['place_name'],position['room'] ,distance) + bcolors.ENDC
                     if (distance < self.shortest_path) and position['penalty'] < 2:
                         self.shortest_path = distance
-                        print bcolors.OKGREEN + 'shortest path is now to the %s in the %s'%(position['place_name'],position['room']) + bcolors.ENDC
-                        ud.robot_end_pose = {'room': position['room'], 'place':position['place_name'], 'distance':distance, 'penalty':position['penalty']}
+                        print bcolors.OKGREEN + 'shortest path is now to the %s in the %s' % (position['place_name'], position['room']) + bcolors.ENDC
+                        ud.robot_end_pose = {'room': position['room'], 'place': position['place_name'], 'distance': distance, 'penalty': position['penalty']}
                     else:
                         pass
             else:
@@ -239,9 +238,18 @@ class ObjectDetected(smach.State):
 
     def execute(self, ud):
         #rospy.loginfo('Did we find the object?')
-        for index, item in ud.ids:
-            if ud.object_name.data in item.data:
-                ud.object_pose = ud.transforms[index]
+        print(ud.ids)
+        print(type(ud.ids))
+        if not ud.ids:
+            return 'failure'
+        try:
+            for index, item in enumerate(ud.ids):
+                if ud.object_name.data in item.data:
+                    ud.object_pose = ud.transforms[index]
+                    return 'succeeded'
+        except:
+            if ud.object_name.data in ud.ids.data:
+                ud.object_pose = ud.transforms
                 return 'succeeded'
         return 'failure'
 
@@ -299,7 +307,7 @@ def main():
 
     with bo_sm:
         smach.StateMachine.add('INIT', Init(), transitions={'succeeded':'GET_OBJECTS_POSITIONS', 'canceled':'CLEAN_UP'})
-        smach.StateMachine.add('GET_OBJECTS_POSITIONS', ServiceState('/Hobbit/ObjectService/get_object_locations', GetObjectLocations, request_key='object_name', response_key='response'), transitions={'succeeded':'CLEAN_POSITIONS'})
+        smach.StateMachine.add('GET_OBJECTS_POSITIONS', ServiceState('/Hobbit/ObjectService/get_object_locations', GetObjectLocations, request_key='object_name', response_key='response'), transitions={'succeeded':'CLEAN_POSITIONS', 'preempted':'preempted'})
         smach.StateMachine.add('CLEAN_POSITIONS', CleanPositions(), transitions={'succeeded':'GET_ROBOT_POSE', 'failure':'CLEAN_UP', 'preempted':'CLEAN_UP'})
         smach.StateMachine.add('GET_ROBOT_POSE', util.WaitForMsgState('/amcl_pose', PoseWithCovarianceStamped, get_robot_pose_cb, output_keys=['robot_current_pose'], timeout=5),
                 transitions={'succeeded':'GET_ROBOTS_CURRENT_ROOM', 'aborted':'GET_ROBOT_POSE', 'preempted':'CLEAN_UP'})
