@@ -1,0 +1,7 @@
+<launch>   
+    <node name="rgbdacquisition" pkg="rgb_acquisition" type="rgb_acquisition" >
+      <param name="name" value="rgb_acquisition" />
+      <param name="useSkeleton" value="0" />
+      <param name="useDevice" value="0" />
+    </node>  
+</launch>
