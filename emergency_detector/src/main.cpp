@@ -4,12 +4,8 @@
 #include <unistd.h>
 #include <ros/ros.h>
 #include <ros/spinner.h>
-
-
-#include <stdexcept>
-#include <opencv2/opencv.hpp>
-#include <opencv/cvwimage.h>
-#include <opencv/highgui.h>
+ 
+#include <stdexcept> 
 #include <image_transport/image_transport.h>
 
 
@@ -20,17 +16,12 @@
 #include <cv_bridge/cv_bridge.h>
 
 #include <std_srvs/Empty.h>
-
-
+ 
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
 #include <sensor_msgs/CameraInfo.h>
 #include <image_transport/image_transport.h>
-
-
-
-//#include "rgbd_acquisition/SetAcquisition.h"
-
+ 
 int key = 0;
 
 
@@ -56,30 +47,7 @@ bool resume(std_srvs::Empty::Request& request, std_srvs::Empty::Response& respon
     return true;
 }
 
-
-void frameSpinner()
-{
-  ros::spinOnce();
-}
-
-//----------------------------------------------------------
-
-
-void loopEvent()
-{
-  //ROS_INFO("Loop Event started");
-  //We spin from this thread to keep thread synchronization problems at bay
-  frameSpinner();
-
-   // if we got a depth and rgb frames , lets go
-  // key=getKeyPressed(); //Post our geometry to ROS
-   //If we draw out we have to visualize the hand pose , set up windows , put out text etc.
-
-   // doDrawOut();
-   // <- end of we have depth and rgb code
-}
-
-
+ 
 int main(int argc, char **argv)
 {
    ROS_INFO("Starting Up!!");
@@ -106,9 +74,9 @@ int main(int argc, char **argv)
       //---------------------------------------------------------------------------------------------------
 	  //////////////////////////////////////////////////////////////////////////
 	  while ( ( key!='q' ) && (ros::ok()) )
-		{
-          loopEvent(); //<- this keeps our ros node messages handled up until synergies take control of the main thread
-          usleep(1000);
+		{  
+                  ros::spinOnce();//<- this keeps our ros node messages handled up until synergies take control of the main thread
+                  usleep(1000);
 		 }
 
 	}
