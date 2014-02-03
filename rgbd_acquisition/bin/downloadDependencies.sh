@@ -1,5 +1,10 @@
 #!/bin/bash
 
+STARTDIR=`pwd` 
+#Force switch to this directory ( ROS Fuerte seems to go to ~/.ros for some reason :P )
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd "$DIR"
+
 if [ -d NiTE2 ]
 then 
   echo "You seem to already have Nite , not downloading it"
@@ -13,5 +18,8 @@ echo "Put there in order to reduce the size of this repository"
 echo "In case that the download does not work please contact ammarkov@ics.forth.gr , papoutsa@ics.forth.gr"
 wget "http://cvrlcode.ics.forth.gr/web_share/Hobbit/rgbd_acquisition_data.tar.gz" -O data.tar.gz
 tar xvzf data.tar.gz
+
+
+cd "$STARTDIR"
 
 exit 0
