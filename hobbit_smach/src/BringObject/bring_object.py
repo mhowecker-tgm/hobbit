@@ -24,7 +24,6 @@ from recognizer_msg_and_services.srv import recognize
 from move_base_msgs.msg import MoveBaseAction
 from nav_msgs.srv import GetPlan, GetPlanRequest
 from geometry_msgs.msg import Pose2D, PoseStamped, Point, Quaternion, Vector3Stamped, PoseWithCovarianceStamped, Pose
-from operator import itemgetter
 
 class bcolors:
     HEADER = '\033[95m'
@@ -220,25 +219,31 @@ class DummyGrasp(smach.State):
 
 class MoveHead(smach.State):
     def __init__(self):
-        smach.State.__init__(self, outcomes=['succeeded', 'preempted'])
+        smach.State.__init__(self, outcomes=['succeeded', 'preempted', 'failure'])
         self.run_counter = 0
 
     def execute(self, ud):
-        rospy.loginfo('Moving Head')
-        return 'succeeded'
+        if self.run_counter < 3:
+            rospy.loginfo('Moving head to position %d' % (self.run_counter + 1))
+            self.run_counter += 1
+            return 'succeeded'
+        self.run_counter = 0
+        return 'failure'
 
 
 class ObjectDetected(smach.State):
     def __init__(self):
         smach.State.__init__(self, outcomes=['succeeded', 'failure', 'preempted'],
-                             input_keys = ['ids', 'transforms'])
+                             input_keys=['ids', 'transforms', 'object_name', 'object_pose'],
+                             output_keys=['object_pose'])
 
     def execute(self, ud):
-        rospy.loginfo('Did we find the object?')
-        print(ud.ids)
-        if not ud.ids:
-            return 'failure'
-        return 'succeeded'
+        #rospy.loginfo('Did we find the object?')
+        for index, item in ud.ids:
+            if ud.object_name.data in item.data:
+                ud.object_pose = ud.transforms[index]
+                return 'succeeded'
+        return 'failure'
 
 
 class ObjectRecognition(smach.State):
@@ -277,8 +282,6 @@ def get_robot_pose_cb(msg, ud):
 
 
 def point_cloud_cb(msg, ud):
-    print 'point_cloud_cb'
-    print(type(msg))
     ud.cloud= msg
     return True
 
@@ -288,8 +291,8 @@ def main():
 
     bo_sm = smach.StateMachine(
         outcomes=['succeeded', 'aborted', 'preempted'],
-        input_keys = ['object_name'],
-        output_keys = ['result'])
+        input_keys=['object_name'],
+        output_keys=['result'])
 
     bo_sm.userdata.result = String('started')
     bo_sm.userdata.detection = False
@@ -305,13 +308,13 @@ def main():
         smach.StateMachine.add('MOVE_BASE_GO', MoveBase(), transitions={'succeeded':'LOCATION_REACHED', 'preempted':'CLEAN_UP', 'failure':'CLEAN_UP'})
         smach.StateMachine.add('LOCATION_REACHED',
                 util.WaitForMsgState('/goal_status', String, goal_reached_cb, timeout=10), transitions={'aborted':'LOCATION_REACHED', 'succeeded':'MOVE_HEAD', 'preempted':'CLEAN_UP'})
-        smach.StateMachine.add('MOVE_HEAD', MoveHead(), transitions={'succeeded':'GET_POINT_CLOUD', 'preempted':'CLEAN_UP'})
+        smach.StateMachine.add('MOVE_HEAD', MoveHead(), transitions={'succeeded':'GET_POINT_CLOUD', 'preempted':'CLEAN_UP', 'failure':'PLAN_PATH'})
         smach.StateMachine.add('GET_POINT_CLOUD',
                                util.WaitForMsgState('/headcam/depth_registered/points', PointCloud2, point_cloud_cb, timeout=5, output_keys=['cloud']),
                                transitions={'succeeded':'START_OBJECT_RECOGNITION', 'aborted':'GET_POINT_CLOUD', 'preempted':'CLEAN_UP'})
         smach.StateMachine.add('START_OBJECT_RECOGNITION',
                                ServiceState('mp_recognition', recognize, request_slots=['cloud'], response_slots=['ids', 'transforms']),
-                               transitions={'succeeded':'OBJECT_DETECTED', 'preempted':'CLEAN_UP'})
+                               transitions={'succeeded':'OBJECT_DETECTED', 'preempted':'CLEAN_UP', 'aborted':'START_OBJECT_RECOGNITION'})
         smach.StateMachine.add('OBJECT_DETECTED', ObjectDetected(), transitions={'succeeded':'GRASP_OBJECT', 'failure':'MOVE_HEAD', 'preempted':'CLEAN_UP'})
         smach.StateMachine.add('GRASP_OBJECT', DummyGrasp(), transitions={'succeeded':'SET_SUCCESS', 'failure':'CLEAN_UP', 'preempted':'CLEAN_UP'})
         smach.StateMachine.add('SET_SUCCESS', SetSuccess(), transitions={'succeeded':'succeeded', 'preempted':'CLEAN_UP'})
