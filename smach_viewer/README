@@ -1,0 +1,2 @@
+needed packae in ubuntu xdot
+sudo apt-get install ros-hydro-xdot
