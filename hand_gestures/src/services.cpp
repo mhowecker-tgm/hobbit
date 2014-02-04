@@ -39,7 +39,7 @@ void broadcastNewGesture(unsigned int frameNumber,struct handGesture * gesture)
 
 int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int colorWidth , unsigned int colorHeight ,
                                        unsigned short * depthFrame  , unsigned int depthWidth , unsigned int depthHeight ,
-                                        struct calibration * calib ,
+                                        struct calibrationHT * calib ,
                                          unsigned int frameTimestamp )
 {
   if ( (colorFrameCopy==0) ||  (depthFrameCopy==0) ) { fprintf(stderr,"Cannot run handtracker due to not allocated intermediate buffer\n"); return 0; }

@@ -47,7 +47,7 @@ volatile int paused = 0;
 unsigned int frameTimestamp =0;
 unsigned int colorWidth = 640 , colorHeight =480 , depthWidth = 640 , depthHeight = 480;
 
-struct calibration calib={0};
+struct calibrationHT calib={0};
 
 //sensor_msgs::CameraInfo camInfo;
 

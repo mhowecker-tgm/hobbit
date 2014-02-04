@@ -34,7 +34,8 @@ struct handGesture
   unsigned int frameTimestamp;
 };
 
-enum calibIntrinsics
+
+enum calibIntrinsicsHT
 {
   CALIB_INTR_FX = 0 ,
   CALIB_INTR_FY = 4 ,
@@ -42,28 +43,27 @@ enum calibIntrinsics
   CALIB_INTR_CY = 5
 };
 
-
-struct calibration
+struct calibrationHT
 {
-  /* CAMERA INTRINSIC PARAMETERS */
+  // CAMERA INTRINSIC PARAMETERS
   char intrinsicParametersSet;
   double intrinsic[9];
   double k1,k2,p1,p2,k3;
 
-  /* CAMERA EXTRINSIC PARAMETERS */
+  // CAMERA EXTRINSIC PARAMETERS
   char extrinsicParametersSet;
   double extrinsicRotationRodriguez[3];
   double extrinsicTranslation[3];
   double extrinsic[16];
 
-  /*CAMERA DIMENSIONS ( WHEN RENDERING )*/
+  //CAMERA DIMENSIONS ( WHEN RENDERING )
   double nearPlane,farPlane;
   unsigned int width;
   unsigned int height;
 
   double depthUnit;
 
-  /*CONFIGURATION*/
+  //CONFIGURATION
   int imagesUsed;
   int boardWidth;
   int boardHeight;
@@ -77,7 +77,7 @@ int hobbitGestures_Close();
 
 int hobbitGestures_NewFrame(unsigned char * colorFrame , unsigned int colorWidth , unsigned int colorHeight ,
                             unsigned short * depthFrame  , unsigned int depthWidth , unsigned int depthHeight ,
-                            struct calibration * frameCalibration ,
+                            struct calibrationHT * frameCalibration ,
                             unsigned int frameTimestamp );
 
 

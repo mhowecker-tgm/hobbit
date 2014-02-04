@@ -11,7 +11,7 @@ extern unsigned char dontPublishGestures;
 int registerServices(ros::NodeHandle * nh,unsigned int width,unsigned int height);
 int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int colorWidth , unsigned int colorHeight ,
                                        unsigned short * depthFrame  , unsigned int depthWidth , unsigned int depthHeight ,
-                                        struct calibration * calib ,
+                                        struct calibrationHT * calib ,
                                           unsigned int frameTimestamp );
 
 int stopServices();
