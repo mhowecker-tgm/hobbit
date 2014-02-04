@@ -136,7 +136,6 @@ unsigned int DetectFaces(unsigned int frameNumber ,
          unsigned int sY = r->y;
          unsigned int avgFaceDepth = countDepthAverage(depthPixels,depthWidth,depthHeight,sX,sY,tileWidth,tileHeight);
 
-
          float headX=0.0 , headY=0.0 , headZ=0.0;
          transform2DProjectedPointTo3DPoint(calib, sX+tileWidthHalf , sY+tileHeightHalf , (unsigned short) avgFaceDepth , &headX , &headY , &headZ);
 

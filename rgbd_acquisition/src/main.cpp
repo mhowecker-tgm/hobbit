@@ -43,6 +43,8 @@ image_transport::Publisher pubDepth;
 ros::Publisher pubRGBInfo;
 ros::Publisher pubDepthInfo;
 
+char fromPath[1024]={0};
+
 //----------------------------------------------------------
 //Advertised Service switches
 bool visualizeOn(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
@@ -226,9 +228,8 @@ int main(int argc, char **argv)
 {
    ROS_INFO("Starting Up!!");
 
-   int i=0;
-   for (i=0; i<argc; i++) { fprintf(stderr,"Arg %u : %s \n",i,argv[i]); }
-
+   int i=system("./downloadDependencies.sh");
+   if (i!=0 ) { ROS_INFO("Could not check for missing dependencies of rgbd_acquisition"); }
 
    try
 	{
@@ -286,7 +287,6 @@ int main(int argc, char **argv)
       //This code segment waits for a valid first frame to come and initialize the focal lengths etc..
       //If there is no first frame it times out after a little while displaying a relevant error message
       //---------------------------------------------------------------------------------------------------
-      char fromPath[1024]={0};
       if (! acquistionStartUp((char*) "OPENNI2",0,fromPath,640,480,30) )
                                      { ROS_ERROR("Stopping service.."); return 1; }
 

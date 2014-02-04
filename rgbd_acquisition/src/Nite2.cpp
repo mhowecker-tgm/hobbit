@@ -286,7 +286,7 @@ void prepareSkeletonState(int devID,unsigned int frameNumber , nite::UserTracker
      humanSkeleton.joint[HUMAN_SKELETON_RIGHT_FOOT].z = jointRightFoot.getPosition().z;
      humanSkeleton.jointAccuracy[HUMAN_SKELETON_RIGHT_FOOT] = jointRightFoot.getPositionConfidence();
 
-
+     //At first take the bounding box given by NiTE ( but this is 2D only and we want a 3D one )
      float maxX=user.getBoundingBox().max.x , maxY=user.getBoundingBox().max.y , maxZ=user.getBoundingBox().max.z;
      float minX=user.getBoundingBox().min.x , minY=user.getBoundingBox().min.y , minZ=user.getBoundingBox().min.z;
 
@@ -297,7 +297,7 @@ void prepareSkeletonState(int devID,unsigned int frameNumber , nite::UserTracker
      minZ = humanSkeleton.joint[HUMAN_SKELETON_HEAD].z;      maxZ = humanSkeleton.joint[HUMAN_SKELETON_HEAD].z;
 
      unsigned int i=0;
-     for (i=0; i<HUMAN_SKELETON_MIRRORED_PARTS; i++)
+     for (i=0; i<HUMAN_SKELETON_PARTS; i++)
       {
         if (humanSkeleton.joint[i].x>maxX) { maxX = humanSkeleton.joint[i].x; } else
         if (humanSkeleton.joint[i].x<minX) { minX = humanSkeleton.joint[i].x; }
