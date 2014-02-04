@@ -194,7 +194,7 @@ void prepareSkeletonState(int devID,unsigned int frameNumber , nite::UserTracker
     humanSkeleton.observationNumber = observation;
     humanSkeleton.observationTotal = totalObservations;
 
-    humanSkeleton.userID = user.getId();
+    humanSkeleton.userID = user.getId() % MAX_USERS;
 
     humanSkeleton.centerOfMass.x = user.getCenterOfMass().x;
     humanSkeleton.centerOfMass.y = user.getCenterOfMass().y;
@@ -325,14 +325,14 @@ void prepareSkeletonState(int devID,unsigned int frameNumber , nite::UserTracker
 
     long long unsigned int ts = frameNumber;
 	if (user.isNew())  { humanSkeleton.isNew=1; } else
-    if ((user.isVisible()) && (!stc[devID].g_visibleUsers[user.getId()])) { humanSkeleton.isVisible=1; }  else
-    if ((!user.isVisible()) && (stc[devID].g_visibleUsers[user.getId()])) { humanSkeleton.isOutOfScene=1; } else
+    if ((user.isVisible()) && (!stc[devID].g_visibleUsers[humanSkeleton.userID])) { humanSkeleton.isVisible=1; }  else
+    if ((!user.isVisible()) && (stc[devID].g_visibleUsers[humanSkeleton.userID])) { humanSkeleton.isOutOfScene=1; } else
     if (user.isLost())  { humanSkeleton.isLost=1; }
 
-	stc[devID].g_visibleUsers[user.getId()] = user.isVisible();
-	if(stc[devID].g_skeletonStates[user.getId()] != user.getSkeleton().getState())
+	stc[devID].g_visibleUsers[humanSkeleton.userID] = user.isVisible();
+	if(stc[devID].g_skeletonStates[humanSkeleton.userID] != user.getSkeleton().getState())
 	{
-		switch(stc[devID].g_skeletonStates[user.getId()] = user.getSkeleton().getState())
+		switch(stc[devID].g_skeletonStates[humanSkeleton.userID] = user.getSkeleton().getState())
 		{
 		 case nite::SKELETON_NONE:         humanSkeleton.statusStoppedTracking = 1; break; // USER_MESSAGE("Stopped tracking.")
 		 case nite::SKELETON_CALIBRATING:  humanSkeleton.statusCalibrating=1;       break; // USER_MESSAGE("Calibrating...")
