@@ -1,0 +1,5 @@
+<launch>   
+    <node name="hand_gestures" pkg="hand_gestures" type="run_it.sh" required="true">
+      <param name="name" value="hand_gestures" /> 
+    </node>   
+</launch>
