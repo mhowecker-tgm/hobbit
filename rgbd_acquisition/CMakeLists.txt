@@ -1,7 +1,19 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rgbd_acquisition)
 
-find_package(catkin REQUIRED COMPONENTS sensor_msgs OpenCV cv_bridge roscpp std_msgs genmsg image_transport geometry_msgs roslib tf)
+find_package(catkin REQUIRED COMPONENTS 
+  sensor_msgs 
+  OpenCV 
+  pcl_conversions
+  pcl_ros
+  cv_bridge 
+  roscpp 
+  std_msgs 
+  genmsg 
+  image_transport 
+  geometry_msgs 
+  roslib 
+  tf)
  
   
 
@@ -45,7 +57,7 @@ generate_messages(DEPENDENCIES std_msgs)
 #This needs to be after generate messages
 catkin_package()
 
-include_directories(${catkin_INCLUDEDIR}
+include_directories(${catkin_INCLUDEDIR}  
 		    ${OpenNI2_INCLUDEDIR}
 #		    ${Nite2_INCLUDEDIR}
                     ${CMAKE_CURRENT_SOURCE_DIR}/include/NiTE2Includes
