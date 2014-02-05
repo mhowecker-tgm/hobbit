@@ -1,11 +1,17 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rgbd_acquisition)
 
+if(NOT OpenCV_DIR)
+ find_path(OpenCV_DIR "OpenCVConfig.cmake" DOC "Root directory of OpenCV" HINTS    "/opt/ros/hydro/share/OpenCV/")
+endif(NOT OpenCV_DIR)
+
+
 find_package(catkin REQUIRED COMPONENTS 
   sensor_msgs 
   OpenCV 
   pcl_conversions
   pcl_ros
+  sensor_msgs
   cv_bridge 
   roscpp 
   std_msgs 
@@ -32,7 +38,7 @@ message(STATUS ${OpenNI2_LIBRARIES})
 
 
 
-# Nite2 Specific Declarations ---------------
+# Nite2 Specific Declarations They are now added inside this node ---------------
 #message(status $ENV{NITE2_INCLUDE})
 #message(status $ENV{NITE2_REDIST64})
 #find_path(Nite2_INCLUDEDIR

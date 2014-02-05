@@ -43,9 +43,10 @@
 
 #if EMMIT_POINTCLOUD
 #include <sensor_msgs/PointCloud2.h>
-//#include <pcl/ros/conversions.h>
-//#include <pcl/point_cloud.h>
-//#include <pcl/point_types.h>
+// PCL specific includes
+#include <pcl/ros/conversions.h>
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
 //#include "pcl_ros/point_cloud.h"
 #endif
 
