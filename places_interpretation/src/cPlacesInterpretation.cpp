@@ -22,7 +22,9 @@ bool cPlacesInterpretation::LoadFile(std::string placesFileName)
 
 
     pugi::xml_document doc;
+    std::cout << "string " << placesFileName.c_str() << std::endl;
     std::ifstream nameFile(placesFileName.c_str());
+    std::cout << "string " << nameFile << std::endl;
     pugi::xml_parse_result result = doc.load(nameFile);
 
    if (!result) //FIXME, pass as argument
