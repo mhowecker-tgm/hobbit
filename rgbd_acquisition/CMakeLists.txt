@@ -9,8 +9,6 @@ endif(NOT OpenCV_DIR)
 find_package(catkin REQUIRED COMPONENTS 
   sensor_msgs 
   OpenCV 
-  pcl_conversions
-  pcl_ros
   sensor_msgs
   cv_bridge 
   roscpp 

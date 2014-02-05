@@ -1,7 +1,6 @@
 
 
 #define EMMIT_CALIBRATION 1
-#define EMMIT_POINTCLOUD 0
 
 
 
@@ -39,16 +38,6 @@
 #include "rgbd_acquisition/SetQuality.h"
 
 #include "extAcquisition.h"
-
-
-#if EMMIT_POINTCLOUD
-#include <sensor_msgs/PointCloud2.h>
-// PCL specific includes
-#include <pcl/ros/conversions.h>
-#include <pcl/point_cloud.h>
-#include <pcl/point_types.h>
-//#include "pcl_ros/point_cloud.h"
-#endif
 
 //These are the static declarations of the various parts of this ROS package
 int key = 0;
@@ -166,15 +155,6 @@ bool publishImagesFrames(unsigned char * color , unsigned int colorWidth , unsig
    out_Depth_msg.header.stamp= ros::Time::now();
    pubDepth.publish(out_Depth_msg.toImageMsg());
 
-
-   //---------------------------------------------------------------------------------------------------
-   //  POINT CLOUD BROADCAST --------------------------------------------------------------------
-   //---------------------------------------------------------------------------------------------------
-   #if EMMIT_POINTCLOUD
-     sensor_msgs::PointCloud2 newCloud;
-     //pcl::PCLPointCloud2 newCloud;
-     pubDepthCloud.publish(newCloud);
-   #endif
 
    //---------------------------------------------------------------------------------------------------
    //  CAMERA INFORMATION BROADCAST --------------------------------------------------------------------
@@ -311,9 +291,7 @@ int main(int argc, char **argv)
 
      pubDepth = it.advertise("camera/depth_registered/image_raw", 1);
      pubDepthInfo = nh.advertise<sensor_msgs::CameraInfo>("camera/depth_registered/camera_info",1);
-     #if EMMIT_POINTCLOUD
-     pubDepthCloud = nh.advertise<sensor_msgs::PointCloud2>("camera/depth_registered/points", 1);
-     #endif
+
       //---------------------------------------------------------------------------------------------------
       //This code segment waits for a valid first frame to come and initialize the focal lengths etc..
       //If there is no first frame it times out after a little while displaying a relevant error message
