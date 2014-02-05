@@ -69,12 +69,14 @@ cv::Mat rgb,depth;
 bool visualizeOn(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
     doCVOutput=1;
+     doCalibrationOutput=1;
     return true;
 }
 
 bool visualizeOff(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
     doCVOutput=0;
+      doCalibrationOutput=0;
     cv::destroyAllWindows();
     cv::destroyWindow("signs");
     cv::destroyWindow("gestures");

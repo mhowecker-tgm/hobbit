@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(hand_gestures)
 
+
+if(NOT OpenCV_DIR)
+ find_path(OpenCV_DIR "OpenCVConfig.cmake" DOC "Root directory of OpenCV" HINTS    "/opt/ros/hydro/share/OpenCV/")
+endif(NOT OpenCV_DIR)
+
+
 find_package(catkin REQUIRED COMPONENTS sensor_msgs OpenCV cv_bridge roscpp std_msgs genmsg image_transport geometry_msgs roslib tf)
  
    
@@ -27,7 +33,7 @@ include_directories(${catkin_INCLUDEDIR}
 
 add_executable(hand_gestures src/main.cpp src/services.cpp)
 
-target_link_libraries(hand_gestures ${CMAKE_CURRENT_SOURCE_DIR}/bin/libHobbitTrackerLib.a ${catkin_LIBRARIES} ${OpenCV_LIBRARIES}  ${Boost_LIBRARIES}   )
+target_link_libraries(hand_gestures  ${CMAKE_CURRENT_SOURCE_DIR}/bin/libHobbitTrackerLib.a ${catkin_LIBRARIES} ${OpenCV_LIBRARIES}  ${Boost_LIBRARIES}   )
 
 install(TARGETS hand_gestures RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 install(FILES hand_gestures.xml DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})

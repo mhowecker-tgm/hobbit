@@ -37,10 +37,10 @@ struct handGesture
 
 enum calibIntrinsicsHT
 {
-  CALIB_INTR_FX = 0 ,
-  CALIB_INTR_FY = 4 ,
-  CALIB_INTR_CX = 2 ,
-  CALIB_INTR_CY = 5
+  HT_CALIB_INTR_FX = 0 ,
+  HT_CALIB_INTR_FY = 4 ,
+  HT_CALIB_INTR_CX = 2 ,
+  HT_CALIB_INTR_CY = 5
 };
 
 struct calibrationHT
@@ -71,6 +71,7 @@ struct calibrationHT
 };
 
 extern unsigned char doCVOutput;
+extern unsigned char doCalibrationOutput;
 
 int hobbitGestures_Initialize(unsigned int targetWidth , unsigned int targetHeight);
 int hobbitGestures_Close();
