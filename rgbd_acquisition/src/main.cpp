@@ -10,6 +10,10 @@
 #include <opencv/cvwimage.h>
 #include <opencv/highgui.h>
 
+#include <pcl/ros/conversions.h>
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
+
 #include <message_filters/subscriber.h>
 #include <message_filters/sync_policies/approximate_time.h>
 #include <message_filters/time_synchronizer.h>
@@ -21,6 +25,9 @@
 #include <sensor_msgs/distortion_models.h>
 #include <sensor_msgs/image_encodings.h>
 #include <sensor_msgs/CameraInfo.h>
+#include <sensor_msgs/PointCloud2.h>
+
+
 #include <image_transport/image_transport.h>
 
 #include "OpenNI2Acquisition.h"
@@ -42,6 +49,7 @@ image_transport::Publisher pubDepth;
 
 ros::Publisher pubRGBInfo;
 ros::Publisher pubDepthInfo;
+ros::Publisher pubDepthCloud;
 
 char fromPath[1024]={0};
 
@@ -144,6 +152,16 @@ bool publishImagesFrames(unsigned char * color , unsigned int colorWidth , unsig
 
    out_Depth_msg.header.stamp= ros::Time::now();
    pubDepth.publish(out_Depth_msg.toImageMsg());
+
+
+   //---------------------------------------------------------------------------------------------------
+   //  POINT CLOUD BROADCAST --------------------------------------------------------------------
+   //---------------------------------------------------------------------------------------------------
+
+
+
+   pubDepthCloud.publish();
+
 
 
    //---------------------------------------------------------------------------------------------------
@@ -281,7 +299,7 @@ int main(int argc, char **argv)
 
      pubDepth = it.advertise("camera/depth_registered/image_raw", 1);
      pubDepthInfo = nh.advertise<sensor_msgs::CameraInfo>("camera/depth_registered/camera_info",1);
-
+     pubDepthCloud = nh.advertise<sensor_msgs::PointCloud2>("camera/depth_registered/points", 1);
 
       //---------------------------------------------------------------------------------------------------
       //This code segment waits for a valid first frame to come and initialize the focal lengths etc..
