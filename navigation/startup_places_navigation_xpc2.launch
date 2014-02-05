@@ -4,8 +4,8 @@
   <node name="map_server" pkg="map_server" type="map_server" args="$(find places_learning)/../navigation/share/map.yaml"/> 
 
  <group if="true">
-    <include file="$(find hobbit_launch)/launch/basecam_xpc2.launch"></include>
-    <include file="$(find hobbit_launch)/launch/headcam_xpc2.launch"></include>
+    <include file="$(find hobbit_launch)/launch/basecam_xpc2_hydro.launch"></include>
+    <include file="$(find hobbit_launch)/launch/headcam_xpc2_hydro.launch"></include>
   </group>
 
   <node name="top_kinect" pkg="top_kinect" type="top_kinect" args="$(find top_kinect)/Params_xpc2.txt">
@@ -28,7 +28,7 @@
     <include file="$(find virtual_laser)/launch/startup_xpc2.launch" />
     <include file="$(find head)/launch/startup_xpc2.launch"></include>
     <include file="$(find hobbit_launch)/../navigation/amcl_diff_hobbit.launch" />
-    <include file="$(find places_interpretation)/launch/startup_placesInterpretation.launch" />
+    <include file="$(find places_interpretation)/launch/startup_places_interpretation.launch" />
     <include file="$(find hobbit_launch)/../navigation/move_base_hobbit.launch" /> 
     <!--<include file="$(find sending_goals)/launch/startup_sending_goals.launch" /> -->
   </group>

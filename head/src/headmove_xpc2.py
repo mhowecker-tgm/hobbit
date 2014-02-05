@@ -3,7 +3,7 @@
 ## walter wohlkinger
 ## first version: 27.04.2011
 
-PKG = 'Head'
+PKG = 'head'
 import roslib; roslib.load_manifest(PKG)
 import rospy
 import sys

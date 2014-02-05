@@ -8,9 +8,13 @@
 int main(int argc, char **argv)
 {
 
-  if (argc != 2)
+  if (argc < 2)
   {
     printf("\nusage: %s name_of_the_xml_file\n\n", argv[0]);
+    printf("number of arguments are: %d\n", argc);
+    for(int i=0; i<argc; i++) {
+        printf("arg #%d is: %s\n",i, argv[i]);
+    }
     return 0;
   }
    
