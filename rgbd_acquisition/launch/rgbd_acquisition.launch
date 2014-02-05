@@ -1,7 +1,16 @@
 <launch>   
-    <node name="rgbdacquisition" pkg="rgb_acquisition" type="rgb_acquisition" >
+    <node name="rgbd_acquisition" pkg="rgbd_acquisition" type="run_it.sh" required="true">
       <param name="name" value="rgb_acquisition" />
       <param name="useSkeleton" value="0" />
-      <param name="useDevice" value="0" />
+      <param name="useDevice" value="0" /> 
     </node>  
+
+   <node pkg="nodelet" type="nodelet" name="cloudify" args="load depth_image_proc/point_cloud_xyzrgb rgbd_acquisition --no-bond">
+   <remap from="depth_registered/image_raw" to="camera/depth_registered/image2"/>
+   <remap from="depth_registered/points" to="camera/depth_registered/points"/>
+   <remap from="rgb/image_color" to="camera/rgb/image_rect_color"/>
+   <remap from="rgb/camera_info" to="camera/rgb/camera_info"/>
+  </node>
+
+
 </launch>
