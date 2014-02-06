@@ -5,11 +5,19 @@
       <param name="useDevice" value="0" /> 
     </node>  
 
-   <node pkg="nodelet" type="nodelet" name="cloudify" args="load depth_image_proc/point_cloud_xyzrgb rgbd_acquisition --no-bond">
-   <remap from="depth_registered/image_raw" to="camera/depth_registered/image2"/>
-   <remap from="depth_registered/points" to="camera/depth_registered/points"/>
-   <remap from="rgb/image_color" to="camera/rgb/image_rect_color"/>
-   <remap from="rgb/camera_info" to="camera/rgb/camera_info"/>
+   <node pkg="nodelet" type="nodelet" name="nodelet_manager" ns="camera" args="manager" output="screen"/>
+
+    <!-- The depth image is already rectified and registered to the camera optical frame, but stored in mm; convert it to meters  -->
+    <node pkg="nodelet" type="nodelet" name="metric_rect" ns="camera" args="load depth_image_proc/convert_metric nodelet_manager">
+     <remap from="image_raw" to="camera/depth_registered/image_rect"/>
+     <remap from="image" to="camera/depth_registered/image_rect_m"/>
+    </node>
+
+   <node pkg="nodelet" type="nodelet" name="cloudify" ns="camera" args="load depth_image_proc/point_cloud_xyzrgb nodelet_manager" output="screen">
+   <remap from="depth_registered/image_rect" to="/camera/depth_registered/image_rect_m"/>
+   <remap from="depth_registered/points" to="/camera/depth_registered/points"/>
+   <remap from="rgb/image_rect_color" to="/camera/rgb/image_rect_color"/>
+   <remap from="rgb/camera_info" to="/camera/rgb/camera_info"/> 
   </node>
 
 

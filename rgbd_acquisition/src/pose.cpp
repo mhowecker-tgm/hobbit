@@ -4,7 +4,7 @@
 #include <tf/transform_broadcaster.h>
 #include "pose.h"
 
-#define tfRoot "map"
+#define tfRoot "frame"
 
 int postPoseTransform(char * name , float x ,float y , float z)
 {

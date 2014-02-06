@@ -286,10 +286,10 @@ int main(int argc, char **argv)
      //Output RGB Image
      image_transport::ImageTransport it(nh);
 
-     pubRGB = it.advertise("camera/rgb/image_color", 1);
+     pubRGB = it.advertise("camera/rgb/image_rect_color", 1);
      pubRGBInfo = nh.advertise<sensor_msgs::CameraInfo>("camera/rgb/camera_info",1);
 
-     pubDepth = it.advertise("camera/depth_registered/image_raw", 1);
+     pubDepth = it.advertise("camera/depth_registered/image_rect", 1);
      pubDepthInfo = nh.advertise<sensor_msgs::CameraInfo>("camera/depth_registered/camera_info",1);
 
       //---------------------------------------------------------------------------------------------------
