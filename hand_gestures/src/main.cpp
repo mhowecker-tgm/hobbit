@@ -40,6 +40,7 @@
 //This will make this node also register to color/depth calibrations and
 //pass them to the gesture node instead of the defaults
 #define USE_NONDEFAULT_CALIBRATIONS 1
+#define TARGET_FRAMERATE 11 //Set to FPS
 
 int first=0;
 int key = 0;
@@ -213,7 +214,7 @@ int main(int argc, char **argv)
   	 ros::init(argc, argv, regName);
      ros::start();
 
-     ros::Rate loop_rate(10); // 10 hz should be our target performance
+     ros::Rate loop_rate(TARGET_FRAMERATE); //  hz should be our target performance
 
      ros::NodeHandle nh;
 
@@ -235,10 +236,10 @@ int main(int argc, char **argv)
 	 rgb_cam_info_sub = new message_filters::Subscriber<sensor_msgs::CameraInfo>(nh,camRGBInfo,1);
 
      #if USE_NONDEFAULT_CALIBRATIONS
-	   sync = new message_filters::Synchronizer<RgbdSyncPolicy>(RgbdSyncPolicy(10), *rgb_img_sub, *depth_img_sub,*depth_cam_info_sub); //*rgb_cam_info_sub,
+	   sync = new message_filters::Synchronizer<RgbdSyncPolicy>(RgbdSyncPolicy(TARGET_FRAMERATE), *rgb_img_sub, *depth_img_sub,*depth_cam_info_sub); //*rgb_cam_info_sub,
  	   sync->registerCallback(rgbdCallback);
      #else
-       sync = new message_filters::Synchronizer<RgbdSyncPolicy>(RgbdSyncPolicy(5), *rgb_img_sub, *depth_img_sub); //*rgb_cam_info_sub,
+       sync = new message_filters::Synchronizer<RgbdSyncPolicy>(RgbdSyncPolicy(TARGET_FRAMERATE), *rgb_img_sub, *depth_img_sub); //*rgb_cam_info_sub,
 	   sync->registerCallback(rgbdCallbackNoCalibration);
     #endif
 
@@ -247,7 +248,7 @@ int main(int argc, char **argv)
 	  while ( ( key!='q' ) && (ros::ok()) )
 		{
           ros::spinOnce();
-          loop_rate.sleep();
+         loop_rate.sleep();
 		 }
 
 	   stopServices();
