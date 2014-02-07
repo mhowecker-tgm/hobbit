@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdexcept>
 #include <iostream>
 #include <unistd.h>
@@ -33,6 +34,7 @@
 #include <image_transport/image_transport.h>
 
 #include "OpenNI2Acquisition.h"
+#include "pose.h"
 #include "services.h"
 
 #include "rgbd_acquisition/SetQuality.h"
@@ -53,7 +55,6 @@ ros::Publisher pubDepthInfo;
 ros::Publisher pubDepthCloud;
 #endif
 
-char fromPath[1024]={0};
 
 //----------------------------------------------------------
 //Advertised Service switches
@@ -139,6 +140,7 @@ bool publishImagesFrames(unsigned char * color , unsigned int colorWidth , unsig
    out_RGB_msg.encoding = sensor_msgs::image_encodings::RGB8; // Or whatever
    out_RGB_msg.image    = imageRGB; // Your cv::Mat
 
+   out_RGB_msg.header.frame_id= tfRoot;
    out_RGB_msg.header.stamp= ros::Time::now();
    pubRGB.publish(out_RGB_msg.toImageMsg());
 
@@ -152,6 +154,7 @@ bool publishImagesFrames(unsigned char * color , unsigned int colorWidth , unsig
    out_Depth_msg.encoding = sensor_msgs::image_encodings::TYPE_16UC1; // Or whatever
    out_Depth_msg.image    = imageDepth; // Your cv::Mat
 
+   out_Depth_msg.header.frame_id= tfRoot;
    out_Depth_msg.header.stamp= ros::Time::now();
    pubDepth.publish(out_Depth_msg.toImageMsg());
 
@@ -254,50 +257,56 @@ int main(int argc, char **argv)
      ros::NodeHandle nh;
      nhPtr = &nh;
 
-     std::string tmp;
-     char nodeRoot[512]={0};
-     if (nhPtr->getParamCached("name", tmp)) { strcpy(nodeRoot,(char*) tmp.c_str()); }
-     fprintf(stderr,"NAME is %s \n",nodeRoot);
+     int useSkeleton=0,devID=0;
+     std::string from;
+     std::string name;
+     std::string camera;
+     std::string frame;
+     int rate;
 
+     ros::NodeHandle private_node_handle_("~");
+     private_node_handle_.param("useSkeleton", useSkeleton, int(0));
+     if (useSkeleton) { pauseSkeletonDetection=0; pauseFaceDetection=0; dontPublishPointEvents=0;}
+     private_node_handle_.param("name", name, std::string("rgbd_acquisition"));
+     private_node_handle_.param("camera", camera, std::string("camera"));
+     private_node_handle_.param("frame", frame, std::string("frame"));
+     private_node_handle_.param("rate", rate, int(30));
+     private_node_handle_.param("device_id", from, std::string(""));
 
-     if (nhPtr->getParamCached("useSkeleton", tmp))
-     {
-       fprintf(stderr,"Skeleton processing is %s \n",nodeRoot);
-       if (strcmp(tmp.c_str(),"0")==0) {  pauseFaceDetection = 1; pauseSkeletonDetection = 1; }
-     }
+     //Pass root frame for TF poses
+     strcpy(tfRoot,frame.c_str());
 
-     if (nhPtr->getParamCached("devID", tmp))
-     {
-       fprintf(stderr,"DevID processing is %s \n",nodeRoot);
-       //if (strcmp(tmp,"0")==0) {  pauseFaceDetection = 1; pauseSkeletonDetection = 1; }
-     }
+     //Decide on devID
+     if (from.length()==0) { } else
+     if (from.length()<=2) { devID=atoi( from.c_str() ); from.clear(); ROS_INFO("Using OpenNI2 Serializer to get device"); }
+
+     ros::Rate loop_rate(rate); //  hz should be our target performance
 
      //We advertise the services we want accessible using "rosservice call *w/e*"
-     ros::ServiceServer visualizeOnService      = nh.advertiseService("rgbd_acquisition/visualize_on", visualizeOn);
-     ros::ServiceServer visualizeOffService     = nh.advertiseService("rgbd_acquisition/visualize_off", visualizeOff);
-     ros::ServiceServer terminateService        = nh.advertiseService("rgbd_acquisition/terminate", terminate);
-     ros::ServiceServer pauseService            = nh.advertiseService("rgbd_acquisition/pause_peopletracker", pause);
-     ros::ServiceServer resumeService           = nh.advertiseService("rgbd_acquisition/resume_peopletracker", resume);
-     ros::ServiceServer pausePointingService    = nh.advertiseService("rgbd_acquisition/pause_pointing_gesture_messages", pausePointingMessages);
-     ros::ServiceServer resumePointingService   = nh.advertiseService("rgbd_acquisition/resume_pointing_gesture_messages", resumePointingMessages);
-     ros::ServiceServer setQualityService       = nh.advertiseService("rgbd_acquisition/setQuality", setQuality);
+     ros::ServiceServer visualizeOnService      = nh.advertiseService(name+"/visualize_on", visualizeOn);
+     ros::ServiceServer visualizeOffService     = nh.advertiseService(name+"/visualize_off", visualizeOff);
+     ros::ServiceServer terminateService        = nh.advertiseService(name+"/terminate", terminate);
+     ros::ServiceServer pauseService            = nh.advertiseService(name+"/pause_peopletracker", pause);
+     ros::ServiceServer resumeService           = nh.advertiseService(name+"/resume_peopletracker", resume);
+     ros::ServiceServer pausePointingService    = nh.advertiseService(name+"/pause_pointing_gesture_messages", pausePointingMessages);
+     ros::ServiceServer resumePointingService   = nh.advertiseService(name+"/resume_pointing_gesture_messages", resumePointingMessages);
+     ros::ServiceServer setQualityService       = nh.advertiseService(name+"/setQuality", setQuality);
 
 
      //Output RGB Image
      image_transport::ImageTransport it(nh);
 
-     pubRGB = it.advertise("camera/rgb/image_rect_color", 1);
-     pubRGBInfo = nh.advertise<sensor_msgs::CameraInfo>("camera/rgb/camera_info",1);
+     pubRGB = it.advertise(camera+"/rgb/image_rect_color", 1);
+     pubRGBInfo = nh.advertise<sensor_msgs::CameraInfo>(camera+"/rgb/camera_info",1);
 
-     pubDepth = it.advertise("camera/depth_registered/image_rect", 1);
-     pubDepthInfo = nh.advertise<sensor_msgs::CameraInfo>("camera/depth_registered/camera_info",1);
+     pubDepth = it.advertise(camera+"/depth_registered/image_rect", 1);
+     pubDepthInfo = nh.advertise<sensor_msgs::CameraInfo>(camera+"/depth_registered/camera_info",1);
 
       //---------------------------------------------------------------------------------------------------
       //This code segment waits for a valid first frame to come and initialize the focal lengths etc..
       //If there is no first frame it times out after a little while displaying a relevant error message
       //---------------------------------------------------------------------------------------------------
-      if (! acquistionStartUp((char*) "OPENNI2",0,fromPath,640,480,30) )
-                                     { ROS_ERROR("Stopping service.."); return 1; }
+      if (! acquistionStartUp((char*) "OPENNI2",devID,(char*) from.c_str(),640,480,30) ) { ROS_ERROR("Stopping service.."); return 1; }
 
       //Create our context
       //---------------------------------------------------------------------------------------------------
@@ -307,7 +316,8 @@ int main(int argc, char **argv)
 	  while ( ( key!='q' ) && (ros::ok()) )
 		{
           loopEvent(); //<- this keeps our ros node messages handled up until synergies take control of the main thread
-          usleep(1000);
+          //usleep(1000);
+          loop_rate.sleep();
 		 }
 
       switchDrawOutTo(0);
