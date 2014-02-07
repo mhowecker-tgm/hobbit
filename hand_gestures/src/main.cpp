@@ -31,17 +31,12 @@
 
 #include "HobbitTrackerLib.h"
 
-#define camDepthRaw "camera/depth_registered/image_raw"
-#define camDepthInfo "camera/depth_registered/camera_info"
-
-#define camRGBRaw "camera/rgb/image_color"
-#define camRGBInfo "camera/rgb/camera_info"
 
 //This will make this node also register to color/depth calibrations and
 //pass them to the gesture node instead of the defaults
 #define USE_NONDEFAULT_CALIBRATIONS 1
-#define TARGET_FRAMERATE 11 //Set to FPS
 
+int rate=11;
 int first=0;
 int key = 0;
 volatile int paused = 0;
@@ -214,32 +209,48 @@ int main(int argc, char **argv)
   	 ros::init(argc, argv, regName);
      ros::start();
 
-     ros::Rate loop_rate(TARGET_FRAMERATE); //  hz should be our target performance
+
 
      ros::NodeHandle nh;
+     ros::NodeHandle private_node_handle_("~");
+
+     std::string name;
+     std::string fromDepthTopic;
+     std::string fromDepthTopicInfo;
+     std::string fromRGBTopic;
+     std::string fromRGBTopicInfo;
+
+
+     private_node_handle_.param("fromDepthTopic", fromDepthTopic, std::string("/headcam/depth_registered/image_rect"));
+     private_node_handle_.param("fromDepthTopicInfo", fromDepthTopicInfo, std::string("/headcam/depth_registered/camera_info"));
+     private_node_handle_.param("fromRGBTopic", fromRGBTopic, std::string("headcam/rgb/image_rect_color"));
+     private_node_handle_.param("fromRGBTopicInfo", fromRGBTopicInfo, std::string("/headcam/rgb/camera_info"));
+     private_node_handle_.param("name", name, std::string("hand_gestures"));
+     private_node_handle_.param("rate", rate, int(11));
+     ros::Rate loop_rate(rate); //  hz should be our target performance
 
      //We advertise the services we want accessible using "rosservice call *w/e*"
-     ros::ServiceServer visualizeOnService      = nh.advertiseService("hand_gestures/visualize_on" , visualizeOn);
-     ros::ServiceServer visualizeOffService     = nh.advertiseService("hand_gestures/visualize_off", visualizeOff);
-     ros::ServiceServer terminateService        = nh.advertiseService("hand_gestures/terminate"   , terminate);
-     ros::ServiceServer resumeService           = nh.advertiseService("hand_gestures/pause"       , pause);
-     ros::ServiceServer pauseService            = nh.advertiseService("hand_gestures/resume"      , resume);
-     ros::ServiceServer setQualityService       = nh.advertiseService("hand_gestures/set_quality"  , setQuality);
+     ros::ServiceServer visualizeOnService      = nh.advertiseService(name+"/visualize_on" , visualizeOn);
+     ros::ServiceServer visualizeOffService     = nh.advertiseService(name+"/visualize_off", visualizeOff);
+     ros::ServiceServer terminateService        = nh.advertiseService(name+"/terminate"    , terminate);
+     ros::ServiceServer resumeService           = nh.advertiseService(name+"/pause"        , pause);
+     ros::ServiceServer pauseService            = nh.advertiseService(name+"/resume"       , resume);
+     ros::ServiceServer setQualityService       = nh.advertiseService(name+"/set_quality"  , setQuality);
 
      //Make our rostopic cmaera grabber
      message_filters::Synchronizer<RgbdSyncPolicy> *sync;
 
-	 depth_img_sub = new message_filters::Subscriber<sensor_msgs::Image>(nh,camDepthRaw,1);
-	 depth_cam_info_sub = new message_filters::Subscriber<sensor_msgs::CameraInfo>(nh,camDepthInfo,1);
+	 depth_img_sub = new message_filters::Subscriber<sensor_msgs::Image>(nh,fromDepthTopic,1);
+	 depth_cam_info_sub = new message_filters::Subscriber<sensor_msgs::CameraInfo>(nh,fromDepthTopicInfo,1);
 
-	 rgb_img_sub = new  message_filters::Subscriber<sensor_msgs::Image>(nh,camRGBRaw, 1);
-	 rgb_cam_info_sub = new message_filters::Subscriber<sensor_msgs::CameraInfo>(nh,camRGBInfo,1);
+	 rgb_img_sub = new  message_filters::Subscriber<sensor_msgs::Image>(nh,fromRGBTopic, 1);
+	 rgb_cam_info_sub = new message_filters::Subscriber<sensor_msgs::CameraInfo>(nh,fromRGBTopicInfo,1);
 
      #if USE_NONDEFAULT_CALIBRATIONS
-	   sync = new message_filters::Synchronizer<RgbdSyncPolicy>(RgbdSyncPolicy(TARGET_FRAMERATE), *rgb_img_sub, *depth_img_sub,*depth_cam_info_sub); //*rgb_cam_info_sub,
+	   sync = new message_filters::Synchronizer<RgbdSyncPolicy>(RgbdSyncPolicy(rate), *rgb_img_sub, *depth_img_sub,*depth_cam_info_sub); //*rgb_cam_info_sub,
  	   sync->registerCallback(rgbdCallback);
      #else
-       sync = new message_filters::Synchronizer<RgbdSyncPolicy>(RgbdSyncPolicy(TARGET_FRAMERATE), *rgb_img_sub, *depth_img_sub); //*rgb_cam_info_sub,
+       sync = new message_filters::Synchronizer<RgbdSyncPolicy>(RgbdSyncPolicy(rate), *rgb_img_sub, *depth_img_sub); //*rgb_cam_info_sub,
 	   sync->registerCallback(rgbdCallbackNoCalibration);
     #endif
 
@@ -248,7 +259,7 @@ int main(int argc, char **argv)
 	  while ( ( key!='q' ) && (ros::ok()) )
 		{
           ros::spinOnce();
-         loop_rate.sleep();
+          loop_rate.sleep();
 		 }
 
 	   stopServices();
