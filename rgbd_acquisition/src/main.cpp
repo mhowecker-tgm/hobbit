@@ -280,6 +280,17 @@ int main(int argc, char **argv)
      if (from.length()==0) { } else
      if (from.length()<=2) { devID=atoi( from.c_str() ); from.clear(); ROS_INFO("Using OpenNI2 Serializer to get device"); }
 
+
+
+     std::cout<<"RGBDAcquisition Starting settings ----------------"<<endl;
+     std::cout<<"Name : "<<name<<endl;
+     std::cout<<"Camera : "<<camera<<endl;
+     std::cout<<"Frame : "<<frame<<endl;
+     std::cout<<"Rate : "<<rate<<endl;
+     std::cout<<"Device_id : "<<from<<"  devID : "<<devID<<endl;
+     std::cout<<"--------------------------------------------------"<<endl;
+
+
      ros::Rate loop_rate(rate); //  hz should be our target performance
 
      //We advertise the services we want accessible using "rosservice call *w/e*"
