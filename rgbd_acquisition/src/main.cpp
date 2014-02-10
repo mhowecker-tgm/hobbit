@@ -282,13 +282,13 @@ int main(int argc, char **argv)
 
 
 
-     std::cout<<"RGBDAcquisition Starting settings ----------------"<<endl;
-     std::cout<<"Name : "<<name<<endl;
-     std::cout<<"Camera : "<<camera<<endl;
-     std::cout<<"Frame : "<<frame<<endl;
-     std::cout<<"Rate : "<<rate<<endl;
-     std::cout<<"Device_id : "<<from<<"  devID : "<<devID<<endl;
-     std::cout<<"--------------------------------------------------"<<endl;
+     std::cout<<"RGBDAcquisition Starting settings ----------------"<<std::endl;
+     std::cout<<"Name : "<<name<<std::endl;
+     std::cout<<"Camera : "<<camera<<std::endl;
+     std::cout<<"Frame : "<<frame<<std::endl;
+     std::cout<<"Rate : "<<rate<<std::endl;
+     std::cout<<"Device_id : "<<from<<"  devID : "<<devID<<std::endl;
+     std::cout<<"--------------------------------------------------"<<std::endl;
 
 
      ros::Rate loop_rate(rate); //  hz should be our target performance
