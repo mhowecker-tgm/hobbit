@@ -14,15 +14,23 @@ export GLOG_logtostderr=1
  
 echo `pwd`
 
-PATHOFBIN="./rgbd_acquisition" 
+BINNAME="rgbd_acquisition"
+
+PATHOFBIN="../../../devel/lib/$BINNAME/$BINNAME"
+if [ -e $PATHOFBIN ]
+then
+ echo "$green Running freshly compiled file $normal" 
+else 
+PATHOFBIN="./$BINNAME" 
   
 if [ ! -e $PATHOFBIN ]
 then 
-  echo "$red Could not find rgbd_acquisition binary! (rosmake RGBDAcquisition) $normal"
+  echo "$red Could not find $BINNAME binary!  $normal"
 else
-  echo "$green Found rgbd_acquisition binary! $normal"
+  echo "$green Found $BINNAME binary! $normal"
 fi
- 
+fi 
+
 LD_LIBRARY_PATH=./:$LD_LIBRARY_PATH "$PATHOFBIN" $@
 
 cd "$STARTDIR"
