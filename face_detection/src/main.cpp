@@ -152,6 +152,7 @@ void rgbdCallback(const sensor_msgs::Image::ConstPtr rgb_img_msg,
   runServicesThatNeedColorAndDepth((unsigned char*) rgb.data, colorWidth , colorHeight ,
                                    (unsigned short*) depth.data ,  depthWidth , depthHeight ,
                                      &calib , frameTimestamp );
+  ++frameTimestamp;
 
  doDrawOut();
  //After running (at least) once it is not a first run any more!
@@ -179,6 +180,7 @@ void rgbdCallbackNoCalibration(const sensor_msgs::Image::ConstPtr rgb_img_msg,
   runServicesThatNeedColorAndDepth((unsigned char*) rgb.data, colorWidth , colorHeight ,
                                    (unsigned short*) depth.data ,  depthWidth , depthHeight ,
                                      0 , frameTimestamp );
+  ++frameTimestamp;
  //After running (at least) once it is not a first run any more!
  first = false;
 return;
