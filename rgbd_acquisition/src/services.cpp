@@ -95,7 +95,7 @@ void broadcastSkeleton(unsigned int frameNumber ,struct skeletonHuman * skeleton
      for ( i=0; i<8; i++ )
       {
        sprintf(tag,"bbox/point%u",i);
-       postPoseTransform(tag,/*-1.0**/skeletonFound->bbox[i].x/1000,-1.0*skeletonFound->bbox[i].y/1000,skeletonFound->bbox[i].z/1000);
+       postPoseTransform(tag,/*-1.0**/skeletonFound->bbox[i].x/1000,/*-1.0**/skeletonFound->bbox[i].y/1000,skeletonFound->bbox[i].z/1000);
       }
      broadcastNewPerson();
 }
@@ -114,7 +114,7 @@ void broadcastDetectedFace(unsigned int frameNumber ,struct detectedFace * faceF
      actualZ=faceFound->headZ;
      actualTheta=0.0;
 
-     postPoseTransform((char*) jointNames[HUMAN_SKELETON_HEAD],/*-1.0**/faceFound->headX/1000,-1.0*faceFound->headY/1000,faceFound->headZ/1000);
+     postPoseTransform((char*) jointNames[HUMAN_SKELETON_HEAD],/*-1.0**/faceFound->headX/1000,/*-1.0**/faceFound->headY/1000,faceFound->headZ/1000);
 
      broadcastNewPerson();
 }
