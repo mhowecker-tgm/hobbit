@@ -1,0 +1,13 @@
+<launch>   
+    <node name="face_detection" pkg="face_detection" type="run_it.sh" required="true">
+      <param name="name" value="face_detection" /> 
+      <!-- name of the root frame -->
+      <arg name="frame" value="frame"/> 
+
+      <param name="fromDepthTopic" value="/headcam/depth_registered/image_rect" /> 
+      <param name="fromDepthTopicInfo" value="/headcam/depth_registered/camera_info" /> 
+      <param name="fromRGBTopic" value="headcam/rgb/image_rect_color" /> 
+      <param name="fromRGBTopicInfo" value="/headcam/rgb/camera_info" /> 
+ 
+    </node>   
+</launch>

@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package>
+  <name>face_detection</name>
+  <version>0.0.0</version>
+  <description>
+    A node that receives an RGB/Depth stream and outputs faces </description>
+  <maintainer email="ammarkov@ics.forth.gr">Ammar Qammaz</maintainer>
+  <author email="ammarkov@ics.forth.gr">Ammar Qammaz</author>
+  <license>BSD</license>
+  <url type="website">http://ics.forth.gr/</url>  
+
+  <buildtool_depend>catkin</buildtool_depend>
+ 
+  <build_depend>geometry_msgs</build_depend> 
+  <build_depend>roscpp</build_depend>
+  <build_depend>roslib</build_depend>
+  <build_depend>tf</build_depend>
+ 
+  <run_depend>geometry_msgs</run_depend> 
+  <run_depend>roscpp</run_depend>
+  <run_depend>roslib</run_depend>
+  <run_depend>tf</run_depend>
+</package>
