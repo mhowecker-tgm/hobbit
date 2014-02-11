@@ -14,16 +14,24 @@ export GLOG_logtostderr=1
  
 echo `pwd`
 
-PATHOFBIN="./hand_gestures" 
+BINNAME="hand_gestures"
+
+PATHOFBIN="../../../devel/lib/$BINNAME/$BINNAME"
+if [ -e $PATHOFBIN ]
+then
+ echo "$green Running freshly compiled file $normal" 
+else 
+PATHOFBIN="./$BINNAME" 
   
 if [ ! -e $PATHOFBIN ]
 then 
-  echo "$red Could not find hand_gestures binary! (rosmake RGBDAcquisition) $normal"
+  echo "$red Could not find $BINNAME binary!  $normal"
 else
-  echo "$green Found hand_gestures binary! $normal"
+  echo "$green Found $BINNAME binary! $normal"
 fi
- 
-LD_LIBRARY_PATH=./:$LD_LIBRARY_PATH "$PATHOFBIN" 
+fi 
+
+LD_LIBRARY_PATH=./:$LD_LIBRARY_PATH "$PATHOFBIN" $@
 
 cd "$STARTDIR"
 exit 0
