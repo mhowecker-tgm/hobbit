@@ -35,7 +35,6 @@ void broadcastNewPerson()
 
   fprintf(stderr,"Publishing a new Person\n");
   personBroadcaster.publish(msg);
-  ros::spinOnce();
 }
 
 
