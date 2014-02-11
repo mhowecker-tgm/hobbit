@@ -221,6 +221,17 @@ int main(int argc, char **argv)
      //Pass root frame for TF poses
      strcpy(tfRoot,frame.c_str());
 
+
+     std::cout<<"face_detection Starting settings ----------------"<<std::endl;
+     std::cout<<"Name : "<<name<<std::endl;
+     std::cout<<"Frame : "<<frame<<std::endl;
+     std::cout<<"Rate : "<<rate<<std::endl;
+     std::cout<<"RGB : "<<fromRGBTopic<<" calibs : "<<fromRGBTopicInfo<<std::endl;
+     std::cout<<"Depth : "<<fromDepthTopic<<" calibs : "<<fromDepthTopicInfo<<std::endl;
+     std::cout<<"--------------------------------------------------"<<std::endl;
+
+
+
      //We advertise the services we want accessible using "rosservice call *w/e*"
      ros::ServiceServer visualizeOnService      = nh.advertiseService(name+"/visualize_on" , visualizeOn);
      ros::ServiceServer visualizeOffService     = nh.advertiseService(name+"/visualize_off", visualizeOff);
@@ -246,13 +257,17 @@ int main(int argc, char **argv)
 	   sync->registerCallback(rgbdCallbackNoCalibration);
     #endif
 
+
+   ROS_INFO("Registering services !!");
      registerServices(&nh,640,480);
 
+      ROS_INFO("Entering Spin loop!!");
 	  while ( ( key!='q' ) && (ros::ok()) )
 		{
           ros::spinOnce();
           loop_rate.sleep();
 		 }
+      ROS_INFO("Stopping Spin loop!!");
 
 	   stopServices();
 	}
