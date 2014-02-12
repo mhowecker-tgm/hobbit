@@ -272,6 +272,13 @@ int main(int argc, char **argv)
       ROS_INFO("Stopping Spin loop!!");
 
 	   stopServices();
+
+	   delete depth_img_sub;
+	   delete depth_cam_info_sub;
+	   delete rgb_img_sub;
+	   delete rgb_cam_info_sub;
+	   delete sync;
+
 	}
 	catch(std::exception &e) { ROS_ERROR("Exception: %s", e.what()); return 1; }
 	catch(...)               { ROS_ERROR("Unknown Error"); return 1; }
