@@ -24,6 +24,11 @@ source /opt/ros/hobbit_hydro/devel/setup.bash
 
 roscore&
 sleep 3
+ 
+#Start up vision acquisition etc
+/opt/ros/hobbit_hydro/src/rgbd_acquisition/scripts/startFORTHStuff.sh&
+sleep 5
+
 
 #Start Head ( and bring it to level )
 roslaunch head startup.launch&
@@ -31,8 +36,6 @@ roslaunch head startup.launch&
 rosrun mobile_platform mobile_platform&
 #Bring up web interface ( port 8080 )
 /opt/ros/hobbit_hydro/src/web_interface/scripts/startWebInterface.sh&
-#Start up vision acquisition etc
-/opt/ros/hobbit_hydro/src/rgbd_acquisition/scripts/startFORTHStuff.sh&
 
 #Give some time for the first camera to come online
 sleep 2
