@@ -16,8 +16,8 @@
          ______________________________________________________________________   
     -->
 
-    <!--  This is the kinect camera address in the hobbit PT1 I use in Vienna -->
-    <arg name="device_id" value="3@6"/> 
+    <!--  This is the kinect camera address in the hobbit PT1 I use in Vienna 3@6 -->
+    <arg name="device_id" value=" freenect://0"/> 
  
  
    <!--  rosrun pcl_ros pointcloud_to_pcd input:=headcam/depth_registered/points/ -->
@@ -30,15 +30,15 @@
       <param name="useSkeleton" value="0" />  
     </node>  
 
-   <node pkg="nodelet" type="nodelet" name="nodelet_manager" ns="$(arg camera)" args="manager" output="screen"/>
+   <node pkg="nodelet" type="nodelet" name="rgbd_nodelet_manager" ns="$(arg camera)" args="manager" output="screen"/>
 
     <!-- The depth image is already rectified and registered to the camera optical frame, but stored in mm; convert it to meters  -->
-    <node pkg="nodelet" type="nodelet" name="metric_rect" ns="$(arg camera)" args="load depth_image_proc/convert_metric nodelet_manager --no-bond">
+    <node pkg="nodelet" type="nodelet" name="metric_rect" ns="$(arg camera)" args="load depth_image_proc/convert_metric rgbd_nodelet_manager --no-bond">
      <remap from="image_raw" to="/$(arg camera)/depth_registered/image_rect"/>
      <remap from="image" to="/$(arg camera)/depth_registered/image_rect_m"/>
     </node>
 
-   <node pkg="nodelet" type="nodelet" name="cloudify" ns="$(arg camera)" args="load depth_image_proc/point_cloud_xyzrgb nodelet_manager --no-bond" output="screen">
+   <node pkg="nodelet" type="nodelet" name="cloudify" ns="$(arg camera)" args="load depth_image_proc/point_cloud_xyzrgb rgbd_nodelet_manager --no-bond" output="screen">
    <remap from="depth_registered/image_rect" to="/$(arg camera)/depth_registered/image_rect_m"/>
    <remap from="depth_registered/points" to="/$(arg camera)/depth_registered/points"/>
    <remap from="rgb/image_rect_color" to="/$(arg camera)/rgb/image_rect_color"/>
