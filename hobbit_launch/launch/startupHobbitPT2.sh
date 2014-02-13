@@ -42,7 +42,7 @@ roslaunch openni2_launch openni2.launch camera:=basecam depth_registration:=true
 
 
 #After everything is done , bring had to up position
-rostopic pub -1 /HeadMove std_msgs/String 'up' 
+rostopic pub -1 /HeadMove std_msgs/String 'up'&
 
 
 cd $STARTDIR
