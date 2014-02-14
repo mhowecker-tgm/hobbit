@@ -1,10 +1,4 @@
 #!/bin/bash
-
-sleep 5
-echo "TODO : Lets try to see if everything is broadcasting"
-rostopic list
-
-
 ISITUP=`screen -ls | grep rgbd_acquisition`
 while [ -n "$ISITUP" ]
 do
