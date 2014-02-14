@@ -4,12 +4,14 @@ sleep 5
 echo "TODO : Lets try to see if everything is broadcasting"
 rostopic list
 
-ISITUP="grep"
 
-while [ -n `screen -ls | grep rgbd_acquisition` ]
+ISITUP=`screen -ls | grep rgbd_acquisition`
+while [ -n "$ISITUP" ]
+do
  echo "Trying to start-up rgbd_acquisition"
  screen -d -m -S "rgbd_acquisition" /bin/bash -c "source /home/hobbit/.bashrc && source /opt/ros/hobbit_hydro/devel/setup.bash && roslaunch rgbd_acquisition startHobbitTopCamera.sh"
  sleep 10
+ ISITUP=`screen -ls | grep rgbd_acquisition`
 done
 
 
