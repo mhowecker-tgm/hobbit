@@ -3,6 +3,9 @@
     <arg name="camera" value="headcam"/> 
     <!-- name of the root frame -->
     <arg name="frame" value="frame"/> 
+    <arg name="rgb_frame_id" default="$(arg frame)/$(arg camera)_rgb_optical_frame" />
+    <arg name="depth_frame_id" default="$(arg frame)/$(arg camera)_depth_optical_frame" />
+
 
     <!-- device_id can have the following formats:
          "B00367707227042B": Use device with given serial number
@@ -43,8 +46,10 @@
     <!-- Produce a disparity image  -->
     <node pkg="nodelet" type="nodelet" name="disparityBroadcaster" ns="$(arg camera)" args="load depth_image_proc/disparity rgbd_nodelet_manager --no-bond" output="screen">
      <remap from="left/image_rect" to="/$(arg camera)/depth_registered/image_rect_m"/>
-     <remap from="right/camera_info" to="/$(arg camera)/rgb/camera_info"/>
+     <remap from="right" to="/$(arg camera)/rgb/camera_info"/>
      <remap from="left/disparity" to="/$(arg camera)/depth_registered/disparity"/>
+     <param name="min_range" value="0.5" />
+     <param name="max_range" value="4.0" />
     </node>
 
 
@@ -55,6 +60,22 @@
    <remap from="rgb/image_rect_color" to="/$(arg camera)/rgb/image_rect_color"/>
    <remap from="rgb/camera_info" to="/$(arg camera)/rgb/camera_info"/> 
   </node>
+  
+
+  <arg name="pi/2" value="1.5707963267948966" />
+  <arg name="optical_rotate" value="0 0 0 -$(arg pi/2) 0 -$(arg pi/2)" />
+
+  <node pkg="tf" type="static_transform_publisher" name="$(arg camera)_base_link"
+        args="0 -0.02 0 0 0 0 $(arg camera)_link $(arg camera)_depth_frame 100" />
+  <node pkg="tf" type="static_transform_publisher" name="$(arg camera)_base_link1"
+        args="0 -0.045 0 0 0 0 $(arg camera)_link $(arg camera)_rgb_frame 100" />
+  <node pkg="tf" type="static_transform_publisher" name="$(arg camera)_base_link2"
+        args="$(arg optical_rotate) $(arg camera)_depth_frame $(arg camera)_depth_optical_frame 100" />
+  <node pkg="tf" type="static_transform_publisher" name="$(arg camera)_base_link3"
+        args="$(arg optical_rotate) $(arg camera)_rgb_frame $(arg camera)_rgb_optical_frame 100" />
+ 
+
+
 
 
 </launch>
