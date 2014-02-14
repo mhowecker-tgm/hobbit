@@ -172,6 +172,7 @@ bool publishImagesFrames(unsigned char * color , unsigned int colorWidth , unsig
     cal.width=colorWidth; cal.height=colorHeight;
 
     //ROS_INFO("Filling D"); <- This segfaults for some reason
+    //cal->D.resize(5, 0.0);
     //cal.distortion_model=sensor_msgs::distortion_models::PLUMB_BOB;
     //cal.D[0]=calib->k1; cal.D[1]=calib->k2; cal.D[2]=calib->p1; cal.D[3]=calib->p2; cal.D[4]=calib->k3;
 
