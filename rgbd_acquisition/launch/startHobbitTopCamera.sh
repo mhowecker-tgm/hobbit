@@ -38,6 +38,17 @@
      <remap from="image" to="/$(arg camera)/depth_registered/image_rect_m"/>
     </node>
 
+
+
+    <!-- Produce a disparity image  -->
+    <node pkg="nodelet" type="nodelet" name="disparityBroadcaster" ns="$(arg camera)" args="load depth_image_proc/disparity rgbd_nodelet_manager --no-bond">
+     <remap from="left/image_rect" to="/$(arg camera)/depth_registered/image_rect"/>
+     <remap from="right/camera_info" to="/$(arg camera)/rgb/camera_info"/>
+     <remap from="left/disparity" to="/$(arg camera)/depth_registered/disparity"/>
+    </node>
+
+
+
    <node pkg="nodelet" type="nodelet" name="cloudify" ns="$(arg camera)" args="load depth_image_proc/point_cloud_xyzrgb rgbd_nodelet_manager --no-bond" output="screen">
    <remap from="depth_registered/image_rect" to="/$(arg camera)/depth_registered/image_rect_m"/>
    <remap from="depth_registered/points" to="/$(arg camera)/depth_registered/points"/>
