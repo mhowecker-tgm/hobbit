@@ -41,10 +41,10 @@
 
 
     <!-- Produce a disparity image  -->
-    <node pkg="nodelet" type="nodelet" name="disparityBroadcaster" ns="$(arg camera)" args="load depth_image_proc/disparity rgbd_nodelet_manager --no-bond">
+    <node pkg="nodelet" type="nodelet" name="disparityBroadcaster" ns="$(arg camera)" args="load depth_image_proc/disparity rgbd_nodelet_manager --no-bond" output="screen">
      <remap from="left/image_rect" to="/$(arg camera)/depth_registered/image_rect"/>
      <remap from="right/camera_info" to="/$(arg camera)/rgb/camera_info"/>
-     <remap from="left/disparity" to="/$(arg camera)/depth_registered/disparity"/>
+     <remap from="left/disparity" to="/$(arg camera)/depth_registered/disparityLoL"/>
     </node>
 
 
