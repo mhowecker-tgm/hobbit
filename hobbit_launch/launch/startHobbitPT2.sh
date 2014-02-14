@@ -41,7 +41,7 @@ rosrun mobile_platform mobile_platform&
 sleep 2
 
 #Start bottom camera
-roslaunch openni2_launch openni2.launch camera:=basecam depth_registration:=true&
+roslaunch openni2_launch openni2.launch camera:=basecam depth_registration:=true disparity_processing:=true disparity_registered_processing:=true &
 
 
 #After everything is done , bring had to up position
