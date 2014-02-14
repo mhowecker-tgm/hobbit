@@ -6,7 +6,7 @@
 #include <ros/spinner.h>
 
 
-#define BROADCAST_HOBBIT 0
+#define BROADCAST_HOBBIT 1
 
 #include "hand_gestures/HandGesture.h"
 
