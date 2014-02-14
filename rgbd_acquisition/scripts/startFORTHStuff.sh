@@ -1,11 +1,13 @@
 #!/bin/bash
-ISITUP=`screen -ls | grep rgbd_acquisition`
-while [ -n "$ISITUP" ]
+ISRGBDUP=`screen -ls | grep rgbd_acquisition`
+while [ -n "$ISRGBDUP" ]
 do
+
  echo "Trying to start-up rgbd_acquisition"
  screen -d -m -S "rgbd_acquisition" /bin/bash -c "source /home/hobbit/.bashrc && source /opt/ros/hobbit_hydro/devel/setup.bash && roslaunch rgbd_acquisition startHobbitTopCamera.sh"
  sleep 10
- ISITUP=`screen -ls | grep rgbd_acquisition`
+ ISRGBDUP=`screen -ls | grep rgbd_acquisition`
+
 done
 
 
