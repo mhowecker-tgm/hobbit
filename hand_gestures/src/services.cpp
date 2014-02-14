@@ -5,7 +5,16 @@
 #include <ros/ros.h>
 #include <ros/spinner.h>
 
+
+#define BROADCAST_HOBBIT 0
+
 #include "hand_gestures/HandGesture.h"
+
+#if BROADCAST_HOBBIT
+#include "hobbit_msgs/Event.h"
+ros::Publisher gestureEventBroadcaster;
+#endif
+
 
 ros::Publisher gestureBroadcaster;
 
@@ -34,6 +43,26 @@ void broadcastNewGesture(unsigned int frameNumber,struct handGesture * gesture)
 
     fprintf(stderr,"Publishing a new gesture\n");
     gestureBroadcaster.publish(msg);
+
+
+
+#if BROADCAST_HOBBIT
+    hobbit_msgs::Event evt;
+    switch (gesture->gestureID) 
+    { 
+     GESTURE_CANCEL : evt.event="G_CANCEL"; break; 
+     GESTURE_HELP   : evt.event="G_HELP"; break; 
+     GESTURE_YES    : evt.event="G_YES"; break; 
+     GESTURE_NO     : evt.event="G_NO"; break; 
+     GESTURE_REWARD : evt.event="G_REWARD"; break; 
+     GESTURE_POINT  : evt.event="G_POINT"; break; 
+    };
+     
+    evt.confidence = 1.0;
+#endif
+
+
+
     return ;
 }
 
@@ -65,6 +94,11 @@ int registerServices(ros::NodeHandle * nh,unsigned int width,unsigned int height
   if (depthFrameCopy==0) { fprintf(stderr,"Cannot make an intermidiate copy of depth frame \n"); }
 
   gestureBroadcaster = nh->advertise <hand_gestures::HandGesture> ("gestures", 1000);
+
+
+#if BROADCAST_HOBBIT
+  gestureEventBroadcaster = nh->advertise <hand_gestures::HandGesture> ("Event", 1000);
+#endif
 
   hobbitGestures_Initialize(width , height);
   hobbitGestures_RegisterGestureDetectedEvent((void *) &broadcastNewGesture);
