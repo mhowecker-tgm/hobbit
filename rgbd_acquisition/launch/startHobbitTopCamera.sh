@@ -2,10 +2,16 @@
     <!-- name of the "camera" -->
     <arg name="camera" value="headcam"/> 
     <!-- name of the root frame -->
-    <arg name="frame" value="frame"/> 
+    <arg name="frame" value="frameMPOURDA"/> 
+
+    <!-- Virtual Baseline for emulating disparity data , please note that disparity is a bad thing to use since we are using an active depth sensor and already have an observation in mm and meters 
+         Please note that the values here require an initial m to be parsed by ROS parameter server for an unknown reason so change the value but don't remove the m  
+    -->
+    <arg name="virtual_baseline" value="m0.25" />
+
+
     <arg name="rgb_frame_id" default="$(arg frame)/$(arg camera)_rgb_optical_frame" />
     <arg name="depth_frame_id" default="$(arg frame)/$(arg camera)_depth_optical_frame" />
-
 
     <!-- device_id can have the following formats:
          "B00367707227042B": Use device with given serial number
@@ -20,17 +26,17 @@
     -->
 
     <!--  This is the kinect camera address in the hobbit PT1 I use in Vienna 3@6 -->
-    <arg name="device_id" value=" freenect://0"/> 
+    <arg name="device_id" value="freenect://0"/> 
  
  
-   <!--  rosrun pcl_ros pointcloud_to_pcd input:=headcam/depth_registered/points/ -->
 
 
     <node name="rgbd_acquisition" pkg="rgbd_acquisition" type="run_it.sh" required="true" output="screen"> 
       <param name="camera" value="$(arg camera)" />
       <param name="device_id" value="$(arg device_id)" /> 
+      <param name="virtual_baseline" value="$(arg virtual_baseline)" />   
       <param name="frame" value="$(arg frame)" /> 
-      <param name="useSkeleton" value="0" />  
+      <param name="useSkeleton" value="1" />  
     </node>  
 
    <node pkg="nodelet" type="nodelet" name="rgbd_nodelet_manager" ns="$(arg camera)" args="manager" output="screen"/>
@@ -46,7 +52,7 @@
     <!-- Produce a disparity image  -->
     <node pkg="nodelet" type="nodelet" name="disparityBroadcaster" ns="$(arg camera)" args="load depth_image_proc/disparity rgbd_nodelet_manager --no-bond" output="screen">
      <remap from="left/image_rect" to="/$(arg camera)/depth_registered/image_rect_m"/>
-     <remap from="right" to="/$(arg camera)/rgb/camera_info"/>
+     <remap from="right/camera_info" to="/$(arg camera)/rgb/camera_info"/>
      <remap from="left/disparity" to="/$(arg camera)/depth_registered/disparity"/>
      <param name="min_range" value="0.5" />
      <param name="max_range" value="4.0" />
@@ -54,6 +60,7 @@
 
 
 
+   <!--  Produce point cloud ( rosrun pcl_ros pointcloud_to_pcd input:=headcam/depth_registered/points/ ) to dump it -->
    <node pkg="nodelet" type="nodelet" name="cloudify" ns="$(arg camera)" args="load depth_image_proc/point_cloud_xyzrgb rgbd_nodelet_manager --no-bond" output="screen">
    <remap from="depth_registered/image_rect" to="/$(arg camera)/depth_registered/image_rect_m"/>
    <remap from="depth_registered/points" to="/$(arg camera)/depth_registered/points"/>
@@ -61,7 +68,8 @@
    <remap from="rgb/camera_info" to="/$(arg camera)/rgb/camera_info"/> 
   </node>
   
-
+ 
+<!-- ONE could also add those
   <arg name="pi/2" value="1.5707963267948966" />
   <arg name="optical_rotate" value="0 0 0 -$(arg pi/2) 0 -$(arg pi/2)" />
 
@@ -74,7 +82,7 @@
   <node pkg="tf" type="static_transform_publisher" name="$(arg camera)_base_link3"
         args="$(arg optical_rotate) $(arg camera)_rgb_frame $(arg camera)_rgb_optical_frame 100" />
  
-
+-->
 
 
 

@@ -43,6 +43,7 @@
 
 //These are the static declarations of the various parts of this ROS package
 int key = 0;
+double  virtual_baseline=0.0; //This is 0 and should be zero since we have a registered depth/rgb stream , however it can be changed to allow fake disparity to be generated
 volatile int paused = 0;
 
 ros::NodeHandle * nhPtr=0;
@@ -140,8 +141,11 @@ bool publishImagesFrames(unsigned char * color , unsigned int colorWidth , unsig
    out_RGB_msg.encoding = sensor_msgs::image_encodings::RGB8; // Or whatever
    out_RGB_msg.image    = imageRGB; // Your cv::Mat
 
+   ros::Time sampleTime = ros::Time::now();
+
+
    out_RGB_msg.header.frame_id= tfRoot;
-   out_RGB_msg.header.stamp= ros::Time::now();
+   out_RGB_msg.header.stamp= sampleTime;
    pubRGB.publish(out_RGB_msg.toImageMsg());
 
 
@@ -155,7 +159,7 @@ bool publishImagesFrames(unsigned char * color , unsigned int colorWidth , unsig
    out_Depth_msg.image    = imageDepth; // Your cv::Mat
 
    out_Depth_msg.header.frame_id= tfRoot;
-   out_Depth_msg.header.stamp= ros::Time::now();
+   out_Depth_msg.header.stamp= sampleTime;
    pubDepth.publish(out_Depth_msg.toImageMsg());
 
 
@@ -168,10 +172,9 @@ bool publishImagesFrames(unsigned char * color , unsigned int colorWidth , unsig
     int i=0;
 
     sensor_msgs::CameraInfo cal;
-    cal.header.stamp = ros::Time::now();
+    cal.header.stamp = sampleTime;
     cal.width=colorWidth; cal.height=colorHeight;
 
-    //ROS_INFO("Filling D"); <- This segfaults for some reason
     cal.D.resize(5, 0.0);
     cal.distortion_model=sensor_msgs::distortion_models::PLUMB_BOB;
     cal.D[0]=calib->k1; cal.D[1]=calib->k2; cal.D[2]=calib->p1; cal.D[3]=calib->p2; cal.D[4]=calib->k3;
@@ -183,6 +186,11 @@ bool publishImagesFrames(unsigned char * color , unsigned int colorWidth , unsig
     cal.R[6]=0.0; cal.R[7]=0.0; cal.R[8]=1.0;
 
     for (i=0; i<12; i++) { cal.P[i]=0.0; }
+
+    //Base line for fake disparity !
+    cal.P[3]=virtual_baseline;
+    //P[3] should be 0.0 since we have a registered feed but we add a baseline for fake disparity here
+
     cal.P[0]=calib->intrinsic[CALIB_INTR_FX];
     cal.P[5]=calib->intrinsic[CALIB_INTR_FY];
     cal.P[2]=calib->intrinsic[CALIB_INTR_CX];
@@ -198,6 +206,7 @@ bool publishImagesFrames(unsigned char * color , unsigned int colorWidth , unsig
    //---------------------------------------------------------------------------------------------------
    //---------------------------------------------------------------------------------------------------
 
+
    //Spin ROS one time
    ros::spinOnce();
 
@@ -207,7 +216,6 @@ bool publishImagesFrames(unsigned char * color , unsigned int colorWidth , unsig
 
    return true;
 }
-
 
 
 int publishImages()
@@ -263,6 +271,7 @@ int main(int argc, char **argv)
      std::string name;
      std::string camera;
      std::string frame;
+     std::string virtualBaselineStr;
      int rate;
 
      ros::NodeHandle private_node_handle_("~");
@@ -273,6 +282,10 @@ int main(int argc, char **argv)
      private_node_handle_.param("frame", frame, std::string("frame"));
      private_node_handle_.param("rate", rate, int(30));
      private_node_handle_.param("device_id", from, std::string(""));
+     private_node_handle_.param("virtual_baseline", virtualBaselineStr, std::string("0.0"));
+     std::cout<<"virtual_baseline initially : "<<virtual_baseline<<" ("<<virtualBaselineStr<<")"<<std::endl;
+     if (virtualBaselineStr[0]=='m') { virtualBaselineStr[0]='0'; }
+     virtual_baseline = atof(virtualBaselineStr.c_str());
 
      //Pass root frame for TF poses
      strcpy(tfRoot,frame.c_str());
@@ -288,7 +301,9 @@ int main(int argc, char **argv)
      std::cout<<"Camera : "<<camera<<std::endl;
      std::cout<<"Frame : "<<frame<<std::endl;
      std::cout<<"Rate : "<<rate<<std::endl;
+     std::cout<<"virtual_baseline : "<<virtual_baseline<<" ("<<virtualBaselineStr<<")"<<std::endl;
      std::cout<<"Device_id : "<<from<<"  devID : "<<devID<<std::endl;
+     std::cout<<"useSkeleton : "<<useSkeleton<<std::endl;
      std::cout<<"--------------------------------------------------"<<std::endl;
 
 
