@@ -68,7 +68,7 @@ include_directories(${catkin_INCLUDEDIR}
 		    ${OpenCV_INCLUDEDIR})
 
 
-add_executable(rgbd_acquisition  src/main.cpp src/extAcquisition.cpp src/OpenNI2Acquisition.cpp src/Nite2.cpp src/FaceDetection.cpp src/AmMatrix/solveLinearSystemGJ.c src/AmMatrix/matrixCalculations.c src/AmMatrix/matrix4x4Tools.c src/AmMatrix/matrix3x3Tools.c src/calibration.c src/ImageOperations/imageOps.c src/services.cpp src/pose.cpp)
+add_executable(rgbd_acquisition  src/main.cpp src/extAcquisition.cpp src/OpenNI2Acquisition.cpp src/Nite2.cpp src/services.cpp src/pose.cpp)
 
 #${Nite2_LIBRARY}
 target_link_libraries(rgbd_acquisition ${catkin_LIBRARIES} ${OpenNI2_LIBRARIES}  ${CMAKE_CURRENT_SOURCE_DIR}/bin/libNiTE2.so ${OpenCV_LIBRARIES})
