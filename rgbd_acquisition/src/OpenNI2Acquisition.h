@@ -7,7 +7,56 @@ extern "C"
 {
 #endif
 
-    #include "calibration.h"
+/**
+ * @brief A short hand  enumerator to make it easy to access the double intrinsic[9]; field of a struct calibration
+ *
+ * This enumerator holds all the possible values passed when and where moduleID is requested
+ * These have an 1:1 relation to the modules that are supported and are used to reference them
+ *
+ */
+enum calibIntrinsics
+{
+  CALIB_INTR_FX = 0 ,
+  CALIB_INTR_FY = 4 ,
+  CALIB_INTR_CX = 2 ,
+  CALIB_INTR_CY = 5
+};
+
+/**
+ * @brief The structure that holds the calibration data
+ *
+ *  The calibration structure covers everything from intrinsics / distortion  / dimensions to
+ *  the extrinsic calibration of the input source , this gets set by each of the modules and is one of the
+ *  core structures used in most things in RGBDAcquisition
+ */
+struct calibration
+{
+  /* CAMERA INTRINSIC PARAMETERS */
+  char intrinsicParametersSet;
+  double intrinsic[9];
+  double k1,k2,p1,p2,k3;
+
+  /* CAMERA EXTRINSIC PARAMETERS */
+  char extrinsicParametersSet;
+  double extrinsicRotationRodriguez[3];
+  double extrinsicTranslation[3];
+  double extrinsic[16];
+
+  /*CAMERA DIMENSIONS ( WHEN RENDERING )*/
+  double nearPlane,farPlane;
+  unsigned int width;
+  unsigned int height;
+
+  double depthUnit;
+
+  /*CONFIGURATION*/
+  int imagesUsed;
+  int boardWidth;
+  int boardHeight;
+  double squareSize;
+};
+
+
     #define USE_CALIBRATION 1
 
    //Initialization of OpenNI2

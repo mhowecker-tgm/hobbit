@@ -1,7 +1,6 @@
 #include "services.h"
 
 #include "Nite2.h"
-#include "FaceDetection.h"
 
 #include <ros/ros.h>
 #include <ros/spinner.h>
@@ -102,25 +101,6 @@ void broadcastSkeleton(unsigned int frameNumber ,struct skeletonHuman * skeleton
 
 
 
-void broadcastDetectedFace(unsigned int frameNumber ,struct detectedFace * faceFound)
-{
-    fprintf(stderr,"Broadcasting a head \n");
-
-     actualTimestamp=frameNumber;
-     actualInFieldOfView=1; //We won't get this message if we don't have a face
-     actualConfidence=0.4; // We aren't particularly sure
-     actualX=faceFound->headX;
-     actualY=faceFound->headY;
-     actualZ=faceFound->headZ;
-     actualTheta=0.0;
-
-     postPoseTransform((char*) jointNames[HUMAN_SKELETON_HEAD],/*-1.0**/faceFound->headX/1000,/*-1.0**/faceFound->headY/1000,faceFound->headZ/1000);
-
-     broadcastNewPerson();
-}
-
-
-
 
 int registerServices(ros::NodeHandle * nh)
 {
@@ -130,5 +110,4 @@ int registerServices(ros::NodeHandle * nh)
 
     registerSkeletonDetectedEvent(0,(void*) &broadcastSkeleton);
     registerSkeletonPointingDetectedEvent(0,(void *) &broadcastPointing);
-    registerFaceDetectedEvent((void *) &broadcastDetectedFace);
 }

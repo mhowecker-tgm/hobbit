@@ -32,6 +32,15 @@
 #define ANY_OPENNI2_DEVICE MAX_OPENNI2_DEVICES*2
 #define MAX_TRIES_FOR_EACH_FRAME 10
 
+#define DEFAULT_WIDTH 640
+#define DEFAULT_HEIGHT 480
+
+#define DEFAULT_FX 535.423874
+#define DEFAULT_FY 533.484654
+
+//Default Kinect things for reference
+#define DEFAULT_FOCAL_LENGTH 120.0
+#define DEFAULT_PIXEL_SIZE 0.1052
 
 using namespace std;
 using namespace openni;
@@ -44,6 +53,7 @@ VideoFrameRef depthFrame[MAX_OPENNI2_DEVICES],colorFrame[MAX_OPENNI2_DEVICES];
 unsigned int frameSnapped=0;
 
 #if USE_CALIBRATION
+
  struct calibration calibRGB[MAX_OPENNI2_DEVICES];
  struct calibration calibDepth[MAX_OPENNI2_DEVICES];
 #endif
@@ -523,6 +533,58 @@ int snapOpenNI2Frames(int devID)
 
   ++frameSnapped;
   return retres;
+}
+
+int NullCalibration(unsigned int width,unsigned int height, struct calibration * calib)
+{
+  calib->width=width;
+  calib->height=height;
+
+  calib->intrinsicParametersSet=0;
+  calib->extrinsicParametersSet=0;
+
+
+  calib->nearPlane=1.0;
+  calib->farPlane=1000.0;
+
+  calib->intrinsic[0]=0.0;  calib->intrinsic[1]=0.0;  calib->intrinsic[2]=0.0;
+  calib->intrinsic[3]=0.0;  calib->intrinsic[4]=0.0;  calib->intrinsic[5]=0.0;
+  calib->intrinsic[6]=0.0;  calib->intrinsic[7]=0.0;  calib->intrinsic[8]=1.0;
+
+  calib->k1=0.0;  calib->k2=0.0; calib->p1=0.0; calib->p2=0.0; calib->k3=0.0;
+
+  calib->extrinsicRotationRodriguez[0]=0.0; calib->extrinsicRotationRodriguez[1]=0.0; calib->extrinsicRotationRodriguez[2]=0.0;
+  calib->extrinsicTranslation[0]=0.0; calib->extrinsicTranslation[1]=0.0; calib->extrinsicTranslation[2]=0.0;
+
+  /*cx*/calib->intrinsic[CALIB_INTR_CX]  = (double) width/2;
+  /*cy*/calib->intrinsic[CALIB_INTR_CY]  = (double) height/2;
+
+  //-This is a bad initial estimation i guess :P
+  /*fx*/ calib->intrinsic[CALIB_INTR_FX] = (double) (DEFAULT_FX * width) / DEFAULT_WIDTH;   //<- these might be wrong
+  /*fy*/ calib->intrinsic[CALIB_INTR_FY] = (double) (DEFAULT_FY * height)  / DEFAULT_HEIGHT;    //<- these might be wrong
+  //--------------------------------------------
+
+  calib->depthUnit=1000.0; //Default is meters to millimeters
+
+  return 1;
+}
+
+
+int FocalLengthAndPixelSizeToCalibration(double focalLength , double pixelSize ,unsigned int width,unsigned int height ,  struct calibration * calib)
+{
+  NullCalibration(width,height,calib);
+
+  if (pixelSize!=0)
+  {
+   calib->intrinsic[CALIB_INTR_FX] = (double) focalLength/pixelSize;
+   calib->intrinsic[CALIB_INTR_FY] = (double) focalLength/pixelSize;
+   calib->intrinsicParametersSet=1;
+
+   return 1;
+  }
+
+  fprintf(stderr,"FocalLengthAndPixelSizeToCalibration(with focalLength %f and pixelSize %f) cannot yield a valid calibration\n",focalLength , pixelSize);
+  return 0;
 }
 
 int createOpenNI2Device(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
