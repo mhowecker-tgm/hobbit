@@ -63,6 +63,7 @@ void broadcastNewGesture(unsigned int frameNumber,struct handGesture * gesture)
     evt.sessionID  = "SessionID";
     evt.confidence = 1.0;
     evt.params.resize(0);
+    fprintf(stderr,"Publishing a new Event\n");
     gestureEventBroadcaster.publish(evt);
 #endif
 
