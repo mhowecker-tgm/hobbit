@@ -62,6 +62,8 @@ void broadcastNewGesture(unsigned int frameNumber,struct handGesture * gesture)
     evt.header.stamp = ros::Time::now();
     evt.sessionID  = "SessionID";
     evt.confidence = 1.0;
+    evt.params.resize(0);
+    gestureEventBroadcaster.publish(evt);
 #endif
 
 
