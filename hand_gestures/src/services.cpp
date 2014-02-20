@@ -50,12 +50,14 @@ void broadcastNewGesture(unsigned int frameNumber,struct handGesture * gesture)
     hobbit_msgs::Event evt;
     switch (gesture->gestureID)
     {
-     GESTURE_CANCEL : evt.event="G_CANCEL"; break;
-     GESTURE_HELP   : evt.event="G_HELP"; break;
-     GESTURE_YES    : evt.event="G_YES"; break;
-     GESTURE_NO     : evt.event="G_NO"; break;
-     GESTURE_REWARD : evt.event="G_REWARD"; break;
-     GESTURE_POINT  : evt.event="G_POINT"; break;
+     case GESTURE_NONE   : evt.event="G_NONE";   break;
+     case GESTURE_CANCEL : evt.event="G_CANCEL"; break;
+     case GESTURE_HELP   : evt.event="G_HELP";   break;
+     case GESTURE_YES    : evt.event="G_YES";    break;
+     case GESTURE_NO     : evt.event="G_NO";     break;
+     case GESTURE_REWARD : evt.event="G_REWARD"; break;
+     case GESTURE_POINT  : evt.event="G_POINT";  break;
+     default :             evt.event="G_NOTFOUND"; break;
     };
     evt.header.seq = frameNumber;
     evt.header.frame_id = "hand_gestures";
@@ -63,7 +65,7 @@ void broadcastNewGesture(unsigned int frameNumber,struct handGesture * gesture)
     evt.sessionID  = "SessionID";
     evt.confidence = 1.0;
     evt.params.resize(0);
-    fprintf(stderr,"Publishing a new Event\n");
+    fprintf(stderr,"Publishing a new Event ( %u ) \n",gesture->gestureID);
     gestureEventBroadcaster.publish(evt);
 #endif
 
