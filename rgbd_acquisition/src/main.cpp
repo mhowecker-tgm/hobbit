@@ -3,7 +3,6 @@
 #define EMMIT_CALIBRATION 1
 
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -51,10 +50,7 @@ image_transport::Publisher pubRGB;
 image_transport::Publisher pubDepth;
 
 ros::Publisher pubRGBInfo;
-ros::Publisher pubDepthInfo;
-#if EMMIT_POINTCLOUD
-ros::Publisher pubDepthCloud;
-#endif
+ros::Publisher pubDepthInfo; 
 
 
 //----------------------------------------------------------
@@ -270,8 +266,7 @@ int main(int argc, char **argv)
      std::string from;
      std::string name;
      std::string camera;
-     std::string frame;
-     std::string virtualBaselineStr;
+     std::string frame; 
      int rate;
 
      ros::NodeHandle private_node_handle_("~");
@@ -281,12 +276,9 @@ int main(int argc, char **argv)
      private_node_handle_.param("camera", camera, std::string("camera"));
      private_node_handle_.param("frame", frame, std::string("frame"));
      private_node_handle_.param("rate", rate, int(30));
-     private_node_handle_.param("device_id", from, std::string(""));
-     private_node_handle_.param("virtual_baseline", virtualBaselineStr, std::string("0.0"));
-     std::cout<<"virtual_baseline initially : "<<virtual_baseline<<" ("<<virtualBaselineStr<<")"<<std::endl;
-     if (virtualBaselineStr[0]=='m') { virtualBaselineStr[0]='0'; }
-     virtual_baseline = atof(virtualBaselineStr.c_str());
-
+     private_node_handle_.param("device_id", from, std::string("")); 
+     private_node_handle_.param("virtual_baseline", virtual_baseline, 0.0);
+      
      //Pass root frame for TF poses
      strcpy(tfRoot,frame.c_str());
 
@@ -301,7 +293,7 @@ int main(int argc, char **argv)
      std::cout<<"Camera : "<<camera<<std::endl;
      std::cout<<"Frame : "<<frame<<std::endl;
      std::cout<<"Rate : "<<rate<<std::endl;
-     std::cout<<"virtual_baseline : "<<virtual_baseline<<" ("<<virtualBaselineStr<<")"<<std::endl;
+     std::cout<<"virtual_baseline : "<<virtual_baseline<<std::endl;
      std::cout<<"Device_id : "<<from<<"  devID : "<<devID<<std::endl;
      std::cout<<"useSkeleton : "<<useSkeleton<<std::endl;
      std::cout<<"--------------------------------------------------"<<std::endl;
@@ -342,10 +334,9 @@ int main(int argc, char **argv)
 
 	  while ( ( key!='q' ) && (ros::ok()) )
 		{
-          loopEvent(); //<- this keeps our ros node messages handled up until synergies take control of the main thread
-          //usleep(1000);
-          loop_rate.sleep();
-		 }
+                  loopEvent(); //<- this keeps our ros node messages handled up until synergies take control of the main thread
+                  loop_rate.sleep();
+		}
 
       switchDrawOutTo(0);
 	}

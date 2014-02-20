@@ -2,12 +2,10 @@
     <!-- name of the "camera" -->
     <arg name="camera" value="headcam"/> 
     <!-- name of the root frame -->
-    <arg name="frame" value="frameMPOURDA"/> 
+    <arg name="frame" value="frame"/> 
 
-    <!-- Virtual Baseline for emulating disparity data , please note that disparity is a bad thing to use since we are using an active depth sensor and already have an observation in mm and meters 
-         Please note that the values here require an initial m to be parsed by ROS parameter server for an unknown reason so change the value but don't remove the m  
-    -->
-    <arg name="virtual_baseline" value="m0.25" />
+    <!-- Virtual Baseline for emulating disparity data , please note that disparity is a bad thing to use since we are using an active depth sensor and already have an observation in mm and meters -->
+    <arg name="virtual_baseline" value="0.25" type="double" />
 
 
     <arg name="rgb_frame_id" default="$(arg frame)/$(arg camera)_rgb_optical_frame" />
@@ -80,8 +78,7 @@
   <node pkg="tf" type="static_transform_publisher" name="$(arg camera)_base_link2"
         args="$(arg optical_rotate) $(arg camera)_depth_frame $(arg camera)_depth_optical_frame 100" />
   <node pkg="tf" type="static_transform_publisher" name="$(arg camera)_base_link3"
-        args="$(arg optical_rotate) $(arg camera)_rgb_frame $(arg camera)_rgb_optical_frame 100" />
- 
+        args="$(arg optical_rotate) $(arg camera)_rgb_frame $(arg camera)_rgb_optical_frame 100" /> 
 -->
 
 
