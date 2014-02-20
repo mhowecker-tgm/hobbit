@@ -7,10 +7,7 @@
     <!-- Virtual Baseline for emulating disparity data , please note that disparity is a bad thing to use since we are using an active depth sensor and already have an observation in mm and meters -->
     <arg name="virtual_baseline" value="0.25" type="double" />
 
-
-    <arg name="rgb_frame_id" default="$(arg frame)/$(arg camera)_rgb_optical_frame" />
-    <arg name="depth_frame_id" default="$(arg frame)/$(arg camera)_depth_optical_frame" />
-
+ 
     <!-- device_id can have the following formats:
          "B00367707227042B": Use device with given serial number
          "#1"              : Use first device found
