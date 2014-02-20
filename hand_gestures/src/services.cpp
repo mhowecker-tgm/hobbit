@@ -48,16 +48,19 @@ void broadcastNewGesture(unsigned int frameNumber,struct handGesture * gesture)
 
 #if BROADCAST_HOBBIT
     hobbit_msgs::Event evt;
-    switch (gesture->gestureID) 
-    { 
-     GESTURE_CANCEL : evt.event="G_CANCEL"; break; 
-     GESTURE_HELP   : evt.event="G_HELP"; break; 
-     GESTURE_YES    : evt.event="G_YES"; break; 
-     GESTURE_NO     : evt.event="G_NO"; break; 
-     GESTURE_REWARD : evt.event="G_REWARD"; break; 
-     GESTURE_POINT  : evt.event="G_POINT"; break; 
+    switch (gesture->gestureID)
+    {
+     GESTURE_CANCEL : evt.event="G_CANCEL"; break;
+     GESTURE_HELP   : evt.event="G_HELP"; break;
+     GESTURE_YES    : evt.event="G_YES"; break;
+     GESTURE_NO     : evt.event="G_NO"; break;
+     GESTURE_REWARD : evt.event="G_REWARD"; break;
+     GESTURE_POINT  : evt.event="G_POINT"; break;
     };
-     
+    evt.header.seq = frameNumber;
+    evt.header.frame_id = "hand_gestures";
+    evt.header.stamp = ros::Time::now();
+    evt.sessionID  = "SessionID";
     evt.confidence = 1.0;
 #endif
 
@@ -97,7 +100,7 @@ int registerServices(ros::NodeHandle * nh,unsigned int width,unsigned int height
 
 
 #if BROADCAST_HOBBIT
-  gestureEventBroadcaster = nh->advertise <hand_gestures::HandGesture> ("Event", 1000);
+  gestureEventBroadcaster = nh->advertise <hobbit_msgs::Event> ("Event", 1000);
 #endif
 
   hobbitGestures_Initialize(width , height);
