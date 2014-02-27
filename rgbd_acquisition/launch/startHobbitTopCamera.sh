@@ -4,8 +4,8 @@
     <!-- name of the root frame -->
     <arg name="frame" value="frame"/> 
 
-    <!-- Virtual Baseline for emulating disparity data , please note that disparity is a bad thing to use since we are using an active depth sensor and already have an observation in mm and meters -->
-    <arg name="virtual_baseline" value="0.075" type="double" />
+    <!-- Virtual Baseline for emulating disparity data , please note that disparity is a bad thing to use since we are using an active depth sensor and already have an observation in mm and meters , also please note that value given here should be in millimeters since the disparity nodelet is connected straight to the depth_registered topic which is on millimeters -->
+    <arg name="virtual_baseline" value="-75" type="double" />
 
  
     <!-- device_id can have the following formats:
