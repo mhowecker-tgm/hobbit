@@ -8,6 +8,7 @@
          The value -43.186 = -0.075 * 575.815735 due to a bug (?) on ROS
          see : https://github.com/ros-perception/image_pipeline/blob/hydro-devel/depth_image_proc/src/nodelets/disparity.cpp#L136
          so we are multiplying * fX until it is fixed (?)
+         I have opened an issue ticket here : https://github.com/ros-perception/image_pipeline/issues/58 
 -->
 
     <arg name="virtual_baseline" value="-43.186" type="double" />
