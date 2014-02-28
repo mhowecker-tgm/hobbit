@@ -1,0 +1,10 @@
+<root>
+  <Map>
+    <Image>static.png</Image>
+    <CellSize>0.025</CellSize>
+    <Offset>
+      <X>400</X>
+      <Y>440</Y>
+    </Offset>
+  </Map>
+</root>

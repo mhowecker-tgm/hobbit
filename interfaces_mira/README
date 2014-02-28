@@ -1,0 +1,39 @@
+
+
+To compile this package it is necessay to install the binary version of Mira from:
+
+ http://mira-project.org/downloads/6c37f526e62ece4696fd83958b8e6f42/mira-installer-binary.sh
+
+Then, run mirapackage:
+
+cd /path_to_mira/bin
+./mirapackage
+
+Then, the MIRA-commercial repository has to be installed:
+
+In mirapackage click the "+" button in "Settings -> Repositories" and then
+insert the link to the correct .repo file. To find this file, go to this link:
+ftp://ftp.metralabs-service.com/repos/MIRA-commercial/
+and then select the matching operating system. 
+Inside you will find a file MIRA-commercial.repo. 
+Copy that link and paste it into the text field, then click "OK" twice and say "Yes" 
+when it asks to reindex. After that, you should be able to find and install all required packages.
+
+List of required packages:
+
+MapBuilderGUI
+Pilot
+PilotNogoAreas
+Poseidon
+SCITOS
+SCITOSConfigs
+Maps
+Mapping
+RobotModelPublisher
+PersistentLocalization
+MCFLoader
+OccupancyGridMapper
+RangeFinder
+
+
+and all dependencies.
