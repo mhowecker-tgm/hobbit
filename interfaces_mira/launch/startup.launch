@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<launch>
+
+  <arg name="TEST_MODULES" default="VirtualLaser"/>
+
+  <node pkg="interfaces_mira" type="interfaces_node" name="interfaces_node" output="screen">
+    <param name="config_file" value="$(find interfaces_mira)/resources/interfaces_node.xml" type="string"/>
+    <param name="mira_modules" value="$(arg TEST_MODULES)" />
+  </node>
+
+</launch>

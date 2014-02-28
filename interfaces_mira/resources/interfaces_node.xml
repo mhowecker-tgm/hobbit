@@ -1,0 +1,38 @@
+<root>
+	<!-- Specify the variables for your robot and environment -->
+	<var MCFFile="/home/racin/hobbit_hydro/src/interfaces_mira/mcf.xml" />
+	<var robot="SCITOS-G5" />
+
+	<!-- Enable networked communication with the MIRA instance. I.e. you can 
+		 see the robot's data (and your virtual laser scanner) by calling 
+		 'miracenter -k 127.0.0.1:1234' from a different terminal, while your
+		 ROS-MIRA bridge is running. -->
+	<communication>
+		<Port>1234</Port>
+	</communication>
+	
+	<!-- Provide navigation capabilities by including the Pilot config file -->
+	<!-- <include file="${findpkg SCITOSConfigs}/etc/SCITOS-Pilot.xml" /> -->
+
+	<!-- Here we patch in the kinect as the laser to use for localization -->
+	<!-- <namespace name="localization">-->
+		<!-- See line 18 of file MIRA-commercial/domains/robot/SCITOSConfigs/etc/PoseidonLocalization.xml -->
+	<!-- 	<parameter name="Poseidon.Sensors[?].item{mira::localization::RangeScanSensor}">
+			<RangeChannels>
+				<item>/VirtualLaserLoc</item>
+			</RangeChannels>
+		</parameter>
+	</namespace> -->
+
+	<!-- Here we patch in the kinect as the laser to use for navigation -->
+	<!-- <namespace name="navigation">
+		<namespace name="laser"> -->
+			<!-- See line 156 of file MIRA-commercial/domains/robot/SCITOSConfigs/etc/SCITOS-Pilot.xml -->
+		<!-- 	<parameter name="GridMapperLaser"> 
+				<Sensors>
+					<item>/VirtualLaserObs</item>
+				</Sensors>
+			</parameter>
+		</namespace>
+	</namespace> -->
+</root>
