@@ -4,7 +4,12 @@
     <!-- name of the root frame -->
     <arg name="frame" value="frame"/> 
 
-    <!-- Virtual Baseline for emulating disparity data , please note that disparity is a bad thing to use since we are using an active depth sensor and already have an observation in mm and meters , also please note that value given here should be in millimeters since the disparity nodelet is connected straight to the depth_registered topic which is on millimeters -->
+    <!-- Virtual Baseline for emulating disparity data , please note that disparity is a bad thing to use since we are using an active depth sensor and already have an observation in mm and meters , also please note that value given here should be in millimeters since the disparity nodelet is connected straight to the depth_registered topic which is on millimeters 
+         The value -43.186 = -0.075 * 575.815735 due to a bug (?) on ROS
+         see : https://github.com/ros-perception/image_pipeline/blob/hydro-devel/depth_image_proc/src/nodelets/disparity.cpp#L136
+         so we are multiplying * fX until it is fixed (?)
+-->
+
     <arg name="virtual_baseline" value="-43.186" type="double" />
 
  
