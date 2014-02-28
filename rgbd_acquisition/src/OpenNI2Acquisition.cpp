@@ -35,8 +35,8 @@
 #define DEFAULT_WIDTH 640
 #define DEFAULT_HEIGHT 480
 
-#define DEFAULT_FX 535.423874
-#define DEFAULT_FY 533.484654
+#define DEFAULT_FX 575.815735
+#define DEFAULT_FY 575.815735
 
 //Default Kinect things for reference
 #define DEFAULT_FOCAL_LENGTH 120.0
