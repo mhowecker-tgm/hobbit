@@ -35,5 +35,25 @@ MCFLoader
 OccupancyGridMapper
 RangeFinder
 
-
 and all dependencies.
+
+
+-------------------------------------------------------------------------------
+
+To have access to the provided channels:
+
+cd hobbit_hydro/src/interfaces_mira/launch
+roslaunch startup.launch
+
+cd /path_to_mira/bin
+./miracenter -k 127.0.0.1:1234
+
+The channels with the data should be shown on the left. 
+For visualization, drag and drop in the main window.
+
+To visualize the laser data, ROS nodes publishing loc_scan (bottom kinect) and obstcle_scan (top_kinect) should have been launched.
+
+
+
+
+
