@@ -12,14 +12,14 @@ void MiraGetPose::initialize() {
 
   current_pose_pub = robot_->getRosNode().advertise<geometry_msgs::PoseWithCovarianceStamped>("/amcl_pose", 20);
 
-  robot_->getMiraAuthority().subscribe<mira::PoseCov3>("/robot/PoseCov3", &MiraGetPose::loc_pose_callback, this);
+  robot_->getMiraAuthority().subscribe<mira::PoseCov2>("/robot/PoseCov2", &MiraGetPose::loc_pose_callback, this);
 
 }
 
-void MiraGetPose::loc_pose_callback(mira::ChannelRead<mira::PoseCov3> data) 
+void MiraGetPose::loc_pose_callback(mira::ChannelRead<mira::PoseCov2> data) 
 {
 
-  const mira::PoseCov3 robotPose = robot_->getMiraAuthority().getTransform<mira::PoseCov3>("/robot/RobotFrame", "/GlobalFrame");
+  const mira::PoseCov2 robotPose = robot_->getMiraAuthority().getTransform<mira::PoseCov2>("/robot/RobotFrame", "/maps/MapFrame", Time::now());
 
   geometry_msgs::PoseWithCovarianceStamped pose_msg;
 
@@ -30,22 +30,25 @@ void MiraGetPose::loc_pose_callback(mira::ChannelRead<mira::PoseCov3> data)
   pose_msg.header.stamp = pose_time;
   pose_msg.header.frame_id = "map";
 
-  //FIXME!! What is the structure of PoseCov3?? Do they use quaternions? No documentation found
 
   //pose
-/*  pose_msg.pose.pose.position.x = ; 
-  pose_msg.pose.pose.position.y = ;
+  pose_msg.pose.pose.position.x = robotPose.x(); 
+  pose_msg.pose.pose.position.y = robotPose.y();
   pose_msg.pose.pose.position.z = 0;
 
-  //pose_msg.pose.pose.orientation = tf::createQuaternionMsgFromYaw(theta);
+  pose_msg.pose.pose.orientation = tf::createQuaternionMsgFromYaw(robotPose.phi());
 
-  pose_msg.pose.pose.orientation.x = ; 
-  pose_msg.pose.pose.orientation.y = ; 
-  pose_msg.pose.pose.orientation.z = ; 
-  pose_msg.pose.pose.orientation.w = ; */
 
   //FIXME!! Provide covariance
-  //pose_msg.pose.covariance = ;
+  pose_msg.pose.covariance[0] = robotPose.cov(0,0); //robotPose.cov is a public member, the data type is  Eigen::Matrix
+  pose_msg.pose.covariance[1] = robotPose.cov(0,1);
+  pose_msg.pose.covariance[5] = robotPose.cov(0,2);
+  pose_msg.pose.covariance[6] = robotPose.cov(0,1);
+  pose_msg.pose.covariance[7] = robotPose.cov(1,1);
+  pose_msg.pose.covariance[11] = robotPose.cov(1,2);
+  pose_msg.pose.covariance[30] = robotPose.cov(0,2);
+  pose_msg.pose.covariance[31] = robotPose.cov(1,2);
+  pose_msg.pose.covariance[35] = robotPose.cov(2,2);
 
 
   //publish the pose
