@@ -38,6 +38,13 @@ void MiraGetPose::loc_pose_callback(mira::ChannelRead<mira::PoseCov2> data)
 
   pose_msg.pose.pose.orientation = tf::createQuaternionMsgFromYaw(robotPose.phi());
 
+  int cov_size = 36;
+  for (int i=0; i<cov_size; i++)
+  {
+	pose_msg.pose.covariance[i] = 0;
+
+  }
+
 
   //FIXME!! Provide covariance
   pose_msg.pose.covariance[0] = robotPose.cov(0,0); //robotPose.cov is a public member, the data type is  Eigen::Matrix
