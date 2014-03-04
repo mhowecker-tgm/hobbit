@@ -8,6 +8,7 @@
 #define MIRASENDINGGOALS_H
 
 #define GOAL_POSE "goal_pose"
+#define GOAL_STATUS "goal_status"
 
 //#include <fw/Framework.h>
 
@@ -18,6 +19,7 @@
 #include <navigation/INavigation.h> 
 
 #include <hobbit_msgs/Pose2DStamped.h>
+#include <std_msgs/String.h>
 
 
 class MiraSendingGoals: public MiraRobotModule {
@@ -30,10 +32,18 @@ public:
 
 	void goal_pose_callback(const hobbit_msgs::Pose2DStamped::ConstPtr& goal_pose);
 
+        void stop_request_callback(const std_msgs::String::ConstPtr& msg);
+
+        void goal_status_channel_callback(mira::ChannelRead<std::string> data);
+
 private:
         MiraSendingGoals();
 
 	ros::Subscriber goal_pose_subscriber;
+
+	ros::Publisher goal_status_pub;
+
+	std_msgs::String goal_status;
 
 };
 

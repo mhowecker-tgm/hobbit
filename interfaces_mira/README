@@ -51,7 +51,7 @@ cd /path_to_mira/bin
 The channels with the data should be shown on the left. 
 For visualization, drag and drop in the main window.
 
-To visualize the laser data, ROS nodes publishing loc_scan (bottom kinect) and obstcle_scan (top_kinect) should have been launched.
+To visualize the laser data, ROS nodes publishing loc_scan (bottom kinect) and obstacle_scan (top_kinect) should have been launched.
 
 
 

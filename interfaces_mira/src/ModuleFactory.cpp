@@ -3,11 +3,13 @@
 #include "interfaces_mira/MiraVirtualLaser.h"
 #include "interfaces_mira/MiraSendingGoals.h"
 #include "interfaces_mira/MiraGetPose.h"
+#include "interfaces_mira/MiraGetPath.h"
 
 ModuleFactory::ModuleFactory() {
         Register("VirtualLaser", &MiraVirtualLaser::Create);
 	Register("SendingGoals", &MiraSendingGoals::Create);
         Register("MiraGetPose", &MiraGetPose::Create);
+	Register("MiraGetPath", &MiraGetPath::Create);
 }
 
 void ModuleFactory::Register(const std::string &name, ModuleCreator func) {
