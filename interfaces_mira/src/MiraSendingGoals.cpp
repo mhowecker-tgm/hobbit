@@ -34,9 +34,6 @@ void MiraSendingGoals::goal_status_channel_callback(mira::ChannelRead<std::strin
 	}
 	if(data->value().c_str() == "PlanAndDrive") 
 	{
-		goal_status.data = "aborted";
-		std::cout << "Goal aborted " << std::endl;
-
   		goal_status.data = "active";
 		goal_status_pub.publish(goal_status);
 	}
