@@ -21,6 +21,7 @@ void MiraSendingGoals::initialize() {
   robot_->getMiraAuthority().subscribe<std::string>("PilotEvent", &MiraSendingGoals::goal_status_channel_callback, this);
 
   goal_status.data = "idle";
+  goal_status_pub.publish(goal_status);
 
 }
 
