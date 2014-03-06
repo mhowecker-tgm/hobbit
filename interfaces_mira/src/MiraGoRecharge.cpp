@@ -1,32 +1,32 @@
-#include <interfaces_mira/MiraSendingGoals.h>
+#include <interfaces_mira/MiraGoRecharge.h>
 
 #include <navigation/Task.h>
-#include <navigation/tasks/OrientationTask.h>
 #include <navigation/tasks/PreferredDirectionTask.h>
-#include <navigation/tasks/PositionTask.h>
+#include <navigation/tasks/DockingTask.h>
 
 #include <string>
 
 using namespace mira::navigation;
 
-MiraSendingGoals::MiraSendingGoals() : MiraRobotModule(std::string ("SendingGoal")) {
+MiraGoRecharge::MiraGoRecharge() : MiraRobotModule(std::string ("SendingGoal")) {
 }
 
-void MiraSendingGoals::initialize() {
+void MiraGoRecharge::initialize() {
         
-  goal_pose_subscriber = robot_->getRosNode().subscribe(GOAL_POSE, 1000, &MiraSendingGoals::goal_pose_callback, this);
-  stop_sub = robot_->getRosNode().subscribe(STOP_REQUEST, 2, &MiraSendingGoals::stop_request_callback, this);
+  go_to_place_sub = robot_->getRosNode().subscribe(PLACE_NAME_TARGET, 1000, &MiraGoRecharge::go_to_place_callback, this);
+
+  stop_sub = robot_->getRosNode().subscribe(STOP_REQUEST, 2, &MiraGoRecharge::stop_request_callback, this);
 
   goal_status_pub = robot_->getRosNode().advertise<std_msgs::String>(GOAL_STATUS, 20);
 
-  robot_->getMiraAuthority().subscribe<std::string>("PilotEvent", &MiraSendingGoals::goal_status_channel_callback, this);
+  robot_->getMiraAuthority().subscribe<std::string>("PilotEvent", &MiraGoRecharge::goal_status_channel_callback, this);
 
   goal_status.data = "idle";
   goal_status_pub.publish(goal_status);
 
 }
 
-void MiraSendingGoals::goal_status_channel_callback(mira::ChannelRead<std::string> data) 
+void MiraGoRecharge::goal_status_channel_callback(mira::ChannelRead<std::string> data) 
 {
         if(data->value().c_str() == "Idle") 
 	{
@@ -68,20 +68,23 @@ void MiraSendingGoals::goal_status_channel_callback(mira::ChannelRead<std::strin
 
 }
 
-void MiraSendingGoals::goal_pose_callback(const hobbit_msgs::Pose2DStamped::ConstPtr& goal_pose) 
+void MiraGoRecharge::go_to_place_callback(const std_msgs::String::ConstPtr& msg)
 {
 
-	TaskPtr task(new Task());
-	task->addSubTask(SubTaskPtr(new PreferredDirectionTask(mira::navigation::PreferredDirectionTask::FORWARD, 1.0f)));
-        task->addSubTask(SubTaskPtr(new mira::navigation::PositionTask(mira::Point2f(goal_pose->x, goal_pose->y), 0.1f, 0.1f)));
-	task->addSubTask(mira::navigation::SubTaskPtr(new mira::navigation::OrientationTask(goal_pose->theta, mira::deg2rad(15.0f))));
+	if (msg->data.compare("docking_station") || msg->data.compare("DockingStation"))
+	{
 
-	std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
-	robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
+		TaskPtr task(new Task());
+		task->addSubTask(SubTaskPtr(new PreferredDirectionTask(mira::navigation::PreferredDirectionTask::FORWARD, 1.0f)));
+		task->addSubTask(SubTaskPtr(new mira::navigation::DockingTask()));
+
+		std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
+		robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
+	}
 
 }
 
-void MiraSendingGoals::stop_request_callback(const std_msgs::String::ConstPtr& msg)
+void MiraGoRecharge::stop_request_callback(const std_msgs::String::ConstPtr& msg)
 {
 	if (msg->data.compare("stop") || msg->data.compare("Stop") || msg->data.compare("STOP"))
 	{
@@ -90,7 +93,7 @@ void MiraSendingGoals::stop_request_callback(const std_msgs::String::ConstPtr& m
   		robot_->getMiraAuthority().callService<void>(navService, "setTask", NULL);
 
 		goal_status.data = "cancelled";
-		std::cout << "Goal cancelled " << std::endl;
+		std::cout << "Docking cancelled " << std::endl;
 		goal_status_pub.publish(goal_status);
 	}
 

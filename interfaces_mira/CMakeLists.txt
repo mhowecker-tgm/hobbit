@@ -98,7 +98,8 @@ add_executable(interfaces_node src/interfaces_node.cpp
                                                         src/MiraVirtualLaser.cpp
 							src/MiraSendingGoals.cpp
 						        src/MiraGetPose.cpp
-							src/MiraGetPath.cpp)
+							src/MiraGetPath.cpp
+							src/MiraGoRecharge.cpp)
 # make sure configure headers are build before node using them
 add_dependencies(interfaces_node ${PROJECT_NAME}_gencfg mira_msgs_gencpp) #FIXME
 

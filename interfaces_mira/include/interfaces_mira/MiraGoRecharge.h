@@ -1,15 +1,16 @@
-/* MiraSendingGoals.h
+/* MiraGoRecharge.h
 * Author: Paloma de la Puente
 *
-* Wrapper to send goals from ROS to MIRA
+* Wrapper to send the robot to the charging station
 */
 
-#ifndef MIRASENDINGGOALS_H
-#define MIRASENDINGGOALS_H
+#ifndef MiraGoRecharge_H
+#define MiraGoRecharge_H
 
-#define GOAL_POSE "goal_pose"
-#define GOAL_STATUS "goal_status"
+#define PLACE_NAME_TARGET "place_name_target"
 #define STOP_REQUEST "stop_request"
+#define GOAL_STATUS "goal_status"
+
 
 //#include <fw/Framework.h>
 
@@ -23,24 +24,25 @@
 #include <std_msgs/String.h>
 
 
-class MiraSendingGoals: public MiraRobotModule {
+class MiraGoRecharge: public MiraRobotModule {
 public:
         static MiraRobotModule* Create() {
-                return new MiraSendingGoals();
+                return new MiraGoRecharge();
         }
 
         void initialize();
 
-	void goal_pose_callback(const hobbit_msgs::Pose2DStamped::ConstPtr& goal_pose);
+	void go_to_place_callback(const std_msgs::String::ConstPtr& msg);
 
-        void stop_request_callback(const std_msgs::String::ConstPtr& msg);
+        void stop_request_callback(const std_msgs::String::ConstPtr& msg);  //FIXME?
 
         void goal_status_channel_callback(mira::ChannelRead<std::string> data);
 
 private:
-        MiraSendingGoals();
+        MiraGoRecharge();
 
-	ros::Subscriber goal_pose_subscriber;
+
+        ros::Subscriber go_to_place_sub;
 	ros::Subscriber stop_sub;
 
 	ros::Publisher goal_status_pub;

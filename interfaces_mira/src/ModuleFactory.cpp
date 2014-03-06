@@ -4,12 +4,14 @@
 #include "interfaces_mira/MiraSendingGoals.h"
 #include "interfaces_mira/MiraGetPose.h"
 #include "interfaces_mira/MiraGetPath.h"
+#include "interfaces_mira/MiraGoRecharge.h"
 
 ModuleFactory::ModuleFactory() {
         Register("VirtualLaser", &MiraVirtualLaser::Create);
 	Register("SendingGoals", &MiraSendingGoals::Create);
         Register("MiraGetPose", &MiraGetPose::Create);
 	Register("MiraGetPath", &MiraGetPath::Create);
+	Register("MiraGoRecharge", &MiraGoRecharge::Create);
 }
 
 void ModuleFactory::Register(const std::string &name, ModuleCreator func) {
