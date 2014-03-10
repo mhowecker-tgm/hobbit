@@ -184,8 +184,12 @@ bool publishImagesFrames(unsigned char * color , unsigned int colorWidth , unsig
     for (i=0; i<12; i++) { cal.P[i]=0.0; }
 
     //Base line for fake disparity !
-    cal.P[3]=virtual_baseline;
     //P[3] should be 0.0 since we have a registered feed but we add a baseline for fake disparity here
+    //Please note that the virtual baseline is multiplied by -1 and fX to fit the "ROS" way of 
+    //declaring a baseline as seen here https://github.com/ros-perception/image_pipeline/blob/hydro-devel/depth_image_proc/src/nodelets/disparity.cpp#L136
+    //for the record , I added an issue https://github.com/ros-perception/image_pipeline/issues/58 but it seems this is the way to do it..
+     cal.P[3]=-1.0 * virtual_baseline * calib->intrinsic[CALIB_INTR_FX];
+    // ----------------------------------------------------------------------
 
     cal.P[0]=calib->intrinsic[CALIB_INTR_FX];
     cal.P[5]=calib->intrinsic[CALIB_INTR_FY];

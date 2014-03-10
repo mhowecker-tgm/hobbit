@@ -4,14 +4,9 @@
     <!-- name of the root frame -->
     <arg name="frame" value="frame"/> 
 
-    <!-- Virtual Baseline for emulating disparity data , please note that disparity is a bad thing to use since we are using an active depth sensor and already have an observation in mm and meters , also please note that value given here should be in meters since although the disparity nodelet is connected straight to the depth_registered topic which is on millimeters it gets scaled to meters from the code of the depth_image_proc nodelet 
-         The value -43.186 is -0.075 * 575.815735 due to a bug (?) on ROS that makes us need to multiply with focal Length
-         see : https://github.com/ros-perception/image_pipeline/blob/hydro-devel/depth_image_proc/src/nodelets/disparity.cpp#L136
-         so we are multiplying BaselineInMeters * fX until it is fixed (?)
-         when this is fixed we should just have BaselineInMeters
-         I have opened an issue ticket here : https://github.com/ros-perception/image_pipeline/issues/58 
--->
-    <arg name="virtual_baseline" value="-43.186" type="double" />
+    <!-- Virtual Baseline for emulating disparity data , please note that disparity is a bad thing to use since we are using an active depth sensor and already have an observation in mm and meters , also please note that value given here should be in meters since although the disparity nodelet is connected straight to the depth_registered topic which is on millimeters it gets scaled to meters from the code of the depth_image_proc nodelet , See source code-->
+
+    <arg name="virtual_baseline" value="0.075" type="double" />
 
  
     <!-- device_id can have the following formats:
