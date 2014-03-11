@@ -71,7 +71,7 @@ void MiraGoRecharge::goal_status_channel_callback(mira::ChannelRead<std::string>
 void MiraGoRecharge::go_to_place_callback(const std_msgs::String::ConstPtr& msg)
 {
 
-	if (msg->data.compare("docking_station") || msg->data.compare("DockingStation"))
+	if (msg->data.compare("docking_station") || msg->data.compare("DockingStation") || msg->data.compare("Recharge") || msg->data.compare("recharge"))
 	{
 
 		TaskPtr task(new Task());

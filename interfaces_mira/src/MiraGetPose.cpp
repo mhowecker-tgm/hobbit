@@ -49,12 +49,12 @@ void MiraGetPose::loc_pose_callback(mira::ChannelRead<mira::PoseCov2> data)
   //FIXME!! Provide covariance
   pose_msg.pose.covariance[0] = robotPose.cov(0,0); //robotPose.cov is a public member, the data type is  Eigen::Matrix
   pose_msg.pose.covariance[1] = robotPose.cov(0,1);
-  pose_msg.pose.covariance[5] = robotPose.cov(0,2);
+  pose_msg.pose.covariance[5] = robotPose.cov(0,2); //may not be needed
   pose_msg.pose.covariance[6] = robotPose.cov(0,1);
   pose_msg.pose.covariance[7] = robotPose.cov(1,1);
-  pose_msg.pose.covariance[11] = robotPose.cov(1,2);
-  pose_msg.pose.covariance[30] = robotPose.cov(0,2);
-  pose_msg.pose.covariance[31] = robotPose.cov(1,2);
+  pose_msg.pose.covariance[11] = robotPose.cov(1,2); //may not be needed
+  pose_msg.pose.covariance[30] = robotPose.cov(0,2); //may not be needed
+  pose_msg.pose.covariance[31] = robotPose.cov(1,2); //may not be needed
   pose_msg.pose.covariance[35] = robotPose.cov(2,2);
 
 
@@ -63,7 +63,6 @@ void MiraGetPose::loc_pose_callback(mira::ChannelRead<mira::PoseCov2> data)
 
         
 }
-
 
 
 
