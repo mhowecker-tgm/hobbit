@@ -8,12 +8,12 @@ global_costmap:
        -
          name: footprint_layer
          type: "costmap_2d::FootprintLayer" 
+       -
+	 name: static_layer
+	 type: "costmap_2d::StaticLayer"
        - 
          name: obstacle_layer
          type: "costmap_2d::NavLayer" 
        - 
          name: inflation_layer
          type: "costmap_2d::InflationLayer"
-       -
-	 name: static_layer
-	 type: "costmap_2d::StaticLayer"
