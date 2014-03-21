@@ -399,12 +399,12 @@ def main():
 
     with lu_sm:
         smach.StateMachine.add('INIT', Init(), transitions={'succeeded':'GET_ALL_POSITIONS', 'canceled':'CLEAN_UP'})
-        smach.StateMachine.add('GET_ALL_POSITIONS', ServiceState('get_all_rooms', GetRooms, response_key='response'), transitions={'succeeded':'GET_ROBOT_POSE'})
+        smach.StateMachine.add('GET_ALL_POSITIONS', ServiceState('getRooms', GetRooms, response_key='response'), transitions={'succeeded':'GET_ROBOT_POSE'})
         #smach.StateMachine.add('GET_ROBOT_POSE', DummyGetRobotPose(), transitions={'succeeded':'CLEAN_POSITIONS'})
         smach.StateMachine.add('GET_ROBOT_POSE', util.WaitForMsgState('/amcl_pose', PoseWithCovarianceStamped, get_robot_pose_cb, output_keys=['robot_current_pose'], timeout=120),
                 transitions={'succeeded':'CLEAN_POSITIONS', 'aborted':'GET_ROBOT_POSE', 'preempted':'CLEAN_UP'})
         smach.StateMachine.add('CLEAN_POSITIONS', CleanPositions(), transitions={'succeeded':'GET_CURRENT_ROOM'})
-        smach.StateMachine.add('GET_CURRENT_ROOM', ServiceState('get_robots_current_room', GetName, response_key='robots_room_name'), transitions={'succeeded':'GET_USERS_ROOM'})
+        smach.StateMachine.add('GET_CURRENT_ROOM', ServiceState('getCurrentRoom', GetName, response_key='robots_room_name'), transitions={'succeeded':'GET_USERS_ROOM'})
         #smach.StateMachine.add('GET_USERS_ROOM', util.WaitForMsgState('/AAL_users_last_known_room', String, get_users_current_room, output_keys=['users_current_room'], timeout=5), transitions={'succeeded':'PLAN_PATH','aborted':'CLEAN_UP', 'preempted':'CLEAN_UP'})
         smach.StateMachine.add('GET_USERS_ROOM', ServiceState('get_users_current_room', GetUsersCurrentRoom, response_key='users_current_room'), transitions={'succeeded':'PLAN_PATH', 'preempted':'CLEAN_UP'})
         smach.StateMachine.add('PLAN_PATH', PlanPath(), transitions={'movement':'MOVE_BASE_GO', 'preempted':'CLEAN_UP', 'get_path':'GET_PATH', 'failure':'CLEAN_UP'})

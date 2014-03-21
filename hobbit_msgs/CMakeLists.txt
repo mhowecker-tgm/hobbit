@@ -41,6 +41,7 @@ add_service_files(
   ClustersOnPlane.srv
   GetCoordinates.srv
   GetName.srv
+  GetNameOfRoom.srv
   GetObjectLocations.srv
   GetRobotsCurrentRoom.srv
   GetRoomName.srv

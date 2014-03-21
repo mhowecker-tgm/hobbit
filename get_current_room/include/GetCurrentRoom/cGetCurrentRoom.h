@@ -14,6 +14,7 @@
 #include "std_msgs/Bool.h"
 #include "geometry_msgs/PoseWithCovarianceStamped.h"
 #include "hobbit_msgs/GetName.h"
+#include "hobbit_msgs/GetNameOfRoom.h"
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //FIXME check topic names, move to a common interface file?
 #define CURRENT_ROOM_NAME	"current_room"
@@ -35,6 +36,7 @@ class cGetCurrentRoom
 
     //services
     bool getCurrentRoom(hobbit_msgs::GetName::Request  &req, hobbit_msgs::GetName::Response &res);
+    bool getNameOfRoom(hobbit_msgs::GetNameOfRoom::Request  &req, hobbit_msgs::GetNameOfRoom::Response &res);
 
   private:
   

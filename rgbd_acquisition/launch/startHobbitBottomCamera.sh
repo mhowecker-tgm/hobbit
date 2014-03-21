@@ -1,6 +1,6 @@
 <launch>   
     <!-- name of the "camera" -->
-    <arg name="camera" value="bottomcam"/> 
+    <arg name="camera" value="basecam"/> 
     <!-- name of the root frame -->
     <arg name="frame" value="frame"/> 
 

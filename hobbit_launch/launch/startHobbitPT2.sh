@@ -16,7 +16,7 @@ xset s off&
 xdotool mousemove 1024 1024&
 
 #Display knight-rider for head :P
-animate /home/hobbit/Pictures/knight.gif&
+#animate /home/hobbit/Pictures/knight.gif&
 
 #Make sure we have our stuff sourced
 source /home/hobbit/.bashrc
@@ -38,7 +38,7 @@ rosrun mobile_platform mobile_platform&
 /opt/ros/hobbit_hydro/src/web_interface/scripts/startWebInterface.sh&
 
 #Give some time for the first camera to come online
-sleep 2
+sleep 5
 
 #Start bottom camera
 roslaunch openni2_launch openni2.launch camera:=basecam depth_registration:=true disparity_processing:=true disparity_registered_processing:=true &

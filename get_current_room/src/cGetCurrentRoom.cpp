@@ -169,6 +169,38 @@ bool cGetCurrentRoom::getCurrentRoom(hobbit_msgs::GetName::Request  &req, hobbit
  }
 
 
+//SERVICE to get check for a  room name
+bool cGetCurrentRoom::getNameOfRoom(hobbit_msgs::GetNameOfRoom::Request  &req, hobbit_msgs::GetNameOfRoom::Response &res)
+ {
+	
+	ROS_INFO("Room name request received");
+
+	for (unsigned int i=0;i<known_rooms.rooms_vector.size();i++)
+	{
+		std::vector<hobbit_msgs::Point2D> room_vertices;
+		for (unsigned int j=0; j < known_rooms.rooms_vector[i].vertices_vector.size(); j++)
+		{
+			hobbit_msgs::Point2D vertex;
+			vertex.x = known_rooms.rooms_vector[i].vertices_vector[j].x;
+			vertex.y = known_rooms.rooms_vector[i].vertices_vector[j].y;
+			room_vertices.push_back(vertex);
+		}
+		if (isInRoom(req.x,req.y,room_vertices)) //The vertices MUST be ordered
+		{
+			//current_room_name.data = known_rooms.rooms_vector[i].room_name;
+
+			res.name = known_rooms.rooms_vector[i].room_name;
+			break;
+		}		
+
+	}
+
+	ROS_INFO("sending back response: [%s]", res.name.c_str());
+	return true;
+
+ }
+
+
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Check if pose is inside polygon

@@ -6,6 +6,7 @@
 
     <!-- Virtual Baseline for emulating disparity data , please note that disparity is a bad thing to use since we are using an active depth sensor and already have an observation in mm and meters , also please note that value given here should be in meters since although the disparity nodelet is connected straight to the depth_registered topic which is on millimeters it gets scaled to meters from the code of the depth_image_proc nodelet , See source code-->
 
+    <!--<arg name="virtual_baseline" value="-43.186" type="double" /> -->
     <arg name="virtual_baseline" value="0.075" type="double" />
 
  

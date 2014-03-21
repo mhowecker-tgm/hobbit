@@ -1,12 +1,14 @@
 <launch>
 
 <!-- Run the map server -->
-  <node name="map_server" pkg="map_server" type="map_server" args="$(find places_interpretation)/../navigation/hobbit_map_ISTU_20131024.yaml"/> 
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find places_interpretation)/../navigation/share/map.yaml"/> 
 
+<!--
  <group if="true">
     <include file="$(find hobbit_launch)/launch/basecam.launch"></include>
     <include file="$(find hobbit_launch)/launch/headcam.launch"></include>
   </group>
+-->
 
   <node name="top_kinect" pkg="top_kinect" type="top_kinect" args="$(find top_kinect)/Params.txt">
 	<!-- Parameters
@@ -26,10 +28,10 @@
 
   <group if="true">
     <include file="$(find virtual_laser)/launch/startup.launch" />
-    <include file="$(find head)/launch/startup.launch"></include>
+    <!-- <include file="$(find head)/launch/startup.launch"></include> -->
     <include file="$(find hobbit_launch)/../navigation/amcl_diff_hobbit.launch" />
     <include file="$(find places_interpretation)/launch/startup_places_interpretation.launch" />
-    <include file="$(find hobbit_launch)/../navigation/move_base_hobbit.launch" /> 
+    <!--<include file="$(find hobbit_launch)/../navigation/move_base_hobbit.launch" /> -->
     <!--<include file="$(find sending_goals)/launch/startup_sending_goals.launch" /> -->
   </group>
 

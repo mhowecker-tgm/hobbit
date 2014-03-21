@@ -1,35 +1,32 @@
 <launch>
 
-	<param name="/ENV/ObjectList" type="string" value="aspirin+++banana"></param>
-	<param name="/ENV/Place/Callbutton1/name" type="string" value="kitchen table"></param>
-	<param name="/ENV/Place/Callbutton1/th" type="string" value="7"></param>
-	<param name="/ENV/Place/Callbutton1/x" type="string" value="3"></param>
-	<param name="/ENV/Place/Callbutton1/y" type="string" value="7"></param>
-	<param name="/ENV/Place/Charger/name" type="string" value="kuek"></param>
-	<param name="/ENV/Place/Charger/th" type="string" value="5"></param>
-	<param name="/ENV/Place/Charger/x" type="string" value="5"></param>
-	<param name="/ENV/Place/Charger/y" type="string" value="5"></param>
-	<param name="/ENV/Place/Couch/name" type="string" value="vardagsrum"></param>
-	<param name="/ENV/Place/Couch/th" type="string" value="7"></param>
-	<param name="/ENV/Place/Couch/x" type="string" value="3"></param>
-	<param name="/ENV/Place/Couch/y" type="string" value="7"></param>
-	<param name="/ENV/Place/Kitchen/name" type="string" value="bord"></param>
-	<param name="/ENV/Place/Kitchen/th" type="string" value="5"></param>
-	<param name="/ENV/Place/Kitchen/x" type="string" value="5"></param>
-	<param name="/ENV/Place/Kitchen/y" type="string" value="5"></param>
-	<param name="/ENV/PlaceList" type="string" value="kitchen+++couch+++bed"></param>
-	<param name="/ENV/SOSbutton/port" type="string" value="COM3"></param>
-	<param name="/ENV/Sensor/SensorA/BusID" type="string" value="1"></param>
-	<param name="/ENV/Sensor/SensorA/NodeID" type="string" value="1"></param>
-	<param name="/ENV/Sensor/SensorA/Place" type="string" value="vardagsrum"></param>
-	<param name="/ENV/Sensor/SensorA/Type" type="string" value="CALL"></param>
-	<param name="/ENV/Sensor/SensorB/BusID" type="string" value="2"></param>
-	<param name="/ENV/Sensor/SensorB/NodeID" type="string" value="2"></param>
-	<param name="/ENV/Sensor/bus1_1103/Time" type="string" value="1390901233"></param>
-	<param name="/ENV/Sensor/bus1_1103/Value" type="string" value="REED=1"></param>
-	<param name="/ENV/Sensor/bus1_284393/Time" type="string" value="1390906769"></param>
-	<param name="/ENV/Sensor/bus1_284393/Value" type="string" value="SWITCH=0"></param>
-	<param name="/ENV/SensorList" type="string" value="SensorA+++SensorB"></param>
+	<param name="ENV/ObjectList" type="string" value="aspirin+++banana" />
+	<param name="ENV/Place/Callbutton1/name" type="string" value="kitchen table" />
+	<param name="ENV/Place/Callbutton1/th" type="string" value="7" />
+	<param name="ENV/Place/Callbutton1/x" type="string" value="3" />
+	<param name="ENV/Place/Callbutton1/y" type="string" value="7" />
+	<param name="ENV/Place/Charger/name" type="string" value="kuek" />
+	<param name="ENV/Place/Charger/th" type="string" value="5" />
+	<param name="ENV/Place/Charger/x" type="string" value="5" />
+	<param name="ENV/Place/Charger/y" type="string" value="5" />
+	<param name="ENV/Place/Couch/name" type="string" value="vardagsrum" />
+	<param name="ENV/Place/Couch/th" type="string" value="7" />
+	<param name="ENV/Place/Couch/x" type="string" value="3" />
+	<param name="ENV/Place/Couch/y" type="string" value="7" />
+	<param name="ENV/Place/Kitchen/name" type="string" value="bord" />
+	<param name="ENV/Place/Kitchen/th" type="string" value="5" />
+	<param name="ENV/Place/Kitchen/x" type="string" value="5" />
+	<param name="ENV/Place/Kitchen/y" type="string" value="5" />
+	<param name="ENV/PlaceList" type="string" value="kitchen+++couch+++bed" />
+	<param name="ENV/SOSbutton/port" type="string" value="COM3" />
+	<param name="ENV/Sensor/SensorA/BusID" type="string" value="1" />
+	<param name="ENV/Sensor/SensorA/NodeID" type="string" value="1" />
+	<param name="ENV/Sensor/SensorA/Place" type="string" value="vardagsrum" />
+	<param name="ENV/Sensor/SensorA/Type" type="string" value="CALL" />
+	<param name="ENV/Sensor/SensorB/BusID" type="string" value="2" />
+	<param name="ENV/Sensor/SensorB/NodeID" type="string" value="2" />
+	<param name="ENV/SensorList" type="string" value="SensorA+++SensorB" />
+    <rosparam command="load" file="$(find aal_service)/launch/params.yaml" />
  <node pkg="aal_service" type="AalServ.py" name="AalService" output="screen" args="">
  </node>>
 </launch>

@@ -5,9 +5,9 @@ TrajectoryPlannerROS:
   acc_lim_y: 0.0
   acc_lim_theta: 0.314
 
-  max_vel_x: 0.2
+  max_vel_x: 0.17
   min_vel_x: 0.075
-  max_rotational_vel: 0.41888
+  max_rotational_vel: 0.35
   min_in_place_rotational_vel: 0.25
   escape_vel: -0.1
 
@@ -17,7 +17,7 @@ TrajectoryPlannerROS:
   xy_goal_tolerance: 0.15
   latch_xy_goal_tolerance: true
 
-  sim_time: 1.5
+  sim_time: 2
   sim_granularity: 0.05
   angular_sim_granularity: 0.05
   vx_samples: 8
@@ -26,9 +26,8 @@ TrajectoryPlannerROS:
 
   meter_scoring: false
   path_distance_bias: 0.6
-  goal_distance_bias: 0.6
-#  occdist_scale: 0.05
-  occdist_scale: 0.2
+  goal_distance_bias: 0.8
+  occdist_scale: 0.01
   heading_lookahead: 0.325
   heading_scoring: true
   heading_scoring_timestep: 0.8

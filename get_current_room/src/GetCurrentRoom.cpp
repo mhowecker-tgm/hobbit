@@ -27,6 +27,7 @@ int main(int argc, char **argv)
   myGetCurrentRoom.LoadFile(file_name);
 
   ros::ServiceServer service = n.advertiseService("getCurrentRoom", &GetCurrentRoom::cGetCurrentRoom::getCurrentRoom, &myGetCurrentRoom);
+  ros::ServiceServer service1 = n.advertiseService("getRoomName", &GetCurrentRoom::cGetCurrentRoom::getNameOfRoom, &myGetCurrentRoom);
   ROS_INFO("Service ready");
 
   ROS_INFO("Init loop");

@@ -3,7 +3,7 @@
 ## walter wohlkinger
 ## first version: 27.04.2011
 
-PKG = 'Head'
+PKG = 'head'
 import roslib; roslib.load_manifest(PKG)
 import rospy
 import sys
@@ -80,7 +80,7 @@ def moveCallback(msg):
         ser.flush()
         ser.write(chr(0x87)+chr(0x01)+chr(0x0a)+chr(0x00))
         ser.flush()
-        ser.write(chr(0x84)+chr(0x01)+chr(16)+chr(53))
+        ser.write(chr(0x84)+chr(0x01)+chr(104)+chr(57))
         ser.flush()
         return
 

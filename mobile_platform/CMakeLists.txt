@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(hobbit_mobile_platform)
+project(mobile_platform)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -80,7 +80,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES hobbit_mobile_platform
+#  LIBRARIES mobile_platform
 #  CATKIN_DEPENDS roscpp
 #  DEPENDS system_lib
 )
@@ -97,22 +97,23 @@ include_directories(
 )
 
 ## Declare a cpp library
-# add_library(hobbit_mobile_platform
-#   src/${PROJECT_NAME}/hobbit_mobile_platform.cpp
+# add_library(mobile_platform
+#   src/${PROJECT_NAME}/mobile_platform.cpp
 # )
 
 ## Declare a cpp executable
-add_executable(hobbit_mobile_platform src/cCommunicationPort.cpp src/cException.cpp src/cMutex.cpp src/cMySystem.cpp src/cRs232Port.cpp src/cSystem.cpp src/cTcpSocket.cpp src/cThread.cpp src/cTimestamping.cpp src/cXml.cpp src/MobilePlatform.cpp)
+add_executable(mobile_platform src/cCommunicationPort.cpp src/cException.cpp src/cMutex.cpp src/cMySystem.cpp src/cRs232Port.cpp src/cSystem.cpp src/cTcpSocket.cpp src/cThread.cpp src/cTimestamping.cpp src/cXml.cpp src/MobilePlatform.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-# add_dependencies(hobbit_mobile_platform_node hobbit_mobile_platform_generate_messages_cpp)
+# add_dependencies(mobile_platform_node mobile_platform_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
- target_link_libraries(hobbit_mobile_platform
-   rt
+ target_link_libraries(mobile_platform
+   -lrt
    ${catkin_LIBRARIES}
  )
+
 
 #############
 ## Install ##
@@ -129,7 +130,7 @@ add_executable(hobbit_mobile_platform src/cCommunicationPort.cpp src/cException.
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS hobbit_mobile_platform hobbit_mobile_platform_node
+# install(TARGETS mobile_platform mobile_platform_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -154,7 +155,7 @@ add_executable(hobbit_mobile_platform src/cCommunicationPort.cpp src/cException.
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_hobbit_mobile_platform.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_mobile_platform.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

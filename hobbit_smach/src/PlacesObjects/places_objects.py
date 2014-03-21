@@ -193,15 +193,18 @@ def getObjectLocations(req):
 def getRoomName(req):
     """ Given a x and y coordinate the room name is searched for and returned
     """
+    print(req)
     global rooms
     vertices = []
     for room in rooms.rooms_vector:
         for vert in room.vertices_vector:
             vertices.append([vert.x, vert.y])
+        print(vertices)
         poly = Path(vertices)
         if poly.contains_point([req.point.x, req.point.y]):
             print room.room_name
             return GetRoomNameResponse(String(room.room_name))
+    return GetRoomNameResponse(String('UNKNOWN'))
 
 def getCoordinates(req):
     """ Given a the name of the room and the location their Pose is retrieved

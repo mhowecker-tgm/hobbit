@@ -1374,14 +1374,9 @@ void QNode::MaskPlatformFromObstacleGrid(unsigned int Selector)
   BlankHeight = 14;*/
 
 /* New values for PT1-1 */
-/*  BlankStart = 33;
+  BlankStart = 33;
   BlankWidth = 50;
-  BlankHeight = 20;*/
-
-/* New values for PT1-1 Feb 2014*/
-  BlankStart = 17;
-  BlankWidth = 70;
-  BlankHeight = 25;
+  BlankHeight = 20;
 
 /* Values for PT1-2
   BlankStart = 34;
@@ -2838,7 +2833,7 @@ bool QNode::init()
 
 // Start the thread function.
   printf("Starting subscriber thread...\n");
-  start();
+  //start();
   return true;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

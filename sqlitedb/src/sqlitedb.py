@@ -13,7 +13,7 @@ import serial
 import time
 import datetime
 import threading
-from std_msgs.msg import String, Header
+from std_msgs.msg import String, Header, Float64
 from hobbit_msgs.msg import Command, Status, Event, Parameter
 
 # -*- coding: utf-8 -*-
@@ -21,6 +21,7 @@ from hobbit_msgs.msg import Command, Status, Event, Parameter
 import sqlite3
 
 mylock = threading.Lock()
+oldtime = 0.
 
 class sqlitedb:
     def __init__(self):
@@ -30,6 +31,7 @@ class sqlitedb:
         self.subC = rospy.Subscriber("/Command", Command, self.commandCallback )
         self.subE = rospy.Subscriber("/Event", Event, self.eventCallback )
         self.subA = rospy.Subscriber("/AALEvent", Event, self.eventAALCallback )
+        self.subB = rospy.Subscriber("/BatteryVoltage", Float64, self.eventBatCallback )
         self.con = sqlite3.connect('hobbit.db')
         self.cur=self.con.cursor()
         #self.cur.execute("DROP TABLE IF EXISTS Hobbit")
@@ -110,7 +112,15 @@ class sqlitedb:
 
     def eventAALCallback(self,msg):
         self.putInDB("AAL",msg.event,msg.confidence,msg.params)
-    
+
+    def eventBatCallback(self,msg):
+        global oldtime
+        if time.time() >= oldtime+60:
+         oldtime = time.time()
+         x="%.1f" % msg.data
+	 with open('batt', 'w') as f:
+            f.write(x)
+   
 def main(args):        
     rospy.init_node('sqlitedb', anonymous=False)
     c = sqlitedb()
