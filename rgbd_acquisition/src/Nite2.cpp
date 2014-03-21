@@ -85,6 +85,13 @@ void newSkeletonDetected(int devID,unsigned int frameNumber ,struct skeletonHuma
     fprintf(stderr,"Head %0.2f %0.2f %0.2f \n",skeletonFound->joint[HUMAN_SKELETON_HEAD].x,skeletonFound->joint[HUMAN_SKELETON_HEAD].y,skeletonFound->joint[HUMAN_SKELETON_HEAD].z);
     fprintf(stderr,  " \n" NORMAL );
 
+
+    for (i=0; i<HUMAN_SKELETON_PARTS; i++)
+    {
+      printf("JOINT2D(%s,%0.2f,%0.2f)\n" , humanSkeletonJointNames[i] , skeletonFound->joint2D[i].x , skeletonFound->joint2D[i].y );
+    }
+
+
   if (stc[devID].skelCallbackAddr!=0)
   {
     void ( *DoCallback) (unsigned int ,struct skeletonHuman *)=0 ;
