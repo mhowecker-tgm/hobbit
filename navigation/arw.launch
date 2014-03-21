@@ -1,0 +1,8 @@
+<launch>
+<include file="/opt/ros/hobbit_hydro/src/navigation/startup_places_navigation.launch" />
+<include file="/opt/ros/hobbit_hydro/src/navigation/move_base_hobbit.launch" />
+<include file="$(find sending_goals)/launch/startup.launch" />
+<include file="$(find get_current_room)/launch/startup.launch" />
+<include file="$(find semantic_segmentation)/launch/get_search_positions.launch" />
+</launch>
+
