@@ -1,6 +1,6 @@
 <root>
 	<!-- Specify the variables for your robot and environment -->
-	<var MCFFile="/home/racin/hobbit_hydro/src/interfaces_mira/mcf.xml" />
+	<var MCFFile="/opt/ros/hobbit_hydro/src/interfaces_mira/mcf.xml" />
 	<var robot="SCITOS-G5" />
 
 	<!-- Enable networked communication with the MIRA instance. I.e. you can 
