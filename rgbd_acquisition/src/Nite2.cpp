@@ -191,6 +191,7 @@ void prepareSkeletonState(int devID,unsigned int frameNumber , nite::UserTracker
     humanSkeleton.centerOfMass.z = user.getCenterOfMass().z;
 
      nite::SkeletonJoint jointHead           =   user.getSkeleton().getJoint(nite::JOINT_HEAD);
+     nite::SkeletonJoint jointNeck           =   user.getSkeleton().getJoint(nite::JOINT_NECK);
      nite::SkeletonJoint jointLeftShoulder   =   user.getSkeleton().getJoint(nite::JOINT_LEFT_SHOULDER);
      nite::SkeletonJoint jointRightShoulder  =   user.getSkeleton().getJoint(nite::JOINT_RIGHT_SHOULDER);
      nite::SkeletonJoint jointLeftElbow      =   user.getSkeleton().getJoint(nite::JOINT_LEFT_ELBOW);
