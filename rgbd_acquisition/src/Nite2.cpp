@@ -218,6 +218,19 @@ void prepareSkeletonState(int devID,unsigned int frameNumber , nite::UserTracker
      //------------------------------------------------------------------------------------------
 
 
+
+     humanSkeleton.joint[HUMAN_SKELETON_NECK].x = jointNeck.getPosition().x;
+     humanSkeleton.joint[HUMAN_SKELETON_NECK].y = jointNeck.getPosition().y;
+     humanSkeleton.joint[HUMAN_SKELETON_NECK].z = jointNeck.getPosition().z;
+     humanSkeleton.jointAccuracy[HUMAN_SKELETON_NECK] = jointNeck.getPositionConfidence();
+     pUserTracker.convertJointCoordinatesToDepth(humanSkeleton.joint[HUMAN_SKELETON_NECK].x ,
+                                                 humanSkeleton.joint[HUMAN_SKELETON_NECK].y ,
+                                                 humanSkeleton.joint[HUMAN_SKELETON_NECK].z ,
+                                                 &humanSkeleton.joint2D[HUMAN_SKELETON_NECK].x ,
+                                                 &humanSkeleton.joint2D[HUMAN_SKELETON_NECK].y );
+     //------------------------------------------------------------------------------------------
+
+
      humanSkeleton.joint[HUMAN_SKELETON_LEFT_SHOULDER].x = jointLeftShoulder.getPosition().x;
      humanSkeleton.joint[HUMAN_SKELETON_LEFT_SHOULDER].y = jointLeftShoulder.getPosition().y;
      humanSkeleton.joint[HUMAN_SKELETON_LEFT_SHOULDER].z = jointLeftShoulder.getPosition().z;
