@@ -21,10 +21,10 @@
          This can also be the serial number of the top Kinect - gathered via "lsusb -v"
          ______________________________________________________________________   
     -->
-
-    <!--  This is the kinect camera address in the hobbit PT1 I use in Vienna 3@6 
-          If you are someone from Vienna trying to make an old hobbit work -->
-          <arg name="device_id" value="freenect://0"/>   
+ 
+ 
+    <!--  This is the kinect camera address for Hobbit PT2 --> 
+          <arg name="device_id" value="#1"/> 
  
 
 
