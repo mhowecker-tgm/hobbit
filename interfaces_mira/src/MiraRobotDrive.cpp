@@ -72,31 +72,37 @@ void MiraRobotDrive::discrete_motion_cmd_callback(const std_msgs::String::ConstP
   {
 	// Get the desired distance 
         float MotionValue = atof(&CmdBuf[5]);
-        
-	// send the command
-	mira::Pose2 v(MotionValue,0,0);
 
 	float x_speed = 0.5; //FIXME
-	float vMax = 0.5; //FIXME
+	float vMax = 0.2; //FIXME
+        float t= MotionValue/x_speed;
+
+        // send the command
+	mira::Pose2 v(x_speed,0,0);
+
+
 	set_mira_param_("MainControlUnit.DriveMode", "1");
-        mira::RPCFuture<void> r = robot_->getMiraAuthority().callService<void>("/robot/Robot","driveDistance", v, MotionValue/x_speed, vMax);
+        mira::RPCFuture<void> r = robot_->getMiraAuthority().callService<void>("/robot/Robot","driveDistance", v, t, vMax);
+	r.get();
 	set_mira_param_("MainControlUnit.DriveMode", "0");
 
   }
 
 // ***** Command "Turn" *****
-  else if (strncmp((const char *)(&CmdBuf[0]), "Turn", 4) == 0)
+   else if (strncmp((const char *)(&CmdBuf[0]), "Turn", 4) == 0)
   {
 	// Get the desired angle and check if it's within the allowed limits - if not ignore command.
         float MotionValue = atof(&CmdBuf[5]);
-	
-	// send the command
-        mira::Pose2 v(0,0,MotionValue);
 
 	float rot_speed = 0.42; //FIXME
-	float vMax = 0.5; //FIXME
+	float vMax = 0.2; //FIXME
+        float t= MotionValue/rot_speed;
+
+	// send the command
+        mira::Pose2 v(0,0,rot_speed);
+
 	set_mira_param_("MainControlUnit.DriveMode", "1");
-        mira::RPCFuture<void> r = robot_->getMiraAuthority().callService<void>("/robot/Robot","driveDistance", v, MotionValue/rot_speed, vMax);
+        mira::RPCFuture<void> r = robot_->getMiraAuthority().callService<void>("/robot/Robot","driveDistance", v, t, vMax);
 	set_mira_param_("MainControlUnit.DriveMode", "0");
 
   }

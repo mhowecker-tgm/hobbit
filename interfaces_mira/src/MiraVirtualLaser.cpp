@@ -28,7 +28,7 @@ void MiraVirtualLaser::virtual_laser_loc_callback(const sensor_msgs::LaserScan::
 	for (int i=0; i<msg->ranges.size();i++)
 	{
 		scan.range[i] = msg->ranges[i];
-		scan.valid[i] = 1;
+		scan.valid[i] = mira::robot::RangeScan::Valid;
 	}
 
 	scan.minimumRange = msg->range_min;
