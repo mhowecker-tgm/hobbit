@@ -1,0 +1,36 @@
+<root>
+	<var MCFFile="${find avh2.mcf}" />
+	<include file="${findpkg SCITOSConfigs}/etc/SCITOS-application.xml" />
+
+	<!-- Here we patch in the kinect as the laser to use for localization -->
+	<namespace name="localization">
+		<parameter name="Poseidon.Sensors[?].item{mira::localization::RangeScanSensor}">
+			<RangeChannels>
+				<item>/VirtualLaserLoc</item>
+			</RangeChannels>
+		</parameter>
+	</namespace>
+
+	<!-- Here we patch in the kinect as the laser to use for navigation -->
+	<namespace name="navigation">
+		<namespace name="laser">
+			<parameter name="GridMapperLaser.Sensors"> 
+				<item>/VirtualLaserLoc</item>
+			</parameter>
+		</namespace>
+	</namespace>
+
+	<namespace name="robot">
+		<link child="LaserFrame" parent="RobotFrame">
+			<X>0.135</X>
+			<Y>0</Y>
+			<Z>0.295</Z>
+			<Yaw>0</Yaw>
+			<Pitch>0</Pitch>
+			<Roll>0</Roll>
+		</link>
+		<namespace name="frontLaser">
+			<using name="/VirtualLaserLoc" as="Laser" />
+		</namespace>
+	</namespace>
+</root>

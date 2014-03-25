@@ -37,7 +37,10 @@ void MiraVirtualLaser::virtual_laser_loc_callback(const sensor_msgs::LaserScan::
 	scan.startAngle = msg->angle_min;               
 	scan.deltaAngle = msg->angle_increment;
 
-	virtual_laser_channel_loc.post(scan, mira::Time::now());
+	auto write = virtual_laser_channel_loc.write();
+	write->timestamp = mira::Time::now();
+	write->frameID = "/robot/LaserFrame";
+	write->value() = scan;
 }
 
 void MiraVirtualLaser::virtual_laser_obs_callback(const sensor_msgs::LaserScan::ConstPtr& msg) 
@@ -49,7 +52,7 @@ void MiraVirtualLaser::virtual_laser_obs_callback(const sensor_msgs::LaserScan::
 	for (int i=0; i<msg->ranges.size();i++)
 	{
 		scan.range[i] = msg->ranges[i];
-		scan.valid[i] = 1;
+		scan.valid[i] = mira::robot::RangeScan::Valid;
 	}
 
 	scan.minimumRange = msg->range_min;
@@ -58,7 +61,12 @@ void MiraVirtualLaser::virtual_laser_obs_callback(const sensor_msgs::LaserScan::
 	scan.startAngle = msg->angle_min;               
 	scan.deltaAngle = msg->angle_increment;
 
-	virtual_laser_channel_obs.post(scan, mira::Time::now());
+	//virtual_laser_channel_obs.post(scan, mira::Time::now());
+
+        auto write = virtual_laser_channel_obs.write();
+	write->timestamp = mira::Time::now();
+	write->frameID = "/robot/LaserFrame";
+	write->value() = scan;
 
 }
 
