@@ -2,6 +2,7 @@
 
 #This script is called from ~/.config/autostart/hobbit.desktop 
 #to make it autostart you can just 
+#mkdir ~/.config/autostart
 #ln -s /opt/ros/hobbit_hydro/src/hobbit_launch/launch/hobbitPT2.desktop ~/.config/autostart/hobbitPT2.desktop 
 #and ( for now ) brings up all the nodes / etc required for the hobbit robot to function
 
@@ -10,7 +11,13 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
 #cd to the directory where the script lies at
 
+
+THEDATETAG=`date +"%y-%m-%d_%H-%M-%S"`
+echo $THEDATETAG > ~/.startup.txt
+env >> ~/.startup.txt
 #env > ~/startMsg.txt
+
+exit 0
 
 #Prohibit screen power down after 10mins
 xset s off&
