@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=HobbitPT2
+Exec=/bin/bash -i -c "/opt/ros/hobbit_hydro/src/hobbit_launch/launch/startupHobbitPT2.sh"
+Icon=/opt/ros/hobbit_hydro/src/doc/hobbitIcon.png
+Comment=KickStarts Hobbit PT2!
