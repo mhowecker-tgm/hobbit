@@ -25,14 +25,19 @@ void MiraVirtualLaser::virtual_laser_loc_callback(const sensor_msgs::LaserScan::
 	scan.range.resize(msg->ranges.size());
 	scan.valid.resize(msg->ranges.size());
 
+	scan.minimumRange = msg->range_min;
+	scan.maximumRange = msg->range_max;
+
 	for (int i=0; i<msg->ranges.size();i++)
 	{
 		scan.range[i] = msg->ranges[i];
-		scan.valid[i] = mira::robot::RangeScan::Valid;
+                if (scan.range[i] < scan.minimumRange)
+			scan.valid[i] = mira::robot::RangeScan::BelowMinimum;
+		else if (scan.range[i] > scan.maximumRange)
+			scanvalid[i] = mira::robot::RangeScan::AboveMaximum;
+		else
+			scan.valid[i] = mira::robot::RangeScan::Valid;
 	}
-
-	scan.minimumRange = msg->range_min;
-	//scan.maximumRange = msg->range_max;
 
 	scan.startAngle = msg->angle_min;               
 	scan.deltaAngle = msg->angle_increment;
