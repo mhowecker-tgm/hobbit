@@ -18,24 +18,16 @@ env >> ~/.startup.txt
 #env > ~/startMsg.txt
 
 exit 0
-
-#Prohibit screen power down after 10mins
-xset s off&
-#Move mouse out of fov
-xdotool mousemove 1024 1024&
-
-#Display knight-rider for head :P
-#animate /home/hobbit/Pictures/knight.gif&
-
+  
 #Make sure we have our stuff sourced
 source /home/hobbit/.bashrc
 source /opt/ros/hobbit_hydro/devel/setup.bash
 
 roscore&
-sleep 3
+sleep 5
  
 #Start up vision acquisition etc
-/opt/ros/hobbit_hydro/src/rgbd_acquisition/scripts/startFORTHStuff.sh&
+/opt/ros/hobbit_hydro/src/rgbd_acquisition/scripts/startFORTHStuffPT2.sh&
 #In case someone would like to startup the top camera without our integrated node he could do it like following
 #roslaunch openni2_launch openni2.launch camera:=headcam depth_registration:=true device_id:="#1"
 sleep 5
