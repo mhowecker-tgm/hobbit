@@ -2,6 +2,8 @@
 
  
 #This script is called from ~/.config/autostart/hobbit.desktop 
+#to make it autostart you can just 
+#ln -s /opt/ros/hobbit_hydro/src/hobbit_launch/launch/hobbit.desktop ~/.config/autostart/hobbit.desktop 
 #and ( for now ) brings up all the nodes / etc required for the hobbit robot to function
 
 STARTDIR=`pwd`
