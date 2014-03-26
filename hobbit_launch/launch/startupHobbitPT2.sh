@@ -17,7 +17,7 @@ echo $THEDATETAG > ~/.startup.txt
 env >> ~/.startup.txt
 #env > ~/startMsg.txt
 
-exit 0
+#exit 0
   
 #Make sure we have our stuff sourced
 source /home/hobbit/.bashrc
