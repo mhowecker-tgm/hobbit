@@ -52,15 +52,15 @@ void MiraSendingGoals::goal_status_channel_callback(mira::ChannelRead<std::strin
 	}
 	if(data->value().c_str() == "NoPathPlannable" || data->value().c_str() == "NoValidMotionCommand")
 	{
-		goal_status.data = "recalled";
-		std::cout << "Goal recalled " << std::endl;
+		goal_status.data = "aborted";
+		std::cout << "Goal aborted " << std::endl;
 		goal_status_pub.publish(goal_status);
 
 	}
 	if(data->value().c_str() == "NoData")
 	{
-		goal_status.data = "recalled";
-		std::cout << "Goal recalled " << std::endl;
+		goal_status.data = "aborted";
+		std::cout << "Goal aborted " << std::endl;
 		goal_status_pub.publish(goal_status);
 
 	}
@@ -85,9 +85,10 @@ void MiraSendingGoals::stop_request_callback(const std_msgs::String::ConstPtr& m
 {
 	if (msg->data.compare("stop") || msg->data.compare("Stop") || msg->data.compare("STOP"))
 	{
+		TaskPtr task(new Task());
 		//cancel the task
 		std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
-  		robot_->getMiraAuthority().callService<void>(navService, "setTask", NULL);
+  		robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
 
 		goal_status.data = "cancelled";
 		std::cout << "Goal cancelled " << std::endl;
