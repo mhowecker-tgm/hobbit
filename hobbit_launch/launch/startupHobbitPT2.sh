@@ -52,7 +52,7 @@ sleep 5
 #roslaunch openni2_launch openni2.launch camera:=basecam depth_registration:=true device_id:="1d27/0601@3/2"
 
 # Start the virtual laser
-roslaunch virtual_laser virtual_laser
+roslaunch virtual_laser virtual_laser&
 
 sleep 5
 
