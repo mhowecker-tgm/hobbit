@@ -3,6 +3,7 @@
 #include <nav_msgs/Odometry.h>
 #include <sensor_msgs/LaserScan.h>
 
+
 //#include <interfaces_mira/MiraRobot.h>
 
 MiraVirtualLaser::MiraVirtualLaser() : MiraRobotModule(std::string ("VirtualLasers")) {
@@ -27,16 +28,29 @@ void MiraVirtualLaser::virtual_laser_loc_callback(const sensor_msgs::LaserScan::
 
 	scan.minimumRange = msg->range_min;
 	scan.maximumRange = msg->range_max;
+	
+	//std::cout << "minimumRange " << scan.minimumRange << std::endl;
+	//std::cout << "maximumRange " << scan.maximumRange << std::endl;
 
 	for (int i=0; i<msg->ranges.size();i++)
 	{
 		scan.range[i] = msg->ranges[i];
                 if (scan.range[i] < scan.minimumRange)
-			scan.valid[i] = mira::robot::RangeScan::BelowMinimum;
-		else if (scan.range[i] > scan.maximumRange)
-			scanvalid[i] = mira::robot::RangeScan::AboveMaximum;
-		else
-			scan.valid[i] = mira::robot::RangeScan::Valid;
+		{
+			scan.valid[i] = mira::robot::RangeScan::Invalid;
+		}
+		else 
+		{
+			if (scan.range[i] > scan.maximumRange)
+			{
+				scan.valid[i] = mira::robot::RangeScan::AboveMaximum;
+			}
+			else
+			{ 
+				scan.valid[i] = mira::robot::RangeScan::Valid;
+				//std::cout << "valid " << std::endl;
+			}
+		}
 	}
 
 	scan.startAngle = msg->angle_min;               
