@@ -46,8 +46,24 @@ sleep 5
 #Start bottom camera 
 roslaunch openni2_launch openni2.launch camera:=basecam depth_registration:=true device_id:="#2"&
 
+sleep 5
+
 #For New Bottom Camera
 #roslaunch openni2_launch openni2.launch camera:=basecam depth_registration:=true device_id:="1d27/0601@3/2"
+
+# Start the virtual laser
+roslaunch virtual_laser virtual_laser
+
+sleep 5
+
+# Start interfaces_mira, which starts the platform driver and the ros-mira interface for virtual lasers
+roslaunch interfaces_mira interfaces_mira&
+
+sleep 5
+
+# Start mira center
+cd /opt/ros/hobbit_hydro/src/interfaces_mira/resources
+miracenter mira_config.xml
 
 
 #After everything is done , bring had to up position
