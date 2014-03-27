@@ -52,12 +52,14 @@ sleep 5
 #roslaunch openni2_launch openni2.launch camera:=basecam depth_registration:=true device_id:="1d27/0601@3/2"
 
 # Start the virtual laser
-roslaunch virtual_laser virtual_laser&
+cd /opt/ros/hobbit_hydro/src/virtual_laser/launch
+roslaunch startup.launch&
 
 sleep 5
 
 # Start interfaces_mira, which starts the platform driver and the ros-mira interface for virtual lasers
-roslaunch interfaces_mira interfaces_mira&
+cd /opt/ros/hobbit_hydro/src/interfaces_mira/launch
+roslaunch startup.launch&
 
 sleep 5
 
