@@ -39,7 +39,7 @@ bool MiraGetPath::get_path(nav_msgs::GetPlan::Request &req, nav_msgs::GetPlan::R
   r.get();
 
   //Set the task for the target pose
-  TaskPtr task(new Task())
+  TaskPtr task(new Task());
   task->addSubTask(SubTaskPtr(new PreferredDirectionTask(mira::navigation::PreferredDirectionTask::FORWARD, 1.0f)));
   task->addSubTask(SubTaskPtr(new mira::navigation::PositionTask(mira::Point2f(goal_pose_mira), 0.1f, 0.1f)));
 
