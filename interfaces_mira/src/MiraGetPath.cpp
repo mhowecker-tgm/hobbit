@@ -34,14 +34,18 @@ bool MiraGetPath::get_path(nav_msgs::GetPlan::Request &req, nav_msgs::GetPlan::R
 
   // mute the pilot
   std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
-  robot_->getMiraAuthority().callService<void>(navService,"setMute", true);
+  mira::RPCFuture<void> r = robot_->getMiraAuthority().callService<void>(navService,"setMute", true);
+  r.timedWait(mira::Duration::seconds(1));
+  r.get();
 
   //Set the task for the target pose
-  TaskPtr task(new Task());
+  TaskPtr task(new Task())
   task->addSubTask(SubTaskPtr(new PreferredDirectionTask(mira::navigation::PreferredDirectionTask::FORWARD, 1.0f)));
   task->addSubTask(SubTaskPtr(new mira::navigation::PositionTask(mira::Point2f(goal_pose_mira), 0.1f, 0.1f)));
 
-  robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
+  mira::RPCFuture<void> r1 = robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
+  r1.timedWait(mira::Duration::seconds(1));
+  r1.get();
   
   // wait for new data on the "navigation/Path" channel  
   //FIXME
@@ -67,10 +71,14 @@ bool MiraGetPath::get_path(nav_msgs::GetPlan::Request &req, nav_msgs::GetPlan::R
 
   //cancel the task
   TaskPtr empty_task(new Task());
-  robot_->getMiraAuthority().callService<void>(navService, "setTask", empty_task);
+  mira::RPCFuture<void> r2 = robot_->getMiraAuthority().callService<void>(navService, "setTask", empty_task);
+  r2.timedWait(mira::Duration::seconds(1));
+  r2.get();
 
   // unmute the pilot
-  robot_->getMiraAuthority().callService<void>("setMute", false);
+  mira::RPCFuture<void> r3 = robot_->getMiraAuthority().callService<void>("setMute", false);
+  r3.timedWait(mira::Duration::seconds(1));
+  r3.get();
 
   return true;
 }
