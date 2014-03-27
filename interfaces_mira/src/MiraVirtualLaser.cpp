@@ -27,8 +27,8 @@ void MiraVirtualLaser::virtual_laser_loc_callback(const sensor_msgs::LaserScan::
 	scan.valid.resize(msg->ranges.size());
 
 	scan.minimumRange = msg->range_min;
-	//scan.maximumRange = msg->range_max;
-	scan.maximumRange = 3.5; //FIXME
+	//scan.maximumRange = msg->range_max; //ok for localization
+	scan.maximumRange = 3.5; //FIXME //value for mapping
 	
 	//std::cout << "minimumRange " << scan.minimumRange << std::endl;
 	//std::cout << "maximumRange " << scan.maximumRange << std::endl;
