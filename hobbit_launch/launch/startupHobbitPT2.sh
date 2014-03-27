@@ -46,6 +46,9 @@ sleep 5
 #Start bottom camera 
 roslaunch openni2_launch openni2.launch camera:=basecam depth_registration:=true device_id:="#2"&
 
+#cd /opt/ros/hobbit_hydro/src/hobbit_launch
+#roslaunch openni2_launch openni2.launch camera:=basecam depth_registration:=true disparity_processing:=true
+
 sleep 5
 
 #For New Bottom Camera
