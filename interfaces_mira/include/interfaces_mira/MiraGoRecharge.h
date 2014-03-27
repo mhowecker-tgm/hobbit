@@ -32,9 +32,9 @@ public:
 
         void initialize();
 
-	void go_to_place_callback(const std_msgs::String::ConstPtr& msg);
+	void docking_task_callback(const std_msgs::String::ConstPtr& msg);
 
-        void stop_request_callback(const std_msgs::String::ConstPtr& msg);  //FIXME?
+        //void stop_request_callback(const std_msgs::String::ConstPtr& msg);  //FIXME?
 
         void goal_status_channel_callback(mira::ChannelRead<std::string> data);
 

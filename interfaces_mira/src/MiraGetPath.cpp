@@ -66,7 +66,8 @@ bool MiraGetPath::get_path(nav_msgs::GetPlan::Request &req, nav_msgs::GetPlan::R
 
 
   //cancel the task
-  robot_->getMiraAuthority().callService<void>(navService, "setTask", NULL);
+  TaskPtr empty_task(new Task());
+  robot_->getMiraAuthority().callService<void>(navService, "setTask", empty_task);
 
   // unmute the pilot
   robot_->getMiraAuthority().callService<void>("setMute", false);

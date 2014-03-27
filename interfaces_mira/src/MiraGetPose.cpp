@@ -12,11 +12,12 @@ void MiraGetPose::initialize() {
 
   current_pose_pub = robot_->getRosNode().advertise<geometry_msgs::PoseWithCovarianceStamped>("/amcl_pose", 20);
 
-  robot_->getMiraAuthority().subscribe<mira::PoseCov2>("/robot/PoseCov2", &MiraGetPose::loc_pose_callback, this);
+  robot_->getMiraAuthority().subscribe<mira::Pose2>("/robot/RobotFrame", &MiraGetPose::loc_pose_callback, this);
 
+  
 }
 
-void MiraGetPose::loc_pose_callback(mira::ChannelRead<mira::PoseCov2> data) 
+void MiraGetPose::loc_pose_callback(mira::ChannelRead<mira::Pose2> data) 
 {
 
   const mira::PoseCov2 robotPose = robot_->getMiraAuthority().getTransform<mira::PoseCov2>("/robot/RobotFrame", "/maps/MapFrame", Time::now());
@@ -29,6 +30,9 @@ void MiraGetPose::loc_pose_callback(mira::ChannelRead<mira::PoseCov2> data)
   ros::Time pose_time = ros::Time::now();
   pose_msg.header.stamp = pose_time;
   pose_msg.header.frame_id = "map";
+
+  //std::cout << "pose_x " << robotPose.x() << std::endl;
+  //std::cout << "pose_y " << robotPose.y() << std::endl;
 
 
   //pose

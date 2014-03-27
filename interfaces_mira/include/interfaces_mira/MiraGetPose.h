@@ -35,7 +35,7 @@ private:
         MiraGetPose();
 
 	ros::Publisher current_pose_pub;
-	void loc_pose_callback(mira::ChannelRead<mira::PoseCov2> data);
+	void loc_pose_callback(mira::ChannelRead<mira::Pose2> data);
 
 
 };
