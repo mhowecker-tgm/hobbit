@@ -27,7 +27,8 @@ void MiraVirtualLaser::virtual_laser_loc_callback(const sensor_msgs::LaserScan::
 	scan.valid.resize(msg->ranges.size());
 
 	scan.minimumRange = msg->range_min;
-	scan.maximumRange = msg->range_max;
+	//scan.maximumRange = msg->range_max;
+	scan.maximumRange = 3.5; //FIXME
 	
 	//std::cout << "minimumRange " << scan.minimumRange << std::endl;
 	//std::cout << "maximumRange " << scan.maximumRange << std::endl;
@@ -92,7 +93,8 @@ void MiraVirtualLaser::virtual_laser_obs_callback(const sensor_msgs::LaserScan::
 	}
 
 	scan.minimumRange = msg->range_min;
-	//scan.maximumRange = msg->range_max;
+	scan.maximumRange = msg->range_max;
+	//scan.maximumRange = 3.5; //FIXME
 
 	scan.startAngle = msg->angle_min;               
 	scan.deltaAngle = msg->angle_increment;
