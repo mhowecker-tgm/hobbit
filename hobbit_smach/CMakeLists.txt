@@ -8,7 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   hobbit_msgs
   rospy
   std_msgs
-  semantic_segmentation
+#  semantic_segmentation
 )
 
 ## System dependencies are found with CMake's conventions
