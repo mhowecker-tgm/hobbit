@@ -71,7 +71,24 @@ void MiraVirtualLaser::virtual_laser_obs_callback(const sensor_msgs::LaserScan::
 	for (int i=0; i<msg->ranges.size();i++)
 	{
 		scan.range[i] = msg->ranges[i];
-		scan.valid[i] = mira::robot::RangeScan::Valid;
+		//scan.valid[i] = mira::robot::RangeScan::Valid;
+		if (scan.range[i] < scan.minimumRange)
+		{
+			scan.valid[i] = mira::robot::RangeScan::Invalid;
+		}
+		else 
+		{
+			if (scan.range[i] > scan.maximumRange)
+			{
+				scan.valid[i] = mira::robot::RangeScan::AboveMaximum;
+			}
+			else
+			{ 
+				scan.valid[i] = mira::robot::RangeScan::Valid;
+				//std::cout << "valid " << std::endl;
+			}
+		}
+
 	}
 
 	scan.minimumRange = msg->range_min;
