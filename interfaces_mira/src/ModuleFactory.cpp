@@ -16,7 +16,7 @@ ModuleFactory::ModuleFactory() {
 	Register("MiraGetPath", &MiraGetPath::Create);
 	Register("MiraGoRecharge", &MiraGoRecharge::Create);
 	Register("MiraRobotDrive", &MiraRobotDrive::Create);
-	//Register("MiraRobotCharger", &MiraRobotCharger::Create);
+	Register("MiraRobotCharger", &MiraRobotCharger::Create);
 }
 
 void ModuleFactory::Register(const std::string &name, ModuleCreator func) {
