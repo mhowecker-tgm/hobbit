@@ -49,6 +49,8 @@
 <!--    <param name="initial_cov_yy " value="0.1"/> -->     <!-- 10 cm (default 50 cm) -->
 <!--    <param name="initial_cov_aa " value="0.1225"/>  --> <!-- 20deg (default 15 deg)-->
 
+    <param name="save_pose_rate" value="1"/>
+
     <remap from="scan" to="loc_scan"/>    
 
   </node>
