@@ -61,6 +61,7 @@ add_action_files(
   CallUser.action
   LocateUser.action
   EndUserInteraction.action
+  GeneralHobbit.action
 )
 
 generate_messages(DEPENDENCIES std_msgs sensor_msgs actionlib geometry_msgs)
