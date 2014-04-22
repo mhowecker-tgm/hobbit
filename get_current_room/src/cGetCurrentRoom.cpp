@@ -112,7 +112,7 @@ void cGetCurrentRoom::roomNameRequestedCallback(const std_msgs::String::ConstPtr
 
 	if(msg->data.compare("Request") == 0)
 	{
-		std::cout << "room name requested " << std::endl;
+		//std::cout << "room name requested " << std::endl;
 		for (unsigned int i=0;i<known_rooms.rooms_vector.size();i++)
 		{
 			std::vector<hobbit_msgs::Point2D> room_vertices;
@@ -120,7 +120,12 @@ void cGetCurrentRoom::roomNameRequestedCallback(const std_msgs::String::ConstPtr
 			{
 				hobbit_msgs::Point2D vertex;
 				vertex.x = known_rooms.rooms_vector[i].vertices_vector[j].x;
+				//std::cout << "vertex_x" << vertex.x << std::endl;
 				vertex.y = known_rooms.rooms_vector[i].vertices_vector[j].y;
+				//std::cout << "vertex_y" << vertex.y << std::endl;
+				room_vertices.push_back(vertex);
+				//std::cout << "current_x" << current_x << std::endl;
+				//std::cout << "current_y" << current_y << std::endl;
 				room_vertices.push_back(vertex);
 			}
 			if (isInRoom(current_x,current_y,room_vertices)) //The vertices MUST be ordered
@@ -256,16 +261,17 @@ bool cGetCurrentRoom::isInRoom(float x_pos, float y_pos, std::vector<hobbit_msgs
 
 	if (polygon_points[n-1].x == x_pos && polygon_points[n-1].y <= y_pos) 
 	{
-	    if (polygon_points[n-1].y == y_pos) 
+            //std::cout << "last case " << std::endl;
+	    if (polygon_points[n-1].y == y_pos) //point is a vertex of the polygon
 		return true;
 
-	    if (polygon_points[0].x == x_pos)
+	    if (polygon_points[0].x == x_pos)  //point lies on one side of the polygon
 	    {
 		if (y_pos <= polygon_points[0].y)
 		    return true;
 	    } 
 	    else 
-		if (polygon_points[0].x > x_pos) b=!b; //num_intersections++;
+		if (polygon_points[0].x < x_pos) b=!b; //num_intersections++;
 
 	}
 
