@@ -1,0 +1,10 @@
+# Define the goal
+std_msgs/String command
+std_msgs/String previous_state
+std_msgs/String[] parameters
+---
+# Define the result
+std_msgs/String result
+---
+# Define a feedback message
+std_msgs/String feedback
