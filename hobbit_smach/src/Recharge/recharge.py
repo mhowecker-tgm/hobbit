@@ -13,6 +13,7 @@ import rospy
 # import uashh_smach.util as util
 
 from std_msgs.msg import String
+import hobbit_smach.move_base as move_base
 from hobbit_msgs.msg import GeneralHobbitAction,\
     LocateUserAction, LocateUserGoal, ApproachUserAction, ApproachUserGoal,\
     Event
@@ -20,9 +21,9 @@ from hobbit_msgs.srv import GetCoordinates
 from smach_ros import ActionServerWrapper, \
     SimpleActionState, IntrospectionServer
 from smach import StateMachine, State, Sequence, cb_interface
-from smach_ros import ServiceState
+#from smach_ros import ServiceState
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
-import uashh_smach.platform.move_base as move_base
+#import uashh_smach.platform.move_base as move_base
 
 
 class bcolors:
@@ -335,14 +336,7 @@ def main():
                 HobbitMMUI.WaitforSoundEnd('/Event', Event),
                 transitions={'aborted': 'WAIT_FOR_MMUI'})
             if not DEBUG:
-                Sequence.add(
-                    'SET_NAV_GOAL',
-                    ServiceState(
-                        'Hobbit/ObjectService/get_coordinates',
-                        GetCoordinates,
-                        request_cb=set_nav_goal_cb,
-                        input_keys=['room_name'])
-                )
+                Sequence.add('MOVE_TO_DOCK',hobbit_move.goToPosition())
                 Sequence.add('MOVE_BASE', move_base.MoveBaseState())
             else:
                 Sequence.add('SET_NAV_GOAL', Dummy())

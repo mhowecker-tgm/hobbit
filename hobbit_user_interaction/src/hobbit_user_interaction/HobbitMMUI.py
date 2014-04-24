@@ -46,6 +46,102 @@ class WaitforSoundEnd(util.WaitForMsgState):
             return 'aborted'
 
 
+class CallDecison(smach.State):
+
+    """
+    Inherit from util.WaitForMsgState to wait
+    for S_SAPIEND
+    """
+
+    def __init__(self):
+        smach.State.__init__(
+            self,
+            input_keys=['call_state'],
+            outcomes=['succeeded', 'failed', 'preempted', 'stop', 'ended']
+        )
+
+    def execute(self, ud):
+        if ud.call_state == 'stop':
+            return 'stop'
+        elif ud.call_state == 'ended':
+            return 'ended'
+        else:
+            return 'succeeded'
+
+
+class WaitforEndedCall(util.WaitForMsgState):
+    """
+    Inherit from util.WaitForMsgState to wait
+    for S_SAPIEND
+    """
+
+    def execute(self, ud):
+        """
+            Override execute() to check for S_SAPIEND
+        """
+        msg = self.waitForMsg()
+        if msg is not None:
+            print(msg)
+            if msg == 'preempted':
+                return 'preempted'
+            # call callback if there is one
+            if self.msg_cb is not None:
+                cb_result = self.msg_cb(msg, ud)
+                # check if callback wants to dictate output
+                if cb_result is not None:
+                    print('self.msg_cb is not None')
+                    if cb_result:
+                        return 'succeeded'
+                    else:
+                        return 'failed'
+            if msg.event == 'E_CALLENDED':
+                return 'succeeded'
+            else:
+                return 'aborted'
+        else:
+            return 'aborted'
+
+
+class WaitforConfirmedCall(util.WaitForMsgState):
+    """
+    Inherit from util.WaitForMsgState to wait
+    for some Events
+    """
+
+    def execute(self, ud):
+        """
+            Override execute() to check for some Events
+        """
+        msg = self.waitForMsg()
+        if msg is not None:
+            print(msg)
+            if msg == 'preempted':
+                return 'preempted'
+            # call callback if there is one
+            if self.msg_cb is not None:
+                cb_result = self.msg_cb(msg, ud)
+                # check if callback wants to dictate output
+                if cb_result is not None:
+                    print('self.msg_cb is not None')
+                    if cb_result:
+                        return 'succeeded'
+                    else:
+                        return 'failed'
+            if msg.event == 'E_CALLCONFIRMED':
+                ud.call_state = 'confirmed'
+                return 'succeeded'
+            elif msg.event == 'B_STOPSOS':
+                ud.call_state = 'stop'
+                return 'succeeded'
+            elif msg.event == 'E_CALLENDED' or msg.event == 'B_CALLENDED':
+                ud.call_state = 'ended'
+                return 'succeeded'
+            else:
+                return 'aborted'
+        else:
+            return 'aborted'
+
+
 class ShowMenu(smach.State):
     """
     Class to interact with the MMUI
@@ -140,9 +236,11 @@ class ConfirmInfo(smach.State):
 
 
 class ShowInfo(smach.State):
+
     """
     Class to interact with the MMUI
     """
+
     def __init__(self, info):
         smach.State.__init__(self,
                              outcomes=['succeeded', 'failed', 'preempted']
@@ -155,6 +253,7 @@ class ShowInfo(smach.State):
             return 'preempted'
         mmui = MMUI.MMUIInterface()
         resp = mmui.showMMUI_Info(text=self.info)
+        print('response was: ')
         print(resp)
         # TODO: needs checkfor resp content
         if resp:
@@ -227,7 +326,8 @@ class AskForCmd(smach.State):
                              input_keys=['question'])
 
     def execute(self, ud):
-        resp = MMUI.showMMUI_NAME(ud.question)
+        mmui = MMUI.MMUIInterface()
+        resp = mmui.showMMUI_NAME(ud.question)
         if resp:
             return 'succeeded'
         else:
@@ -241,14 +341,17 @@ class CallEmergency(smach.State):
     def __init__(self):
         smach.State.__init__(
             self,
-            outcomes=['succeeded', 'preempted']
+            outcomes=['succeeded', 'preempted', 'failed']
         )
 
     def execute(self, ud):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
-        MMUI.sendMMUI_Function('F_CALLSOS')
+        mmui = MMUI.MMUIInterface()
+        resp = mmui.StartSOSCall()
+        print('response from StartSOSCall was: ')
+        print(resp)
         return 'succeeded'
 
 
@@ -259,7 +362,7 @@ class CallEnded(smach.State):
     def __init__(self):
         smach.State.__init__(
             self,
-            outcomes=['succeeded', 'preempted'],
+            outcomes=['succeeded', 'preempted', 'failed'],
             input_keys=['call_state']
         )
 
@@ -267,12 +370,11 @@ class CallEnded(smach.State):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
-        if ud.call_state.upper() == 'B_STOPSOS'\
-                or ud.call_state.upper() == 'B_ENDSOS':
-            return 'succeeded'
-        elif ud.call_state.upper() == 'E_CALLCONFIRMED':
-            MMUI.sendMMUI_Function('F_ENDCALL')
-            return 'succeeded'
+        mmui = MMUI.MMUIInterface()
+        resp = mmui.sendMMUI_Function('F_ENDCALL')
+        print('response from StartSOSCall was: ')
+        print(resp)
+        return 'succeeded'
 
 
 if __name__ == '__main__':

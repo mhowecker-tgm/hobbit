@@ -9,7 +9,8 @@ roslib.load_manifest(PKG)
 import rospy
 
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
-import uashh_smach.util as util
+import hobbit_smach.hobbit_move as hobbit_move
+#import uashh_smach.util as util
 #import uashh_smach.platform.move_base as move_base
 
 from std_msgs.msg import String
@@ -37,25 +38,31 @@ class bcolors:
 
 
 class Init(State):
-    """Class to initialize certain parameters"""
+
+    """
+    Class to initialize certain parameters
+    """
+
     def __init__(self):
         State.__init__(
             self,
-            outcomes=['succeeded',
-                      'aborted',
-                      'preempted'],
+            outcomes=['succeeded', 'aborted', 'preempted'],
             output_keys=['social_role'])
 
     def execute(self, ud):
         if rospy.has_param('/hobbit/social_role'):
             ud.social_role = rospy.get_param('/hobbit/social_role')
+        else:
+            pass
         return 'succeeded'
 
 
 class CleanUp(State):
+
     """
     Class for setting the result message and clean up persistent variables
     """
+
     def __init__(self):
         State.__init__(
             self,
@@ -72,10 +79,12 @@ class CleanUp(State):
 
 
 class SetSuccess(State):
+
     """
     Class for setting the success message in the actionlib result and clean
     up of persistent variables
     """
+
     def __init__(self):
         State.__init__(
             self,
@@ -97,9 +106,11 @@ class SetSuccess(State):
 
 
 class Dummy(State):
+
     """
     Class for setting the result message and clean up persistent variables
     """
+
     def __init__(self):
         State.__init__(
             self,
@@ -113,34 +124,36 @@ class Dummy(State):
 
 
 class CheckCaller(State):
+
     """
     What emergency called SOS?
     """
+
     def __init__(self):
         State.__init__(
             self,
-            outcomes=['succeeded', 'failed', 'preempted'],
-            input_keys=['command'],
-            output_keys=['caller']
+            outcomes=['succeeded', 'failed', 'preempted', 'move_to_dock'],
+            input_keys=['parameters']
         )
 
     def execute(self, ud):
-        print(ud.command)
-        ud.caller = 'user_initiated'
-        ud.caller = 'user_not_detected'
-        ud.caller = 'user_not_responding'
-        return 'succeeded'
+        if ud.parameters[0].data == 'user_not_detected':
+            return 'move_to_dock'
+        else:
+            return 'succeeded'
 
 
 class FailCounter(State):
+
     """
     Class for setting the result message and clean up persistent variables
     """
+
     def __init__(self):
         State.__init__(
             self,
             outcomes=['fail1', 'fail2', 'fail3', 'loop'],
-            input_keys=['caller'],
+            input_keys=['parameters'],
             output_keys=['result', 'command']
         )
         self.loop = False
@@ -149,7 +162,10 @@ class FailCounter(State):
     def execute(self, ud):
         if self.fail == 3:
             self.fail = 1
-            if ud.caller == 'user_initiated':
+            if ud.parameters[0].data == 'user_initiated':
+                print(bcolors.OKGREEN +
+                      'user_initiated' +
+                      bcolors.ENDC)
                 if not self.loop:
                     self.loop = True
                     return 'loop'
@@ -181,7 +197,7 @@ def main():
 
     sos_sm = StateMachine(
         outcomes=['succeeded', 'aborted', 'preempted'],
-        input_keys=['command'],
+        input_keys=['command', 'parameters'],
         output_keys=['result'])
 
     sos_sm.userdata.result = String('started')
@@ -199,29 +215,38 @@ def main():
         Sequence.add('START_CALL', HobbitMMUI.CallEmergency())
         Sequence.add(
             'CHECK_CALL_STATE',
-            util.WaitForMsgState(
-                '/Event',
-                Event,
-                callstate_cb,
-                timeout=2,
-                output_keys=['state']),
-            transitions={'aborted': 'failed'})
+            HobbitMMUI.WaitforConfirmedCall(
+                '/Event', Event, output_keys=['call_state']),
+            transitions={'aborted': 'CHECK_CALL_STATE'}
+        )
+        Sequence.add(
+            'CALL_DECISION',
+            HobbitMMUI.CallDecison(),
+            transitions={'stop': 'END_CALL',
+                         'ended': 'failed'}
+        )
+        Sequence.add(
+            'CHECK_CALL_ENDED',
+            HobbitMMUI.WaitforEndedCall(
+                '/Event', Event, output_keys=['call_state']),
+            transitions={'aborted': 'CHECK_CALL_ENDED'}
+        )
         Sequence.add('END_CALL', HobbitMMUI.CallEnded())
 
     with sos_sm:
         StateMachine.add(
             'INIT',
             Init(),
-            transitions={'succeeded': 'CHECK_CALLER',
+            transitions={'succeeded': 'SAY_T_HM_IWillCallFirstPersonInList',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
             'CHECK_CALLER',
-            #Dummy(),
             CheckCaller(),
-            transitions={'succeeded': 'SAY_T_HM_IWillCallFirstPersonInList',
+            transitions={'succeeded': 'succeeded',
                          'failed': 'aborted',
-                         'preempted': 'preempted'}
+                         'preempted': 'preempted',
+                         'move_to_dock': 'MOVE_TO_DOCK'}
         )
         StateMachine.add(
             'SEQ',
@@ -268,14 +293,14 @@ def main():
         StateMachine.add(
             'SAY_T_HM_NoAnswersIWillCallFirstPersonAgain',
             HobbitMMUI.ShowInfo(info='NoAnswersIWillCallFirstPersonAgain'),
-            transitions={'succeeded': 'WAIT_FOR_MMUI',
-                         'failed': 'WAIT_FOR_MMUI',
+            transitions={'succeeded': 'SEQ',
+                         'failed': 'SEQ',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
             'SAY_NoAnswersSayOrPressHelpAgainToTryAgain',
             HobbitMMUI.ShowInfo(info='NoAnswersSayOrPressHelpAgainToTryAgain'),
-            transitions={'succeeded': 'WAIT_FOR_MMUI_2',
+            transitions={'succeeded': 'WAIT_FOR_MMUI',
                          'failed': 'aborted',
                          'preempted': 'preempted'}
         )
@@ -283,19 +308,20 @@ def main():
             'WAIT_FOR_MMUI',
             HobbitMMUI.WaitforSoundEnd('/Event', Event),
             transitions={'aborted': 'WAIT_FOR_MMUI',
-                         'succeeded': 'SEQ'}
-        )
-        StateMachine.add(
-            'WAIT_FOR_MMUI_2',
-            HobbitMMUI.WaitforSoundEnd('/Event', Event),
-            transitions={'aborted': 'WAIT_FOR_MMUI_2',
                          'succeeded': 'MMUI_MAIN_MENU'}
         )
         StateMachine.add(
             'EMO_NEUTRAL',
             HobbitEmotions.ShowEmotions(emotion='NEUTRAL', emo_time=4),
-            transitions={'succeeded': 'succeeded',
+            transitions={'succeeded': 'CHECK_CALLER',
                          'failed': 'aborted',
+                         'preempted': 'preempted'}
+        )
+        StateMachine.add(
+            'MOVE_TO_DOCK',
+            hobbit_move.goToPosition(room=None, place='dock'),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'aborted',
                          'preempted': 'preempted'}
         )
 
@@ -303,7 +329,8 @@ def main():
         'sos', GeneralHobbitAction, sos_sm,
         ['succeeded'], ['aborted'], ['preempted'],
         result_slots_map={'result': 'result'},
-        goal_slots_map={'command': 'command'}
+        goal_slots_map={'command': 'command',
+                        'parameters': 'parameters'}
     )
 
     sis = IntrospectionServer(

@@ -106,6 +106,12 @@ class MMUIInterface:
         parr.append(p)
         return self.callMMUIService('0', 'create', parr)
 
+    def StartSOSCall(self):
+        parr=[]
+        p = Parameter('type', 'F_CALLSOS')
+        parr.append(p)
+        return self.callMMUIService('0', 'create', parr)
+
     def GoToMenu(self, menu='F_MAIN'):
         parr = []
         p = Parameter('type', 'F_GOTOMENU')

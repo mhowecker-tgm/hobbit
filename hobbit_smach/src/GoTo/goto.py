@@ -11,13 +11,13 @@ roslib.load_manifest(PKG)
 import rospy
 import smach
 #import uashh_smach.util as util
-import uashh_smach.platform.move_base as move_base
+#import uashh_smach.platform.move_base as move_base
+import hobbit_smach.hobbit_move as hobbit_move
 
 from std_msgs.msg import String
 from hobbit_msgs.msg import GeneralHobbitAction, Event
 from hobbit_msgs.srv import GetCoordinates
-from smach_ros import ActionServerWrapper, IntrospectionServer, \
-    ServiceState
+from smach_ros import ActionServerWrapper, IntrospectionServer
 from smach import StateMachine, State, Sequence
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 
@@ -344,15 +344,9 @@ def main():
                 transitions={'aborted': 'WAIT_FOR_MMUI'})
             if not DEBUG:
                 Sequence.add(
-                    'SET_NAV_GOAL',
-                    ServiceState(
-                        'Hobbit/ObjectService/get_coordinates',
-                        GetCoordinates,
-                        request_cb=set_nav_goal_cb,
-                        input_keys=['room_name']))
-                Sequence.add(
-                    'MOVE_BASE_GO',
-                    move_base.MoveBaseState())
+                    'MOVE_TO_DOCK',
+                    hobbit_move.goToPosition()
+                )
             else:
                 Sequence.add('SET_NAV_GOAL', Dummy())
                 Sequence.add(
