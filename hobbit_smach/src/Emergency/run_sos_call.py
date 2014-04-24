@@ -2,7 +2,7 @@
 
 NAME = 'run_sos_call'
 import roslib
-roslib.load_manifest('hobbit_msgs')
+roslib.load_manifest('hobbit_smach')
 import rospy
 import actionlib
 

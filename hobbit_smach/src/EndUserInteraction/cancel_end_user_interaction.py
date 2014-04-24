@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import roslib; roslib.load_manifest('hobbit_msgs')
+import roslib; roslib.load_manifest('hobbit_smach')
 import rospy
 import actionlib
 

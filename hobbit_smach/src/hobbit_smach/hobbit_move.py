@@ -29,7 +29,7 @@ class SetNavigationGoal(ServiceState):
             GetCoordinates,
             request_cb=self.__request_cb,
             response_cb=self.__response_cb,
-            input_keys=['room_name', 'location_name']
+            input_keys=['room_name', 'location_name'],
             output_keys=['x', 'y', 'yaw']
         )
         self.frame = frame

@@ -243,7 +243,7 @@ def main():
         StateMachine.add(
             'CHECK_CALLER',
             CheckCaller(),
-            transitions={'succeeded': 'succeeded',
+            transitions={'succeeded': 'SAY_IAmWithYou',
                          'failed': 'aborted',
                          'preempted': 'preempted',
                          'move_to_dock': 'MOVE_TO_DOCK'}
@@ -320,6 +320,13 @@ def main():
         StateMachine.add(
             'MOVE_TO_DOCK',
             hobbit_move.goToPosition(room=None, place='dock'),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'aborted',
+                         'preempted': 'preempted'}
+        )
+        StateMachine.add(
+            'SAY_IAmWWithYou',
+            HobbitMMUI.ShowInfo(info='IAmWithYou'),
             transitions={'succeeded': 'succeeded',
                          'aborted': 'aborted',
                          'preempted': 'preempted'}

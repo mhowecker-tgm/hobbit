@@ -64,12 +64,14 @@ class Init(smach.State):
 class AskYesNo(smach.State):
     """Class to interact with the MMUI"""
     def __init__(self):
-        smach.State.__init__(self, outcomes=['yes', 'no'],
+        smach.State.__init__(self, outcomes=['yes', 'no', 'failed'],
                              input_keys=['question'])
 
     def execute(self, ud):
         mmui = MMUI.MMUIInterface()
         resp = mmui.showMMUI_YESNO(self, ud.question)
+        if not resp:
+            return 'failed'
         if resp:
             print resp
             return 'yes'
@@ -85,6 +87,8 @@ class AskForCmd(smach.State):
 
     def execute(self, ud):
         resp = MMUI.showMMUI_NAME(self, question)
+        if not resp:
+            return 'failed'
         if resp:
             print resp
             return 'succeeded'
