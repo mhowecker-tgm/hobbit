@@ -42,6 +42,8 @@ class QNode : public QThread
 
     hobbit_msgs::RoomsVector rooms;
 
+    bool new_pose; //FIXME
+
   Q_SIGNALS:
     void rosShutdown();
 
