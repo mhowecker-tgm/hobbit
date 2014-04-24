@@ -193,7 +193,7 @@ int main(int argc, char **argv)
    try
 	{
 	 char regName[128]={0};
-	 sprintf(regName,"hand_gestures%u",getpid()); //We use pid on node name
+	 sprintf(regName,"face_detection%u",getpid()); //We use pid on node name
   	 ros::init(argc, argv, regName);
      ros::start();
 
