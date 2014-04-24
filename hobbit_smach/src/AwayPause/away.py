@@ -17,6 +17,7 @@ from hobbit_msgs.srv import GetCoordinates
 from smach_ros import ActionServerWrapper, IntrospectionServer
 from smach import StateMachine, State, Sequence
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
+import hobbit_smach.move_base as hobbit_move
 
 
 class bcolors:
@@ -318,7 +319,9 @@ def main():
                 'WAIT_FOR_MMUI',
                 HobbitMMUI.WaitforSoundEnd('/Event', Event, timeout=5),
                 transitions={'aborted': 'WAIT_FOR_MMUI'})
-            Sequence.add('MOVE_TO_DOCK', Dummy())
+            Sequence.add('MOVE_TO_DOCK',
+                         hobbit_move.goToPosition(room=None, place='dock'))
+
             seq2.userdata.text = 'Tell me when you are back/awake again.'
             # TODO: menu='MAIN' has to be changed to the 'User is back menu'
             # This i not yet implemented in the MMUI
