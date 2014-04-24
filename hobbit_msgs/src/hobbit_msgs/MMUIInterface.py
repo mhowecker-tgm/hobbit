@@ -121,7 +121,7 @@ class MMUIInterface:
         return self.callMMUIService('0', 'create', parr)
 
     def callMMUIService(self, sessionid, txt, params):
-        rospy.wait_for_service('/MMUI', 15)
+        rospy.wait_for_service('/MMUI', 5)
         servicecall = rospy.ServiceProxy('/MMUI', Request)
         print('Trying to call MMUIService')
         try:
