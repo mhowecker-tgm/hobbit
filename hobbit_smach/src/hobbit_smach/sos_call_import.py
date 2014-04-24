@@ -71,7 +71,7 @@ class CleanUp(State):
     def execute(self, ud):
         self.pub_face.publish('EMO_SAD')
         ud.visited_places = []
-        ud.result = String('user not detected')
+        ud.result = String('sos call finished')
         return 'succeeded'
 
 
@@ -98,7 +98,7 @@ class SetSuccess(State):
             ud.result = String('preempted')
             self.service_preempt()
             return 'preempted'
-        ud.result = String('user detected')
+        ud.result = String('sos call finished')
         return 'succeeded'
 
 

@@ -283,7 +283,7 @@ def main():
                          'preempted': 'preempted',
                          'failed': 'SET_FAILURE'}
         )
-        # Why should Hobbit look for the user if the command was givven on
+        # Why should Hobbit look for the user if the command was given on
         # the touchscreen, by voice or by gesture.
         # This means the user is at least in front or very close to hoobit
         #StateMachine.add(

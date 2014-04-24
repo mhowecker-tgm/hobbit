@@ -21,6 +21,8 @@ from smach_ros import ActionServerWrapper, \
 from smach import StateMachine, State, cb_interface
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 from datetime import datetime, time
+import hobbit_smach.sos_call_import as sos_call
+import hobbit_smach.hobbit_move as hobbit_move
 
 
 class bcolors:
@@ -108,7 +110,7 @@ class CallCheck(State):
             return 'event'
         else:
             rospy.loginfo(
-                'Unknown type received in GeneralHobbitAction: %s' % ud.command.data)
+                'Unknown type in GeneralHobbitAction: %s' % ud.command.data)
             return 'failure'
 
 
@@ -288,15 +290,11 @@ def main():
         )
         if not DEBUG:
             StateMachine.add(
-                'SET_NAV_GOAL',
-                ServiceState(
-                    'Hobbit/ObjectService/get_coordinates',
-                    GetCoordinates,
-                    request_cb=set_nav_goal_cb,
-                    input_keys=['bathroom_door']))
-            StateMachine.add(
-                'MOVE_BASE',
-                move_base.MoveBaseState())
+                'MOVE_TO_DOCK',
+                hobbit_move.goToPosition(room='bathroom', place='door'),
+                transitions={'failed': 'SET_FAILURE',
+                             'succeeded': 'MMUI_CONFIRM_DoYouNeedHelp'}
+            )
         else:
             StateMachine.add(
                 'SET_NAV_GOAL',
@@ -333,10 +331,9 @@ def main():
         )
         StateMachine.add(
             'EMERGENCY_CALL',
-            Dummy(),
-            #SimpleActionState(),
+            sos_call.get_call_sos(),
             transitions={'succeeded': 'SET_SUCCESS',
-                         'failed': 'SET_FAILURE',
+                         'aborted': 'SET_FAILURE',
                          'preempted': 'preempted'}
         )
         StateMachine.add(

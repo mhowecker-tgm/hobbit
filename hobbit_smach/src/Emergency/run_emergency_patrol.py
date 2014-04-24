@@ -12,11 +12,15 @@ from hobbit_msgs.msg import GeneralHobbitAction, GeneralHobbitGoal
 
 def start_action():
     print "start client"
-    client = actionlib.SimpleActionClient('emergency_patrol', GeneralHobbitAction)
+    client = actionlib.SimpleActionClient(
+        'emergency_patrol', GeneralHobbitAction)
     client.wait_for_server()
     print "connected to server"
+    par = []
+    par.append(String('user_not_responding'))
     goal = GeneralHobbitGoal(
-        command=String('Emergency'))
+        command=String('Emergency'),
+        parameters=par)
     print goal
     print "send goal"
     client.send_goal(goal)

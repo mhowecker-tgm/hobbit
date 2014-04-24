@@ -94,7 +94,7 @@ class WaitforEndedCall(util.WaitForMsgState):
                         return 'succeeded'
                     else:
                         return 'failed'
-            if msg.event == 'E_CALLENDED':
+            if msg.event == 'E_CALLENDED' or msg.event == 'B_ENDSOS':
                 return 'succeeded'
             else:
                 return 'aborted'
@@ -133,7 +133,7 @@ class WaitforConfirmedCall(util.WaitForMsgState):
             elif msg.event == 'B_STOPSOS':
                 ud.call_state = 'stop'
                 return 'succeeded'
-            elif msg.event == 'E_CALLENDED' or msg.event == 'B_CALLENDED':
+            elif msg.event == 'E_CALLENDED' or msg.event == 'B_CALLENDED' or msg.event == 'B_ENDSOS':
                 ud.call_state = 'ended'
                 return 'succeeded'
             else:
@@ -190,6 +190,7 @@ class AskYesNo(smach.State):
             return 'preempted'
         print(self.timeout_count)
         if self.timeout_count > 2:
+            self.timeout_count = 0
             return '3times'
         mmui = MMUI.MMUIInterface()
         resp = mmui.showMMUI_YESNO(text=self.question)

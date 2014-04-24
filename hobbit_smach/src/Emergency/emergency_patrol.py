@@ -21,6 +21,8 @@ from smach_ros import ActionServerWrapper, \
     IntrospectionServer, ServiceState, SimpleActionState
 from smach import StateMachine, State, cb_interface
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
+import hobbit_smach.sos_call_import as sos_call
+from datetime import datetime, time
 
 
 class bcolors:
@@ -108,7 +110,7 @@ class CallCheck(State):
             return 'event'
         else:
             rospy.loginfo(
-                'Unknown type received in GeneralHobbitAction: %s' % ud.command.data)
+                'Unknown type in GeneralHobbitAction: %s' % ud.command.data)
             return 'failure'
 
 
@@ -335,16 +337,15 @@ def main():
             StateMachine.add(
                 'CALL_USER',
                 Dummy(),
-                transitions={'succeeded': 'EMO_NEUTRAL',
-                             'failed': 'EMERGENCY_CALL',
+                transitions={'failed': 'EMO_NEUTRAL',
+                             'succeeded': 'EMERGENCY_CALL',
                              'preempted': 'preempted'}
             )
         StateMachine.add(
             'EMERGENCY_CALL',
-            Dummy(),
-            #SimpleActionState(),
+            sos_call.get_call_sos(),
             transitions={'succeeded': 'EMO_NEUTRAL',
-                         'failed': 'SET_FAILURE',
+                         'aborted': 'SET_FAILURE',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
