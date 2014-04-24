@@ -37,7 +37,7 @@ class WaitforSoundEnd(util.WaitForMsgState):
                     if cb_result:
                         return 'succeeded'
                     else:
-                        return 'aborted'
+                        return 'failed'
             if msg.event == 'S_SAPIEND':
                 return 'succeeded'
             else:
@@ -50,18 +50,20 @@ class ShowMenu(smach.State):
     """
     Class to interact with the MMUI
     """
-    def __init__(self):
+    def __init__(self, menu=None):
         smach.State.__init__(self,
-                             outcomes=['succeeded', 'aborted', 'preempted'],
+                             outcomes=['succeeded', 'failed', 'preempted'],
                              input_keys=['menu'],
                              )
+        self.menu = menu
 
     def execute(self, ud):
         if self.preempt_requested():
             ud.answer = String('preempted')
             self.service_preempt()
-        menu = 'M_' + ud.menu.data
-        print(menu)
+        menu = 'M_' + self.menu if self.menu is not None else None
+        if not menu:
+            return 'failed'
         mmui = MMUI.MMUIInterface()
         resp = mmui.GoToMenu(menu=menu)
         print(resp)
@@ -69,25 +71,32 @@ class ShowMenu(smach.State):
         if resp:
             return 'succeeded'
         else:
-            return 'aborted'
+            return 'failed'
 
 
 class AskYesNo(smach.State):
     """
     Class to interact with the MMUI
     """
-    def __init__(self):
+    def __init__(self, question):
         smach.State.__init__(self,
-                             outcomes=['yes', 'no', 'aborted', 'preempted'],
+                             outcomes=['yes', 'no', 'failed', 'preempted',
+                                       'timeout', '3times'],
                              input_keys=['question'],
                              output_keys=['answer'])
+        self.question = question
+        self.timeout_count = 0
 
     def execute(self, ud):
         if self.preempt_requested():
             ud.answer = String('preempted')
             self.service_preempt()
+            return 'preempted'
+        print(self.timeout_count)
+        if self.timeout_count > 2:
+            return '3times'
         mmui = MMUI.MMUIInterface()
-        resp = mmui.showMMUI_YESNO(text=ud.question.data)
+        resp = mmui.showMMUI_YESNO(text=self.question)
         if resp:
             for i, v in enumerate(resp.params):
                 print i, v
@@ -96,30 +105,56 @@ class AskYesNo(smach.State):
                 elif v.name == 'result' and v.value == 'D_NO':
                     return 'no'
                 elif v.name == 'result' and v.value == 'D_CANCEL':
-                    #return 'aborted'
                     return 'yes'
+                elif v.name == 'result' and v.value == 'D_TIMEOUT':
+                    self.timeout_count += 1
+                    return 'timeout'
                 else:
-                    return 'aborted'
+                    return 'failed'
         else:
-            return 'aborted'
+            return 'failed'
 
 
-class ShowInfo(smach.State):
+class ConfirmInfo(smach.State):
     """
     Class to interact with the MMUI
     """
-    def __init__(self):
+    def __init__(self, info):
         smach.State.__init__(self,
-                             outcomes=['succeeded', 'aborted', 'preempted'],
-                             input_keys=['text']
+                             outcomes=['succeeded', 'failed', 'preempted']
                              )
+        self.info = info
 
     def execute(self, ud):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
         mmui = MMUI.MMUIInterface()
-        resp = mmui.showMMUI_Info(text=ud.text)
+        resp = mmui.showMMUI_OK(text=self.info)
+        print(resp)
+        # TODO: needs checkfor resp content
+        if resp:
+            return 'succeeded'
+        else:
+            return 'failed'
+
+
+class ShowInfo(smach.State):
+    """
+    Class to interact with the MMUI
+    """
+    def __init__(self, info):
+        smach.State.__init__(self,
+                             outcomes=['succeeded', 'failed', 'preempted']
+                             )
+        self.info = info
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        mmui = MMUI.MMUIInterface()
+        resp = mmui.showMMUI_Info(text=self.info)
         print(resp)
         # TODO: needs checkfor resp content
         if resp:
@@ -162,7 +197,7 @@ class ShowCalendar(smach.State):
     def __init__(self):
         smach.State.__init__(
             self,
-            outcomes=['aborted', 'succeeded', 'preempted'],
+            outcomes=['failed', 'succeeded', 'preempted'],
             input_keys=['timeframe', 'categories']
         )
 
@@ -178,9 +213,9 @@ class ShowCalendar(smach.State):
         elif resp[0].value == 'D_CANCEL':
             return 'failed'
         elif resp[0].value == 'D_TIMEOUT':
-            return 'aborted'
+            return 'failed'
         else:
-            return 'aborted'
+            return 'failed'
 
 
 class AskForCmd(smach.State):

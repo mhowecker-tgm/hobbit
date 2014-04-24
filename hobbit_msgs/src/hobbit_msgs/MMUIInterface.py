@@ -88,6 +88,32 @@ class MMUIInterface:
             parr.append(p)
         return self.callMMUIService('0', 'create', parr)
 
+    def showMMUI_Calendar(
+        self,
+        text='show calendar entries',
+        timespan='03:00',
+        cat=['drinking', 'drug', 'meeting', 'checklist']
+    ):
+        parr = []
+        p = Parameter('type', 'D_REMINDER')
+        parr.append(p)
+        p = Parameter('text', text)
+        parr.append(p)
+        cat = ['drinking', 'drug', 'meeting', 'checklist']
+        p = Parameter('category', cat)
+        parr.append(p)
+        p = Parameter('timespan', timespan)
+        parr.append(p)
+        return self.callMMUIService('0', 'create', parr)
+
+    def GoToMenu(self, menu='F_MAIN'):
+        parr = []
+        p = Parameter('type', 'F_GOTOMENU')
+        parr.append(p)
+        p = Parameter('Value', menu)
+        parr.append(p)
+        return self.callMMUIService('0', txt='Go to menu' + menu[2:], params=parr)
+
     def sendMMUI_Function(self, f):
         parr = []
         p = Parameter('type', f)
@@ -95,8 +121,9 @@ class MMUIInterface:
         return self.callMMUIService('0', 'create', parr)
 
     def callMMUIService(self, sessionid, txt, params):
-        rospy.wait_for_service('/MMUI')
+        rospy.wait_for_service('/MMUI', 15)
         servicecall = rospy.ServiceProxy('/MMUI', Request)
+        print('Trying to call MMUIService')
         try:
             h = Header()
             h.stamp = rospy.Time.now()

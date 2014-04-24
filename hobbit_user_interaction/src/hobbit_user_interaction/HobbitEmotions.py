@@ -7,42 +7,41 @@ NAME = 'hobbit_emotions'
 import roslib
 roslib.load_manifest(PKG)
 import rospy
-import smach
-
+from smach import State
 from std_msgs.msg import String
 
 
-class ShowEmotions(smach.State):
+class ShowEmotions(State):
     """
     Class to display emotions via the two displays in
     HOBBIT's head
     Possible emotions are:
         HAPPY VHAPPY LTIRED VTIRED CONCERNED SAD WONDERING NEUTRAL SLEEPING
     """
-    def __init__(self):
-        smach.State.__init__(self,
-                             outcomes=['succeeded', 'aborted', 'preempted'],
-                             input_keys=['emotion', 'emo_time']
-                             )
+    def __init__(self, emotion='NEUTRAL', emo_time=4):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'failed', 'preempted'],
+            input_keys=['emotion', 'emo_time']
+        )
         self.pub_emo = rospy.Publisher('/head/emo', String)
-        self.emotion = String('NEUTRAL')
-        self.emo_time = 4
+        self.emotion = emotion
+        self.emo_time = emo_time
+        self.default_emotion = 'NEUTRAL'
 
     def execute(self, ud):
-        print(ud.emotion)
-        print(ud.emo_time)
-        if ud.emotion:
-            self.emotion = ud.emotion
-            self.emo_time = ud.emo_time
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
+        self.default_emotion = rospy.get_param('/Hobbit/current_emotion')
+        rospy.set_param('/Hobbit/current_emotion', self.emotion)
         self.pub_emo.publish(self.emotion)
-        if not ud.emo_time:
+        if self.emo_time == 0:
             return 'succeeded'
         else:
             rospy.sleep(self.emo_time)
-            return 'succeeded'
+        self.pub_emo.publish(self.default_emotion)
+        return 'succeeded'
 
 
 if __name__ == '__main__':
