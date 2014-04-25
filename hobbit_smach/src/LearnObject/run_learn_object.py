@@ -22,8 +22,6 @@ def start_action():
     goal = GeneralHobbitGoal(command=String('learn_object'),
                              previous_state=String('call_hobbit'),
                              parameters=par)
-    print(goal)
-    print(type(goal))
     print('learn_object')
     client.send_goal(goal)
     print('waiting for result')
