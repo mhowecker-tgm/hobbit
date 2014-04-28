@@ -1,6 +1,6 @@
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Author: Paloma de la Puente
-// Last update: 15.4.2014
+// Last update: 28.4.2014
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #include "../include/PlacesLearningGui/qnode.hpp"
 
@@ -41,9 +41,9 @@ void QNode::currentRoomCallback(const std_msgs::String::ConstPtr& msg)
 void QNode::learnPlace(const std::string place_name, const std::string place_type)
 {
 
-	cout << "current_x " << current_x << endl;
-        cout << "current_y " << current_y << endl;
-	cout << "current_th " << current_theta << endl;
+	//cout << "current_x " << current_x << endl;
+        //cout << "current_y " << current_y << endl;
+	//cout << "current_th " << current_theta << endl;
 
         std_msgs::String req_msg;
 	req_msg.data = "Request";
@@ -144,7 +144,7 @@ void QNode::run()
   if (bRun)
   {
 
-    cout << "here" << endl;
+    //cout << "here" << endl;
 
     // Init the ROS stuff and create subscribers and a publisher.
     ros::init(init_argc, init_argv, "PlacesLearningGui");
@@ -185,7 +185,7 @@ void QNode::run()
 bool QNode::savePlaces(std::string fileName)
 {
 
-    cout << "here" << endl;
+    //cout << "here" << endl;
     if (rooms.rooms_vector.size()==0)
     {
  		cout << "No places to be saved " << endl;
@@ -208,7 +208,7 @@ bool QNode::savePlaces(std::string fileName)
     
     }
 
-    cout << "file open " << endl;
+    //cout << "file open " << endl;
 
     /*****************************************************************************/
 
