@@ -230,7 +230,7 @@ bool QNode::savePlaces(std::string fileName)
         	room_name_file=room.child_value("name");
 		if(room_name.compare(room_name_file)==0)
 		{
-			cout << "Room found " << room_name << endl;
+			//cout << "Room found " << room_name << endl;
 			if (!rooms.rooms_vector[i].places_vector.size() > 0) continue;
 			// add places
 			pugi::xml_node places_i = room.append_child();
@@ -330,10 +330,10 @@ bool QNode::savePlaces(std::string fileName)
     }// end rooms with places
     
 	 
-    std::cout << "Saving places: " << doc.save_file(fileName.c_str()) << std::endl;
-    return true;
+    //std::cout << "Saving places: " << doc.save_file(fileName.c_str()) << std::endl;
+    //return true;
     
-    //return doc.save_file(fileName.c_str());
+    return doc.save_file(fileName.c_str());
   
   
 }
