@@ -185,6 +185,7 @@ void QNode::run()
 bool QNode::savePlaces(std::string fileName)
 {
 
+    cout << "here" << endl;
     if (rooms.rooms_vector.size()==0)
     {
  		cout << "No places to be saved " << endl;
@@ -207,6 +208,8 @@ bool QNode::savePlaces(std::string fileName)
     
     }
 
+    cout << "file open " << endl;
+
     /*****************************************************************************/
 
     // the rooms node
@@ -227,7 +230,8 @@ bool QNode::savePlaces(std::string fileName)
         	room_name_file=room.child_value("name");
 		if(room_name.compare(room_name_file)==0)
 		{
-			//cout << "Room found " << room_name << endl;
+			cout << "Room found " << room_name << endl;
+			if (!rooms.rooms_vector[i].places_vector.size() > 0) continue;
 			// add places
 			pugi::xml_node places_i = room.append_child();
 		 	places_i.set_name("places");
@@ -288,9 +292,9 @@ bool QNode::savePlaces(std::string fileName)
 				pugi::xml_node place_type_i_j = place_i_j.append_child();
 				place_type_i_j.set_name("type");
 				//place_type_i_j.append_child(pugi::node_pcdata).set_value("EDIT, please write the type of place here");
-    				string place_i_j_type = rooms.rooms_vector[i].places_vector[j].place_type;
+			 	string place_i_j_type = rooms.rooms_vector[i].places_vector[j].place_type;
 				place_type_i_j.append_child(pugi::node_pcdata).set_value(place_i_j_type.c_str());
-			 
+
 				//add pose
 				pugi::xml_node pose_i_j = place_i_j.append_child();
 			 	pose_i_j.set_name("pose");
@@ -326,14 +330,12 @@ bool QNode::savePlaces(std::string fileName)
     }// end rooms with places
     
 	 
-    /*std::cout << "Saving places: " << doc.save_file(fileName.c_str()) << std::endl;
-    return true;*/
+    std::cout << "Saving places: " << doc.save_file(fileName.c_str()) << std::endl;
+    return true;
     
-    return doc.save_file(fileName.c_str());
+    //return doc.save_file(fileName.c_str());
   
   
 }
-
-
 
 
