@@ -7,16 +7,16 @@ DEBUG = True
 
 import roslib
 roslib.load_manifest(PKG)
-import rospy
+#import rospy
 
-from smach import State, Sequence
-from smach_ros import ServiceState
-from hobbit_msgs.srv import GetCoordinates, GetCoordinatesRequest
-from std_msgs.msg import String
+from smach import Sequence
+#from std_msgs.msg import String
+from hobbit_msgs.msg import Event
 #import uashh_smach.util as util
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 import hobbit_smach.hobbit_move as hobbit_move
 import hobbit_smach.arm_move_import as move_arm
+
 
 def returnTurntable():
     """
@@ -54,6 +54,11 @@ def returnTurntable():
         Sequence.add(
             'MMUI_SAY_STOPPED_LEARNING',
             HobbitMMUI.ShowInfo(info='I_STOPPED_LEARNING'))
+        Sequence.add(
+            'WAIT_FOR_MMUI',
+            HobbitMMUI.WaitforSoundEnd('/Event', Event),
+            transitions={'aborted': 'WAIT_FOR_MMUI'})
+        Sequence.add('MMUI_MAIN_MENU', HobbitMMUI.ShowMenu(menu='MAIN'))
     return seq
 
 

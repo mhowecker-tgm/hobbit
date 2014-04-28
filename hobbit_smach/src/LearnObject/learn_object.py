@@ -400,16 +400,26 @@ def main():
             'SAY_LEARN_FROM_DIFFERENT_ANGLE',
             HobbitMMUI.ShowInfo(
                 info='WAIT_LEARNING_OBJECT_FROM_NEW_ANGLE'),
-            transitions={'succeeded': 'LEARN_OBJECT_2',
+            transitions={'succeeded': 'WAIT_FOR_MMUI_4',
                          'failed': 'STOP_SEQ'}
         )
+        StateMachine.add(
+            'WAIT_FOR_MMUI_4',
+            HobbitMMUI.WaitforSoundEnd('/Event', Event),
+            transitions={'aborted': 'WAIT_FOR_MMUI_4',
+                         'succeeded': 'LEARN_OBJECT_2'})
         StateMachine.add(
             'SAY_WHAT_IS_THE_NAME',
             HobbitMMUI.ShowInfo(
                 info='WHAT_IS_THE_NAME_OF_THIS_OBJECT'),
-            transitions={'succeeded': 'END_SEQ',
+            transitions={'succeeded': 'WAIT_FOR_MMUI_5',
                          'failed': 'STOP_SEQ'}
         )
+        StateMachine.add(
+            'WAIT_FOR_MMUI_5',
+            HobbitMMUI.WaitforSoundEnd('/Event', Event),
+            transitions={'aborted': 'WAIT_FOR_MMUI_5',
+                         'succeeded': 'END_SEQ'})
         StateMachine.add(
             'END_SEQ',
             seq2,
