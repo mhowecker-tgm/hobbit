@@ -411,6 +411,13 @@ def main():
                          'failed': 'SET_FAILURE'}
         )
         StateMachine.add(
+            'SAY_WHAT_IS_THE_NAME',
+            speech_output.sayText(
+                info='WHAT_IS_THE_NAME_OF_THIS_OBJECT'),
+            transitions={'succeeded': 'GET_THE_NAME_OF_THE_OBJECT',
+                         'failed': 'STOP_SEQ'}
+        )
+        StateMachine.add(
             'SAY_LEARN_FROM_DIFFERENT_ANGLE',
             speech_output.sayText(
                 info='WAIT_LEARNING_OBJECT_FROM_NEW_ANGLE'),
@@ -418,9 +425,8 @@ def main():
                          'failed': 'STOP_SEQ'}
         )
         StateMachine.add(
-            'SAY_WHAT_IS_THE_NAME',
-            speech_output.sayText(
-                info='WHAT_IS_THE_NAME_OF_THIS_OBJECT'),
+            'GET_THE_NAME_OF_THE_OBJECT',
+            speech_output.AskForName(),
             transitions={'succeeded': 'END_SEQ',
                          'failed': 'STOP_SEQ'}
         )

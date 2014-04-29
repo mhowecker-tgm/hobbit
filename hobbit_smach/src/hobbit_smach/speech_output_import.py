@@ -8,9 +8,10 @@ DEBUG = True
 import roslib
 roslib.load_manifest(PKG)
 
-from smach import Sequence
+from smach import Sequence, State
 from hobbit_user_interaction import HobbitMMUI
 from hobbit_msgs.msg import Event
+from hobbit_msgs import MMUIInterface as MMUI
 
 
 def sayText(info='Text is missing'):
@@ -40,3 +41,35 @@ def sayText(info='Text is missing'):
                 transitions={'aborted': 'WAIT_FOR_MMUI',
                              'succeeded': 'succeeded'})
     return seq
+
+
+class AskForName(State):
+    """
+    Wrap the askForName function from MMUIInterface in a SMACH state.
+    The returned String is stored in the userdata key object_name.
+    """
+
+    #def __init__(self, text='T_LO_WHAT_IS_THE_NAME_OF_THIS_OBJECT'):
+    def __init__(self, text='WHAT IS THE NAME OF THIS OBJECT'):
+        State.__init__(
+            self,
+            output_keys=['object_name'],
+            outcomes=['succeeded', 'failed', 'preempted']
+        )
+        self.text = text
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        mmui = MMUI.MMUIInterface()
+        resp = mmui.askForName(text=self.text)
+        print(resp)
+        if not resp:
+            return 'failed'
+        else:
+            for item in resp.params:
+                if item.name == 'name':
+                    ud.object_name = item.value.lower()
+                    return 'succeeded'
+        return 'failed'

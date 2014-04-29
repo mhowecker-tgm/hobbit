@@ -145,6 +145,18 @@ class MMUIInterface:
             print "Service did not process request: %s" % str(e)
             return None
 
+    def askForName(
+        self,
+        text='What is the name of this object?'
+    ):
+        parr = []
+        p = Parameter('type', 'D_NAME')
+        parr.append(p)
+        p = Parameter('text', text)
+        parr.append(p)
+        return self.callMMUIService('0', 'create', parr)
+
+
 
             #self.showMMUI_Info('T_CF_FIRST_GRASP_FAILED_WILL_TRY_AGAIN', "1")
             #returns to default menu
