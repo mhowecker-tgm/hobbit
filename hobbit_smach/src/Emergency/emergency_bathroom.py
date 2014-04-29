@@ -22,7 +22,7 @@ from smach import StateMachine, State, cb_interface
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 from datetime import datetime, time
 import hobbit_smach.sos_call_import as sos_call
-import hobbit_smach.hobbit_move as hobbit_move
+import hobbit_smach.hobbit_move_import as hobbit_move
 
 
 class bcolors:

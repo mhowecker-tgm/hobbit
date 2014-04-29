@@ -13,7 +13,7 @@ import smach
 #import uashh_smach.util as util
 from uashh_smach.util import SleepState
 #import uashh_smach.platform.move_base as move_base
-import hobbit_smach.hobbit_move as hobbit_move
+import hobbit_smach.hobbit_move_import as hobbit_move
 
 from std_msgs.msg import String
 from hobbit_msgs.msg import GeneralHobbitAction, Event

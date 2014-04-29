@@ -8,7 +8,7 @@ roslib.load_manifest(PKG)
 import rospy
 
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
-import hobbit_smach.hobbit_move as hobbit_move
+import hobbit_smach.hobbit_move_import as hobbit_move
 
 from std_msgs.msg import String
 from hobbit_msgs.msg import GeneralHobbitAction, Event

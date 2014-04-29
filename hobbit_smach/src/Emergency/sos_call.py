@@ -9,7 +9,7 @@ roslib.load_manifest(PKG)
 import rospy
 
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
-import hobbit_smach.hobbit_move as hobbit_move
+import hobbit_smach.hobbit_move_import as hobbit_move
 #import uashh_smach.util as util
 #import uashh_smach.platform.move_base as move_base
 

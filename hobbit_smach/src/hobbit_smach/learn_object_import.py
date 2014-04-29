@@ -14,7 +14,7 @@ from smach import Sequence
 from hobbit_msgs.msg import Event
 #import uashh_smach.util as util
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
-import hobbit_smach.hobbit_move as hobbit_move
+import hobbit_smach.hobbit_move_import as hobbit_move
 import hobbit_smach.arm_move_import as move_arm
 
 
