@@ -17,7 +17,7 @@ from hobbit_msgs.srv import GetCoordinates
 from smach_ros import ActionServerWrapper, IntrospectionServer
 from smach import StateMachine, State, Sequence
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
-import hobbit_smach.move_base as hobbit_move
+import hobbit_smach.hobbit_move_import as hobbit_move
 
 
 class bcolors:
