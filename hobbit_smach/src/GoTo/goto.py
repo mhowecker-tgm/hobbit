@@ -273,7 +273,9 @@ def main():
             transitions={'yes': 'EMO_HAPPY',
                          'no': 'MMUI_REPEAT_CMD',
                          'failed': 'SET_FAILURE',
-                         'preempted': 'preempted'}
+                         'preempted': 'preempted',
+                         'timeout': 'MMUI_ConfirmPlace',
+                         '3times': 'SET_FAILURE'}
         )
         StateMachine.add(
             'MMUI_REPEAT_CMD',

@@ -13,7 +13,7 @@ import rospy
 # import uashh_smach.util as util
 
 from std_msgs.msg import String
-import hobbit_smach.move_base as move_base
+import hobbit_smach.hobbit_move_import as move_base
 from hobbit_msgs.msg import GeneralHobbitAction,\
     LocateUserAction, LocateUserGoal, ApproachUserAction, ApproachUserGoal,\
     Event
@@ -300,7 +300,9 @@ def main():
             transitions={'yes': 'MMUI_SAY_MovingToChargingStation',
                          'no': 'MMUI_SAY_MovingToWaitingPosition',
                          'failed': 'SET_FAILURE',
-                         'preempted': 'preempted'}
+                         'preempted': 'preempted',
+                         'timeout': 'MMUI_CONFIRM',
+                         '3times': 'SET_FAILURE'}
         )
         StateMachine.add(
             'MMUI_SAY_MovingToChargingStation',

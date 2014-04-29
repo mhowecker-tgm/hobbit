@@ -24,6 +24,7 @@ from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 import hobbit_smach.learn_object_import as learn_object
 import hobbit_smach.head_move_import as head_move
 import hobbit_smach.arm_move_import as arm_move
+import hobbit_smach.speech_output_import as speech_output
 
 
 class Init(State):
@@ -173,12 +174,16 @@ def main():
             'HEAD_MOVE',
             head_move.MoveTo(pose='center_center'))
         Sequence.add(
-            'MMUI_SAY_ATTENTION',
-            HobbitMMUI.ShowInfo(info='ATTENTION_I_AM_MOVING_MY_ARM_OUT'))
-        Sequence.add(
-            'WAIT_FOR_MMUI_1',
-            HobbitMMUI.WaitforSoundEnd('/Event', Event),
-            transitions={'aborted': 'WAIT_FOR_MMUI_1'})
+            'SAY_ATTENTION',
+            speech_output.sayText(info='ATTENTION_I_AM_MOVING_MY_ARM_OUT')
+        )
+        #Sequence.add(
+        #    'MMUI_SAY_ATTENTION',
+        #    HobbitMMUI.ShowInfo(info='ATTENTION_I_AM_MOVING_MY_ARM_OUT'))
+        #Sequence.add(
+        #    'WAIT_FOR_MMUI_1',
+        #    HobbitMMUI.WaitforSoundEnd('/Event', Event),
+        #    transitions={'aborted': 'WAIT_FOR_MMUI_1'})
         if not DEBUG:
             Sequence.add(
                 'MOVE_BACK',
@@ -188,11 +193,14 @@ def main():
             head_move.MoveTo(pose='down_center'))
         Sequence.add(
             'MMUI_SAY_GRASPING',
-            HobbitMMUI.ShowInfo(info='GRASPING_THE_TURNTABLE'))
-        Sequence.add(
-            'WAIT_FOR_MMUI_2',
-            HobbitMMUI.WaitforSoundEnd('/Event', Event),
-            transitions={'aborted': 'WAIT_FOR_MMUI_2'})
+            speech_output.sayText(info='GRASPING_THE_TURNTABLE'))
+        #Sequence.add(
+        #    'MMUI_SAY_GRASPING',
+        #    HobbitMMUI.ShowInfo(info='GRASPING_THE_TURNTABLE'))
+        #Sequence.add(
+        #    'WAIT_FOR_MMUI_2',
+        #    HobbitMMUI.WaitforSoundEnd('/Event', Event),
+        #    transitions={'aborted': 'WAIT_FOR_MMUI_2'})
         Sequence.add(
             'ARM_MOVE_TT_POSE',
             arm_move.goToPosition(pose='storage'))
@@ -213,20 +221,24 @@ def main():
         with seq2:
             Sequence.add(
                 'SAY_LEARN_NEW_OBJECT',
-                HobbitMMUI.ShowInfo(info='LEARNING_NEW_SET_OF_OBJECTS_I_AM_THINKING')
+                speech_output.sayText(info='LEARNING_NEW_SET_OF_OBJECTS_I_AM_THINKING')
             )
-            Sequence.add(
-                'WAIT_1',
-                SleepState(duration=2)
-            )
-            Sequence.add(
-                'WAIT_FOR_MMUI_1',
-                HobbitMMUI.WaitforSoundEnd('/Event', Event),
-                transitions={'aborted': 'WAIT_FOR_MMUI_1'})
-            Sequence.add(
-                'WAIT_2',
-                SleepState(duration=2)
-            )
+            #Sequence.add(
+            #    'SAY_LEARN_NEW_OBJECT',
+            #    HobbitMMUI.ShowInfo(info='LEARNING_NEW_SET_OF_OBJECTS_I_AM_THINKING')
+            #)
+            #Sequence.add(
+            #    'WAIT_1',
+            #    SleepState(duration=2)
+            #)
+            #Sequence.add(
+            #    'WAIT_FOR_MMUI_1',
+            #    HobbitMMUI.WaitforSoundEnd('/Event', Event),
+            #    transitions={'aborted': 'WAIT_FOR_MMUI_1'})
+            #Sequence.add(
+            #    'WAIT_2',
+            #    SleepState(duration=2)
+            #)
             Sequence.add(
                 'EMO_HAPPY',
                 HobbitEmotions.ShowEmotions(emotion='HAPPY', emo_time=4)
@@ -237,20 +249,28 @@ def main():
             )
             Sequence.add(
                 'SAY_DONE',
-                HobbitMMUI.ShowInfo(info='I_AM_DONE')
+                speech_output.sayText(info='I_AM_DONE')
             )
-            Sequence.add(
-                'WAIT_FOR_MMUI_2',
-                HobbitMMUI.WaitforSoundEnd('/Event', Event),
-                transitions={'aborted': 'WAIT_FOR_MMUI_2'})
+            #Sequence.add(
+            #    'SAY_DONE',
+            #    HobbitMMUI.ShowInfo(info='I_AM_DONE')
+            #)
+            #Sequence.add(
+            #    'WAIT_FOR_MMUI_2',
+            #    HobbitMMUI.WaitforSoundEnd('/Event', Event),
+            #    transitions={'aborted': 'WAIT_FOR_MMUI_2'})
             Sequence.add(
                 'SAY_THANKS',
-                HobbitMMUI.ShowInfo(info='ThankyYouTeachingNewObject')
+                speech_output.sayText(info='ThankyYouTeachingNewObject')
             )
-            Sequence.add(
-                'WAIT_FOR_MMUI_3',
-                HobbitMMUI.WaitforSoundEnd('/Event', Event),
-                transitions={'aborted': 'WAIT_FOR_MMUI_3'})
+            #Sequence.add(
+            #    'SAY_THANKS',
+            #    HobbitMMUI.ShowInfo(info='ThankyYouTeachingNewObject')
+            #)
+            #Sequence.add(
+            #    'WAIT_FOR_MMUI_3',
+            #    HobbitMMUI.WaitforSoundEnd('/Event', Event),
+            #    transitions={'aborted': 'WAIT_FOR_MMUI_3'})
             Sequence.add('MMUI_MAIN_MENU', HobbitMMUI.ShowMenu(menu='MAIN'))
 
     with learn_object_sm:
@@ -329,21 +349,15 @@ def main():
         )
         StateMachine.add(
             'SAY_UNABLE_TO_SEE_OBJECT',
-            HobbitMMUI.ShowInfo(info='I_COULD:NOT_FIND_OBJECT_ON_TURNTABLE'),
+            speech_output.sayText(info='I_COULD:NOT_FIND_OBJECT_ON_TURNTABLE'),
             transitions={'succeeded': 'CONFIRM_PUT_OBJECT_ON_TRAY',
                          'failed': 'SET_FAILURE'}
         )
         StateMachine.add(
             'SAY_I_AM_LEARNING',
-            HobbitMMUI.ShowInfo(info='I_AM_LEARNING_THE_OBJECT'),
-            transitions={'succeeded': 'WAIT_FOR_MMUI_3',
+            speech_output.sayText(info='I_AM_LEARNING_THE_OBJECT'),
+            transitions={'succeeded': 'LEARN_OBJECT_1',
                          'failed': 'SET_FAILURE'}
-        )
-        StateMachine.add(
-            'WAIT_FOR_MMUI_3',
-            HobbitMMUI.WaitforSoundEnd('/Event', Event),
-            transitions={'aborted': 'WAIT_FOR_MMUI_3',
-                         'succeeded': 'LEARN_OBJECT_1'}
         )
         StateMachine.add(
             'LEARN_OBJECT_1',
@@ -371,7 +385,7 @@ def main():
         )
         StateMachine.add(
             'SAY_UNABLE_TO_SEE_OBJECT_2',
-            HobbitMMUI.ShowInfo(info='I_COULD:NOT_FIND_OBJECT_ON_TURNTABLE'),
+            speech_output.sayText(info='I_COULD:NOT_FIND_OBJECT_ON_TURNTABLE'),
             transitions={'succeeded': 'CONFIRM_TURN_OBJECT',
                          'failed': 'STOP_SEQ_2'}
         )
@@ -398,28 +412,18 @@ def main():
         )
         StateMachine.add(
             'SAY_LEARN_FROM_DIFFERENT_ANGLE',
-            HobbitMMUI.ShowInfo(
+            speech_output.sayText(
                 info='WAIT_LEARNING_OBJECT_FROM_NEW_ANGLE'),
-            transitions={'succeeded': 'WAIT_FOR_MMUI_4',
+            transitions={'succeeded': 'LEARN_OBJECT_2',
                          'failed': 'STOP_SEQ'}
         )
-        StateMachine.add(
-            'WAIT_FOR_MMUI_4',
-            HobbitMMUI.WaitforSoundEnd('/Event', Event),
-            transitions={'aborted': 'WAIT_FOR_MMUI_4',
-                         'succeeded': 'LEARN_OBJECT_2'})
         StateMachine.add(
             'SAY_WHAT_IS_THE_NAME',
-            HobbitMMUI.ShowInfo(
+            speech_output.sayText(
                 info='WHAT_IS_THE_NAME_OF_THIS_OBJECT'),
-            transitions={'succeeded': 'WAIT_FOR_MMUI_5',
+            transitions={'succeeded': 'END_SEQ',
                          'failed': 'STOP_SEQ'}
         )
-        StateMachine.add(
-            'WAIT_FOR_MMUI_5',
-            HobbitMMUI.WaitforSoundEnd('/Event', Event),
-            transitions={'aborted': 'WAIT_FOR_MMUI_5',
-                         'succeeded': 'END_SEQ'})
         StateMachine.add(
             'END_SEQ',
             seq2,

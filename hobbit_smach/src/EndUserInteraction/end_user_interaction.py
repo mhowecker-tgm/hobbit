@@ -17,6 +17,7 @@ from hobbit_msgs.msg import EndUserInteractionAction
 from hobbit_msgs.srv import GetName
 from hobbit_msgs import MMUIInterface as MMUI
 from smach_ros import ActionServerWrapper, ServiceState
+from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 #from actionlib import SimpleActionServer
 #from operator import itemgetter
 
@@ -61,23 +62,23 @@ class Init(smach.State):
         return 'succeeded'
 
 
-class AskYesNo(smach.State):
-    """Class to interact with the MMUI"""
-    def __init__(self):
-        smach.State.__init__(self, outcomes=['yes', 'no', 'failed'],
-                             input_keys=['question'])
-
-    def execute(self, ud):
-        mmui = MMUI.MMUIInterface()
-        resp = mmui.showMMUI_YESNO(self, ud.question)
-        if not resp:
-            return 'failed'
-        if resp:
-            print resp
-            return 'yes'
-        else:
-            return 'no'
-
+#class AskYesNo(smach.State):
+#    """Class to interact with the MMUI"""
+#    def __init__(self):
+#        smach.State.__init__(self, outcomes=['yes', 'no', 'failed'],
+#                             input_keys=['question'])
+#
+#    def execute(self, ud):
+#        mmui = MMUI.MMUIInterface()
+#        resp = mmui.showMMUI_YESNO(self, ud.question)
+#        if not resp:
+#            return 'failed'
+#        if resp:
+#            print resp
+#            return 'yes'
+#        else:
+#            return 'no'
+#
 
 class AskForCmd(smach.State):
     """Class to interact with the MMUI"""
@@ -257,7 +258,7 @@ def main():
         smach.StateMachine.add('INIT', Init(),
                                transitions={'succeeded': 'MMUI_ASK_YES_NO',
                                             'canceled': 'CLEAN_UP'})
-        smach.StateMachine.add('MMUI_ASK_YES_NO', AskYesNo(),
+        smach.StateMachine.add('MMUI_ASK_YES_NO', HobbitMMUI.AskYesNo(question= 'Can I do something else for you?'),
                                transitions={'yes': 'MMUI_ASK_FOR_CMD',
                                             'no': 'GET_CURRENT_ROOM'})
         smach.StateMachine.add('GET_CURRENT_ROOM',
@@ -278,7 +279,7 @@ def main():
                                transitions={'aborted': 'LOCATION_REACHED',
                                             'succeeded': 'SET_SUCCESS',
                                             'preempted': 'CLEAN_UP'})
-        smach.StateMachine.add('MMUI_ASK_FOR_CMD', AskForCmd(),
+        smach.StateMachine.add('MMUI_ASK_FOR_CMD', HobbitMMUI.AskForCmd(),
                                transitions={'succeeded': 'PROCESS_CMD',
                                             'failed': 'CLEAN_UP'})
         smach.StateMachine.add('PROCESS_CMD', process_cmd(),

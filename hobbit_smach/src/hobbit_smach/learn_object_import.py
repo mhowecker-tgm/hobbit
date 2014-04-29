@@ -16,6 +16,7 @@ from hobbit_msgs.msg import Event
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 import hobbit_smach.hobbit_move_import as hobbit_move
 import hobbit_smach.arm_move_import as move_arm
+import hobbit_smach.speech_output_import as speech_output
 
 
 def returnTurntable():
@@ -32,8 +33,8 @@ def returnTurntable():
 
     with seq:
         Sequence.add(
-            'MMUI_SAY_RETURN_TURNTABLE',
-            HobbitMMUI.ShowInfo(info='RETURNING_TURNTABLE'))
+            'SAY_RETURN_TURNTABLE',
+            speech_output.sayText(info='RETURNING_TURNTABLE'))
         Sequence.add(
             'MOVE_ARM_TT_POSE',
             move_arm.goToPosition(pose='storage'))
@@ -53,11 +54,7 @@ def returnTurntable():
                 hobbit_move.Move(goal='front', distance=0.25))
         Sequence.add(
             'MMUI_SAY_STOPPED_LEARNING',
-            HobbitMMUI.ShowInfo(info='I_STOPPED_LEARNING'))
-        Sequence.add(
-            'WAIT_FOR_MMUI',
-            HobbitMMUI.WaitforSoundEnd('/Event', Event),
-            transitions={'aborted': 'WAIT_FOR_MMUI'})
+            speech_output.sayText(info='I_STOPPED_LEARNING'))
         Sequence.add('MMUI_MAIN_MENU', HobbitMMUI.ShowMenu(menu='MAIN'))
     return seq
 
@@ -81,7 +78,7 @@ def unloadReturnTurntable():
         )
         Sequence.add(
             'SAY_I_WILL_PUT_THE_OBJECT_INTO_TRAY',
-            HobbitMMUI.ShowInfo(info='SAY_I_WILL_PUT_THE_OBJECT_INTO_TRAY')
+            speech_output.sayText(info='SAY_I_WILL_PUT_THE_OBJECT_INTO_TRAY')
         )
         Sequence.add(
             'MOVE_ARM_TRAY_POSE',

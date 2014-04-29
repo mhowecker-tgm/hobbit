@@ -18,6 +18,7 @@ from smach_ros import ActionServerWrapper, IntrospectionServer
 from smach import StateMachine, State, Sequence
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 import hobbit_smach.hobbit_move_import as hobbit_move
+import hobbit_smach.speech_output_import as speech_output
 
 
 class bcolors:
@@ -258,7 +259,9 @@ def main():
             transitions={'yes': 'SEQ1',
                          'no': 'MMUI_ASK_Y_N_REMIND_SWITCH_OFF',
                          'preempted': 'preempted',
-                         'failed': 'SET_FAILURE'}
+                         'failed': 'SET_FAILURE',
+                         'timeout': 'MMUI_ASK_Y_N_ACTIVITIES',
+                         '3times': 'SET_FAILURE'}
         )
         with seq1:
             Sequence.add(
@@ -278,7 +281,9 @@ def main():
             transitions={'yes': 'MMUI_SAY_T_BR_SwitchOffOven',
                          'no': 'SEQ2',
                          'preempted': 'preempted',
-                         'failed': 'SET_FAILURE'}
+                         'failed': 'SET_FAILURE',
+                         'timeout': 'MMUI_ASK_Y_N_ACTIVITIES',
+                         '3times': 'SET_FAILURE'}
         )
         StateMachine.add(
             'MMUI_SAY_T_BR_SwitchOffOven',
@@ -312,15 +317,20 @@ def main():
                 'EMO_HAPPY',
                 HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=4))
             Sequence.add(
-                'MMUI_SAY_GOOD_BYE_SLEEP',
-                HobbitMMUI.ShowInfo(info='T_BR_Goodbye')
-            )
-            Sequence.add(
-                'WAIT_FOR_MMUI',
-                HobbitMMUI.WaitforSoundEnd('/Event', Event, timeout=5),
-                transitions={'aborted': 'WAIT_FOR_MMUI'})
+                'SAY_GOOD_BYE_SLEEP',
+                speech_output.sayText(info='T_BR_Goodbye'),
+                transitions={'aborted': 'failed'})
+            #Sequence.add(
+            #    'MMUI_SAY_GOOD_BYE_SLEEP',
+            #    HobbitMMUI.ShowInfo(info='T_BR_Goodbye')
+            #)
+            #Sequence.add(
+            #    'WAIT_FOR_MMUI',
+            #    HobbitMMUI.WaitforSoundEnd('/Event', Event, timeout=5),
+            #    transitions={'aborted': 'WAIT_FOR_MMUI'})
             Sequence.add('MOVE_TO_DOCK',
-                         hobbit_move.goToPosition(room=None, place='dock'))
+                         hobbit_move.goToPosition(room=None, place='dock'),
+                         transitions={'aborted': 'failed'})
 
             seq2.userdata.text = 'Tell me when you are back/awake again.'
             # TODO: menu='MAIN' has to be changed to the 'User is back menu'

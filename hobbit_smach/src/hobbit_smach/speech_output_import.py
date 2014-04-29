@@ -25,16 +25,18 @@ def sayText(info='Text is missing'):
     """
 
     seq = Sequence(
-        outcomes=['succeeded', 'preempted', 'aborted'],
+        outcomes=['succeeded', 'preempted', 'failed'],
         connector_outcome='succeeded'
     )
 
     with seq:
             Sequence.add(
                 'TALK',
-                HobbitMMUI.ShowInfo(info=info))
+                HobbitMMUI.ShowInfo(info=info)
+            )
             Sequence.add(
                 'WAIT_FOR_MMUI',
                 HobbitMMUI.WaitforSoundEnd('/Event', Event),
-                transitions={'aborted': 'WAIT_FOR_MMUI'})
+                transitions={'aborted': 'WAIT_FOR_MMUI',
+                             'succeeded': 'succeeded'})
     return seq
