@@ -11,8 +11,8 @@ PROJECT = 'Hobbit'
 
 FILE='out-places_ISTU20131030-NEW.xml'
 
-import roslib; roslib.load_manifest(PKG) 
-import rospy 
+import roslib; roslib.load_manifest(PKG)
+import rospy
 from hobbit_msgs.srv import *
 from hobbit_msgs.msg import ObjectLocationVector, ObjectLocation
 from hobbit_msgs.msg import *
@@ -57,7 +57,7 @@ def prettify(elem):
     return reparsed.toprettyxml(indent="  ")
 
 def readXml(inFile):
-    """ Read the xml file with all locations and rooms. 
+    """ Read the xml file with all locations and rooms.
     Store this information inside an hobbit_msgs/Objects
     """
     try:
@@ -65,7 +65,7 @@ def readXml(inFile):
     except IOError as e:
         print "I/O error({0}):\n\' {1} \': {2}".format(e.errno, inFile, e.strerror)
         return None
-    
+
     rooms = RoomsVector()
     root = tree.getroot()
     if not 'rooms' in root.tag:
@@ -168,10 +168,10 @@ def addObject(object_name, rooms):
 
     #print rooms.rooms_vector
     updateProb(object_name, 'None', 'None', rooms)
-    return 
+    return
 
 def getObjectLocations(req):
-    """ Given the name of an object it's position (room and location) is returned. 
+    """ Given the name of an object its positions (room and location) are returned.
     """
     query = req.object_name.data
     places = []
@@ -183,12 +183,12 @@ def getObjectLocations(req):
         for place in (x for x in room.places_vector if x.place_type.lower() == 'searchable'):
             for ob in (z for z in place.objects if z.name.lower() == query.lower()):
                 places.append({'room': room.room_name, 'location': place.place_name, 'probability': ob.probability})
-    sorted_places = sorted(places, key=itemgetter('probability'), reverse=True) 
+    sorted_places = sorted(places, key=itemgetter('probability'), reverse=True)
     newlist = ObjectLocationVector()
     for obj in sorted_places:
         tmp_obj = ObjectLocation(obj['room'], obj['location'], obj['probability'])
         newlist.locations.append(tmp_obj)
-    return newlist 
+    return newlist
 
 def getRoomName(req):
     """ Given a x and y coordinate the room name is searched for and returned
@@ -232,7 +232,8 @@ def main():
         writeXml(FILE, rooms)
         s1 = rospy.Service(PROJECT+'/'+NAME+'/get_object_locations', GetObjectLocations, getObjectLocations)
         s2 = rospy.Service(PROJECT+'/'+NAME+'/get_room_name', GetRoomName, getRoomName)
-        s3 = rospy.Service(PROJECT+'/'+NAME+'/get_coordinates', GetCoordinates, getCoordinates)
+        #s3 = rospy.Service(PROJECT+'/'+NAME+'/get_coordinates', GetCoordinates, getCoordinates)
+        s3 = rospy.Service('/get_coordinates', GetCoordinates, getCoordinates)
 
     # spin() keeps Python from exiting until node is shutdown
     rospy.spin()

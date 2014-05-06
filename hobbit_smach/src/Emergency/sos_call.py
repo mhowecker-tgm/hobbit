@@ -325,10 +325,10 @@ def main():
                          'preempted': 'preempted'}
         )
         StateMachine.add(
-            'SAY_IAmWWithYou',
+            'SAY_IAmWithYou',
             HobbitMMUI.ShowInfo(info='IAmWithYou'),
             transitions={'succeeded': 'succeeded',
-                         'aborted': 'aborted',
+                         'failed': 'aborted',
                          'preempted': 'preempted'}
         )
 

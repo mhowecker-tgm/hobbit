@@ -108,6 +108,29 @@ def goToPosition(frame='/map', room='', place='dock'):
     return seq
 
 
+def goToPose():
+    """
+    Returns a move_base.MoveBaseState
+    We use it so that only hobbit_move has to be imported and all
+    SMACH navigation handling is concentrated around
+    hobbit_move_import.
+    """
+    frame = '/map'
+    return move_base.MoveBaseState(frame)
+
+
+def getRobotPose():
+    """
+    Returns a move_base.ReadRobotPositionState
+    We use it so that only hobbit_move has to be imported and all
+    SMACH navigation handling is concentrated around
+    hobbit_move_import.
+    """
+
+    frame = '/map'
+    return move_base.ReadRobotPositionState(frame)
+
+
 def rotateRobot(angle=0, frame='/map'):
     """
     Return a SMACH Sequence for rotating the robot for the angle

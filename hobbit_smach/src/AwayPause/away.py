@@ -249,44 +249,44 @@ def main():
             'UNTIL_MORNING',
             ParameterCheck(),
             transitions={'preempted': 'preempted',
-                         'yes': 'MMUI_ASK_Y_N_ACTIVITIES',
-                         'no': 'MMUI_ASK_Y_N_REMIND_SWITCH_OFF',
+                         'yes': 'ASK_Y_N_ACTIVITIES',
+                         'no': 'ASK_Y_N_REMIND_SWITCH_OFF',
                          'failure': 'SET_FAILURE'}
         )
         StateMachine.add(
-            'MMUI_ASK_Y_N_ACTIVITIES',
+            'ASK_Y_N_ACTIVITIES',
             HobbitMMUI.AskYesNo(question='T_BR_RemindYouTomorrowActivities'),
             transitions={'yes': 'SEQ1',
-                         'no': 'MMUI_ASK_Y_N_REMIND_SWITCH_OFF',
+                         'no': 'ASK_Y_N_REMIND_SWITCH_OFF',
                          'preempted': 'preempted',
                          'failed': 'SET_FAILURE',
-                         'timeout': 'MMUI_ASK_Y_N_ACTIVITIES',
+                         'timeout': 'ASK_Y_N_ACTIVITIES',
                          '3times': 'SET_FAILURE'}
         )
         with seq1:
             Sequence.add(
                 'EMO_HAPPY',
                 HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=4))
+            # TODO: Replace Dummy stub with real function
             #Sequence.add('MMUI_SHOW_CAL', HobbitMMUI.ShowCalendar())
             Sequence.add('MMUI_SHOW_CAL', Dummy())
-            # TODO: Replace Dummy stub with real function
             Sequence.add(
-                'MMUI_SAY_T_BR_RemindersTomorrow',
+                'CONFIRM_REMINDERS_TOMORROW',
                 #HobbitMMUI.ShowInfo(info='These are the appointments')
                 HobbitMMUI.ConfirmInfo(info='T_BR_RemindersTomorrow')
             )
         StateMachine.add(
-            'MMUI_ASK_Y_N_REMIND_SWITCH_OFF',
+            'ASK_Y_N_REMIND_SWITCH_OFF',
             HobbitMMUI.AskYesNo(question='T_BR_RemindYouSwitchOff'),
-            transitions={'yes': 'MMUI_SAY_T_BR_SwitchOffOven',
+            transitions={'yes': 'CONFIRM_SWITCH_OFF_OVEN',
                          'no': 'SEQ2',
                          'preempted': 'preempted',
                          'failed': 'SET_FAILURE',
-                         'timeout': 'MMUI_ASK_Y_N_ACTIVITIES',
+                         'timeout': 'ASK_Y_N_ACTIVITIES',
                          '3times': 'SET_FAILURE'}
         )
         StateMachine.add(
-            'MMUI_SAY_T_BR_SwitchOffOven',
+            'CONFIRM_SWITCH_OFF_OVEN',
             HobbitMMUI.ConfirmInfo(info='T_BR_SwitchOffOven'),
             transitions={'succeeded': 'SEQ2',
                          'failed': 'SET_FAILURE'}
@@ -294,7 +294,7 @@ def main():
         StateMachine.add(
             'SEQ1',
             seq1,
-            transitions={'succeeded': 'MMUI_ASK_Y_N_REMIND_SWITCH_OFF',
+            transitions={'succeeded': 'ASK_Y_N_REMIND_SWITCH_OFF',
                          'failed': 'SET_FAILURE',
                          'preempted': 'preempted'}
         )
@@ -319,7 +319,7 @@ def main():
             Sequence.add(
                 'SAY_GOOD_BYE_SLEEP',
                 speech_output.sayText(info='T_BR_Goodbye'),
-                transitions={'aborted': 'failed'})
+                transitions={'failed': 'failed'})
             #Sequence.add(
             #    'MMUI_SAY_GOOD_BYE_SLEEP',
             #    HobbitMMUI.ShowInfo(info='T_BR_Goodbye')
@@ -334,7 +334,7 @@ def main():
 
             seq2.userdata.text = 'Tell me when you are back/awake again.'
             # TODO: menu='MAIN' has to be changed to the 'User is back menu'
-            # This i not yet implemented in the MMUI
+            # This is not yet implemented in the MMUI
             Sequence.add(
                 'MMUI_SHOW_MENU_ME_BACK_AWAKE',
                 HobbitMMUI.ShowMenu(menu='MAIN'))
