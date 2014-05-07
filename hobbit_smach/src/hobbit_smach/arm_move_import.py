@@ -11,10 +11,34 @@ roslib.load_manifest(PKG)
 from smach import Sequence, State
 from uashh_smach.util import SleepState
 #import uashh_smach.util as util
+from ArmControllerClientFunctions import ArmClientFunctions
 
-if not DEBUG:
-    from ArmControllerClientFunctions import ArmClientFunctions
-    ArmClient = ArmClientFunctions('192.168.25.46')
+def getArm():
+    return ArmClientFunctions('192.168.2.190')
+
+
+class SetMoveToLearningPos(State):
+    """
+    Move the arm to the turntable, grasp it and move to the Learning position.
+    """
+    def __init__(self):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'failed', 'preempted']
+        )
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        arm = getArm()
+        if not arm.GetArmIsEnabled():
+            return 'failed'
+        status = arm.SetMoveToLearningPos()
+        if status[0] == 'MoveToLearningPos' and status[1] == 'COMMAND_OK':
+            return 'succeeded'
+        else:
+            return 'failed'
 
 
 class SetArmPosition(State):
