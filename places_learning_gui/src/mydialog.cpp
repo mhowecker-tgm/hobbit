@@ -16,7 +16,7 @@ MyDialog::~MyDialog()
  void MyDialog::on_accept_clicked()
 {
 
-    if (ui->searching->isChecked()) current_place_type = "searching";   
+    if (ui->searching->isChecked()) current_place_type = "searchable";   
     if (ui->goTo->isChecked()) current_place_type = "goTo"; 
     if (ui->default_place->isChecked()) current_place_type = "default";
     if (ui->call_button->isChecked()) current_place_type = "call_button";
