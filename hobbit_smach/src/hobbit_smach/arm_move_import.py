@@ -10,11 +10,35 @@ roslib.load_manifest(PKG)
 
 from smach import Sequence, State
 from uashh_smach.util import SleepState
-#import uashh_smach.util as util
 from ArmControllerClientFunctions import ArmClientFunctions
+
 
 def getArm():
     return ArmClientFunctions('192.168.2.190')
+
+
+def getArmAtPosition(arm, position='home'):
+    status = arm.GetArmState()
+    if position == 'home':
+        if status.ArmAtHomePos:
+            return True
+    elif position == 'cwpos':
+        if status.ArmAtCWPos:
+            return True
+    elif position == 'ccwpos':
+        if status.ArmAtCCWPos:
+            return True
+    elif position == 'learn':
+        if status.ArmAtLearningPos:
+            return True
+    elif position == 'pregrasp':
+        if status.ArmAtPreGraspFromFloor:
+            return True
+    elif position == 'tray':
+        if status.ArmAtTrayPos:
+            return True
+    else:
+        return False
 
 
 class SetMoveToLearningPos(State):
@@ -41,6 +65,76 @@ class SetMoveToLearningPos(State):
             return 'failed'
 
 
+class StoreTurntable(State):
+    """
+    """
+    def __init__(self):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'failed', 'preempted']
+        )
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        arm = getArm()
+        if not arm.GetArmIsEnabled():
+            return 'failed'
+        status = arm.SetStoreTurnTable()
+        if status[0] == 'StoreTurntable' and status[1] == 'COMMAND_OK':
+            return 'succeeded'
+        else:
+            return 'failed'
+
+
+class CheckArmReachedKnownPosition(State):
+    """
+    Check that the Arm has reached the specified predefined position.
+    """
+    def __init__(self, position):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'failed', 'preempted']
+        )
+        self.position = position
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        arm = getArm()
+        if not arm.GetArmIsEnabled():
+            return 'failed'
+        if getArmAtPosition(arm, self.position):
+            return 'succeeded'
+        else:
+            return 'failed'
+
+
+class CheckArmIsMoving(State):
+    """
+    Check that the Arm has reached the specified predefined position.
+    """
+    def __init__(self):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'failed', 'preempted']
+        )
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        arm = getArm()
+        if not arm.GetArmIsEnabled():
+            return 'failed'
+        if arm.GetArmIsMoving():
+            return 'succeeded'
+        else:
+            return 'failed'
+
+
 class SetArmPosition(State):
     """
     Move the robotarm to a specified position
@@ -50,25 +144,31 @@ class SetArmPosition(State):
             self,
             outcomes=['succeeded', 'failed', 'preempted']
         )
+        self.position = position
 
     def execute(self, ud):
-        if DEBUG:
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        arm = getArm()
+        if self.position == 'home':
+            status = arm.SetMoveToHomePos()
+        elif self.position == 'learn':
+            status = arm.SetMoveToLearningPos()
+        elif self.position == 'tray':
+            status = arm.SetMoveToTrayPos()
+        elif self.position == 'pregrasp':
+            status = arm.SetMoveToPreGraspFromFloorPos()
+        elif self.position == 'ccw':
+            status = arm.SetTurnTurntableCCW()
+        elif self.position == 'cw':
+            status = arm.SetTurnTurntableCW()
+        else:
+            return 'failed'
+        if status[1] == 'COMMAND_OK':
             return 'succeeded'
-
-
-class ArmReachedPosition(State):
-    """
-    Did the arm reach the specified position yet?
-    """
-    def __init__(self, position):
-        State.__init__(
-            self,
-            outcomes=['succeeded', 'failed', 'preempted']
-        )
-
-    def execute(self, ud):
-        if DEBUG:
-            return 'succeeded'
+        else:
+            return 'failed'
 
 
 class OpenGripper(State):
@@ -116,12 +216,9 @@ class CheckGripperClosed(State):
             return 'succeeded'
 
 
-def goToPosition(pose='storage'):
+def goToTrayPosition():
     """
-    Return a SMACH Sequence that will move the arm to the specified pose.
-    The default values will move the arm to the storage pose.
-
-    pose: defaults to storage
+    Return a SMACH Sequence that will move the arm to the tray pose.
     """
 
     seq = Sequence(
@@ -130,9 +227,58 @@ def goToPosition(pose='storage'):
     )
 
     with seq:
-        Sequence.add('MOVE_ARM_TO_POSE', SetArmPosition(position=pose))
-        Sequence.add('ARM_POSE_REACHED', ArmReachedPosition(position=pose),
+        Sequence.add('MOVE_ARM_TO_TRAY_POSE',
+                     SetArmPosition(position='tray'))
+        Sequence.add('ARM_POSE_REACHED',
+                     CheckArmReachedKnownPosition(position='learn'),
                      transitions={'failed': 'ARM_POSE_REACHED'})
+        Sequence.add('CHECK_ARM_IS_NOT_MOVING', CheckArmIsMoving())
+    return seq
+
+
+def goToLearnPosition():
+    """
+    Return a SMACH Sequence that will move the arm to the learning pose.
+    """
+
+    seq = Sequence(
+        outcomes=['succeeded', 'preempted', 'failed'],
+        connector_outcome='succeeded'
+    )
+
+    with seq:
+        Sequence.add('MOVE_ARM_TO_LEARNING_POSE',
+                     SetArmPosition(position='learn'))
+        Sequence.add('ARM_POSE_REACHED',
+                     CheckArmReachedKnownPosition(position='learn'),
+                     transitions={'failed': 'ARM_POSE_REACHED'})
+        Sequence.add('CHECK_ARM_IS_NOT_MOVING', CheckArmIsMoving())
+        Sequence.add('ROTATE_TT_CCW',
+                     SetArmPosition(position='ccw'))
+        Sequence.add('TT_ROTATED',
+                     CheckArmReachedKnownPosition(position='ccw'),
+                     transitions={'failed': 'ARM_POSE_REACHED'})
+        Sequence.add('CHECK_TT_IS_NOT_MOVING', CheckArmIsMoving())
+    return seq
+
+
+def goToHomePosition():
+    """
+    Return a SMACH Sequence that will move the arm to the learning pose.
+    """
+
+    seq = Sequence(
+        outcomes=['succeeded', 'preempted', 'failed'],
+        connector_outcome='succeeded'
+    )
+
+    with seq:
+        Sequence.add('MOVE_ARM_TO_HOME',
+                     SetArmPosition(position='home'))
+        Sequence.add('ARM_POSE_REACHED',
+                     CheckArmReachedKnownPosition(position='learn'),
+                     transitions={'failed': 'ARM_POSE_REACHED'})
+        Sequence.add('CHECK_ARM_IS_NOT_MOVING', CheckArmIsMoving())
     return seq
 
 

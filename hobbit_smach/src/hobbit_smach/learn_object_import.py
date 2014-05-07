@@ -37,17 +37,18 @@ def returnTurntable():
             speech_output.sayText(info='RETURNING_TURNTABLE'))
         Sequence.add(
             'MOVE_ARM_TT_POSE',
-            move_arm.goToPosition(pose='storage'))
-        Sequence.add(
-            'OPEN_GRIPPER',
-            move_arm.OpenGripper())
+        #    move_arm.goToPosition(pose='storage'))
+            move_arm.StoreTurntable())
+        #Sequence.add(
+        #    'OPEN_GRIPPER',
+        #    move_arm.OpenGripper())
         if not DEBUG:
             Sequence.add(
                 'MOVE_BACK',
                 hobbit_move.Move(goal='back', distance=0.25))
         Sequence.add(
             'MOVE_ARM_STORAGE',
-            move_arm.goToPosition(pose='home'))
+            move_arm.goToHomePosition())
         if not DEBUG:
             Sequence.add(
                 'MOVE_FRONT',
@@ -80,16 +81,12 @@ def unloadReturnTurntable():
             'SAY_I_WILL_PUT_THE_OBJECT_INTO_TRAY',
             speech_output.sayText(info='SAY_I_WILL_PUT_THE_OBJECT_INTO_TRAY')
         )
-        Sequence.add(
-            'MOVE_ARM_TRAY_POSE',
-            move_arm.goToPosition(pose='tray')
-        )
-        Sequence.add(
-            'TILT_TRAY',
-            move_arm.goToPosition(pose='tray_tilt')
-        )
-        Sequence.add(
-            'RETURN_TURNTABLE',
-            returnTurntable()
-        )
+        #Sequence.add(
+        #    'MOVE_ARM_TRAY_POSE',
+        #    move_arm.goToTrayPosition()
+        #)
+        #Sequence.add(
+        #    'RETURN_TURNTABLE',
+        #    returnTurntable()
+        #)
     return seq
