@@ -342,10 +342,6 @@ def main():
                 'MMUI_SAY_GoingToPlace',
                 #HobbitMMUI.ShowInfo(info='T_GT_GoingToPlace'))
                 speech_output.sayText(info='T_GT_GoingToPlace'))
-            #Sequence.add(
-            #    'WAIT_FOR_MMUI',
-            #    HobbitMMUI.WaitforSoundEnd('/Event', Event),
-            #    transitions={'aborted': 'WAIT_FOR_MMUI'})
             if not DEBUG:
                 Sequence.add(
                     'MOVE_TO_DOCK',
@@ -366,10 +362,6 @@ def main():
                 #HobbitMMUI.ShowInfo(info='T_GT_WayBlocked'))
                 speech_output.sayText(info='T_GT_WayBlocked'))
             Sequence.add(
-                'WAIT_FOR_MMUI_1',
-                HobbitMMUI.WaitforSoundEnd('/Event', Event),
-                transitions={'aborted': 'WAIT_FOR_MMUI_1'})
-            Sequence.add(
                 'SHOW_MENU_MAIN',
                 HobbitMMUI.ShowMenu(menu='MAIN'),
                 transitions={'succeeded': 'failed'})
@@ -380,10 +372,6 @@ def main():
                 'MMUI_SAY_ReachedPlace',
                 #HobbitMMUI.ShowInfo(info='T_GT_ReachedMyDestionation'))
                 speech_output.sayText(info='T_GT_ReachedMyDestionation'))
-            Sequence.add(
-                'WAIT_FOR_MMUI_2',
-                HobbitMMUI.WaitforSoundEnd('/Event', Event),
-                transitions={'aborted': 'WAIT_FOR_MMUI_2'})
             Sequence.add(
                 'SHOW_MENU_MAIN_1',
                 HobbitMMUI.ShowMenu(menu='MAIN'))
