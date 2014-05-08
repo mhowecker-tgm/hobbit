@@ -1,0 +1,67 @@
+How to set up the mobile internet connection
+--------------------------------------------
+
+The active 3G antenna is directed, so it has to be carefully adjusted to find the position with the largest signal strength. It is better to place it at some higher location in the room, next to windows or even outside.
+
+To find the best antenna position, execute the following procedure:
+
+1. Connect the 3G stick with a USB extension to your laptop and place the stick itself inside the mounting slot. Clamp it between the brackets. Plug in the antenna's power supply, the green LED should light up (Check the manual for further details).
+
+2. Make sure the stick has been recognized by the OS entering the command
+   dmesg | grep -e "modem" -e "tty"
+   You should get an output comparable to this:
+[59012.006060] option 2-1.8.4.4:1.0: GSM modem (1-port) converter detected
+[59012.006268] usb 2-1.8.4.4: GSM modem (1-port) converter now attached to ttyUSB0
+[59012.008537] option 2-1.8.4.4:1.3: GSM modem (1-port) converter detected
+[59012.008707] usb 2-1.8.4.4: GSM modem (1-port) converter now attached to ttyUSB1
+[59012.009030] option 2-1.8.4.4:1.4: GSM modem (1-port) converter detected
+[59012.009246] usb 2-1.8.4.4: GSM modem (1-port) converter now attached to ttyUSB2
+
+3. Make sure that the Mobile Broadband network is DISABLED in the network manager. Otherwise, the following commands will not work.
+
+4. Open 2 terminals. In the first, enter the command 
+   while :; do  echo -e "AT+CSQ\r" > /dev/ttyUSB0; sleep 1; done
+   (you might need to adjust the index number 0)
+   This periodically sends a request to read the signal strength from the 3G stick and should be executed without any error message until you hit CTRL+C.
+
+5. In the second terminal, enter the command
+   cat /dev/ttyUSB0
+   (you might need to adjust the index number 0)
+   to display the responses of the 3G stick. Looking at the output values, you can adjust the antenna's position to find the one with the best signal strength. Here is a conversion table from the output values to dBm:
+
+2 	-109 	Marginal
+3 	-107 	Marginal
+4 	-105 	Marginal
+5 	-103 	Marginal
+6 	-101 	Marginal
+7 	-99 	Marginal
+8 	-97 	Marginal
+9 	-95 	Marginal
+10 	-93 	OK
+11 	-91 	OK
+12 	-89 	OK
+13 	-87 	OK
+14 	-85 	OK
+15 	-83 	Good
+16 	-81 	Good
+17 	-79 	Good
+18 	-77 	Good
+19 	-75 	Good
+20 	-73 	Excellent
+21 	-71 	Excellent
+22 	-69 	Excellent
+23 	-67 	Excellent
+24 	-65 	Excellent
+25 	-63 	Excellent
+26 	-61 	Excellent
+27 	-59 	Excellent
+28 	-57 	Excellent
+29 	-55 	Excellent
+30 	-53 	Excellent
+31 	>-51 	Excellent
+
+so larger is better.
+
+6. If you have found a good antenna location, maybe you want to perform a speed test. If everything is fine, unplug the stick from your computer and plug it into the 3G wifi router. Connect your laptop to the router's wifi (called TP-Link_XXXXXX), the password is on the sticker on the router.
+
+7. Open the router's webinterface at 192.168.0.1 (user and pw "admin") and wait until it says "Identify successfully" under 3G/4G USB Modem on the status page. This might take some seconds. Then press the "Connect" button to establish a connection. The signal strength should be excellent now.
