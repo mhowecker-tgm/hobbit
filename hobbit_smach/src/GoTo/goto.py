@@ -11,6 +11,7 @@ roslib.load_manifest(PKG)
 import rospy
 import smach
 import hobbit_smach.hobbit_move_import as hobbit_move
+import hobbit_smach.speech_output_import as speech_output
 
 from std_msgs.msg import String
 from hobbit_msgs.msg import GeneralHobbitAction, Event
@@ -312,14 +313,16 @@ def main():
         )
         StateMachine.add(
             'MMUI_SAY_CAM_BLOCKED',
-            HobbitMMUI.ShowInfo(info='T_GT_EyesBlockedMoveObject'),
+            #HobbitMMUI.ShowInfo(info='T_GT_EyesBlockedMoveObject'),
+            speech_output.sayText(info='T_GT_EyesBlockedMoveObject'),
             transitions={'succeeded': 'VIEW_BLOCKED',
                          'preempted': 'preempted',
                          'failed': 'SET_FAILURE'}
         )
         StateMachine.add(
             'MMUI_SAY_CAM_STILL_BLOCKED',
-            HobbitMMUI.ShowInfo(info='T_GT_EyesBlockedRemoveObject'),
+            #HobbitMMUI.ShowInfo(info='T_GT_EyesBlockedRemoveObject'),
+            speech_output.sayText(info='T_GT_EyesBlockedRemoveObject'),
             transitions={'succeeded': 'SET_FAILURE',
                          'preempted': 'preempted',
                          'failed': 'SET_FAILURE'}
@@ -337,15 +340,16 @@ def main():
                 HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=4))
             Sequence.add(
                 'MMUI_SAY_GoingToPlace',
-                HobbitMMUI.ShowInfo(info='T_GT_GoingToPlace'))
-            Sequence.add(
-                'WAIT_FOR_MMUI',
-                HobbitMMUI.WaitforSoundEnd('/Event', Event),
-                transitions={'aborted': 'WAIT_FOR_MMUI'})
+                #HobbitMMUI.ShowInfo(info='T_GT_GoingToPlace'))
+                speech_output.sayText(info='T_GT_GoingToPlace'))
+            #Sequence.add(
+            #    'WAIT_FOR_MMUI',
+            #    HobbitMMUI.WaitforSoundEnd('/Event', Event),
+            #    transitions={'aborted': 'WAIT_FOR_MMUI'})
             if not DEBUG:
                 Sequence.add(
                     'MOVE_TO_DOCK',
-                    hobbit_move.goToPosition()
+                    hobbit_move.goToPosition(frame='/map', place=dock)
                 )
             else:
                 Sequence.add('SET_NAV_GOAL', Dummy())
@@ -359,7 +363,8 @@ def main():
                 HobbitEmotions.ShowEmotions(emotion='EMO_SAD', emo_time=4))
             Sequence.add(
                 'MMUI_SAY_WayBlocked',
-                HobbitMMUI.ShowInfo(info='T_GT_WayBlocked'))
+                #HobbitMMUI.ShowInfo(info='T_GT_WayBlocked'))
+                speech_output.sayText(info='T_GT_WayBlocked'))
             Sequence.add(
                 'WAIT_FOR_MMUI_1',
                 HobbitMMUI.WaitforSoundEnd('/Event', Event),
@@ -373,7 +378,8 @@ def main():
                 HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=4))
             Sequence.add(
                 'MMUI_SAY_ReachedPlace',
-                HobbitMMUI.ShowInfo(info='T_GT_ReachedMyDestionation'))
+                #HobbitMMUI.ShowInfo(info='T_GT_ReachedMyDestionation'))
+                speech_output.sayText(info='T_GT_ReachedMyDestionation'))
             Sequence.add(
                 'WAIT_FOR_MMUI_2',
                 HobbitMMUI.WaitforSoundEnd('/Event', Event),
