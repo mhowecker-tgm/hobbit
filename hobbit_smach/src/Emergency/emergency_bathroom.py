@@ -22,6 +22,7 @@ from smach import StateMachine, State, cb_interface
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 from datetime import datetime, time
 import hobbit_smach.sos_call_import as sos_call
+import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.hobbit_move_import as hobbit_move
 
 
@@ -277,37 +278,32 @@ def main():
         )
         StateMachine.add(
             'MMUI_SAY_YesIAmComing',
-            HobbitMMUI.ShowInfo(info='T_HM_YesIAmComing'),
-            transitions={'succeeded': 'WAIT_FOR_MMUI',
+            #HobbitMMUI.ShowInfo(info='T_HM_YesIAmComing'),
+            speech_output.sayText(info='T_HM_YesIAmComing'),
+            transitions={'succeeded': 'MOVE_TO_BATHROOM',
                          'preempted': 'preempted',
                          'failed': 'SET_FAILURE'}
         )
-        StateMachine.add(
-            'WAIT_FOR_MMUI',
-            HobbitMMUI.WaitforSoundEnd('/Event', Event),
-            transitions={'succeeded': 'SET_NAV_GOAL',
-                         'aborted': 'WAIT_FOR_MMUI'}
-        )
+        #StateMachine.add(
+        #    'WAIT_FOR_MMUI',
+        #    HobbitMMUI.WaitforSoundEnd('/Event', Event),
+        #    transitions={'succeeded': 'SET_NAV_GOAL',
+        #                 'aborted': 'WAIT_FOR_MMUI'}
+        #)
         if not DEBUG:
             StateMachine.add(
-                'MOVE_TO_DOCK',
+                'MOVE_TO_BATHROOM',
                 hobbit_move.goToPosition(room='bathroom', place='door'),
                 transitions={'failed': 'SET_FAILURE',
                              'succeeded': 'MMUI_CONFIRM_DoYouNeedHelp'}
             )
         else:
             StateMachine.add(
-                'SET_NAV_GOAL',
+                'MOVE_TO_BATHROOM',
                 Dummy(),
-                transitions={'succeeded': 'MOVE_BASE',
+                transitions={'succeeded': 'MMUI_CONFIRM_DoYouNeedHelp',
                              'failed': 'SET_FAILURE',
                              'preempted': 'preempted'}
-            )
-            StateMachine.add(
-                'MOVE_BASE',
-                Dummy(),
-                transitions={'failed': 'SET_FAILURE',
-                             'succeeded': 'MMUI_CONFIRM_DoYouNeedHelp'}
             )
         # TODO: Change volume to maximum
         StateMachine.add(
@@ -352,7 +348,8 @@ def main():
         )
         StateMachine.add(
             'MMUI_SAY_YouCanGetHelpAnytime',
-            HobbitMMUI.ShowInfo(info='T_HM_YouCanGetHelpAnytime'),
+            #HobbitMMUI.ShowInfo(info='T_HM_YouCanGetHelpAnytime'),
+            speech_output.sayText(info='T_HM_YouCanGetHelpAnytime'),
             transitions={'succeeded': 'SET_SUCCESS',
                          'preempted': 'preempted',
                          'failed': 'SET_FAILURE'}

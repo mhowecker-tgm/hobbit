@@ -23,6 +23,7 @@ from smach_ros import ActionServerWrapper, \
 from smach import StateMachine, State, cb_interface
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 import hobbit_smach.sos_call_import as sos_call
+import hobbit_smach.speech_output_import as speech_output
 from datetime import datetime, time
 
 
@@ -326,7 +327,8 @@ def main():
         )
         StateMachine.add(
             'MMUI_SAY_YouCanGetHelpAnytime',
-            HobbitMMUI.ShowInfo(info='T_HM_YouCanGetHelpAnytime'),
+            #HobbitMMUI.ShowInfo(info='T_HM_YouCanGetHelpAnytime'),
+            speech_output.sayText(info='T_HM_YouCanGetHelpAnytime'),
             transitions={'succeeded': 'EMO_NEUTRAL',
                          'preempted': 'preempted',
                          'failed': 'SET_FAILURE'}

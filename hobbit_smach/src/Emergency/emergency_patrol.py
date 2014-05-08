@@ -22,6 +22,7 @@ from smach_ros import ActionServerWrapper, \
 from smach import StateMachine, State, cb_interface
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 import hobbit_smach.sos_call_import as sos_call
+import hobbit_smach.speech_output_import as speech_output
 from datetime import datetime, time
 
 
@@ -312,15 +313,9 @@ def main():
         )
         StateMachine.add(
             'SAY_WhatCanIDoForYou',
-            HobbitMMUI.ShowInfo('T_HM_WhatCanIDoForYou'),
-            transitions={'succeeded': 'WAIT_FOR_MMUI',
-                         'failed': 'SET_FAILURE'}
-        )
-        StateMachine.add(
-            'WAIT_FOR_MMUI',
-            HobbitMMUI.WaitforSoundEnd('/Event', Event),
+            speech_output.sayText('T_HM_WhatCanIDoForYou'),
             transitions={'succeeded': 'MMUI_MAIN_MENU',
-                         'aborted': 'WAIT_FOR_MMUI'}
+                         'failed': 'SET_FAILURE'}
         )
         if not DEBUG:
             StateMachine.add(
