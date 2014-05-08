@@ -15,6 +15,7 @@ from hobbit_msgs.msg import GeneralHobbitAction, Event
 from smach_ros import ActionServerWrapper, \
     IntrospectionServer
 from smach import StateMachine, State, Sequence
+import hobbit_smach.speech_output_import as speech_output
 
 
 class bcolors:
@@ -203,10 +204,10 @@ def get_call_sos():
     )
 
     with seq:
-        Sequence.add(
-            'WAIT_FOR_MMUI',
-            HobbitMMUI.WaitforSoundEnd('/Event', Event),
-            transitions={'aborted': 'WAIT_FOR_MMUI'})
+        #Sequence.add(
+        #    'WAIT_FOR_MMUI',
+        #    HobbitMMUI.WaitforSoundEnd('/Event', Event),
+        #    transitions={'aborted': 'WAIT_FOR_MMUI'})
         Sequence.add('START_CALL', HobbitMMUI.CallEmergency())
         Sequence.add(
             'CHECK_CALL_STATE',
@@ -266,45 +267,50 @@ def get_call_sos():
         )
         StateMachine.add(
             'SAY_T_HM_IWillCallFirstPersonInList',
-            HobbitMMUI.ShowInfo(info='IWillCallFirstPersonInList'),
+            #HobbitMMUI.ShowInfo(info='IWillCallFirstPersonInList'),
+            speech_output.sayText(info='IWillCallFirstPersonInList'),
             transitions={'succeeded': 'SEQ',
                          'failed': 'SEQ',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
             'SAY_T_HM_IWillCallSecondPersonInList',
-            HobbitMMUI.ShowInfo(info='IWillCallSecondPersonInList'),
+            #HobbitMMUI.ShowInfo(info='IWillCallSecondPersonInList'),
+            speech_output.sayText(info='IWillCallSecondPersonInList'),
             transitions={'succeeded': 'SEQ',
                          'failed': 'SEQ',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
             'SAY_T_HM_IWillCallThirdPersonInList',
-            HobbitMMUI.ShowInfo(info='IWillCallThirdPersonInList'),
+            #HobbitMMUI.ShowInfo(info='IWillCallThirdPersonInList'),
+            speech_output.sayText(info='IWillCallThirdPersonInList'),
             transitions={'succeeded': 'SEQ',
                          'failed': 'SEQ',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
             'SAY_T_HM_NoAnswersIWillCallFirstPersonAgain',
-            HobbitMMUI.ShowInfo(info='NoAnswersIWillCallFirstPersonAgain'),
+            #HobbitMMUI.ShowInfo(info='NoAnswersIWillCallFirstPersonAgain'),
+            speech_output.sayText(info='NoAnswersIWillCallFirstPersonAgain'),
             transitions={'succeeded': 'SEQ',
                          'failed': 'SEQ',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
             'SAY_NoAnswersSayOrPressHelpAgainToTryAgain',
-            HobbitMMUI.ShowInfo(info='NoAnswersSayOrPressHelpAgainToTryAgain'),
-            transitions={'succeeded': 'WAIT_FOR_MMUI',
+            speech_output.sayText(info='NoAnswersSayOrPressHelpAgainToTryAgain'),
+            #transitions={'succeeded': 'WAIT_FOR_MMUI',
+            transitions={'succeeded': 'SAY_IAmWithYou',
                          'failed': 'aborted',
                          'preempted': 'preempted'}
         )
-        StateMachine.add(
-            'WAIT_FOR_MMUI',
-            HobbitMMUI.WaitforSoundEnd('/Event', Event),
-            transitions={'aborted': 'WAIT_FOR_MMUI',
-                         'succeeded': 'SAY_IAmWithYou'}
-        )
+        #StateMachine.add(
+        #    'WAIT_FOR_MMUI',
+        #    HobbitMMUI.WaitforSoundEnd('/Event', Event),
+        #    transitions={'aborted': 'WAIT_FOR_MMUI',
+        #                 'succeeded': 'SAY_IAmWithYou'}
+        #)
         StateMachine.add(
             'EMO_NEUTRAL',
             HobbitEmotions.ShowEmotions(emotion='NEUTRAL', emo_time=4),
@@ -328,7 +334,8 @@ def get_call_sos():
         )
         StateMachine.add(
             'SAY_IAmWithYou',
-            HobbitMMUI.ShowInfo(info='IAmWithYou'),
+            #HobbitMMUI.ShowInfo(info='IAmWithYou'),
+            speech_output.sayText(info='IAmWithYou'),
             transitions={'succeeded': 'EMO_NEUTRAL',
                          'preempted': 'preempted',
                          'failed': 'EMO_NEUTRAL'}
