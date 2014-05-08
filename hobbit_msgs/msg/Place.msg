@@ -10,7 +10,7 @@ string place_name
 
 # type of the place
 # object search, user search
-std_msgs/String place_type
+string place_type
 
 # array of possible objects
 #hobbit_msgs/Object[] objects
