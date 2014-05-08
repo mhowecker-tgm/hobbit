@@ -13,7 +13,7 @@ import rospy
 # import uashh_smach.util as util
 
 from std_msgs.msg import String
-import hobbit_smach.hobbit_move_import as move_base
+import hobbit_smach.hobbit_move_import as hobbit_move
 from hobbit_msgs.msg import GeneralHobbitAction,\
     LocateUserAction, LocateUserGoal, ApproachUserAction, ApproachUserGoal,\
     Event
@@ -23,6 +23,7 @@ from smach_ros import ActionServerWrapper, \
 from smach import StateMachine, State, Sequence, cb_interface
 #from smach_ros import ServiceState
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
+import hobbit_smach.speech_output_import as speech_output
 #import uashh_smach.platform.move_base as move_base
 
 
@@ -306,14 +307,16 @@ def main():
         )
         StateMachine.add(
             'MMUI_SAY_MovingToChargingStation',
-            HobbitMMUI.ShowInfo(info='T_CH_MovingToChargingStation'),
+            #HobbitMMUI.ShowInfo(info='T_CH_MovingToChargingStation'),
+            speech_output.sayText(info='T_CH_MovingToChargingStation'),
             transitions={'succeeded': 'EMO_HAPPY',
                          'failed': 'SET_FAILURE',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
             'MMUI_SAY_MovingToWaitingPosition',
-            HobbitMMUI.ShowInfo(info='T_CH_MovingToWaitingPosition'),
+            #HobbitMMUI.ShowInfo(info='T_CH_MovingToWaitingPosition'),
+            speech_output.sayText(info='T_CH_MovingToWaitingPosition'),
             transitions={'succeeded': 'SEQ',
                          'failed': 'SET_FAILURE',
                          'preempted': 'preempted'}
@@ -333,16 +336,18 @@ def main():
                          'preempted': 'preempted'}
         )
         with seq:
-            Sequence.add(
-                'WAIT_FOR_MMUI',
-                HobbitMMUI.WaitforSoundEnd('/Event', Event),
-                transitions={'aborted': 'WAIT_FOR_MMUI'})
+            #Sequence.add(
+            #    'WAIT_FOR_MMUI',
+            #    HobbitMMUI.WaitforSoundEnd('/Event', Event),
+            #    transitions={'aborted': 'WAIT_FOR_MMUI'})
             if not DEBUG:
-                Sequence.add('MOVE_TO_DOCK',hobbit_move.goToPosition())
-                Sequence.add('MOVE_BASE', move_base.MoveBaseState())
+                Sequence.add(
+                    'MOVE_TO_DOCK',
+                    hobbit_move.goToPosition(frame='/map', place='dock'))
+                #Sequence.add('MOVE_BASE', move_base.MoveBaseState())
             else:
-                Sequence.add('SET_NAV_GOAL', Dummy())
-                Sequence.add('MOVE_BASE', Dummy())
+                Sequence.add('MOVE_TO_DOCK', Dummy())
+            # DOCKING has to execute the actual docking procedure within mira
             Sequence.add('DOCKING', Dummy())
             Sequence.add('MMUI_MAIN_MENU', HobbitMMUI.ShowMenu(menu='MAIN'))
         StateMachine.add(
