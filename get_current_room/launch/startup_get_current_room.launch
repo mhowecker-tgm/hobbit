@@ -1,4 +1,0 @@
-<launch>
-  <node pkg="get_current_room" type="get_current_room" name="get_current_room" args="$(find get_current_room)/../navigation/places.xml" output="screen"/>
-</launch>
-
