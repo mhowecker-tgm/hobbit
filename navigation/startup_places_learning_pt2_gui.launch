@@ -1,0 +1,11 @@
+<launch>
+
+
+  <group if="true">
+    <include file="$(find virtual_laser)/launch/startup.launch" />
+    <include file="$(find interfaces_mira)/launch/startup.launch" />
+    <include file="$(find get_current_room)/launch/startup.launch" />
+    <include file="$(find places_learning_gui)/launch/startup.launch" />
+  </group>
+
+</launch>

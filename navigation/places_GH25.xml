@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<rooms>
+	<room>
+		<name>Office</name>
+		<vertices>
+			<vertex x="-5.727999" y="-3.360001" />
+			<vertex x="-6.615999" y="1.819998" />
+			<vertex x="0.784000" y="1.819998" />
+			<vertex x="0.932001" y="-3.360001" />
+		</vertices>
+	</room>
+	<room>
+		<name>MainCorridor</name>
+		<vertices>
+			<vertex x="1.228001" y="16.768002" />
+			<vertex x="2.708004" y="-6.172001" />
+			<vertex x="5.667999" y="-6.023998" />
+			<vertex x="4.336002" y="16.916000" />
+		</vertices>
+	</room>
+	<room>
+		<name>ShortCorridor</name>
+		<vertices>
+			<vertex x="-1.732000" y="5.816000" />
+			<vertex x="-1.732000" y="3.448002" />
+			<vertex x="1.672001" y="3.151999" />
+			<vertex x="1.524000" y="5.667999" />
+		</vertices>
+	</room>
+</rooms>
