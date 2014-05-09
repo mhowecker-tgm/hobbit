@@ -13,11 +13,7 @@ from smach import Sequence, State
 from uashh_smach.util import SleepState
 from ArmControllerClientFunctions import ArmClientFunctions
 
-def getArm():
-    arm = ArmClientFunctions('192.168.2.190')
-    arm = ArmClientFunctions('192.168.2.190')
-    rospy.sleep(1.0)
-    return arm
+arm = ArmClientFunctions('192.168.2.190')
 
 
 def getArmAtPosition(arm, position='home'):
@@ -61,7 +57,6 @@ class SetMoveToLearningPos(State):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
-        arm = getArm()
         if not arm.GetArmIsEnabled():
             return 'failed'
         status = arm.SetMoveToLearningPos()
@@ -84,7 +79,6 @@ class StoreTurntable(State):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
-        arm = getArm()
         if not arm.GetArmIsEnabled():
             return 'failed'
         status = arm.SetStoreTurnTable()
@@ -109,7 +103,6 @@ class CheckArmReachedKnownPosition(State):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
-        arm = getArm()
         if not arm.GetArmIsEnabled():
             return 'failed'
         if getArmAtPosition(arm, self.position):
@@ -132,7 +125,6 @@ class CheckArmIsMoving(State):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
-        arm = getArm()
         if not arm.GetArmIsEnabled():
             return 'failed'
         if arm.GetArmIsMoving():
@@ -151,7 +143,6 @@ class SetArmPosition(State):
             outcomes=['succeeded', 'failed', 'preempted']
         )
         self.position = position
-        self.arm = ArmClientFunctions('192.168.2.190')
 
     def execute(self, ud):
         if self.preempt_requested():
@@ -165,7 +156,7 @@ class SetArmPosition(State):
         elif self.position == 'learn':
             status = self.arm.SetMoveToLearningPos()
         elif self.position == 'tray':
-            status = self.arm.SetMoveToTrayPos()
+            statu = self.arm.SetMoveToTrayPos()
         elif self.position == 'pregrasp':
             status = self.arm.SetMoveToPreGraspFromFloorPos()
         elif self.position == 'ccwpos':
@@ -178,51 +169,6 @@ class SetArmPosition(State):
             return 'succeeded'
         else:
             return 'failed'
-
-
-class OpenGripper(State):
-    """
-    Send the Close Gripper command to the arm
-    """
-    def __init__(self):
-        State.__init__(
-            self,
-            outcomes=['succeeded', 'failed', 'preempted']
-        )
-
-    def execute(self, ud):
-        if DEBUG:
-            return 'succeeded'
-
-
-class CloseGripper(State):
-    """
-    Send the Close Gripper command to the arm
-    """
-    def __init__(self):
-        State.__init__(
-            self,
-            outcomes=['succeeded', 'failed', 'preempted']
-        )
-
-    def execute(self, ud):
-        if DEBUG:
-            return 'succeeded'
-
-
-class CheckGripperClosed(State):
-    """
-    Ccheck that the gripper is really closed
-    """
-    def __init__(self):
-        State.__init__(
-            self,
-            outcomes=['succeeded', 'failed', 'preempted']
-        )
-
-    def execute(self, ud):
-        if DEBUG:
-            return 'succeeded'
 
 
 def goToTrayPosition():
