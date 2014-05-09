@@ -7,6 +7,7 @@ DEBUG = True
 
 import roslib
 roslib.load_manifest(PKG)
+import rospy
 
 from smach import Sequence, State
 from uashh_smach.util import SleepState
@@ -14,7 +15,9 @@ from ArmControllerClientFunctions import ArmClientFunctions
 
 
 def getArm():
-    return ArmClientFunctions('192.168.2.190')
+    arm = ArmClientFunctions('192.168.2.190')
+    rospy.sleep(1.0)
+    return arm
 
 
 def getArmAtPosition(arm, position='home'):
@@ -153,7 +156,9 @@ class SetArmPosition(State):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
-        arm = getArm()
+        arm = ArmClientFunctions('192.168.2.190')
+        print self.position
+        print(arm.GetArmState)
         if self.position == 'home':
             status = arm.SetMoveToHomePos()
         elif self.position == 'learn':
