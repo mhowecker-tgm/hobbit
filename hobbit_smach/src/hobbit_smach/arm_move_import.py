@@ -37,6 +37,9 @@ def getArmAtPosition(arm, position='home'):
     elif position == 'tray':
         if status.ArmAtTrayPos:
             return True
+    elif position == 'empty_into_tray':
+        if status.ArmAtTrayPos:
+            return True
     else:
         return False
 
@@ -159,9 +162,9 @@ class SetArmPosition(State):
             status = arm.SetMoveToTrayPos()
         elif self.position == 'pregrasp':
             status = arm.SetMoveToPreGraspFromFloorPos()
-        elif self.position == 'ccw':
+        elif self.position == 'ccwpos':
             status = arm.SetTurnTurntableCCW()
-        elif self.position == 'cw':
+        elif self.position == 'cwpos':
             status = arm.SetTurnTurntableCW()
         else:
             return 'failed'
@@ -228,9 +231,9 @@ def goToTrayPosition():
 
     with seq:
         Sequence.add('MOVE_ARM_TO_TRAY_POSE',
-                     SetArmPosition(position='tray'))
+                     SetArmPosition(position='empty_into_tray'))
         Sequence.add('ARM_POSE_REACHED',
-                     CheckArmReachedKnownPosition(position='learn'),
+                     CheckArmReachedKnownPosition(position='empty_into_tray'),
                      transitions={'failed': 'ARM_POSE_REACHED'})
         Sequence.add('CHECK_ARM_IS_NOT_MOVING', CheckArmIsMoving())
     return seq
@@ -254,9 +257,9 @@ def goToLearnPosition():
                      transitions={'failed': 'ARM_POSE_REACHED'})
         Sequence.add('CHECK_ARM_IS_NOT_MOVING', CheckArmIsMoving())
         Sequence.add('ROTATE_TT_CCW',
-                     SetArmPosition(position='ccw'))
+                     SetArmPosition(position='ccwpos'))
         Sequence.add('TT_ROTATED',
-                     CheckArmReachedKnownPosition(position='ccw'),
+                     CheckArmReachedKnownPosition(position='ccwposw'),
                      transitions={'failed': 'ARM_POSE_REACHED'})
         Sequence.add('CHECK_TT_IS_NOT_MOVING', CheckArmIsMoving())
     return seq
@@ -279,17 +282,4 @@ def goToHomePosition():
                      CheckArmReachedKnownPosition(position='learn'),
                      transitions={'failed': 'ARM_POSE_REACHED'})
         Sequence.add('CHECK_ARM_IS_NOT_MOVING', CheckArmIsMoving())
-    return seq
-
-
-def closeGripper():
-    seq = Sequence(
-        outcomes=['succeeded', 'preempted', 'failed'],
-        connector_outcome='succeeded'
-    )
-
-    with seq:
-        Sequence.add('CLOSE_GRIPPER', CloseGripper())
-        Sequence.add('WAIT_FOR_GRIPPER', SleepState(duration=2))
-        Sequence.add('GRIPPER_CLOSED', CheckGripperClosed())
     return seq
