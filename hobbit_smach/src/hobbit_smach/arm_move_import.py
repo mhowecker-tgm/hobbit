@@ -13,8 +13,8 @@ from smach import Sequence, State
 from uashh_smach.util import SleepState
 from ArmControllerClientFunctions import ArmClientFunctions
 
-
 def getArm():
+    arm = ArmClientFunctions('192.168.2.190')
     arm = ArmClientFunctions('192.168.2.190')
     rospy.sleep(1.0)
     return arm
@@ -151,26 +151,27 @@ class SetArmPosition(State):
             outcomes=['succeeded', 'failed', 'preempted']
         )
         self.position = position
+        self.arm = ArmClientFunctions('192.168.2.190')
 
     def execute(self, ud):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
-        arm = ArmClientFunctions('192.168.2.190')
+        print(type(self.arm))
         print self.position
-        print(arm.GetArmState)
+        print(self.arm.GetArmState)
         if self.position == 'home':
-            status = arm.SetMoveToHomePos()
+            status = self.arm.SetMoveToHomePos()
         elif self.position == 'learn':
-            status = arm.SetMoveToLearningPos()
+            status = self.arm.SetMoveToLearningPos()
         elif self.position == 'tray':
-            status = arm.SetMoveToTrayPos()
+            status = self.arm.SetMoveToTrayPos()
         elif self.position == 'pregrasp':
-            status = arm.SetMoveToPreGraspFromFloorPos()
+            status = self.arm.SetMoveToPreGraspFromFloorPos()
         elif self.position == 'ccwpos':
-            status = arm.SetTurnTurntableCCW()
+            status = self.arm.SetTurnTurntableCCW()
         elif self.position == 'cwpos':
-            status = arm.SetTurnTurntableCW()
+            status = self.arm.SetTurnTurntableCW()
         else:
             return 'failed'
         if status[1] == 'COMMAND_OK':
