@@ -38,7 +38,8 @@ def returnTurntable():
         Sequence.add(
             'MOVE_ARM_TT_POSE',
         #    move_arm.goToPosition(pose='storage'))
-            move_arm.StoreTurntable())
+        #    move_arm.StoreTurntable())
+             move_arm.returnTurnTable())
         #Sequence.add(
         #    'OPEN_GRIPPER',
         #    move_arm.OpenGripper())
