@@ -1379,14 +1379,19 @@ void QNode::MaskPlatformFromObstacleGrid(unsigned int Selector)
   BlankHeight = 20;*/
 
 /* New values for PT1-1 Feb 2014*/
-  BlankStart = 17;
+  /*BlankStart = 17;
   BlankWidth = 70;
-  BlankHeight = 25;
+  BlankHeight = 25;*/
 
 /* Values for PT1-2
   BlankStart = 34;
   BlankWidth = 27;
   BlankHeight = 9; */
+
+//New values for PT2b May 2014
+  BlankStart = 18;
+  BlankWidth = 70;
+  BlankHeight = 15;
 
   pGrid += BlankStart;
 
