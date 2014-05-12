@@ -272,7 +272,7 @@ def main():
         StateMachine.add(
             'STOP_SEQ',
             learn_object.unloadReturnTurntable(),
-            transitions={'succeeded': 'SET_FAILURE',
+            transitions={'succeeded': 'STOP_SEQ_2',
                          'failed': 'SET_FAILURE',
                          'preempted': 'SET_FAILURE'}
         )
@@ -392,7 +392,7 @@ def main():
         StateMachine.add(
             'END_SEQ',
             seq2,
-            transitions={'succeeded': 'succeeded',
+            transitions={'succeeded': 'STOP_SEQ_2',
                          'failed': 'STOP_SEQ'}
         )
         StateMachine.add(
