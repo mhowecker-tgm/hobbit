@@ -15,11 +15,10 @@ import uashh_smach.util as util
 from std_msgs.msg import String
 from hobbit_msgs.msg import EndUserInteractionAction
 from hobbit_msgs.srv import GetName
-from hobbit_msgs import MMUIInterface as MMUI
 from smach_ros import ActionServerWrapper, ServiceState
-from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
-#from actionlib import SimpleActionServer
-#from operator import itemgetter
+from hobbit_user_interaction import HobbitMMUI
+import datetime
+import random
 
 
 class bcolors:
@@ -43,17 +42,9 @@ class Init(smach.State):
     """Class to initialize certain parameters"""
     def __init__(self):
         smach.State.__init__(self, outcomes=['succeeded', 'canceled'],
-                             input_keys=['command'],
-                             output_keys=['question'])
-        self.pub_head = rospy.Publisher('HeadMove', String)
-        self.pub_obstacle = rospy.Publisher('/headcam/active', String)
-        self.pub_face = rospy.Publisher('/Hobbit/Emoticon', String)
-        self.pub_face.publish('EMO_NEUTRAL')
+                             input_keys=['command'])
 
     def execute(self, ud):
-        self.pub_face.publish('EMO_NEUTRAL')
-        self.pub_head.publish('down')
-        self.pub_obstacle.publish('active')
         if rospy.has_param('/hobbit/social_role'):
             ud.social_role = rospy.get_param('/hobbit/social_role')
         # TODO:
@@ -62,39 +53,36 @@ class Init(smach.State):
         return 'succeeded'
 
 
-#class AskYesNo(smach.State):
-#    """Class to interact with the MMUI"""
-#    def __init__(self):
-#        smach.State.__init__(self, outcomes=['yes', 'no', 'failed'],
-#                             input_keys=['question'])
-#
-#    def execute(self, ud):
-#        mmui = MMUI.MMUIInterface()
-#        resp = mmui.showMMUI_YESNO(self, ud.question)
-#        if not resp:
-#            return 'failed'
-#        if resp:
-#            print resp
-#            return 'yes'
-#        else:
-#            return 'no'
-#
+class ChangeSocialRole(smach.State):
+    """Class to interact with the MMUI"""
+    def __init__(self, change=0):
+        smach.State.__init__(self,
+                             outcomes=['succeeded', 'failed', 'preempted'])
+        self.change = change
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            ud.result = String('preempted')
+            self.service_preempt()
+            return 'preempted'
+        if abs(self.change) == 1:
+            old = rospy.get_param('social_role')
+            if abs(old) <= 2:
+                rospy.set_param('social_role', old + self.change)
+            else:
+                rospy.loginfo('Already at the highest or lowest social role')
+        else:
+            return 'failed'
+        return 'succeeded'
+
 
 class AskForCmd(smach.State):
     """Class to interact with the MMUI"""
     def __init__(self):
-        smach.State.__init__(self, outcomes=['succeeded', 'failed'],
-                             input_keys=['question'])
+        smach.State.__init__(self, outcomes=['succeeded', 'failed'])
 
     def execute(self, ud):
-        resp = MMUI.showMMUI_NAME(self, question)
-        if not resp:
-            return 'failed'
-        if resp:
-            print resp
-            return 'succeeded'
-        else:
-            return 'failed'
+        return 'succeeded'
 
 
 class select_end_pose(smach.State):
@@ -106,6 +94,33 @@ class select_end_pose(smach.State):
 
     def execute(self, ud):
         return 'succeeded'
+
+
+class TimeDiffCheck(smach.State):
+    """
+    check the days between the last time we asked the user about the
+    social role and today
+    """
+    def __init__(self):
+        smach.State.__init__(self,
+                             outcomes=['yes', 'no', 'failed', 'preempted'])
+        self.last = 0
+        random.seed()
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            ud.result = String('preempted')
+            self.service_preempt()
+            return 'preempted'
+        if rospy.has_param('social_role_check_day'):
+            self.last = rospy.get_param('social_role_check_day')
+        today = datetime.datetime.today().weekday()
+        limit = random.randint(3, 4)
+        if abs(today - self.last) > limit:
+            return 'yes'
+        else:
+            return 'no'
+        return 'failed'
 
 
 class process_cmd(smach.State):
@@ -228,21 +243,6 @@ def goal_reached_cb(msg, ud):
         return False
 
 
-def get_robot_pose_cb(msg, ud):
-    #print bcolors.WARNING + 'received message: '+ bcolors.ENDC
-    #print msg
-    try:
-        pose = PoseStamped()
-        pose.header.frame_id = 'map'
-        pose.pose.position = msg.pose.pose.position
-        pose.pose.orientation = msg.pose.pose.orientation
-        ud.robot_current_pose = pose
-        return True
-    except:
-        print bcolors.FAIL + 'no robot pose message received.' + bcolors.ENDC
-        return False
-
-
 def main():
     rospy.init_node(NAME)
 
@@ -256,11 +256,38 @@ def main():
 
     with eui_sm:
         smach.StateMachine.add('INIT', Init(),
-                               transitions={'succeeded': 'MMUI_ASK_YES_NO',
+                               transitions={'succeeded': 'CHECK_FOR_MUC',
                                             'canceled': 'CLEAN_UP'})
-        smach.StateMachine.add('MMUI_ASK_YES_NO', HobbitMMUI.AskYesNo(question= 'Can I do something else for you?'),
-                               transitions={'yes': 'MMUI_ASK_FOR_CMD',
-                                            'no': 'GET_CURRENT_ROOM'})
+        smach.StateMachine.add('CHECK_FOR_MUC',
+                               TimeDiffCheck(),
+                               transitions={'yes': 'ASK_ABOUT_SOCIAL_ROLE',
+                                            'no': 'MMUI_ASK_YES_NO',
+                                            'failed': 'aborted',
+                                            'preempted': 'preempted'})
+        smach.StateMachine.add(
+            'ASK_ABOUT_SOCIAL_ROLE',
+            HobbitMMUI.AskYesNo(question='Am i too obstrusive in general?'),
+            transitions={'yes': 'SOCIAL_ROLE_DOWN',
+                         'no': 'SOCIAL_ROLE_UP'})
+        smach.StateMachine.add(
+            'SOCIAL_ROLE_UP',
+            ChangeSocialRole(change=1),
+            transitions={'succeeded': 'MMUI_ASK_YES_NO',
+                         'failed': 'aborted',
+                         'preempted': 'preempted'}
+        )
+        smach.StateMachine.add(
+            'SOCIAL_ROLE_DOWN',
+            ChangeSocialRole(change=-1),
+            transitions={'succeeded': 'MMUI_ASK_YES_NO',
+                         'failed': 'aborted',
+                         'preempted': 'preempted'}
+        )
+        smach.StateMachine.add(
+            'MMUI_ASK_YES_NO',
+            HobbitMMUI.AskYesNo(question='Can I do something else for you?'),
+            transitions={'yes': 'MMUI_ASK_FOR_CMD',
+                         'no': 'GET_CURRENT_ROOM'})
         smach.StateMachine.add('GET_CURRENT_ROOM',
                                ServiceState('get_robots_current_room', GetName,
                                             response_key='robots_room_name'),
