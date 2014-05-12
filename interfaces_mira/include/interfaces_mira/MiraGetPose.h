@@ -19,7 +19,8 @@
 #include <transform/RigidTransform.h>
 #include <navigation/INavigation.h> 
 
-
+#include "geometry_msgs/TransformStamped.h"
+#include "tf/transform_broadcaster.h"
 
 class MiraGetPose: public MiraRobotModule {
 public:
@@ -37,6 +38,9 @@ private:
 	ros::Publisher current_pose_pub;
 	void loc_pose_callback(mira::ChannelRead<mira::Pose2> data);
 
+
+	geometry_msgs::TransformStamped robot_trans;
+        tf::TransformBroadcaster *p_robot_broadcaster;
 
 };
 

@@ -1,10 +1,12 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(interfaces_mira)
 
+set(actionlibs_msgs_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../build)
+
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp std_msgs sensor_msgs tf nav_msgs dynamic_reconfigure)
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs sensor_msgs tf nav_msgs actionlib_msgs dynamic_reconfigure)
 
 
 # include cmake file for MIRA
@@ -38,11 +40,15 @@ include(CMakeLists.mira)
 #
 #)
 
+add_action_files(
+  DIRECTORY action
+  FILES MiraSendingGoals.action
+)
+
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-# DEPENDENCIES
-# geometry_msgs# std_msgs
-# )
+ generate_messages(
+  DEPENDENCIES actionlib_msgs std_msgs geometry_msgs
+ )
 
 #######################
 # DYNAMIC RECONFIGURE
@@ -67,6 +73,7 @@ include_directories(cfg/cpp)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
    INCLUDE_DIRS include
+   CATKIN_DEPENDS actionlib_msgs
 # LIBRARIES scitos
 # CATKIN_DEPENDS geometry_msgs roscpp std_msgs
 # DEPENDS system_lib

@@ -22,6 +22,9 @@
 #include <hobbit_msgs/Pose2DStamped.h>
 #include <std_msgs/String.h>
 
+#include <actionlib/server/simple_action_server.h>
+#include <interfaces_mira/MiraSendingGoalsAction.h>
+
 
 class MiraSendingGoals: public MiraRobotModule {
 public:
@@ -37,6 +40,8 @@ public:
 
         void goal_status_channel_callback(mira::ChannelRead<std::string> data);
 
+	actionlib::SimpleActionServer<interfaces_mira::MiraSendingGoalsAction>* as_; 
+
 private:
         MiraSendingGoals();
 
@@ -46,6 +51,10 @@ private:
 	ros::Publisher goal_status_pub;
 
 	std_msgs::String goal_status;
+
+	void executeCb(const interfaces_mira::MiraSendingGoalsGoalConstPtr& goal_pose);
+
+        bool isQuaternionValid(const geometry_msgs::Quaternion& q);
 
 };
 

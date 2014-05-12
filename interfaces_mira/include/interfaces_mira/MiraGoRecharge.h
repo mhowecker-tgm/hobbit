@@ -7,7 +7,7 @@
 #ifndef MiraGoRecharge_H
 #define MiraGoRecharge_H
 
-#define PLACE_NAME_TARGET "place_name_target"
+//#define PLACE_NAME_TARGET "place_name_target"
 #define STOP_REQUEST "stop_request"
 #define GOAL_STATUS "goal_status"
 

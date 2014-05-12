@@ -73,7 +73,7 @@ void MiraRobotDrive::discrete_motion_cmd_callback(const std_msgs::String::ConstP
 	// Get the desired distance 
         float MotionValue = atof(&CmdBuf[5]);
 
-	float x_speed = 0.5; //FIXME
+	float x_speed = 0.2; //FIXME
 	float vMax = 0.2; //FIXME
         float t= MotionValue/x_speed;
 
