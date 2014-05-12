@@ -281,6 +281,51 @@ def returnTurnTable():
     return seq
 
 
+def moveToCW():
+    """
+    Return a SMACH Sequence that will return the turntable after the learning.
+    """
+
+    seq = Sequence(
+        outcomes=['succeeded', 'preempted', 'failed'],
+        connector_outcome='succeeded'
+    )
+
+    with seq:
+        Sequence.add('MOVE_ARM_TO_CW',
+                     SetArmPosition(position='cwpos'))
+        Sequence.add('ARM_POSE_REACHED',
+                     CheckArmReachedKnownPosition(position='cwpos'),
+                     transitions={'failed': 'ARM_POSE_REACHED'})
+        Sequence.add('CHECK_ARM_IS_NOT_MOVING', CheckArmIsMoving())
+
+
+def returnTurnTable():
+    """
+    Return a SMACH Sequence that will return the turntable after the learning.
+    """
+
+    seq = Sequence(
+        outcomes=['succeeded', 'preempted', 'failed'],
+        connector_outcome='succeeded'
+    )
+
+    with seq:
+        Sequence.add('MOVE_ARM_TO_CW',
+                     SetArmPosition(position='cwpos'))
+        Sequence.add('ARM_POSE_REACHED',
+                     CheckArmReachedKnownPosition(position='cwpos'),
+                     transitions={'failed': 'ARM_POSE_REACHED'})
+        Sequence.add('CHECK_ARM_IS_NOT_MOVING', CheckArmIsMoving())
+        Sequence.add('MOVE_ARM_STORE',
+                     SetArmPosition(position='store'))
+        Sequence.add('ARM_IN_HOME_POSE',
+                     CheckArmReachedKnownPosition(position='home'),
+                     transitions={'failed': 'ARM_POSE_REACHED'})
+        Sequence.add('CHECK_TT_IS_NOT_MOVING', CheckArmIsMoving())
+    return seq
+
+
 def goToLearnPosition():
     """
     Return a SMACH Sequence that will move the arm to the learning pose.
