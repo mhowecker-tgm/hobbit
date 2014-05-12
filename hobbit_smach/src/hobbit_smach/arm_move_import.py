@@ -111,7 +111,7 @@ class CheckArmReachedKnownPosition(State):
             return 'failed'
 
 
-class CheckArmIsMoving(State):
+class CheckArmIsNotMoving(State):
     """
     Check that the Arm has reached the specified predefined position.
     """
@@ -128,9 +128,9 @@ class CheckArmIsMoving(State):
         if not arm.GetArmIsEnabled():
             return 'failed'
         if arm.GetArmIsMoving():
-            return 'succeeded'
-        else:
             return 'failed'
+        else:
+            return 'succeeded'
 
 
 class SetArmPosition(State):
@@ -187,7 +187,8 @@ def goToTrayPosition():
         Sequence.add('ARM_POSE_REACHED',
                      CheckArmReachedKnownPosition(position='empty_into_tray'),
                      transitions={'failed': 'ARM_POSE_REACHED'})
-        Sequence.add('CHECK_ARM_IS_NOT_MOVING', CheckArmIsMoving())
+        Sequence.add('CHECK_ARM_IS_NOT_MOVING', CheckArmIsNotMoving(),
+                     transitions={'failed:' 'CHECK_ARM_IS_NOT_MOVING'})
     return seq
 
 
@@ -207,7 +208,8 @@ def moveToCW():
         Sequence.add('ARM_POSE_REACHED',
                      CheckArmReachedKnownPosition(position='cwpos'),
                      transitions={'failed': 'ARM_POSE_REACHED'})
-        Sequence.add('CHECK_ARM_IS_NOT_MOVING', CheckArmIsMoving())
+        Sequence.add('CHECK_ARM_IS_NOT_MOVING', CheckArmIsNotMoving(),
+                     transitions={'failed:' 'CHECK_ARM_IS_NOT_MOVING'})
 
 
 def returnTurnTable():
@@ -226,13 +228,15 @@ def returnTurnTable():
         Sequence.add('ARM_POSE_REACHED',
                      CheckArmReachedKnownPosition(position='cwpos'),
                      transitions={'failed': 'ARM_POSE_REACHED'})
-        Sequence.add('CHECK_ARM_IS_NOT_MOVING', CheckArmIsMoving())
+        Sequence.add('CHECK_ARM_IS_NOT_MOVING', CheckArmIsNotMoving(),
+                     transitions={'failed:' 'CHECK_ARM_IS_NOT_MOVING'})
         Sequence.add('MOVE_ARM_STORE',
                      SetArmPosition(position='store'))
         Sequence.add('ARM_IN_HOME_POSE',
                      CheckArmReachedKnownPosition(position='home'),
                      transitions={'failed': 'ARM_POSE_REACHED'})
-        Sequence.add('CHECK_TT_IS_NOT_MOVING', CheckArmIsMoving())
+        Sequence.add('CHECK_TT_IS_NOT_MOVING', CheckArmIsNotMoving(),
+                     transitions={'failed:' 'CHECK_TT_IS_NOT_MOVING'})
     return seq
 
 
@@ -342,13 +346,15 @@ def goToLearnPosition():
         Sequence.add('ARM_POSE_REACHED',
                      CheckArmReachedKnownPosition(position='learn'),
                      transitions={'failed': 'ARM_POSE_REACHED'})
-        Sequence.add('CHECK_ARM_IS_NOT_MOVING', CheckArmIsMoving())
+        Sequence.add('CHECK_ARM_IS_NOT_MOVING', CheckArmIsNotMoving(),
+                     transitions={'failed:' 'CHECK_ARM_IS_NOT_MOVING'})
         Sequence.add('ROTATE_TT_CCW',
                      SetArmPosition(position='ccwpos'))
         Sequence.add('TT_ROTATED',
                      CheckArmReachedKnownPosition(position='ccwposw'),
                      transitions={'failed': 'ARM_POSE_REACHED'})
-        Sequence.add('CHECK_TT_IS_NOT_MOVING', CheckArmIsMoving())
+        Sequence.add('CHECK_TT_IS_NOT_MOVING', CheckArmIsNotMoving(),
+                     transitions={'failed:' 'CHECK_TT_IS_NOT_MOVING'})
     return seq
 
 
@@ -368,5 +374,6 @@ def goToHomePosition():
         Sequence.add('ARM_POSE_REACHED',
                      CheckArmReachedKnownPosition(position='learn'),
                      transitions={'failed': 'ARM_POSE_REACHED'})
-        Sequence.add('CHECK_ARM_IS_NOT_MOVING', CheckArmIsMoving())
+        Sequence.add('CHECK_ARM_IS_NOT_MOVING', CheckArmIsNotMoving(),
+                     transitions={'failed:' 'CHECK_ARM_IS_NOT_MOVING'})
     return seq
