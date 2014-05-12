@@ -1,0 +1,9 @@
+#goal definition
+#hobbit_msgs/Pose2DStamped
+geometry_msgs/PoseStamped target_pose
+---
+#result definition
+string res
+---
+#feedback
+string feedback
