@@ -19,7 +19,7 @@ class MoveTo(State):
     def __init__(self, pose='center_center'):
         State.__init__(self,
                        outcomes=['succeeded', 'preempted', 'failed'])
-        self._publisher = rospy.Publisher('/head_move', String)
+        self._publisher = rospy.Publisher('/head/move', String)
         self._pose = pose
         self._available_poses = ['center_center', 'up_center', 'down_center',
                                  'up_right', 'center_right', 'down_right',

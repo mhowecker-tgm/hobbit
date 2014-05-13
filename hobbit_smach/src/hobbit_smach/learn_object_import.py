@@ -17,6 +17,7 @@ from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 import hobbit_smach.hobbit_move_import as hobbit_move
 import hobbit_smach.arm_move_import as move_arm
 import hobbit_smach.speech_output_import as speech_output
+import hobbit_smach.head_move_import as head_move
 
 
 def returnTurntable():
@@ -47,13 +48,16 @@ def returnTurntable():
             Sequence.add(
                 'MOVE_BACK',
                 hobbit_move.Move(goal='back', distance=0.25))
-        Sequence.add(
-            'MOVE_ARM_STORAGE',
-            move_arm.goToHomePosition())
+        #Sequence.add(
+        #    'MOVE_ARM_STORAGE',
+        #    move_arm.goToHomePosition())
         if not DEBUG:
             Sequence.add(
                 'MOVE_FRONT',
                 hobbit_move.Move(goal='front', distance=0.25))
+        Sequence.add(
+            'MOVE_HEAD_FRONT',
+            head_move.MoveTo(pose='center_center'))
         Sequence.add(
             'MMUI_SAY_STOPPED_LEARNING',
             speech_output.sayText(info='I_STOPPED_LEARNING'))

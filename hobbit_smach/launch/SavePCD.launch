@@ -1,0 +1,5 @@
+<launch>
+<param name="~prefix" type="str" value="/opt/ros/hobbit_hydro/data/object_" />
+<arg name="input" value="input:=/hobbit/object/points" /> 
+<node name="pointcloud_to_pcd" pkg="pcl_ros" type="pointcloud_to_pcd" args="$(arg input)" output="screen"/>
+</launch>
