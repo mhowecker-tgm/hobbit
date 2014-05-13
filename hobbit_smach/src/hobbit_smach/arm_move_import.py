@@ -13,8 +13,11 @@ from smach import Sequence, State
 from uashh_smach.util import SleepState
 from ArmControllerClientFunctions import ArmClientFunctions
 
-arm = ArmClientFunctions('192.168.2.190')
-arm.SetEnableArm()
+if not DEBUG:
+    arm = ArmClientFunctions('192.168.2.190')
+    arm.SetEnableArm()
+else:
+    arm = True
 
 def getArmAtPosition(position='home'):
     status = arm.GetArmState()
@@ -236,7 +239,7 @@ def returnTurnTable():
         Sequence.add('MOVE_ARM_TO_TT_STORAGE',
                      StoreTurntable())
         Sequence.add('ARM_POSE_REACHED',
-                     CheckArmReachedKnownPosition(position='store'),
+                     CheckArmReachedKnownPosition(position='home'),
                      transitions={'failed': 'ARM_POSE_REACHED'})
     return seq
 
