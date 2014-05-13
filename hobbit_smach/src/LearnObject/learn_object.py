@@ -206,7 +206,7 @@ def main():
                 hobbit_move.Move(goal='front', distance=0.25))
         Sequence.add(
             'HEAD_MOVE_3',
-            head_move.MoveTo(pose='down_right'))
+            head_move.MoveTo(pose='to_turntable'))
 
         with seq2:
             Sequence.add(
@@ -320,7 +320,7 @@ def main():
         )
         StateMachine.add(
             'LEARN_OBJECT_1',
-            Dummy(),
+            learn_object.getData(),
             transitions={'succeeded': 'CONFIRM_TURN_OBJECT',
                          'failed': 'SET_FAILURE'}
         )
@@ -365,7 +365,7 @@ def main():
         )
         StateMachine.add(
             'LEARN_OBJECT_2',
-            Dummy(),
+            learn_object.getData(),
             transitions={'succeeded': 'SAY_WHAT_IS_THE_NAME',
                          'failed': 'SET_FAILURE'}
         )
@@ -398,8 +398,15 @@ def main():
         StateMachine.add(
             'SET_FAILURE',
             SetFailure(),
-            transitions={'succeeded': 'failure',
+            transitions={'succeeded': 'MAIN_MENU',
                          'preempted': 'preempted'}
+        )
+        StateMachine.add(
+            'MAIN_MENU', 
+            HobbitMMUI.ShowMenu(menu='MAIN'),
+            transitions={'succeeded': 'failure',
+                         'preempted': 'preempted',
+                         'failed': 'failure'}
         )
         StateMachine.add(
             'CLEAN_UP',
@@ -408,7 +415,7 @@ def main():
         StateMachine.add(
             'STOP_SEQ_2',
             learn_object.returnTurntable(),
-            transitions={'succeeded': 'SET_FAILURE',
+            transitions={'succeeded': 'succeeded',
                          'failed': 'SET_FAILURE',
                          'preempted': 'SET_FAILURE'}
         )

@@ -291,3 +291,23 @@ def goToHomePosition():
         Sequence.add('CHECK_ARM_IS_NOT_MOVING', CheckArmIsNotMoving(),
                      transitions={'failed': 'CHECK_ARM_IS_NOT_MOVING'})
     return seq
+
+def rotateToCW():
+    """
+    Return a SMACH Sequence that will move the arm to the learning pose.
+    """
+
+    seq = Sequence(
+        outcomes=['succeeded', 'preempted', 'failed'],
+        connector_outcome='succeeded'
+    )
+
+    with seq:
+        Sequence.add('ROTATE_TT_CW',
+                     SetArmPosition(position='cwpos'))
+        Sequence.add('TT_ROTATED',
+                     CheckArmReachedKnownPosition(position='cwposw'),
+                     transitions={'failed': 'ARM_POSE_REACHED'})
+        Sequence.add('CHECK_TT_IS_NOT_MOVING', CheckArmIsNotMoving(),
+                     transitions={'failed': 'CHECK_TT_IS_NOT_MOVING'})
+    return seq

@@ -7,17 +7,17 @@ DEBUG = True
 
 import roslib
 roslib.load_manifest(PKG)
-#import rospy
+import rospy
 
-from smach import Sequence
-#from std_msgs.msg import String
-from hobbit_msgs.msg import Event
-#import uashh_smach.util as util
+from smach import Sequence, Concurrence
+from sensor_msgs.msg import PointCloud2
+import uashh_smach.util as util
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 import hobbit_smach.hobbit_move_import as hobbit_move
 import hobbit_smach.arm_move_import as move_arm
 import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.head_move_import as head_move
+import hobbit_smach.arm_move_import as arm_move
 
 
 def returnTurntable():
@@ -95,3 +95,53 @@ def unloadReturnTurntable():
         #    returnTurntable()
         #)
     return seq
+
+def child_term_cb(outcome_map):
+    if outcome_map['ROTATE']:
+        return True
+
+
+def msg_cb(msg, ud):
+    pub = rospy.Publisher('/hobbit/object/points', PointCloud2)
+    pub.publish(msg)
+    return False
+
+
+def getData():
+    """
+    Return a SMACH concurrence container which rotates the turntable and
+    publishes the received point cloud data to a topic for saving as a
+    series of pcd files.
+
+    in_topic: /headcam/depth_registered/points
+    out_topic: /hobbit/object/points
+    """
+
+    seq = Sequence(
+        outcomes=['succeeded', 'preempted', 'failed'],
+        connector_outcome='succeeded'
+    )
+
+    with seq:
+        Sequence.add(
+            'GET_DATA',
+            util.WaitForMsgState('/headcam/depth_registered/points',
+                            PointCloud2,
+                            msg_cb=msg_cb
+                            ),
+            transitions={'aborted': 'GET_DATA'})
+
+    cc = Concurrence(
+        outcomes=['succeeded', 'preempted', 'failed'],
+        default_outcome='failed',
+        child_termination_cb=child_term_cb,
+    )
+
+    with cc:
+        Concurrence.add(
+            'ROTATE',
+            arm_move.rotateToCW())
+        Concurrence.add(
+            'GET_DATA',
+            seq)
+    return cc
