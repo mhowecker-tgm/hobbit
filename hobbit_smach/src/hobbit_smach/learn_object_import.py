@@ -96,10 +96,7 @@ def unloadReturnTurntable():
         #)
     return seq
 
-<<<<<<< HEAD
-=======
 
->>>>>>> Get pcl data for the object.
 def child_term_cb(outcome_map):
     if outcome_map['ROTATE']:
         return True
@@ -129,11 +126,7 @@ def getData():
     with seq:
         Sequence.add(
             'GET_DATA',
-<<<<<<< HEAD
             util.WaitForMsgState('/headcam/depth_registered/points',
-=======
-            util.WaitForMsg('/headcam/depth_registered/points',
->>>>>>> Get pcl data for the object.
                             PointCloud2,
                             msg_cb=msg_cb
                             ),
@@ -151,9 +144,5 @@ def getData():
             arm_move.rotateToCW())
         Concurrence.add(
             'GET_DATA',
-<<<<<<< HEAD
             seq)
     return cc
-=======
-            util.WaitForMsg())
->>>>>>> Get pcl data for the object.

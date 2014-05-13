@@ -201,50 +201,7 @@ def goToTrayPosition():
                      CheckArmReachedKnownPosition(position='empty_into_tray'),
                      transitions={'failed': 'ARM_POSE_REACHED'})
         Sequence.add('CHECK_ARM_IS_NOT_MOVING', CheckArmIsNotMoving(),
-<<<<<<< HEAD
-                     transitions={'failed': 'CHECK_ARM_IS_NOT_MOVING'})
-    return seq
-
-
-def moveToCW():
-    """
-    Return a SMACH Sequence that will return the turntable after the learning.
-    """
-
-    seq = Sequence(
-        outcomes=['succeeded', 'preempted', 'failed'],
-        connector_outcome='succeeded'
-    )
-
-    with seq:
-        Sequence.add('MOVE_ARM_TO_CW',
-                     SetArmPosition(position='cwpos'))
-        Sequence.add('ARM_POSE_REACHED',
-                     CheckArmReachedKnownPosition(position='cwpos'),
-                     transitions={'failed': 'ARM_POSE_REACHED'})
-        Sequence.add('CHECK_ARM_IS_NOT_MOVING', CheckArmIsNotMoving(),
-                     transitions={'failed': 'CHECK_ARM_IS_NOT_MOVING'})
-
-
-def returnTurnTable():
-    """
-    Return a SMACH Sequence that will return the turntable after the learning.
-    """
-
-    seq = Sequence(
-        outcomes=['succeeded', 'preempted', 'failed'],
-        connector_outcome='succeeded'
-    )
-
-    with seq:
-        Sequence.add('MOVE_ARM_TO_TT_STORAGE',
-                     StoreTurntable())
-        Sequence.add('ARM_POSE_REACHED',
-                     CheckArmReachedKnownPosition(position='home'),
-                     transitions={'failed': 'ARM_POSE_REACHED'})
-=======
                      transitions={'failed:' 'CHECK_ARM_IS_NOT_MOVING'})
->>>>>>> Added checks for arm movement
     return seq
 
 
@@ -313,22 +270,14 @@ def goToLearnPosition():
                      CheckArmReachedKnownPosition(position='learn'),
                      transitions={'failed': 'ARM_POSE_REACHED'})
         Sequence.add('CHECK_ARM_IS_NOT_MOVING', CheckArmIsNotMoving(),
-<<<<<<< HEAD
                      transitions={'failed': 'CHECK_ARM_IS_NOT_MOVING'})
-=======
-                     transitions={'failed:' 'CHECK_ARM_IS_NOT_MOVING'})
->>>>>>> Added checks for arm movement
         Sequence.add('ROTATE_TT_CCW',
                      SetArmPosition(position='ccwpos'))
         Sequence.add('TT_ROTATED',
                      CheckArmReachedKnownPosition(position='ccwposw'),
                      transitions={'failed': 'ARM_POSE_REACHED'})
         Sequence.add('CHECK_TT_IS_NOT_MOVING', CheckArmIsNotMoving(),
-<<<<<<< HEAD
                      transitions={'failed': 'CHECK_TT_IS_NOT_MOVING'})
-=======
-                     transitions={'failed:' 'CHECK_TT_IS_NOT_MOVING'})
->>>>>>> Added checks for arm movement
     return seq
 
 
@@ -349,14 +298,10 @@ def goToHomePosition():
                      CheckArmReachedKnownPosition(position='learn'),
                      transitions={'failed': 'ARM_POSE_REACHED'})
         Sequence.add('CHECK_ARM_IS_NOT_MOVING', CheckArmIsNotMoving(),
-<<<<<<< HEAD
                      transitions={'failed': 'CHECK_ARM_IS_NOT_MOVING'})
     return seq
 
-<<<<<<< HEAD
-=======
 
->>>>>>> Get pcl data for the object.
 def rotateToCW():
     """
     Return a SMACH Sequence that will move the arm to the learning pose.
@@ -375,10 +320,4 @@ def rotateToCW():
                      transitions={'failed': 'ARM_POSE_REACHED'})
         Sequence.add('CHECK_TT_IS_NOT_MOVING', CheckArmIsNotMoving(),
                      transitions={'failed': 'CHECK_TT_IS_NOT_MOVING'})
-<<<<<<< HEAD
-=======
-                     transitions={'failed:' 'CHECK_ARM_IS_NOT_MOVING'})
->>>>>>> Added checks for arm movement
-=======
->>>>>>> Get pcl data for the object.
     return seq
