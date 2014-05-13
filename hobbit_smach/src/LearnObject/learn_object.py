@@ -320,7 +320,7 @@ def main():
         )
         StateMachine.add(
             'LEARN_OBJECT_1',
-            learn_object.getData(),
+            learn_object.getDataCW(),
             transitions={'succeeded': 'CONFIRM_TURN_OBJECT',
                          'failed': 'SET_FAILURE'}
         )
@@ -365,7 +365,7 @@ def main():
         )
         StateMachine.add(
             'LEARN_OBJECT_2',
-            learn_object.getData(),
+            learn_object.getDataCCW(),
             transitions={'succeeded': 'SAY_WHAT_IS_THE_NAME',
                          'failed': 'SET_FAILURE'}
         )
@@ -386,8 +386,14 @@ def main():
         StateMachine.add(
             'GET_THE_NAME_OF_THE_OBJECT',
             speech_output.AskForName(),
-            transitions={'succeeded': 'END_SEQ',
+            transitions={'succeeded': 'SET_PCD_NAME',
                          'failed': 'STOP_SEQ'}
+        )
+        StateMachine.add(
+            'SET_PCD_NAME',
+            learn_object.SetName(),
+            transitions={'succeeded': 'END_SEQ',
+                         'failure': 'STOP_SEQ'}
         )
         StateMachine.add(
             'END_SEQ',

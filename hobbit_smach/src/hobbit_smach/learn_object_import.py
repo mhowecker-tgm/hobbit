@@ -8,8 +8,11 @@ DEBUG = True
 import roslib
 roslib.load_manifest(PKG)
 import rospy
+import os
+import glob
+import shutil
 
-from smach import Sequence, Concurrence
+from smach import Sequence, Concurrence, State
 from sensor_msgs.msg import PointCloud2
 import uashh_smach.util as util
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
@@ -18,6 +21,28 @@ import hobbit_smach.arm_move_import as move_arm
 import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.head_move_import as head_move
 import hobbit_smach.arm_move_import as arm_move
+
+
+class SetName(State):
+    """
+    Set the name of the pcd files
+    """
+    def __init__(self):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'failure'],
+            input_keys=['object_name']
+        )
+
+    def execute(self, ud):
+        print(ud.object_name)
+        directory=rospy.get_param('/hobbit/pcd_path')+'/'
+        directory2=directory+ud.object_name
+        if not os.path.exists(directory2):
+	    os.makedirs(directory2)
+        for data in glob.glob(directory+'*.pcd'):
+            shutil.move(data, directory2)
+        return 'succeeded'
 
 
 def returnTurntable():
@@ -84,7 +109,7 @@ def unloadReturnTurntable():
         )
         Sequence.add(
             'SAY_I_WILL_PUT_THE_OBJECT_INTO_TRAY',
-            speech_output.sayText(info='SAY_I_WILL_PUT_THE_OBJECT_INTO_TRAY')
+            speech_output.sayText(info='I_WILL_PUT_THE_OBJECT_INTO_TRAY')
         )
         #Sequence.add(
         #    'MOVE_ARM_TRAY_POSE',
@@ -98,7 +123,7 @@ def unloadReturnTurntable():
 
 
 def child_term_cb(outcome_map):
-    if outcome_map['ROTATE']:
+    if outcome_map['ROTATE'] == 'succeeded':
         return True
 
 
@@ -108,7 +133,11 @@ def msg_cb(msg, ud):
     return False
 
 
-def getData():
+def out_cb(outcome_map):
+    if outcome_map['ROTATE'] == 'succeeded':
+        return 'succeeded'
+
+def getDataCW():
     """
     Return a SMACH concurrence container which rotates the turntable and
     publishes the received point cloud data to a topic for saving as a
@@ -136,12 +165,54 @@ def getData():
         outcomes=['succeeded', 'preempted', 'failed'],
         default_outcome='failed',
         child_termination_cb=child_term_cb,
+        outcome_cb=out_cb
     )
 
     with cc:
         Concurrence.add(
             'ROTATE',
             arm_move.rotateToCW())
+        Concurrence.add(
+            'GET_DATA',
+            seq)
+    return cc
+
+
+def getDataCCW():
+    """
+    Return a SMACH concurrence container which rotates the turntable and
+    publishes the received point cloud data to a topic for saving as a
+    series of pcd files.
+
+    in_topic: /headcam/depth_registered/points
+    out_topic: /hobbit/object/points
+    """
+
+    seq = Sequence(
+        outcomes=['succeeded', 'preempted', 'failed'],
+        connector_outcome='succeeded'
+    )
+
+    with seq:
+        Sequence.add(
+            'GET_DATA',
+            util.WaitForMsgState('/headcam/depth_registered/points',
+                            PointCloud2,
+                            msg_cb=msg_cb
+                            ),
+            transitions={'aborted': 'GET_DATA'})
+
+    cc = Concurrence(
+        outcomes=['succeeded', 'preempted', 'failed'],
+        default_outcome='failed',
+        child_termination_cb=child_term_cb,
+        outcome_cb=out_cb
+    )
+
+    with cc:
+        Concurrence.add(
+            'ROTATE',
+            arm_move.rotateToCCW())
         Concurrence.add(
             'GET_DATA',
             seq)
