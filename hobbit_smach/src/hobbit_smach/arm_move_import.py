@@ -3,7 +3,7 @@
 
 PKG = 'hobbit_smach'
 NAME = 'ArmMove'
-DEBUG = False
+DEBUG = True
 
 import roslib
 roslib.load_manifest(PKG)
@@ -353,6 +353,10 @@ def goToHomePosition():
                      transitions={'failed': 'CHECK_ARM_IS_NOT_MOVING'})
     return seq
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> Get pcl data for the object.
 def rotateToCW():
     """
     Return a SMACH Sequence that will move the arm to the learning pose.
@@ -371,7 +375,10 @@ def rotateToCW():
                      transitions={'failed': 'ARM_POSE_REACHED'})
         Sequence.add('CHECK_TT_IS_NOT_MOVING', CheckArmIsNotMoving(),
                      transitions={'failed': 'CHECK_TT_IS_NOT_MOVING'})
+<<<<<<< HEAD
 =======
                      transitions={'failed:' 'CHECK_ARM_IS_NOT_MOVING'})
 >>>>>>> Added checks for arm movement
+=======
+>>>>>>> Get pcl data for the object.
     return seq
