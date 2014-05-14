@@ -5,6 +5,8 @@
 #include <navigation/tasks/PreferredDirectionTask.h>
 #include <navigation/tasks/PositionTask.h>
 
+#include <tf/transform_broadcaster.h>
+
 #include <string>
 
 
@@ -27,6 +29,7 @@ void MiraSendingGoals::initialize() {
 
 
   as_ = new actionlib::SimpleActionServer<interfaces_mira::MiraSendingGoalsAction>(robot_->getRosNode(), "mira_sending_goals", boost::bind(&MiraSendingGoals::executeCb, this, _1), false);
+  as_->start();
 
 }
 
@@ -124,15 +127,30 @@ void MiraSendingGoals::executeCb(const interfaces_mira::MiraSendingGoalsGoalCons
     }
 
     geometry_msgs::PoseStamped goal = goal_pose->target_pose; //should be in global reference frame already!!
+    goal_status.data = "idle";
+    goal_status_pub.publish(goal_status);
+
+	//std::cout << "goal actionlib x:" << goal.pose.position.x << " y: " << goal.pose.position.y << " theta " << tf::getYaw(goal.pose.orientation)*180/M_PI << std::endl;
+
+     TaskPtr task(new Task());
+     task->addSubTask(SubTaskPtr(new PreferredDirectionTask(mira::navigation::PreferredDirectionTask::FORWARD, 1.0f)));
+     task->addSubTask(SubTaskPtr(new mira::navigation::PositionTask(mira::Point2f(goal.pose.position.x, goal.pose.position.y), 0.1f, 0.1f)));
+     task->addSubTask(mira::navigation::SubTaskPtr(new mira::navigation::OrientationTask(tf::getYaw(goal.pose.orientation), mira::deg2rad(15.0f))));
+
+     std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
+     robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
 
     ros::NodeHandle n = robot_->getRosNode();
     while(n.ok())
     {
 
+      //std::cout << "actionlib server executeCb ok" << std::endl;
       if(as_->isPreemptRequested())
       {
+	std::cout << "preempt requested" << std::endl;
         if(as_->isNewGoalAvailable())
 	{
+	  //std::cout << "new goal available" << std::endl;
           //if we're active and a new goal is available, we'll accept it, but we won't shut anything down
           interfaces_mira::MiraSendingGoalsGoal new_goal = *as_->acceptNewGoal();
 
@@ -143,10 +161,8 @@ void MiraSendingGoals::executeCb(const interfaces_mira::MiraSendingGoalsGoalCons
           }
 
           goal = new_goal.target_pose;
+	  //std::cout << "goal actionlib loop" << goal.pose.position.x << " y: " << goal.pose.position.y << " theta " << tf::getYaw(goal.pose.orientation)*180/M_PI<< std::endl;
 
-          //we'll make sure that we reset our state for the next execution cycle
-          //recovery_index_ = 0;
-          //state_ = PLANNING;
 
           //we have a new goal so make sure the planner is awake
           TaskPtr task(new Task());
@@ -169,15 +185,19 @@ void MiraSendingGoals::executeCb(const interfaces_mira::MiraSendingGoalsGoalCons
            //we'll actually return from execute after preempting
           return;
         }
-      }
+     }
 
      bool done = false;
      if (goal_status.data == "reached") done=true;
 
      if(done)
+     {
+	//std::cout << "done " << std::endl;
+	as_->setSucceeded(interfaces_mira::MiraSendingGoalsResult(), "Goal reached.");
         return;
-   }
+     }
 
+   }
 
    //if the node is killed then we'll abort and return
     as_->setAborted(interfaces_mira::MiraSendingGoalsResult(), "Aborting on the goal because the node has been killed");

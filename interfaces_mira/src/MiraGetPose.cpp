@@ -63,10 +63,10 @@ void MiraGetPose::loc_pose_callback(mira::ChannelRead<mira::Pose2> data)
 
 
   //publish the pose
-  /*current_pose_pub.publish(pose_msg);
+  current_pose_pub.publish(pose_msg);
 
 
-   robot_trans.header.frame_id = "map";
+   /*robot_trans.header.frame_id = "map";
    robot_trans.child_frame_id = "base_link";
    robot_trans.transform.translation.x = pose_msg.pose.pose.position.x;
    robot_trans.transform.translation.y = pose_msg.pose.pose.position.y;
