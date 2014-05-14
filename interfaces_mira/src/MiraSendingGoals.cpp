@@ -20,7 +20,7 @@ void MiraSendingGoals::initialize() {
 
   goal_status_pub = robot_->getRosNode().advertise<std_msgs::String>(GOAL_STATUS, 20);
 
-  robot_->getMiraAuthority().subscribe<std::string>("PilotEvent", &MiraSendingGoals::goal_status_channel_callback, this);
+  robot_->getMiraAuthority().subscribe<std::string>("/navigation/PilotEvent", &MiraSendingGoals::goal_status_channel_callback, this);
 
   goal_status.data = "idle";
   goal_status_pub.publish(goal_status);
@@ -30,38 +30,51 @@ void MiraSendingGoals::initialize() {
 
 }
 
+void MiraSendingGoals::spin() 
+{
+	// ros::spin();
+	ros::Rate r(10);  //10 Hz
+	while (ros::ok()) 
+	{
+		ros::spinOnce();
+		r.sleep();
+		goal_status_pub.publish(goal_status);
+	}
+}
+
 void MiraSendingGoals::goal_status_channel_callback(mira::ChannelRead<std::string> data) 
 {
-        if(data->value().c_str() == "Idle") 
+	//std::cout << "goal_status " << data->value().c_str() << std::endl;
+        if(data->value() == "Idle") 
 	{
 		goal_status.data = "idle";
 		goal_status_pub.publish(goal_status);
 	}
-	if(data->value().c_str() == "PlanAndDrive") 
+	if(data->value() == "PlanAndDrive") 
 	{
   		goal_status.data = "active";
 		goal_status_pub.publish(goal_status);
 	}
-	if(data->value().c_str() =="GoalReached") 
+	if(data->value() =="GoalReached") 
 	{
 		goal_status.data = "reached";
 		std::cout << "Goal reached " << std::endl;
 		goal_status_pub.publish(goal_status);
 	}
-	if(data->value().c_str() == "PathTemporarilyLost") 
+	if(data->value() == "PathTemporarilyLost") 
 	{
 		goal_status.data = "preempted";
 		std::cout << "Goal preempted " << std::endl;
 		goal_status_pub.publish(goal_status);
 	}
-	if(data->value().c_str() == "NoPathPlannable" || data->value().c_str() == "NoValidMotionCommand")
+	if(data->value() == "NoPathPlannable" || data->value().c_str() == "NoValidMotionCommand")
 	{
 		goal_status.data = "aborted";
 		std::cout << "Goal aborted " << std::endl;
 		goal_status_pub.publish(goal_status);
 
 	}
-	if(data->value().c_str() == "NoData")
+	if(data->value() == "NoData")
 	{
 		goal_status.data = "aborted";
 		std::cout << "Goal aborted " << std::endl;
@@ -203,6 +216,8 @@ bool MiraSendingGoals::isQuaternionValid(const geometry_msgs::Quaternion& q)  //
     }*/
 
     return true;
+
+
 }
 
 

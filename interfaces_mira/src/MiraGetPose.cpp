@@ -63,7 +63,7 @@ void MiraGetPose::loc_pose_callback(mira::ChannelRead<mira::Pose2> data)
 
 
   //publish the pose
-  current_pose_pub.publish(pose_msg);
+  /*current_pose_pub.publish(pose_msg);
 
 
    robot_trans.header.frame_id = "map";
@@ -74,7 +74,7 @@ void MiraGetPose::loc_pose_callback(mira::ChannelRead<mira::Pose2> data)
    robot_trans.transform.rotation = pose_msg.pose.pose.orientation;
 
    robot_trans.header.stamp = pose_msg.header.stamp;
-   (*p_robot_broadcaster).sendTransform(robot_trans);
+   (*p_robot_broadcaster).sendTransform(robot_trans);*/
 
         
 }
