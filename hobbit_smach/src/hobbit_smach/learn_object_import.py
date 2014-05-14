@@ -4,6 +4,7 @@
 PKG = 'hobbit_smach'
 NAME = 'learn_object'
 DEBUG = True
+dir_param = '/hobbit/pcd_path'
 
 import roslib
 roslib.load_manifest(PKG)
@@ -36,11 +37,14 @@ class SetName(State):
 
     def execute(self, ud):
         print(ud.object_name)
-        directory=rospy.get_param('/hobbit/pcd_path')+'/'
-        directory2=directory+ud.object_name
+        if rospy.has_param(dir_param):
+            directory = rospy.get_param(dir_param) + '/'
+        else:
+            directory = '/tmp/pcd_data/'
+        directory2 = directory + ud.object_name
         if not os.path.exists(directory2):
-	    os.makedirs(directory2)
-        for data in glob.glob(directory+'*.pcd'):
+            os.makedirs(directory2)
+        for data in glob.glob(directory + '*.pcd'):
             shutil.move(data, directory2)
         return 'succeeded'
 
