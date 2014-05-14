@@ -56,6 +56,8 @@ private:
 
         bool isQuaternionValid(const geometry_msgs::Quaternion& q);
 
+        void spin();
+
 };
 
 
