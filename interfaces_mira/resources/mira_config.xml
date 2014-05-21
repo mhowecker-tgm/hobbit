@@ -1,5 +1,6 @@
 <root>
-	<var MCFFile="${find map2.mcf}" />
+	<!--<var MCFFile="${find map2.mcf}" />-->
+	<var MCFFile="../maps/current_map/mcf.xml" />
 	<include file="${findpkg SCITOSConfigs}/etc/SCITOS-application.xml" />
 
 	<!-- Here we patch in the kinect as the laser to use for localization -->
