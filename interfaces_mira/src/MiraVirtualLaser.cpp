@@ -102,8 +102,9 @@ void MiraVirtualLaser::virtual_laser_obs_callback(const sensor_msgs::LaserScan::
 	//virtual_laser_channel_obs.post(scan, mira::Time::now());
 
         auto write = virtual_laser_channel_obs.write();
-	write->timestamp = mira::Time::now();
+	//write->frameID="/robot/TopCameraFrame";
 	write->frameID = "/robot/LaserFrame";
+	write->timestamp = mira::Time::now();
 	write->value() = scan;
 
 }
