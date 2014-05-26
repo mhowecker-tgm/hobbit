@@ -51,6 +51,7 @@
   <run_depend>actionlib</run_depend>
   <run_depend>move_base</run_depend>
   <run_depend>semantic_segmentation</run_depend>
+  <run_depend>interfaces_mira</run_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

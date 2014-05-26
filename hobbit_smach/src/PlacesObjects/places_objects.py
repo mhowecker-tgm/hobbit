@@ -10,12 +10,13 @@ NAME = 'ObjectService'
 PROJECT = 'Hobbit'
 
 FILE='out-places_ISTU20131030-NEW.xml'
+FILE='places.xml'
 
 import roslib; roslib.load_manifest(PKG)
 import rospy
-from hobbit_msgs.srv import *
 from hobbit_msgs.msg import ObjectLocationVector, ObjectLocation
 from hobbit_msgs.msg import *
+from hobbit_msgs.srv import GetObjectLocationsRequest
 from hobbit_msgs.srv import *
 from geometry_msgs.msg import Pose2D
 from matplotlib.path import Path
@@ -135,7 +136,8 @@ def updateProb(obj, location, room_name, rooms):
     """ Update the probabilities of the given object for all possible locations.
     It will be lowered for all locations except the one it was found.
     """
-    count = -1
+    #count = -1
+    count = 0
     for room in rooms.rooms_vector:
         rem_prob = 1.0
         for place in (x for x in room.places_vector if x.place_type.lower() == 'searchable'):
@@ -177,7 +179,7 @@ def getObjectLocations(req):
     places = []
     out_places = []
     global rooms
-    print rooms
+    #print rooms
     print 'Return all locations of requested object:',req.object_name.data
     for room in rooms.rooms_vector:
         for place in (x for x in room.places_vector if x.place_type.lower() == 'searchable'):
@@ -228,7 +230,7 @@ def getAllRooms(req):
     # As rooms is already the RoomsVector we are looking for we just return it
     # TODO: The order of the RoomsVector should be with the 6 most important ones
     # at the front. kitchen, bedroom, livingroom, dining room
-    return rooms
+    return rooms.rooms_vector
     
 
 def main():
@@ -238,15 +240,17 @@ def main():
     if not rooms:
         rospy.signal_shutdown('No rooms were loaded. Check the input xml file')
     else:
-        #addObject('test object', rooms)
-        #updateProb('mug', 'default', 'kitchen', rooms)
-        #getObjectLocations('mug')
+        addObject('mug', rooms)
+        updateProb('mug', 'default', 'Office', rooms)
+        mug = GetObjectLocationsRequest()
+        mug.object_name = String('mug')
+        getObjectLocations(mug)
         writeXml(FILE, rooms)
         s1 = rospy.Service(PROJECT+'/'+NAME+'/get_object_locations', GetObjectLocations, getObjectLocations)
         s2 = rospy.Service(PROJECT+'/'+NAME+'/get_room_name', GetRoomName, getRoomName)
         #s3 = rospy.Service(PROJECT+'/'+NAME+'/get_coordinates', GetCoordinates, getCoordinates)
         s3 = rospy.Service('/get_coordinates', GetCoordinates, getCoordinates)
-        #s4 = rospy.Servcie('/get_all_rooms', GetRooms, getAllRooms
+        s4 = rospy.Service('/get_all_rooms', GetRooms, getAllRooms)
 
     # spin() keeps Python from exiting until node is shutdown
     rospy.spin()
