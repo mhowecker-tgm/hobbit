@@ -320,7 +320,7 @@ def main():
         )
         StateMachine.add(
             'LEARN_OBJECT_1',
-            learn_object.getDataCW(),
+            learn_object.getDataCCW(),
             transitions={'succeeded': 'CONFIRM_TURN_OBJECT',
                          'failed': 'SET_FAILURE'}
         )
@@ -365,7 +365,7 @@ def main():
         )
         StateMachine.add(
             'LEARN_OBJECT_2',
-            learn_object.getDataCCW(),
+            learn_object.getDataCW(),
             transitions={'succeeded': 'SAY_WHAT_IS_THE_NAME',
                          'failed': 'SET_FAILURE'}
         )

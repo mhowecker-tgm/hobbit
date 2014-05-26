@@ -266,13 +266,13 @@ def goToLearnPosition():
                      transitions={'failed': 'ARM_POSE_REACHED'})
         Sequence.add('CHECK_ARM_IS_NOT_MOVING', CheckArmIsNotMoving(),
                      transitions={'failed': 'CHECK_ARM_IS_NOT_MOVING'})
-        Sequence.add('ROTATE_TT_CCW',
-                     SetArmPosition(position='ccwpos'))
-        Sequence.add('TT_ROTATED',
-                     CheckArmReachedKnownPosition(position='ccwposw'),
-                     transitions={'failed': 'TT_ROTATED'})
-        Sequence.add('CHECK_TT_IS_NOT_MOVING', CheckArmIsNotMoving(),
-                     transitions={'failed': 'CHECK_TT_IS_NOT_MOVING'})
+        #Sequence.add('ROTATE_TT_CCW',
+        #             SetArmPosition(position='ccwpos'))
+        #Sequence.add('TT_ROTATED',
+        #             CheckArmReachedKnownPosition(position='ccwposw'),
+        #             transitions={'failed': 'TT_ROTATED'})
+        #Sequence.add('CHECK_TT_IS_NOT_MOVING', CheckArmIsNotMoving(),
+        #             transitions={'failed': 'CHECK_TT_IS_NOT_MOVING'})
     return seq
 
 
@@ -299,7 +299,8 @@ def goToHomePosition():
 
 def rotateToCW():
     """
-    Return a SMACH Sequence that will move the arm to the learning pose.
+    Return a SMACH Sequence that will rotate the turntable to the
+    CW position
     """
 
     seq = Sequence(

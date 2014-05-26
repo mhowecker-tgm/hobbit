@@ -34,11 +34,10 @@ class SetName(State):
             outcomes=['succeeded', 'failure'],
             input_keys=['object_name']
         )
-
     def execute(self, ud):
         print(ud.object_name)
-        if rospy.has_param(dir_param):
-            directory = rospy.get_param(dir_param) + '/'
+        if rospy.has_param('/hobbit/pcd_path'):
+            directory = rospy.get_param('/hobbit/pcd_path') + '/'
         else:
             directory = '/tmp/pcd_data/'
         directory2 = directory + ud.object_name
@@ -47,7 +46,6 @@ class SetName(State):
         for data in glob.glob(directory + '*.pcd'):
             shutil.move(data, directory2)
         return 'succeeded'
-
 
 def returnTurntable():
     """

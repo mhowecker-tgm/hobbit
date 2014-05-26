@@ -219,6 +219,18 @@ def getCoordinates(req):
             pose = Pose2D(float(k.x), float(k.y), float(k.theta))
             return pose
 
+def getAllRooms(req):
+    """
+    Returns a RoomsVector with all available rooms inside.
+    """
+    global rooms
+    print(type(rooms))
+    # As rooms is already the RoomsVector we are looking for we just return it
+    # TODO: The order of the RoomsVector should be with the 6 most important ones
+    # at the front. kitchen, bedroom, livingroom, dining room
+    return rooms
+    
+
 def main():
     rospy.init_node(NAME)
     global rooms
@@ -234,6 +246,7 @@ def main():
         s2 = rospy.Service(PROJECT+'/'+NAME+'/get_room_name', GetRoomName, getRoomName)
         #s3 = rospy.Service(PROJECT+'/'+NAME+'/get_coordinates', GetCoordinates, getCoordinates)
         s3 = rospy.Service('/get_coordinates', GetCoordinates, getCoordinates)
+        #s4 = rospy.Servcie('/get_all_rooms', GetRooms, getAllRooms
 
     # spin() keeps Python from exiting until node is shutdown
     rospy.spin()
