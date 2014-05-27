@@ -84,7 +84,8 @@ def get_move_base_state(frame='/map', x=0, y=0, yaw=0):
 class MoveBaseState(SimpleActionState):
     """Calls a move_base action server with the goal (x, y, yaw) from userdata"""
     def __init__(self, frame='/map'):
-        super(MoveBaseState, self).__init__('move_base', MoveBaseAction, input_keys=['x', 'y', 'yaw'], goal_cb=self.__goal_cb)
+        #super(MoveBaseState, self).__init__('move_base', MoveBaseAction, input_keys=['x', 'y', 'yaw'], goal_cb=self.__goal_cb)
+        super(MoveBaseState, self).__init__('mira_move_base', MoveBaseAction, input_keys=['x', 'y', 'yaw'], goal_cb=self.__goal_cb)
         self.frame = frame
 
     def __goal_cb(self, userdata, old_goal):

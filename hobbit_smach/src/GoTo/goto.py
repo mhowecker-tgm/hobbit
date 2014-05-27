@@ -27,12 +27,16 @@ class Init(State):
         State.__init__(
             self,
             outcomes=['succeeded', 'failure'],
+            input_keys=['command', 'parameters'],
             output_keys=['social_role', 'block_counter'])
 
     def execute(self, ud):
         if rospy.has_param('/hobbit/social_role'):
             ud.social_role = rospy.get_param('/hobbit/social_role')
         ud.block_counter = 0
+        print(ud.parameters)
+        ud.room_name = ud.parameters[0].data
+        ud.location_name = ud.parameters[1].data
         return 'succeeded'
 
 
@@ -325,8 +329,12 @@ def main():
                 speech_output.sayText(info='T_GT_GoingToPlace'))
             if not DEBUG:
                 Sequence.add(
+                    'SET_NAV_GOAL',
+                    hobbit_move.SetNavigationGoal(frame='/map')
+                )
+                Sequence.add(
                     'MOVE_TO_DOCK',
-                    hobbit_move.goToPosition(frame='/map', place=dock)
+                    hobbit_move.goToPosition(frame='/map', place=None)
                 )
             else:
                 Sequence.add('SET_NAV_GOAL', Dummy())
