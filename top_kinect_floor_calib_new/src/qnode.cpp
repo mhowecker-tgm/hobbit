@@ -492,7 +492,7 @@ void QNode::run()
 // Init the ROS stuff and create a subscriber.
   ros::init(init_argc, init_argv, "TopKinectFloorCalib");
   ros::NodeHandle n;
-  ros::Subscriber sub2 = n.subscribe<stereo_msgs::DisparityImage>("/camera/depth/disparity", 1, &QNode::disparityCallback, this);
+  ros::Subscriber sub2 = n.subscribe<stereo_msgs::DisparityImage>("/headcam/depth_registered/disparity", 1, &QNode::disparityCallback, this);
 
 // ROS main loop.
   ros::spin();

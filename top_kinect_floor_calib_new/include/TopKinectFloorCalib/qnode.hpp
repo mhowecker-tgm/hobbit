@@ -12,7 +12,7 @@
 #include "stereo_msgs/DisparityImage.h"
 #include <QThread>
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#define HIST_SIZE 100
+#define HIST_SIZE 255
 #define MAX_ANG 45
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 namespace TopKinectFloorCalib {
