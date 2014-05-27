@@ -213,8 +213,11 @@ def getCoordinates(req):
     and returned
     """
     global rooms
-    print req.room_name.data,req.location_name.data
-    gen = (x for x in rooms.rooms_vector if req.room_name.data in x.room_name)
+    print req.room_name.data, req.location_name.data
+    if req.room_name.data == None:
+        gen = (x for x in rooms.rooms_vector)
+    else:
+        gen = (x for x in rooms.rooms_vector if req.room_name.data in x.room_name)
     for x in gen:
         gen1 = (k for k in x.places_vector if req.location_name.data in k.place_name)
         for k in gen1:

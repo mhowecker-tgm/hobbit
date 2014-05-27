@@ -21,23 +21,6 @@ from smach import StateMachine, State, Sequence
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 
 
-class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-
-    def disable(self):
-        self.HEADER = ''
-        self.OKBLUE = ''
-        self.OKGREEN = ''
-        self.WARNING = ''
-        self.FAIL = ''
-        self.ENDC = ''
-
-
 class Init(State):
     """Class to initialize certain parameters"""
     def __init__(self):
@@ -313,7 +296,6 @@ def main():
         )
         StateMachine.add(
             'MMUI_SAY_CAM_BLOCKED',
-            #HobbitMMUI.ShowInfo(info='T_GT_EyesBlockedMoveObject'),
             speech_output.sayText(info='T_GT_EyesBlockedMoveObject'),
             transitions={'succeeded': 'VIEW_BLOCKED',
                          'preempted': 'preempted',
@@ -321,7 +303,6 @@ def main():
         )
         StateMachine.add(
             'MMUI_SAY_CAM_STILL_BLOCKED',
-            #HobbitMMUI.ShowInfo(info='T_GT_EyesBlockedRemoveObject'),
             speech_output.sayText(info='T_GT_EyesBlockedRemoveObject'),
             transitions={'succeeded': 'SET_FAILURE',
                          'preempted': 'preempted',
