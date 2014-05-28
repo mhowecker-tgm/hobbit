@@ -13,9 +13,12 @@ void MiraGetPath::initialize() {
 
   get_path_service = robot_->getRosNode().advertiseService("/make_plan", &MiraGetPath::get_path, this);
 
-  robot_->getMiraAuthority().subscribe<std::vector<mira::Point2f>>("navigation/Path", &MiraGetPath::path_channel_callback, this);
+  robot_->getMiraAuthority().subscribe<std::vector<mira::Point2f>>("/navigation/Path", &MiraGetPath::path_channel_callback, this);
 
   new_plan = false;
+
+  global_plan.clear();
+
 
 }
 
@@ -23,6 +26,8 @@ void MiraGetPath::path_channel_callback(mira::ChannelRead<std::vector<mira::Poin
 {
   global_plan = data;
   new_plan = true;
+
+  std::cout << "path size " << global_plan.size() << std::endl;
 
 }
 
@@ -32,11 +37,15 @@ bool MiraGetPath::get_path(nav_msgs::GetPlan::Request &req, nav_msgs::GetPlan::R
   // convert target pose to Mira format
   mira::Point2f goal_pose_mira(req.goal.pose.position.x, req.goal.pose.position.y);
 
+  std::cout << "req.goal.position " << req.goal.pose.position.x << " " << req.goal.pose.position.y << std::endl;
+
   // mute the pilot
   std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
   mira::RPCFuture<void> r = robot_->getMiraAuthority().callService<void>(navService,"setMute", true);
   r.timedWait(mira::Duration::seconds(1));
   r.get();
+
+  std::cout << "setting the task" << std::endl;
 
   //Set the task for the target pose
   TaskPtr task(new Task());
@@ -46,14 +55,20 @@ bool MiraGetPath::get_path(nav_msgs::GetPlan::Request &req, nav_msgs::GetPlan::R
   mira::RPCFuture<void> r1 = robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
   r1.timedWait(mira::Duration::seconds(1));
   r1.get();
+
+ std::cout << "before waiting" << std::endl;
   
   // wait for new data on the "navigation/Path" channel  
   //FIXME
-  int max_t = 500;
+  int max_t = 1000000;
   int t = 0;
   while(!new_plan && t < max_t) t++;
 
-  if (t>=max_t) return false;
+  //if (t>=max_t) return false;
+
+  sleep (2);
+
+  std::cout << "after waiting" << std::endl;
 
   // Extract the planned path, copy the path into the response
   resp.plan.poses.resize(global_plan.size());
@@ -66,8 +81,10 @@ bool MiraGetPath::get_path(nav_msgs::GetPlan::Request &req, nav_msgs::GetPlan::R
 	pose.pose.position.y = global_plan[i][1];
 
 	resp.plan.poses[i] = pose;
+	//std::cout << "pose " << pose << std:endl;
   }
 
+  std::cout << "resp size " << resp.plan.poses.size() << std::endl;
 
   //cancel the task
   TaskPtr empty_task(new Task());
@@ -75,10 +92,16 @@ bool MiraGetPath::get_path(nav_msgs::GetPlan::Request &req, nav_msgs::GetPlan::R
   r2.timedWait(mira::Duration::seconds(1));
   r2.get();
 
+  //std::cout << "task cancelled" << std::endl;
+
   // unmute the pilot
-  mira::RPCFuture<void> r3 = robot_->getMiraAuthority().callService<void>("setMute", false);
+  mira::RPCFuture<void> r3 = robot_->getMiraAuthority().callService<void>(navService,"setMute", false);
   r3.timedWait(mira::Duration::seconds(1));
   r3.get();
+
+  std::cout << "pilot is back" << std::endl;
+
+  global_plan.clear();
 
   return true;
 }
