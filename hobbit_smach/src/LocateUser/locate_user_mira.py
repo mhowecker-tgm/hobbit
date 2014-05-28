@@ -18,13 +18,14 @@ from hobbit_msgs.msg import LocateUserAction
 from hobbit_msgs.srv import *
 from hobbit_msgs.msg import *
 from hobbit_msgs.srv import *
+from smach import Concurrence
 from smach_ros import ActionServerWrapper, SimpleActionState, ServiceState
 from actionlib import SimpleActionServer
 from move_base_msgs.msg import MoveBaseAction
 from nav_msgs.srv import GetPlan, GetPlanRequest
 from geometry_msgs.msg import Pose2D, PoseStamped, Point, Quaternion, PoseWithCovarianceStamped, Pose
 import hobbit_smach.hobbit_move_import as hobbit_move
-from rgbd_acquisition import Person
+from rgbd_acquisition.msg import Person
 
 class bcolors:
     HEADER = '\033[95m'
@@ -299,19 +300,20 @@ def main():
 
     with lu_sm:
         smach.StateMachine.add('INIT', Init(), transitions={'succeeded':'GET_ALL_POSITIONS', 'canceled':'CLEAN_UP'})
-        smach.StateMachine.add('GET_ALL_POSITIONS', ServiceState('getRooms', GetRooms, response_key='response'), transitions={'succeeded':'GET_ROBOT_POSE'})
+        smach.StateMachine.add('GET_ALL_POSITIONS', ServiceState('getRooms', GetRooms, response_key='response'), transitions={'succeeded':'GET_ROBOT_POSE', 'aborted':'CLEAN_UP'})
         smach.StateMachine.add('GET_ROBOT_POSE', util.WaitForMsgState('/amcl_pose', PoseWithCovarianceStamped, get_robot_pose_cb, output_keys=['robot_current_pose'], timeout=120),
                 transitions={'succeeded':'CLEAN_POSITIONS', 'aborted':'GET_ROBOT_POSE', 'preempted':'CLEAN_UP'})
         smach.StateMachine.add('CLEAN_POSITIONS', CleanPositions(), transitions={'succeeded':'GET_CURRENT_ROOM'})
-        smach.StateMachine.add('GET_CURRENT_ROOM', ServiceState('getCurrentRoom', GetName, response_key='robots_room_name'), transitions={'succeeded':'GET_USERS_ROOM'})
-        smach.StateMachine.add('GET_USERS_ROOM', ServiceState('get_users_current_room', GetUsersCurrentRoom, response_key='users_current_room'), transitions={'succeeded':'PLAN_PATH', 'preempted':'CLEAN_UP'})
+        smach.StateMachine.add('GET_CURRENT_ROOM', ServiceState('getCurrentRoom', GetName, response_key='robots_room_name'), transitions={'succeeded':'GET_USERS_ROOM', 'aborted':'CLEAN_UP'})
+        smach.StateMachine.add('GET_USERS_ROOM', ServiceState('get_users_current_room', GetUsersCurrentRoom, response_key='users_current_room'), transitions={'succeeded':'PLAN_PATH', 'preempted':'CLEAN_UP', 'aborted':'CLEAN_UP'})
         smach.StateMachine.add('PLAN_PATH', PlanPath(), transitions={'movement':'MOVE_BASE_GO', 'preempted':'CLEAN_UP', 'get_path':'GET_PATH', 'failure':'CLEAN_UP'})
         smach.StateMachine.add('GET_PATH',
                 ServiceState('/make_plan', GetPlan, request_key='plan_request', response_key='plan'),
                 #ServiceState('/move_base/NavfnROS/make_plan', MakeNavPlan, request_key='plan_request', response_key='path'),
-                transitions={'succeeded':'PLAN_PATH', 'preempted':'CLEAN_UP'})
-        smach.StateMachine.add('MOVE_BASE_GO', MoveBase(), transitions={'succeeded':'LOCATION_REACHED', 'preempted':'CLEAN_UP', 'failure':'CLEAN_UP'})
-        smach.StateMachine.add('LOCATION_REACHED', util.WaitForMsgState('/goal_status', String, goal_reached_cb, timeout=30), transitions={'aborted':'LOCATION_REACHED', 'succeeded':'ROTATE_360', 'preempted':'CLEAN_UP'})
+                transitions={'succeeded':'PLAN_PATH', 'preempted':'CLEAN_UP', 'aborted':'CLEAN_UP'})
+        smach.StateMachine.add('MOVE_BASE_GO', MoveBase(), transitions={'succeeded':'DETECTION', 'preempted':'CLEAN_UP', 'failure':'CLEAN_UP'})
+        smach.StateMachine.add('DETECTION', cc, transitions={'succeeded': 'DETECTION', 'failed':'CLEAN_UP'})
+        smach.StateMachine.add('STOP_MOVEMENT', hobbit_move.Stop(), transitions={'succeeded': 'SET_SUCCESS', 'preempted':'preempted'})
         smach.StateMachine.add('SET_SUCCESS', SetSuccess(), transitions={'succeeded':'succeeded', 'preempted':'CLEAN_UP'})
         smach.StateMachine.add('CLEAN_UP', CleanUp(), transitions={'succeeded':'preempted'})
 

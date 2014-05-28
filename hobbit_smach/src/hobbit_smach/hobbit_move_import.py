@@ -18,6 +18,26 @@ import uashh_smach.platform.move_base as move_base
 from math import pi
 
 
+class Stop(State):
+    """
+    Publish the stop message to mira
+    topic: /stop_request
+    """
+    def __init__(self, angle=0):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'preempted']
+        )
+        self.stop_pub = rospy.Publisher('/stop_request', String, latch=False)
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        self.stop_pub.publish('stop') 
+        return 'succeeded'
+
+
 class SetRotationGoal(State):
     """
     Read the current pose from userdata and applies the rotation to
