@@ -19,8 +19,8 @@ def start_action():
     client.wait_for_server()
     print('connected to server')
     par = []
-    par.append(String('office'))
-    par.append(String('default'))
+    par.append(String('ShortCorridor'))
+    par.append(String('table'))
     goal = GeneralHobbitGoal(command=String('goto'),
                              previous_state=String('call_hobbit'),
                              parameters=par)

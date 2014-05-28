@@ -3,7 +3,7 @@
 
 PKG = 'hobbit_smach'
 NAME = 'goto'
-DEBUG = True
+DEBUGGOTO = False
 MMUI_IS_DOING_IT = True
 
 import roslib
@@ -28,7 +28,7 @@ class Init(State):
             self,
             outcomes=['succeeded', 'failure'],
             input_keys=['command', 'parameters'],
-            output_keys=['social_role', 'block_counter'])
+            output_keys=['social_role', 'block_counter', 'room_name', 'location_name'])
 
     def execute(self, ud):
         if rospy.has_param('/hobbit/social_role'):
@@ -226,12 +226,12 @@ def main():
     seq = Sequence(
         outcomes=['succeeded', 'failed', 'preempted'],
         connector_outcome='succeeded',
-        input_keys=['emotion', 'emo_time']
+        input_keys=['room_name', 'location_name']
     )
 
     goto_sm.userdata.result = String('started')
     goto_sm.userdata.emotion = 'WONDERING'
-    goto_sm.userdata.emo_time = 4
+    goto_sm.userdata.emo_time = 1
 
     with goto_sm:
         StateMachine.add(
@@ -250,7 +250,8 @@ def main():
         )
         StateMachine.add(
             'EMO_WONDERING',
-            HobbitEmotions.ShowEmotions(emotion='EMO_WONDERING', emo_time=4),
+            #HobbitEmotions.ShowEmotions(emotion='EMO_WONDERING', emo_time=4),
+            HobbitEmotions.ShowEmotions(emotion='EMO_WONDERING', emo_time=1),
             transitions={'preempted': 'preempted',
                          'succeeded': 'MMUI_ConfirmPlace',
                          'failed': 'SET_FAILURE'}
@@ -267,14 +268,16 @@ def main():
         )
         StateMachine.add(
             'MMUI_REPEAT_CMD',
-            HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=4),
+            #HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=4),
+            HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=1),
             transitions={'preempted': 'preempted',
                          'succeeded': 'failure',
                          'failed': 'SET_FAILURE'}
         )
         StateMachine.add(
             'EMO_HAPPY',
-            HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=4),
+            #HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=4),
+            HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=1),
             transitions={'preempted': 'preempted',
                          'succeeded': 'VIEW_BLOCKED',
                          'failed': 'SET_FAILURE'}
@@ -287,7 +290,8 @@ def main():
         )
         StateMachine.add(
             'EMO_SAD',
-            HobbitEmotions.ShowEmotions(emotion='EMO_SAD', emo_time=4),
+            #HobbitEmotions.ShowEmotions(emotion='EMO_SAD', emo_time=4),
+            HobbitEmotions.ShowEmotions(emotion='EMO_SAD', emo_time=1),
             transitions={'preempted': 'preempted',
                          'succeeded': 'COUNT_CHECK',
                          'failed': 'SET_FAILURE'}
@@ -322,19 +326,24 @@ def main():
         with seq:
             Sequence.add(
                 'EMO_HAPPY',
-                HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=4))
+                #HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=4))
+                HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=1))
             Sequence.add(
                 'MMUI_SAY_GoingToPlace',
-                #HobbitMMUI.ShowInfo(info='T_GT_GoingToPlace'))
-                speech_output.sayText(info='T_GT_GoingToPlace'))
-            if not DEBUG:
+                #speech_output.sayText(info='T_GT_GoingToPlace'))
+                speech_output.sayText(info='Going To Place'))
+            if not DEBUGGOTO:
                 Sequence.add(
                     'SET_NAV_GOAL',
-                    hobbit_move.SetNavigationGoal(frame='/map')
+	            hobbit_move.get_set_nav_goal_state(),
+                    transitions={'aborted': 'failed'}
                 )
                 Sequence.add(
-                    'MOVE_TO_DOCK',
-                    hobbit_move.goToPosition(frame='/map', place=None)
+                    'MOVE_TO_GOAL',
+                    #hobbit_move.goToPosition(frame='/map', place=None),
+                    hobbit_move.goToPose(),
+                    transitions={'aborted': 'EMO_SAD',
+                                 'succeeded': 'EMO_HAPPY_1'}
                 )
             else:
                 Sequence.add('SET_NAV_GOAL', Dummy())
@@ -345,22 +354,24 @@ def main():
                                  'succeeded': 'EMO_HAPPY_1'})
             Sequence.add(
                 'EMO_SAD',
-                HobbitEmotions.ShowEmotions(emotion='EMO_SAD', emo_time=4))
+                #HobbitEmotions.ShowEmotions(emotion='EMO_SAD', emo_time=4))
+                HobbitEmotions.ShowEmotions(emotion='EMO_SAD', emo_time=1))
             Sequence.add(
                 'MMUI_SAY_WayBlocked',
                 #HobbitMMUI.ShowInfo(info='T_GT_WayBlocked'))
-                speech_output.sayText(info='T_GT_WayBlocked'))
+                speech_output.sayText(info='Way blocked'))
             Sequence.add(
                 'SHOW_MENU_MAIN',
                 HobbitMMUI.ShowMenu(menu='MAIN'),
                 transitions={'succeeded': 'failed'})
             Sequence.add(
                 'EMO_HAPPY_1',
-                HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=4))
+                #HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=4))
+                HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=1))
             Sequence.add(
                 'MMUI_SAY_ReachedPlace',
-                #HobbitMMUI.ShowInfo(info='T_GT_ReachedMyDestionation'))
-                speech_output.sayText(info='T_GT_ReachedMyDestionation'))
+                #speech_output.sayText(info='T_GT_ReachedMyDestionation'))
+                speech_output.sayText(info='Reached my destionation'))
             Sequence.add(
                 'SHOW_MENU_MAIN_1',
                 HobbitMMUI.ShowMenu(menu='MAIN'))

@@ -52,6 +52,7 @@ class SetNavigationGoal(ServiceState):
     and stored in the userdata.
     """
     def __init__(self, frame='/map', room=None, place='dock'):
+        print('Inside SetNavigationGoal __init__')
         ServiceState.__init__(
             self,
             'get_coordinates',
@@ -66,6 +67,7 @@ class SetNavigationGoal(ServiceState):
         self.place = place
 
     def __request_cb(self, ud, request):
+        print('Inside SetNavigationGoal')
         if ud.room_name:
             self.room = ud.room_name
             if ud.location_name:
@@ -73,7 +75,7 @@ class SetNavigationGoal(ServiceState):
             else:
                 self.place = String('default')
         request = GetCoordinatesRequest()
-        request.header.stamp = rospy.Time.now()
+        #request.header.stamp = rospy.Time.now()
         request.room_name.data = self.room
         request.location_name.data = self.place
         return request
@@ -103,7 +105,12 @@ def goToPosition(frame='/map', room='', place='dock'):
     )
 
     with seq:
-        Sequence.add('SET_NAV_GOAL', SetNavigationGoal(room, place))
+	#Sequence.add(
+	#    'SET_NAV_GOAL_GOTO',
+	#    hobbit_move.get_set_nav_goal_state(),
+	#    transitions={'aborted': 'failed'}
+	#)
+        #Sequence.add('SET_NAV_GOAL', SetNavigationGoal(room, place))
         Sequence.add('MOVE_HOBBIT', move_base.MoveBaseState(frame))
     return seq
 
@@ -150,3 +157,6 @@ def rotateRobot(angle=0, frame='/map'):
         Sequence.add('SET_ROT_GOAL', SetRotationGoal(angle=angle))
         Sequence.add('ROTATE_ROBOT', move_base.MoveBaseState())
         return seq
+
+def get_set_nav_goal_state(room_name=None, location_name='dock'):
+    return SetNavigationGoal(room=None, place='dock')

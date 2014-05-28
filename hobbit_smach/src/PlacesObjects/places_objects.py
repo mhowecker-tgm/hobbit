@@ -213,6 +213,7 @@ def getCoordinates(req):
     and returned
     """
     global rooms
+    print('Inside: getCoordinates')
     print req.room_name.data, req.location_name.data
     if req.room_name.data == None:
         gen = (x for x in rooms.rooms_vector)
@@ -253,7 +254,7 @@ def main():
         s2 = rospy.Service(PROJECT+'/'+NAME+'/get_room_name', GetRoomName, getRoomName)
         #s3 = rospy.Service(PROJECT+'/'+NAME+'/get_coordinates', GetCoordinates, getCoordinates)
         s3 = rospy.Service('/get_coordinates', GetCoordinates, getCoordinates)
-        s4 = rospy.Service('/get_all_rooms', GetRooms, getAllRooms)
+        s4 = rospy.Service('/getRooms', GetRooms, getAllRooms)
 
     # spin() keeps Python from exiting until node is shutdown
     rospy.spin()
