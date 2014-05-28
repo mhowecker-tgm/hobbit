@@ -235,6 +235,10 @@ def getAllRooms(req):
     # TODO: The order of the RoomsVector should be with the 6 most important ones
     # at the front. kitchen, bedroom, livingroom, dining room
     return rooms.rooms_vector
+
+def getCurrentRoom(req):
+    print('Returning random room name: MainCorridor')
+    return 'MainCorridor' 
     
 
 def main():
@@ -255,6 +259,7 @@ def main():
         #s3 = rospy.Service(PROJECT+'/'+NAME+'/get_coordinates', GetCoordinates, getCoordinates)
         s3 = rospy.Service('/get_coordinates', GetCoordinates, getCoordinates)
         s4 = rospy.Service('/getRooms', GetRooms, getAllRooms)
+        s5 = rospy.Service('/get_robots_current_room', GetName, getCurrentRoom)
 
     # spin() keeps Python from exiting until node is shutdown
     rospy.spin()

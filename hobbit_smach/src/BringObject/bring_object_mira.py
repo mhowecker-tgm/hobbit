@@ -92,7 +92,7 @@ class CleanPositions(smach.State):
     Remove the waiting, 'object search' and recharge positions"""
     def __init__(self):
         smach.State.__init__(self, outcomes=['succeeded', 'preempted', 'failure'], input_keys=['response', 'positions'], output_keys=['positions', 'plan', 'visited_places'])
-        self.getCoordinates = rospy.ServiceProxy('/Hobbit/ObjectService/get_coordinates', GetCoordinates, persistent=True)
+        self.getCoordinates = rospy.ServiceProxy('/get_coordinates', GetCoordinates, persistent=True)
 
     def execute(self, ud):
         if self.preempt_requested():
@@ -101,7 +101,7 @@ class CleanPositions(smach.State):
         ud.positions = []
         ud.visited_places = []
         for pos in ud.response.object_locations.locations:
-            #print pos.room, pos.location, pos.probability
+            print pos.room, pos.location, pos.probability
             req = GetCoordinatesRequest(String(pos.room), String(pos.location))
             try:
                 resp = self.getCoordinates(req)
@@ -152,7 +152,9 @@ class PlanPath(smach.State):
                     resp = self.getPlan(req)
                 except rospy.ServiceException:
                     self.getPlan.close()
+                    print('No plan received')
                     return 'failure'
+                #print(resp.plan)
                 if resp.plan.poses:
                     print bcolors.OKBLUE + 'Plan received'+bcolors.ENDC
                     # calculate distance
@@ -171,7 +173,7 @@ class PlanPath(smach.State):
                         ud.robot_end_pose = {'room': position['room'], 'place': position['place_name'], 'distance': distance, 'penalty': position['penalty']}
                         ud.goal_position_x = position['pose'].pose.position.x
                         ud.goal_position_y = position['pose'].pose.position.y
-                        (roll, pitch, ud.goal_position_yaw) =(roll,pitch,yaw) = tf.euler_from_quaternion(pose.orientation)
+                        ud.goal_position_yaw = 0.0
                     else:
                         pass
             else:
