@@ -125,7 +125,7 @@ class PlanPath(smach.State):
                 output_keys=['plan_request', 'detection', 'visited_places', 'robot_end_pose'])
         self.positions=[]
         self.pub_obstacle = rospy.Publisher('/headcam/active', String)
-        self.getPlan = rospy.ServiceProxy('/move_base/NavfnROS/make_plan', GetPlan, persistent=True)
+        self.getPlan = rospy.ServiceProxy('/make_plan', GetPlan, persistent=True)
         self.shortest_path = 99999.99
 
     def execute(self, ud):
@@ -170,6 +170,9 @@ class PlanPath(smach.State):
                         self.shortest_path = distance
                         print bcolors.OKGREEN + 'shortest path is now to the %s in the %s' % (position['place_name'], position['room']) + bcolors.ENDC
                         ud.robot_end_pose = {'room': position['room'], 'place': position['place_name'], 'distance': distance, 'penalty': position['penalty']}
+                        ud.goal_position_x = position['pose'].pose.position.x
+                        ud.goal_position_y = position['pose'].pose.position.y
+                        ud.goal_position_yaw = 0.0
                     else:
                         pass
             else:
@@ -182,30 +185,6 @@ class PlanPath(smach.State):
             return 'success'
 
 
-class MoveBase(smach.State):
-    def __init__(self):
-        smach.State.__init__(self, outcomes=['succeeded', 'preempted', 'failure'],
-                input_keys=['robot_end_pose', 'visited_places'],
-                output_keys=['robot_end_pose', 'visited_places'])
-        self.pub_room = rospy.Publisher('/room_name_target', String)
-        self.pub_place = rospy.Publisher('/place_name_target', String)
-        self.pub_head = rospy.Publisher('HeadMove', String)
-        self.pub_obstacle = rospy.Publisher('/headcam/active', String)
-
-    def execute(self, ud):
-        self.pub_obstacle.publish('active')
-        print bcolors.OKGREEN+ 'Moving to %s in %s'%(ud.robot_end_pose['place'], ud.robot_end_pose['room'])  + bcolors.ENDC
-        self.pub_room.publish(String(ud.robot_end_pose['room']))
-        rospy.sleep(0.5)
-        self.pub_place.publish(String(ud.robot_end_pose['place']))
-        self.pub_head.publish(String('down'))
-        rospy.sleep(1.5)
-        try:
-            ud.visited_places.append(ud.robot_end_pose)
-        except:
-            ud.visited_places = []
-            ud.visited_places.append(ud.robot_end_pose)
-        return 'succeeded'
 
 class DummyGrasp(smach.State):
     def __init__(self):
@@ -313,7 +292,7 @@ def main():
                 transitions={'succeeded':'GET_ROBOTS_CURRENT_ROOM', 'aborted':'GET_ROBOT_POSE', 'preempted':'CLEAN_UP'})
         smach.StateMachine.add('GET_ROBOTS_CURRENT_ROOM', ServiceState('get_robots_current_room', GetName, response_key='robots_room_name'), transitions={'succeeded':'PLAN_PATH'})
         smach.StateMachine.add('PLAN_PATH', PlanPath(), transitions={'success':'MOVE_BASE_GO', 'preempted':'CLEAN_UP', 'failure':'CLEAN_UP'})
-        smach.StateMachine.add('MOVE_BASE_GO', MoveBase(), transitions={'succeeded':'LOCATION_REACHED', 'preempted':'CLEAN_UP', 'failure':'CLEAN_UP'})
+        smach.StateMachine.add('MOVE_BASE', MoveBase(), transitions={'succeeded':'LOCATION_REACHED', 'preempted':'CLEAN_UP', 'failure':'CLEAN_UP'})
         smach.StateMachine.add('LOCATION_REACHED',
                 util.WaitForMsgState('/goal_status', String, goal_reached_cb, timeout=10), transitions={'aborted':'LOCATION_REACHED', 'succeeded':'MOVE_HEAD', 'preempted':'CLEAN_UP'})
         smach.StateMachine.add('MOVE_HEAD', MoveHead(), transitions={'succeeded':'GET_POINT_CLOUD', 'preempted':'CLEAN_UP', 'failure':'PLAN_PATH'})
