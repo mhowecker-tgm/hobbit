@@ -105,12 +105,12 @@ def goToPosition(frame='/map', room='', place='dock'):
     )
 
     with seq:
-	#Sequence.add(
-	#    'SET_NAV_GOAL_GOTO',
-	#    hobbit_move.get_set_nav_goal_state(),
-	#    transitions={'aborted': 'failed'}
-	#)
-        #Sequence.add('SET_NAV_GOAL', SetNavigationGoal(room, place))
+    #Sequence.add(
+    #    'SET_NAV_GOAL_GOTO',
+    #    hobbit_move.get_set_nav_goal_state(),
+    #    transitions={'aborted': 'failed'}
+    #)
+        # Sequence.add('SET_NAV_GOAL', SetNavigationGoal(room, place))
         Sequence.add('MOVE_HOBBIT', move_base.MoveBaseState(frame))
     return seq
 
@@ -123,7 +123,18 @@ def goToPose():
     hobbit_move_import.
     """
     frame = '/map'
-    return move_base.MoveBaseState(frame)
+    seq = Sequence(outcomes=['succeeded', 'aborted', 'preempted'],
+        connector_outcome='succeeded',
+        input_keys=['x', 'y', 'yaw'])
+
+    with seq:
+        Sequence.add('MOVE_BASE_GOAL', move_base.MoveBaseState(frame),
+                     remapping={'x':'x',
+                                'y':'y',
+                                'yaw':'yaw'}
+                    )
+    return seq
+    #return move_base.MoveBaseState(frame)
 
 
 def getRobotPose():
