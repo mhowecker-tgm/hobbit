@@ -24,6 +24,7 @@
 
 #include <actionlib/server/simple_action_server.h>
 #include <interfaces_mira/MiraSendingGoalsAction.h>
+#include <move_base_msgs/MoveBaseAction.h>
 
 
 class MiraSendingGoals: public MiraRobotModule {
@@ -41,6 +42,7 @@ public:
         void goal_status_channel_callback(mira::ChannelRead<std::string> data);
 
 	actionlib::SimpleActionServer<interfaces_mira::MiraSendingGoalsAction>* as_; 
+	actionlib::SimpleActionServer<move_base_msgs::MoveBaseAction>* as2_; 
 
 private:
         MiraSendingGoals();
@@ -53,6 +55,7 @@ private:
 	std_msgs::String goal_status;
 
 	void executeCb(const interfaces_mira::MiraSendingGoalsGoalConstPtr& goal_pose);
+	void executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& goal_pose);
 
         bool isQuaternionValid(const geometry_msgs::Quaternion& q);
 
