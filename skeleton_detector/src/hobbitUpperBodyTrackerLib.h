@@ -49,6 +49,7 @@ struct calibrationHUBT
 static const char * jointNames[] =
 {
  "head",
+ "neck" ,
  "torso",
  "left_shoulder",
  "right_shoulder",
@@ -62,7 +63,6 @@ static const char * jointNames[] =
  "right_knee",
  "left_foot",
  "right_foot" ,
- "neck" ,
  "hip" ,
  //=================
  "End of Joint Names"
@@ -72,6 +72,7 @@ static const char * jointNames[] =
 static const char * tgbtNames[] =
 {
  "head",
+ "neck",
  "bodyCenter",
  "rightShoulder",
  "leftShoulder",
@@ -85,7 +86,6 @@ static const char * tgbtNames[] =
  "leftKnee",
  "rightAnkle",
  "leftAnkle",
- "neck",
  "hip",
  //--------------------
  "End Of TGBT Names"
@@ -94,6 +94,7 @@ static const char * tgbtNames[] =
 static const char * const humanSkeletonJointNames[] =
     {
        "HUMAN_SKELETON_HEAD",
+       "HUMAN_SKELETON_NECK",
        "HUMAN_SKELETON_TORSO",
        "HUMAN_SKELETON_RIGHT_SHOULDER",
        "HUMAN_SKELETON_LEFT_SHOULDER",
@@ -107,13 +108,13 @@ static const char * const humanSkeletonJointNames[] =
        "HUMAN_SKELETON_LEFT_KNEE",
        "HUMAN_SKELETON_RIGHT_FOOT",
        "HUMAN_SKELETON_LEFT_FOOT",
-       "HUMAN_SKELETON_NECK",
        "HUMAN_SKELETON_HIP"
     };
 
 enum humanSkeletonJoints
 {
    HUMAN_SKELETON_HEAD = 0,
+   HUMAN_SKELETON_NECK,
    HUMAN_SKELETON_TORSO,
    HUMAN_SKELETON_RIGHT_SHOULDER,
    HUMAN_SKELETON_LEFT_SHOULDER,
@@ -127,7 +128,6 @@ enum humanSkeletonJoints
    HUMAN_SKELETON_LEFT_KNEE,
    HUMAN_SKELETON_RIGHT_FOOT,
    HUMAN_SKELETON_LEFT_FOOT,
-   HUMAN_SKELETON_NECK,
    HUMAN_SKELETON_HIP,
    //---------------------
    HUMAN_SKELETON_PARTS
@@ -136,6 +136,7 @@ enum humanSkeletonJoints
 static const char * const humanSkeletonMirroredJointNames[] =
     {
       "HUMAN_SKELETON_MIRRORED_HEAD",
+      "HUMAN_SKELETON_MIRRORED_NECK",
       "HUMAN_SKELETON_MIRRORED_TORSO",
       "HUMAN_SKELETON_MIRRORED_LEFT_SHOULDER",
       "HUMAN_SKELETON_MIRRORED_RIGHT_SHOULDER",
@@ -149,13 +150,13 @@ static const char * const humanSkeletonMirroredJointNames[] =
       "HUMAN_SKELETON_MIRRORED_RIGHT_KNEE",
       "HUMAN_SKELETON_MIRRORED_LEFT_FOOT",
       "HUMAN_SKELETON_MIRRORED_RIGHT_FOOT",
-      "HUMAN_SKELETON_MIRRORED_NECK",
       "HUMAN_SKELETON_MIRRORED_HIP"
     };
 
 enum humanMirroredSkeletonJoints
 {
    HUMAN_SKELETON_MIRRORED_HEAD = 0,
+   HUMAN_SKELETON_MIRRORED_NECK,
    HUMAN_SKELETON_MIRRORED_TORSO,
    HUMAN_SKELETON_MIRRORED_LEFT_SHOULDER,
    HUMAN_SKELETON_MIRRORED_RIGHT_SHOULDER,
@@ -169,7 +170,6 @@ enum humanMirroredSkeletonJoints
    HUMAN_SKELETON_MIRRORED_RIGHT_KNEE,
    HUMAN_SKELETON_MIRRORED_LEFT_FOOT,
    HUMAN_SKELETON_MIRRORED_RIGHT_FOOT,
-   HUMAN_SKELETON_MIRRORED_NECK,
    HUMAN_SKELETON_MIRRORED_HIP,
    //---------------------
    HUMAN_SKELETON_MIRRORED_PARTS
@@ -233,4 +233,3 @@ int hobbitUpperBodyTracker_NewFrame(unsigned char * colorFrame , unsigned int co
 
 
 #endif
-
