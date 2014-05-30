@@ -14,7 +14,7 @@ export GLOG_logtostderr=1
  
 echo `pwd`
 
-BINNAME="skleeton_detector"
+BINNAME="skeleton_detector"
 
 PATHOFBIN="../../../devel/lib/$BINNAME/$BINNAME"
 if [ -e $PATHOFBIN ]
