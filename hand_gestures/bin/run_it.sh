@@ -14,7 +14,7 @@ export GLOG_logtostderr=1
  
 echo `pwd`
 
-BINNAME="hand_gestures"
+BINNAME="skleeton_detector"
 
 PATHOFBIN="../../../devel/lib/$BINNAME/$BINNAME"
 if [ -e $PATHOFBIN ]
