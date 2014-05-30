@@ -4,7 +4,9 @@
 
 #include <ros/ros.h>
 #include <ros/spinner.h>
+#include "pose.h"
 
+#define SKPREFIX "SK_"
 
 #define BROADCAST_HOBBIT 1
 
@@ -27,52 +29,29 @@ unsigned char * colorFrameCopy=0;
 unsigned short * depthFrameCopy =0;
 
 
-/*
-void broadcastNewGesture(unsigned int frameNumber,struct handGesture * gesture)
+void broadcastNewSkeleton(unsigned int frameNumber,unsigned int skeletonID , struct skeletonHuman * skeletonFound )
 {
-    if ( (dontPublishGestures) || (gesture==0) ) { return ; }
+    if ( (dontPublishSkeletons) || (skeletonFound==0) ) { return ; }
 
-    hand_gestures::HandGesture msg;
-    msg.x = gesture->x;
-    msg.y = gesture->y;
-    msg.z = gesture->z;
-    msg.theta = 0;
+    fprintf(stderr,"Broadcasting a skeleton at TF\n");
 
-    msg.confidence = 1.0;
-    msg.timestamp=frameNumber;
+     //Do TF Broadcast here
+     char tag[256]={0};
+     unsigned int i =0;
+     for ( i=0; i<HUMAN_SKELETON_PARTS; i++ )
+      {
+       sprintf(tag,"%s%s",SKPREFIX,jointNames[i]);
+        postPoseTransform(tag,/*-1.0**/skeletonFound->joint[i].x/1000,-1.0*skeletonFound->joint[i].y/1000,skeletonFound->joint[i].z/1000);
+      }
 
-    fprintf(stderr,"Publishing a new gesture\n");
-    gestureBroadcaster.publish(msg);
-
-
-
-#if BROADCAST_HOBBIT
-    hobbit_msgs::Event evt;
-    switch (gesture->gestureID)
-    {
-     case GESTURE_NONE   : evt.event="G_NONE";   break;
-     case GESTURE_CANCEL : evt.event="G_CANCEL"; break;
-     case GESTURE_HELP   : evt.event="G_HELP";   break;
-     case GESTURE_YES    : evt.event="G_YES";    break;
-     case GESTURE_NO     : evt.event="G_NO";     break;
-     case GESTURE_REWARD : evt.event="G_REWARD"; break;
-     case GESTURE_POINT  : evt.event="G_POINT";  break;
-     default :             evt.event="G_NOTFOUND"; break;
-    };
-    evt.header.seq = frameNumber;
-    evt.header.frame_id = "hand_gestures";
-    evt.header.stamp = ros::Time::now();
-    evt.sessionID  = "SessionID";
-    evt.confidence = 1.0;
-    evt.params.resize(0);
-    fprintf(stderr,"Publishing a new Event ( %u ) \n",gesture->gestureID);
-    gestureEventBroadcaster.publish(evt);
-#endif
-
-
+     for ( i=0; i<8; i++ )
+      {
+       sprintf(tag,SKPREFIX "bbox/point%u",i);
+       postPoseTransform(tag,/*-1.0**/skeletonFound->bbox[i].x/1000,/*-1.0**/skeletonFound->bbox[i].y/1000,skeletonFound->bbox[i].z/1000);
+      }
 
     return ;
-}*/
+}
 
 int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int colorWidth , unsigned int colorHeight ,
                                        unsigned short * depthFrame  , unsigned int depthWidth , unsigned int depthHeight ,
@@ -83,11 +62,10 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
   //Unfortunately gestures need its dedicated frame buffer read/write so we copy frames here before passing them
   memcpy(colorFrameCopy,colorFrame,colorWidth*colorHeight*3*sizeof(unsigned char));
   memcpy(depthFrameCopy,depthFrame,depthWidth*depthHeight*1*sizeof(unsigned short));
-  
-  int retres=0;
-  //int retres = hobbitGestures_NewFrame(colorFrameCopy , colorWidth , colorHeight ,
-  //                                      depthFrameCopy  , depthWidth , depthHeight ,
-  //                                       calib , frameTimestamp );
+
+  int retres = hobbitUpperBodyTracker_NewFrame(colorFrameCopy , colorWidth , colorHeight ,
+                                               depthFrameCopy  , depthWidth , depthHeight ,
+                                               calib , frameTimestamp );
 
 
 
@@ -101,21 +79,14 @@ int registerServices(ros::NodeHandle * nh,unsigned int width,unsigned int height
   if (colorFrameCopy==0) { fprintf(stderr,"Cannot make an intermidiate copy of color frame \n");  }
   depthFrameCopy = (unsigned short * ) malloc(width*height*1*sizeof(unsigned short));
   if (depthFrameCopy==0) { fprintf(stderr,"Cannot make an intermidiate copy of depth frame \n"); }
-/*
-  gestureBroadcaster = nh->advertise <hand_gestures::HandGesture> ("gestures", 1000);
 
-
-#if BROADCAST_HOBBIT
-  gestureEventBroadcaster = nh->advertise <hobbit_msgs::Event> ("Event", 1000);
-#endif
-*/
-  //hobbitGestures_Initialize(width , height);
-  //hobbitGestures_RegisterGestureDetectedEvent((void *) &broadcastNewGesture);
+  hobbitUpperBodyTracker_Initialize(width , height);
+  hobbitUpperBodyTracker_RegisterSkeletonDetectedEvent((void *) &broadcastNewSkeleton);
 }
 
 int stopServices()
 {
-  //  hobbitGestures_Close();
+  hobbitUpperBodyTracker_Close();
 
   if (colorFrameCopy!=0) { free(colorFrameCopy); colorFrameCopy=0; }
   if (depthFrameCopy!=0) { free(depthFrameCopy); depthFrameCopy=0; }

@@ -74,14 +74,6 @@ bool visualizeOff(std_srvs::Empty::Request& request, std_srvs::Empty::Response& 
     //doCVOutput=0;
     //doCalibrationOutput=0;
     cv::destroyAllWindows();
-    cv::destroyWindow("signs");
-    cv::destroyWindow("gestures");
-    cv::destroyWindow("raw_models");
-    cv::destroyWindow("hand_gestures RAW Depth");
-    cv::destroyWindow("hand_gestures RAW RGB");
-    cv::destroyWindow("rgbGest");
-    cv::destroyWindow("depthGest");
-    cv::destroyWindow("centers tracking");
     cv::waitKey(1);
     return true;
 }
