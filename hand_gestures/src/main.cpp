@@ -29,7 +29,7 @@
 #include "services.h"
 
 
-#include "HobbitTrackerLib.h"
+#include "hobbitUpperBodyTrackerLib.h"
 
 
 //This will make this node also register to color/depth calibrations and
@@ -43,7 +43,7 @@ volatile int paused = 0;
 unsigned int frameTimestamp =0;
 unsigned int colorWidth = 640 , colorHeight =480 , depthWidth = 640 , depthHeight = 480;
 
-struct calibrationHT calib={0};
+struct calibrationHUBT calib={0};
 
 //sensor_msgs::CameraInfo camInfo;
 
@@ -64,15 +64,15 @@ cv::Mat rgb,depth;
 
 bool visualizeOn(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    doCVOutput=1;
-     doCalibrationOutput=1;
+     //doCVOutput=1;
+     //doCalibrationOutput=1;
     return true;
 }
 
 bool visualizeOff(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    doCVOutput=0;
-      doCalibrationOutput=0;
+    //doCVOutput=0;
+    //doCalibrationOutput=0;
     cv::destroyAllWindows();
     cv::destroyWindow("signs");
     cv::destroyWindow("gestures");
@@ -119,7 +119,7 @@ bool setQuality( hand_gestures::SetQuality::Request  &request,
 
 int doDrawOut()
 {
-    if (doCVOutput)
+   // if (doCVOutput)
     {
      /*Don't add this on output ( reduce cluttering )
      cv::Mat rgbTmp = rgb.clone();

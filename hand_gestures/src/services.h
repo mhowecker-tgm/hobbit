@@ -2,16 +2,16 @@
 #define SERVICES_H_INCLUDED
 
 
-#include "HobbitTrackerLib.h"
+#include "hobbitUpperBodyTrackerLib.h"
 
 #include <ros/ros.h>
 
-extern unsigned char dontPublishGestures;
+extern unsigned char dontPublishSkeletons;
 
 int registerServices(ros::NodeHandle * nh,unsigned int width,unsigned int height);
 int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int colorWidth , unsigned int colorHeight ,
                                        unsigned short * depthFrame  , unsigned int depthWidth , unsigned int depthHeight ,
-                                        struct calibrationHT * calib ,
+                                        struct calibrationHUBT * calib ,
                                           unsigned int frameTimestamp );
 
 int stopServices();
