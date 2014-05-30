@@ -67,6 +67,24 @@ class CleanUp(smach.State):
         ud.result = String('object not found')
         return 'succeeded'
 
+
+class MoveCounter(smach.State):
+    def __init__(self):
+        smach.State.__init__(self, outcomes=['succeeded', 'preempted', 'failure'])
+        self.run_counter = -1
+
+    def execute(self, ud):
+        print('Recognizer counter: '+str(self.run_counter))
+        if self.run_counter < 3:
+            rospy.loginfo('Recognition run: #%d' % (self.run_counter + 2))
+            self.run_counter += 1
+            return 'succeeded'
+        else:
+            self.run_counter = -1
+        return 'failure'
+
+
+
 class SetSuccess(smach.State):
     """Class for setting the success message in the actionlib result and clean up of persistent variables"""
     def __init__(self):
@@ -110,7 +128,7 @@ class CleanPositions(smach.State):
                 pose.header.frame_id = 'map'
                 pose.pose.position = Point(resp.pose.x, resp.pose.y, 0.0)
                 pose.pose.orientation = Quaternion(*tf.transformations.quaternion_from_euler(0, 0, resp.pose.theta))
-                ud.positions.append({'pose': pose, 'room': pos.room, 'distance': 'None', 'place_name': pos.location, 'penalty':1})
+                ud.positions.append({'pose': pose, 'room': pos.room, 'distance': 'None', 'place_name': pos.location, 'penalty':1, 'theta': resp.pose.theta})
             except rospy.ServiceException:
                 self.getCoordinates.close()
                 return 'failure'
@@ -120,7 +138,7 @@ class PlanPath(smach.State):
     """Class to determine the shortest path to all possible positions of the desired object"""
     def __init__(self):
         smach.State.__init__(self, outcomes=['success', 'preempted', 'failure'],
-                input_keys=['robot_current_pose', 'pose', 'positions', 'detection', 'plan', 'users_current_room', 'visited_places'],
+                input_keys=['robot_current_pose', 'pose', 'positions', 'detection', 'plan', 'users_current_room', 'visited_places', 'robot_end_pose'],
                 output_keys=['plan_request', 'detection', 'visited_places', 'robot_end_pose', 'goal_position_x', 'goal_position_y', 'goal_position_yaw' ])
         self.positions=[]
         self.pub_obstacle = rospy.Publisher('/headcam/active', String)
@@ -173,17 +191,25 @@ class PlanPath(smach.State):
                         ud.robot_end_pose = {'room': position['room'], 'place': position['place_name'], 'distance': distance, 'penalty': position['penalty']}
                         ud.goal_position_x = position['pose'].pose.position.x
                         ud.goal_position_y = position['pose'].pose.position.y
-                        ud.goal_position_yaw = 0.0
+                        ud.goal_position_yaw = position['theta']
+                        #print(position['theta'])
                     else:
                         pass
             else:
                 #print bcolors.FAIL +position['room'], position['place_name'] + bcolors.ENDC
                 pass
         if len(ud.visited_places) == len(ud.positions):
+            print(len(ud.visited_places))
+            print(len(ud.positions))
             print bcolors.FAIL+'Visited all positions'+bcolors.ENDC
             return 'failure'
         else:
-            return 'success'
+	    try:
+	        ud.visited_places.append(ud.robot_end_pose)
+	    except:
+	        ud.visited_places = []
+	        ud.visited_places.append(ud.robot_end_pose)
+	    return 'success'
 
 
 
@@ -256,6 +282,7 @@ def get_robot_pose_cb(msg, ud):
 
 
 def point_cloud_cb(msg, ud):
+    print('point cloud received')
     ud.cloud= msg
     return True
 
@@ -278,7 +305,8 @@ def main():
         smach.StateMachine.add('GET_ROBOT_POSE', util.WaitForMsgState('/amcl_pose', PoseWithCovarianceStamped, get_robot_pose_cb, output_keys=['robot_current_pose'], timeout=5),
                 transitions={'succeeded':'GET_ROBOTS_CURRENT_ROOM', 'aborted':'GET_ROBOT_POSE', 'preempted':'CLEAN_UP'})
         smach.StateMachine.add('GET_ROBOTS_CURRENT_ROOM', ServiceState('get_robots_current_room', GetName, response_key='robots_room_name'), transitions={'succeeded':'PLAN_PATH'})
-        smach.StateMachine.add('PLAN_PATH', PlanPath(), transitions={'success':'MOVE_BASE', 'preempted':'CLEAN_UP', 'failure':'CLEAN_UP'})
+        smach.StateMachine.add('PLAN_PATH', PlanPath(), transitions={'success':'MOVE_HEAD_DOWN', 'preempted':'CLEAN_UP', 'failure':'CLEAN_UP'})
+        smach.StateMachine.add('MOVE_HEAD_DOWN', head_move.MoveTo(pose='down_center'), transitions={'succeeded':'MOVE_BASE', 'preempted':'CLEAN_UP', 'failed':'MOVE_BASE'})
         smach.StateMachine.add(
             'MOVE_BASE', 
             hobbit_move.goToPose(), 
@@ -286,13 +314,15 @@ def main():
             remapping={'x':'goal_position_x',
                        'y':'goal_position_y',
                        'yaw':'goal_position_yaw'})
-        smach.StateMachine.add('MOVE_HEAD', head_move.MoveTo(pose='center_center'), transitions={'succeeded':'GET_POINT_CLOUD', 'preempted':'CLEAN_UP', 'failed':'PLAN_PATH'})
+        smach.StateMachine.add('MOVE_HEAD', head_move.MoveTo(pose='center_center'), transitions={'succeeded':'REC_COUNTER', 'preempted':'CLEAN_UP', 'failed':'PLAN_PATH'})
+        smach.StateMachine.add('REC_COUNTER', MoveCounter(), transitions={'succeeded':'GET_POINT_CLOUD', 'preempted':'aborted', 'failure':'PLAN_PATH'})
         smach.StateMachine.add('GET_POINT_CLOUD',
                                util.WaitForMsgState('/headcam/depth_registered/points', PointCloud2, point_cloud_cb, timeout=5, output_keys=['cloud']),
                                transitions={'succeeded':'START_OBJECT_RECOGNITION', 'aborted':'GET_POINT_CLOUD', 'preempted':'CLEAN_UP'})
         smach.StateMachine.add('START_OBJECT_RECOGNITION',
                                ServiceState('mp_recognition', recognize, request_slots=['cloud'], response_slots=['ids', 'transforms']),
-                               transitions={'succeeded':'OBJECT_DETECTED', 'preempted':'CLEAN_UP', 'aborted':'START_OBJECT_RECOGNITION'})
+                               #transitions={'succeeded':'OBJECT_DETECTED', 'preempted':'CLEAN_UP', 'aborted':'START_OBJECT_RECOGNITION'})
+                               transitions={'succeeded':'OBJECT_DETECTED', 'preempted':'CLEAN_UP', 'aborted':'REC_COUNTER'})
         smach.StateMachine.add('OBJECT_DETECTED', ObjectDetected(), transitions={'succeeded':'GRASP_OBJECT', 'failure':'MOVE_HEAD', 'preempted':'CLEAN_UP'})
         smach.StateMachine.add('GRASP_OBJECT', DummyGrasp(), transitions={'succeeded':'SET_SUCCESS', 'failure':'CLEAN_UP', 'preempted':'CLEAN_UP'})
         smach.StateMachine.add('SET_SUCCESS', SetSuccess(), transitions={'succeeded':'succeeded', 'preempted':'CLEAN_UP'})
