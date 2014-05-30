@@ -57,7 +57,6 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
                                         struct calibrationHUBT * calib ,
                                          unsigned int frameTimestamp )
 {
-  fprintf(stderr,"runServicesThatNeedColorAndDepth\n");
   if ( (colorFrameCopy==0) ||  (depthFrameCopy==0) ) { fprintf(stderr,"Cannot run handtracker due to not allocated intermediate buffer\n"); return 0; }
   //Unfortunately gestures need its dedicated frame buffer read/write so we copy frames here before passing them
   memcpy(colorFrameCopy,colorFrame,colorWidth*colorHeight*3*sizeof(unsigned char));
