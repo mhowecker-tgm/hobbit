@@ -50,7 +50,7 @@ image_transport::Publisher pubRGB;
 image_transport::Publisher pubDepth;
 
 ros::Publisher pubRGBInfo;
-ros::Publisher pubDepthInfo; 
+ros::Publisher pubDepthInfo;
 
 
 //----------------------------------------------------------
@@ -185,7 +185,7 @@ bool publishImagesFrames(unsigned char * color , unsigned int colorWidth , unsig
 
     //Base line for fake disparity !
     //P[3] should be 0.0 since we have a registered feed but we add a baseline for fake disparity here
-    //Please note that the virtual baseline is multiplied by -1 and fX to fit the "ROS" way of 
+    //Please note that the virtual baseline is multiplied by -1 and fX to fit the "ROS" way of
     //declaring a baseline as seen here https://github.com/ros-perception/image_pipeline/blob/hydro-devel/depth_image_proc/src/nodelets/disparity.cpp#L136
     //for the record , I added an issue https://github.com/ros-perception/image_pipeline/issues/58 but it seems this is the way to do it..
      cal.P[3]=-1.0 * virtual_baseline * calib->intrinsic[CALIB_INTR_FX];
@@ -270,7 +270,7 @@ int main(int argc, char **argv)
      std::string from;
      std::string name;
      std::string camera;
-     std::string frame; 
+     std::string frame;
      int rate;
 
      ros::NodeHandle private_node_handle_("~");
@@ -280,9 +280,9 @@ int main(int argc, char **argv)
      private_node_handle_.param("camera", camera, std::string("camera"));
      private_node_handle_.param("frame", frame, std::string("frame"));
      private_node_handle_.param("rate", rate, int(30));
-     private_node_handle_.param("device_id", from, std::string("")); 
+     private_node_handle_.param("device_id", from, std::string(""));
      private_node_handle_.param("virtual_baseline", virtual_baseline, 0.0);
-      
+
      //Pass root frame for TF poses
      strcpy(tfRoot,frame.c_str());
 
@@ -321,9 +321,11 @@ int main(int argc, char **argv)
 
      pubRGB = it.advertise(camera+"/rgb/image_rect_color", 1);
      pubRGBInfo = nh.advertise<sensor_msgs::CameraInfo>(camera+"/rgb/camera_info",1);
+     std::cout<<"ROS RGB Topic name : "<<camera<<"/rgb/image_rect_color"<<std::endl;
 
      pubDepth = it.advertise(camera+"/depth_registered/image_rect", 1);
      pubDepthInfo = nh.advertise<sensor_msgs::CameraInfo>(camera+"/depth_registered/camera_info",1);
+     std::cout<<"ROS Depth Topic name : "<<camera<<"/depth_registered/image_rect"<<std::endl;
 
       //---------------------------------------------------------------------------------------------------
       //This code segment waits for a valid first frame to come and initialize the focal lengths etc..

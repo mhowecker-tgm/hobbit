@@ -80,7 +80,7 @@ bool visualizeOff(std_srvs::Empty::Request& request, std_srvs::Empty::Response& 
 
 bool terminate(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    ROS_INFO("Stopping Hand Gestures");
+    ROS_INFO("Stopping Skeleton Detector");
     exit(0);
     return true;
 }
@@ -88,14 +88,14 @@ bool terminate(std_srvs::Empty::Request& request, std_srvs::Empty::Response& res
 
 bool pause(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    ROS_INFO("Hand Gestures are now paused");
+    ROS_INFO("Skeleton Detector is now paused");
     paused =1;
     return true;
 }
 
 bool resume(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    ROS_INFO("Hand Gestures are now resuming");
+    ROS_INFO("Skeleton Detector is now resuming");
     paused =0;
     return true;
 }
@@ -197,7 +197,7 @@ int main(int argc, char **argv)
    try
 	{
 	 char regName[128]={0};
-	 sprintf(regName,"hand_gestures%u",getpid()); //We use pid on node name
+	 sprintf(regName,"skeleton_detector%u",getpid()); //We use pid on node name
   	 ros::init(argc, argv, regName);
      ros::start();
 
@@ -237,6 +237,10 @@ int main(int argc, char **argv)
 
 	 rgb_img_sub = new  message_filters::Subscriber<sensor_msgs::Image>(nh,fromRGBTopic, 1);
 	 rgb_cam_info_sub = new message_filters::Subscriber<sensor_msgs::CameraInfo>(nh,fromRGBTopicInfo,1);
+
+
+     std::cout<<"Skeleton Detector , subscribed to RGB feed "<<fromRGBTopic<<" \n";
+     std::cout<<"Skeleton Detector , subscribed to Depth feed "<<fromDepthTopic<<" \n";
 
      #if USE_NONDEFAULT_CALIBRATIONS
 	   sync = new message_filters::Synchronizer<RgbdSyncPolicy>(RgbdSyncPolicy(rate), *rgb_img_sub, *depth_img_sub,*depth_cam_info_sub); //*rgb_cam_info_sub,
