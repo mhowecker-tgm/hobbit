@@ -1,0 +1,13 @@
+cancelSignNbWaves 3
+cancelSignMinDist 50
+okSignMinNbFrames 8
+kinectMaxAllowedDepth 1500
+saveInputImages false
+saveInputImageOutputFolder frames_in/
+saveOutputImages false
+saveOutputImagesOutputFolder frames_out/
+showTrackedRawTrees false
+showDetectedModels false
+showRawSigns false
+showSignsEvents true
+fullOpenHandMode false
