@@ -2,7 +2,7 @@
 
 #Quick Settings
 HOBBITDIR="/opt/ros/hobbit_hydro/"
-SLEEP_TIME_IN_SECONDS_BETWEEN_RETRIES=15
+SLEEP_TIME_IN_SECONDS_BETWEEN_RETRIES=10
 MAX_RETRIES=10
  
  
@@ -18,7 +18,7 @@ fi
 
 #Try to bring up our node for the first time!
 echo "Trying to bring BaseCam Node up with a first try"
-screen -d -m -S "basecam" /bin/bash -c "source ~/.bashrc && source $HOBBITDIR/devel/setup.bash && roslaunch openni2_launch openni2.launch camera:=basecam depth_registration:=true device_id:=\"#2\""
+screen -d -m -S "basecam" /bin/bash -c "source ~/.bashrc && source $HOBBITDIR/devel/setup.bash && roslaunch openni2_launch openni2.launch camera:=basecam depth_registration:=true device_id:=\"#2\" &>> ~/debugBaseCam.txt "
 sleep $SLEEP_TIME_IN_SECONDS_BETWEEN_RETRIES
 
 
@@ -32,7 +32,7 @@ do
  sleep $SLEEP_TIME_IN_SECONDS_BETWEEN_RETRIES
  
  #Do Startup Here
-  screen -d -m -S "basecam" /bin/bash -c "source ~/.bashrc && source $HOBBITDIR/devel/setup.bash && roslaunch openni2_launch openni2.launch camera:=basecam depth_registration:=true device_id:=\"#2\""
+  screen -d -m -S "basecam" /bin/bash -c "source ~/.bashrc && source $HOBBITDIR/devel/setup.bash && roslaunch openni2_launch openni2.launch camera:=basecam depth_registration:=true device_id:=\"#2\" &>> ~/debugBaseCam.txt"
  #Do Startup Here
  
  ISRGBDUP=`rostopic list | grep /basecam/rgb/image_rect_color/compressed`
