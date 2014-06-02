@@ -215,7 +215,7 @@ bool cGetCurrentRoom::isInRoom(float x_pos, float y_pos, std::vector<hobbit_msgs
 	//The points MUST be ordered either clockwise or counterclockwise
 	//int num_intersections = 0;
 
-//Implementation of the crossing number algorithm. Inspired by the original article in Communications of the ACM by M. Shimrat and by the pseudocode provided by D. Eppstein, with some bugs fixed. Points laying on the edges or the vertices are also considered.
+//Implementation of the crossing number algorithm. Inspired by the original article in Communications of the ACM by M. Shimrat and by the pseudocode provided by D. Eppstein, with some inconsistencies fixed. Points laying on the edges or the vertices are also considered.
 	bool b = false;
 	for (unsigned int i = 0; i < polygon_points.size()-1; i++)
 	{
