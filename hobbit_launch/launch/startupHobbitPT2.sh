@@ -22,7 +22,7 @@ env >> ~/.startup.txt
 #exit 0
   
 #Make sure we have our stuff sourced
-source /home/hobbit/.bashrc
+source ~/.bashrc
 source /opt/ros/hobbit_hydro/devel/setup.bash
 
 roscore&
