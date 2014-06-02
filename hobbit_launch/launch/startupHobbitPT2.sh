@@ -36,11 +36,9 @@ roslaunch openni2_launch openni2.launch camera:=basecam depth_registration:=true
 
 sleep $DELAY_BETWEEN_STEPS
 #maybe prompt for failure here!
-
-
-
+ 
 #Start up vision acquisition etc
-/opt/ros/hobbit_hydro/src/rgbd_acquisition/scripts/startFORTHStuffPT2.sh&
+/opt/ros/hobbit_hydro/src/rgbd_acquisition/scripts/startFORTHStuffPT2.sh
 #In case someone would like to startup the top camera without our integrated node he could do it like following
 #roslaunch openni2_launch openni2.launch camera:=headcam depth_registration:=true device_id:="#1"
 sleep $DELAY_BETWEEN_STEPS
