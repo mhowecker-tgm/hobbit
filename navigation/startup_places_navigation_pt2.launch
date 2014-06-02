@@ -1,0 +1,40 @@
+<launch>
+
+<!-- Run the map server -->
+<!--  <node name="map_server" pkg="map_server" type="map_server" args="$(find places_interpretation)/../navigation/share/map.yaml"/> -->
+
+<!--
+ <group if="true">
+    <include file="$(find hobbit_launch)/launch/basecam.launch"></include>
+    <include file="$(find hobbit_launch)/launch/headcam.launch"></include>
+  </group>
+-->
+
+  <node name="top_kinect" pkg="top_kinect" type="top_kinect" args="$(find top_kinect)/Params.txt">
+	<!-- Parameters
+	<param name="ImgW" type="float" value="640.0"/>
+	<param name="ImgH" type="float" value="480.0"/>    
+	<param name="ImgW" type="float" value="640.0"/>  
+	<param name="MinK" type="float" value="0.128028"/> 
+	<param name="MinD" type="float" value="18.373226"/> 
+	<param name="NomK" type="float" value="0.109548"/> 
+	<param name="NomD" type="float" value="21.985956"/> 
+	<param name="MaxK" type="float" value="0.095835"/>    
+	<param name="MaxD" type="float" value="24.717989"/>  
+	-->
+  </node>
+
+
+
+  <group if="true">
+    <include file="$(find virtual_laser)/launch/startup.launch" />
+    <!-- <include file="$(find head)/launch/startup.launch"></include> -->
+    <!--<include file="$(find hobbit_launch)/../navigation/amcl_diff_hobbit.launch" /> -->
+    <include file="$(find interfaces_mira)/launch/startup.launch" />
+    <include file="$(find places_interpretation)/launch/startup_places_interpretation.launch" />
+    <!--<include file="$(find hobbit_launch)/../navigation/move_base_hobbit.launch" /> -->
+    <!--<include file="$(find sending_goals)/launch/startup_sending_goals.launch" /> -->
+  </group>
+
+</launch>
+
