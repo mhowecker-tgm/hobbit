@@ -1,6 +1,6 @@
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Author: Paloma de la Puente
-// Last update: 31.10.2013
+// Last update: 22.4.2014
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #include <string.h>
 #include "../include/GetCurrentRoom/cGetCurrentRoom.h"
