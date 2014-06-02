@@ -38,12 +38,12 @@ do
  ((i++))
  if [ $i -gt $MAX_RETRIES ]
  then 
-  echo "Maximum retries reached ,complete failure starting service"
+  echo "Maximum retries reached ,complete failure starting service , todo try to restart a device or something here"
   exit 1
  fi
 done
 
-echo "Started succesfully"
+echo "Top Cam - Started succesfully"
 
  
 

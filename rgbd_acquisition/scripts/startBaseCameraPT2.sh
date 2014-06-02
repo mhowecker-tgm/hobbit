@@ -44,6 +44,6 @@ do
  fi
 done
 
-echo "Started succesfully"
+echo "Base cam - Started succesfully"
 
 exit 0
