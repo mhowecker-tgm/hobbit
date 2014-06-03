@@ -20,6 +20,30 @@ import head_move_import as head_move
 from math import pi
 
 
+class SetObstacles(State):
+    """
+    Publish the docking message to mira
+    topic: /docking_task
+    """
+    def __init__(self, active=True):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'preempted']
+        )
+        self.obstacles = rospy.Publisher('headcam/active', String, latch=False)
+        self.active = active
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        if self.active:
+            self.obstacles.publish('active')
+        else:
+            self.obstacles.publish('inactive')
+        return 'succeeded'
+
+
 class Undock(State):
     """
     Publish the docking message to mira
@@ -171,11 +195,9 @@ def goToPosition(frame='/map', room='', place='dock'):
     with seq:
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
                      head_move.MoveTo(pose='down_center'))
-    #Sequence.add(
-    #    'SET_NAV_GOAL_GOTO',
-    #    hobbit_move.get_set_nav_goal_state(),
-    #    transitions={'aborted': 'failed'}
-    #)
+        Sequence.add('WAIT', SleepState(duration=1))
+        Sequence.add('ACTIVATE_OBSTACLES',
+                     SetObstacles(active=True))
         # Sequence.add('SET_NAV_GOAL', SetNavigationGoal(room, place))
         Sequence.add('MOVE_HOBBIT', move_base.MoveBaseState(frame))
     return seq
@@ -196,6 +218,9 @@ def goToPose():
     with seq:
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
                      head_move.MoveTo(pose='down_center'))
+        Sequence.add('WAIT', SleepState(duration=1))
+        Sequence.add('ACTIVATE_OBSTACLES',
+                     SetObstacles(active=True))
         Sequence.add('MOVE_BASE_GOAL', move_base.MoveBaseState(frame),
                      remapping={'x': 'x',
                                 'y': 'y',
