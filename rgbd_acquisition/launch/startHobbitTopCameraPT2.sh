@@ -69,10 +69,12 @@
   </node>
   
  
-<!-- ONE could also add those
+  <!-- ONE could also add those -->
   <arg name="pi/2" value="1.5707963267948966" />
   <arg name="optical_rotate" value="0 0 0 -$(arg pi/2) 0 -$(arg pi/2)" />
 
+  <!--node pkg="tf" type="static_transform_publisher" name="$(arg camera)_base_link0"
+        args="0 0 0 0 0 0 $(arg camera)_link $(arg camera)_depth_frame 100" /-->
   <node pkg="tf" type="static_transform_publisher" name="$(arg camera)_base_link"
         args="0 -0.02 0 0 0 0 $(arg camera)_link $(arg camera)_depth_frame 100" />
   <node pkg="tf" type="static_transform_publisher" name="$(arg camera)_base_link1"
@@ -81,7 +83,7 @@
         args="$(arg optical_rotate) $(arg camera)_depth_frame $(arg camera)_depth_optical_frame 100" />
   <node pkg="tf" type="static_transform_publisher" name="$(arg camera)_base_link3"
         args="$(arg optical_rotate) $(arg camera)_rgb_frame $(arg camera)_rgb_optical_frame 100" /> 
--->
+
 
 
 
