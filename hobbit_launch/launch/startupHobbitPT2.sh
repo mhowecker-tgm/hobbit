@@ -12,40 +12,40 @@ STARTDIR=`pwd`
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
 #cd to the directory where the script lies at
-
-
+ 
 THEDATETAG=`date +"%y-%m-%d_%H-%M-%S"`
 echo $THEDATETAG > ~/.startup.txt
-env >> ~/.startup.txt
-#env > ~/startMsg.txt
-
-#exit 0
+env >> ~/.startup.txt  
   
 #Make sure we have our stuff sourced
 source ~/.bashrc
 source /opt/ros/hobbit_hydro/devel/setup.bash
 
 roscore&
+
+#ros core takes ages to start
+sleep $DELAY_BETWEEN_STEPS
+sleep $DELAY_BETWEEN_STEPS
 sleep $DELAY_BETWEEN_STEPS
    
+
+
+/opt/ros/hobbit_hydro/src/rgbd_acquisition/scripts/workAroundUSB.sh
+
+
 #Trying to start basecam
 /opt/ros/hobbit_hydro/src/rgbd_acquisition/scripts/startBaseCameraPT2.sh
 #If someone would like to start it on his own he could use the following
 #roslaunch openni2_launch openni2.launch camera:=basecam depth_registration:=true device_id:="#2"&
-
 sleep $DELAY_BETWEEN_STEPS
-#maybe prompt for failure here!
- 
+
+
 #Start up vision acquisition etc
 /opt/ros/hobbit_hydro/src/rgbd_acquisition/scripts/startFORTHStuffPT2.sh
 #In case someone would like to startup the top camera without our integrated node he could do it like following
-#roslaunch openni2_launch openni2.launch camera:=headcam depth_registration:=true device_id:="#1"
+#roslaunch openni2_launch openni2.launch camera:=headcam depth_registration:=true device_id:="#1"&
 sleep $DELAY_BETWEEN_STEPS
 
-
-#Start Head ( and bring it to level )
-#roslaunch head startup.launch&
-#Start Base
 #rosrun mobile_platform mobile_platform&
 #Bring up web interface ( port 8080 )
 /opt/ros/hobbit_hydro/src/web_interface/scripts/startWebInterface.sh&
@@ -54,6 +54,10 @@ sleep $DELAY_BETWEEN_STEPS
 sleep $DELAY_BETWEEN_STEPS
   
 
+
+#Start Head ( and bring it to level )
+#roslaunch head startup.launch&
+#Start Base
 
 # Start the virtual laser
 cd /opt/ros/hobbit_hydro/src/virtual_laser/launch
