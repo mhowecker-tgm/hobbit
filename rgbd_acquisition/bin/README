@@ -1,0 +1,8 @@
+This node has a lot of extra stuff
+
+NiViewer is part of the OpenNI2 driver stack
+
+Grabber , libAcquisition.so , libOpenNI2Acquisition.so is part of https://github.com/AmmarkoV/RGBDAcquisition
+and is provided to vet the startup procedure
+
+

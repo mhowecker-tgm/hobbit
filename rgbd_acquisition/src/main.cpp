@@ -2,6 +2,7 @@
 
 #define EMMIT_CALIBRATION 1
 
+ 
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -280,15 +281,17 @@ int main(int argc, char **argv)
      private_node_handle_.param("camera", camera, std::string("camera"));
      private_node_handle_.param("frame", frame, std::string("frame"));
      private_node_handle_.param("rate", rate, int(30));
-     private_node_handle_.param("device_id", from, std::string(""));
+     private_node_handle_.param("deviceID", from, std::string(""));
      private_node_handle_.param("virtual_baseline", virtual_baseline, 0.0);
 
      //Pass root frame for TF poses
      strcpy(tfRoot,frame.c_str());
+         
 
      //Decide on devID
+/*
      if (from.length()==0) { } else
-     if (from.length()<=2) { devID=atoi( from.c_str() ); from.clear(); ROS_INFO("Using OpenNI2 Serializer to get device"); }
+     if (from.length()<=2) { devID=atoi( from.c_str() ); from.clear(); ROS_INFO("Using OpenNI2 Serializer to get device"); }*/
 
 
 
@@ -298,7 +301,7 @@ int main(int argc, char **argv)
      std::cout<<"Frame : "<<frame<<std::endl;
      std::cout<<"Rate : "<<rate<<std::endl;
      std::cout<<"virtual_baseline : "<<virtual_baseline<<std::endl;
-     std::cout<<"Device_id : "<<from<<"  devID : "<<devID<<std::endl;
+     std::cout<<"Device_id : "<<from<<" length "<<from.length()<<"  devID : "<<devID<<std::endl;
      std::cout<<"useSkeleton : "<<useSkeleton<<std::endl;
      std::cout<<"--------------------------------------------------"<<std::endl;
 

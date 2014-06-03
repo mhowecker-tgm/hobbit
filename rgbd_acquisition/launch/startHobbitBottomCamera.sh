@@ -15,7 +15,7 @@
          This can also be the serial number of the top Kinect - gathered via "lsusb -v"
          ______________________________________________________________________   
     -->
-    <arg name="device_id" value="3@6"/> 
+    <arg name="device_id" value="3@3"/> 
  
  
    <!--  rosrun pcl_ros pointcloud_to_pcd input:=headcam/depth_registered/points/ -->

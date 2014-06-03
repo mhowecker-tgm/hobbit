@@ -3,14 +3,9 @@
     <arg name="camera" value="headcam"/> 
     <!-- name of the root frame -->
     <arg name="frame" value="frame"/> 
-
-    <!-- Virtual Baseline for emulating disparity data , please note that disparity is a bad thing to use since we are using an active depth sensor and already have an observation in mm and meters , also please note that value given here should be in meters since although the disparity nodelet is connected straight to the depth_registered topic which is on millimeters it gets scaled to meters from the code of the depth_image_proc nodelet , See source code-->
-
-    <!--<arg name="virtual_baseline" value="-43.186" type="double" /> -->
-    <arg name="virtual_baseline" value="0.075" type="double" />
-
- 
-    <!-- device_id can have the following formats:
+    <!--  This is the kinect camera address -->  
+    <arg name="deviceID" value="1d27/0601@1/3" type="str"/> 
+    <!-- deviceID can have the following formats:
          "B00367707227042B": Use device with given serial number
          "#1"              : Use first device found
          "2@3"             : Use device on USB bus 2, address 3
@@ -22,15 +17,23 @@
          ______________________________________________________________________   
     -->
  
+
+
+
+    <!-- Virtual Baseline for emulating disparity data , please note that disparity is a bad thing to use since we are using an active depth sensor and already have an observation in mm and meters , also please note that value given here should be in meters since although the disparity nodelet is connected straight to the depth_registered topic which is on millimeters it gets scaled to meters from the code of the depth_image_proc nodelet , See source code-->
+
+    <!--<arg name="virtual_baseline" value="-43.186" type="double" /> -->
+    <arg name="virtual_baseline" value="0.075" type="double" />
+
  
-    <!--  This is the kinect camera address for Hobbit PT2 --> 
-          <arg name="device_id" value="#1"/> 
+
+ 
  
 
 
     <node name="rgbd_acquisition" pkg="rgbd_acquisition" type="run_it.sh" required="true" output="screen"> 
       <param name="camera" value="$(arg camera)" />
-      <param name="device_id" value="$(arg device_id)" /> 
+      <param name="deviceID" value="$(arg deviceID)" /> 
       <param name="virtual_baseline" value="$(arg virtual_baseline)" />   
       <param name="frame" value="$(arg frame)" /> 
       <param name="useSkeleton" value="1" />  

@@ -18,7 +18,7 @@ fi
 echo "NewLog" > ~/debug.txt 
 #Try to bring up our node for the first time!
 echo "Trying to bring RGBD Node up with a first try"
-screen -d -m -S "rgbd_acquisition" /bin/bash -c "source ~/.bashrc && source $HOBBITDIR/devel/setup.bash && roslaunch rgbd_acquisition startHobbitTopCameraPT2.sh &>> ~/debugTopCam.txt"
+screen -d -m -S "rgbd_acquisition" /bin/bash -c "source ~/.bashrc && source $HOBBITDIR/devel/setup.bash && roslaunch rgbd_acquisition startHobbitTopCameraPT2.sh"
 sleep $SLEEP_TIME_IN_SECONDS_BETWEEN_RETRIES
 
 
@@ -32,7 +32,7 @@ do
  sleep $SLEEP_TIME_IN_SECONDS_BETWEEN_RETRIES
  
  #Do Startup Here
-  screen -d -m -S "rgbd_acquisition" /bin/bash -c "source ~/.bashrc && source $HOBBITDIR/devel/setup.bash && roslaunch rgbd_acquisition startHobbitTopCameraPT2.sh &>> ~/debugTopCam.txt"
+  screen -d -m -S "rgbd_acquisition" /bin/bash -c "source ~/.bashrc && source $HOBBITDIR/devel/setup.bash && roslaunch rgbd_acquisition startHobbitTopCameraPT2.sh"
  #Do Startup Here
  
  ISRGBDUP=`rostopic list | grep /headcam/rgb/image_rect_color/compressed`
