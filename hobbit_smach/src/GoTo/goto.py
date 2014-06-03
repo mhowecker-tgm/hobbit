@@ -336,6 +336,7 @@ def main():
                 Sequence.add(
                     'SET_NAV_GOAL',
 	            hobbit_move.get_set_nav_goal_state(),
+                    #hobbit_move.SetNavigationGoal(frame='/map'),
                     transitions={'aborted': 'failed'}
                 )
                 Sequence.add(

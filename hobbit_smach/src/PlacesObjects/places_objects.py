@@ -214,6 +214,7 @@ def getCoordinates(req):
     """
     global rooms
     print('Inside: getCoordinates')
+    print(rooms)
     print req.room_name.data, req.location_name.data
     if req.room_name.data == None:
         gen = (x for x in rooms.rooms_vector)
@@ -223,6 +224,7 @@ def getCoordinates(req):
         gen1 = (k for k in x.places_vector if req.location_name.data in k.place_name)
         for k in gen1:
             pose = Pose2D(float(k.x), float(k.y), float(k.theta))
+            print(pose)
             return pose
 
 def getAllRooms(req):

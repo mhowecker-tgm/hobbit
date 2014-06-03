@@ -314,7 +314,7 @@ def main():
             remapping={'x':'goal_position_x',
                        'y':'goal_position_y',
                        'yaw':'goal_position_yaw'})
-        smach.StateMachine.add('MOVE_HEAD', head_move.MoveTo(pose='center_center'), transitions={'succeeded':'REC_COUNTER', 'preempted':'CLEAN_UP', 'failed':'PLAN_PATH'})
+        smach.StateMachine.add('MOVE_HEAD', head_move.MoveTo(pose='search_table'), transitions={'succeeded':'REC_COUNTER', 'preempted':'CLEAN_UP', 'failed':'PLAN_PATH'})
         smach.StateMachine.add('REC_COUNTER', MoveCounter(), transitions={'succeeded':'GET_POINT_CLOUD', 'preempted':'aborted', 'failure':'PLAN_PATH'})
         smach.StateMachine.add('GET_POINT_CLOUD',
                                util.WaitForMsgState('/headcam/depth_registered/points', PointCloud2, point_cloud_cb, timeout=5, output_keys=['cloud']),

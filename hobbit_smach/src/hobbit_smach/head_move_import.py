@@ -24,7 +24,7 @@ class MoveTo(State):
         self._available_poses = ['center_center', 'up_center', 'down_center',
                                  'up_right', 'center_right', 'down_right',
                                  'up_left', 'center_left', 'down_left',
-                                 'to_grasp', 'to_turntable']
+                                 'to_grasp', 'to_turntable', 'search_table']
 
     def execute(self, ud):
         if self.preempt_requested():
