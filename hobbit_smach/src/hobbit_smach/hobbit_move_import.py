@@ -9,13 +9,55 @@ import roslib
 roslib.load_manifest(PKG)
 import rospy
 
-from smach import State, Sequence
+from smach import State, Sequence, Concurrence, StateMachine
 from smach_ros import ServiceState
 from hobbit_msgs.srv import GetCoordinates, GetCoordinatesRequest
 from std_msgs.msg import String
-#import uashh_smach.util as util
+from mira_msgs.msg import BatteryState
+from uashh_smach.util import SleepState, WaitForMsgState
 import uashh_smach.platform.move_base as move_base
+import head_move_import as head_move
 from math import pi
+
+
+class Undock(State):
+    """
+    Publish the docking message to mira
+    topic: /docking_task
+    """
+    def __init__(self, angle=0):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'preempted']
+        )
+        self.stop_pub = rospy.Publisher('/docking_task', String, latch=False)
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        #self.stop_pub.publish('docking_off')
+        return 'succeeded'
+
+
+class Dock(State):
+    """
+    Publish the docking message to mira
+    topic: /docking_task
+    """
+    def __init__(self, angle=0):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'preempted']
+        )
+        self.stop_pub = rospy.Publisher('/docking_task', String, latch=False)
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        self.stop_pub.publish('docking_on')
+        return 'succeeded'
 
 
 class Stop(State):
@@ -34,7 +76,7 @@ class Stop(State):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
-        self.stop_pub.publish('stop') 
+        self.stop_pub.publish('stop')
         return 'succeeded'
 
 
@@ -120,12 +162,15 @@ def goToPosition(frame='/map', room='', place='dock'):
     place: defaults to dock
     """
 
+
     seq = Sequence(
         outcomes=['succeeded', 'preempted', 'aborted'],
         connector_outcome='succeeded'
     )
 
     with seq:
+        Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
+                     head_move.MoveTo(pose='down_center'))
     #Sequence.add(
     #    'SET_NAV_GOAL_GOTO',
     #    hobbit_move.get_set_nav_goal_state(),
@@ -145,15 +190,16 @@ def goToPose():
     """
     frame = '/map'
     seq = Sequence(outcomes=['succeeded', 'aborted', 'preempted'],
-        connector_outcome='succeeded',
-        input_keys=['x', 'y', 'yaw'])
+                   connector_outcome='succeeded',
+                   input_keys=['x', 'y', 'yaw'])
 
     with seq:
+        Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
+                     head_move.MoveTo(pose='down_center'))
         Sequence.add('MOVE_BASE_GOAL', move_base.MoveBaseState(frame),
-                     remapping={'x':'x',
-                                'y':'y',
-                                'yaw':'yaw'}
-                    )
+                     remapping={'x': 'x',
+                                'y': 'y',
+                                'yaw': 'yaw'})
     return seq
     #return move_base.MoveBaseState(frame)
 
@@ -190,5 +236,52 @@ def rotateRobot(angle=0, frame='/map'):
         Sequence.add('ROTATE_ROBOT', move_base.MoveBaseState())
         return seq
 
+
 def get_set_nav_goal_state(room_name=None, location_name='dock'):
     return SetNavigationGoal(room=None, place='dock')
+
+
+def battery_cb(msg, ud):
+    print('Received battery_state message')
+    print(msg)
+    if msg.charging:
+        return True
+    else:
+        return False
+
+
+def out_cb(outcome_map):
+    if outcome_map['CHARGE_CHECK'] == 'succeeded':
+        return 'succeeded'
+    else:
+        return 'failed'
+
+
+def child_term_cb(outcome_map):
+    return True
+
+
+def startDockProcedure():
+    cc = Concurrence(
+        outcomes=['succeeded', 'preempted', 'failed'],
+        default_outcome='failed',
+        child_termination_cb=child_term_cb,
+        outcome_cb=out_cb
+    )
+
+    sm = StateMachine(
+        outcomes=['succeeded', 'aborted', 'preempted'])
+
+    with cc:
+        Concurrence.add(
+            'DOCK_TIMER',
+            SleepState(duration=10))
+        Concurrence.add(
+            'CHARGE_CHECK',
+            WaitForMsgState('/battery_state', BatteryState, msg_cb=battery_cb),
+        )
+
+    with sm:
+        StateMachine.add('START_DOCK', Dock())
+        StateMachine.add('CHECK')
+    return sm

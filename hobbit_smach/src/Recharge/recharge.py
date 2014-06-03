@@ -344,7 +344,9 @@ def main():
                 Sequence.add(
                     'MOVE_TO_DOCK',
                     hobbit_move.goToPosition(frame='/map', place='dock'))
-                #Sequence.add('MOVE_BASE', move_base.MoveBaseState())
+                Sequence.add(
+                    'DOCKING',
+                    hobbit_move.dock())
             else:
                 Sequence.add('MOVE_TO_DOCK', Dummy())
             # DOCKING has to execute the actual docking procedure within mira
