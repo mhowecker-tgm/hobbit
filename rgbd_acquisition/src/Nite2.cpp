@@ -75,9 +75,9 @@ void newSkeletonDetected(int devID,unsigned int frameNumber ,struct skeletonHuma
 
     fprintf(stderr,"BBox : ( ");
     unsigned int i=0;
-    for (i=0; i<8; i++)
+    for (i=0; i<4; i++)
     {
-      fprintf(stderr,"%0.1f %0.1f %0.1f" ,skeletonFound->bbox[i].x , skeletonFound->bbox[i].y , skeletonFound->bbox[i].z  );
+      fprintf(stderr,"%0.1f %0.1f " ,skeletonFound->bbox[i].x , skeletonFound->bbox[i].y  );
       if (i<3) { fprintf(stderr,","); } else { fprintf(stderr,")"); }
     }
     fprintf(stderr,"\n");
@@ -88,9 +88,10 @@ void newSkeletonDetected(int devID,unsigned int frameNumber ,struct skeletonHuma
 
     for (i=0; i<HUMAN_SKELETON_PARTS; i++)
     {
-      printf("JOINT2D(%s,%0.2f,%0.2f)\n" , humanSkeletonJointNames[i] , skeletonFound->joint2D[i].x , skeletonFound->joint2D[i].y );
+      printf("%0.2f %0.2f ", skeletonFound->joint2D[i].x , skeletonFound->joint2D[i].y );
+      //printf("JOINT2D(%s,%0.2f,%0.2f)\n" , humanSkeletonJointNames[i] , skeletonFound->joint2D[i].x , skeletonFound->joint2D[i].y );
     }
-
+   printf("\n\n");
 
   if (stc[devID].skelCallbackAddr!=0)
   {
@@ -136,7 +137,7 @@ int considerSkeletonPointing(int devID ,unsigned int frameNumber,struct skeleton
   if ( (distanceLeft<MAXIMUM_DISTANCE_FOR_POINTING) && (distanceRight<MAXIMUM_DISTANCE_FOR_POINTING) ) { fprintf(stderr,"Cutting off pointing "); return 0; }
 
 
-  int doHand=1; //1 = right , 2 = left
+  int doHand=1; //1 = right , 2 =left
   if (distanceLeft<distanceRight) { doHand=2; }
 
   if (doHand==2)
@@ -177,6 +178,39 @@ int considerSkeletonPointing(int devID ,unsigned int frameNumber,struct skeleton
 
 
 
+void updateSkeletonBoundingBox(struct skeletonHuman * sk)
+{
+  //Use joints to extract bbox
+  float minX = sk->joint[0].x; float maxX = sk->joint[0].x;
+  float minY = sk->joint[0].y; float maxY = sk->joint[0].y;
+  float minZ = sk->joint[0].z; float maxZ = sk->joint[0].z;
+
+  unsigned int i=0;
+     for (i=0; i<HUMAN_SKELETON_PARTS; i++)
+      {
+        if (sk->joint[i].x>maxX) { maxX = sk->joint[i].x; } else
+        if (sk->joint[i].x<minX) { minX = sk->joint[i].x; }
+
+        if (sk->joint[i].y>maxY) { maxY = sk->joint[i].y; } else
+        if (sk->joint[i].y<minY) { minY = sk->joint[i].y; }
+
+        if (sk->joint[i].z>maxZ) { maxZ = sk->joint[i].z; } else
+        if (sk->joint[i].z<minZ) { minZ = sk->joint[i].z; }
+      }
+
+     sk->bbox[0].x = maxX; sk->bbox[0].y = maxY; sk->bbox[0].z = minZ;
+     sk->bbox[1].x = maxX; sk->bbox[1].y = minY; sk->bbox[1].z = minZ;
+     sk->bbox[2].x = minX; sk->bbox[2].y = minY; sk->bbox[2].z = minZ;
+     sk->bbox[3].x = minX; sk->bbox[3].y = maxY; sk->bbox[3].z = minZ;
+     sk->bbox[4].x = maxX; sk->bbox[4].y = maxY; sk->bbox[4].z = maxZ;
+     sk->bbox[5].x = maxX; sk->bbox[5].y = minY; sk->bbox[5].z = maxZ;
+     sk->bbox[6].x = minX; sk->bbox[6].y = minY; sk->bbox[6].z = maxZ;
+     sk->bbox[7].x = minX; sk->bbox[7].y = maxY; sk->bbox[7].z = maxZ;
+}
+
+
+
+
 void prepareSkeletonState(int devID,unsigned int frameNumber , nite::UserTracker & pUserTracker , const nite::UserData & user  , unsigned int observation , unsigned int totalObservations)
 {
     struct skeletonHuman humanSkeleton={0};
@@ -184,7 +218,7 @@ void prepareSkeletonState(int devID,unsigned int frameNumber , nite::UserTracker
     humanSkeleton.observationNumber = observation;
     humanSkeleton.observationTotal = totalObservations;
 
-    humanSkeleton.userID = user.getId() % MAX_USERS;
+    humanSkeleton.userID = user.getId();
 
     humanSkeleton.centerOfMass.x = user.getCenterOfMass().x;
     humanSkeleton.centerOfMass.y = user.getCenterOfMass().y;
@@ -205,7 +239,6 @@ void prepareSkeletonState(int devID,unsigned int frameNumber , nite::UserTracker
      nite::SkeletonJoint jointRightKnee     =   user.getSkeleton().getJoint(nite::JOINT_RIGHT_KNEE);
      nite::SkeletonJoint jointLeftFoot     =   user.getSkeleton().getJoint(nite::JOINT_LEFT_FOOT);
      nite::SkeletonJoint jointRightFoot     =   user.getSkeleton().getJoint(nite::JOINT_RIGHT_FOOT);
-
 
      humanSkeleton.joint[HUMAN_SKELETON_HEAD].x = jointHead.getPosition().x;
      humanSkeleton.joint[HUMAN_SKELETON_HEAD].y = jointHead.getPosition().y;
@@ -375,38 +408,22 @@ void prepareSkeletonState(int devID,unsigned int frameNumber , nite::UserTracker
                                                  &humanSkeleton.joint2D[HUMAN_SKELETON_RIGHT_FOOT].y );
      //------------------------------------------------------------------------------------------
 
-     //At first take the bounding box given by NiTE ( but this is 2D only and we want a 3D one )
-     float maxX=user.getBoundingBox().max.x , maxY=user.getBoundingBox().max.y , maxZ=user.getBoundingBox().max.z;
-     float minX=user.getBoundingBox().min.x , minY=user.getBoundingBox().min.y , minZ=user.getBoundingBox().min.z;
-
      #if CALCULATE_BOUNDING_BOX
-     //Use joints to extract bbox
-     minX = humanSkeleton.joint[HUMAN_SKELETON_HEAD].x;      maxX = humanSkeleton.joint[HUMAN_SKELETON_HEAD].x;
-     minY = humanSkeleton.joint[HUMAN_SKELETON_HEAD].y;      maxY = humanSkeleton.joint[HUMAN_SKELETON_HEAD].y;
-     minZ = humanSkeleton.joint[HUMAN_SKELETON_HEAD].z;      maxZ = humanSkeleton.joint[HUMAN_SKELETON_HEAD].z;
-
-     unsigned int i=0;
-     for (i=0; i<HUMAN_SKELETON_PARTS; i++)
-      {
-        if (humanSkeleton.joint[i].x>maxX) { maxX = humanSkeleton.joint[i].x; } else
-        if (humanSkeleton.joint[i].x<minX) { minX = humanSkeleton.joint[i].x; }
-
-        if (humanSkeleton.joint[i].y>maxY) { maxY = humanSkeleton.joint[i].y; } else
-        if (humanSkeleton.joint[i].y<minY) { minY = humanSkeleton.joint[i].y; }
-
-        if (humanSkeleton.joint[i].z>maxZ) { maxZ = humanSkeleton.joint[i].z; } else
-        if (humanSkeleton.joint[i].z<minZ) { minZ = humanSkeleton.joint[i].z; }
-      }
+      //We calculate by hand the Bounding box 
+        updateSkeletonBoundingBox(&humanSkeleton);
+     #else
+      //We take the bounding box given by NiTE ( but this is 2D only and we want a 3D one )
+      float maxX=user.getBoundingBox().max.x , maxY=user.getBoundingBox().max.y , maxZ=user.getBoundingBox().max.z;
+      float minX=user.getBoundingBox().min.x , minY=user.getBoundingBox().min.y , minZ=user.getBoundingBox().min.z;
+      humanSkeleton.bbox[0].x = maxX;       humanSkeleton.bbox[0].y = maxY;   humanSkeleton.bbox[0].z =  minZ;
+      humanSkeleton.bbox[1].x = maxX;       humanSkeleton.bbox[1].y = minY;   humanSkeleton.bbox[1].z =  minZ;
+      humanSkeleton.bbox[2].x = minX;       humanSkeleton.bbox[2].y = minY;   humanSkeleton.bbox[2].z =  minZ;
+      humanSkeleton.bbox[3].x = minX;       humanSkeleton.bbox[3].y = maxY;   humanSkeleton.bbox[3].z =  minZ;
+      humanSkeleton.bbox[4].x = maxX;       humanSkeleton.bbox[4].y = maxY;   humanSkeleton.bbox[4].z =  maxZ;
+      humanSkeleton.bbox[5].x = maxX;       humanSkeleton.bbox[5].y = minY;   humanSkeleton.bbox[5].z =  maxZ;
+      humanSkeleton.bbox[6].x = minX;       humanSkeleton.bbox[6].y = minY;   humanSkeleton.bbox[6].z =  maxZ;
+      humanSkeleton.bbox[7].x = minX;       humanSkeleton.bbox[7].y = maxY;   humanSkeleton.bbox[7].z =  maxZ;
      #endif
-
-     humanSkeleton.bbox[0].x = maxX;       humanSkeleton.bbox[0].y = maxY;   humanSkeleton.bbox[0].z =  minZ;
-     humanSkeleton.bbox[1].x = maxX;       humanSkeleton.bbox[1].y = minY;   humanSkeleton.bbox[1].z =  minZ;
-     humanSkeleton.bbox[2].x = minX;       humanSkeleton.bbox[2].y = minY;   humanSkeleton.bbox[2].z =  minZ;
-     humanSkeleton.bbox[3].x = minX;       humanSkeleton.bbox[3].y = maxY;   humanSkeleton.bbox[3].z =  minZ;
-     humanSkeleton.bbox[4].x = maxX;       humanSkeleton.bbox[4].y = maxY;   humanSkeleton.bbox[4].z =  maxZ;
-     humanSkeleton.bbox[5].x = maxX;       humanSkeleton.bbox[5].y = minY;   humanSkeleton.bbox[5].z =  maxZ;
-     humanSkeleton.bbox[6].x = minX;       humanSkeleton.bbox[6].y = minY;   humanSkeleton.bbox[6].z =  maxZ;
-     humanSkeleton.bbox[7].x = minX;       humanSkeleton.bbox[7].y = maxY;   humanSkeleton.bbox[7].z =  maxZ;
 
 
 
@@ -414,14 +431,14 @@ void prepareSkeletonState(int devID,unsigned int frameNumber , nite::UserTracker
 
     long long unsigned int ts = frameNumber;
 	if (user.isNew())  { humanSkeleton.isNew=1; } else
-    if ((user.isVisible()) && (!stc[devID].g_visibleUsers[humanSkeleton.userID])) { humanSkeleton.isVisible=1; }  else
-    if ((!user.isVisible()) && (stc[devID].g_visibleUsers[humanSkeleton.userID])) { humanSkeleton.isOutOfScene=1; } else
+    if ((user.isVisible()) && (!stc[devID].g_visibleUsers[user.getId()])) { humanSkeleton.isVisible=1; }  else
+    if ((!user.isVisible()) && (stc[devID].g_visibleUsers[user.getId()])) { humanSkeleton.isOutOfScene=1; } else
     if (user.isLost())  { humanSkeleton.isLost=1; }
 
-	stc[devID].g_visibleUsers[humanSkeleton.userID] = user.isVisible();
-	if(stc[devID].g_skeletonStates[humanSkeleton.userID] != user.getSkeleton().getState())
+	stc[devID].g_visibleUsers[user.getId()] = user.isVisible();
+	if(stc[devID].g_skeletonStates[user.getId()] != user.getSkeleton().getState())
 	{
-		switch(stc[devID].g_skeletonStates[humanSkeleton.userID] = user.getSkeleton().getState())
+		switch(stc[devID].g_skeletonStates[user.getId()] = user.getSkeleton().getState())
 		{
 		 case nite::SKELETON_NONE:         humanSkeleton.statusStoppedTracking = 1; break; // USER_MESSAGE("Stopped tracking.")
 		 case nite::SKELETON_CALIBRATING:  humanSkeleton.statusCalibrating=1;       break; // USER_MESSAGE("Calibrating...")
@@ -507,8 +524,8 @@ int startNite2(int maxVirtualSkeletonTrackers)
       stc[i].skelCallbackPointingAddr = 0;
       for (uid=0; uid<MAX_USERS; uid++)
          {
-          stc[i].g_visibleUsers[i] = false;
-          stc[i].g_skeletonStates[i] = nite::SKELETON_NONE;
+          stc[i].g_visibleUsers[uid] = false;
+          stc[i].g_skeletonStates[uid] = nite::SKELETON_NONE;
          }
     }
  return 1;
@@ -540,8 +557,15 @@ int createNite2Device(int devID,openni::Device * device)
 
 int destroyNite2Device(int devID)
 {
-   stc[devID].userTracker->destroy();
    stc[devID].userTrackerFrame->release();
+   
+    for (int i=0; i < MAX_USERS; i++) 
+   {
+		stc[devID].userTracker->stopSkeletonTracking(i+1);
+   }
+   
+   stc[devID].userTracker->destroy();
+
 
    delete stc[devID].userTracker;
    delete stc[devID].userTrackerFrame;
@@ -590,6 +614,10 @@ int loopNite2(int devID ,unsigned int frameNumber)
 			}
 			else
             //If we have a skeleton tracked , populate our internal structures and call callbacks
+            if (user.getSkeleton().getState() == nite::SKELETON_CALIBRATING )
+            {
+              fprintf(stderr,"Skeleton is beeing calibrated\n");
+            }
             if (user.getSkeleton().getState() == nite::SKELETON_TRACKED)
 			{
 		      prepareSkeletonState(devID,frameNumber,*stc[devID].userTracker,user  , i , users.getSize() );
@@ -605,3 +633,14 @@ unsigned short  * getNite2DepthFrame(int devID)
   return (unsigned short *) stc[devID].userTrackerFrame->getDepthFrame().getData();
 }
 
+
+int getNite2DepthHeight(int devID)
+{
+	return (int) stc[devID].userTrackerFrame->getDepthFrame().getHeight();
+}
+
+
+int getNite2DepthWidth(int devID)
+{
+	return (int) stc[devID].userTrackerFrame->getDepthFrame().getWidth();
+}

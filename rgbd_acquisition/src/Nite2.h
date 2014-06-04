@@ -109,15 +109,16 @@ enum humanMirroredSkeletonJoints
 
 extern const char * jointNames[];
 
+struct point3D
+{
+    float x,y,z;
+};
+
 struct point2D
 {
     float x,y;
 };
 
-struct point3D
-{
-    float x,y,z;
-};
 
 struct skeletonHuman
 {
@@ -156,6 +157,7 @@ int stopNite2();
 int loopNite2(int devID,unsigned int frameNumber);
 
 unsigned short  * getNite2DepthFrame(int devID);
-
+int getNite2DepthHeight(int devID);
+int getNite2DepthWidth(int devID);
 
 #endif // NITE2_H_INCLUDED

@@ -334,7 +334,11 @@ int main(int argc, char **argv)
       //This code segment waits for a valid first frame to come and initialize the focal lengths etc..
       //If there is no first frame it times out after a little while displaying a relevant error message
       //---------------------------------------------------------------------------------------------------
-      if (! acquistionStartUp((char*) "OPENNI2",devID,(char*) from.c_str(),640,480,30) ) { ROS_ERROR("Stopping service.."); return 1; }
+      if (! acquistionStartUp((char*) "OPENNI2",devID,(char*) from.c_str(),640,480,30) )
+          {
+            ROS_ERROR("Stopping RGBDAcquisition service , OpenNI2 USB Issues etc ? :( ..");
+            return 1;
+          }
 
       //Create our context
       //---------------------------------------------------------------------------------------------------
