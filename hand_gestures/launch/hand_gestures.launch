@@ -1,11 +1,17 @@
-<launch>   
-    <node name="hand_gestures" pkg="hand_gestures" type="run_it.sh" required="true">
-      <param name="name" value="hand_gestures" /> 
-
-      <param name="fromDepthTopic" value="/headcam/depth_registered/image_rect" /> 
-      <param name="fromDepthTopicInfo" value="/headcam/depth_registered/camera_info" /> 
-      <param name="fromRGBTopic" value="headcam/rgb/image_rect_color" /> 
-      <param name="fromRGBTopicInfo" value="/headcam/rgb/camera_info" /> 
+<launch>  
+      <arg name="name" value="hand_gestures" />
+      <arg name="fromDepthTopic" value="/headcam/depth_registered/image_rect" />
+      <arg name="fromDepthTopicInfo" value="/headcam/depth_registered/camera_info" />
+      <arg name="fromRGBTopic" value="headcam/rgb/image_rect_color" />
+      <arg name="fromRGBTopicInfo" value="/headcam/rgb/camera_info" />
+      <arg name="rate" value="5" type="int" />
  
+    <node name="hand_gestures" pkg="hand_gestures" type="run_it.sh" required="true">
+      <param name="name" value="$(arg name)" /> 
+      <param name="fromDepthTopic" value="$(arg fromDepthTopic)" /> 
+      <param name="fromDepthTopicInfo" value="$(arg fromDepthTopicInfo)" /> 
+      <param name="fromRGBTopic" value="$(arg fromRGBTopic)" /> 
+      <param name="fromRGBTopicInfo" value="$(arg fromRGBTopicInfo)" /> 
+      <param name="rate" value="$(arg rate)" type="int" /> 
     </node>   
 </launch>

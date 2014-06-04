@@ -36,7 +36,7 @@
 //pass them to the gesture node instead of the defaults
 #define USE_NONDEFAULT_CALIBRATIONS 1
 
-int rate=11;
+int rate=9;
 int first=0;
 int key = 0;
 volatile int paused = 0;
@@ -226,8 +226,17 @@ int main(int argc, char **argv)
      private_node_handle_.param("fromRGBTopic", fromRGBTopic, std::string("headcam/rgb/image_rect_color"));
      private_node_handle_.param("fromRGBTopicInfo", fromRGBTopicInfo, std::string("/headcam/rgb/camera_info"));
      private_node_handle_.param("name", name, std::string("hand_gestures"));
-     private_node_handle_.param("rate", rate, int(11));
+     private_node_handle_.param("rate", rate, int(9)); //11 should me optimal  less for a little less CPU Usage
      ros::Rate loop_rate(rate); //  hz should be our target performance
+
+     std::cerr<<"HandGestures Starting settings ----------------"<<std::endl;
+     std::cerr<<"Name : "<<name<<std::endl;
+     std::cerr<<"RGB : "<<fromRGBTopic<<std::endl;
+     std::cerr<<"Depth : "<<fromDepthTopic<<std::endl;
+     std::cerr<<"Rate : "<<rate<<std::endl;
+     std::cerr<<"--------------------------------------------------"<<std::endl;
+     
+
 
      //We advertise the services we want accessible using "rosservice call *w/e*"
      ros::ServiceServer visualizeOnService      = nh.advertiseService(name+"/visualize_on" , visualizeOn);
