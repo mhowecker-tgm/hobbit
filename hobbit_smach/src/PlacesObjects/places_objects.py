@@ -158,7 +158,6 @@ def addObject(object_name, rooms):
     for room in rooms.rooms_vector:
         for place in (x for x in room.places_vector if x.place_type.lower() == 'searchable'):
             if not place.objects:
-                print(type(object_name))
                 place.objects.append(Object(object_name, 0.0))
             else:
                 new = True
