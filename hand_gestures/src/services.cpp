@@ -5,6 +5,9 @@
 #include <ros/ros.h>
 #include <ros/spinner.h>
 
+#include <iostream>
+#include <sstream>
+#include <string>
 
 #define BROADCAST_HOBBIT 1
 
@@ -12,6 +15,7 @@
 
 #if BROADCAST_HOBBIT
 #include "hobbit_msgs/Event.h"
+#include <std_msgs/String.h>
 ros::Publisher gestureEventBroadcaster;
 #endif
 
@@ -31,34 +35,27 @@ unsigned short * depthFrameCopy =0;
 void broadcastNewGesture(unsigned int frameNumber,struct handGesture * gesture)
 {
     if ( (dontPublishGestures) || (gesture==0) ) { return ; }
-
-    hand_gestures::HandGesture msg;
-    msg.x = gesture->x;
-    msg.y = gesture->y;
-    msg.z = gesture->z;
-    msg.theta = 0;
-
-    msg.confidence = 1.0;
-    msg.timestamp=frameNumber;
-
-    fprintf(stderr,"Publishing a new gesture\n");
-    gestureBroadcaster.publish(msg);
-
-
+ 
 
 #if BROADCAST_HOBBIT
     hobbit_msgs::Event evt;
+    
+    std::stringstream ss;
+    //std_msgs::String sROS;
     switch (gesture->gestureID)
     {
-     case GESTURE_NONE   : evt.event="G_NONE";   break;
-     case GESTURE_CANCEL : evt.event="G_CANCEL"; break;
-     case GESTURE_HELP   : evt.event="G_HELP";   break;
-     case GESTURE_YES    : evt.event="G_YES";    break;
-     case GESTURE_NO     : evt.event="G_NO";     break;
-     case GESTURE_REWARD : evt.event="G_REWARD"; break;
-     case GESTURE_POINT  : evt.event="G_POINT";  break;
-     default :             evt.event="G_NOTFOUND"; break;
+     case GESTURE_NONE   : ss<<"G_NONE";   break;
+     case GESTURE_CANCEL : ss<<"G_CANCEL"; break;
+     case GESTURE_HELP   : ss<<"G_HELP";   break;
+     case GESTURE_YES    : ss<<"G_YES";    break;
+     case GESTURE_NO     : ss<<"G_NO";     break;
+     case GESTURE_REWARD : ss<<"G_REWARD"; break;
+     case GESTURE_POINT  : ss<<"G_POINT";  break;
+     default :             ss<<"G_NOTFOUND"; break;
     };
+
+    //sROS.data=ss.str();
+    evt.event=ss.str();
     evt.header.seq = frameNumber;
     evt.header.frame_id = "hand_gestures";
     evt.header.stamp = ros::Time::now();
@@ -70,6 +67,25 @@ void broadcastNewGesture(unsigned int frameNumber,struct handGesture * gesture)
 #endif
 
 
+
+    hand_gestures::HandGesture msg;
+
+#if BROADCAST_HOBBIT
+    msg.gesture = ss.str();
+#endif
+
+    msg.x = gesture->x;
+    msg.y = gesture->y;
+    msg.z = gesture->z;
+    msg.theta = 0;
+
+    msg.confidence = 1.0;
+    msg.timestamp=frameNumber;
+
+    fprintf(stderr,"Publishing a new gesture\n");
+    gestureBroadcaster.publish(msg);
+
+ 
 
     return ;
 }
