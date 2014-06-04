@@ -231,16 +231,18 @@ void execute(char * command,char * param)
   if (strcmp(command,"head")==0)
   {
     if (strcmp(param,"default")==0)  {
-                                        execute((char*)"head",(char*)"center");
-                                        execute((char*)"head",(char*)"middle");
+                                        execute((char*)"head",(char*)"center_center"); 
                                         return;
-                                     } else
-    if (strcmp(param,"right")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /HeadMove std_msgs/String \"right\" -1\" "); } else
-    if (strcmp(param,"center")==0)    { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /HeadMove std_msgs/String \"center\" -1\" ");    } else
-    if (strcmp(param,"left")==0)  { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /HeadMove std_msgs/String \"left\" -1\" ");  } else
-    if (strcmp(param,"up")==0)    { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /HeadMove std_msgs/String \"up\" -1\" ");    } else
-    if (strcmp(param,"middle")==0)  { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /HeadMove std_msgs/String \"middle\" -1\" ");  } else
-    if (strcmp(param,"down")==0)  { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /HeadMove std_msgs/String \"down\" -1\" ");  }
+                                     } else    
+    if (strcmp(param,"up_right")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /HeadMove std_msgs/String \"up_right\" -1\" "); } else
+    if (strcmp(param,"up_center")==0)    { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /HeadMove std_msgs/String \"up_center\" -1\" ");    } else
+    if (strcmp(param,"up_left")==0)  { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /HeadMove std_msgs/String \"up_left\" -1\" ");  } else 
+    if (strcmp(param,"center_right")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /HeadMove std_msgs/String \"center_right\" -1\" "); } else
+    if (strcmp(param,"center_center")==0)    { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /HeadMove std_msgs/String \"center_center\" -1\" ");    } else
+    if (strcmp(param,"center_left")==0)  { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /HeadMove std_msgs/String \"center_left\" -1\" ");  } else 
+    if (strcmp(param,"down_right")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /HeadMove std_msgs/String \"down_right\" -1\" "); } else
+    if (strcmp(param,"down_center")==0)    { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /HeadMove std_msgs/String \"down_center\" -1\" ");    } else
+    if (strcmp(param,"down_left")==0)  { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /HeadMove std_msgs/String \"down_left\" -1\" ");  }   
   }
    else
   if (strcmp(command,"rtd")==0)

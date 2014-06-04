@@ -240,23 +240,39 @@ function drop(ev)
          <td>
 
 	<div class="rtd">
-          <strong>HEAD</strong><br/>
-          <a href="controlpanel.html?head=left">  Head Left</a><br/>
-          <a href="controlpanel.html?head=center">Head Center</a><br/>
-          <a href="controlpanel.html?head=right"> Head Right</a> <br/>
+          <strong>HEAD CONTROL</strong><br/>
+           <table>
+              <tr> 
+                 <td align="center"><a href="controlpanel.html?head=up_left"><img src="head_up_left.png"></a></td> 
+                 <td align="center"><a href="controlpanel.html?head=up_center"><img src="head_up.png"></a></td> 
+                 <td align="center"><a href="controlpanel.html?head=up_right"><img src="head_up_right.png"></a></td> 
+               <tr>
+                 <td align="center"><br><a href="controlpanel.html?head=center_left"><img src="head_left.png"></a></td> 
+                 <td><a href="controlpanel.html?head=center_center"><img src="head.png"></a></td>
+                 <td align="center"><br><a href="controlpanel.html?head=center_right"><img src="head_right.png"></a></td> 
+               </tr>
+              <tr>
+                 <td align="center"><a href="controlpanel.html?head=down_left"><img src="head_down_left.png"></a></td> 
+                 <td align="center"><a href="controlpanel.html?head=down_center"><img src="head_down.png"></a></td> 
+                 <td align="center"><a href="controlpanel.html?head=down_right"><img src="head_down_right.png"></a></td> 
+              </tr> 
 
-          <a href="controlpanel.html?head=up">    Head Up</a><br/>
-          <a href="controlpanel.html?head=middle">Head Middle</a><br/>
-          <a href="controlpanel.html?head=down">  Head Down</a><br/><br/> 
-
-          <a href="controlpanel.html?head=default">  Head Default</a><br/> 
-
+              <tr>
+                <td colspan=3> Eyes status  : 
+                  <select>
+                    <option value="Open">Open</option>
+                    <option value="Closed">Closed</option>
+                  </select>  
+                </td>
+              </tr>
+           </table>  
 	</div> 
         </td>
         <td>
 
 	<div class="rtd">
-        <strong>COMMANDS</strong><br/>
+        <strong>STATUS</strong><br/>
+       <img width=200 src="battery_100.png"><br>
         <a href="controlpanel.html?scenario=moveto1">Move To Start</a><br/>
         <a href="controlpanel.html?robot=clearfloor">  Clear Floor </a><br/> 
         <a href="controlpanel.html?robot=learnobject">  Learn Object </a><br/> 

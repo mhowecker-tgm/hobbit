@@ -17,5 +17,14 @@ add_executable(web_interface src/main.cpp )
 
 target_link_libraries(web_interface ${CMAKE_CURRENT_SOURCE_DIR}/bin/libAmmarServer.a ${catkin_LIBRARIES} )
 
-install(TARGETS web_interface RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-install(FILES web_interface.xml DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+#install(TARGETS web_interface RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+#install(FILES web_interface.xml DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+
+
+install(TARGETS web_interface
+        ARCHIVE DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/bin
+        LIBRARY DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/bin
+        RUNTIME DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/bin
+)
+install(FILES web_interface.xml DESTINATION ${CMAKE_CURRENT_SOURCE_DIR} )
+
