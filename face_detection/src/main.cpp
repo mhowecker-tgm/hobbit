@@ -35,8 +35,10 @@
 //This will make this node also register to color/depth calibrations and
 //pass them to the gesture node instead of the defaults
 #define USE_NONDEFAULT_CALIBRATIONS 1
+#define DEFAULT_FRAME_RATE 5
 
-int rate=11;
+
+int rate=DEFAULT_FRAME_RATE;
 int first=0;
 int key = 0;
 volatile int paused = 0;
@@ -216,7 +218,7 @@ int main(int argc, char **argv)
      private_node_handle_.param("fromRGBTopicInfo", fromRGBTopicInfo, std::string("/headcam/rgb/camera_info"));
      private_node_handle_.param("name", name, std::string("hand_gestures"));
      private_node_handle_.param("frame", frame, std::string("frame"));
-     private_node_handle_.param("rate", rate, int(11));
+     private_node_handle_.param("rate", rate, int(DEFAULT_FRAME_RATE));
      ros::Rate loop_rate(rate); //  hz should be our target performance
 
 
