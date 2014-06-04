@@ -1,0 +1,159 @@
+<?xml version="1.0"?>
+<rooms>
+	<room>
+		<name>Bedroom</name>
+		<vertices>
+			<vertex x="-0.650000" y="-1.850000" />
+			<vertex x="0.850000" y="-0.750000" />
+			<vertex x="1.600000" y="-1.650001" />
+			<vertex x="0.000000" y="-2.800000" />
+		</vertices>
+		<places>
+			<place>
+				<name>default </name>>
+				<type>searchable </type>
+               			<pose x="0.828000" y="-1.378056" theta="-1.158330"/>
+              			<objects>
+                    			<object name="mug" probability="0.4"/>
+                    			<object name="glasses" probability="0.1"/>
+                		</objects>
+            		</place>
+			<place>
+				<name>tv</name>
+				<type>default</type>
+               			<pose x="0.665330" y="-1.820597" theta="-2.418353"/>
+            		</place>
+		</places>
+	</room>
+	<room>
+		<name>LivingRoom</name>
+		<vertices>
+			<vertex x="-1.550000" y="-0.800000" />
+			<vertex x="-0.650000" y="-1.850000" />
+			<vertex x="0.850000" y="-0.750000" />
+			<vertex x="0.150001" y="0.400000" />
+		</vertices>
+		<places>
+            		<place>
+				<name>default</name>
+				<type>searchable</type>
+               			<pose x="0.201210" y="-0.607421" theta="-2.429707"/>
+              			<objects>
+                    			<object name="mug" probability="0.4"/>
+                    			<object name="glasses" probability="0.1"/>
+                		</objects>
+            		</place>
+			<place>
+				<name>tv</name>
+				<type>default</type>
+               			<pose x="0.334518" y="-0.079993" theta="2.418575"/>
+            		</place>
+		</places>
+		
+	</room>
+	<room>
+		<name>Corridor1</name>
+		<vertices>
+			<vertex x="1.700000" y="-1.700000" />
+			<vertex x="3.250000" y="-3.350000" />
+			<vertex x="3.950000" y="-2.700000" />
+			<vertex x="2.650001" y="-1.250000" />
+		</vertices>
+		<places>
+			<place>
+				<name>whatever</name>
+				<type>default</type>
+               			<pose x="3.066916" y="-2.675593" theta="-0.908085"/>
+            		</place>
+		</places>
+	</room>
+	<room>
+		<name>Corridor2</name>
+		<vertices>
+			<vertex x="9.000000" y="3.950000" />
+			<vertex x="-3.200000" y="-7.350000" />
+			<vertex x="-2.450000" y="-8.300001" />
+			<vertex x="9.900000" y="3.000000" />
+		</vertices>
+		<places>
+			<place>
+				<name>whatever</name>
+				<type>default</type>
+               			<pose x="1.883488" y="-3.716272" theta="-2.363522"/>
+            		</place>
+			<place>
+				<name>end</name>
+				<type>searchable</type>
+               			<pose x="-1.609179" y="-7.267895" theta="-1.154227"/>
+            		</place>
+			<place>
+				<name>secretariat</name>
+				<type>searchable</type>
+               			<pose x="6.774985" y="0.836318" theta="1.773389"/>
+            		</place>
+			<place>
+				<name>paul</name>
+				<type>searchable</type>
+               			<pose x="8.466290" y="2.650212" theta="1.896591"/>
+            		</place>
+		</places>
+	</room>
+	<room>
+		<name>Kitchen</name>
+		<vertices>
+			<vertex x="2.650001" y="-1.100000" />
+			<vertex x="4.050000" y="0.050000" />
+			<vertex x="3.350000" y="0.800000" />
+			<vertex x="2.100000" y="-0.300000" />
+		</vertices>
+		<places>
+			<place>
+				<name>default</name>
+				<type>searchable</type>
+               			<pose x="2.640917" y="-0.492336" theta="-1.196047"/>
+            		</place>
+			<place>
+				<name>dishwasher</name>
+				<type>searchable</type>
+               			<pose x="3.573587" y="0.012761" theta="-0.639572"/>
+            		</place>
+		</places>
+	</room>
+	<room>
+		<name>DinningRoom</name>
+		<vertices>
+			<vertex x="2.100000" y="-0.250000" />
+			<vertex x="3.400001" y="0.849999" />
+			<vertex x="2.350000" y="2.100000" />
+			<vertex x="1.150001" y="1.250000" />
+		</vertices>
+		<places>
+			<place>
+				<name>default</name>
+				<type>searchable</type>
+               			<pose x="1.638460" y="0.603471" theta="1.031660"/>
+            		</place>
+			<place>
+				<name>table</name>
+				<type>searchable</type>
+               			<pose x="1.937785" y="0.590487" theta="0.730851"/>
+            		</place>
+		</places>
+	</room>
+	<room>
+		<name>CentralHall</name>
+		<vertices>
+			<vertex x="1.150001" y="1.250000" />
+			<vertex x="0.200000" y="0.450000" />
+			<vertex x="1.650001" y="-1.650001" />
+			<vertex x="2.650001" y="-1.200000" />
+		</vertices>
+		<places>
+			<place>
+				<name>default</name>
+				<type>searchable</type>
+               			<pose x="1.607165" y="-0.819800" theta="-0.934939"/>
+            		</place>
+		</places>
+	</room>
+</rooms>
