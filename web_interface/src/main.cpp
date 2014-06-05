@@ -31,8 +31,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #include <unistd.h>
 #include <ros/ros.h>
 #include <ros/spinner.h>
- 
-#include <stdexcept> 
+
+#include <stdexcept>
 #include <image_transport/image_transport.h>
 
 
@@ -43,12 +43,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #include <cv_bridge/cv_bridge.h>
 
 #include <std_srvs/Empty.h>
- 
+
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
 #include <sensor_msgs/CameraInfo.h>
 #include <image_transport/image_transport.h>
-  
+
 
 
 ros::NodeHandle * nhPtr=0;
@@ -111,7 +111,7 @@ bool resume(std_srvs::Empty::Request& request, std_srvs::Empty::Response& respon
    One can test them by opening http://127.0.0.1:8081/stats.html for a dynamic time page and http://127.0.0.1:8081/formtest.html for form testing..
 
 */
- 
+
 //The decleration of some dynamic content resources..
 struct AmmServer_Instance  * default_server=0;
 struct AmmServer_Instance  * admin_server=0;
@@ -121,6 +121,7 @@ struct AmmServer_RH_Context indexPage={0};
 struct AmmServer_RH_Context stats={0};
 struct AmmServer_RH_Context form={0};
 struct AmmServer_RH_Context chatbox={0};
+struct AmmServer_RH_Context image={0};
 struct AmmServer_RH_Context random_chars={0};
 
 
@@ -192,6 +193,32 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
 }
 
 
+//This function prepares the content of  stats context , ( stats.content )
+void * prepare_image(struct AmmServer_DynamicRequest  * rqst)
+{
+  unsigned int length;
+  char * readContent = AmmServer_ReadFileToMemory("~/tmp/left0000.jpg",&length);
+
+  if(readContent==0)
+  {
+     sprintf(rqst->content,"<html><body><h1>Bad Image</h1></body></html>");
+     rqst->contentSize=strlen(rqst->content);
+  } else
+  {
+     if (rqst->MAXcontentSize<length)
+     {
+        length = rqst->MAXcontentSize;
+        fprintf(stderr,"Error , not enough space to accomodate image \n");
+     }
+     memcpy(rqst->content,readContent,length);
+     rqst->contentSize=length;
+  }
+
+  return 0;
+}
+
+
+
 void joystickExecute(float x , float y )
 {
    AmmServer_Warning("Joystick(%0.2f,%0.2f)\n",x,y);
@@ -210,53 +237,59 @@ void joystickExecute(float x , float y )
 
 
 /*
-      ===========================================================================================================================  
-      ===========================================================================================================================  
-      ===========================================================================================================================  
-      ===========================================================================================================================  
-      ===========================================================================================================================  
-                     IF SOMEONE WANTS TO ADD SOMETHING JUST ADD TO THE FOLLOWING ( execute("command","param" )   
-      ===========================================================================================================================  
-      ===========================================================================================================================  
-      ===========================================================================================================================  
-      ===========================================================================================================================  
-      ===========================================================================================================================  
-*/ 
+      ===========================================================================================================================
+      ===========================================================================================================================
+      ===========================================================================================================================
+      ===========================================================================================================================
+      ===========================================================================================================================
+                     IF SOMEONE WANTS TO ADD SOMETHING JUST ADD TO THE FOLLOWING ( execute("command","param" )
+      ===========================================================================================================================
+      ===========================================================================================================================
+      ===========================================================================================================================
+      ===========================================================================================================================
+      ===========================================================================================================================
+*/
 void execute(char * command,char * param)
 {
   fprintf(stderr,"Execute(%s,%s) \n",command,param);
   int i=0;
   char commandToRun[1024]={0};
 
+
+  if (strcmp(command,"camera")==0)
+  {
+    if (strcmp(param,"refresh")==0)
+        { strcpy(commandToRun,"/bin/bash -c \"mkdir ~/tmp && cd ~/tmp && timeout 1 rosrun image_view image_saver image:=/basecam/rgb/image_raw\" "); }
+  } else
   if (strcmp(command,"head")==0)
   {
     if (strcmp(param,"default")==0)  {
-                                        execute((char*)"head",(char*)"center_center"); 
+                                        execute((char*)"head",(char*)"center_center");
                                         return;
-                                     } else    
+                                     } else
     if (strcmp(param,"up_right")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/move std_msgs/String \"up_right\" -1\" "); } else
     if (strcmp(param,"up_center")==0)    { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/move std_msgs/String \"up_center\" -1\" ");    } else
-    if (strcmp(param,"up_left")==0)  { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/move std_msgs/String \"up_left\" -1\" ");  } else 
+    if (strcmp(param,"up_left")==0)  { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/move std_msgs/String \"up_left\" -1\" ");  } else
     if (strcmp(param,"center_right")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/move std_msgs/String \"center_right\" -1\" "); } else
     if (strcmp(param,"center_center")==0)    { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/move std_msgs/String \"center_center\" -1\" ");    } else
-    if (strcmp(param,"center_left")==0)  { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/move std_msgs/String \"center_left\" -1\" ");  } else 
+    if (strcmp(param,"center_left")==0)  { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/move std_msgs/String \"center_left\" -1\" ");  } else
     if (strcmp(param,"down_right")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/move std_msgs/String \"down_right\" -1\" "); } else
     if (strcmp(param,"down_center")==0)    { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/move std_msgs/String \"down_center\" -1\" ");    } else
-    if (strcmp(param,"down_left")==0)  { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/move std_msgs/String \"down_left\" -1\" ");  }   
+    if (strcmp(param,"down_left")==0)  { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/move std_msgs/String \"down_left\" -1\" ");  }
   }
    else
   if (strcmp(command,"emotion")==0)
-  { 
+  {
     //HAPPY VHAPPY LTIRED VTIRED CONCERNED SAD WONDERING NEUTRAL SLEEPING
-    if (strcmp(param,"happy")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"HAPPY\" -1\" "); } else 
-    if (strcmp(param,"vhappy")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"VHAPPY\" -1\" "); } else 
-    if (strcmp(param,"ltired")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"LTIRED\" -1\" "); } else 
-    if (strcmp(param,"vtired")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"VTIRED\" -1\" "); } else 
-    if (strcmp(param,"concerned")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"CONCERNED\" -1\" "); } else 
-    if (strcmp(param,"sad")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"SAD\" -1\" "); } else 
-    if (strcmp(param,"wondering")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"WONDERING\" -1\" "); } else 
-    if (strcmp(param,"neutral")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"NEUTRAL\" -1\" "); } else 
-    if (strcmp(param,"sleeping")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"SLEEPING\" -1\" "); }   
+    if (strcmp(param,"happy")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"HAPPY\" -1\" "); } else
+    if (strcmp(param,"vhappy")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"VHAPPY\" -1\" "); } else
+    if (strcmp(param,"ltired")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"LTIRED\" -1\" "); } else
+    if (strcmp(param,"vtired")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"VTIRED\" -1\" "); } else
+    if (strcmp(param,"concerned")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"CONCERNED\" -1\" "); } else
+    if (strcmp(param,"sad")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"SAD\" -1\" "); } else
+    if (strcmp(param,"wondering")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"WONDERING\" -1\" "); } else
+    if (strcmp(param,"neutral")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"NEUTRAL\" -1\" "); } else
+    if (strcmp(param,"sleeping")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"SLEEPING\" -1\" "); }
   }
    else
   if (strcmp(command,"rtd")==0)
@@ -285,7 +318,7 @@ void execute(char * command,char * param)
   }
    else
   if (strcmp(command,"body")==0)
-  {                                
+  {
     if (strcmp(param,"360")==0) { strcpy(commandToRun,"rostopic pub /DiscreteMotionCmd std_msgs/String \"data: 'Turn 360'\" -1"); } else
     if (strcmp(param,"right")==0) { strcpy(commandToRun,"rostopic pub /DiscreteMotionCmd std_msgs/String \"data: 'Turn -30'\" -1"); } else
     if (strcmp(param,"left")==0) { strcpy(commandToRun,"rostopic pub /DiscreteMotionCmd std_msgs/String \"data: 'Turn 30'\" -1"); } else
@@ -358,18 +391,18 @@ void execute(char * command,char * param)
 
 
 /*
-      ===========================================================================================================================  
-      ===========================================================================================================================  
-      ===========================================================================================================================  
-      ===========================================================================================================================  
-      ===========================================================================================================================  
-                     IF SOMEONE WANTS TO ADD SOMETHING JUST ADD TO THE PREVIOUS FUNCTION  ( execute("command","param" )   
-      ===========================================================================================================================  
-      ===========================================================================================================================  
-      ===========================================================================================================================  
-      ===========================================================================================================================  
-      ===========================================================================================================================  
-*/ 
+      ===========================================================================================================================
+      ===========================================================================================================================
+      ===========================================================================================================================
+      ===========================================================================================================================
+      ===========================================================================================================================
+                     IF SOMEONE WANTS TO ADD SOMETHING JUST ADD TO THE PREVIOUS FUNCTION  ( execute("command","param" )
+      ===========================================================================================================================
+      ===========================================================================================================================
+      ===========================================================================================================================
+      ===========================================================================================================================
+      ===========================================================================================================================
+*/
 
 
 
@@ -435,8 +468,11 @@ void init_dynamic_content()
   if (! AmmServer_AddResourceHandler(default_server,&indexPage,(char*)"/index.html",webserver_root,4096,0,(void* ) &prepare_index_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding stats page\n"); }
   if (! AmmServer_AddResourceHandler(default_server,&stats,(char*)"/stats.html",webserver_root,4096,0,(void* ) &prepare_stats_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding stats page\n"); }
 
+  fprintf(stderr,"Please note that control panel , is only refreshed once per startup for min resource consumption\n");
   page=AmmServer_ReadFileToMemory((char*)"controlpanel.html",&pageLength);
   if (! AmmServer_AddResourceHandler(default_server,&form,(char*)"/controlpanel.html",webserver_root,pageLength+1,0,(void* ) &prepare_form_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding form testing page\n"); }
+
+  if (! AmmServer_AddResourceHandler(default_server,&image,(char*)"/image.jpg",webserver_root,640*480*3,0,(void* ) &prepare_image,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding prepare image page\n"); }
 
   AmmServer_DoNOTCacheResourceHandler(default_server,&form);
  }
@@ -450,8 +486,8 @@ void close_dynamic_content()
 /*! Dynamic content code ..! END ------------------------*/
 
 
-  
- 
+
+
 int main(int argc, char **argv)
 {
    ROS_INFO("Starting Up!!");
@@ -507,9 +543,9 @@ int main(int argc, char **argv)
       //---------------------------------------------------------------------------------------------------
 	  //////////////////////////////////////////////////////////////////////////
 	  while ( (AmmServer_Running(default_server))  && (ros::ok()) )
-		{  
+		{
                   ros::spinOnce();//<- this keeps our ros node messages handled up until synergies take control of the main thread
-                  
+
              //Main thread should just sleep and let the background threads do the hard work..!
              //In other applications the programmer could use the main thread to do anything he likes..
              //The only caveat is that he would takeup more CPU time from the server and that he would have to poll
@@ -518,14 +554,14 @@ int main(int argc, char **argv)
              sleep(1);
 		 }
 
- 
+
     //Delete dynamic content allocations and remove stats.html and formtest.html from the server
     close_dynamic_content();
 
     //Stop the server and clean state
     AmmServer_Stop(default_server);
     AmmServer_Warning("Ammar Server stopped\n");
-         
+
 
 
 	}
