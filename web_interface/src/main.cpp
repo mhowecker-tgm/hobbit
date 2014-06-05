@@ -121,7 +121,8 @@ struct AmmServer_RH_Context indexPage={0};
 struct AmmServer_RH_Context stats={0};
 struct AmmServer_RH_Context form={0};
 struct AmmServer_RH_Context chatbox={0};
-struct AmmServer_RH_Context image={0};
+struct AmmServer_RH_Context base_image={0};
+struct AmmServer_RH_Context top_image={0};
 struct AmmServer_RH_Context random_chars={0};
 
 
@@ -194,10 +195,10 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
 
 
 //This function prepares the content of  stats context , ( stats.content )
-void * prepare_image(struct AmmServer_DynamicRequest  * rqst)
+void * prepare_base_image(struct AmmServer_DynamicRequest  * rqst)
 {
   unsigned int length;
-  char * readContent = AmmServer_ReadFileToMemory("~/tmp/left0000.jpg",&length);
+  char * readContent = AmmServer_ReadFileToMemory("/opt/ros/hobbit_hydro/src/rgbd_acquisition/bin/frames/base/left0000.jpg",&length);
 
   if(readContent==0)
   {
@@ -212,11 +213,33 @@ void * prepare_image(struct AmmServer_DynamicRequest  * rqst)
      }
      memcpy(rqst->content,readContent,length);
      rqst->contentSize=length;
-  }
-
+  } 
   return 0;
 }
 
+
+//This function prepares the content of  stats context , ( stats.content )
+void * prepare_top_image(struct AmmServer_DynamicRequest  * rqst)
+{
+  unsigned int length;
+  char * readContent = AmmServer_ReadFileToMemory("/opt/ros/hobbit_hydro/src/rgbd_acquisition/bin/frames/top/left0000.jpg",&length);
+
+  if(readContent==0)
+  {
+     sprintf(rqst->content,"<html><body><h1>Bad Image</h1></body></html>");
+     rqst->contentSize=strlen(rqst->content);
+  } else
+  {
+     if (rqst->MAXcontentSize<length)
+     {
+        length = rqst->MAXcontentSize;
+        fprintf(stderr,"Error , not enough space to accomodate image \n");
+     }
+     memcpy(rqst->content,readContent,length);
+     rqst->contentSize=length;
+  } 
+  return 0;
+}
 
 
 void joystickExecute(float x , float y )
@@ -259,7 +282,7 @@ void execute(char * command,char * param)
   if (strcmp(command,"camera")==0)
   {
     if (strcmp(param,"refresh")==0)
-        { strcpy(commandToRun,"/bin/bash -c \"mkdir ~/tmp && cd ~/tmp && timeout 1 rosrun image_view image_saver image:=/basecam/rgb/image_raw\" "); }
+        { strcpy(commandToRun,"/bin/bash -c \"cd /opt/ros/hobbit_hydro/src/rgbd_acquisition/bin/frames/base/ && timeout 1 rosrun image_view image_saver image:=/basecam/rgb/image_raw\" && cd /opt/ros/hobbit_hydro/src/rgbd_acquisition/bin/frames/top/ && timeout 1 rosrun image_view image_saver image:=/headcam/rgb/image_raw "); }
   } else
   if (strcmp(command,"head")==0)
   {
@@ -473,7 +496,9 @@ void init_dynamic_content()
   page=AmmServer_ReadFileToMemory((char*)"controlpanel.html",&pageLength);
   if (! AmmServer_AddResourceHandler(default_server,&form,(char*)"/controlpanel.html",webserver_root,pageLength+1,0,(void* ) &prepare_form_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding form testing page\n"); }
 
-  if (! AmmServer_AddResourceHandler(default_server,&image,(char*)"/image.jpg",webserver_root,640*480*3,0,(void* ) &prepare_image,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding prepare image page\n"); }
+  if (! AmmServer_AddResourceHandler(default_server,&base_image,(char*)"/base_image.jpg",webserver_root,640*480*3,0,(void* ) &prepare_base_image,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding prepare base_image page\n"); }
+
+  if (! AmmServer_AddResourceHandler(default_server,&top_image,(char*)"/top_image.jpg",webserver_root,640*480*3,0,(void* ) &prepare_top_image,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding prepare top_image page\n"); }
 
   AmmServer_DoNOTCacheResourceHandler(default_server,&form);
  }
