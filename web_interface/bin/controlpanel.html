@@ -258,10 +258,17 @@ function drop(ev)
               </tr> 
 
               <tr>
-                <td colspan=3> Eyes status  : 
-                  <select>
-                    <option value="Open">Open</option>
-                    <option value="Closed">Closed</option>
+                <td colspan=3 align="center" > Head Emotion   : 
+                  <select id="emotionSelector" onchange="javascript:command('emotion='+this.value);" > 
+                    <option value="happy">Happy</option>
+                    <option value="vhappy">Very Happy</option>
+                    <option value="ltired">Little Tired</option>
+                    <option value="vtired">Very Tired</option>
+                    <option value="concerned">Concerned</option>
+                    <option value="sad">Sad</option>
+                    <option value="wondering">Wondering</option>
+                    <option value="neutral">Neutral</option>
+                    <option value="sleeping">Sleeping</option>
                   </select>  
                 </td>
               </tr>

@@ -245,6 +245,20 @@ void execute(char * command,char * param)
     if (strcmp(param,"down_left")==0)  { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/move std_msgs/String \"down_left\" -1\" ");  }   
   }
    else
+  if (strcmp(command,"emotion")==0)
+  { 
+    //HAPPY VHAPPY LTIRED VTIRED CONCERNED SAD WONDERING NEUTRAL SLEEPING
+    if (strcmp(param,"happy")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"HAPPY\" -1\" "); } else 
+    if (strcmp(param,"vhappy")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"VHAPPY\" -1\" "); } else 
+    if (strcmp(param,"ltired")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"LTIRED\" -1\" "); } else 
+    if (strcmp(param,"vtired")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"VTIRED\" -1\" "); } else 
+    if (strcmp(param,"concerned")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"CONCERNED\" -1\" "); } else 
+    if (strcmp(param,"sad")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"SAD\" -1\" "); } else 
+    if (strcmp(param,"wondering")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"WONDERING\" -1\" "); } else 
+    if (strcmp(param,"neutral")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"NEUTRAL\" -1\" "); } else 
+    if (strcmp(param,"sleeping")==0) { strcpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"SLEEPING\" -1\" "); }   
+  }
+   else
   if (strcmp(command,"rtd")==0)
   {
     if (strcmp(param,"home")==0) 		{ strcpy(commandToRun,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PoseHome.py"); 			} else
