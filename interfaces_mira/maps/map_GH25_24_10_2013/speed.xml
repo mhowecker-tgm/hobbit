@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<root>
+	<Map>
+		<Image>speed.png</Image>
+		<CellSize>0.050000</CellSize>
+		<Offset>
+			<X>600.000000</X>
+			<Y>600.000000</Y>
+		</Offset>
+	</Map>
+</root>
