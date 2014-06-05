@@ -27,7 +27,6 @@ roscore&
 sleep $DELAY_BETWEEN_STEPS
 sleep $DELAY_BETWEEN_STEPS
 sleep $DELAY_BETWEEN_STEPS
-   
 
 
 /opt/ros/hobbit_hydro/src/rgbd_acquisition/scripts/workAroundUSB.sh
@@ -56,6 +55,7 @@ sleep $DELAY_BETWEEN_STEPS
 
 
 #Start Head ( and bring it to level )
+/opt/ros/hobbit_hydro/src/hobbit_launch/launch/startupBlueDanubeHead.sh&
 #roslaunch head startup.launch&
 #Start Base
 
@@ -66,8 +66,6 @@ roslaunch startup.launch&
 sleep $DELAY_BETWEEN_STEPS
 
 
-echo "Will not do mira stuff , this is it for now"
-exit 0
 
 # Start interfaces_mira, which starts the platform driver and the ros-mira interface for virtual lasers
 cd /opt/ros/hobbit_hydro/src/interfaces_mira/launch
