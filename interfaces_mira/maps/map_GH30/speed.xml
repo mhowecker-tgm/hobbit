@@ -1,6 +1,6 @@
 <root>
   <Map>
-    <Image>static.png</Image>
+    <Image>speed.png</Image>
     <CellSize>0.025</CellSize>
     <Offset>
       <X>400</X>
