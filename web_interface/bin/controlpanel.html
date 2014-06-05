@@ -107,11 +107,13 @@
           }
      } 
    }
-
+ 
     function refreshFeed()
     {
-      document.getElementById("videoFeed").style.visibility='visible';
       command('camera=refresh');
+      document.getElementById("videoFeed").style.visibility='visible';
+      var randomnumber=Math.floor(Math.random()*100000);
+      document.getElementById("videoFeedImage").src="base_image.jpg?t="+randomnumber;
     }
 
     function makeFeedVisible()
