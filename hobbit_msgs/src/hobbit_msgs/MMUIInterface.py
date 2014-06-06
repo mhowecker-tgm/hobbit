@@ -32,10 +32,9 @@ class MMUIInterface:
 
     def processCommand(self, msg):
 	print "david"
-	print msg.data.name
         if msg.command == "C_SPEAK":
             print "C_SPEAK"
-            self.showMMUI_Info("test")     
+            self.showMMUI_Info(msg.params[0].value)     
 	    print "msg.params[0].value: "
 	    print msg.params[0].value
         print "##",msg.command,"##"

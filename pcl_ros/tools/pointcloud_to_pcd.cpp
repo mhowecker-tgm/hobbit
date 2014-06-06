@@ -63,6 +63,7 @@ class PointCloudToPCD
 
   private:
     std::string prefix_;
+  pcl::PCDWriter writer;
 
   public:
     string cloud_topic_;
@@ -86,8 +87,11 @@ class PointCloudToPCD
       ss << prefix_ << cloud->header.stamp << ".pcd";
       ROS_INFO ("Data saved to %s", ss.str ().c_str ());
 
-      pcl::io::savePCDFile (ss.str (), *cloud, Eigen::Vector4f::Zero (),
-                            Eigen::Quaternionf::Identity (), true);
+      //pcl::io::savePCDFile (ss.str (), *cloud, Eigen::Vector4f::Zero (),
+      //                      Eigen::Quaternionf::Identity (), true);
+      writer.writeBinaryCompressed (ss.str (), *cloud, 
+                            Eigen::Vector4f::Zero (),
+                            Eigen::Quaternionf::Identity ());
     }
 
     ////////////////////////////////////////////////////////////////////////////////

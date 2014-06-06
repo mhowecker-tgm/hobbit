@@ -24,6 +24,30 @@ import hobbit_smach.head_move_import as head_move
 import hobbit_smach.arm_move_import as arm_move
 
 
+class MoveFiles(State):
+    """
+    Move the pcd files for the upper or lower part of the object
+    """
+    def __init__(self, side):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'failed']
+        )
+        self.side = side
+    def execute(self, ud):
+        if rospy.has_param('/hobbit/pcd_path'):
+            directory = rospy.get_param('/hobbit/pcd_path') + '/'
+        else:
+            directory = '/tmp/pcd_data/'
+        directory2 = directory + self.side
+        if not os.path.exists(directory2):
+            os.makedirs(directory2)
+        for data in glob.glob(directory + '*.pcd'):
+            shutil.move(data, directory2)
+        return 'succeeded'
+    
+                
+
 class SetName(State):
     """
     Set the name of the pcd files
@@ -43,8 +67,8 @@ class SetName(State):
         directory2 = directory + ud.object_name
         if not os.path.exists(directory2):
             os.makedirs(directory2)
-        for data in glob.glob(directory + '*.pcd'):
-            shutil.move(data, directory2)
+        shutil.move(directory+'up', directory2)
+        shutil.move(directory+'down', directory2)
         return 'succeeded'
 
 def returnTurntable():
@@ -153,12 +177,17 @@ def getDataCW():
         outcomes=['succeeded', 'preempted', 'failed'],
         connector_outcome='succeeded'
     )
+    
+    seq1 = Sequence(
+        outcomes=['succeeded', 'preempted', 'failed'],
+        connector_outcome='succeeded'
+    )
 
     with seq:
         Sequence.add(
             'GET_DATA',
-            #util.WaitForMsgState('/headcam/depth_registered/points',
-            util.WaitForMsgState('/camera/depth_registered/points',
+            util.WaitForMsgState('/headcam/depth_registered/points',
+            #util.WaitForMsgState('/camera/depth_registered/points',
                             PointCloud2,
                             msg_cb=msg_cb
                             ),
@@ -178,7 +207,17 @@ def getDataCW():
         Concurrence.add(
             'GET_DATA',
             seq)
-    return cc
+
+    with seq1:
+        Sequence.add(
+            'DATA',
+            cc
+        )
+        Sequence.add(
+            'MOVE_FILES',
+            MoveFiles('up')
+        )
+    return seq1
 
 
 def getDataCCW():
@@ -199,12 +238,18 @@ def getDataCCW():
     with seq:
         Sequence.add(
             'GET_DATA',
-            #util.WaitForMsgState('/headcam/depth_registered/points',
-            util.WaitForMsgState('/camera/depth_registered/points',
+            util.WaitForMsgState('/headcam/depth_registered/points',
+            #util.WaitForMsgState('/camera/depth_registered/points',
                             PointCloud2,
                             msg_cb=msg_cb
                             ),
             transitions={'aborted': 'GET_DATA'})
+    
+    seq1 = Sequence(
+        outcomes=['succeeded', 'preempted', 'failed'],
+        connector_outcome='succeeded'
+    )
+
 
     cc = Concurrence(
         outcomes=['succeeded', 'preempted', 'failed'],
@@ -220,4 +265,14 @@ def getDataCCW():
         Concurrence.add(
             'GET_DATA',
             seq)
-    return cc
+
+    with seq1:
+        Sequence.add(
+            'DATA',
+            cc
+        )
+        Sequence.add(
+            'MOVE_FILES',
+            MoveFiles('down')
+        )
+    return seq1
