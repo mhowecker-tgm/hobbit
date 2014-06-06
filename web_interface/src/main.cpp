@@ -178,7 +178,7 @@ void * prepare_index_content_callback(struct AmmServer_DynamicRequest  * rqst)
 
 
 
-int getBackCommandLine(chat *  command , char * what2GetBack , unsigned int what2GetBackMaxSize)
+int getBackCommandLine(char *  command , char * what2GetBack , unsigned int what2GetBackMaxSize)
 {
  FILE *fp;
  /* Open the command for reading. */
@@ -191,7 +191,7 @@ int getBackCommandLine(chat *  command , char * what2GetBack , unsigned int what
 
  /* Read the output a line at a time - output it. */
   unsigned int i=0;
-  while (fgets(what2GetBack, size_of_output , fp) != 0)
+  while (fgets(what2GetBack, what2GetBackMaxSize , fp) != 0)
     {
         ++i;
         //fprintf(stderr,"\n\nline %u = %s \n",i,output);
