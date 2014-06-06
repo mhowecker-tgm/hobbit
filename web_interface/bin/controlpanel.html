@@ -230,7 +230,8 @@ function drop(ev)
 
   <center>
 	<!--a href="controlpanel.html?nothing=true"> <img src="header.png" border=0/> </a-->
-	<img src="scissors.png" id="scissors"/>
+	<!--
+        <img src="scissors.png" id="scissors"/> -->
 	<hr />
 	
    <table id="content">
@@ -275,6 +276,22 @@ function drop(ev)
                   </select>  
                 </td>
               </tr>
+
+ 
+              <tr>
+                <td colspan=3>
+                  <form action="controlpanel.html" accept-charset="utf-8" > 
+                   TTS : 
+                     <div style="overflow: hidden; padding-right: .5em;">
+                      <input type="text" name="say"  style="width: 60%;">
+                      <input type="submit" value="Speak" onclick="updateFormRandomNumber()" style="float: right">
+                     </div> 
+                     <input id="FormRandomField" type="hidden" name="t" value="somethingRandomHere"> 
+                   </form>
+                </td>
+              </tr>
+
+
            </table>  
 	</div> 
         </td>
@@ -287,14 +304,9 @@ function drop(ev)
         Temperature (In) : 0.0 C<br>
         Temperature (Look) : 0.0 C<br>
         No Humans in sight <br>
-        <a href="controlpanel.html?scenario=moveto1">Move To Start</a><br/>
-        <a href="controlpanel.html?robot=clearfloor">  Clear Floor </a><br/> 
-        <a href="controlpanel.html?robot=learnobject">  Learn Object </a><br/> 
-        <a href="controlpanel.html?bring=aspirin">  Bring Aspirin </a><br/>  
-        <a href="controlpanel.html?robot=helpme">  Help me </a><br/> 
-        <br/>
 
-        <a href="controlpanel.html?hand=calibrate">  Calibrate Hand</a><br/>
+
+        <a href="javascript:makeFeedVisible();">View</a>  / <a href="javascript:makeFeedInvisible();">Hide</a> the Camera<br/>
 	</div>
 
         </td>
@@ -302,8 +314,14 @@ function drop(ev)
        <tr>
         <td colspan=2>
            <div class="rtd">
-            <center>
               <strong>MOVEMENT</strong><br/> 
+            <center>
+
+<table>
+ <tr> 
+   <td>         
+      <!-- Movement has 2 parts , First is the Joystick -->
+
               <a href="javascript:joystickExecute(0.5,0);"><img class="turnControls" src="turnLeft.png" id="turnLeft" ></a>
 <!--  ------------------------------------------------------------------------------
       START OF:         THE HTML5 CANVAS CODE FOR MAKING THE JOYSTICK WORK 
@@ -440,6 +458,49 @@ function drop(ev)
                 <br/> 
                 <label><input id="joystickActiveSwitch" type="checkbox" onchange='handleJoystickActiveSwitch(this);' >Joystick Active</label> <br/>
                 <a href="javascript:joystickExecute(0,0);">STOP ALL MOVEMENT</a>
+
+
+</td>
+<td>
+</td>
+<td>
+        <!-- Movement has 2 parts , Second is the Discrete Movement -->
+        <table>
+          <tr>
+           <td></td>
+           <td>
+               <a href="controlpanel.html?body=forward"><img src="head_up.png" width=40></a><br/>
+           </td>
+           <td></td>
+          </tr>
+          <tr>
+           <td>
+              <a href="controlpanel.html?body=left"><img src="head_left.png" width=40></a><br/> 
+           </td>
+           <td>
+              <a href="controlpanel.html?body=stop"><img src="head_stop.png" width=40></a><br/> 
+           </td>
+           <td>
+              <a href="controlpanel.html?body=right"><img src="head_right.png" width=40></a><br/>
+           </td>
+          </tr>
+          <tr>
+           <td>
+              <a href="controlpanel.html?body=360ccw"><img src="head_ccw.png" width=40></a><br/>
+           </td>
+           <td>
+               <a href="controlpanel.html?body=back"><img src="head_down.png" width=40></a><br/>
+           </td>
+           <td>
+               <a href="controlpanel.html?body=360cw"><img src="head_cw.png" width=40></a><br/>
+           </td>
+          </tr>
+        </table>   
+        
+        
+</td>
+</tr>
+</table>
             </center>
            </div> 
         </td>
@@ -462,17 +523,23 @@ function drop(ev)
         <a href="controlpanel.html?robot=closemic">  Mute Microphone </a><br/>
         <a href="controlpanel.html?robot=call">  Call to Room </a><br/>
         <a href="controlpanel.html?robot=settings"> Settings </a><br/> 
-        <a href="javascript:makeFeedVisible();">View</a>  / <a href="javascript:makeFeedInvisible();">Hide</a> the Camera<br/> 
+
+
+        <a href="controlpanel.html?scenario=moveto1">Move To Start</a><br/>
+        <a href="controlpanel.html?robot=clearfloor">  Clear Floor </a><br/> 
+        <a href="controlpanel.html?robot=learnobject">  Learn Object </a><br/> 
+        <a href="controlpanel.html?bring=aspirin">  Bring Aspirin </a><br/>  
+        <a href="controlpanel.html?robot=helpme">  Help me </a><br/> 
+        <br/>
+
+        <a href="controlpanel.html?hand=calibrate">  Calibrate Hand</a><br/>
+
+ 
 	</div>
 
 
 	<div class="rtd">
-        <strong>BODY</strong><br/>
-        <a href="controlpanel.html?body=forward">  Move Forward </a><br/>
-        <a href="controlpanel.html?body=back">  Move Back </a><br/>
-        <a href="controlpanel.html?body=left">  Rotate Left </a><br/> 
-        <a href="controlpanel.html?body=right">  Rotate Right </a><br/>
-        <a href="controlpanel.html?body=360">  Rotate 360 </a><br/>
+        <strong>EMPTY</strong><br/>
 	</div><br/>
 
 
@@ -511,12 +578,7 @@ function drop(ev)
 
     <tr>
       <td colspan=10><center>
-       <form action="controlpanel.html" accept-charset="utf-8" >
-        Speech : 
-         <input type="text" name="say"> 
-         <input id="FormRandomField" type="hidden" name="t" value="somethingRandomHere"> 
-         <input type="submit" value="Say It" onclick="updateFormRandomNumber()">
-       </form></center>
+     </center>
       </td>
     </tr>
 
