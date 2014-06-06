@@ -46,6 +46,17 @@ void broadcast2DJoints(struct skeletonHuman * skeletonFound)
 {
   if (dontPublishPersons) { return ; }
 
+
+  for (unsigned int z=0; z<HUMAN_SKELETON_PARTS; z++)
+  {
+    if ( (msg.joints2D[2*z+0]==0) && (msg.joints2D[2*z+1]==0) )
+    {
+        fprintf(stderr,"Will not send a joint configuration because tablet doesnt like zeros\n");
+        return;
+    }
+  }
+
+
   rgbd_acquisition::Skeleton2D msg;
   msg.joints2D.resize(HUMAN_SKELETON_PARTS * 2, 0.0);
 
@@ -70,9 +81,9 @@ void broadcastPointing(unsigned int frameNumber ,struct skeletonPointing * skele
 {
   if (dontPublishPointEvents) { return ; }
   fprintf(stderr,"Broadcasting a pointing event \n");
-  
-  //David Wants to Flip Y 
-  signed int YFlipper = -1; 
+
+  //David Wants to Flip Y
+  signed int YFlipper = -1;
 
   rgbd_acquisition::PointEvents msg;
   msg.x = skeletonPointingFound->pointStart.x;
