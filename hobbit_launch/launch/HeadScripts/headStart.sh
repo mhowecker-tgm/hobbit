@@ -41,6 +41,11 @@ echo "Starting blue_pose"
 #screen -d -m -S "blue_pose" /bin/bash -c "source /home/pi/.bashrc && source /home/pi/ros/setup.bash && rosrun blue_owlpose owlpose.py"
 rosrun blue_owlpose owlpose.py&
 
+
+sleep 2 
+rostopic pub /head/cmd std_msgs/String "startup" -1&
+
+
 #sudo -i
 #rosrun blue_temperature blue_temperature&
 

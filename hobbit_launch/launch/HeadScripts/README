@@ -2,19 +2,8 @@ How to setup heads so they are auto booted with the rest of the things
 
 Ok , so in order to make the heads work one must change the current bashrc madness and use a better way to boot them up 
  
-So first copy the new scripts to the raspberry pi ..!
-cd /opt/ros/hobbit_hydro/src/hobbit_launch/launch/HeadScripts/
-scp headStart.sh pi@192.168.2.199:/home/pi/headStart.sh 
-scp headKickStarter.sh pi@192.168.2.199:/home/pi/headKickStarter.sh 
-scp activateHeadAutoStart.sh pi@192.168.2.199:/home/pi/activateHeadAutoStart.sh
-scp owlpose.py pi@192.168.2.199:/home/pi/workspace/blue_owlpose/scripts/owlpose.py
-scp herkulex.py pi@192.168.2.199:/home/pi/workspace/blue_owlpose/scripts/herkulex.py
+/opt/ros/hobbit_hydro/src/hobbit_launch/launch/HeadScripts/updateHead.sh
 
-ssh pi@192.168.2.199
-
-chmod +x activateHeadAutoStart.sh && ./activateHeadAutoStart.sh
-
-and then nano ~/.bashrc and put a # in front of the rosrun commands 
 
 I literally cannot make it easier than this :)
 
