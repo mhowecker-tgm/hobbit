@@ -42,8 +42,8 @@ echo "Starting blue_pose"
 rosrun blue_owlpose owlpose.py&
 
 
-sleep 2 
-rostopic pub /head/cmd std_msgs/String "startup" -1&
+sleep 5
+rostopic pub /head/cmd std_msgs/String "startup" -1
 
 
 #sudo -i
