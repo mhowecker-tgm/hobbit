@@ -21,13 +21,22 @@ from hobbit_msgs.msg import Parameter
 
 class MMUIInterface:
     def __init__(self):
-        #self.cSub = rospy.Subscriber("/ActionSequence", Command, self.processCommand, queue_size=1)
+        self.cSub = rospy.Subscriber("/ActionSequence", Command, self.processCommand, queue_size=1)
         #self.PubStatus = rospy.Publisher("/Status", Status)
         #self.stopSub = rospy.Subscriber("/Hobbit/Cancel", String, self.processStop, queue_size=1)
         self.dostop = False
 
     def processStop(self, msg):
         self.dostop = True  # has to be implemented => ISTU directly on MMUI
+
+    def processCommand(self, msg):
+	print "david"
+	print msg.data.name
+        if msg.command == "C_SPEAK":
+            print "C_SPEAK"
+            self.showMMUI_Info("test")     
+        print "##",msg.command,"##"
+
 
     def showMMUI_Info(self, text, wait="1", prm="", prm2="", prm3=""):
         parr = []
@@ -166,5 +175,9 @@ class MMUIInterface:
 
 
 def main(args):
-    MMUIIF = MMUIInterface()
-    MMUIIF.showMMUI_Info('test test test')
+    #MMUIIF = MMUIInterface()
+    #MMUIIF.showMMUI_Info('test test test')
+    print "MMUIInterface"
+    rospy.init_node('ActionSequencerLearnObject', anonymous=False)
+    mmui = MMUIInterface()
+    rospy.spin()
