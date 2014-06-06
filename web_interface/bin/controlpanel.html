@@ -179,6 +179,15 @@
      } 
 
 
+
+function updateStatusMonitor()
+{
+    var iframe = document.getElementById('statusMonitor');
+    iframe.reload(true);
+}
+
+setTimeout('updateStatusMonitor()', 10000);
+
 function updateFormRandomNumber()
     {
        var randomnumber=Math.floor(Math.random()*100000);
@@ -299,13 +308,9 @@ function drop(ev)
 
 	<div class="rtd">
         <strong>STATUS</strong><br/>
-        <img width=200 src="battery_100.png"><br>
-        Mileage :  000000 m <br>
-        Temperature (In) : 0.0 C<br>
-        Temperature (Look) : 0.0 C<br>
-        No Humans in sight <br>
-
-
+         <iframe id="statusMonitor" src="stats.html" frameBorder="0" scrolling="no" > 
+         </iframe>
+        <br><br>   
         <a href="javascript:makeFeedVisible();">View</a>  / <a href="javascript:makeFeedInvisible();">Hide</a> the Camera<br/>
 	</div>
 
