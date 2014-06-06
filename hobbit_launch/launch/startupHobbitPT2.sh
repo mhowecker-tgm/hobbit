@@ -26,7 +26,6 @@ roscore&
 #ros core takes ages to start
 sleep $DELAY_BETWEEN_STEPS
 sleep $DELAY_BETWEEN_STEPS
-sleep $DELAY_BETWEEN_STEPS
 
 
 /opt/ros/hobbit_hydro/src/rgbd_acquisition/scripts/workAroundUSB.sh
@@ -78,9 +77,9 @@ cd /opt/ros/hobbit_hydro/src/interfaces_mira/resources
 miracenter mira_config.xml
 
 
-#After everything is done , bring had to up position
-#rostopic pub -1 /HeadMove std_msgs/String 'up'&
 
+#Start MMUI TTS interface
+rosrun hobbit_msgs MMUIInterface.py
 
 cd $STARTDIR
 
