@@ -91,6 +91,28 @@ bool resume(std_srvs::Empty::Request& request, std_srvs::Empty::Response& respon
 
 
 
+
+/*
+rostopic echo /battery_state
+
+header: 
+  seq: 10374
+  stamp: 
+    secs: 1402062613
+    nsecs: 430198039
+  frame_id: ''
+voltage: 26.0810012817
+current: 3.8780002594
+lifePercent: 41
+lifeTime: -1
+charging: False
+powerSupplyPresent: False
+cellVoltage: [3.264000177383423, 3.259000062942505, 3.267000198364258, 3.2680001258850098, 3.261000156402588, 3.258000135421753, 3.258000135421753, 3.252000093460083]
+
+
+*/
+
+
 /*! Dynamic content code ..! START!*/
 /* A few words about dynamic content here..
    This is actually one of the key features on AmmarServer and maybe the reason that I started the whole project
