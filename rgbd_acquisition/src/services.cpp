@@ -70,15 +70,17 @@ void broadcastPointing(unsigned int frameNumber ,struct skeletonPointing * skele
 {
   if (dontPublishPointEvents) { return ; }
   fprintf(stderr,"Broadcasting a pointing event \n");
-
+  
+  //David Wants to Flip Y 
+  signed int YFlipper = -1; 
 
   rgbd_acquisition::PointEvents msg;
   msg.x = skeletonPointingFound->pointStart.x;
-  msg.y = skeletonPointingFound->pointStart.y;
+  msg.y = YFlipper*skeletonPointingFound->pointStart.y;
   msg.z = skeletonPointingFound->pointStart.z;
 
   msg.vectorX = skeletonPointingFound->pointingVector.x;
-  msg.vectorY = skeletonPointingFound->pointingVector.y;
+  msg.vectorY = YFlipper*skeletonPointingFound->pointingVector.y;
   msg.vectorZ = skeletonPointingFound->pointingVector.z;
 
   msg.leftHand = skeletonPointingFound->isLeftHand;
