@@ -49,7 +49,7 @@ void broadcast2DJoints(struct skeletonHuman * skeletonFound)
 
   for (unsigned int z=0; z<HUMAN_SKELETON_PARTS; z++)
   {
-    if ( (msg.joints2D[2*z+0]==0) && (msg.joints2D[2*z+1]==0) )
+    if ( (skeletonFound->joint2D[z].x==0) && (skeletonFound->joint2D[z].y==0) )
     {
         fprintf(stderr,"Will not send a joint configuration because tablet doesnt like zeros\n");
         return;
