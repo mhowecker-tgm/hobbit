@@ -8,7 +8,7 @@ scp headStart.sh pi@192.168.2.199:/home/pi/headStart.sh
 scp headKickStarter.sh pi@192.168.2.199:/home/pi/headKickStarter.sh 
 scp activateHeadAutoStart.sh pi@192.168.2.199:/home/pi/activateHeadAutoStart.sh
 scp owlpose.py pi@192.168.2.199:/home/pi/workspace/blue_owlpose/scripts/owlpose.py
-
+scp herkulex.py pi@192.168.2.199:/home/pi/workspace/blue_owlpose/scripts/herkulex.py
 
 ssh pi@192.168.2.199
 
