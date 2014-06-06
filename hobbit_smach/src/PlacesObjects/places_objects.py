@@ -9,7 +9,6 @@ PKG = 'hobbit_msgs' # this package name
 NAME = 'ObjectService'
 PROJECT = 'Hobbit'
 
-FILE='out-places_ISTU20131030-NEW.xml'
 FILE='places.xml'
 
 import roslib; roslib.load_manifest(PKG)
@@ -232,6 +231,9 @@ def getAllRooms(req):
     Returns a RoomsVector with all available rooms inside.
     """
     global rooms
+    print('Request received')
+    print(req)
+    print(rooms)
     # As rooms is already the RoomsVector we are looking for we just return it
     # TODO: The order of the RoomsVector should be with the 6 most important ones
     # at the front. kitchen, bedroom, livingroom, dining room

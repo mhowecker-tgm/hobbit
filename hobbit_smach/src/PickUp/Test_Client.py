@@ -31,9 +31,9 @@ ArmClient = ArmClientFunctions('192.168.2.190')
 ''' SET Functions '''
 #print ArmClient.SetAbsolutePos(90, 0, 50, 0, 110, 0)
 #print ArmClient.SetStartMove(10) #10 Grad/Sec
-print ArmClient.SetMoveToHomePos()
+#print ArmClient.SetMoveToHomePos()
 #print ArmClient.SetMoveToLearningPos()
-#print ArmClient.SetMoveToTrayPos()
+print ArmClient.SetMoveToTrayPos()
 #print ArmClient.SetMoveToPreGraspFromFloorPos()
 #print ArmClient.SetStoreTurntable()
 #print ArmClient.SetTurnTurntableCW()

@@ -8,6 +8,28 @@
 			<vertex x="0.784000" y="1.819998" />
 			<vertex x="0.932001" y="-3.360001" />
 		</vertices>
+		<places>
+			<place>
+				<name>default</name>
+				<type>goto</type>
+               			<pose x="-0.3" y="0" theta="-1.570795"/>
+            		</place>
+			<place>
+				<name>side_desk</name>
+				<type>searchable</type>
+               			<pose x="-1.834" y="1.159" theta="-1.491"/>
+            		</place>
+			<place>
+				<name>front_desk</name>
+				<type>searchable</type>
+               			<pose x="-0.908" y="0.527" theta="-3.029"/>
+            		</place>
+			<place>
+				<name>workshop_desk</name>
+				<type>searchable</type>
+               			<pose x="-0.159" y="0.684" theta="0.1302"/>
+            		</place>
+		</places>
 	</room>
 	<room>
 		<name>MainCorridor</name>
@@ -17,6 +39,19 @@
 			<vertex x="5.667999" y="-6.023998" />
 			<vertex x="4.336002" y="16.916000" />
 		</vertices>
+		<places>
+			<place>
+				<name>front</name>
+				<type>goto</type>
+               			<pose x="3.5" y="6" theta="0.0"/>
+            		</place>
+
+			<place>
+				<name>side_entrance</name>
+				<type>default</type>
+               			<pose x="3.5" y="3" theta="-1.57"/>
+            		</place>
+		</places>
 	</room>
 	<room>
 		<name>ShortCorridor</name>
@@ -26,5 +61,17 @@
 			<vertex x="1.672001" y="3.151999" />
 			<vertex x="1.524000" y="5.667999" />
 		</vertices>
+		<places>
+			<place>
+				<name>center</name>
+				<type>goto</type>
+               			<pose x="-0.2" y="4.5" theta="0.0"/>
+            		</place>
+			<place>
+				<name>printer_desk</name>
+				<type>searchable</type>
+               			<pose x="-0.198" y="5.098" theta="1.5782"/>
+            		</place>
+		</places>
 	</room>
 </rooms>

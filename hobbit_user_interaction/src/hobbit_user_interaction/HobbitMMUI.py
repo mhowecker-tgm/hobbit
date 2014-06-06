@@ -249,6 +249,7 @@ class ShowInfo(smach.State):
         self.info = info
 
     def execute(self, ud):
+        print('INSIDE: ShowInfo')
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'

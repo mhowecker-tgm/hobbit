@@ -157,7 +157,8 @@ def getDataCW():
     with seq:
         Sequence.add(
             'GET_DATA',
-            util.WaitForMsgState('/headcam/depth_registered/points',
+            #util.WaitForMsgState('/headcam/depth_registered/points',
+            util.WaitForMsgState('/camera/depth_registered/points',
                             PointCloud2,
                             msg_cb=msg_cb
                             ),
@@ -198,7 +199,8 @@ def getDataCCW():
     with seq:
         Sequence.add(
             'GET_DATA',
-            util.WaitForMsgState('/headcam/depth_registered/points',
+            #util.WaitForMsgState('/headcam/depth_registered/points',
+            util.WaitForMsgState('/camera/depth_registered/points',
                             PointCloud2,
                             msg_cb=msg_cb
                             ),

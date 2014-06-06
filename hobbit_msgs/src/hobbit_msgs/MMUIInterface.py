@@ -10,6 +10,7 @@
 
 PKG = 'hobbit_msgs'
 import roslib
+import sys
 roslib.load_manifest(PKG)
 import rospy
 from hobbit_msgs.msg import Command, Status
@@ -35,6 +36,8 @@ class MMUIInterface:
         if msg.command == "C_SPEAK":
             print "C_SPEAK"
             self.showMMUI_Info("test")     
+	    print "msg.params[0].value: "
+	    print msg.params[0].value
         print "##",msg.command,"##"
 
 
@@ -181,3 +184,6 @@ def main(args):
     rospy.init_node('ActionSequencerLearnObject', anonymous=False)
     mmui = MMUIInterface()
     rospy.spin()
+
+if __name__ == "__main__":        
+    main(sys.argv)

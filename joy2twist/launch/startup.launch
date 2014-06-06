@@ -2,7 +2,7 @@
     <node   name="joy"
             pkg="joy"
             type="joy_node"
-            respawn="false"
+            respawn="true"
             output="screen">
     </node>
     <node   pkg="joy2twist"

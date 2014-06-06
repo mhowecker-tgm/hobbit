@@ -228,7 +228,7 @@ def main():
             )
             Sequence.add(
                 'SAY_THANKS',
-                speech_output.sayText(info='ThankyYouTeachingNewObject')
+                speech_output.sayText(info='ThankYouTeachingNewObject')
             )
             Sequence.add('MMUI_MAIN_MENU', HobbitMMUI.ShowMenu(menu='MAIN'))
 
