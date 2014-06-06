@@ -91,28 +91,6 @@ bool resume(std_srvs::Empty::Request& request, std_srvs::Empty::Response& respon
 
 
 
-
-/*
-rostopic echo /battery_state
-
-header: 
-  seq: 10374
-  stamp: 
-    secs: 1402062613
-    nsecs: 430198039
-  frame_id: ''
-voltage: 26.0810012817
-current: 3.8780002594
-lifePercent: 41
-lifeTime: -1
-charging: False
-powerSupplyPresent: False
-cellVoltage: [3.264000177383423, 3.259000062942505, 3.267000198364258, 3.2680001258850098, 3.261000156402588, 3.258000135421753, 3.258000135421753, 3.252000093460083]
-
-
-*/
-
-
 /*! Dynamic content code ..! START!*/
 /* A few words about dynamic content here..
    This is actually one of the key features on AmmarServer and maybe the reason that I started the whole project
@@ -198,22 +176,76 @@ void * prepare_index_content_callback(struct AmmServer_DynamicRequest  * rqst)
   return 0;
 }
 
+
+
+int getBackCommandLine(chat *  command , char * what2GetBack , unsigned int what2GetBackMaxSize)
+{
+ FILE *fp;
+ /* Open the command for reading. */
+ fp = popen(command, "r");
+ if (fp == 0 )
+       {
+         fprintf(stderr,"Failed to run command (%s) \n",command);
+         return 0;
+       }
+
+ /* Read the output a line at a time - output it. */
+  unsigned int i=0;
+  while (fgets(what2GetBack, size_of_output , fp) != 0)
+    {
+        ++i;
+        //fprintf(stderr,"\n\nline %u = %s \n",i,output);
+        break;
+    }
+  /* close */
+  pclose(fp);
+  return 1;
+}
+
+
+
+
+
+/*
+rostopic echo /battery_state
+
+header:
+  seq: 10374
+  stamp:
+    secs: 1402062613
+    nsecs: 430198039
+  frame_id: ''
+voltage: 26.0810012817
+current: 3.8780002594
+lifePercent: 41
+lifeTime: -1
+charging: False
+powerSupplyPresent: False
+cellVoltage: [3.264000177383423, 3.259000062942505, 3.267000198364258, 3.2680001258850098, 3.261000156402588, 3.258000135421753, 3.258000135421753, 3.252000093460083]
+
+rostopic echo /battery_state -n 1 | grep lifePercent | cut -d ':' -f2
+
+*/
+
 //This function prepares the content of  stats context , ( stats.content )
 void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
 {
   time_t t = time(NULL);
   struct tm tm = *localtime(&t);
 
+  char batteryState[1000]={0};
+  getBackCommandLine("rostopic echo /battery_state -n 1 | grep lifePercent | cut -d ':' -f2", batteryState , 1000 );
+
+
   //No range check but since everything here is static max_stats_size should be big enough not to segfault with the strcat calls!
-  sprintf(rqst->content,"<html><head><title>Dynamic Content Enabled</title><meta http-equiv=\"refresh\" content=\"1\"></head><body>The date and time in AmmarServer is<br><h2>%02d-%02d-%02d %02d:%02d:%02d\n</h2>",
-                    tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900,   tm.tm_hour, tm.tm_min, tm.tm_sec);
-  strcat(rqst->content,"The string you see is updated dynamically every time you get a fresh copy of this file!<br><br>\n");
-  strcat(rqst->content,"To include your own content see the <a href=\"https://github.com/AmmarkoV/AmmarServer/blob/master/src/main.c#L37\">Dynamic content code label in ammarserver main.c</a><br>\n");
-  strcat(rqst->content,"If you dont need dynamic content at all consider disabling it from ammServ.conf or by setting DYNAMIC_CONTENT_RESOURCE_MAPPING_ENABLED=0; in ");
-  strcat(rqst->content,"<a href=\"https://github.com/AmmarkoV/AmmarServer/blob/master/src/AmmServerlib/file_caching.c\">file_caching.c</a> and recompiling.!</body></html>");
+  sprintf(rqst->content,"<html><head><body>Time is<br><h2>%02d-%02d-%02d %02d:%02d:%02d\n</h2><br>Battery is : %s<br>",
+                    tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900,   tm.tm_hour, tm.tm_min, tm.tm_sec,batteryState);
+  strcat(rqst->content,"Have a nice day!<br></body></html>");
   rqst->contentSize=strlen(rqst->content);
   return 0;
 }
+
+
 
 
 //This function prepares the content of  stats context , ( stats.content )
@@ -235,7 +267,7 @@ void * prepare_base_image(struct AmmServer_DynamicRequest  * rqst)
      }
      memcpy(rqst->content,readContent,length);
      rqst->contentSize=length;
-  } 
+  }
   return 0;
 }
 
@@ -259,7 +291,7 @@ void * prepare_top_image(struct AmmServer_DynamicRequest  * rqst)
      }
      memcpy(rqst->content,readContent,length);
      rqst->contentSize=length;
-  } 
+  }
   return 0;
 }
 
