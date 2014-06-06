@@ -235,12 +235,16 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
 
   char batteryState[1000]={0};
   getBackCommandLine("rostopic echo /battery_state -n 1 | grep lifePercent | cut -d ':' -f2", batteryState , 1000 );
+  char chargingState[1000]={0};
+  getBackCommandLine("rostopic echo /battery_state -n 1 | grep charging | cut -d ':' -f2", chargingState , 1000 );
+  char mileageState[1000]={0};
+  getBackCommandLine("rostopic echo /mileage -n 1 | grep data | cut -d ':' -f2", mileageState , 1000 );
 
 
   //No range check but since everything here is static max_stats_size should be big enough not to segfault with the strcat calls!
-  sprintf(rqst->content,"<html><head><body>Time is<br><h2>%02d-%02d-%02d %02d:%02d:%02d\n</h2><br>Battery is : %s<br>",
-                    tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900,   tm.tm_hour, tm.tm_min, tm.tm_sec,batteryState);
-  strcat(rqst->content,"Have a nice day!<br></body></html>");
+  sprintf(rqst->content,"<html><head><body>Time is<br> %02d-%02d-%02d %02d:%02d:%02d\n <br>Battery is : %s<br>Charging : %s<br>Mileage : %s<br>",
+                    tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900,   tm.tm_hour, tm.tm_min, tm.tm_sec,batteryState,chargingState,mileageState);
+  strcat(rqst->content,"<br></body></html>");
   rqst->contentSize=strlen(rqst->content);
   return 0;
 }
@@ -396,6 +400,7 @@ void execute(char * command,char * param)
    else
   if (strcmp(command,"body")==0)
   {
+    if (strcmp(param,"reset")==0) { strcpy(commandToRun,"rosservice call /reset_motorstop service,mira_msgs::ResetMotorStop::Request"); } else
     if (strcmp(param,"360")==0) { strcpy(commandToRun,"rostopic pub /DiscreteMotionCmd std_msgs/String \"data: 'Turn 360'\" -1"); } else
     if (strcmp(param,"360ccw")==0) { strcpy(commandToRun,"rostopic pub /DiscreteMotionCmd std_msgs/String \"data: 'Turn 360'\" -1"); } else
     if (strcmp(param,"360cw")==0) { strcpy(commandToRun,"rostopic pub /DiscreteMotionCmd std_msgs/String \"data: 'Turn -360'\" -1"); } else
