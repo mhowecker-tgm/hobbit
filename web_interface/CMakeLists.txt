@@ -1,11 +1,10 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(web_interface)
 
-find_package(catkin REQUIRED COMPONENTS sensor_msgs roscpp std_msgs image_transport geometry_msgs roslib tf)
- 
-     
+find_package(catkin REQUIRED COMPONENTS roscpp roslib std_msgs)
+
 ## Generate added messages and services
-generate_messages(DEPENDENCIES std_msgs)
+#generate_messages(DEPENDENCIES std_msgs)
 
 #This needs to be after generate messages
 catkin_package()
