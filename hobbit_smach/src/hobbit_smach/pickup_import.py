@@ -8,10 +8,11 @@ import roslib
 roslib.load_manifest(PKG)
 # import rospy
 
-from smach import Concurrence  # , State, Sequence
+from smach import Concurrence, Sequence # , State
 from hobbit_user_interaction import HobbitEmotions  # ,HobbitMMUI
 import hobbit_smach.speech_output_import as speech_output
 # import hobbit_smach.head_move_import as head_move
+import hobbit_smach.hobbit_move_import as hobbit_move
 
 
 def child_term_cb(outcome_map):
@@ -280,3 +281,29 @@ def sayRemoveObjectTakeObject():
     return cc
 
 
+def getStartLooking():
+    """
+    Return SMACH Sequence that will let the robot give some speech output
+    and moves the robot to a pose that should be good enough so that an
+    object could be detected.
+    """
+    seq = Sequence(
+        outcomes=['succeeded', 'preempted', 'failed'],
+        connector_outcome='succeeded'
+    )
+
+    with seq:
+        Sequence.add(
+        'EMO_SAY_START_LOOKING',
+        sayStartLooking()
+        )
+        Sequence.add(
+            'CALCULATE_LOOKING_POSE',
+            DummyLookingPose()
+        )
+        Sequence.add(
+            'MOVE_TO_POSE',
+            hobbit_move.goToPose()
+        )
+
+    return seq
