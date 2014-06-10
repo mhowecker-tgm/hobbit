@@ -14,6 +14,36 @@ from hobbit_msgs.msg import Event
 from hobbit_msgs import MMUIInterface as MMUI
 
 
+def askYesNo(question='Text is missing'):
+    """
+    Return a SMACH Sequence for speech output on the MMUI.
+    We wait for an answer, Yes or No, from the MMUI.
+    The second State is needed to wait until the spoken text
+    is completely done. Otherwise the next State can disturb
+    the speech output.
+
+    info: defaults to 'Text is missing' which indicates that
+    no textID was specified.
+    """
+
+    seq = Sequence(
+        outcomes=['succeeded', 'preempted', 'failed'],
+        connector_outcome='succeeded'
+    )
+
+    with seq:
+            Sequence.add(
+                'TALK',
+                HobbitMMUI.AslYesNo(question=question)
+            )
+            Sequence.add(
+                'WAIT_FOR_MMUI',
+                HobbitMMUI.WaitforSoundEnd('/Event', Event),
+                transitions={'aborted': 'WAIT_FOR_MMUI',
+                             'succeeded': 'succeeded'})
+    return seq
+
+
 def sayText(info='Text is missing'):
     """
     Return a SMACH Sequence for speech output on the MMUI.
