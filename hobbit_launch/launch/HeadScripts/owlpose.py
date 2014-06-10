@@ -16,8 +16,10 @@ pitch = 0
 yaw = 0
 roll = 0
 br = tf.TransformBroadcaster()
-base_tf = "hobbit"
-head_tf = "topcamera_rgb_optical_frame"
+#base_tf = "hobbit"
+#head_tf = "topcamera_rgb_optical_frame"
+base_tf = "headcam_link"
+head_tf = "hobbit_head"
 
 def set_head_orientation(msg):
 	print "Move to",msg.data
