@@ -127,15 +127,15 @@ def point_cloud_cb(msg, ud):
 def main():
     rospy.init_node(NAME)
 
-    bo_sm = smach.StateMachine(
+    pickup_sm = smach.StateMachine(
         outcomes=['succeeded', 'aborted', 'preempted'],
         input_keys=['object_name'],
         output_keys=['result'])
 
-    bo_sm.userdata.result = String('started')
-    bo_sm.userdata.detection = False
+    pickup_sm.userdata.result = String('started')
+    pickup_sm.userdata.detection = False
 
-    with bo_sm:
+    with pickup_sm:
         StateMachine.add(
             'INIT',
             Init(),
@@ -168,6 +168,24 @@ def main():
             'START_LOOKING',
             pickup.getStartLooking(),
             transitions={}
+        )
+        StateMachine.add(
+            'LOOK_FOR_OBJECT',
+            DavidDummyLook(),
+            transitions={'succeeded': 'CALC_GRASP_POSE',
+                         'aborted': 'END_FAIL_OBJECT_DETECTION',
+                         'preempted': 'preempted'}
+        )
+        StateMachine.add(
+            'CALC_GRASP_POSE',
+            DavidDummyLook(),
+            transitions={'succeeded': '',
+                         'aborted': 'EMO_SAY_OBJECT_NOT_DETECTED',
+                         'preempted': 'preempted'}
+        )
+        StateMachine.add(
+            'EMO_SAY_OBJECT_NOT_DETECTED',
+            pickup.sayObjectNotDetected1
         )
 
 
@@ -207,7 +225,7 @@ def main():
             result_slots_map = {'result':'result'},
             goal_slots_map = {'object_name':'object_name'})
 
-    sis = smach_ros.IntrospectionServer('smach_server', bo_sm, '/HOBBIT/PICKUP_SM_ROOT')
+    sis = smach_ros.IntrospectionServer('smach_server', pickup_sm, '/HOBBIT/PICKUP_SM_ROOT')
     sis.start()
     asw.run_server()
     rospy.spin()

@@ -19,7 +19,7 @@ def child_term_cb(outcome_map):
     return True
 
 
-def sayPointingGestureNotDetected():
+def sayPointingGestureNotDetected1():
     cc = Concurrence(
         outcomes=['succeeded', 'preempted', 'failed'],
         default_outcome='failed',
@@ -35,7 +35,8 @@ def sayPointingGestureNotDetected():
         )
         Concurrence.add(
             'SAY_POINTING_NOT_DETECTED',
-            speech_output.sayText(info='PointingGestureNotDetected1')
+            #speech_output.askYesNo(question='T_PU_PointingGestureNotDetected1')
+            speech_output.askYesNo(question='PointingGestureNotDetected1')
         )
     return cc
 
@@ -99,8 +100,8 @@ def sayObjectNotDetected1():
         )
         Concurrence.add(
             'SAY_OBJECT_NOT_DETECTED',
-            # speech_output.sayText(info='T_PU_ObjectNotDetected1')
-            speech_output.sayText(info='ObjectNotDetected1')
+            # speech_output.askYesNo(question='T_PU_ObjectNotDetected1')
+            speech_output.askYesNo(question='ObjectNotDetected1')
         )
     return cc
 
