@@ -47,6 +47,18 @@ bool resume(std_srvs::Empty::Request& request, std_srvs::Empty::Response& respon
     return true;
 }
 
+
+/*
+   Plane Segmentation Values , for Hobbit PT2 topology
+    Point : -644.82 , 465.96 , 1381.00
+    Normal : -0.00 , -0.82 , -0.58
+    Offset 30.0 
+
+    3Points 164.85 , 381.37 , 1496.00
+            -644.82 , 465.96 , 1381.00
+              -231.41 , 72.58 , 1936.00
+
+*/
  
 int main(int argc, char **argv)
 {
