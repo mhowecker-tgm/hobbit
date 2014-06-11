@@ -1,5 +1,4 @@
 <class_libraries>
-  </library>
   <library path="lib/libnav_layer">
     <class type="costmap_2d::NavLayer" base_class_type="costmap_2d::Layer">
       <description>layer for RGB-D</description>
