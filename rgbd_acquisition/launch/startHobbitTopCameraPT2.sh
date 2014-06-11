@@ -73,6 +73,9 @@
   <arg name="pi/2" value="1.5707963267948966" />
   <arg name="optical_rotate" value="0 0 0 -$(arg pi/2) 0 -$(arg pi/2)" />
 
+<!-- static transformation for head camera AND!!! bottom camera -->
+  <node pkg="tf" type="static_transform_publisher" name="loc_link_to_basecam_link"
+        args="0.0 0.0 0.0 0 0 0 loc_link basecam_link 100" />
   <node pkg="tf" type="static_transform_publisher" name="base_link_to_hobbit_neck"
         args="-0.26 0 1.09 0 0 0 base_link hobbit_neck 100" />
   <node pkg="tf" type="static_transform_publisher" name="hobbit_neck_dynamic_to_headcam_link"
