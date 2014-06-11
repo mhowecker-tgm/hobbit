@@ -79,7 +79,7 @@
   <node pkg="tf" type="static_transform_publisher" name="base_link_to_hobbit_neck"
         args="-0.26 0 1.09 0 0 0 base_link hobbit_neck 100" />
   <node pkg="tf" type="static_transform_publisher" name="hobbit_neck_dynamic_to_headcam_link"
-        args="0.0 -0.165 0.02 0 0 0 base_link hobbit_neck 100" />
+        args="0.02 0.0 0.165 0 0 0 hobbit_neck_dynamic headcam_link 100" />
   <node pkg="tf" type="static_transform_publisher" name="$(arg camera)_base_link"
         args="0 -0.02 0 0 0 0 $(arg camera)_link $(arg camera)_depth_frame 100" />
   <node pkg="tf" type="static_transform_publisher" name="$(arg camera)_base_link1"
