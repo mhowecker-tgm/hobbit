@@ -132,6 +132,8 @@ void NavLayer::onInitialize()
        observation_notifiers_.push_back(filter);
  
        observation_notifiers_.back()->setTolerance(ros::Duration(0.05));
+
+	cout << "Laser callback created" << endl;
      }
      else if (data_type == "PointCloud")
      {
@@ -213,6 +215,8 @@ void NavLayer::onInitialize()
  void NavLayer::laserScanCallback(const sensor_msgs::LaserScanConstPtr& message,
                                        const boost::shared_ptr<ObservationBuffer>& buffer)
  {
+
+   cout << "laser callback" << endl;
    //project the laser into a point cloud
    sensor_msgs::PointCloud2 cloud;
    cloud.header = message->header;
@@ -240,6 +244,8 @@ void NavLayer::onInitialize()
    buffer->lock();
    buffer->bufferCloud(cloud);
    buffer->unlock();
+	
+   cout << "laser callback2" << endl;
  }
 
  void NavLayer::laserScanValidInfCallback(const sensor_msgs::LaserScanConstPtr& raw_message, 
