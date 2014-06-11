@@ -156,8 +156,10 @@ def main():
         )
         StateMachine.add(
             'POINTING_NOT_DETECTED_1',
-            pickup.sayPointingGestureNotDetected(),
-            transitions={}
+            pickup.sayPointingGestureNotDetected1(),
+            transitions={'yes': 'GET_POINTING_DIRECTION',
+                         'no': 'POINTING_NOT_DETECTED_2',
+                         'preempted': 'preempted'}
         )
         StateMachine.add(
             'POINTING_NOT_DETECTED_2',
@@ -178,15 +180,72 @@ def main():
         )
         StateMachine.add(
             'CALC_GRASP_POSE',
-            DavidDummyLook(),
+            DavidDummyCalcGraspPose(),
             transitions={'succeeded': '',
                          'aborted': 'EMO_SAY_OBJECT_NOT_DETECTED',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
             'EMO_SAY_OBJECT_NOT_DETECTED',
-            pickup.sayObjectNotDetected1
+            pickup.sayObjectNotDetected1,
+            transitions={'yes': 'GET_POINTING_DIRECTION',
+                         'no': 'POINTING_NOT_DETECTED_2',
+                         'preempted': 'preempted'}
         )
+        StateMachine.add(
+            'EMO_SAY_OBJECT_FOUND',
+            pickup.sayObjectFoundRepositioning(),
+            transitions={'succeeded': 'MOVE_TO_GRASP_POSE'}
+        )
+        StateMachine.add(
+            'MOVE_TO_GRASP_POSE',
+            hobbit_move.goToPose(),
+            transitions={'succeeded': 'SAY_PICKING_UP',
+                         'aborted': 'MOVE_COUNTER',
+                         'preempted': 'preempted'}
+        )
+        StateMachine.add(
+            'MOVE_COUNTER',
+            MoveCounter(),
+            transitions={'first': 'EMO_SAY_UNABLE_TO_GRASP',
+                         'second': 'EMO_SAY_TRY_TO_REMVOE_OBJECT'}
+        )
+        StateMachine.add(
+            'SAY_PICKING_UP',
+            #speech_output.sayText(info='T_PU_PickingUpObject')
+            speech_output.sayText(info='PickingUpObject')
+            transitions={'succeeded': 'GRASP_OBJECT',
+                         'aborted': 'EMO_SAY_DID_NOT_PICKUP',
+                         'preempted': 'preempted'}
+        )
+        StateMachine.add(
+            'GRASP_OBJECT',
+            DavidDummyPickingUp(),
+            transitions={'succeeded': 'EMO_SAY_PICKED_UP_OBJECT',
+                         'aborted': 'COUNTER_GRASP',
+                         'preempted': 'preempted'}
+        )
+        StateMachine.add(
+            'SAY_CHECK_GRASP',
+            #speech_output.sayText(info='T_PU_CheckingGrasp')
+            speech_output.sayText(info='CheckingGrasp')
+            transitions={'succeeded': 'CHECK_GRASP',
+                         'failed': 'EMO_SAY_DID_NOT_PICKUP'}
+        )
+        StateMachine.add(
+            'CHECK_GRASP',
+            DavidDummyCheckGrasp(),
+            transitions={'succeeded': 'PICKUP_SEQ',
+                         'aborted': 'COUNTER_GRASP_CHECK'}
+        )
+        StateMachine.add(
+            'PICKUP_SEQ',
+            pickup.getPickupSeq(),
+            transitions={'succeeded': 'CHECK_HELP',
+                         'aborted': 'GRASP_FAIL_SEQ',
+                         'preempted': 'preempted'}
+        )
+
 
 
 

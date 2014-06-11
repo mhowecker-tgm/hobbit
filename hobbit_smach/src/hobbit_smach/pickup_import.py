@@ -13,6 +13,7 @@ from hobbit_user_interaction import HobbitEmotions  # ,HobbitMMUI
 import hobbit_smach.speech_output_import as speech_output
 # import hobbit_smach.head_move_import as head_move
 import hobbit_smach.hobbit_move_import as hobbit_move
+import hobbit_smach.arm_move_import as arm_move
 
 
 def child_term_cb(outcome_map):
@@ -21,11 +22,12 @@ def child_term_cb(outcome_map):
 
 def sayPointingGestureNotDetected1():
     cc = Concurrence(
-        outcomes=['succeeded', 'preempted', 'failed'],
-        default_outcome='failed',
+        outcomes=['yes', 'no' 'preempted', 'failed'],
+        default_outcome='no',
         child_termination_cb=child_term_cb,
-        outcome_map={'succeeded': {'EMO_SAD': 'succeeded',
-                                   'SAY_POINTING_NOT_DETECTED': 'succeeded'}}
+        outcome_map={'yes': {'EMO_SAD': 'succeeded',
+                             'SAY_POINTING_NOT_DETECTED': 'yes'},
+                     'no': {'SAY_POINTING_NOT_DETECTED': 'no'}}
     )
 
     with cc:
@@ -86,11 +88,12 @@ def sayStartLooking():
 
 def sayObjectNotDetected1():
     cc = Concurrence(
-        outcomes=['succeeded', 'preempted', 'failed'],
+        outcomes=['yes', 'no' 'preempted', 'failed'],
         default_outcome='failed',
         child_termination_cb=child_term_cb,
-        outcome_map={'succeeded': {'EMO_SAD': 'succeeded',
-                                   'SAY_OBJECT_NOT_DETECTED': 'succeeded'}}
+        outcome_map={'yes': {'EMO_SAD': 'succeeded',
+                             'SAY_OBJECT_NOT_DETECTED': 'yes'},
+                     'no': {'SAY_OBJECT_NOT_DETECTED': 'no'}}
     )
 
     with cc:
@@ -152,11 +155,12 @@ def sayObjectFoundRepositioning():
 
 def sayUnableToGraspObject():
     cc = Concurrence(
-        outcomes=['succeeded', 'preempted', 'failed'],
+        outcomes=['yes', 'no' 'preempted', 'failed'],
         default_outcome='failed',
         child_termination_cb=child_term_cb,
-        outcome_map={'succeeded': {'EMO_SAD': 'succeeded',
-                                   'SAY_UNABLE_TO_GRASP_OBJECT': 'succeeded'}}
+        outcome_map={'yes': {'EMO_SAD': 'succeeded',
+                             'SAY_UNABLE_TO_GRASP_OBJECT': 'yes'},
+                     'no': {'SAY_UNABLE_TO_GRASP_OBJECT': 'no'}}
     )
 
     with cc:
@@ -306,5 +310,34 @@ def getStartLooking():
             'MOVE_TO_POSE',
             hobbit_move.goToPose()
         )
-
     return seq
+
+
+def getPickupSeq():
+    """
+    Return a SMACH Sequence that gives feedback to the user, stores a grasped
+    object on the tray and searches for the user.
+    """
+    seq = Sequence(
+        outcomes=['succeeded', 'preempted', 'failed'],
+        connector_outcome='succeeded'
+    )
+
+    with seq:
+        Sequence.add(
+            'EMO_SAY_PICKED_UP',
+            sayPickedUpObject()
+        )
+        Sequence.add(
+            'MOVE_ARM_TO_TRAY_AND_HOME',
+            arm_move.goToTrayPosition()
+        )
+        Sequence.add(
+            'LOCATE_USER',
+            Dummy()
+        )
+        Sequence.add(
+            'EMO_SAY_REMOVE_OBJECT',
+            sayRemoveObjectTakeObject()
+        )
+        return seq
