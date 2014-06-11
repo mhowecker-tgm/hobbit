@@ -73,8 +73,10 @@
   <arg name="pi/2" value="1.5707963267948966" />
   <arg name="optical_rotate" value="0 0 0 -$(arg pi/2) 0 -$(arg pi/2)" />
 
-  <node pkg="tf" type="static_transform_publisher" name="hobbit_tran_to_hobbit_head"
-        args="1 0 0 0 0 0 hobbit_tran hobbit_head 100" />
+  <node pkg="tf" type="static_transform_publisher" name="base_link_to_hobbit_neck"
+        args="-0.26 0 1.09 0 0 0 base_link hobbit_neck 100" />
+  <node pkg="tf" type="static_transform_publisher" name="hobbit_neck_dynamic_to_headcam_link"
+        args="0.0 -0.165 0.02 0 0 0 base_link hobbit_neck 100" />
   <node pkg="tf" type="static_transform_publisher" name="$(arg camera)_base_link"
         args="0 -0.02 0 0 0 0 $(arg camera)_link $(arg camera)_depth_frame 100" />
   <node pkg="tf" type="static_transform_publisher" name="$(arg camera)_base_link1"
