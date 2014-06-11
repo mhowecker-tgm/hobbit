@@ -26,6 +26,7 @@ import hobbit_smach.head_move_import as head_move
 import hobbit_smach.arm_move_import as arm_move
 import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.pickup_import as pickup
+import hobbit_smach.return_of_favour_import as return_of_favour
 
 class bcolors:
     HEADER = '\033[95m'
@@ -243,6 +244,26 @@ def main():
             pickup.getPickupSeq(),
             transitions={'succeeded': 'CHECK_HELP',
                          'aborted': 'GRASP_FAIL_SEQ',
+                         'preempted': 'preempted'}
+        )
+        StateMachine.add(
+            'CHECK_HELP',
+            CheckHelpAccepted,
+            transitions={'yes': 'SAY_THANK_YOU',
+                         'no': 'SET_SUCCESS',
+                         'preempted': 'preempted'}
+        )
+        StateMachine.add(
+            'SAY_THANK_YOU',
+            #speech_output.sayText(info='T_PU_ThankYouPointing'),
+            speech_output.sayText(info='ThankYouPointing'),
+            transitions={}
+        )
+        StateMachine.add(
+            'OFFER_RETURN_OF_FAVOR',
+            return_of_favour.offer(rof='pickup'),
+            transitions={'succeeded': 'SET_SUCCESS',
+                         'aborted': 'SET_SUCCESS',
                          'preempted': 'preempted'}
         )
 

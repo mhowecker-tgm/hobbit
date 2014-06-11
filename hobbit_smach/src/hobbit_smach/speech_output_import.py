@@ -34,7 +34,7 @@ def askYesNo(question='Text is missing'):
     with seq:
             Sequence.add(
                 'TALK',
-                HobbitMMUI.AslYesNo(question=question)
+                HobbitMMUI.AskYesNo(question=question)
             )
             Sequence.add(
                 'WAIT_FOR_MMUI',
