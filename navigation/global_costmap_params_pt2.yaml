@@ -5,15 +5,13 @@ global_costmap:
   static_map: true
   transform_tolerance: 0.25
   plugins:
-       -
-         name: footprint_layer
-         type: "costmap_2d::FootprintLayer" 
-       -
-	 name: static_layer
-	 type: "costmap_2d::StaticLayer"
-       - 
-         name: obstacle_layer
-         type: "costmap_2d::NavLayerGlobal" 
-       - 
-         name: inflation_layer
-         type: "costmap_2d::InflationLayer"
+   -
+     name: footprint
+     type: "costmap_2d::FootprintLayer"
+   -
+     name: static_layer
+     type: "costmap_2d::StaticLayer"
+   - 
+     name: inflater
+     type: "costmap_2d::InflationLayer"
+

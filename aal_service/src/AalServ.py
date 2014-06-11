@@ -40,6 +40,7 @@ callactivityset = {}
 activityset = {}
 placeset = {}
 actuatorset = {}
+nameset = {}
 
 def getparam(deentry):
         mypar=deentry.replace('.', '/')
@@ -93,17 +94,19 @@ class topicsend():
        self.roomid=param.value
       if param.name.lower() == 'value':
        self.value=param.value
-    print "actuator command:", self.busid,self.sensorid,self.actuatorid,self.roomid,self.value
-    if self.actuatorid and self.busid and self.busid in actuatorset.keys():
+    print "actuator command:", self.busid,self.sensorid,self.actuatorid.upper(),self.roomid,self.value
+    print actuatorset.keys(),actuatorset, nameset.keys()
+    if self.actuatorid and self.busid and self.busid in actuatorset.keys() and self.actuatorid.upper() in nameset.keys():
      try:
+      node=nameset[self.actuatorid.upper()].split('_')
       s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
       s.settimeout(3)
       t=str((time.time()))
-      print '* connect',t, s.gettimeout()
-      s.connect(('128.130.197.176',5544))
+      print '* connect',t, s.gettimeout(),actuatorset[self.busid],actuatorset[self.busid].get('host')
+      s.connect((actuatorset[self.busid].get('host'),5544))
       t=str((time.time()))
       print '* connected',t
-      s.sendall("GET /actuators?busId=1&actuatorId=%s&value=%s\n" % (self.actuatorid, self.value))
+      s.sendall("GET /actuators?busId=1&actuatorId=%s&value=%s\n" % (node[1], self.value))
       t=str((time.time()))
       print '* sent',t
       data = s.recv(1024)
@@ -116,7 +119,7 @@ class topicsend():
       print "No service known for busID",self.busid
 
 class Srv(LineReceiver):
-    #=== here we get called
+    #=== here we get called with new sensor data
     def do_GET(self, path):
         self.matchObj = re.match( r'GET\s+/sensors\?busID=(\S+)&sensorID=(\S+)&(\S+)', path, re.M|re.I)
 
@@ -133,19 +136,22 @@ class Srv(LineReceiver):
           self.skey=self.matchObj.group(1)
           self.key="bus"+self.matchObj.group(1)+"_"+self.matchObj.group(2)
           self.value=self.matchObj.group(3)
+      
+          mysensor=False
 
           if self.key in placeset.keys():
            self.place=placeset[self.key]
+           mysensor=True
 
           #=== check sensor.type CALL
           if self.key in callactivityset.keys(): #it is a call button
              self.sensor=callactivityset[self.key]
-             if self.sensor:
+             if self.sensor and self.value == "SWITCH=1":
                 print self.sensor
                 self.pubecall_event(self.place,self.sensor) #issue call request
                 t=str(int(time.time()))
-                setparam("ENV.Sensor."+self.sensor+".Time",t)
-                setparam("ENV.Sensor."+self.sensor+".Value", self.value)
+                #setparam("ENV.Sensor."+self.sensor+".Time",t)
+                #setparam("ENV.Sensor."+self.sensor+".Value", self.value)
                 print "-got CALL sensor-"
 
           #=== check sensor.type ACTIVITY
@@ -155,15 +161,17 @@ class Srv(LineReceiver):
                 print self.sensor
                 self.pubAALevent(self.place,self.sensor,self.value)
                 t=str(int(time.time()))
-                setparam("ENV.Sensor."+self.sensor+".Time",t)
-                setparam("ENV.Sensor."+self.sensor+".Value", self.value)
+                #setparam("ENV.Sensor."+self.sensor+".Time",t)
+                #setparam("ENV.Sensor."+self.sensor+".Value", self.value)
 
                 #=== remember location of ACTIVITY(user)
-                setparam("ENV.Sensor.Time",t)
-                setparam("ENV.Sensor.Place", self.place)
+                setparam("USER.Sensor.Time",t)
+                setparam("USER.Sensor.Place", self.place)
                 print "-got ACTIVITY sensor-"
-          #=== check sensor.type EHOME
-          if self.skey == '33':
+
+          if mysensor==True:
+           #=== check sensor.type EHOME
+           if self.skey == '33':
              self.sensor=self.key
              if self.sensor:
                 print self.sensor
@@ -173,7 +181,7 @@ class Srv(LineReceiver):
                 setparam("ENV.Sensor."+self.sensor+".Value", self.value)
 
                 print "-got EHOME sensor-"
-          elif self.skey == '1':
+           elif self.skey == '1':
              self.sensor=self.key
              if self.sensor:
                 print self.sensor
@@ -183,7 +191,8 @@ class Srv(LineReceiver):
                 setparam("ENV.Sensor."+self.sensor+".Value", self.value)
 
                 print "-got ENO sensor-"
-          elif self.skey == '2':
+
+           elif self.skey == '2':
              self.sensor=self.key
              if self.sensor:
                 self.sensor=self.sensor.replace(":","_")
@@ -201,7 +210,7 @@ class Srv(LineReceiver):
 
 
                 print "-got HM sensor-"
-          else:
+           else:
              print "-not tagged sensor-"
           self.sendLine('HTTP/1.1 200 OK')
           self.sendLine('Content-Length: 0')
@@ -221,6 +230,7 @@ class Srv(LineReceiver):
               print "##### new service for busID",self.skey,"at port",int(self.key,16)
               actuatorset[self.skey]={"port": int(self.key,16),"host": self.transport.getPeer().host}
               print "#####",actuatorset
+              print "#####",actuatorset[self.skey].get('host'),"####"
 
             else:
               '''self.send_response(400)
@@ -256,6 +266,11 @@ class Srv(LineReceiver):
         e.params.append(p)
         p=Parameter("sensor",sensor)
         e.params.append(p)
+        attr="ENV.Sensor."+sensor+".Type"
+        typeresp=getparam(attr)
+        if "BATHROOM" in typeresp:
+         p=Parameter("bathroom","true")
+         e.params.append(p)
         pubE.publish(e)
 
     #=== register AAL event in DB
@@ -296,7 +311,7 @@ if __name__ == '__main__':
         attr="ENV.Sensor."+sensor+".NodeID"
         resp=getparam(attr)
         node=resp
-        key=bus+"."+node
+        key="bus"+bus+"_"+node
         attr="ENV.Sensor."+sensor+".Type"
         resp=getparam(attr)
         type=resp
@@ -308,6 +323,8 @@ if __name__ == '__main__':
           callactivityset[key] = sensor
         if "ACTIVITY" in type and len(place) and len(node) and len(bus):
           activityset[key] = sensor
+        if len(node) and len(bus):
+          nameset[sensor.upper()] = key
         if len(place) and len(node) and len(bus):
           placeset[key] = place
    print "CALLBUTTONS:"
@@ -316,6 +333,9 @@ if __name__ == '__main__':
    print "ACTIVITYSENSORS:"
    for sensor in activityset.keys():
         print "   ", sensor,activityset[sensor],placeset[sensor]
+   print "NAMESENSORS:"
+   for sensor in nameset.keys():
+        print "   ", sensor,nameset[sensor]
 
    print "Server Started - Connect to port " + str(port) + "..."
    factory = Factory()

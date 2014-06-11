@@ -19,13 +19,15 @@
 	<param name="ENV/Place/Kitchen/y" type="string" value="5" />
 	<param name="ENV/PlaceList" type="string" value="kitchen+++couch+++bed" />
 	<param name="ENV/SOSbutton/port" type="string" value="COM3" />
-	<param name="ENV/Sensor/SensorA/BusID" type="string" value="1" />
-	<param name="ENV/Sensor/SensorA/NodeID" type="string" value="1" />
-	<param name="ENV/Sensor/SensorA/Place" type="string" value="vardagsrum" />
-	<param name="ENV/Sensor/SensorA/Type" type="string" value="CALL" />
-	<param name="ENV/Sensor/SensorB/BusID" type="string" value="2" />
-	<param name="ENV/Sensor/SensorB/NodeID" type="string" value="2" />
-	<param name="ENV/SensorList" type="string" value="SensorA+++SensorB" />
+	<param name="ENV/Sensor/CALL1/BusID" type="string" value="1" />
+	<param name="ENV/Sensor/CALL1/NodeID" type="string" value="298a24" />
+	<param name="ENV/Sensor/CALL1/Place" type="string" value="vardagsrum" />
+	<param name="ENV/Sensor/CALL1/Type" type="string" value="CALL" />
+	<param name="ENV/Sensor/PIR1/BusID" type="string" value="1" />
+	<param name="ENV/Sensor/PIR1/NodeID" type="string" value="89be55" />
+	<param name="ENV/Sensor/PIR1/Place" type="string" value="myroom" />
+	<param name="ENV/Sensor/PIR1/Type" type="string" value="ACTIVITY" />
+	<param name="ENV/SensorList" type="string" value="CALL1+++PIR1" />
     <rosparam command="load" file="$(find aal_service)/launch/params.yaml" />
  <node pkg="aal_service" type="AalServ.py" name="AalService" output="screen" args="">
  </node>>

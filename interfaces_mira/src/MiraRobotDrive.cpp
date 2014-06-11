@@ -197,7 +197,7 @@ void MiraRobotDrive::odometry_data_callback(mira::ChannelRead<mira::robot::Odome
 	geometry_msgs::TransformStamped odom_tf;
 	odom_tf.header.stamp = odom_time;
 	odom_tf.header.frame_id = "/odom";
-	odom_tf.child_frame_id = "/base_footprint";
+	odom_tf.child_frame_id = "/base_link";
 
 	odom_tf.transform.translation.x = data->value().pose.x();
 	odom_tf.transform.translation.y = data->value().pose.y();
