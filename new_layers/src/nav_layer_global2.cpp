@@ -1,31 +1,31 @@
-#include "../include/new_layers/nav_layer_global.h"
-#include<costmap_2d/costmap_math.h>
-
-#include <pluginlib/class_list_macros.h>
-PLUGINLIB_EXPORT_CLASS(costmap_2d::NavLayerGlobal, costmap_2d::Layer)
+#include "../include/new_layers/nav_layer_global2.h"
+ #include<costmap_2d/costmap_math.h>
  
-using costmap_2d::NO_INFORMATION;
-using costmap_2d::LETHAL_OBSTACLE;
-using costmap_2d::FREE_SPACE;
+ #include <pluginlib/class_list_macros.h>
+ PLUGINLIB_EXPORT_CLASS(costmap_2d::NavLayerGlobal2, costmap_2d::Layer)
  
-using costmap_2d::ObservationBuffer;
-using costmap_2d::Observation;
+ using costmap_2d::NO_INFORMATION;
+ using costmap_2d::LETHAL_OBSTACLE;
+ using costmap_2d::FREE_SPACE;
  
-namespace costmap_2d
-{
-void NavLayerGlobal::onInitialize()
-{
+ using costmap_2d::ObservationBuffer;
+ using costmap_2d::Observation;
+ 
+ namespace costmap_2d
+ {
+ void NavLayerGlobal2::onInitialize()
+ {
    ros::NodeHandle nh("~/" + name_), g_nh;
    rolling_window_ = layered_costmap_->isRolling();
  
    bool track_unknown_space;
-   nh.param("track_unknown_space", track_unknown_space, true);
+   nh.param("track_unknown_space", track_unknown_space, layered_costmap_->isTrackingUnknown());
    if(track_unknown_space)
      default_value_ = NO_INFORMATION;
    else
      default_value_ = FREE_SPACE;
  
-   NavLayerGlobal::matchSize();
+   NavLayerGlobal2::matchSize();
    current_ = true;
    has_been_reset_ = false;
  
@@ -59,7 +59,7 @@ void NavLayerGlobal::onInitialize()
      source_node.param("min_obstacle_height", min_obstacle_height, 0.0);
      source_node.param("max_obstacle_height", max_obstacle_height, 2.0);
      source_node.param("inf_is_valid", inf_is_valid, false);
-     source_node.param("clearing", clearing, true);
+     source_node.param("clearing", clearing, false);
      source_node.param("marking", marking, true);
 
      source_node.param("min_range", min_range, 0.45); //FIXME
@@ -120,12 +120,12 @@ void NavLayerGlobal::onInitialize()
        if (inf_is_valid)
        {
          filter->registerCallback(
-             boost::bind(&NavLayerGlobal::laserScanValidInfCallback, this, _1, observation_buffers_.back()));
+             boost::bind(&NavLayerGlobal2::laserScanValidInfCallback, this, _1, observation_buffers_.back()));
        }
        else
        {
          filter->registerCallback(
-             boost::bind(&NavLayerGlobal::laserScanCallback, this, _1, observation_buffers_.back()));
+             boost::bind(&NavLayerGlobal2::laserScanCallback, this, _1, observation_buffers_.back()));
        }
  
        observation_subscribers_.push_back(sub);
@@ -140,13 +140,13 @@ void NavLayerGlobal::onInitialize()
  
        if( inf_is_valid )
        {
-        ROS_WARN("nav_layer: inf_is_valid option is not applicable to PointCloud observations.");
+        ROS_WARN("obstacle_layer: inf_is_valid option is not applicable to PointCloud observations.");
        }
  
        boost::shared_ptr < tf::MessageFilter<sensor_msgs::PointCloud>
            > filter(new tf::MessageFilter<sensor_msgs::PointCloud>(*sub, *tf_, global_frame_, 50));
        filter->registerCallback(
-           boost::bind(&NavLayerGlobal::pointCloudCallback, this, _1, observation_buffers_.back()));
+           boost::bind(&NavLayerGlobal2::pointCloudCallback, this, _1, observation_buffers_.back()));
  
        observation_subscribers_.push_back(sub);
        observation_notifiers_.push_back(filter);
@@ -158,13 +158,13 @@ void NavLayerGlobal::onInitialize()
  
        if( inf_is_valid )
        {
-        ROS_WARN("nav_layer: inf_is_valid option is not applicable to PointCloud observations.");
+        ROS_WARN("obstacle_layer: inf_is_valid option is not applicable to PointCloud observations.");
        }
  
        boost::shared_ptr < tf::MessageFilter<sensor_msgs::PointCloud2>
            > filter(new tf::MessageFilter<sensor_msgs::PointCloud2>(*sub, *tf_, global_frame_, 50));
        filter->registerCallback(
-           boost::bind(&NavLayerGlobal::pointCloud2Callback, this, _1, observation_buffers_.back()));
+           boost::bind(&NavLayerGlobal2::pointCloud2Callback, this, _1, observation_buffers_.back()));
  
        observation_subscribers_.push_back(sub);
        observation_notifiers_.push_back(filter);
@@ -187,22 +187,22 @@ void NavLayerGlobal::onInitialize()
    costmap_copy = new unsigned char[4*min_range_cells];
  }
  
- void NavLayerGlobal::setupDynamicReconfigure(ros::NodeHandle& nh)
+ void NavLayerGlobal2::setupDynamicReconfigure(ros::NodeHandle& nh)
  {
    dsrv_ = new dynamic_reconfigure::Server<costmap_2d::ObstaclePluginConfig>(nh);
    dynamic_reconfigure::Server<costmap_2d::ObstaclePluginConfig>::CallbackType cb = boost::bind(
-       &NavLayerGlobal::reconfigureCB, this, _1, _2);
+       &NavLayerGlobal2::reconfigureCB, this, _1, _2);
    dsrv_->setCallback(cb);
  }
  
- void NavLayerGlobal::reconfigureCB(costmap_2d::ObstaclePluginConfig &config, uint32_t level)
+ void NavLayerGlobal2::reconfigureCB(costmap_2d::ObstaclePluginConfig &config, uint32_t level)
  {
    enabled_ = config.enabled;
    max_obstacle_height_ = config.max_obstacle_height;
-   //combination_method_ = config.combination_method;
+   combination_method_ = config.combination_method;
  }
  
- void NavLayerGlobal::laserScanCallback(const sensor_msgs::LaserScanConstPtr& message,
+ void NavLayerGlobal2::laserScanCallback(const sensor_msgs::LaserScanConstPtr& message,
                                        const boost::shared_ptr<ObservationBuffer>& buffer)
  {
    //project the laser into a point cloud
@@ -212,7 +212,7 @@ void NavLayerGlobal::onInitialize()
    //project the scan into a point cloud
    try
    {
-     projector_.transformLaserScanToPointCloud(global_frame_, *message, cloud, *tf_);
+     projector_.transformLaserScanToPointCloud(message->header.frame_id, *message, cloud, *tf_);
    }
    catch (tf::TransformException &ex)
    {
@@ -226,8 +226,8 @@ void NavLayerGlobal::onInitialize()
    buffer->bufferCloud(cloud);
    buffer->unlock();
  }
-
- void NavLayerGlobal::laserScanValidInfCallback(const sensor_msgs::LaserScanConstPtr& raw_message, 
+ 
+ void NavLayerGlobal2::laserScanValidInfCallback(const sensor_msgs::LaserScanConstPtr& raw_message, 
                                                const boost::shared_ptr<ObservationBuffer>& buffer){
    // Filter positive infinities ("Inf"s) to max_range.
    float epsilon = 0.0001; // a tenth of a millimeter
@@ -262,7 +262,7 @@ void NavLayerGlobal::onInitialize()
    buffer->unlock();
  }
  
- void NavLayerGlobal::pointCloudCallback(const sensor_msgs::PointCloudConstPtr& message,
+ void NavLayerGlobal2::pointCloudCallback(const sensor_msgs::PointCloudConstPtr& message,
                                                 const boost::shared_ptr<ObservationBuffer>& buffer)
  {
    sensor_msgs::PointCloud2 cloud2;
@@ -279,7 +279,7 @@ void NavLayerGlobal::onInitialize()
    buffer->unlock();
  }
  
- void NavLayerGlobal::pointCloud2Callback(const sensor_msgs::PointCloud2ConstPtr& message,
+ void NavLayerGlobal2::pointCloud2Callback(const sensor_msgs::PointCloud2ConstPtr& message,
                                                  const boost::shared_ptr<ObservationBuffer>& buffer)
  {
    //buffer the point cloud
@@ -288,7 +288,7 @@ void NavLayerGlobal::onInitialize()
    buffer->unlock();
  }
  
- void NavLayerGlobal::updateBounds(double robot_x, double robot_y, double robot_yaw, double* min_x,
+ void NavLayerGlobal2::updateBounds(double robot_x, double robot_y, double robot_yaw, double* min_x,
                                            double* min_y, double* max_x, double* max_y)
  {
    //std::cout << "updateBounds" << std::endl;
@@ -371,47 +371,47 @@ void NavLayerGlobal::onInitialize()
  
        unsigned int index = getIndex(mx, my);
        costmap_[index] = LETHAL_OBSTACLE;
-       //touch(px, py, min_x, min_y, max_x, max_y);   //FIXME
-       *min_x = std::min(px, *min_x);
+       touch(px, py, min_x, min_y, max_x, max_y);
+       /* *min_x = std::min(px, *min_x);
        *min_y = std::min(py, *min_y);
        *max_x = std::max(px, *max_x);
-       *max_y = std::max(py, *max_y);
-     }
-   }
+       *max_y = std::max(py, *max_y);*/
+      }
+    }
  
    footprint_layer_.updateBounds(robot_x, robot_y, robot_yaw, min_x, min_y, max_x, max_y);
  }
  
- void NavLayerGlobal::updateCosts(costmap_2d::Costmap2D& master_grid, int min_i, int min_j, int max_i, int max_j)
+ void NavLayerGlobal2::updateCosts(costmap_2d::Costmap2D& master_grid, int min_i, int min_j, int max_i, int max_j)
  {
    if (!enabled_)
      return;
  
-   // The footprint layer clears the footprint in this NavLayerGlobal
+   // The footprint layer clears the footprint in this NavLayerGlobal2
    // before we merge this obstacle layer into the master_grid.
    footprint_layer_.updateCosts(*this, min_i, min_j, max_i, max_j);
-   unsigned char* master_array = master_grid.getCharMap();
-   unsigned int span = master_grid.getSizeInCellsX();
-   for (int j = min_j; j < max_j; j++)
-   {
-	     unsigned int it = j * span + min_i;
-	     for (int i = min_i; i < max_i; i++)
-	     {
-		if (costmap_[it] == NO_INFORMATION)
-		{
-		 it++;
-		 continue;
-		}
+ 
 
-		unsigned char old_cost = master_array[it];
-		if (old_cost == NO_INFORMATION || old_cost < costmap_[it])
-		 master_array[it] = costmap_[it];
-		it++;
-	     }
-   }
+
+
+
+
+   if(combination_method_==0)
+     updateWithOverwrite(master_grid, min_i, min_j, max_i, max_j);
+   else
+     updateWithMax(master_grid, min_i, min_j, max_i, max_j);
+
+
+
+
+
+
+
+
+
  }
  
- void NavLayerGlobal::addStaticObservation(costmap_2d::Observation& obs, bool marking, bool clearing)
+ void NavLayerGlobal2::addStaticObservation(costmap_2d::Observation& obs, bool marking, bool clearing)
  {
    if(marking)
      static_marking_observations_.push_back(obs);
@@ -419,7 +419,7 @@ void NavLayerGlobal::onInitialize()
      static_clearing_observations_.push_back(obs);
  }
  
- bool NavLayerGlobal::getMarkingObservations(std::vector<Observation>& marking_observations) const
+ bool NavLayerGlobal2::getMarkingObservations(std::vector<Observation>& marking_observations) const
  {
    bool current = true;
    //get the marking observations
@@ -435,7 +435,7 @@ void NavLayerGlobal::onInitialize()
    return current;
  }
  
- bool NavLayerGlobal::getClearingObservations(std::vector<Observation>& clearing_observations) const
+ bool NavLayerGlobal2::getClearingObservations(std::vector<Observation>& clearing_observations) const
  {
    bool current = true;
    //get the clearing observations
@@ -451,7 +451,7 @@ void NavLayerGlobal::onInitialize()
    return current;
  }
  
- void NavLayerGlobal::raytraceFreespace(const Observation& clearing_observation, double* min_x, double* min_y,
+ void NavLayerGlobal2::raytraceFreespace(const Observation& clearing_observation, double* min_x, double* min_y,
                                                double* max_x, double* max_y)
  {
    double ox = clearing_observation.origin_.x;
@@ -474,11 +474,11 @@ void NavLayerGlobal::onInitialize()
    double map_end_y = origin_y + size_y_ * resolution_;
  
  
-   //touch(ox, oy, min_x, min_y, max_x, max_y); //FIXME
-   *min_x = std::min(ox, *min_x);
+   touch(ox, oy, min_x, min_y, max_x, max_y); //FIXME
+   /* *min_x = std::min(ox, *min_x);
    *min_y = std::min(oy, *min_y);
    *max_x = std::max(ox, *max_x);
-   *max_y = std::max(oy, *max_y);
+   *max_y = std::max(oy, *max_y);*/
 
    //copy costmap blind window before applying raytracing  !!!!!!
    //unsigned char* costmap_copy; 
@@ -583,9 +583,9 @@ void NavLayerGlobal::onInitialize()
 
    //delete[] costmap_copy;
 
- }
+}
  
- void NavLayerGlobal::activate()
+ void NavLayerGlobal2::activate()
  {
    //if we're stopped we need to re-subscribe to topics
    for (unsigned int i = 0; i < observation_subscribers_.size(); ++i)
@@ -600,7 +600,7 @@ void NavLayerGlobal::onInitialize()
        observation_buffers_[i]->resetLastUpdated();
    }
  }
- void NavLayerGlobal::deactivate()
+ void NavLayerGlobal2::deactivate()
  {
    for (unsigned int i = 0; i < observation_subscribers_.size(); ++i)
    {
@@ -609,21 +609,21 @@ void NavLayerGlobal::onInitialize()
    }
  }
  
- void NavLayerGlobal::updateRaytraceBounds(double ox, double oy, double wx, double wy, double range, double* min_x, double* min_y,
+ void NavLayerGlobal2::updateRaytraceBounds(double ox, double oy, double wx, double wy, double range, double* min_x, double* min_y,
                                           double* max_x, double* max_y)
  {
    double dx = wx-ox, dy = wy-oy;
-   double full_distance = sqrt( dx*dx+dy*dy );
+   double full_distance = ::hypot(dx, dy);
    double scale = std::min(1.0, range / full_distance);
    double ex = ox + dx * scale, ey = oy + dy * scale;
-   //touch(ex, ey, min_x, min_y, max_x, max_y);   //FIXME
-   *min_x = std::min(ex, *min_x);
+   touch(ex, ey, min_x, min_y, max_x, max_y);
+   /* *min_x = std::min(ex, *min_x);
    *min_y = std::min(ey, *min_y);
    *max_x = std::max(ex, *max_x);
-   *max_y = std::max(ey, *max_y);
+   *max_y = std::max(ey, *max_y);*/
  }
  
- void NavLayerGlobal::reset()
+ void NavLayerGlobal2::reset()
  {
      deactivate();
      resetMaps();
@@ -632,12 +632,12 @@ void NavLayerGlobal::onInitialize()
      activate();
  }
  
- void NavLayerGlobal::onFootprintChanged()
+ void NavLayerGlobal2::onFootprintChanged()
  {
    footprint_layer_.onFootprintChanged();
  }
 
- void NavLayerGlobal::resetMapOutsideWindow(double wx, double wy, double w_size_x, double w_size_y) //FIXME, should belong to Costmap2D
+ void NavLayerGlobal2::resetMapOutsideWindow(double wx, double wy, double w_size_x, double w_size_y) //FIXME, should belong to Costmap2D
  {
      ROS_ASSERT_MSG(w_size_x >= 0 && w_size_y >= 0, "You cannot specify a negative size window");
  
@@ -681,3 +681,4 @@ void NavLayerGlobal::onInitialize()
  }
  
  } // end namespace costmap_2d
+

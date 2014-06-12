@@ -37,8 +37,8 @@
 
  * Modified by Paloma de la Puente
  *********************************************************************/
-#ifndef NAV2_COSTMAP_PLUGIN_H_
-#define NAV2_COSTMAP_PLUGIN_H_
+#ifndef NAV2GLOB_COSTMAP_PLUGIN_H_
+#define NAV2GLOB_COSTMAP_PLUGIN_H_
 #include <ros/ros.h>
 #include <costmap_2d/costmap_layer.h>
 #include <costmap_2d/layered_costmap.h>
@@ -59,10 +59,10 @@
 
 namespace costmap_2d
 {
-class NavLayer2 : public CostmapLayer
+class NavLayerGlobal2 : public CostmapLayer
 {
 public:
-  NavLayer2()
+  NavLayerGlobal2()
   {
     costmap_ = NULL; // this is the unsigned char* member of parent class Costmap2D.
   }
@@ -183,14 +183,8 @@ protected:
 
   double min_range;
 
-  unsigned char* costmap_copy; 
-  int min_range_cells;
-
-  double prev_x;
-  double prev_y;
-  double prev_yaw;
-
-  bool started;
+   unsigned char* costmap_copy; 
+   int min_range_cells;
 
 private:
   void reconfigureCB(costmap_2d::ObstaclePluginConfig &config, uint32_t level);
