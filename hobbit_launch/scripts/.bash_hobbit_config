@@ -1,2 +1,10 @@
+#ssh connection to head (pi)
 alias sshpi='ssh -X pi@192.168.2.199'
+
+#update (=>copy) files on robot head (pi)
 alias updateHead="source /opt/ros/hobbit_hydro/src/hobbit_launch/launch/HeadScripts/updateHead.sh"
+
+#short cut for changing .bashrc 
+alias dfb="sudo gedit ~/.bashrc"
+#short cut for sourcing .bashrc 
+alias dfbs="source ~/.bashrc"
