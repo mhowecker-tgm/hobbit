@@ -203,14 +203,12 @@ class PlanPath(smach.State):
             print(len(ud.positions))
             print bcolors.FAIL+'Visited all positions'+bcolors.ENDC
             return 'failure'
-        else:
-	    try:
-	        ud.visited_places.append(ud.robot_end_pose)
-	    except:
-	        ud.visited_places = []
-	        ud.visited_places.append(ud.robot_end_pose)
-	    return 'success'
-
+        try:
+            ud.visited_places.append(ud.robot_end_pose)
+        except:
+            ud.visited_places = []
+            ud.visited_places.append(ud.robot_end_pose)
+        return 'success'
 
 
 class DummyGrasp(smach.State):
@@ -308,8 +306,8 @@ def main():
         smach.StateMachine.add('PLAN_PATH', PlanPath(), transitions={'success':'MOVE_HEAD_DOWN', 'preempted':'CLEAN_UP', 'failure':'CLEAN_UP'})
         smach.StateMachine.add('MOVE_HEAD_DOWN', head_move.MoveTo(pose='down_center'), transitions={'succeeded':'MOVE_BASE', 'preempted':'CLEAN_UP', 'failed':'MOVE_BASE'})
         smach.StateMachine.add(
-            'MOVE_BASE', 
-            hobbit_move.goToPose(), 
+            'MOVE_BASE',
+            hobbit_move.goToPose(),
             transitions={'succeeded':'MOVE_HEAD', 'preempted':'CLEAN_UP', 'aborted':'CLEAN_UP'},
             remapping={'x':'goal_position_x',
                        'y':'goal_position_y',

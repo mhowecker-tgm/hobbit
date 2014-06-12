@@ -11,7 +11,6 @@ import smach_ros
 import uashh_smach.util as util
 import tf
 import math
-#from rospy.service import ServiceException
 
 from std_msgs.msg import String
 from hobbit_msgs.msg import LocateUserAction
@@ -19,28 +18,14 @@ from hobbit_msgs.srv import *
 from hobbit_msgs.msg import *
 from hobbit_msgs.srv import *
 from smach import Concurrence
-from smach_ros import ActionServerWrapper, SimpleActionState, ServiceState
-from actionlib import SimpleActionServer
-from move_base_msgs.msg import MoveBaseAction
+from smach_ros import ServiceState
+from move_base_msgs.msg import GeneralHobbitAction
 from nav_msgs.srv import GetPlan, GetPlanRequest
 from geometry_msgs.msg import Pose2D, PoseStamped, Point, Quaternion, PoseWithCovarianceStamped, Pose
 import hobbit_smach.hobbit_move_import as hobbit_move
+from hobbit_smach import bcolors
 from rgbd_acquisition.msg import Person
 
-class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-def disable(self):
-        self.HEADER = ''
-        self.OKBLUE = ''
-        self.OKGREEN = ''
-        self.WARNING = ''
-        self.FAIL = ''
-        self.ENDC = ''
 
 class Init(smach.State):
     """Class to initialize certain parameters"""
@@ -54,12 +39,13 @@ class Init(smach.State):
     def execute(self,ud):
         self.pub_face.publish('EMO_NEUTRAL')
         self.pub_head.publish('down')
-	self.pub_obstacle.publish('active')
+        self.pub_obstacle.publish('active')
         if rospy.has_param('/hobbit/social_role'):
             ud.social_role = rospy.get_param('/hobbit/social_role')
         if ud.command.data == 'cancel':
             return 'canceled'
         return 'succeeded'
+
 
 class CleanUp(smach.State):
     """Class for setting the result message and clean up persistent variables"""
@@ -74,6 +60,7 @@ class CleanUp(smach.State):
         ud.visited_places = []
         ud.result = String('user not detected')
         return 'succeeded'
+
 
 class SetSuccess(smach.State):
     """Class for setting the success message in the actionlib result and clean up of persistent variables"""
@@ -94,6 +81,7 @@ class SetSuccess(smach.State):
         ud.result = String('user detected')
         return 'succeeded'
 
+
 class CleanPositions(smach.State):
     """Class for removing unneeded positions from the rooms. Only use the default 'user search' positions. \
             Remove the waiting, 'object search' and recharge positions"""
@@ -113,12 +101,13 @@ class CleanPositions(smach.State):
         ud.plan = None
         return 'succeeded'
 
+
 class PlanPath(smach.State):
     """Class to determine the shortest path to all possible positions, start in the users last known room"""
     def __init__(self):
         smach.State.__init__(self, outcomes=['get_path', 'movement', 'preempted', 'failure'],
                 input_keys=['robot_current_pose', 'pose', 'positions', 'detection', 'plan', 'users_current_room', 'visited_places'],
-                output_keys=['detection', 'visited_places', 'robot_end_pose'])
+                output_keys=['detection', 'visited_places', 'robot_end_pose', 'goal_position_x', 'goal_position_y', 'goal_position_yaw'])
         self.positions=[]
         self.pub_obstacle = rospy.Publisher('/headcam/active', String)
         self.getPlan = rospy.ServiceProxy('make_plan', GetPlan, persistent=True)
@@ -170,7 +159,7 @@ class PlanPath(smach.State):
 
             if resp.plan.poses:
                 print bcolors.OKBLUE + 'Plan received'
-                print str(len(resp.plan.poses))+ bcolors.ENDC
+                print str(len(resp.plan.poses)) + bcolors.ENDC
                 # calculate distance
                 last = (end_pose.pose.position.x, end_pose.pose.position.y)
                 distance = 0.0
@@ -185,13 +174,16 @@ class PlanPath(smach.State):
                     self.shortest_path = distance
                     print bcolors.OKGREEN + 'shortest path is now to the %s in the %s'%(position['place_name'],position['room']) + bcolors.ENDC
                     ud.robot_end_pose = {'room': position['room'], 'place':position['place_name'], 'distance':distance, 'penalty':position['penalty']}
+                    ud.goal_position_x = position['pose'].pose.position.x
+                    ud.goal_position_y = position['pose'].pose.position.y
+                    ud.goal_position_yaw = position['pose'].pose.position.theta
+                    print(position['theta'])
                 else:
                     pass
         if len(ud.visited_places) == len(ud.positions):
             return 'failure'
         else:
             return 'movement'
-
 
 
 class MoveBase(smach.State):
@@ -306,19 +298,23 @@ def main():
         smach.StateMachine.add('CLEAN_POSITIONS', CleanPositions(), transitions={'succeeded':'GET_CURRENT_ROOM'})
         smach.StateMachine.add('GET_CURRENT_ROOM', ServiceState('getCurrentRoom', GetName, response_key='robots_room_name'), transitions={'succeeded':'GET_USERS_ROOM', 'aborted':'CLEAN_UP'})
         smach.StateMachine.add('GET_USERS_ROOM', ServiceState('get_users_current_room', GetUsersCurrentRoom, response_key='users_current_room'), transitions={'succeeded':'PLAN_PATH', 'preempted':'CLEAN_UP', 'aborted':'CLEAN_UP'})
+        smach.StateMachine.add('PLAN_PATH', PlanPath(), transitions={'success':'MOVE_HEAD_DOWN', 'preempted':'CLEAN_UP', 'failure':'CLEAN_UP'})
+        smach.StateMachine.add('MOVE_HEAD_DOWN', head_move.MoveTo(pose='down_center'), transitions={'succeeded':'MOVE_BASE', 'preempted':'CLEAN_UP', 'failed':'MOVE_BASE'})
+        smach.StateMachine.add(
+            'MOVE_BASE',
+            hobbit_move.goToPose(),
+            transitions={'succeeded':'MOVE_HEAD', 'preempted':'CLEAN_UP', 'aborted':'CLEAN_UP'},
+            remapping={'x':'goal_position_x',
+                       'y':'goal_position_y',
+                       'yaw':'goal_position_yaw'})
         smach.StateMachine.add('PLAN_PATH', PlanPath(), transitions={'movement':'MOVE_BASE_GO', 'preempted':'CLEAN_UP', 'get_path':'GET_PATH', 'failure':'CLEAN_UP'})
-        smach.StateMachine.add('GET_PATH',
-                ServiceState('/make_plan', GetPlan, request_key='plan_request', response_key='plan'),
-                #ServiceState('/move_base/NavfnROS/make_plan', MakeNavPlan, request_key='plan_request', response_key='path'),
-                transitions={'succeeded':'PLAN_PATH', 'preempted':'CLEAN_UP', 'aborted':'CLEAN_UP'})
-        smach.StateMachine.add('MOVE_BASE_GO', MoveBase(), transitions={'succeeded':'DETECTION', 'preempted':'CLEAN_UP', 'failure':'CLEAN_UP'})
         smach.StateMachine.add('DETECTION', cc, transitions={'succeeded': 'DETECTION', 'failed':'CLEAN_UP'})
         smach.StateMachine.add('STOP_MOVEMENT', hobbit_move.Stop(), transitions={'succeeded': 'SET_SUCCESS', 'preempted':'preempted'})
         smach.StateMachine.add('SET_SUCCESS', SetSuccess(), transitions={'succeeded':'succeeded', 'preempted':'CLEAN_UP'})
         smach.StateMachine.add('CLEAN_UP', CleanUp(), transitions={'succeeded':'preempted'})
 
     asw = smach_ros.ActionServerWrapper(
-            'locate_user', LocateUserAction, lu_sm,
+            'locate_user', GeneralHobbitAction, lu_sm,
             ['succeeded'], ['aborted'],['preempted'],
             result_slots_map = {'result':'result'},
             goal_slots_map = {'command':'command'})
