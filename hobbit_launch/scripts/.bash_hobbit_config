@@ -1,0 +1,2 @@
+alias sshpi='ssh -X pi@192.168.2.199'
+alias updateHead="source /opt/ros/hobbit_hydro/src/hobbit_launch/launch/HeadScripts/updateHead.sh"
