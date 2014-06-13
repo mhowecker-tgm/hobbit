@@ -79,7 +79,7 @@ class AskForName(State):
     The returned String is stored in the userdata key object_name.
     """
 
-    #def __init__(self, text='T_LO_WHAT_IS_THE_NAME_OF_THIS_OBJECT'):
+    # def __init__(self, text='T_LO_WHAT_IS_THE_NAME_OF_THIS_OBJECT'):
     def __init__(self, text='WHAT IS THE NAME OF THIS OBJECT'):
         State.__init__(
             self,

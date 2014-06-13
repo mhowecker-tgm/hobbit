@@ -29,13 +29,16 @@ def offer(rof='pickup'):
 
     seq = Sequence(
         outcomes=['succeeded', 'preempted', 'failed'],
-        connector_outcome='succeeded'
+        connector_outcome='yes'
     )
 
     with seq:
             Sequence.add(
                 'OFFER_ROF',
-                HobbitMMUI.AskYesNo(question=favours[rof])
+                HobbitMMUI.AskYesNo(question=favours[rof]),
+                transitions={'no': 'failed',
+                             'timeout': 'OFFER_ROF',
+                             '3times': 'failed'}
             )
             Sequence.add(
                 'EXECUTE_ROF',

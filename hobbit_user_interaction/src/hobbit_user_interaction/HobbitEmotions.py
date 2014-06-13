@@ -24,7 +24,7 @@ class ShowEmotions(State):
             outcomes=['succeeded', 'failed', 'preempted'],
             input_keys=['emotion', 'emo_time']
         )
-        self.pub_emo = rospy.Publisher('/head/emo', String)
+        self.pub_emo = rospy.Publisher('/head/emo', String, queue_size=50)
         self.emotion = emotion
         self.emo_time = emo_time
         self.default_emotion = 'NEUTRAL'

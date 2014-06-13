@@ -18,8 +18,8 @@ class MoveTo(State):
     """
     def __init__(self, pose='center_center'):
         State.__init__(self,
-                       outcomes=['succeeded', 'preempted', 'failed'])
-        self._publisher = rospy.Publisher('/head/move', String)
+                       outcomes=['succeeded', 'preempted', 'aborted'])
+        self._publisher = rospy.Publisher('/head/move', String, queue_size=50)
         self._pose = pose
         self._available_poses = ['center_center', 'up_center', 'down_center',
                                  'up_right', 'center_right', 'down_right',
@@ -36,4 +36,5 @@ class MoveTo(State):
             return 'succeeded'
         else:
             print(self._pose)
-            return 'failed'
+            return 'aborted'
+            # return 'failed'

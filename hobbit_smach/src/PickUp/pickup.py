@@ -21,6 +21,7 @@ from hobbit_msgs.msg import GeneralHobbitAction
 from smach_ros import ActionServerWrapper, SimpleActionState, ServiceState
 from sensor_msgs.msg import PointCloud2
 from geometry_msgs.msg import Pose2D, PoseStamped, Point, Quaternion, Vector3Stamped, PoseWithCovarianceStamped, Pose
+from rgbd_acquisition.msg import PointEvents
 import hobbit_smach.hobbit_move_import as hobbit_move
 import hobbit_smach.head_move_import as head_move
 import hobbit_smach.arm_move_import as arm_move
@@ -43,14 +44,70 @@ def disable(self):
         self.FAIL = ''
         self.ENDC = ''
 
+
+def pointevents_cb(msg, ud):
+    print('pointevents_cb')
+    print(msg)
+    return True
+
+class CheckHelpAccepted(smach.State):
+    """
+    Just a counter in a SMACH State.
+    """
+    def __init__(self):
+        smach.State.__init__(self, outcomes=['yes', 'no', 'preempted'])
+        self._help_accepted = 'no'
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            rospy.set_param('/hobbit/help_accepted', 'no')
+            return 'preempted'
+        if rospy.has_param('/hobbit/help_accepted'):
+             self._help_accepted = rospy.get_param('/hobbit/help_accepted')
+        return self._help_accepted
+
+
+
+class GraspCounter(smach.State):
+    """
+    Just a counter in a SMACH State.
+    """
+    def __init__(self):
+        smach.State.__init__(self, outcomes=['first', 'second'])
+        self._counter = 0
+
+    def execute(self, ud):
+        self._counter += 1
+        print('self._counter: %d' % self._counter )
+        if self._counter > 1:
+            return 'second'
+        else:
+            return 'first'
+
+
+class MoveCounter(smach.State):
+    """
+    Just a counter in a SMACH State.
+    """
+    def __init__(self):
+        smach.State.__init__(self, outcomes=['first', 'second'])
+        self._counter = 0
+
+    def execute(self, ud):
+        self._counter += 1
+        print('self._counter: %d' % self._counter )
+        if self._counter > 1:
+            return 'second'
+        else:
+            return 'first'
+
+
 class Init(smach.State):
     """Class to initialize certain parameters"""
     def __init__(self):
         smach.State.__init__(self, outcomes=['succeeded', 'canceled'], input_keys=['object_name'], output_keys=['social_role'])
-        self.pub_obstacle = rospy.Publisher('/headcam/active', String)
 
     def execute(self,ud):
-        self.pub_obstacle.publish('active')
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
@@ -77,7 +134,7 @@ class SetSuccess(smach.State):
         smach.State.__init__(self, outcomes=['succeeded', 'preempted'],
                              input_keys=['result'],
                              output_keys=['result', 'visited_places'])
-        self.pub = rospy.Publisher('/DiscreteMotionCmd', String)
+        self.pub = rospy.Publisher('/DiscreteMotionCmd', String, queue_size=50)
 
     def execute(self, ud):
         ud.visited_places = []
@@ -140,63 +197,69 @@ def main():
         StateMachine.add(
             'INIT',
             Init(),
-            transitions={'succeeded': 'GET_OBJECTS_POSITIONS',
+            transitions={'succeeded': 'GET_POINTING_DIRECTION',
                          'canceled': 'CLEAN_UP'}
         )
         StateMachine.add(
             'GET_POINTING_DIRECTION',
-            GetDataFromCommand(),
-            transitions={'succeeded': 'GET_VECTOR',
-                         'failed': 'SET_FAILURE',
+            util.WaitForMsgState(
+                '/pointEvents',
+                PointEvents,
+                msg_cb=pointevents_cb,
+                timeout=5,
+                output_keys=['pointEvent']
+                ),
+            transitions={'succeeded': 'START_LOOKING',
+                         'aborted': 'POINTING_NOT_DETECTED_1',
                          'preempted': 'preempted'}
-        )
-        StateMachine.add(
-            'GET_VECTOR',
-            GetVectorFromCommand(),
-            transitions={}
         )
         StateMachine.add(
             'POINTING_NOT_DETECTED_1',
             pickup.sayPointingGestureNotDetected1(),
             transitions={'yes': 'GET_POINTING_DIRECTION',
                          'no': 'POINTING_NOT_DETECTED_2',
-                         'preempted': 'preempted'}
+                         'preempted': 'preempted',
+                         'failed': 'POINTING_NOT_DETECTED_2'}
         )
         StateMachine.add(
             'POINTING_NOT_DETECTED_2',
             pickup.sayPointingGestureNotDetected2(),
-            transitions={}
+            transitions={'succeeded': 'aborted',
+                         'failed': 'aborted'}
         )
         StateMachine.add(
             'START_LOOKING',
             pickup.getStartLooking(),
-            transitions={}
+            transitions={'succeeded': 'LOOK_FOR_OBJECT',
+                         'failed': 'EMO_SAY_OBJECT_NOT_DETECTED'}
         )
         StateMachine.add(
             'LOOK_FOR_OBJECT',
-            DavidDummyLook(),
+            pickup.DavidDummyLook(),
             transitions={'succeeded': 'CALC_GRASP_POSE',
-                         'aborted': 'END_FAIL_OBJECT_DETECTION',
+                         'aborted': 'EMO_SAY_OBJECT_NOT_DETECTED',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
             'CALC_GRASP_POSE',
-            DavidDummyCalcGraspPose(),
-            transitions={'succeeded': '',
+            pickup.DavidDummyCalcGraspPose(),
+            transitions={'succeeded': 'EMO_SAY_OBJECT_FOUND',
                          'aborted': 'EMO_SAY_OBJECT_NOT_DETECTED',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
             'EMO_SAY_OBJECT_NOT_DETECTED',
-            pickup.sayObjectNotDetected1,
+            pickup.sayObjectNotDetected1(),
             transitions={'yes': 'GET_POINTING_DIRECTION',
                          'no': 'POINTING_NOT_DETECTED_2',
-                         'preempted': 'preempted'}
+                         'preempted': 'preempted',
+                         'failed': 'POINTING_NOT_DETECTED_2'}
         )
         StateMachine.add(
             'EMO_SAY_OBJECT_FOUND',
             pickup.sayObjectFoundRepositioning(),
-            transitions={'succeeded': 'MOVE_TO_GRASP_POSE'}
+            transitions={'succeeded': 'MOVE_TO_GRASP_POSE',
+                         'failed': 'MOVE_TO_GRASP_POSE'}
         )
         StateMachine.add(
             'MOVE_TO_GRASP_POSE',
@@ -209,46 +272,79 @@ def main():
             'MOVE_COUNTER',
             MoveCounter(),
             transitions={'first': 'EMO_SAY_UNABLE_TO_GRASP',
-                         'second': 'EMO_SAY_TRY_TO_REMVOE_OBJECT'}
+                         'second': 'EMO_SAY_TRY_TO_REMOVE_OBJECT'}
+        )
+        StateMachine.add(
+            'EMO_SAY_UNABLE_TO_GRASP',
+            pickup.sayUnableToGraspObject(),
+            transitions={'yes': 'MOVE_TO_GRASP_POSE',
+                         'no': 'EMO_SAY_TRY_TO_REMOVE_OBJECT',
+                         'failed': 'EMO_SAY_TRY_TO_REMOVE_OBJECT',
+                         'preempted': 'preempted'}
+        )
+        StateMachine.add(
+            'EMO_SAY_TRY_TO_REMOVE_OBJECT',
+            pickup.sayTryToRemoveObject(),
+            transitions={'succeeded': 'aborted',
+                         'failed': 'aborted',
+                         'preempted': 'preempted'}
         )
         StateMachine.add(
             'SAY_PICKING_UP',
             #speech_output.sayText(info='T_PU_PickingUpObject')
-            speech_output.sayText(info='PickingUpObject')
+            speech_output.sayText(info='PickingUpObject'),
             transitions={'succeeded': 'GRASP_OBJECT',
-                         'aborted': 'EMO_SAY_DID_NOT_PICKUP',
+                         'failed': 'EMO_SAY_DID_NOT_PICKUP',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
             'GRASP_OBJECT',
-            DavidDummyPickingUp(),
-            transitions={'succeeded': 'EMO_SAY_PICKED_UP_OBJECT',
-                         'aborted': 'COUNTER_GRASP',
+            pickup.DavidDummyPickingUp(),
+            transitions={'succeeded': 'COUNTER_GRASP_CHECK',
+                         'aborted': 'EMO_SAY_DID_NOT_PICKUP',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
             'SAY_CHECK_GRASP',
             #speech_output.sayText(info='T_PU_CheckingGrasp')
-            speech_output.sayText(info='CheckingGrasp')
+            speech_output.sayText(info='CheckingGrasp'),
             transitions={'succeeded': 'CHECK_GRASP',
                          'failed': 'EMO_SAY_DID_NOT_PICKUP'}
         )
         StateMachine.add(
             'CHECK_GRASP',
-            DavidDummyCheckGrasp(),
+            pickup.DavidDummyCheckGrasp(),
             transitions={'succeeded': 'PICKUP_SEQ',
                          'aborted': 'COUNTER_GRASP_CHECK'}
+        )
+        StateMachine.add(
+            'COUNTER_GRASP_CHECK',
+            GraspCounter(),
+            transitions={'first': 'EMO_SAY_DID_NOT_PICKUP',
+                         'second': 'EMO_SAY_DID_NOT_PICKUP_2'}
+        )
+        StateMachine.add(
+            'EMO_SAY_DID_NOT_PICKUP',
+            pickup.sayDidNotPickupObject1(),
+            transitions={'succeeded': 'aborted',
+                         'failed': 'aborted'}
+        )
+        StateMachine.add(
+            'EMO_SAY_DID_NOT_PICKUP_2',
+            pickup.sayDidNotPickupObject1(),
+            transitions={'succeeded': 'aborted',
+                         'failed': 'aborted'}
         )
         StateMachine.add(
             'PICKUP_SEQ',
             pickup.getPickupSeq(),
             transitions={'succeeded': 'CHECK_HELP',
-                         'aborted': 'GRASP_FAIL_SEQ',
+                         'failed': 'EMO_SAY_DID_NOT_PICKUP',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
             'CHECK_HELP',
-            CheckHelpAccepted,
+            CheckHelpAccepted(),
             transitions={'yes': 'SAY_THANK_YOU',
                          'no': 'SET_SUCCESS',
                          'preempted': 'preempted'}
@@ -257,13 +353,15 @@ def main():
             'SAY_THANK_YOU',
             #speech_output.sayText(info='T_PU_ThankYouPointing'),
             speech_output.sayText(info='ThankYouPointing'),
-            transitions={}
+            transitions={'succeeded': 'OFFER_RETURN_OF_FAVOR',
+                         'failed': 'OFFER_RETURN_OF_FAVOR',
+                         'preempted': 'preempted'}
         )
         StateMachine.add(
             'OFFER_RETURN_OF_FAVOR',
             return_of_favour.offer(rof='pickup'),
             transitions={'succeeded': 'SET_SUCCESS',
-                         'aborted': 'SET_SUCCESS',
+                         'failed': 'SET_SUCCESS',
                          'preempted': 'preempted'}
         )
 
@@ -271,31 +369,31 @@ def main():
 
 
 
-        smach.StateMachine.add('GET_OBJECTS_POSITIONS', ServiceState('/Hobbit/ObjectService/get_object_locations', GetObjectLocations, request_key='object_name', response_key='response'), transitions={'succeeded':'CLEAN_POSITIONS', 'preempted':'preempted'})
-        smach.StateMachine.add('CLEAN_POSITIONS', CleanPositions(), transitions={'succeeded':'GET_ROBOT_POSE', 'failure':'CLEAN_UP', 'preempted':'CLEAN_UP'})
-        smach.StateMachine.add('GET_ROBOT_POSE', util.WaitForMsgState('/amcl_pose', PoseWithCovarianceStamped, get_robot_pose_cb, output_keys=['robot_current_pose'], timeout=5),
-                transitions={'succeeded':'GET_ROBOTS_CURRENT_ROOM', 'aborted':'GET_ROBOT_POSE', 'preempted':'CLEAN_UP'})
-        smach.StateMachine.add('GET_ROBOTS_CURRENT_ROOM', ServiceState('get_robots_current_room', GetName, response_key='robots_room_name'), transitions={'succeeded':'PLAN_PATH'})
-        smach.StateMachine.add('PLAN_PATH', PlanPath(), transitions={'success':'MOVE_HEAD_DOWN', 'preempted':'CLEAN_UP', 'failure':'CLEAN_UP'})
-        smach.StateMachine.add('MOVE_HEAD_DOWN', head_move.MoveTo(pose='down_center'), transitions={'succeeded':'MOVE_BASE', 'preempted':'CLEAN_UP', 'failed':'MOVE_BASE'})
-        smach.StateMachine.add(
-            'MOVE_BASE',
-            hobbit_move.goToPose(),
-            transitions={'succeeded':'MOVE_HEAD', 'preempted':'CLEAN_UP', 'aborted':'CLEAN_UP'},
-            remapping={'x':'goal_position_x',
-                       'y':'goal_position_y',
-                       'yaw':'goal_position_yaw'})
-        smach.StateMachine.add('MOVE_HEAD', head_move.MoveTo(pose='search_table'), transitions={'succeeded':'REC_COUNTER', 'preempted':'CLEAN_UP', 'failed':'PLAN_PATH'})
-        smach.StateMachine.add('REC_COUNTER', MoveCounter(), transitions={'succeeded':'GET_POINT_CLOUD', 'preempted':'aborted', 'failure':'PLAN_PATH'})
-        smach.StateMachine.add('GET_POINT_CLOUD',
-                               util.WaitForMsgState('/headcam/depth_registered/points', PointCloud2, point_cloud_cb, timeout=5, output_keys=['cloud']),
-                               transitions={'succeeded':'START_OBJECT_RECOGNITION', 'aborted':'GET_POINT_CLOUD', 'preempted':'CLEAN_UP'})
-        smach.StateMachine.add('START_OBJECT_RECOGNITION',
-                               ServiceState('mp_recognition', recognize, request_slots=['cloud'], response_slots=['ids', 'transforms']),
-                               #transitions={'succeeded':'OBJECT_DETECTED', 'preempted':'CLEAN_UP', 'aborted':'START_OBJECT_RECOGNITION'})
-                               transitions={'succeeded':'OBJECT_DETECTED', 'preempted':'CLEAN_UP', 'aborted':'REC_COUNTER'})
-        smach.StateMachine.add('OBJECT_DETECTED', ObjectDetected(), transitions={'succeeded':'GRASP_OBJECT', 'failure':'MOVE_HEAD', 'preempted':'CLEAN_UP'})
-        smach.StateMachine.add('GRASP_OBJECT', DummyGrasp(), transitions={'succeeded':'SET_SUCCESS', 'failure':'CLEAN_UP', 'preempted':'CLEAN_UP'})
+        #smach.StateMachine.add('GET_OBJECTS_POSITIONS', ServiceState('/Hobbit/ObjectService/get_object_locations', GetObjectLocations, request_key='object_name', response_key='response'), transitions={'succeeded':'CLEAN_POSITIONS', 'preempted':'preempted'})
+        #smach.StateMachine.add('CLEAN_POSITIONS', CleanPositions(), transitions={'succeeded':'GET_ROBOT_POSE', 'failure':'CLEAN_UP', 'preempted':'CLEAN_UP'})
+        #smach.StateMachine.add('GET_ROBOT_POSE', util.WaitForMsgState('/amcl_pose', PoseWithCovarianceStamped, get_robot_pose_cb, output_keys=['robot_current_pose'], timeout=5),
+        #        transitions={'succeeded':'GET_ROBOTS_CURRENT_ROOM', 'aborted':'GET_ROBOT_POSE', 'preempted':'CLEAN_UP'})
+        #smach.StateMachine.add('GET_ROBOTS_CURRENT_ROOM', ServiceState('get_robots_current_room', GetName, response_key='robots_room_name'), transitions={'succeeded':'PLAN_PATH'})
+        #smach.StateMachine.add('PLAN_PATH', PlanPath(), transitions={'success':'MOVE_HEAD_DOWN', 'preempted':'CLEAN_UP', 'failure':'CLEAN_UP'})
+        #smach.StateMachine.add('MOVE_HEAD_DOWN', head_move.MoveTo(pose='down_center'), transitions={'succeeded':'MOVE_BASE', 'preempted':'CLEAN_UP', 'failed':'MOVE_BASE'})
+        #smach.StateMachine.add(
+        #    'MOVE_BASE',
+        #    hobbit_move.goToPose(),
+        #    transitions={'succeeded':'MOVE_HEAD', 'preempted':'CLEAN_UP', 'aborted':'CLEAN_UP'},
+        #    remapping={'x':'goal_position_x',
+        #               'y':'goal_position_y',
+        #               'yaw':'goal_position_yaw'})
+        #smach.StateMachine.add('MOVE_HEAD', head_move.MoveTo(pose='search_table'), transitions={'succeeded':'REC_COUNTER', 'preempted':'CLEAN_UP', 'failed':'PLAN_PATH'})
+        #smach.StateMachine.add('REC_COUNTER', MoveCounter(), transitions={'succeeded':'GET_POINT_CLOUD', 'preempted':'aborted', 'failure':'PLAN_PATH'})
+        #smach.StateMachine.add('GET_POINT_CLOUD',
+        #                       util.WaitForMsgState('/headcam/depth_registered/points', PointCloud2, point_cloud_cb, timeout=5, output_keys=['cloud']),
+        #                       transitions={'succeeded':'START_OBJECT_RECOGNITION', 'aborted':'GET_POINT_CLOUD', 'preempted':'CLEAN_UP'})
+        #smach.StateMachine.add('START_OBJECT_RECOGNITION',
+        #                       ServiceState('mp_recognition', recognize, request_slots=['cloud'], response_slots=['ids', 'transforms']),
+        #                       #transitions={'succeeded':'OBJECT_DETECTED', 'preempted':'CLEAN_UP', 'aborted':'START_OBJECT_RECOGNITION'})
+        #                       transitions={'succeeded':'OBJECT_DETECTED', 'preempted':'CLEAN_UP', 'aborted':'REC_COUNTER'})
+        #smach.StateMachine.add('OBJECT_DETECTED', ObjectDetected(), transitions={'succeeded':'GRASP_OBJECT', 'failure':'MOVE_HEAD', 'preempted':'CLEAN_UP'})
+        #smach.StateMachine.add('GRASP_OBJECT', DummyGrasp(), transitions={'succeeded':'SET_SUCCESS', 'failure':'CLEAN_UP', 'preempted':'CLEAN_UP'})
         smach.StateMachine.add('SET_SUCCESS', SetSuccess(), transitions={'succeeded':'succeeded', 'preempted':'CLEAN_UP'})
         smach.StateMachine.add('CLEAN_UP', CleanUp(), transitions={'succeeded':'preempted'})
 

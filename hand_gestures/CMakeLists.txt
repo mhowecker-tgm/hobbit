@@ -23,11 +23,11 @@ generate_messages(DEPENDENCIES std_msgs)
 #This needs to be after generate messages
 catkin_package()
 
-find_package(Boost COMPONENTS system filesystem thread serialization program_options) 
+find_package(Boost REQUIRED COMPONENTS system filesystem thread serialization program_options) 
 #LINK_DIRECTORIES(${BOOST_LIBRARY_DIRS})
 
 
-include_directories(${catkin_INCLUDEDIR} 
+include_directories(include ${BOOST_INCLUDE_DIRS} ${catkin_INCLUDEDIR} 
 		    ${OpenCV_INCLUDEDIR})
 
 

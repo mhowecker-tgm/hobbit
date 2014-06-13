@@ -30,7 +30,7 @@ class SetObstacles(State):
             self,
             outcomes=['succeeded', 'preempted']
         )
-        self.obstacles = rospy.Publisher('headcam/active', String, latch=False)
+        self.obstacles = rospy.Publisher('headcam/active', String, latch=False, queue_size=50)
         self.active = active
 
     def execute(self, ud):
@@ -54,7 +54,7 @@ class Undock(State):
             self,
             outcomes=['succeeded', 'preempted']
         )
-        self.stop_pub = rospy.Publisher('/docking_task', String, latch=False)
+        self.stop_pub = rospy.Publisher('/docking_task', String, latch=False, queue_size=50)
 
     def execute(self, ud):
         if self.preempt_requested():
@@ -74,7 +74,7 @@ class Dock(State):
             self,
             outcomes=['succeeded', 'preempted']
         )
-        self.stop_pub = rospy.Publisher('/docking_task', String, latch=False)
+        self.stop_pub = rospy.Publisher('/docking_task', String, latch=False, queue_size=50)
 
     def execute(self, ud):
         if self.preempt_requested():
@@ -94,7 +94,7 @@ class Stop(State):
             self,
             outcomes=['succeeded', 'preempted']
         )
-        self.stop_pub = rospy.Publisher('/stop_request', String, latch=False)
+        self.stop_pub = rospy.Publisher('/stop_request', String, latch=False, queue_size=50)
 
     def execute(self, ud):
         if self.preempt_requested():

@@ -7,22 +7,109 @@ NAME = 'pickup_import'
 import roslib
 roslib.load_manifest(PKG)
 # import rospy
+import uashh_smach.util as util
 
-from smach import Concurrence, Sequence # , State
-from hobbit_user_interaction import HobbitEmotions  # ,HobbitMMUI
+from smach import Concurrence, Sequence , State
+from hobbit_user_interaction import HobbitEmotions  ,HobbitMMUI
 import hobbit_smach.speech_output_import as speech_output
 # import hobbit_smach.head_move_import as head_move
 import hobbit_smach.hobbit_move_import as hobbit_move
 import hobbit_smach.arm_move_import as arm_move
 
+class DavidDummyLookingPose(State):
+    """
+    """
+    def __init__(self):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'failed', 'preempted'],
+            output_keys=['goal_position']
+        )
+    def execute(self, ud):
+        if self.preempt_requested():
+            return 'preempted'
+        ud.goal_position.x = 0
+        ud.goal_position.y = 0
+        ud.goal_position.yaw = 0
+        return 'succeeded'
+
+class DavidDummyLook(State):
+    """
+    """
+    def __init__(self):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'aborted', 'preempted'],
+            output_keys=['goal_position']
+        )
+    def execute(self, ud):
+        if self.preempt_requested():
+            return 'preempted'
+        ud.goal_position.x = 0
+        ud.goal_position.y = 0
+        ud.goal_position.yaw = 0
+        return 'succeeded'
+
+class DavidDummyCalcGraspPose(State):
+    """
+    """
+    def __init__(self):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'aborted', 'preempted'],
+            output_keys=['goal_position']
+        )
+    def execute(self, ud):
+        if self.preempt_requested():
+            return 'preempted'
+        ud.goal_position.x = 0
+        ud.goal_position.y = 0
+        ud.goal_position.yaw = 0
+        return 'succeeded'
+
+
+class DavidDummyPickingUp(State):
+    """
+    """
+    def __init__(self):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'aborted', 'preempted'],
+            output_keys=['goal_position']
+        )
+    def execute(self, ud):
+        if self.preempt_requested():
+            return 'preempted'
+        ud.goal_position.x = 0
+        ud.goal_position.y = 0
+        ud.goal_position.yaw = 0
+        return 'succeeded'
+
+
+class DavidDummyCheckGrasp(State):
+    """
+    """
+    def __init__(self):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'aborted', 'preempted'],
+            output_keys=['goal_position']
+        )
+    def execute(self, ud):
+        if self.preempt_requested():
+            return 'preempted'
+        ud.goal_position.x = 0
+        ud.goal_position.y = 0
+        ud.goal_position.yaw = 0
+        return 'succeeded'
 
 def child_term_cb(outcome_map):
-    return True
+    return False
 
 
 def sayPointingGestureNotDetected1():
     cc = Concurrence(
-        outcomes=['yes', 'no' 'preempted', 'failed'],
+        outcomes=['yes', 'no', 'preempted', 'failed'],
         default_outcome='no',
         child_termination_cb=child_term_cb,
         outcome_map={'yes': {'EMO_SAD': 'succeeded',
@@ -38,7 +125,8 @@ def sayPointingGestureNotDetected1():
         Concurrence.add(
             'SAY_POINTING_NOT_DETECTED',
             #speech_output.askYesNo(question='T_PU_PointingGestureNotDetected1')
-            speech_output.askYesNo(question='PointingGestureNotDetected1')
+            # speech_output.askYesNo(question='PointingGestureNotDetected1')
+            HobbitMMUI.AskYesNo(question='PointingGestureNotDetected1')
         )
     return cc
 
@@ -88,7 +176,7 @@ def sayStartLooking():
 
 def sayObjectNotDetected1():
     cc = Concurrence(
-        outcomes=['yes', 'no' 'preempted', 'failed'],
+        outcomes=['yes', 'no', 'failed', 'preempted'],
         default_outcome='failed',
         child_termination_cb=child_term_cb,
         outcome_map={'yes': {'EMO_SAD': 'succeeded',
@@ -104,7 +192,8 @@ def sayObjectNotDetected1():
         Concurrence.add(
             'SAY_OBJECT_NOT_DETECTED',
             # speech_output.askYesNo(question='T_PU_ObjectNotDetected1')
-            speech_output.askYesNo(question='ObjectNotDetected1')
+            # speech_output.askYesNo(question='ObjectNotDetected1')
+            HobbitMMUI.AskYesNo(question='ObjectNotDetected1')
         )
     return cc
 
@@ -155,7 +244,7 @@ def sayObjectFoundRepositioning():
 
 def sayUnableToGraspObject():
     cc = Concurrence(
-        outcomes=['yes', 'no' 'preempted', 'failed'],
+        outcomes=['yes', 'no', 'preempted', 'failed'],
         default_outcome='failed',
         child_termination_cb=child_term_cb,
         outcome_map={'yes': {'EMO_SAD': 'succeeded',
@@ -171,7 +260,8 @@ def sayUnableToGraspObject():
         Concurrence.add(
             'SAY_UNABLE_TO_GRASP_OBJECT',
             # speech_output.sayText(info='T_PU_UnableToGraspObject')
-            speech_output.sayText(info='UnableToGraspObject')
+            # speech_output.sayText(info='UnableToGraspObject')
+            HobbitMMUI.AskYesNo(question='UnableToGraspObject')
         )
     return cc
 
@@ -304,11 +394,12 @@ def getStartLooking():
         )
         Sequence.add(
             'CALCULATE_LOOKING_POSE',
-            DummyLookingPose()
+            DavidDummyLookingPose()
         )
         Sequence.add(
             'MOVE_TO_POSE',
-            hobbit_move.goToPose()
+            hobbit_move.goToPose(),
+            transitions={'aborted': 'failed'}
         )
     return seq
 
@@ -332,10 +423,10 @@ def getPickupSeq():
             'MOVE_ARM_TO_TRAY_AND_HOME',
             arm_move.goToTrayPosition()
         )
-        Sequence.add(
-            'LOCATE_USER',
-            Dummy()
-        )
+        #Sequence.add(
+        #    'LOCATE_USER',
+        #    Dummy()
+        #)
         Sequence.add(
             'EMO_SAY_REMOVE_OBJECT',
             sayRemoveObjectTakeObject()
