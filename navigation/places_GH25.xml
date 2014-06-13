@@ -10,7 +10,7 @@
 		</vertices>
 		<places>
 			<place>
-				<name>default</name>
+				<name>Werner</name>
 				<type>goto</type>
                			<pose x="-0.3" y="0" theta="-1.570795"/>
             		</place>
@@ -41,7 +41,7 @@
 		</vertices>
 		<places>
 			<place>
-				<name>front</name>
+				<name>default</name>
 				<type>goto</type>
                			<pose x="3.5" y="6" theta="0.0"/>
             		</place>
@@ -63,7 +63,7 @@
 		</vertices>
 		<places>
 			<place>
-				<name>center</name>
+				<name>default</name>
 				<type>goto</type>
                			<pose x="-0.2" y="4.5" theta="0.0"/>
             		</place>
