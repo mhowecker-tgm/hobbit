@@ -408,6 +408,7 @@
    min_j = 0;
    max_j = size_y_;
 
+   unsigned char* master = master_grid.getCharMap();
 	
    if(first_update)
    {
@@ -416,17 +417,15 @@
 		for (int it_j= 0; it_j< size_y_; it_j++)
 		{
 			int ind = getIndex(it_i,it_j);
-			static_map_copy[ind] = master_grid.getCost(it_i,it_j);
-		        int static_value = master_grid.getCost(it_i,it_j);
+			static_map_copy[ind] = master[ind];
+		        int static_value = master[ind];
 		        //std::cout << "static value " << static_value << std::endl;
 
 		}
 	   }
            first_update = false;	
-           std::cout << "done " << std::endl;
+           std::cout << "done ***********************************" << std::endl;
    }
-
-   unsigned char* master = master_grid.getCharMap();
 
    for (int it_i= 0; it_i<size_x_; it_i++)
    {
@@ -440,19 +439,6 @@
 			master[ind] = costmap_[ind]; 
 	}
    }
-
-
-   //if(combination_method_==0)
-     //updateWithOverwrite(master_grid, min_i, min_j, max_i, max_j);
-   //else
-     //updateWithMax(master_grid, min_i, min_j, max_i, max_j);
-
-
-
-
-
-
-
 
 
  }
@@ -720,10 +706,10 @@
      memset(costmap_, FREE_SPACE, size_x_ * size_y_ * sizeof(unsigned char));
  
      //now we want to copy the local map back into the costmap
-     //copyMapRegion(local_map, 0, 0, cell_size_x, costmap_, start_x, start_y, size_x_, cell_size_x, cell_size_y);
+     copyMapRegion(local_map, 0, 0, cell_size_x, costmap_, start_x, start_y, size_x_, cell_size_x, cell_size_y);
 
 
-     for (int it_i= start_x; it_i<end_x; it_i++)
+/*     for (int it_i= start_x; it_i<end_x; it_i++)
 		for (int it_j= start_y; it_j<end_y; it_j++)
 		{
 			int ind = getIndex(it_i,it_j);
@@ -731,7 +717,7 @@
 			costmap_[ind] = LETHAL_OBSTACLE;
 			//std::cout << "costmap value copied " << count << " : " << value << std::endl;
 		}
- 
+ */
      //clean up
      delete[] local_map;
  }
