@@ -27,7 +27,7 @@ void MiraGetPath::path_channel_callback(mira::ChannelRead<std::vector<mira::Poin
   global_plan = data;
   new_plan = true;
 
-  std::cout << "path size " << global_plan.size() << std::endl;
+  //std::cout << "path size " << global_plan.size() << std::endl;
 
 }
 
@@ -56,7 +56,7 @@ bool MiraGetPath::get_path(nav_msgs::GetPlan::Request &req, nav_msgs::GetPlan::R
   r1.timedWait(mira::Duration::seconds(1));
   r1.get();
 
- std::cout << "before waiting" << std::endl;
+ //std::cout << "before waiting" << std::endl;
   
   // wait for new data on the "navigation/Path" channel  
   //FIXME
@@ -68,7 +68,7 @@ bool MiraGetPath::get_path(nav_msgs::GetPlan::Request &req, nav_msgs::GetPlan::R
 
   sleep (2);
 
-  std::cout << "after waiting" << std::endl;
+  //std::cout << "after waiting" << std::endl;
 
   // Extract the planned path, copy the path into the response
   resp.plan.poses.resize(global_plan.size());
