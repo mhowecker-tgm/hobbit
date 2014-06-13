@@ -198,7 +198,8 @@ def goToPosition(frame='/map', room='', place='dock'):
     with seq:
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
                      head_move.MoveTo(pose='down_center'),
-                     transitions={'failed': 'aborted'})
+        #             transitions={'failed': 'aborted'}
+        )
         Sequence.add('WAIT', SleepState(duration=1))
         Sequence.add('ACTIVATE_OBSTACLES',
                      SetObstacles(active=True))
@@ -222,7 +223,8 @@ def goToPose():
     with seq:
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
                      head_move.MoveTo(pose='down_center'),
-                     transitions={'failed': 'aborted'})
+                     # transitions={'failed': 'aborted'}
+        )
         Sequence.add('WAIT', SleepState(duration=1))
         Sequence.add('ACTIVATE_OBSTACLES',
                      SetObstacles(active=True))
