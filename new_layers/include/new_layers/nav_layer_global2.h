@@ -186,6 +186,10 @@ protected:
    unsigned char* costmap_copy; 
    int min_range_cells;
 
+   unsigned char* static_map_copy;
+
+   bool first_update; 
+
 private:
   void reconfigureCB(costmap_2d::ObstaclePluginConfig &config, uint32_t level);
 };

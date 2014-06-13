@@ -185,6 +185,18 @@
 
    min_range_cells = cellDistance(min_range);
    costmap_copy = new unsigned char[4*min_range_cells];
+
+   int size_x_cells = getSizeInCellsX();
+   int size_y_cells = getSizeInCellsY();
+   std::cout << "size_x " << size_x_cells << std::endl;
+   std::cout << "size_y " << size_y_cells << std::endl;
+
+  // make a copy of the original static map!!
+  static_map_copy = new unsigned char[size_x_cells*size_y_cells];
+
+  first_update = true;
+  
+
  }
  
  void NavLayerGlobal2::setupDynamicReconfigure(ros::NodeHandle& nh)
@@ -322,16 +334,16 @@
    current_ = current;
  
    //raytrace freespace
-   for (unsigned int i = 0; i < clearing_observations.size(); ++i)
+/*   for (unsigned int i = 0; i < clearing_observations.size(); ++i)
    {
      raytraceFreespace(clearing_observations[i], min_x, min_y, max_x, max_y);
-   }
+   }*/
 
    //Reset obstacles outside window
    resetMapOutsideWindow(robot_x, robot_y, 2*min_range, 2*min_range);  //FIXME, should be implemented in base class
  
    //place the new obstacles into a priority queue... each with a priority of zero to begin with
-   for (std::vector<Observation>::const_iterator it = observations.begin(); it != observations.end(); ++it)
+/*   for (std::vector<Observation>::const_iterator it = observations.begin(); it != observations.end(); ++it)
    {
      const Observation& obs = *it;
  
@@ -372,14 +384,14 @@
        unsigned int index = getIndex(mx, my);
        costmap_[index] = LETHAL_OBSTACLE;
        touch(px, py, min_x, min_y, max_x, max_y);
-       /* *min_x = std::min(px, *min_x);
-       *min_y = std::min(py, *min_y);
-       *max_x = std::max(px, *max_x);
-       *max_y = std::max(py, *max_y);*/
+       // *min_x = std::min(px, *min_x);
+       // *min_y = std::min(py, *min_y);
+       // *max_x = std::max(px, *max_x);
+       // *max_y = std::max(py, *max_y);
       }
-    }
+    }*/
  
-   footprint_layer_.updateBounds(robot_x, robot_y, robot_yaw, min_x, min_y, max_x, max_y);
+   //footprint_layer_.updateBounds(robot_x, robot_y, robot_yaw, min_x, min_y, max_x, max_y);
  }
  
  void NavLayerGlobal2::updateCosts(costmap_2d::Costmap2D& master_grid, int min_i, int min_j, int max_i, int max_j)
@@ -389,17 +401,51 @@
  
    // The footprint layer clears the footprint in this NavLayerGlobal2
    // before we merge this obstacle layer into the master_grid.
-   footprint_layer_.updateCosts(*this, min_i, min_j, max_i, max_j);
+   //footprint_layer_.updateCosts(*this, min_i, min_j, max_i, max_j);
  
+   min_i = 0;
+   max_i = size_x_;
+   min_j = 0;
+   max_j = size_y_;
+
+	
+   if(first_update)
+   {
+	   for (int it_i= 0; it_i<size_x_; it_i++)
+	   {
+		for (int it_j= 0; it_j< size_y_; it_j++)
+		{
+			int ind = getIndex(it_i,it_j);
+			static_map_copy[ind] = master_grid.getCost(it_i,it_j);
+		        int static_value = master_grid.getCost(it_i,it_j);
+		        //std::cout << "static value " << static_value << std::endl;
+
+		}
+	   }
+           first_update = false;	
+           std::cout << "done " << std::endl;
+   }
+
+   unsigned char* master = master_grid.getCharMap();
+
+   for (int it_i= 0; it_i<size_x_; it_i++)
+   {
+	for (int it_j= 0; it_j< size_y_; it_j++)
+	{
+		int ind = getIndex(it_i,it_j);
+		if(costmap_[ind] < static_map_copy[ind])
+			costmap_[ind] = static_map_copy[ind];
+
+		if (costmap_[ind] != NO_INFORMATION)
+			master[ind] = costmap_[ind]; 
+	}
+   }
 
 
-
-
-
-   if(combination_method_==0)
-     updateWithOverwrite(master_grid, min_i, min_j, max_i, max_j);
-   else
-     updateWithMax(master_grid, min_i, min_j, max_i, max_j);
+   //if(combination_method_==0)
+     //updateWithOverwrite(master_grid, min_i, min_j, max_i, max_j);
+   //else
+     //updateWithMax(master_grid, min_i, min_j, max_i, max_j);
 
 
 
@@ -634,7 +680,7 @@
  
  void NavLayerGlobal2::onFootprintChanged()
  {
-   footprint_layer_.onFootprintChanged();
+   //footprint_layer_.onFootprintChanged();
  }
 
  void NavLayerGlobal2::resetMapOutsideWindow(double wx, double wy, double w_size_x, double w_size_y) //FIXME, should belong to Costmap2D
@@ -674,7 +720,17 @@
      memset(costmap_, FREE_SPACE, size_x_ * size_y_ * sizeof(unsigned char));
  
      //now we want to copy the local map back into the costmap
-     copyMapRegion(local_map, 0, 0, cell_size_x, costmap_, start_x, start_y, size_x_, cell_size_x, cell_size_y);
+     //copyMapRegion(local_map, 0, 0, cell_size_x, costmap_, start_x, start_y, size_x_, cell_size_x, cell_size_y);
+
+
+     for (int it_i= start_x; it_i<end_x; it_i++)
+		for (int it_j= start_y; it_j<end_y; it_j++)
+		{
+			int ind = getIndex(it_i,it_j);
+			//std::cout << "ind " << ind << std::endl;
+			costmap_[ind] = LETHAL_OBSTACLE;
+			//std::cout << "costmap value copied " << count << " : " << value << std::endl;
+		}
  
      //clean up
      delete[] local_map;
