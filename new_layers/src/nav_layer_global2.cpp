@@ -724,17 +724,17 @@
      memset(costmap_, FREE_SPACE, size_x_ * size_y_ * sizeof(unsigned char));
  
      //now we want to copy the local map back into the costmap
-     //copyMapRegion(local_map, 0, 0, cell_size_x, costmap_, start_x, start_y, size_x_, cell_size_x, cell_size_y);
+     copyMapRegion(local_map, 0, 0, cell_size_x, costmap_, start_x, start_y, size_x_, cell_size_x, cell_size_y);
 
 
-     for (int it_i= start_x; it_i<end_x; it_i++)
+/*     for (int it_i= start_x; it_i<end_x; it_i++)
 		for (int it_j= start_y; it_j<end_y; it_j++)
 		{
 			int ind = getIndex(it_i,it_j);
 			//std::cout << "ind " << ind << std::endl;
 			costmap_[ind] = LETHAL_OBSTACLE;
 			//std::cout << "costmap value copied " << count << " : " << value << std::endl;
-		}
+		}*/
  
      //clean up
      delete[] local_map;
