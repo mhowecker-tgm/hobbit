@@ -190,6 +190,8 @@ protected:
 
    bool first_update; 
 
+   int c_num;
+
 private:
   void reconfigureCB(costmap_2d::ObstaclePluginConfig &config, uint32_t level);
 };

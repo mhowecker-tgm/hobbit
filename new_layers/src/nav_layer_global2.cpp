@@ -196,6 +196,7 @@
 
   first_update = true;
   
+  int c_num = 0;
 
  }
  
@@ -408,9 +409,17 @@
    min_j = 0;
    max_j = size_y_;
 
+   //std::cout << "c_num " << c_num << std::endl;
+
+   if (c_num < 5)
+   {
+     c_num++;
+     return;
+   }
+
    unsigned char* master = master_grid.getCharMap();
 	
-   if(first_update)
+   if(c_num == 5)
    {
 	   for (int it_i= 0; it_i<size_x_; it_i++)
 	   {
@@ -425,6 +434,7 @@
 	   }
            first_update = false;	
            std::cout << "done ***********************************" << std::endl;
+	   c_num++;
    }
 
    for (int it_i= 0; it_i<size_x_; it_i++)
@@ -432,11 +442,19 @@
 	for (int it_j= 0; it_j< size_y_; it_j++)
 	{
 		int ind = getIndex(it_i,it_j);
-		if(costmap_[ind] < static_map_copy[ind])
+		int val = costmap_[ind];
+		//if (val == LETHAL_OBSTACLE)
+			//std::cout << "val leth" << val << std::endl;
+		if(static_map_copy[ind]!= NO_INFORMATION && costmap_[ind] < static_map_copy[ind]) 
 			costmap_[ind] = static_map_copy[ind];
 
-		if (costmap_[ind] != NO_INFORMATION)
-			master[ind] = costmap_[ind]; 
+		//if (master[ind]== NO_INFORMATION ||master[ind] < costmap_[ind]) 
+		{
+			master[ind] = costmap_[ind];
+			//int val2 = costmap_[ind];
+			//if (val2 == LETHAL_OBSTACLE)
+				//std::cout << "val leth copied" << val << std::endl;
+		}
 	}
    }
 
@@ -706,10 +724,10 @@
      memset(costmap_, FREE_SPACE, size_x_ * size_y_ * sizeof(unsigned char));
  
      //now we want to copy the local map back into the costmap
-     copyMapRegion(local_map, 0, 0, cell_size_x, costmap_, start_x, start_y, size_x_, cell_size_x, cell_size_y);
+     //copyMapRegion(local_map, 0, 0, cell_size_x, costmap_, start_x, start_y, size_x_, cell_size_x, cell_size_y);
 
 
-/*     for (int it_i= start_x; it_i<end_x; it_i++)
+     for (int it_i= start_x; it_i<end_x; it_i++)
 		for (int it_j= start_y; it_j<end_y; it_j++)
 		{
 			int ind = getIndex(it_i,it_j);
@@ -717,7 +735,7 @@
 			costmap_[ind] = LETHAL_OBSTACLE;
 			//std::cout << "costmap value copied " << count << " : " << value << std::endl;
 		}
- */
+ 
      //clean up
      delete[] local_map;
  }
