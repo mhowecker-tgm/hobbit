@@ -186,6 +186,27 @@ class SetArmPosition(State):
             return 'failed'
 
 
+def goToPreGraspPosition():
+    """
+    Return a SMACH Sequence that will move the arm to pregrasp position.
+    """
+
+    seq = Sequence(
+        outcomes=['succeeded', 'preempted', 'failed'],
+        connector_outcome='succeeded'
+    )
+
+    with seq:
+        Sequence.add('MOVE_ARM_TO_TRAY_POSE',
+                     SetArmPosition(position='pregrasp'))
+        Sequence.add('ARM_POSE_REACHED',
+                     CheckArmReachedKnownPosition(position='pregrasp'),
+                     transitions={'failed': 'ARM_POSE_REACHED'})
+        Sequence.add('CHECK_ARM_IS_NOT_MOVING', CheckArmIsNotMoving(),
+                     transitions={'failed': 'CHECK_ARM_IS_NOT_MOVING'})
+    return seq
+
+
 def goToTrayPosition():
     """
     Return a SMACH Sequence that will move the arm to the tray pose.

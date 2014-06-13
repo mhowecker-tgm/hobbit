@@ -204,7 +204,8 @@ def goToPosition(frame='/map', room='', place='dock'):
         Sequence.add('ACTIVATE_OBSTACLES',
                      SetObstacles(active=True))
         # Sequence.add('SET_NAV_GOAL', SetNavigationGoal(room, place))
-        Sequence.add('MOVE_HOBBIT', move_base.MoveBaseState(frame))
+        if not DEBUG:
+            Sequence.add('MOVE_HOBBIT', move_base.MoveBaseState(frame))
     return seq
 
 
@@ -228,10 +229,11 @@ def goToPose():
         Sequence.add('WAIT', SleepState(duration=1))
         Sequence.add('ACTIVATE_OBSTACLES',
                      SetObstacles(active=True))
-        Sequence.add('MOVE_BASE_GOAL', move_base.MoveBaseState(frame),
-                     remapping={'x': 'x',
-                                'y': 'y',
-                                'yaw': 'yaw'})
+        if not DEBUG:
+            Sequence.add('MOVE_BASE_GOAL', move_base.MoveBaseState(frame),
+                            remapping={'x': 'x',
+                                    'y': 'y',
+                                    'yaw': 'yaw'})
     return seq
     #return move_base.MoveBaseState(frame)
 

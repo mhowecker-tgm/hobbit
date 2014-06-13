@@ -3,6 +3,7 @@
 
 PKG = 'hobbit_smach'
 NAME = 'pickup_import'
+DEBUG = True
 
 import roslib
 roslib.load_manifest(PKG)
@@ -16,92 +17,124 @@ import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.hobbit_move_import as hobbit_move
 import hobbit_smach.arm_move_import as arm_move
 
-class DavidDummyLookingPose(State):
+class DavidLookForObject(State):
     """
+    This state is called after the robot moved to a position from where it should be
+    able to observe the floor and find an object there.
+    The head will already be looking down to the floor.
+    The pose of an object has to be stored in the userdata key object_pose
     """
     def __init__(self):
         State.__init__(
             self,
             outcomes=['succeeded', 'failed', 'preempted'],
-            output_keys=['goal_position']
+            input_keys=['goal_position_x', 'goal_position_y', 'goal_position_yaw'],
+            output_keys=['goal_position_x', 'goal_position_y', 'goal_position_yaw']
         )
     def execute(self, ud):
         if self.preempt_requested():
             return 'preempted'
-        ud.goal_position.x = 0
-        ud.goal_position.y = 0
-        ud.goal_position.yaw = 0
+        # TODO: David please put the pose calculations in here
+        # if you need any specific input data (point cloud) you can either
+        # subscribe to a topic yourself or get the data from and input key which i have
+        # to provide you with
+        ud.object_pose.position.x = 0
+        ud.object_pose.position.y = 0
+        ud.object_pose.position.z = 0
+        ud.object_pose.orientation.x = 0
+        ud.object_pose.orientation.y = 0
+        ud.object_pose.orientation.z = 0
+        ud.object_pose.orientation.w = 0
+
         return 'succeeded'
 
-class DavidDummyLook(State):
+class DavidLookingPose(State):
     """
+    This state should handle the following task.
+    Given the data from the pointing gesture (x,y,z,vectorX, vectorY, vectorZ)
+    a Pose is calculated to which the robot will then navigate. This pose has
+    to be stored inside the userdata output keys.
     """
     def __init__(self):
         State.__init__(
             self,
             outcomes=['succeeded', 'aborted', 'preempted'],
-            output_keys=['goal_position']
+            input_keys=['pointing_msg', 'goal_position_x', 'goal_position_y', 'goal_position_yaw'],
+            output_keys=['goal_position_x', 'goal_position_y', 'goal_position_yaw']
         )
     def execute(self, ud):
         if self.preempt_requested():
             return 'preempted'
-        ud.goal_position.x = 0
-        ud.goal_position.y = 0
-        ud.goal_position.yaw = 0
+        print(ud.pointing_msg)
+        # TODO: David please put the pose calculations in here
+
+        ud.goal_position_x = 0
+        ud.goal_position_y = 0
+        ud.goal_position_yaw = 0
         return 'succeeded'
 
-class DavidDummyCalcGraspPose(State):
+class DavidCalcGraspPose(State):
     """
+    This state should handle the following task.
+    Given the Pose data given in the object_pose a Pose is calculated to
+    which the robot will then navigate. This pose has to be stored inside
+    the userdata output keys.
     """
     def __init__(self):
         State.__init__(
             self,
             outcomes=['succeeded', 'aborted', 'preempted'],
-            output_keys=['goal_position']
+            input_keys=['object_pose', 'goal_position_x', 'goal_position_y', 'goal_position_yaw'],
+            output_keys=['goal_position_x', 'goal_position_y', 'goal_position_yaw']
         )
     def execute(self, ud):
         if self.preempt_requested():
             return 'preempted'
-        ud.goal_position.x = 0
-        ud.goal_position.y = 0
-        ud.goal_position.yaw = 0
+        print(ud.object_pose)
+        # TODO: David please put the pose calculations in here
+
+        ud.goal_position_x = 0
+        ud.goal_position_y = 0
+        ud.goal_position_yaw = 0
         return 'succeeded'
 
 
-class DavidDummyPickingUp(State):
+class DavidPickingUp(State):
     """
+    This state moves the arm from the PreGrasping position to the object,
+    closes the gripper and returns 'succeeded' afterwards.
     """
     def __init__(self):
         State.__init__(
             self,
-            outcomes=['succeeded', 'aborted', 'preempted'],
-            output_keys=['goal_position']
+            outcomes=['succeeded', 'aborted', 'preempted']
         )
     def execute(self, ud):
         if self.preempt_requested():
             return 'preempted'
-        ud.goal_position.x = 0
-        ud.goal_position.y = 0
-        ud.goal_position.yaw = 0
+        # TODO: David please add the grasping in here
+
         return 'succeeded'
 
 
-class DavidDummyCheckGrasp(State):
+class DavidCheckGrasp(State):
     """
+    This state has to check if the grasping was successful or not.
+    Return 'succeeded' if it was, 'aborted' if it was not.
+    Returns 'preempted' on request.
     """
     def __init__(self):
         State.__init__(
             self,
-            outcomes=['succeeded', 'aborted', 'preempted'],
-            output_keys=['goal_position']
+            outcomes=['succeeded', 'aborted', 'preempted']
         )
     def execute(self, ud):
         if self.preempt_requested():
             return 'preempted'
-        ud.goal_position.x = 0
-        ud.goal_position.y = 0
-        ud.goal_position.yaw = 0
+        # TODO: David please add the check of the grasping in here
+
         return 'succeeded'
+
 
 def child_term_cb(outcome_map):
     return False
@@ -386,6 +419,10 @@ def getStartLooking():
         outcomes=['succeeded', 'preempted', 'failed'],
         connector_outcome='succeeded'
     )
+    if DEBUG:
+        seq.userdata.goal_position_x = 0
+        seq.userdata.goal_position_y = 0
+        seq.userdata.goal_position_yaw = 0
 
     with seq:
         Sequence.add(
@@ -394,17 +431,20 @@ def getStartLooking():
         )
         Sequence.add(
             'CALCULATE_LOOKING_POSE',
-            DavidDummyLookingPose()
+            DavidLookingPose()
         )
         Sequence.add(
             'MOVE_TO_POSE',
             hobbit_move.goToPose(),
-            transitions={'aborted': 'failed'}
+            transitions={'aborted': 'failed'},
+            remapping={'x':'goal_position_x',
+                       'y':'goal_position_y',
+                       'yaw':'goal_position_yaw'}
         )
     return seq
 
 
-def getPickupSeq():
+def getEndPickupSeq():
     """
     Return a SMACH Sequence that gives feedback to the user, stores a grasped
     object on the tray and searches for the user.
@@ -419,16 +459,44 @@ def getPickupSeq():
             'EMO_SAY_PICKED_UP',
             sayPickedUpObject()
         )
-        Sequence.add(
-            'MOVE_ARM_TO_TRAY_AND_HOME',
-            arm_move.goToTrayPosition()
-        )
-        #Sequence.add(
-        #    'LOCATE_USER',
-        #    Dummy()
-        #)
+        if not DEBUG:
+            Sequence.add(
+                'MOVE_ARM_TO_TRAY_AND_HOME',
+                arm_move.goToTrayPosition()
+            )
+            Sequence.add(
+                'LOCATE_USER',
+                Dummy()
+            )
         Sequence.add(
             'EMO_SAY_REMOVE_OBJECT',
             sayRemoveObjectTakeObject()
+        )
+        return seq
+
+
+def getEndPickupSeq():
+    """
+    Return a SMACH Sequence that gives feedback to the user, stores a grasped
+    object on the tray and searches for the user.
+    """
+    seq = Sequence(
+        outcomes=['succeeded', 'preempted', 'failed'],
+        connector_outcome='succeeded'
+    )
+
+    with seq:
+        Sequence.add(
+            'EMO_SAY_PICKED_UP',
+            sayPickedUpObject()
+        )
+        if not DEBUG:
+            Sequence.add(
+                'MOVE_ARM_TO_PRE_GRASP_POSITION',
+                arm_move.goToPreGraspPosition()
+            )
+        Sequence.add(
+            'GRASP_OBJECT',
+            DavidPickingUp()
         )
         return seq

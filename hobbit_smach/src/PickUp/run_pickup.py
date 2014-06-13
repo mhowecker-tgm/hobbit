@@ -16,7 +16,7 @@ def start_action():
     client.wait_for_server()
     print "connected to server"
     goal = GeneralHobbitGoal(
-        command=String('Pickup'))
+        command=String('pickup'))
     print goal
     print "send goal"
     client.send_goal(goal)

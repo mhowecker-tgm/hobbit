@@ -67,6 +67,24 @@ class CheckHelpAccepted(smach.State):
         return self._help_accepted
 
 
+class PointingCounter(smach.State):
+    """
+    Just a counter in a SMACH State.
+    """
+    def __init__(self):
+        smach.State.__init__(self, outcomes=['first', 'second'])
+        self._counter = 0
+
+    def execute(self, ud):
+        self._counter += 1
+        print('self._counter: %d' % self._counter )
+        if self._counter > 1:
+            self._counter = 0
+            return 'second'
+        else:
+            return 'first'
+
+
 
 class GraspCounter(smach.State):
     """
@@ -80,6 +98,7 @@ class GraspCounter(smach.State):
         self._counter += 1
         print('self._counter: %d' % self._counter )
         if self._counter > 1:
+            self._counter = 0
             return 'second'
         else:
             return 'first'
@@ -97,6 +116,7 @@ class MoveCounter(smach.State):
         self._counter += 1
         print('self._counter: %d' % self._counter )
         if self._counter > 1:
+            self._counter = 0
             return 'second'
         else:
             return 'first'
@@ -105,7 +125,7 @@ class MoveCounter(smach.State):
 class Init(smach.State):
     """Class to initialize certain parameters"""
     def __init__(self):
-        smach.State.__init__(self, outcomes=['succeeded', 'canceled'], input_keys=['object_name'], output_keys=['social_role'])
+        smach.State.__init__(self, outcomes=['succeeded', 'canceled'], output_keys=['social_role'])
 
     def execute(self,ud):
         if self.preempt_requested():
@@ -187,7 +207,6 @@ def main():
 
     pickup_sm = smach.StateMachine(
         outcomes=['succeeded', 'aborted', 'preempted'],
-        input_keys=['object_name'],
         output_keys=['result'])
 
     pickup_sm.userdata.result = String('started')
@@ -210,8 +229,14 @@ def main():
                 output_keys=['pointEvent']
                 ),
             transitions={'succeeded': 'START_LOOKING',
-                         'aborted': 'POINTING_NOT_DETECTED_1',
+                         'aborted': 'POINTING_COUNTER',
                          'preempted': 'preempted'}
+        )
+        StateMachine.add(
+            'POINTING_COUNTER',
+            PointingCounter(),
+            transitions={'first': 'POINTING_NOT_DETECTED_1',
+                         'second': 'POINTING_NOT_DETECTED_2'}
         )
         StateMachine.add(
             'POINTING_NOT_DETECTED_1',
@@ -230,19 +255,26 @@ def main():
         StateMachine.add(
             'START_LOOKING',
             pickup.getStartLooking(),
-            transitions={'succeeded': 'LOOK_FOR_OBJECT',
+            transitions={'succeeded': 'HEAD_TO_SEARCH',
                          'failed': 'EMO_SAY_OBJECT_NOT_DETECTED'}
         )
         StateMachine.add(
+            'HEAD_TO_SEARCH',
+            head_move.MoveTo(pose='to_grasp'),
+            transitions={'succeeded': 'LOOK_FOR_OBJECT',
+                         'aborted': 'EMO_SAY_OBJECT_NOT_DETECTED',
+                         'preempted': 'preempted'}
+        )
+        StateMachine.add(
             'LOOK_FOR_OBJECT',
-            pickup.DavidDummyLook(),
+            pickup.DavidLookForObject(),
             transitions={'succeeded': 'CALC_GRASP_POSE',
                          'aborted': 'EMO_SAY_OBJECT_NOT_DETECTED',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
             'CALC_GRASP_POSE',
-            pickup.DavidDummyCalcGraspPose(),
+            pickup.DavidCalcGraspPose(),
             transitions={'succeeded': 'EMO_SAY_OBJECT_FOUND',
                          'aborted': 'EMO_SAY_OBJECT_NOT_DETECTED',
                          'preempted': 'preempted'}
@@ -266,7 +298,10 @@ def main():
             hobbit_move.goToPose(),
             transitions={'succeeded': 'SAY_PICKING_UP',
                          'aborted': 'MOVE_COUNTER',
-                         'preempted': 'preempted'}
+                         'preempted': 'preempted'},
+            remapping={'x':'goal_position_x',
+                       'y':'goal_position_y',
+                       'yaw':'goal_position_yaw'}
         )
         StateMachine.add(
             'MOVE_COUNTER',
@@ -299,8 +334,9 @@ def main():
         )
         StateMachine.add(
             'GRASP_OBJECT',
-            pickup.DavidDummyPickingUp(),
-            transitions={'succeeded': 'COUNTER_GRASP_CHECK',
+            pickup.getPickupSeq(),
+            #pickup.DavidPickingUp(),
+            transitions={'succeeded': 'CHECK_GRASP',
                          'aborted': 'EMO_SAY_DID_NOT_PICKUP',
                          'preempted': 'preempted'}
         )
@@ -313,8 +349,8 @@ def main():
         )
         StateMachine.add(
             'CHECK_GRASP',
-            pickup.DavidDummyCheckGrasp(),
-            transitions={'succeeded': 'PICKUP_SEQ',
+            pickup.DavidCheckGrasp(),
+            transitions={'succeeded': 'END_PICKUP_SEQ',
                          'aborted': 'COUNTER_GRASP_CHECK'}
         )
         StateMachine.add(
@@ -326,18 +362,18 @@ def main():
         StateMachine.add(
             'EMO_SAY_DID_NOT_PICKUP',
             pickup.sayDidNotPickupObject1(),
-            transitions={'succeeded': 'aborted',
+            transitions={'succeeded': 'SAY_PICKING_UP',
                          'failed': 'aborted'}
         )
         StateMachine.add(
             'EMO_SAY_DID_NOT_PICKUP_2',
-            pickup.sayDidNotPickupObject1(),
+            pickup.sayDidNotPickupObject2(),
             transitions={'succeeded': 'aborted',
                          'failed': 'aborted'}
         )
         StateMachine.add(
-            'PICKUP_SEQ',
-            pickup.getPickupSeq(),
+            'END_PICKUP_SEQ',
+            pickup.getEndPickupSeq(),
             transitions={'succeeded': 'CHECK_HELP',
                          'failed': 'EMO_SAY_DID_NOT_PICKUP',
                          'preempted': 'preempted'}
@@ -364,44 +400,23 @@ def main():
                          'failed': 'SET_SUCCESS',
                          'preempted': 'preempted'}
         )
-
-
-
-
-
-        #smach.StateMachine.add('GET_OBJECTS_POSITIONS', ServiceState('/Hobbit/ObjectService/get_object_locations', GetObjectLocations, request_key='object_name', response_key='response'), transitions={'succeeded':'CLEAN_POSITIONS', 'preempted':'preempted'})
-        #smach.StateMachine.add('CLEAN_POSITIONS', CleanPositions(), transitions={'succeeded':'GET_ROBOT_POSE', 'failure':'CLEAN_UP', 'preempted':'CLEAN_UP'})
-        #smach.StateMachine.add('GET_ROBOT_POSE', util.WaitForMsgState('/amcl_pose', PoseWithCovarianceStamped, get_robot_pose_cb, output_keys=['robot_current_pose'], timeout=5),
-        #        transitions={'succeeded':'GET_ROBOTS_CURRENT_ROOM', 'aborted':'GET_ROBOT_POSE', 'preempted':'CLEAN_UP'})
-        #smach.StateMachine.add('GET_ROBOTS_CURRENT_ROOM', ServiceState('get_robots_current_room', GetName, response_key='robots_room_name'), transitions={'succeeded':'PLAN_PATH'})
-        #smach.StateMachine.add('PLAN_PATH', PlanPath(), transitions={'success':'MOVE_HEAD_DOWN', 'preempted':'CLEAN_UP', 'failure':'CLEAN_UP'})
-        #smach.StateMachine.add('MOVE_HEAD_DOWN', head_move.MoveTo(pose='down_center'), transitions={'succeeded':'MOVE_BASE', 'preempted':'CLEAN_UP', 'failed':'MOVE_BASE'})
-        #smach.StateMachine.add(
-        #    'MOVE_BASE',
-        #    hobbit_move.goToPose(),
-        #    transitions={'succeeded':'MOVE_HEAD', 'preempted':'CLEAN_UP', 'aborted':'CLEAN_UP'},
-        #    remapping={'x':'goal_position_x',
-        #               'y':'goal_position_y',
-        #               'yaw':'goal_position_yaw'})
-        #smach.StateMachine.add('MOVE_HEAD', head_move.MoveTo(pose='search_table'), transitions={'succeeded':'REC_COUNTER', 'preempted':'CLEAN_UP', 'failed':'PLAN_PATH'})
-        #smach.StateMachine.add('REC_COUNTER', MoveCounter(), transitions={'succeeded':'GET_POINT_CLOUD', 'preempted':'aborted', 'failure':'PLAN_PATH'})
-        #smach.StateMachine.add('GET_POINT_CLOUD',
-        #                       util.WaitForMsgState('/headcam/depth_registered/points', PointCloud2, point_cloud_cb, timeout=5, output_keys=['cloud']),
-        #                       transitions={'succeeded':'START_OBJECT_RECOGNITION', 'aborted':'GET_POINT_CLOUD', 'preempted':'CLEAN_UP'})
-        #smach.StateMachine.add('START_OBJECT_RECOGNITION',
-        #                       ServiceState('mp_recognition', recognize, request_slots=['cloud'], response_slots=['ids', 'transforms']),
-        #                       #transitions={'succeeded':'OBJECT_DETECTED', 'preempted':'CLEAN_UP', 'aborted':'START_OBJECT_RECOGNITION'})
-        #                       transitions={'succeeded':'OBJECT_DETECTED', 'preempted':'CLEAN_UP', 'aborted':'REC_COUNTER'})
-        #smach.StateMachine.add('OBJECT_DETECTED', ObjectDetected(), transitions={'succeeded':'GRASP_OBJECT', 'failure':'MOVE_HEAD', 'preempted':'CLEAN_UP'})
-        #smach.StateMachine.add('GRASP_OBJECT', DummyGrasp(), transitions={'succeeded':'SET_SUCCESS', 'failure':'CLEAN_UP', 'preempted':'CLEAN_UP'})
-        smach.StateMachine.add('SET_SUCCESS', SetSuccess(), transitions={'succeeded':'succeeded', 'preempted':'CLEAN_UP'})
-        smach.StateMachine.add('CLEAN_UP', CleanUp(), transitions={'succeeded':'preempted'})
+        StateMachine.add(
+            'SET_SUCCESS',
+            SetSuccess(),
+            transitions={'succeeded':'succeeded',
+                         'preempted':'CLEAN_UP'}
+        )
+        StateMachine.add(
+            'CLEAN_UP',
+            CleanUp(),
+            transitions={'succeeded':'preempted'}
+        )
 
     asw = smach_ros.ActionServerWrapper(
             'pickup', GeneralHobbitAction, pickup_sm,
             ['succeeded'], ['aborted'],['preempted'],
-            result_slots_map = {'result':'result'},
-            goal_slots_map = {'object_name':'object_name'})
+            result_slots_map = {'result':'result'}
+    )
 
     sis = smach_ros.IntrospectionServer('smach_server', pickup_sm, '/HOBBIT/PICKUP_SM_ROOT')
     sis.start()
