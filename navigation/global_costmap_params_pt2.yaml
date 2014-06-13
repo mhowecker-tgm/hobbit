@@ -17,6 +17,6 @@ global_costmap:
      name: my_obstacle_layer
      type: "costmap_2d::NavLayerGlobal2"
    - 
-     name: inflater
+     name: inflation_layer
      type: "costmap_2d::InflationLayer"
 
