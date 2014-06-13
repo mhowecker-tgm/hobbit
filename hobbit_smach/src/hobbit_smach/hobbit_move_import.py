@@ -118,7 +118,7 @@ class SetRotationGoal(State):
             output_keys=['x', 'y', 'yaw'],
             outcomes=['succeeded', 'preempted', 'aborted']
         )
-        self._angle = angle
+        self._angle = float(angle)
 
     def execute(self, ud):
         if self.preempt_requested():
@@ -129,6 +129,9 @@ class SetRotationGoal(State):
         ud.yaw = ud.yaw + (self._angle / 180) * pi
         if DEBUG:
             print('after: %f' % ud.yaw)
+        print('goal_x: %s' % ud.x)
+        print('goal_y: %s' % ud.y)
+        print('goal_yaw: %s' % ud.yaw)
         return 'succeeded'
 
 
@@ -194,7 +197,8 @@ def goToPosition(frame='/map', room='', place='dock'):
 
     with seq:
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
-                     head_move.MoveTo(pose='down_center'))
+                     head_move.MoveTo(pose='down_center'),
+                     transitions={'failed': 'aborted'})
         Sequence.add('WAIT', SleepState(duration=1))
         Sequence.add('ACTIVATE_OBSTACLES',
                      SetObstacles(active=True))
@@ -217,7 +221,8 @@ def goToPose():
 
     with seq:
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
-                     head_move.MoveTo(pose='down_center'))
+                     head_move.MoveTo(pose='down_center'),
+                     transitions={'failed': 'aborted'})
         Sequence.add('WAIT', SleepState(duration=1))
         Sequence.add('ACTIVATE_OBSTACLES',
                      SetObstacles(active=True))
@@ -254,11 +259,18 @@ def rotateRobot(angle=0, frame='/map'):
         outcomes=['succeeded', 'preempted', 'aborted'],
         connector_outcome='succeeded'
     )
+    frame = '/map'
 
     with seq:
         Sequence.add('GET_ROBOT_POSE', move_base.ReadRobotPositionState())
-        Sequence.add('SET_ROT_GOAL', SetRotationGoal(angle=angle))
-        Sequence.add('ROTATE_ROBOT', move_base.MoveBaseState())
+        Sequence.add('SET_ROT_GOAL', SetRotationGoal(angle=angle/4))
+        Sequence.add('ROTATE_ROBOT', move_base.MoveBaseState(frame))
+        Sequence.add('SET_ROT_GOAL_2', SetRotationGoal(angle=angle/4))
+        Sequence.add('ROTATE_ROBOT_2', move_base.MoveBaseState(frame))
+        Sequence.add('SET_ROT_GOAL_3', SetRotationGoal(angle=angle/4))
+        Sequence.add('ROTATE_ROBOT_3', move_base.MoveBaseState(frame))
+        Sequence.add('SET_ROT_GOAL_4', SetRotationGoal(angle=angle/4))
+        Sequence.add('ROTATE_ROBOT_4', move_base.MoveBaseState(frame))
         return seq
 
 

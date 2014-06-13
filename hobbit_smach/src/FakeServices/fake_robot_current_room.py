@@ -17,6 +17,7 @@ import rospy
 def getCurrentRoom(req):
     print 'Returning robots current room'
     room_names = ('kitchen', 'office', 'living room', 'bedroom')
+    room_names = ('MainCorridor', 'office', 'living room', 'bedroom')
     room_name = choice(room_names)
     print room_name
     return room_name
@@ -24,6 +25,7 @@ def getCurrentRoom(req):
 def main():
     rospy.init_node(NAME)
     s = rospy.Service('get_robots_current_room', GetName, getCurrentRoom)
+    s1 = rospy.Service('getCurrentRoom', GetName, getCurrentRoom)
 
     # spin() keeps Python from exiting until node is shutdown
     rospy.spin()

@@ -17,14 +17,33 @@ from hobbit_msgs.msg import LocateUserAction
 from hobbit_msgs.srv import *
 from hobbit_msgs.msg import *
 from hobbit_msgs.srv import *
-from smach import Concurrence
+from smach import Concurrence, Sequence
 from smach_ros import ServiceState
-from move_base_msgs.msg import GeneralHobbitAction
+from hobbit_msgs.msg import GeneralHobbitAction
 from nav_msgs.srv import GetPlan, GetPlanRequest
 from geometry_msgs.msg import Pose2D, PoseStamped, Point, Quaternion, PoseWithCovarianceStamped, Pose
 import hobbit_smach.hobbit_move_import as hobbit_move
 from hobbit_smach import bcolors
 from rgbd_acquisition.msg import Person
+import hobbit_smach.head_move_import as head_move
+from uashh_smach.util import SleepState, WaitForMsgState
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+def disable(self):
+        self.HEADER = ''
+        self.OKBLUE = ''
+        self.OKGREEN = ''
+        self.WARNING = ''
+        self.FAIL = ''
+        self.ENDC = ''
+
+
 
 
 class Init(smach.State):
@@ -67,13 +86,11 @@ class SetSuccess(smach.State):
     def __init__(self):
         smach.State.__init__(self, outcomes=['succeeded', 'preempted'],
                 output_keys=['result', 'visited_places'])
-        self.pub = rospy.Publisher('/DiscreteMotionCmd', String)
         self.pub_face = rospy.Publisher('/Hobbit/Emoticon', String)
 
     def execute(self, ud):
         ud.visited_places = []
         self.pub_face.publish('EMO_HAPPY')
-        self.pub.publish('Stop')
         if self.preempt_requested():
             ud.result = String('preempted')
             self.service_preempt()
@@ -105,8 +122,8 @@ class CleanPositions(smach.State):
 class PlanPath(smach.State):
     """Class to determine the shortest path to all possible positions, start in the users last known room"""
     def __init__(self):
-        smach.State.__init__(self, outcomes=['get_path', 'movement', 'preempted', 'failure'],
-                input_keys=['robot_current_pose', 'pose', 'positions', 'detection', 'plan', 'users_current_room', 'visited_places'],
+        smach.State.__init__(self, outcomes=['success', 'preempted', 'failure'],
+                input_keys=['robot_current_pose', 'pose', 'positions', 'detection', 'plan', 'users_current_room', 'visited_places', 'robot_end_pose'],
                 output_keys=['detection', 'visited_places', 'robot_end_pose', 'goal_position_x', 'goal_position_y', 'goal_position_yaw'])
         self.positions=[]
         self.pub_obstacle = rospy.Publisher('/headcam/active', String)
@@ -174,16 +191,18 @@ class PlanPath(smach.State):
                     self.shortest_path = distance
                     print bcolors.OKGREEN + 'shortest path is now to the %s in the %s'%(position['place_name'],position['room']) + bcolors.ENDC
                     ud.robot_end_pose = {'room': position['room'], 'place':position['place_name'], 'distance':distance, 'penalty':position['penalty']}
-                    ud.goal_position_x = position['pose'].pose.position.x
-                    ud.goal_position_y = position['pose'].pose.position.y
-                    ud.goal_position_yaw = position['pose'].pose.position.theta
+                    ud.goal_position_x = position['x']
+                    ud.goal_position_y = position['y']
+                    ud.goal_position_yaw = position['theta']
                     print(position['theta'])
                 else:
                     pass
         if len(ud.visited_places) == len(ud.positions):
             return 'failure'
         else:
-            return 'movement'
+            ud.visited_places = []
+            ud.visited_places.append(ud.robot_end_pose)
+            return 'success'
 
 
 class MoveBase(smach.State):
@@ -208,14 +227,30 @@ class MoveBase(smach.State):
             ud.visited_places.append(ud.robot_end_pose)
         return 'succeeded'
 
+class Counter(smach.State):
+    def __init__(self):
+        smach.State.__init__(self, outcomes=['succeeded', 'preempted', 'aborted'],
+                input_keys=['counter'],
+                output_keys=['counter'])
+
+    def execute(self, ud):
+        print('Counter: %d' % ud.counter)
+        ud.counter += 1
+        if ud.counter > 1000:
+            return 'succeeded'
+        else:
+            ud.counter = 0
+            return 'aborted'
 
 def userdetection_cb(msg, ud):
-    print bcolors.WARNING + 'received message: ' + bcolors.ENDC
-    print msg.header.frame_id
+    print bcolors.OKGREEN + 'received message: ' 
+    print msg 
+    print bcolors.ENDC
     if msg.confidence > 0.6:
         print bcolors.OKGREEN + 'User detected!' + bcolors.ENDC
         return True
     else:
+        print bcolors.WARNING + 'NO USER' + bcolors.ENDC
         return False
 
 
@@ -245,7 +280,8 @@ def get_robot_pose_cb(msg, ud):
 
 
 def child_term_cb(outcome_map):
-    if outcome_map['DETECT_USER'] == 'succeeded':
+    if outcome_map['DETECT_USER'] == 'succeeded' or outcome_map ['ROTATE'] == 'succeeded':
+        print('child_term_cb: succeeded')
         return True
     else:
         return False
@@ -253,6 +289,7 @@ def child_term_cb(outcome_map):
 
 def out_cb(outcome_map):
     if outcome_map['DETECT_USER'] == 'succeeded':
+        print('out_cb: succeeded')
         return 'succeeded'
     else:
         return 'failed'
@@ -276,6 +313,27 @@ def main():
         child_termination_cb=child_term_cb,
         outcome_cb=out_cb
     )
+    
+    seq = Sequence(
+        outcomes=['succeeded', 'preempted', 'aborted'],
+        connector_outcome='aborted'
+    )
+    seq.userdata.counter = 0
+
+    with seq:
+        Sequence.add('USER_DETECTOR',
+            util.WaitForMsgState(
+                'persons',
+                Person,
+                userdetection_cb,
+                timeout=1)
+        )
+        Sequence.add('COUNTER',
+            Counter(),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'USER_DETECTOR'}
+        )
+        
 
     with cc:
         Concurrence.add(
@@ -283,11 +341,7 @@ def main():
             hobbit_move.rotateRobot(angle=360, frame='/map'))
         Concurrence.add(
             'DETECT_USER',
-            util.WaitForMsgState(
-                'persons',
-                Person,
-                userdetection_cb,
-                timeout=2))
+            seq)
 
 
     with lu_sm:
@@ -303,12 +357,13 @@ def main():
         smach.StateMachine.add(
             'MOVE_BASE',
             hobbit_move.goToPose(),
-            transitions={'succeeded':'MOVE_HEAD', 'preempted':'CLEAN_UP', 'aborted':'CLEAN_UP'},
+            transitions={'succeeded':'MOVE_HEAD_UP', 'preempted':'CLEAN_UP', 'aborted':'CLEAN_UP'},
             remapping={'x':'goal_position_x',
                        'y':'goal_position_y',
                        'yaw':'goal_position_yaw'})
-        smach.StateMachine.add('PLAN_PATH', PlanPath(), transitions={'movement':'MOVE_BASE_GO', 'preempted':'CLEAN_UP', 'get_path':'GET_PATH', 'failure':'CLEAN_UP'})
-        smach.StateMachine.add('DETECTION', cc, transitions={'succeeded': 'DETECTION', 'failed':'CLEAN_UP'})
+        smach.StateMachine.add('MOVE_HEAD_UP', head_move.MoveTo(pose='center_center'), transitions={'succeeded':'WAIT', 'preempted':'CLEAN_UP', 'failed':'DETECTION'})
+        smach.StateMachine.add('WAIT', SleepState(duration=1), transitions={'succeeded': 'DETECTION'})
+        smach.StateMachine.add('DETECTION', cc, transitions={'succeeded': 'STOP_MOVEMENT', 'failed':'PLAN_PATH'})
         smach.StateMachine.add('STOP_MOVEMENT', hobbit_move.Stop(), transitions={'succeeded': 'SET_SUCCESS', 'preempted':'preempted'})
         smach.StateMachine.add('SET_SUCCESS', SetSuccess(), transitions={'succeeded':'succeeded', 'preempted':'CLEAN_UP'})
         smach.StateMachine.add('CLEAN_UP', CleanUp(), transitions={'succeeded':'preempted'})

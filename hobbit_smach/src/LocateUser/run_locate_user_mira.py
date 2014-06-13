@@ -4,7 +4,7 @@ import roslib; roslib.load_manifest('hobbit_smach')
 import rospy
 import actionlib
 
-from hobbit_msgs.msg import GeneralHobbitAction, GeneralHobbitActionGoal
+from hobbit_msgs.msg import GeneralHobbitAction, GeneralHobbitGoal
 from std_msgs.msg import String
 
 def start_action():
@@ -12,8 +12,10 @@ def start_action():
     client = actionlib.SimpleActionClient('locate_user', GeneralHobbitAction)
     client.wait_for_server()
     print "connected to server"
-    goal = hobbit_msgs.msg.GeneralHobbitActionGoal(
-            command=String('locateUser'))
+    par = []
+    goal = GeneralHobbitGoal(command=String('locateUser'),
+                             previous_state=String('call_hobbit'),
+                             parameters=par)
     print goal
     print "send goal"
     client.send_goal(goal)
