@@ -458,12 +458,25 @@ void MapLayer::updateCosts(costmap_2d::Costmap2D& master_grid, int min_i, int mi
      }
   }*/
 
-   if (!map_received_)
-     return;
-   if(!use_maximum_)
-       updateWithTrueOverwrite(master_grid, min_i, min_j, max_i, max_j);
-   else
-       updateWithMax(master_grid, min_i, min_j, max_i, max_j);
+  unsigned char* master_array = master_grid.getCharMap();
+  unsigned int span = master_grid.getSizeInCellsX();
+  for (int j = min_j; j < max_j; j++)
+  {
+	     unsigned int it = j * span + min_i;
+	     for (int i = min_i; i < max_i; i++)
+	     {
+		if (costmap_[it] == NO_INFORMATION)
+		{
+		 it++;
+		 continue;
+		}
+
+		unsigned char old_cost = master_array[it];
+		if (old_cost == NO_INFORMATION || old_cost < costmap_[it])
+		 master_array[it] = costmap_[it];
+		it++;
+	     }
+  }
 
 }
 
@@ -491,7 +504,11 @@ void MapLayer::raytraceFreespace(const Observation& clearing_observation, double
    double map_end_y = origin_y + size_y_ * resolution_;
  
  
-   touch(ox, oy, min_x, min_y, max_x, max_y); //FIXME
+   //touch(ox, oy, min_x, min_y, max_x, max_y); //FIXME
+   *min_x = std::min(ox, *min_x);
+   *min_y = std::min(oy, *min_y);
+   *max_x = std::max(ox, *max_x);
+   *max_y = std::max(oy, *max_y);
 
 
    //initialize layer costmap with the static map, by copying the values
@@ -618,7 +635,11 @@ void MapLayer::raytraceFreespace(const Observation& clearing_observation, double
    double full_distance = sqrt( dx*dx+dy*dy );
    double scale = std::min(1.0, range / full_distance);
    double ex = ox + dx * scale, ey = oy + dy * scale;
-   touch(ex, ey, min_x, min_y, max_x, max_y);   
+   //touch(ex, ey, min_x, min_y, max_x, max_y);   //FIXME
+   *min_x = std::min(ex, *min_x);
+   *min_y = std::min(ey, *min_y);
+   *max_x = std::max(ex, *max_x);
+   *max_y = std::max(ey, *max_y);
 }
  
 
