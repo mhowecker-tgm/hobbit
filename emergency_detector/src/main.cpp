@@ -4,8 +4,8 @@
 #include <unistd.h>
 #include <ros/ros.h>
 #include <ros/spinner.h>
- 
-#include <stdexcept> 
+
+#include <stdexcept>
 #include <image_transport/image_transport.h>
 
 
@@ -16,16 +16,50 @@
 #include <cv_bridge/cv_bridge.h>
 
 #include <std_srvs/Empty.h>
- 
+
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
 #include <sensor_msgs/CameraInfo.h>
 #include <image_transport/image_transport.h>
- 
+
+
+#if BROADCAST_HOBBIT
+#include "hobbit_msgs/Event.h"
+#include <std_msgs/String.h>
+ros::Publisher gestureEventBroadcaster;
+#endif
+
+
 int key = 0;
-
-
 ros::NodeHandle * nhPtr=0;
+unsigned int emergencyDetected=0;
+
+void broadcastEmergency(unsigned int frameNumber)
+{
+  if ( (!emergencyDetected) ) { return ; }
+
+  #if BROADCAST_HOBBIT
+    hobbit_msgs::Event evt;
+    std::stringstream ss;
+     case GESTURE_NONE   : break;
+     if (emergencyDetected) { ss<<"G_FALL"; } else
+                             { ss<<"G_NONE"; }
+
+    //sROS.data=ss.str();
+    evt.event=ss.str();
+    evt.header.seq = frameNumber;
+    evt.header.frame_id = "emergency_detector";
+    evt.header.stamp = ros::Time::now();
+    evt.sessionID  = "SessionID";
+    evt.confidence = 1.0;
+    evt.params.resize(0);
+    fprintf(stderr,"Publishing a new Emergency Event ( %u ) \n",emergencyDetected);
+    gestureEventBroadcaster.publish(evt);
+   #endif
+
+ return ;
+}
+
 
 //----------------------------------------------------------
 //Advertised Service switches
@@ -48,15 +82,6 @@ bool resume(std_srvs::Empty::Request& request, std_srvs::Empty::Response& respon
 }
 
 
-/*
-   Plane Segmentation Values , for Hobbit PT2 topology
-    Point :  204.93 503.04 1322.00
-    Normal : 0.00 , -0.79 , -0.62
-    Offset 30.0 
- 
-
-*/
- 
 int main(int argc, char **argv)
 {
    ROS_INFO("Starting Up!!");
@@ -83,7 +108,7 @@ int main(int argc, char **argv)
       //---------------------------------------------------------------------------------------------------
 	  //////////////////////////////////////////////////////////////////////////
 	  while ( ( key!='q' ) && (ros::ok()) )
-		{  
+		{
                   ros::spinOnce();//<- this keeps our ros node messages handled up until synergies take control of the main thread
                   usleep(1000);
 		 }
