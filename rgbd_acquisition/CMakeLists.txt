@@ -73,5 +73,9 @@ add_executable(rgbd_acquisition  src/main.cpp src/extAcquisition.cpp src/OpenNI2
 #${Nite2_LIBRARY}
 target_link_libraries(rgbd_acquisition ${catkin_LIBRARIES} ${OpenNI2_LIBRARIES}  ${CMAKE_CURRENT_SOURCE_DIR}/bin/libNiTE2.so ${OpenCV_LIBRARIES})
 
+## Add cmake target dependencies of the executable/library
+## as an example, message headers may need to be generated before nodes
+add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencpp)
+
 install(TARGETS rgbd_acquisition RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 install(FILES rgbd_acquisition.xml DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})

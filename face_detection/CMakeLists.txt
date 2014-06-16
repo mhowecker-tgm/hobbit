@@ -33,6 +33,10 @@ include_directories(${catkin_INCLUDEDIR}
 
 add_executable(face_detection src/main.cpp src/services.cpp src/pose.cpp src/FaceDetection.cpp src/AmMatrix/solveLinearSystemGJ.c src/AmMatrix/matrixCalculations.c src/AmMatrix/matrix4x4Tools.c src/AmMatrix/matrix3x3Tools.c src/calibration.c src/ImageOperations/imageOps.c)
 
+## Add cmake target dependencies of the executable/library
+## as an example, message headers may need to be generated before nodes
+add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencpp)
+
 target_link_libraries(face_detection  ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} )
 
 install(TARGETS face_detection RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
