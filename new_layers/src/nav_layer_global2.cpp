@@ -691,7 +691,7 @@
    //footprint_layer_.onFootprintChanged();
  }
 
- void NavLayerGlobal2::resetMapOutsideWindow(double wx, double wy, double w_size_x, double w_size_y) //FIXME, should belong to Costmap2D
+ void NavLayerGlobal2::resetMapOutsideWindow(double wx, double wy, double w_size_x, double w_size_y) //FIXME
  {
      ROS_ASSERT_MSG(w_size_x >= 0 && w_size_y >= 0, "You cannot specify a negative size window");
  
