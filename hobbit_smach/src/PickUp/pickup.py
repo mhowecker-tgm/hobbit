@@ -50,6 +50,13 @@ def pointevents_cb(msg, ud):
     print(msg)
     return True
 
+
+def point_cloud_cb(msg, ud):
+    print('point cloud received')
+    ud.cloud = msg
+    return True
+
+
 class CheckHelpAccepted(smach.State):
     """
     Just a counter in a SMACH State.
@@ -261,24 +268,35 @@ def main():
         StateMachine.add(
             'HEAD_TO_SEARCH',
             head_move.MoveTo(pose='to_grasp'),
-            transitions={'succeeded': 'LOOK_FOR_OBJECT',
+            transitions={'succeeded': 'GET_POINT_CLOUD',
                          'aborted': 'EMO_SAY_OBJECT_NOT_DETECTED',
                          'preempted': 'preempted'}
         )
+        StateMachine.add(
+            'GET_POINT_CLOUD',
+            util.WaitForMsgState(
+                '/headcam/depth_registered/points',
+                PointCloud2,
+                point_cloud_cb,
+                timeout=5,
+                output_keys=['cloud']),
+            transitions={'succeeded':'LOOK_FOR_OBJECT',
+                         'aborted':'GET_POINT_CLOUD',
+                         'preempted':'preempted'})
         StateMachine.add(
             'LOOK_FOR_OBJECT',
             pickup.DavidLookForObject(),
-            transitions={'succeeded': 'CALC_GRASP_POSE',
-                         'aborted': 'EMO_SAY_OBJECT_NOT_DETECTED',
-                         'preempted': 'preempted'}
-        )
-        StateMachine.add(
-            'CALC_GRASP_POSE',
-            pickup.DavidCalcGraspPose(),
             transitions={'succeeded': 'EMO_SAY_OBJECT_FOUND',
                          'aborted': 'EMO_SAY_OBJECT_NOT_DETECTED',
                          'preempted': 'preempted'}
         )
+        #StateMachine.add(
+        #    'CALC_GRASP_POSE',
+        #    pickup.DavidCalcGraspPose(),
+        #    transitions={'succeeded': 'EMO_SAY_OBJECT_FOUND',
+        #                 'aborted': 'EMO_SAY_OBJECT_NOT_DETECTED',
+        #                 'preempted': 'preempted'}
+        #)
         StateMachine.add(
             'EMO_SAY_OBJECT_NOT_DETECTED',
             pickup.sayObjectNotDetected1(),

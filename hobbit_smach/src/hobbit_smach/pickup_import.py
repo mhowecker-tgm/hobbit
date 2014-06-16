@@ -8,36 +8,56 @@ DEBUG = True
 import roslib
 roslib.load_manifest(PKG)
 # import rospy
-import uashh_smach.util as util
 
-from smach import Concurrence, Sequence , State
-from hobbit_user_interaction import HobbitEmotions  ,HobbitMMUI
+from smach import Concurrence, Sequence, State
+from hobbit_user_interaction import HobbitEmotions, HobbitMMUI
+from sensor_msgs.msg import PointCloud2
 import hobbit_smach.speech_output_import as speech_output
 # import hobbit_smach.head_move_import as head_move
 import hobbit_smach.hobbit_move_import as hobbit_move
 import hobbit_smach.arm_move_import as arm_move
 
+
 class DavidLookForObject(State):
     """
-    This state is called after the robot moved to a position from where it should be
-    able to observe the floor and find an object there.
-    The head will already be looking down to the floor.
-    The pose of an object has to be stored in the userdata key object_pose
+    This state is called after the robot moved to a position from where it
+    should be able to observe the floor and find an object there.
+    The calculations should result in a pose from where the robot is able to
+    grasp the detected object.
+
+    input_keys:
+        cloud: sensor_msgs/PointCloud2
+        goal_position_x: Needed to be able to write in the
+        classes scope (SMACH thingy)
+        goal_position_y: Needed to be able to write in the
+        classes scope (SMACH thingy)
+        goal_position_yaw: Needed to be able to write in the
+        classes scope (SMACH thingy)
+
+    output_keys:
+        goal_position_x: x coordinate of the pose the robot should move to
+        (world coordinates.)
+        goal_position_y y coordinate of the pose the robot should move to
+        (world coordinates.)
+        goal_position_yaw: rotation of the pose the robot should move to
+        (world coordinates.)
     """
     def __init__(self):
         State.__init__(
             self,
             outcomes=['succeeded', 'failed', 'preempted'],
-            input_keys=['goal_position_x', 'goal_position_y', 'goal_position_yaw'],
+            input_keys=['cloud', 'goal_position_x', 'goal_position_y', 'goal_position_yaw'],
             output_keys=['goal_position_x', 'goal_position_y', 'goal_position_yaw']
         )
+
     def execute(self, ud):
         if self.preempt_requested():
             return 'preempted'
         # TODO: David please put the pose calculations in here
-        # if you need any specific input data (point cloud) you can either
-        # subscribe to a topic yourself or get the data from and input key which i have
-        # to provide you with
+        # The acquired point cloud is stored in ud.cloud
+        # (sensor_msgs/PointCloud2)
+        # The head will already be looking down to the floor.
+
         ud.object_pose.position.x = 0
         ud.object_pose.position.y = 0
         ud.object_pose.position.z = 0
@@ -48,12 +68,30 @@ class DavidLookForObject(State):
 
         return 'succeeded'
 
+
 class DavidLookingPose(State):
     """
     This state should handle the following task.
     Given the data from the pointing gesture (x,y,z,vectorX, vectorY, vectorZ)
     a Pose is calculated to which the robot will then navigate. This pose has
     to be stored inside the userdata output keys.
+
+    input_keys:
+        pointing_msg: rgbd_acquisition/PointEvents
+        goal_position_x: Needed to be able to write in the
+        classes scope (SMACH thingy)
+        goal_position_y: Needed to be able to write in the
+        classes scope (SMACH thingy)
+        goal_position_yaw: Needed to be able to write in the
+        classes scope (SMACH thingy)
+
+    output_keys:
+        goal_position_x: x coordinate of the pose the robot should move to
+        (world coordinates.)
+        goal_position_y y coordinate of the pose the robot should move to
+        (world coordinates.)
+        goal_position_yaw: rotation of the pose the robot should move to
+        (world coordinates.)
     """
     def __init__(self):
         State.__init__(
@@ -62,6 +100,7 @@ class DavidLookingPose(State):
             input_keys=['pointing_msg', 'goal_position_x', 'goal_position_y', 'goal_position_yaw'],
             output_keys=['goal_position_x', 'goal_position_y', 'goal_position_yaw']
         )
+
     def execute(self, ud):
         if self.preempt_requested():
             return 'preempted'
@@ -73,30 +112,30 @@ class DavidLookingPose(State):
         ud.goal_position_yaw = 0
         return 'succeeded'
 
-class DavidCalcGraspPose(State):
-    """
-    This state should handle the following task.
-    Given the Pose data given in the object_pose a Pose is calculated to
-    which the robot will then navigate. This pose has to be stored inside
-    the userdata output keys.
-    """
-    def __init__(self):
-        State.__init__(
-            self,
-            outcomes=['succeeded', 'aborted', 'preempted'],
-            input_keys=['object_pose', 'goal_position_x', 'goal_position_y', 'goal_position_yaw'],
-            output_keys=['goal_position_x', 'goal_position_y', 'goal_position_yaw']
-        )
-    def execute(self, ud):
-        if self.preempt_requested():
-            return 'preempted'
-        print(ud.object_pose)
-        # TODO: David please put the pose calculations in here
-
-        ud.goal_position_x = 0
-        ud.goal_position_y = 0
-        ud.goal_position_yaw = 0
-        return 'succeeded'
+#class DavidCalcGraspPose(State):
+#    """
+#    This state should handle the following task.
+#    Given the Pose data given in the object_pose a Pose is calculated to
+#    which the robot will then navigate. This pose has to be stored inside
+#    the userdata output keys.
+#    """
+#    def __init__(self):
+#        State.__init__(
+#            self,
+#            outcomes=['succeeded', 'aborted', 'preempted'],
+#            input_keys=['object_pose', 'goal_position_x', 'goal_position_y', 'goal_position_yaw'],
+#            output_keys=['goal_position_x', 'goal_position_y', 'goal_position_yaw']
+#        )
+#    def execute(self, ud):
+#        if self.preempt_requested():
+#            return 'preempted'
+#        print(ud.object_pose)
+#        # TODO: David please put the pose calculations in here
+#
+#        ud.goal_position_x = 0
+#        ud.goal_position_y = 0
+#        ud.goal_position_yaw = 0
+#        return 'succeeded'
 
 
 class DavidPickingUp(State):
@@ -109,6 +148,7 @@ class DavidPickingUp(State):
             self,
             outcomes=['succeeded', 'aborted', 'preempted']
         )
+
     def execute(self, ud):
         if self.preempt_requested():
             return 'preempted'
@@ -128,6 +168,7 @@ class DavidCheckGrasp(State):
             self,
             outcomes=['succeeded', 'aborted', 'preempted']
         )
+
     def execute(self, ud):
         if self.preempt_requested():
             return 'preempted'
