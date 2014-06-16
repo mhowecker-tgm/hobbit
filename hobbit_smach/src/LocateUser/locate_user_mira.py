@@ -227,6 +227,23 @@ class MoveBase(smach.State):
             ud.visited_places.append(ud.robot_end_pose)
         return 'succeeded'
 
+
+class Rotate180(smach.State):
+    def __init__(self):
+        smach.State.__init__(self, outcomes=['succeeded', 'preempted', 'failure'],
+        self.pub = rospy.Publisher('/DiscreteMotionCmd', String)
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        rospy.sleep(1.0)
+        self.pub.publish(String('Turn 180.0'))
+        print bcolors.OKGREEN + 'Should start rotating now...' + bcolors.ENDC
+        #rospy.sleep(3.0)
+        return 'succeeded'
+
+
 class Counter(smach.State):
     def __init__(self):
         smach.State.__init__(self, outcomes=['succeeded', 'preempted', 'aborted'],
@@ -243,8 +260,8 @@ class Counter(smach.State):
             return 'aborted'
 
 def userdetection_cb(msg, ud):
-    print bcolors.OKGREEN + 'received message: ' 
-    print msg 
+    print bcolors.OKGREEN + 'received message: '
+    print msg
     print bcolors.ENDC
     if msg.confidence > 0.6:
         print bcolors.OKGREEN + 'User detected!' + bcolors.ENDC
@@ -313,7 +330,7 @@ def main():
         child_termination_cb=child_term_cb,
         outcome_cb=out_cb
     )
-    
+
     seq = Sequence(
         outcomes=['succeeded', 'preempted', 'aborted'],
         connector_outcome='aborted'
@@ -333,7 +350,7 @@ def main():
             transitions={'succeeded': 'succeeded',
                          'aborted': 'USER_DETECTOR'}
         )
-        
+
 
     with cc:
         Concurrence.add(
@@ -343,30 +360,217 @@ def main():
             'DETECT_USER',
             seq)
 
+    detect_sm = smach.StateMachine(
+        outcomes=['succeeded', ' aborted', 'preempted'],
+        input_keys=['command'],
+        output_keys=['result']
+    )
+
+    with detect_sm:
+        smach.StateMachine.add(
+            'ROTATE_180',
+            Rotate180(),
+            transitions={'succeeded':'ROTATION',
+                         'preempted':'CLEAN_UP',
+                         'failure':'GET_ROBOT_POSE'}
+        )
+        smach.StateMachine.add(
+            'ROTATION',
+            util.WaitForMsgState('/DiscreteMotionState',
+                                 String,
+                                 rotating_cb,
+                                 timeout=3
+                                 ),
+            transitions={'aborted':'ROTATION',
+                         'succeeded':'ROTATION_FINISHED',
+                         'preempted':'CLEAN_UP'}
+        )
+        smach.StateMachine.add(
+            'ROTATION_FINISHED',
+            util.WaitForMsgState('/DiscreteMotionState',
+                                 String,
+                                 rotation_cb,
+                                 timeout=2
+                                 ),
+            transitions={'aborted':'USER_DETECTION',
+                         'preempted':'CLEAN_UP',
+                         'succeeded':'GET_ROBOT_POSE'}
+        )
+        smach.StateMachine.add(
+            'USER_DETECTION',
+            util.WaitForMsgState(
+                'persons',
+                Person,
+                userdetection_cb,
+                timeout=1
+            ),
+            transitions={'succeeded':'STOP_MOVEMENT',
+                        'preempted':'CLEAN_UP',
+                        'aborted':'ROTATION_FINISHED'}
+        )
+        smach.StateMachine.add(
+            'STOP_MOVEMENT',
+            hobbit_move.Stop(),
+            transitions={'succeeded': 'SET_SUCCESS',
+                         'preempted':'preempted'}
+        )
+
 
     with lu_sm:
-        smach.StateMachine.add('INIT', Init(), transitions={'succeeded':'GET_ALL_POSITIONS', 'canceled':'CLEAN_UP'})
-        smach.StateMachine.add('GET_ALL_POSITIONS', ServiceState('getRooms', GetRooms, response_key='response'), transitions={'succeeded':'GET_ROBOT_POSE', 'aborted':'CLEAN_UP'})
-        smach.StateMachine.add('GET_ROBOT_POSE', util.WaitForMsgState('/amcl_pose', PoseWithCovarianceStamped, get_robot_pose_cb, output_keys=['robot_current_pose'], timeout=120),
-                transitions={'succeeded':'CLEAN_POSITIONS', 'aborted':'GET_ROBOT_POSE', 'preempted':'CLEAN_UP'})
-        smach.StateMachine.add('CLEAN_POSITIONS', CleanPositions(), transitions={'succeeded':'GET_CURRENT_ROOM'})
-        smach.StateMachine.add('GET_CURRENT_ROOM', ServiceState('getCurrentRoom', GetName, response_key='robots_room_name'), transitions={'succeeded':'GET_USERS_ROOM', 'aborted':'CLEAN_UP'})
-        smach.StateMachine.add('GET_USERS_ROOM', ServiceState('get_users_current_room', GetUsersCurrentRoom, response_key='users_current_room'), transitions={'succeeded':'PLAN_PATH', 'preempted':'CLEAN_UP', 'aborted':'CLEAN_UP'})
-        smach.StateMachine.add('PLAN_PATH', PlanPath(), transitions={'success':'MOVE_HEAD_DOWN', 'preempted':'CLEAN_UP', 'failure':'CLEAN_UP'})
-        smach.StateMachine.add('MOVE_HEAD_DOWN', head_move.MoveTo(pose='down_center'), transitions={'succeeded':'MOVE_BASE', 'preempted':'CLEAN_UP', 'failed':'MOVE_BASE'})
+        smach.StateMachine.add(
+            'INIT',
+            Init(),
+            transitions={'succeeded':'GET_ALL_POSITIONS',
+                         'canceled':'CLEAN_UP'}
+        )
+        smach.StateMachine.add(
+            'GET_ALL_POSITIONS',
+            ServiceState('getRooms',
+                         GetRooms,
+                         response_key='response'),
+            transitions={'succeeded':'GET_ROBOT_POSE',
+                         'aborted':'CLEAN_UP'}
+        )
+        smach.StateMachine.add(
+            'GET_ROBOT_POSE',
+            util.WaitForMsgState('/amcl_pose',
+                                 PoseWithCovarianceStamped,
+                                 get_robot_pose_cb,
+                                 output_keys=['robot_current_pose'],
+                                 timeout=120),
+                transitions={'succeeded':'CLEAN_POSITIONS',
+                             'aborted':'GET_ROBOT_POSE',
+                             'preempted':'CLEAN_UP'}
+        )
+        smach.StateMachine.add(
+            'CLEAN_POSITIONS',
+            CleanPositions(),
+            transitions={'succeeded':'GET_CURRENT_ROOM'}
+        )
+        smach.StateMachine.add(
+            'GET_CURRENT_ROOM',
+            ServiceState('getCurrentRoom',
+                         GetName,
+                         response_key='robots_room_name'),
+            transitions={'succeeded':'GET_USERS_ROOM', 'aborted':'CLEAN_UP'}
+        )
+        smach.StateMachine.add(
+            'GET_USERS_ROOM',
+            ServiceState('get_users_current_room',
+                         GetUsersCurrentRoom,
+                         response_key='users_current_room'),
+            transitions={'succeeded':'PLAN_PATH',
+                         'preempted':'CLEAN_UP',
+                         'aborted':'CLEAN_UP'}
+        )
+        smach.StateMachine.add(
+            'PLAN_PATH',
+            PlanPath(),
+            transitions={'success':'MOVE_HEAD_DOWN',
+                         'preempted':'CLEAN_UP',
+                         'failure':'CLEAN_UP'}
+        )
+        smach.StateMachine.add(
+            'MOVE_HEAD_DOWN',
+            head_move.MoveTo(pose='down_center'),
+            transitions={'succeeded':'MOVE_BASE',
+                         'preempted':'CLEAN_UP',
+                         'failed':'MOVE_BASE'}
+        )
         smach.StateMachine.add(
             'MOVE_BASE',
             hobbit_move.goToPose(),
-            transitions={'succeeded':'MOVE_HEAD_UP', 'preempted':'CLEAN_UP', 'aborted':'CLEAN_UP'},
+            transitions={'succeeded':'MOVE_HEAD_UP',
+                         'preempted':'CLEAN_UP',
+                         'aborted':'CLEAN_UP'},
             remapping={'x':'goal_position_x',
                        'y':'goal_position_y',
-                       'yaw':'goal_position_yaw'})
-        smach.StateMachine.add('MOVE_HEAD_UP', head_move.MoveTo(pose='center_center'), transitions={'succeeded':'WAIT', 'preempted':'CLEAN_UP', 'failed':'DETECTION'})
-        smach.StateMachine.add('WAIT', SleepState(duration=1), transitions={'succeeded': 'DETECTION'})
-        smach.StateMachine.add('DETECTION', cc, transitions={'succeeded': 'STOP_MOVEMENT', 'failed':'PLAN_PATH'})
-        smach.StateMachine.add('STOP_MOVEMENT', hobbit_move.Stop(), transitions={'succeeded': 'SET_SUCCESS', 'preempted':'preempted'})
-        smach.StateMachine.add('SET_SUCCESS', SetSuccess(), transitions={'succeeded':'succeeded', 'preempted':'CLEAN_UP'})
-        smach.StateMachine.add('CLEAN_UP', CleanUp(), transitions={'succeeded':'preempted'})
+                       'yaw':'goal_position_yaw'}
+        )
+        smach.StateMachine.add(
+            'MOVE_HEAD_UP',
+            head_move.MoveTo(pose='center_center'),
+            transitions={'succeeded':'WAIT',
+                         'preempted':'CLEAN_UP',
+                         'failed':'DETECTION'}
+        )
+        smach.StateMachine.add(
+            'WAIT',
+            SleepState(duration=1),
+            transitions={'succeeded': 'DETECTION'}
+        )
+        smach.StateMachine.add(
+            'DETECTION_1',
+            detect_sm,
+            transitions={'succeeded': 'SET_SUCCESS',
+                         'preempted': 'preempted',
+                         'aborted': 'DETECTION_2'}
+        )
+        smach.StateMachine.add(
+            'DETECTION_2',
+            detect_sm,
+            transitions={'succeeded': 'SET_SUCCESS',
+                         'preempted': 'preempted',
+                         'aborted': 'GET_ROBOT_POSE'}
+        )
+        #smach.StateMachine.add(
+        #    'ROTATE_180',
+        #    Rotate180(),
+        #    transitions={'succeeded':'ROTATION',
+        #                 'preempted':'CLEAN_UP',
+        #                 'failure':'GET_ROBOT_POSE'}
+        #)
+        #smach.StateMachine.add(
+        #    'ROTATION',
+        #    util.WaitForMsgState('/DiscreteMotionState',
+        #                         String,
+        #                         rotating_cb,
+        #                         timeout=3
+        #                         ),
+        #    transitions={'aborted':'ROTATION',
+        #                 'succeeded':'ROTATION_FINISHED',
+        #                 'preempted':'CLEAN_UP'}
+        #)
+        #smach.StateMachine.add(
+        #    'ROTATION_FINISHED',
+        #    util.WaitForMsgState('/DiscreteMotionState',
+        #                         String,
+        #                         rotation_cb,
+        #                         timeout=2
+        #                         ),
+        #    transitions={'aborted':'USER_DETECTION',
+        #                 'preempted':'CLEAN_UP',
+        #                 'succeeded':'GET_ROBOT_POSE'}
+        #)
+        #smach.StateMachine.add(
+        #    'USER_DETECTION',
+        #    util.WaitForMsgState(
+        #        'persons',
+        #        Person,
+        #        userdetection_cb,
+        #        timeout=1
+        #    ),
+        #    transitions={'succeeded':'STOP_MOVEMENT',
+        #                'preempted':'CLEAN_UP',
+        #                'aborted':'ROTATION_FINISHED'}
+        #)
+        #smach.StateMachine.add(
+        #    'STOP_MOVEMENT',
+        #    hobbit_move.Stop(),
+        #    transitions={'succeeded': 'SET_SUCCESS',
+        #                 'preempted':'preempted'}
+        #)
+        smach.StateMachine.add(
+            'SET_SUCCESS',
+            SetSuccess(),
+            transitions={'succeeded':'succeeded',
+                         'preempted':'CLEAN_UP'}
+        )
+        smach.StateMachine.add(
+            'CLEAN_UP',
+            CleanUp(),
+            transitions={'succeeded':'preempted'}
+        )
 
     asw = smach_ros.ActionServerWrapper(
             'locate_user', GeneralHobbitAction, lu_sm,
