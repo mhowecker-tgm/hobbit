@@ -344,7 +344,7 @@
    resetMapOutsideWindow(robot_x, robot_y, 2*min_range, 2*min_range);  //FIXME, should be implemented in base class
  
    //place the new obstacles into a priority queue... each with a priority of zero to begin with
-/*   for (std::vector<Observation>::const_iterator it = observations.begin(); it != observations.end(); ++it)
+   for (std::vector<Observation>::const_iterator it = observations.begin(); it != observations.end(); ++it)
    {
      const Observation& obs = *it;
  
@@ -390,7 +390,7 @@
        // *max_x = std::max(px, *max_x);
        // *max_y = std::max(py, *max_y);
       }
-    }*/
+    }
  
    //footprint_layer_.updateBounds(robot_x, robot_y, robot_yaw, min_x, min_y, max_x, max_y);
  }
@@ -419,7 +419,7 @@
 
    unsigned char* master = master_grid.getCharMap();
 	
-   if(c_num == 5)
+   if(c_num == 5)  //the robot should start at a clean area with no obstacles
    {
 	   for (int it_i= 0; it_i<size_x_; it_i++)
 	   {
