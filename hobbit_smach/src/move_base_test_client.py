@@ -8,6 +8,7 @@ import tf
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from interfaces_mira.msg import MiraSendingGoalsAction, MiraSendingGoalsGoal
 from geometry_msgs.msg import PoseStamped, PoseWithCovarianceStamped, Quaternion
+from uashh_smach import util
 
 
 def test_action():
@@ -25,8 +26,8 @@ def test_action():
     goal_pose.pose.orientation = Quaternion(*tf.transformations.quaternion_from_euler(0,0,3))
     goal = MoveBaseGoal(target_pose = goal_pose)
     print('Sending goal:' + str(goal))
-    client.send_goal(goal)
-    client.wait_for_result()
+    #client.send_goal(goal)
+    #client.wait_for_result()
     return(client.get_result())
 
 
@@ -51,4 +52,6 @@ def listener():
 
 if __name__ == '__main__':
     rospy.init_node('move_base_test_client')
-    listener()
+    #listener()
+    (x, y, yaw) = util.get_current_robot_position()
+    print(x, y, yaw)
