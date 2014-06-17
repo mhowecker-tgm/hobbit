@@ -171,6 +171,8 @@ def main():
 
     rem_sm.userdata.result = String('started')
     rem_sm.userdata.detection = False
+    rem_sm.userdata.categories = ['meeting']
+    rem_sm.userdata.timeframe = '23:59'
 
     with rem_sm:
         StateMachine.add(
@@ -196,7 +198,10 @@ def main():
         )
         StateMachine.add(
             'MMUI_SHOW_CAL',
-            HobbitMMUI.ShowCalendar(),
+            HobbitMMUI.ShowCalendar(
+                timeframe = rem_sm.userdata.timeframe,
+                categories = rem_sm.userdata.categories
+            ),
             transitions={'preempted': 'CLEAN_UP',
                          'succeeded': 'SET_SUCCESS',
                          'failed': 'SET_FAILURE'}

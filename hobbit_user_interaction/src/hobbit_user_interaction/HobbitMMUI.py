@@ -295,25 +295,27 @@ class ShowCalendar(smach.State):
     Smach State class to show calendar entries based on the given timeframe
     and categories.
     """
-    def __init__(self):
+    def __init__(self, timeframe='03:00', categories=['meeting']):
         smach.State.__init__(
             self,
-            outcomes=['failed', 'succeeded', 'preempted'],
-            input_keys=['timeframe', 'categories']
+            outcomes=['failed', 'succeeded', 'preempted']
+            #input_keys=['timeframe', 'categories']
         )
+        self._categories = categories
+        self._timeframe = timeframe
 
     def execute(self, ud):
         if self.preempt_requested():
             ud.answer = String('preempted')
             self.service_preempt()
         mmui = MMUI.MMUIInterface()
-        resp = mmui.showMMUI_Calendar(timespan=ud.timeframe, cat=ud.categories)
+        resp = mmui.showMMUI_Calendar(timespan=self._timeframe, cat=self._categories[0])
         print(resp)
-        if resp[0].value == 'D_OK':
+        if resp.params[0].value == 'D_OK':
             return 'succeeded'
-        elif resp[0].value == 'D_CANCEL':
+        elif resp.params[0].value == 'D_CANCEL':
             return 'failed'
-        elif resp[0].value == 'D_TIMEOUT':
+        elif resp.params[0].value == 'D_TIMEOUT':
             return 'failed'
         else:
             return 'failed'

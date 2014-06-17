@@ -34,7 +34,7 @@ class MMUIInterface:
 	print "david"
         if msg.command == "C_SPEAK":
             print "C_SPEAK"
-            self.showMMUI_Info(msg.params[0].value)     
+            self.showMMUI_Info(msg.params[0].value)
 	    print "msg.params[0].value: "
 	    print msg.params[0].value
         print "##",msg.command,"##"
@@ -103,14 +103,15 @@ class MMUIInterface:
         self,
         text='show calendar entries',
         timespan='03:00',
-        cat=['drinking', 'drug', 'meeting', 'checklist']
+        # cat=['drinking', 'drug', 'meeting', 'checklist']
+        cat = 'meeting'
     ):
         parr = []
         p = Parameter('type', 'D_REMINDER')
         parr.append(p)
         p = Parameter('text', text)
         parr.append(p)
-        cat = ['drinking', 'drug', 'meeting', 'checklist']
+        #cat = ['drinking', 'drug', 'meeting', 'checklist']
         p = Parameter('category', cat)
         parr.append(p)
         p = Parameter('timespan', timespan)
@@ -184,5 +185,5 @@ def main(args):
     mmui = MMUIInterface()
     rospy.spin()
 
-if __name__ == "__main__":        
+if __name__ == "__main__":
     main(sys.argv)
