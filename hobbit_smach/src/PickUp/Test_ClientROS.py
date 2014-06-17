@@ -1,16 +1,14 @@
 '''
 Created on 07.01.2014
 
-@author: HofmannS, ROSified by D. Fischinger
+@author: HofmannS, ROSified by D. Fischinger (17.6.2014)
 '''
 
 PKG = 'hobbit_smach'
 
 import roslib
 roslib.load_manifest(PKG)
-
 from ArmControllerClientFunctions import ArmClientFunctions
-
 
 
 class ArmClientROS:
@@ -29,61 +27,97 @@ class ArmClientROS:
 	input = strdata.split()        
      	cmd = input[0]
 
-	if cmd  
-        
+	''' GET Functions '''
+	if cmd == 'GetArmState':
+            print self.ArmClient.GetArmState()
+	elif cmd == 'GetActualPosition':
+	    print self.ArmClient.GetActualPosition()
+	elif cmd == 'GetArmAtHomePos':
+	    print self.ArmClient.GetArmAtHomePos()
+	elif cmd == 'GetArmAtLearningPos':
+	    print self.ArmClient.GetArmAtLearningPos() 
+	elif cmd == 'GetArmAtTrayPos':
+	    print self.ArmClient.GetArmAtTrayPos() 
+	elif cmd == 'GetArmAtTurntablePos':
+	    print self.ArmClient.GetArmAtTurntablePos() 
+	elif cmd == 'GetTurntableAtCCWPos':
+	    print self.ArmClient.GetTurntableAtCCWPos(
+	elif cmd == 'GetTurntableAtCWPos':
+	    print self.ArmClient.GetTurntableAtCWPos()
+	elif cmd == 'GetArmHasError':
+	    print self.ArmClient.GetArmHasError()                        
+	elif cmd == 'GetArmHasStopped':
+	    print self.ArmClient.GetArmHasStopped()
+	elif cmd == 'GetArmInPositionArea':
+	    print self.ArmClient.GetArmInPositionArea()
+	elif cmd == 'GetArmInTargetPos':
+	    print self.ArmClient.GetArmInTargetPos()
+	elif cmd == 'GetArmIsEnabled':
+	    print self.ArmClient.GetArmIsEnabled() 
+	elif cmd == 'GetArmIsHomed':
+	    print self.ArmClient.GetArmIsHomed()
+	elif cmd == 'GetArmIsMoving':
+	    print self.ArmClient.GetArmIsMoving()
+	elif cmd == 'GetArmSoftLimitMax':
+	    print self.ArmClient.GetArmSoftLimitMax()
+	elif cmd == 'GetArmSoftLimitMin':
+	    print self.ArmClient.GetArmSoftLimitMin()
+	elif cmd == 'GetGripperIsClosed':
+            print self.ArmClient.GetGripperIsClosed()      
+                    
+	''' SET Functions '''
 
+	elif cmd == 'SetMoveToHomePos':
+	    print self.ArmClient.SetMoveToHomePos()
+	elif cmd == 'SetMoveToLearningPos':
+	    print self.ArmClient.SetMoveToLearningPos()
+	elif cmd == 'SetMoveToTrayPos':
+	    print self.ArmClient.SetMoveToTrayPos()
+	elif cmd == 'SetMoveToPreGraspFromFloorPos':
+	    print self.ArmClient.SetMoveToPreGraspFromFloorPos()
+	elif cmd == 'SetStoreTurntable':
+	    print self.ArmClient.SetStoreTurntable()
+	elif cmd == 'SetTurnTurntableCW':
+	    print self.ArmClient.SetTurnTurntableCW()
+	elif cmd == 'SetTurnTurntableCCW':
+	    print self.ArmClient.SetTurnTurntableCCW()
+	elif cmd == 'SetStartArmReference':
+	    print self.ArmClient.SetStartArmReference()
+	elif cmd == 'SetDisableArm':
+	    print self.ArmClient.SetDisableArm()
+	elif cmd == 'SetEnableArm':
+	    print self.ArmClient.SetEnableArm()
+	elif cmd == 'SetOpenGripper':
+	    print self.ArmClient.SetOpenGripper()
+	elif cmd == 'SetCloseGripper':
+	    print self.ArmClient.SetCloseGripper()
+	elif cmd == 'SetResetArm':
+	    print self.ArmClient.SetResetArm()
+	elif cmd == 'SetStopArmMove':
+	    print self.ArmClient.SetStopArmMove()
+	elif cmd == 'SetAbsolutePos':
+	    print self.ArmClient.SetAbsolutePos(float(input[1]),float(input[2]),float(input[3]),float(input[4]),float(input[5]),float(input[6])) #(90, 0, 50, 0, 110, 0)
+	elif cmd == 'SetStartMove':
+	    print self.ArmClient.SetStartMove(float(input[1]))   #(10) #10 Grad/Sec
 
-''' GET Functions '''
-#print ArmClient.GetArmState()                          
-#print ArmClient.GetActualPosition()                    
-#print ArmClient.GetArmAtHomePos()                      
-#print ArmClient.GetArmAtLearningPos()                  
-#print ArmClient.GetArmAtTrayPos()                      
-#print ArmClient.GetArmAtTurntablePos()                 
-#print ArmClient.GetTurntableAtCCWPos()                 
-#print ArmClient.GetTurntableAtCWPos()                              
-#print ArmClient.GetArmHasError()                        
-#print ArmClient.GetArmHasStopped()                      
-#print ArmClient.GetArmInPositionArea()                  
-#print ArmClient.GetArmInTargetPos()                     
-#print ArmClient.GetArmIsEnabled()                       
-#print ArmClient.GetArmIsHomed()                         
-#print ArmClient.GetArmIsMoving()                        
-#print ArmClient.GetArmSoftLimitMax()                    
-#print ArmClient.GetArmSoftLimitMin()                    
-#print ArmClient.GetGripperIsClosed()                    
+	''' For Interpolation Mode '''   #no check of logic!!
 
+	elif cmd == 'SetClearPosBuffer':
+	    self.ArmClient.SetClearPosBuffer()
+	elif cmd == 'SetPositionsForInterpolation':
+	    self.ArmClient.SetPositionsForInterpolation(float(input[1]),float(input[2]),float(input[3]),float(input[4]),float(input[5]),float(input[6]))    #(90, 86, 70, 0, 110, 0)
+	    #self.ArmClient.SetPositionsForInterpolation(90, 70, 65, 0, 110, 0)
+	    #self.ArmClient.SetPositionsForInterpolation(90, 60, 60, 0, 110, 0)
+	    #self.ArmClient.SetPositionsForInterpolation(90, 50, 60, 0, 110, 0)
+	    #self.ArmClient.SetPositionsForInterpolation(90, 40, 55, 0, 110, 0)
+	    #self.ArmClient.SetPositionsForInterpolation(90, 30, 55, 0, 110, 0)
+	    #self.ArmClient.SetPositionsForInterpolation(90, 20, 50, 0, 110, 0)
+	    #self.ArmClient.SetPositionsForInterpolation(90, 0, 50, 0, 110, 0)
+	elif cmd == 'SetPositionsForInterpolationReady':
+	    self.ArmClient.SetPositionsForInterpolationReady()
+	elif cmd == 'SetStartInterpolation':
+	    self.ArmClient.SetStartInterpolation()
 
-''' SET Functions '''
-#print ArmClient.SetAbsolutePos(90, 0, 50, 0, 110, 0)
-#print ArmClient.SetStartMove(10) #10 Grad/Sec
-#print ArmClient.SetMoveToHomePos()
-#print ArmClient.SetMoveToLearningPos()
-print ArmClient.SetMoveToTrayPos()
-#print ArmClient.SetMoveToPreGraspFromFloorPos()
-#print ArmClient.SetStoreTurntable()
-#print ArmClient.SetTurnTurntableCW()
-#print ArmClient.SetTurnTurntableCCW()
-#print ArmClient.SetStartArmReference()
-#print ArmClient.SetDisableArm()
-#print ArmClient.SetEnableArm()
-#print ArmClient.SetOpenGripper()
-#print ArmClient.SetCloseGripper()
-#print ArmClient.SetResetArm()
-#print ArmClient.SetStopArmMove()
-
-''' For Interpolation Mode '''
-#ArmClient.SetClearPosBuffer()
-#ArmClient.SetPositionsForInterpolation(90, 86, 70, 0, 110, 0)
-#ArmClient.SetPositionsForInterpolation(90, 70, 65, 0, 110, 0)
-#ArmClient.SetPositionsForInterpolation(90, 60, 60, 0, 110, 0)
-#ArmClient.SetPositionsForInterpolation(90, 50, 60, 0, 110, 0)
-#ArmClient.SetPositionsForInterpolation(90, 40, 55, 0, 110, 0)
-#ArmClient.SetPositionsForInterpolation(90, 30, 55, 0, 110, 0)
-#ArmClient.SetPositionsForInterpolation(90, 20, 50, 0, 110, 0)
-#ArmClient.SetPositionsForInterpolation(90, 0, 50, 0, 110, 0)
-#ArmClient.SetPositionsForInterpolationReady()
-#ArmClient.SetStartInterpolation()
 
 
 if __name__ == '__main__':
@@ -92,6 +126,4 @@ if __name__ == '__main__':
     rospy.init_node('arm_client_ros')
     armclient = ArmClientROS()
 
-    s = rospy.Service('manage_grasphypothesis/get_best_grasphypothesis', BestGraspHypothesis, grasplist.get_best_grasp_hypothesis)
- 
     rospy.spin()
