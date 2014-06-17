@@ -392,7 +392,7 @@
       }
     }
  
-   //footprint_layer_.updateBounds(robot_x, robot_y, robot_yaw, min_x, min_y, max_x, max_y);
+   footprint_layer_.updateBounds(robot_x, robot_y, robot_yaw, min_x, min_y, max_x, max_y);
  }
  
  void NavLayerGlobal2::updateCosts(costmap_2d::Costmap2D& master_grid, int min_i, int min_j, int max_i, int max_j)
@@ -437,6 +437,8 @@
 	   c_num++;
    }
 
+   footprint_layer_.updateCosts(*this, min_i, min_j, max_i, max_j);
+
    for (int it_i= 0; it_i<size_x_; it_i++)
    {
 	for (int it_j= 0; it_j< size_y_; it_j++)
@@ -447,7 +449,16 @@
 			//std::cout << "val leth" << val << std::endl;
 		if(static_map_copy[ind]!= NO_INFORMATION && costmap_[ind] < static_map_copy[ind]) 
 			costmap_[ind] = static_map_copy[ind];
+	}	
+   }
 
+
+
+   for (int it_i= 0; it_i<size_x_; it_i++)
+   {
+	for (int it_j= 0; it_j< size_y_; it_j++)
+	{
+		int ind = getIndex(it_i,it_j);
 		//if (master[ind]== NO_INFORMATION ||master[ind] < costmap_[ind]) 
 		{
 			master[ind] = costmap_[ind];
@@ -684,7 +695,7 @@
  
  void NavLayerGlobal2::onFootprintChanged()
  {
-   //footprint_layer_.onFootprintChanged();
+   footprint_layer_.onFootprintChanged();
  }
 
  void NavLayerGlobal2::resetMapOutsideWindow(double wx, double wy, double w_size_x, double w_size_y) //FIXME, should belong to Costmap2D
