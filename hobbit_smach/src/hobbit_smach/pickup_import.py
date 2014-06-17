@@ -12,6 +12,7 @@ roslib.load_manifest(PKG)
 from smach import Concurrence, Sequence, State
 from hobbit_user_interaction import HobbitEmotions, HobbitMMUI
 from sensor_msgs.msg import PointCloud2
+import uashh_smach.util as util
 import hobbit_smach.speech_output_import as speech_output
 # import hobbit_smach.head_move_import as head_move
 import hobbit_smach.hobbit_move_import as hobbit_move
@@ -58,6 +59,7 @@ class DavidLookForObject(State):
     def execute(self, ud):
         if self.preempt_requested():
             return 'preempted'
+        (robot_x, robot_y, robot_yaw) = util.get_current_robot_position(frame='/map')
         # TODO: David please put the pose calculations in here
         # The acquired point cloud is stored in ud.cloud
         # (sensor_msgs/PointCloud2)
@@ -383,6 +385,7 @@ class DavidLookingPose(State):
     def execute(self, ud):
         if self.preempt_requested():
             return 'preempted'
+        (robot_x, robot_y, robot_yaw) = util.get_current_robot_position(frame='/map')
         print(ud.pointing_msg)
         # TODO: David please put the pose calculations in here
 

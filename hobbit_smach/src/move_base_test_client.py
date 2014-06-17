@@ -48,7 +48,7 @@ def listener():
     result = test_action()
     print result
     rospy.sleep(1)
-    
+
 
 if __name__ == '__main__':
     rospy.init_node('move_base_test_client')
