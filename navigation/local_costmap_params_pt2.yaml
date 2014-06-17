@@ -15,7 +15,7 @@ local_costmap:
      type: "costmap_2d::FootprintLayer"
    - 
      name: obstacle_layer
-     type: "costmap_2d::ObstacleLayer"
+     type: "costmap_2d::NavLayer2"
    - 
      name: inflater
      type: "costmap_2d::InflationLayer"
