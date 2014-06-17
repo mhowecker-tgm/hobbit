@@ -346,11 +346,10 @@ def main():
                     hobbit_move.goToPosition(frame='/map', place='dock'))
                 Sequence.add(
                     'DOCKING',
-                    hobbit_move.dock())
+                    hobbit_move.Dock())
             else:
                 Sequence.add('MOVE_TO_DOCK', Dummy())
-            # DOCKING has to execute the actual docking procedure within mira
-            Sequence.add('DOCKING', Dummy())
+                Sequence.add('DOCKING', Dummy())
             Sequence.add('MMUI_MAIN_MENU', HobbitMMUI.ShowMenu(menu='MAIN'))
         StateMachine.add(
             'SET_SUCCESS',
