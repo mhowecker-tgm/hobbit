@@ -172,11 +172,11 @@ class ArmClientFunctions():
         return ReceiveDataList
     
     def SetPositionsForInterpolation(self,Value1, Value2, Value3, Value4, Value5, Value6):
-        self.SendInterpolationPositions()
-        #buf = 'SET;PositionsForInterpolation;{Val1}/{Val2}/{Val3}/{Val4}/{Val5}/{Val6};'.format(Val1=Value1,Val2=Value2,Val3=Value3,Val4=Value4,Val5=Value5,Val6=Value6)
-        #ReceiveDataList = self.SendTCP(buf)
+        #self.SendInterpolationPositions()
+        buf = 'SET;PositionsForInterpolation;{Val1}/{Val2}/{Val3}/{Val4}/{Val5}/{Val6};'.format(Val1=Value1,Val2=Value2,Val3=Value3,Val4=Value4,Val5=Value5,Val6=Value6)
+        ReceiveDataList = self.SendTCP(buf)
         #ArmControllerFunctions.PublishToROS(ReceiveDataList)
-        #return ReceiveDataList
+        return ReceiveDataList
     
     def SetPositionsForInterpolationReady(self):
         buf = 'SET;PositionsForInterpolationReady;'
