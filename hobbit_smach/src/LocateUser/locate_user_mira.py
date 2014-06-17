@@ -161,6 +161,8 @@ class PlanPath(smach.State):
             req = GetPlanRequest(ud.robot_current_pose, end_pose, 0.01)
             #print req
 
+            print('ud.visited_places')
+            print(ud.visited_places)
             for visited in ud.visited_places:
                 if position['room'] == visited['room']:
                     if position['place_name'] == visited['place']:
@@ -202,6 +204,7 @@ class PlanPath(smach.State):
         else:
             ud.visited_places = []
             ud.visited_places.append(ud.robot_end_pose)
+            print(ud.robot_end_pose)
             return 'success'
 
 
@@ -230,7 +233,7 @@ class MoveBase(smach.State):
 
 class Rotate180(smach.State):
     def __init__(self):
-        smach.State.__init__(self, outcomes=['succeeded', 'preempted', 'failure'],
+        smach.State.__init__(self, outcomes=['succeeded', 'preempted', 'failure'])
         self.pub = rospy.Publisher('/DiscreteMotionCmd', String)
 
     def execute(self, ud):
@@ -258,6 +261,40 @@ class Counter(smach.State):
         else:
             ud.counter = 0
             return 'aborted'
+
+def rotating_cb(msg, ud):
+    print bcolors.WARNING + 'ROTATING: received message: /DiscreteMotionState '+ bcolors.ENDC
+    #print msg.data
+    #if (msg.data == 'Moving') or (msg.data == 'Turning'):
+    if (msg.data == 'Turning'):
+        print bcolors.WARNING + 'Now we are actually moving.'+ bcolors.ENDC
+        rospy.sleep(0.5)
+        return True
+    else:
+        return False
+
+def rotation_cb(msg, ud):
+    print bcolors.WARNING + 'ROTATION FINISHED?: received message: /DiscreteMotionState '+ bcolors.ENDC
+    #print bcolors.FAIL
+    #print msg.data
+    #print bcolors.ENDC
+    if (msg.data == 'Stopping') or (msg.data == 'Idle'):
+        print bcolors.OKGREEN + '180 degree rotation completed. User not detected'+ bcolors.ENDC
+        #rospy.sleep(1.5)
+        return True
+    else:
+        return False
+
+def goal_reached_cb(msg, ud):
+    print bcolors.WARNING + 'received message: /goal_status'+ bcolors.ENDC
+    #print msg.data
+    if (msg.data == 'reached') or (msg.data == 'idle'):
+        print bcolors.OKGREEN + 'position reached. Start rotation.' + bcolors.ENDC
+        #rospy.sleep(2.0)
+        return True
+    else:
+        return False
+
 
 def userdetection_cb(msg, ud):
     print bcolors.OKGREEN + 'received message: '
@@ -316,7 +353,7 @@ def main():
     rospy.init_node(NAME)
 
     lu_sm = smach.StateMachine(
-        outcomes=['succeeded', ' aborted', 'preempted'],
+        outcomes=['succeeded', 'aborted', 'preempted'],
         input_keys=['command'],
         output_keys=['result'])
 
@@ -361,7 +398,7 @@ def main():
             seq)
 
     detect_sm = smach.StateMachine(
-        outcomes=['succeeded', ' aborted', 'preempted'],
+        outcomes=['succeeded', 'aborted', 'preempted'],
         input_keys=['command'],
         output_keys=['result']
     )
@@ -371,30 +408,30 @@ def main():
             'ROTATE_180',
             Rotate180(),
             transitions={'succeeded':'ROTATION',
-                         'preempted':'CLEAN_UP',
-                         'failure':'GET_ROBOT_POSE'}
+                         'preempted':'preempted',
+                         'failure':'aborted'}
         )
         smach.StateMachine.add(
             'ROTATION',
             util.WaitForMsgState('/DiscreteMotionState',
                                  String,
                                  rotating_cb,
-                                 timeout=3
+                                 timeout=0.5
                                  ),
             transitions={'aborted':'ROTATION',
                          'succeeded':'ROTATION_FINISHED',
-                         'preempted':'CLEAN_UP'}
+                         'preempted':'preempted'}
         )
         smach.StateMachine.add(
             'ROTATION_FINISHED',
             util.WaitForMsgState('/DiscreteMotionState',
                                  String,
                                  rotation_cb,
-                                 timeout=2
+                                 timeout=0.5
                                  ),
             transitions={'aborted':'USER_DETECTION',
-                         'preempted':'CLEAN_UP',
-                         'succeeded':'GET_ROBOT_POSE'}
+                         'preempted':'preempted',
+                         'succeeded':'aborted'}
         )
         smach.StateMachine.add(
             'USER_DETECTION',
@@ -402,16 +439,16 @@ def main():
                 'persons',
                 Person,
                 userdetection_cb,
-                timeout=1
+                timeout=2
             ),
             transitions={'succeeded':'STOP_MOVEMENT',
-                        'preempted':'CLEAN_UP',
+                        'preempted':'preempted',
                         'aborted':'ROTATION_FINISHED'}
         )
         smach.StateMachine.add(
             'STOP_MOVEMENT',
             hobbit_move.Stop(),
-            transitions={'succeeded': 'SET_SUCCESS',
+            transitions={'succeeded': 'succeeded',
                          'preempted':'preempted'}
         )
 
@@ -475,7 +512,7 @@ def main():
             head_move.MoveTo(pose='down_center'),
             transitions={'succeeded':'MOVE_BASE',
                          'preempted':'CLEAN_UP',
-                         'failed':'MOVE_BASE'}
+                         'aborted':'MOVE_BASE'}
         )
         smach.StateMachine.add(
             'MOVE_BASE',
@@ -492,18 +529,18 @@ def main():
             head_move.MoveTo(pose='center_center'),
             transitions={'succeeded':'WAIT',
                          'preempted':'CLEAN_UP',
-                         'failed':'DETECTION'}
+                         'aborted':'WAIT'}
         )
         smach.StateMachine.add(
             'WAIT',
             SleepState(duration=1),
-            transitions={'succeeded': 'DETECTION'}
+            transitions={'succeeded': 'DETECTION_1'}
         )
         smach.StateMachine.add(
             'DETECTION_1',
             detect_sm,
             transitions={'succeeded': 'SET_SUCCESS',
-                         'preempted': 'preempted',
+                         'preempted': 'CLEAN_UP',
                          'aborted': 'DETECTION_2'}
         )
         smach.StateMachine.add(
