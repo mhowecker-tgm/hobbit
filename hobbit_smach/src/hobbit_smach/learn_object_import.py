@@ -12,6 +12,7 @@ import rospy
 import os
 import glob
 import shutil
+import random
 
 from smach import Sequence, Concurrence, State
 from sensor_msgs.msg import PointCloud2
@@ -45,8 +46,7 @@ class MoveFiles(State):
         for data in glob.glob(directory + '*.pcd'):
             shutil.move(data, directory2)
         return 'succeeded'
-    
-                
+
 
 class SetName(State):
     """
@@ -58,18 +58,25 @@ class SetName(State):
             outcomes=['succeeded', 'failure'],
             input_keys=['object_name']
         )
+        random.seed()
+
     def execute(self, ud):
         print(ud.object_name)
         if rospy.has_param('/hobbit/pcd_path'):
             directory = rospy.get_param('/hobbit/pcd_path') + '/'
         else:
             directory = '/tmp/pcd_data/'
-        directory2 = directory + ud.object_name
+        if not ud.object_name = '':
+            directory2 = directory + ud.object_name
+        else:
+            directory2 = directory + 'object-' +
+            random.choice("abcdefghijklmnopqrstuvwxyz")
         if not os.path.exists(directory2):
             os.makedirs(directory2)
-        shutil.move(directory+'up', directory2)
-        shutil.move(directory+'down', directory2)
+        shutil.move(directory + 'up', directory2)
+        shutil.move(directory + 'down', directory2)
         return 'succeeded'
+
 
 def returnTurntable():
     """
@@ -177,7 +184,7 @@ def getDataCW():
         outcomes=['succeeded', 'preempted', 'failed'],
         connector_outcome='succeeded'
     )
-    
+
     seq1 = Sequence(
         outcomes=['succeeded', 'preempted', 'failed'],
         connector_outcome='succeeded'
@@ -244,7 +251,7 @@ def getDataCCW():
                             msg_cb=msg_cb
                             ),
             transitions={'aborted': 'GET_DATA'})
-    
+
     seq1 = Sequence(
         outcomes=['succeeded', 'preempted', 'failed'],
         connector_outcome='succeeded'
