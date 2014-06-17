@@ -1,14 +1,16 @@
-'''
-Created on 07.01.2014
+#!/usr/bin/python
 
-@author: HofmannS, ROSified by D. Fischinger (17.6.2014)
-'''
+#Created on 07.01.2014
+#@author: HofmannS, ROSified by D. Fischinger (17.6.2014)
+
 
 PKG = 'hobbit_smach'
 
 import roslib
 roslib.load_manifest(PKG)
+import rospy
 from ArmControllerClientFunctions import ArmClientFunctions
+from std_msgs.msg import String
 
 
 class ArmClientROS:
@@ -20,7 +22,7 @@ class ArmClientROS:
 
 
 
-   def arm_execute(self, data):
+    def arm_execute(self, data):
         
         strdata = str(data.data)
         print "\nGRASP COMMAND received:\n", strdata
@@ -41,7 +43,7 @@ class ArmClientROS:
 	elif cmd == 'GetArmAtTurntablePos':
 	    print self.ArmClient.GetArmAtTurntablePos() 
 	elif cmd == 'GetTurntableAtCCWPos':
-	    print self.ArmClient.GetTurntableAtCCWPos(
+	    print self.ArmClient.GetTurntableAtCCWPos()
 	elif cmd == 'GetTurntableAtCWPos':
 	    print self.ArmClient.GetTurntableAtCWPos()
 	elif cmd == 'GetArmHasError':
@@ -63,10 +65,8 @@ class ArmClientROS:
 	elif cmd == 'GetArmSoftLimitMin':
 	    print self.ArmClient.GetArmSoftLimitMin()
 	elif cmd == 'GetGripperIsClosed':
-            print self.ArmClient.GetGripperIsClosed()      
-                    
-	''' SET Functions '''
-
+            print self.ArmClient.GetGripperIsClosed()         
+	# SET Functions
 	elif cmd == 'SetMoveToHomePos':
 	    print self.ArmClient.SetMoveToHomePos()
 	elif cmd == 'SetMoveToLearningPos':
@@ -99,9 +99,7 @@ class ArmClientROS:
 	    print self.ArmClient.SetAbsolutePos(float(input[1]),float(input[2]),float(input[3]),float(input[4]),float(input[5]),float(input[6])) #(90, 0, 50, 0, 110, 0)
 	elif cmd == 'SetStartMove':
 	    print self.ArmClient.SetStartMove(float(input[1]))   #(10) #10 Grad/Sec
-
-	''' For Interpolation Mode '''   #no check of logic!!
-
+	# For Interpolation Mode    #no check of logic!!
 	elif cmd == 'SetClearPosBuffer':
 	    self.ArmClient.SetClearPosBuffer()
 	elif cmd == 'SetPositionsForInterpolation':
@@ -117,13 +115,61 @@ class ArmClientROS:
 	    self.ArmClient.SetPositionsForInterpolationReady()
 	elif cmd == 'SetStartInterpolation':
 	    self.ArmClient.SetStartInterpolation()
+	elif cmd == 'help':
+	    self.help()
 
 
+
+    def help(self): 
+         
+        print " ===   GET Functions === "
+	print 'GetArmState'
+	print 'GetActualPosition'
+	print 'GetArmAtHomePos'
+	print 'GetArmAtLearningPos'
+	print 'GetArmAtTrayPos'
+	print 'GetArmAtTurntablePos'
+	print 'GetTurntableAtCCWPos'
+	print 'GetTurntableAtCWPos'
+	print 'GetArmHasError'
+	print 'GetArmHasStopped'
+	print 'GetArmInPositionArea'
+	print 'GetArmInTargetPos'
+	print 'GetArmIsEnabled'
+	print 'GetArmIsHomed'
+	print 'GetArmIsMoving'
+	print 'GetArmSoftLimitMax'
+	print 'GetArmSoftLimitMin'
+	print 'GetGripperIsClosed'
+        print "\n === SET Functions ===\n"
+	print 'SetMoveToHomePos'
+	print 'SetMoveToLearningPos'
+	print 'SetMoveToTrayPos'
+	print 'SetMoveToPreGraspFromFloorPos'
+	print 'SetStoreTurntable'
+	print 'SetTurnTurntableCW'
+	print 'SetTurnTurntableCCW'
+	print 'SetStartArmReference'
+	print 'SetDisableArm'
+	print 'SetEnableArm'
+	print 'SetOpenGripper'
+	print 'SetCloseGripper'
+	print 'SetResetArm'
+	print 'SetStopArmMove'
+	print 'SetAbsolutePos p1 p2 p3 p4 p5 p6'
+	print 'SetStartMove v1'
+	print '\nFor Interpolation Mode:  '
+	print 'SetClearPosBuffer'
+	print 'SetPositionsForInterpolation p1 p2 p3 p4 p5 p6'
+	print 'SetPositionsForInterpolationReady'
+	print 'SetStartInterpolation'
+	    
 
 if __name__ == '__main__':
    
     # Node name
     rospy.init_node('arm_client_ros')
+    print "node arm_client_ros started"
     armclient = ArmClientROS()
 
     rospy.spin()
