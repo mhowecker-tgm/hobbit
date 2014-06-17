@@ -8,6 +8,7 @@
 #include "rgbd_acquisition/Person.h"
 #include "rgbd_acquisition/PointEvents.h"
 #include "rgbd_acquisition/Skeleton2D.h"
+#include "rgbd_acquisition/SkeletonBBox.h"
 #include "pose.h"
 
 ros::Publisher joint2DBroadcaster;
@@ -81,9 +82,9 @@ void broadcast2DBBox(struct skeletonHuman * skeletonFound)
 
   rgbd_acquisition::SkeletonBBox msg;
 
-  msg.width=skeletonFound->bboxDimensions[0];
-  msg.height=skeletonFound->bboxDimensions[1];
-  msg.depth=skeletonFound->bboxDimensions[2];
+  msg.width=skeletonFound->bboxDimensions.x;
+  msg.height=skeletonFound->bboxDimensions.y;
+  msg.depth=skeletonFound->bboxDimensions.z;
   msg.timestamp=actualTimestamp;
 
   fprintf(stderr,"Publishing a new Joint BBox configuration\n");
