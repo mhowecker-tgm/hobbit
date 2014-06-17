@@ -123,7 +123,10 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
 
 void bboxReceived(const emergency_detector::SkeletonBBox & msg)
 {
-  fprintf(stderr,"Received BBOX %f , %f , %f \n",msg.width , msg.height ,msg.depth );
+  if (msg.depth!=0)
+  {
+   fprintf(stderr,"Received BBOX %f , %f , %f \n",msg.width , msg.height ,msg.depth );
+  }
 }
 
 //RGBd Callback is called every time we get a new pair of frames , it is synchronized to the main thread
