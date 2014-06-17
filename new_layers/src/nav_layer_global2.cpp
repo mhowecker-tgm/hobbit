@@ -385,10 +385,6 @@
        unsigned int index = getIndex(mx, my);
        costmap_[index] = LETHAL_OBSTACLE;
        touch(px, py, min_x, min_y, max_x, max_y);
-       // *min_x = std::min(px, *min_x);
-       // *min_y = std::min(py, *min_y);
-       // *max_x = std::max(px, *max_x);
-       // *max_y = std::max(py, *max_y);
       }
     }
  
@@ -536,10 +532,6 @@
  
  
    touch(ox, oy, min_x, min_y, max_x, max_y); //FIXME
-   /* *min_x = std::min(ox, *min_x);
-   *min_y = std::min(oy, *min_y);
-   *max_x = std::max(ox, *max_x);
-   *max_y = std::max(oy, *max_y);*/
 
    //copy costmap blind window before applying raytracing  !!!!!!
    //unsigned char* costmap_copy; 
@@ -678,10 +670,6 @@
    double scale = std::min(1.0, range / full_distance);
    double ex = ox + dx * scale, ey = oy + dy * scale;
    touch(ex, ey, min_x, min_y, max_x, max_y);
-   /* *min_x = std::min(ex, *min_x);
-   *min_y = std::min(ey, *min_y);
-   *max_x = std::max(ex, *max_x);
-   *max_y = std::max(ey, *max_y);*/
  }
  
  void NavLayerGlobal2::reset()
