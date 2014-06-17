@@ -153,7 +153,7 @@ void broadcastSkeleton(unsigned int frameNumber ,struct skeletonHuman * skeleton
      broadcastNewPerson();
 
      broadcast2DJoints(skeletonFound);
-     broadcast2DΒΒοχ(skeletonFound);
+     broadcast2DBBox(skeletonFound);
 }
 
 
