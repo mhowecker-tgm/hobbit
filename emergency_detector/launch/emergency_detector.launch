@@ -1,0 +1,5 @@
+<launch>   
+    <node name="emergency_detector" pkg="emergency_detector" type="run_it.sh" required="true">
+      <param name="name" value="emergency_detector" /> 
+    </node>   
+</launch>
