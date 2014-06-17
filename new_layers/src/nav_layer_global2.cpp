@@ -322,17 +322,17 @@
      has_been_reset_ = false;
    }
  
-   //bool current = true;
+   bool current = true;
    std::vector<Observation> observations, clearing_observations;
  
    //get the marking observations
-   //current = current && getMarkingObservations(observations);
+   current = current && getMarkingObservations(observations);
  
    //get the clearing observations
-   //current = current && getClearingObservations(clearing_observations);
+   current = current && getClearingObservations(clearing_observations);
  
    //update the global current status
-   //current_ = current;
+   current_ = current;
  
    //raytrace freespace
 /*   for (unsigned int i = 0; i < clearing_observations.size(); ++i)
@@ -385,6 +385,10 @@
        unsigned int index = getIndex(mx, my);
        costmap_[index] = LETHAL_OBSTACLE;
        touch(px, py, min_x, min_y, max_x, max_y);
+       // *min_x = std::min(px, *min_x);
+       // *min_y = std::min(py, *min_y);
+       // *max_x = std::max(px, *max_x);
+       // *max_y = std::max(py, *max_y);
       }
     }
  
@@ -424,6 +428,7 @@
 			int ind = getIndex(it_i,it_j);
 			static_map_copy[ind] = master[ind];
 		        int static_value = master[ind];
+		        //std::cout << "static value " << static_value << std::endl;
 
 		}
 	   }
@@ -442,24 +447,6 @@
 			//std::cout << "val leth" << val << std::endl;
 		if(static_map_copy[ind]!= NO_INFORMATION && costmap_[ind] < static_map_copy[ind]) 
 			costmap_[ind] = static_map_copy[ind];
-
-		bool current = true;
-	        std::vector<Observation> observations, clearing_observations;
-	 
-	        //get the marking observations
-	        current = current && getMarkingObservations(observations);
-	 
-	        //get the clearing observations
-	        current = current && getClearingObservations(clearing_observations);
-	 
-	        //update the global current status
-	        current_ = current;
-	 
-	        //raytrace freespace
-	     /*   for (unsigned int i = 0; i < clearing_observations.size(); ++i)
-	        {
-	          raytraceFreespace(clearing_observations[i], min_x, min_y, max_x, max_y);
-	        }*/
 
 		//if (master[ind]== NO_INFORMATION ||master[ind] < costmap_[ind]) 
 		{
@@ -537,9 +524,14 @@
    double map_end_y = origin_y + size_y_ * resolution_;
  
  
-   touch(ox, oy, min_x, min_y, max_x, max_y); //FIXME/
+   touch(ox, oy, min_x, min_y, max_x, max_y); //FIXME
+   /* *min_x = std::min(ox, *min_x);
+   *min_y = std::min(oy, *min_y);
+   *max_x = std::max(ox, *max_x);
+   *max_y = std::max(oy, *max_y);*/
 
    //copy costmap blind window before applying raytracing  !!!!!!
+   //unsigned char* costmap_copy; 
 
    int min_x_ind = x0 - min_range_cells;
    int max_x_ind = x0 + min_range_cells;
@@ -675,6 +667,10 @@
    double scale = std::min(1.0, range / full_distance);
    double ex = ox + dx * scale, ey = oy + dy * scale;
    touch(ex, ey, min_x, min_y, max_x, max_y);
+   /* *min_x = std::min(ex, *min_x);
+   *min_y = std::min(ey, *min_y);
+   *max_x = std::max(ex, *max_x);
+   *max_y = std::max(ey, *max_y);*/
  }
  
  void NavLayerGlobal2::reset()
@@ -691,7 +687,7 @@
    //footprint_layer_.onFootprintChanged();
  }
 
- void NavLayerGlobal2::resetMapOutsideWindow(double wx, double wy, double w_size_x, double w_size_y) //FIXME
+ void NavLayerGlobal2::resetMapOutsideWindow(double wx, double wy, double w_size_x, double w_size_y) //FIXME, should belong to Costmap2D
  {
      ROS_ASSERT_MSG(w_size_x >= 0 && w_size_y >= 0, "You cannot specify a negative size window");
  

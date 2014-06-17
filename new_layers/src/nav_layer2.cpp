@@ -483,10 +483,10 @@
 
 
 
-   if(combination_method_==0)
+   //if(combination_method_==0)
      updateWithOverwrite(master_grid, min_i, min_j, max_i, max_j);
-   else
-     updateWithMax(master_grid, min_i, min_j, max_i, max_j);
+   //else
+     //updateWithMax(master_grid, min_i, min_j, max_i, max_j);
 
 
 
