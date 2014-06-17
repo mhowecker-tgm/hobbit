@@ -11,6 +11,7 @@
 #include "pose.h"
 
 ros::Publisher joint2DBroadcaster;
+ros::Publisher jointBBoxBroadcaster;
 ros::Publisher personBroadcaster;
 ros::Publisher pointEventsBroadcaster;
 
@@ -70,6 +71,23 @@ void broadcast2DJoints(struct skeletonHuman * skeletonFound)
 
   fprintf(stderr,"Publishing a new Joint 2D configuration\n");
   joint2DBroadcaster.publish(msg);
+  ros::spinOnce();
+}
+
+
+void broadcast2DBBox(struct skeletonHuman * skeletonFound)
+{
+  if (dontPublishPersons) { return ; }
+
+  rgbd_acquisition::SkeletonBBox msg;
+
+  msg.width=skeletonFound->bboxDimensions[0];
+  msg.height=skeletonFound->bboxDimensions[1];
+  msg.depth=skeletonFound->bboxDimensions[2];
+  msg.timestamp=actualTimestamp;
+
+  fprintf(stderr,"Publishing a new Joint BBox configuration\n");
+  jointBBoxBroadcaster.publish(msg);
   ros::spinOnce();
 }
 
@@ -135,6 +153,7 @@ void broadcastSkeleton(unsigned int frameNumber ,struct skeletonHuman * skeleton
      broadcastNewPerson();
 
      broadcast2DJoints(skeletonFound);
+     broadcast2DΒΒοχ(skeletonFound);
 }
 
 
@@ -145,6 +164,7 @@ int registerServices(ros::NodeHandle * nh)
     personBroadcaster = nh->advertise <rgbd_acquisition::Person> ("persons", 1000);
     pointEventsBroadcaster = nh->advertise <rgbd_acquisition::PointEvents> ("pointEvents", 1000);
     joint2DBroadcaster = nh->advertise <rgbd_acquisition::Skeleton2D> ("joints2D", 1000);
+    jointBBoxBroadcaster = nh->advertise <rgbd_acquisition::SkeletonBBox> ("jointsBBox", 1000);
 
 
     registerSkeletonDetectedEvent(0,(void*) &broadcastSkeleton);
