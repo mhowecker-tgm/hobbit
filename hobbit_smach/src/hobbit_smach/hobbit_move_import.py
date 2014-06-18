@@ -3,7 +3,7 @@
 
 PKG = 'hobbit_smach'
 NAME = 'hobbit_move'
-DEBUG = True
+DEBUG = False
 
 import roslib
 roslib.load_manifest(PKG)

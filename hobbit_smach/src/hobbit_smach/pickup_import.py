@@ -66,10 +66,10 @@ class DavidLookForObject(State):
 
 
 
-    if findobject(ud):
+        if findobject(ud):
 
-        (robot_x, robot_y, robot_yaw) = util.get_current_robot_position(frame='/map')
-        posRobot = [robot_x, robot_y] #Bajo, please fill in
+            (robot_x, robot_y, robot_yaw) = util.get_current_robot_position(frame='/map')
+            posRobot = [robot_x, robot_y] #Bajo, please fill in
         # self.graspable_center_of_cluster_wcs  #center of graspable point cluster
             robotApproachDir = [self.graspable_center_of_cluster_wcs[0] - posRobot[0], self.graspable_center_of_cluster_wcs[1] - posRobot[1]]
             robotApproachDir = [robotApproachDir[0]/numpy.linalg.norm(robotApproachDir), robotApproachDir[1]/numpy.linalg.norm(robotApproachDir)]       #normalized
@@ -79,9 +79,9 @@ class DavidLookForObject(State):
             ud.goal_position_y = self.graspable_center_of_cluster_wcs[1] - robotDistFromGraspPntForGrasping * robotApproachDir[1]
             ud.goal_position_yaw = math.atan2(robotApproachDir[1],robotApproachDir[0]) + robotOffsetRotationForGrasping #can be negative!  180/math.pi*math.atan2(y,x) = angle in degree of vector (x,y)
 
-        return 'succeeded'
-    else:
-        return 'failed'
+            return 'succeeded'
+        else:
+            return 'failed'
 
 
     def findobject(self, ud):
@@ -130,10 +130,10 @@ class DavidLookForObject(State):
         p.point.z = m[2]
 
         pnt_wcs = self.listener.transformPoint('/map', p)           #center of cluster in world coordinate system
-    pnt_rcs = self.listener.transformPoint('/base_link', p)     #center of cluster in robot coordinate system
+        pnt_rcs = self.listener.transformPoint('/base_link', p)     #center of cluster in robot coordinate system
 
         #print "============== center of cluster in camera coordinate system: ", p
-    print "============== center of cluster in rcs:                    : ", pnt_rcs
+        print "============== center of cluster in rcs:                    : ", pnt_rcs
         print "============== center of cluster in wcs:                    : ", pnt_wcs
 
         isgraspable = self.ispossibleobject(pnt_rcs)
@@ -391,10 +391,10 @@ class DavidLookingPose(State):
 
     #def savePointingDirection(self, msg):
         mm2m = 1000
-    robotDistFromGraspPnt = 1 #in meters
-    robotOffsetRotationForLooking = math.pi/4
+        robotDistFromGraspPnt = 1 #in meters
+        robotOffsetRotationForLooking = math.pi/4
 
-        self.pointingDirCCS = [float(pointing_msg.params[1].value)/mm2m,float(pointing_msg.params[2].value)/mm2m,float(pointing_msg.params[3].value)/mm2m,float(pointing_msg.params[4].value)/mm2m,float(pointing_msg.params[5].value)/mm2m,float(pointing_msg.params[6].value)/mm2m]
+        self.pointingDirCCS = [float(ud.pointing_msg.x)/mm2m,float(ud.pointing_msg.y)/mm2m,float(ud.pointing_msg.z)/mm2m,float(ud.pointing_msg.vectorX)/mm2m,float(ud.pointing_msg.vectorY)/mm2m,float(ud.pointing_msg.vectorZ)/mm2m]
         #calculate hand wrist point in robot coordinate system
         p = PointStamped()
         p.header.frame_id = '/headcam_rgb_optical_frame'
@@ -407,21 +407,21 @@ class DavidLookingPose(State):
         target_frame = "/map"
         pvecWCS = (0,0,0)
         while True:
-        try:
-            t = rospy.Time(0)
-            #point_cloud.header.stamp = t
-            (trans,rot) = self.listener.lookupTransform('/headcam_rgb_optical_frame', target_frame, rospy.Time(0))
-            rot = quaternion_matrix(rot)[0:3,0:3]
-            pvec = (self.pointingDirCCS[3],self.pointingDirCCS[4],self.pointingDirCCS[5])
-            #print "pvec: ", pvec (CCS)
-            pvecWCS = numpy.dot(pvec,rot)
-            #print "Pointing Vector in RCS: ", pvecWCS
+            try:
+                t = rospy.Time(0)
+                #point_cloud.header.stamp = t
+                (trans,rot) = self.listener.lookupTransform('/headcam_rgb_optical_frame', target_frame, rospy.Time(0))
+                rot = quaternion_matrix(rot)[0:3,0:3]
+                pvec = (self.pointingDirCCS[3],self.pointingDirCCS[4],self.pointingDirCCS[5])
+                #print "pvec: ", pvec (CCS)
+                pvecWCS = numpy.dot(pvec,rot)
+                #print "Pointing Vector in RCS: ", pvecWCS
 
-            break
-        except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
-            print "savePointingDirection(), calc pvec in RCS: tf transform /headcam_rgb_optical_frame to ", target_frame," not found"
-            rospy.sleep(0.1)
-            continue
+                break
+            except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+                print "savePointingDirection(), calc pvec in RCS: tf transform /headcam_rgb_optical_frame to ", target_frame," not found"
+                rospy.sleep(0.1)
+                continue
 
 
         gpOnFloor = self.calcIntersectionPointingDirWithFloor(pspWCS, pvecWCS)

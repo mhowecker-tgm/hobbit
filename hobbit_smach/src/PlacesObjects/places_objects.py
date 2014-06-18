@@ -137,6 +137,7 @@ def updateProb(obj, location, room_name, rooms):
     """
     #count = -1
     count = 0
+    rem_prob = 1.0
     for room in rooms.rooms_vector:
         rem_prob = 1.0
         for place in (x for x in room.places_vector if x.place_type.lower() == 'searchable'):
@@ -146,6 +147,8 @@ def updateProb(obj, location, room_name, rooms):
                     diff = (1.0 - float(ob.probability))*0.5
                     ob.probability = float(ob.probability) + diff
                     rem_prob = 1.0 - ob.probability
+    if count == 0:
+        count = 1
     new_prob = rem_prob / count
     for room in (y for y in rooms.rooms_vector if not y.room_name.lower() == room_name.lower()):
         for place in (x for x in room.places_vector if x.place_type.lower() == 'searchable'):

@@ -3,7 +3,7 @@
 
 PKG = 'hobbit_smach'
 NAME = 'learn_object'
-DEBUG = True
+DEBUG = False
 dir_param = '/hobbit/pcd_path'
 
 import roslib
@@ -66,11 +66,10 @@ class SetName(State):
             directory = rospy.get_param('/hobbit/pcd_path') + '/'
         else:
             directory = '/tmp/pcd_data/'
-        if not ud.object_name = '':
+        if not ud.object_name == '':
             directory2 = directory + ud.object_name
         else:
-            directory2 = directory + 'object-' +
-            random.choice("abcdefghijklmnopqrstuvwxyz")
+            directory2 = directory + 'object-' + random.choice("abcdefghijklmnopqrstuvwxyz")
         if not os.path.exists(directory2):
             os.makedirs(directory2)
         shutil.move(directory + 'up', directory2)
@@ -102,20 +101,21 @@ def returnTurntable():
         #Sequence.add(
         #    'OPEN_GRIPPER',
         #    move_arm.OpenGripper())
-        if not DEBUG:
-            Sequence.add(
-                'MOVE_BACK',
-                hobbit_move.Move(goal='back', distance=0.25))
+        #if not DEBUG:
+        #    Sequence.add(
+        #        'MOVE_BACK',
+        #        hobbit_move.Move(goal='back', distance=0.25))
         #Sequence.add(
         #    'MOVE_ARM_STORAGE',
         #    move_arm.goToHomePosition())
-        if not DEBUG:
-            Sequence.add(
-                'MOVE_FRONT',
-                hobbit_move.Move(goal='front', distance=0.25))
+        #if not DEBUG:
+        #    Sequence.add(
+        #        'MOVE_FRONT',
+        #        hobbit_move.Move(goal='front', distance=0.25))
         Sequence.add(
             'MOVE_HEAD_FRONT',
-            head_move.MoveTo(pose='center_center'))
+            head_move.MoveTo(pose='center_center'),
+            transitions={'aborted': 'failed'})
         Sequence.add(
             'MMUI_SAY_STOPPED_LEARNING',
             speech_output.sayText(info='I_STOPPED_LEARNING'))

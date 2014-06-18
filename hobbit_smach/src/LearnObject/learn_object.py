@@ -172,7 +172,8 @@ def main():
             HobbitEmotions.ShowEmotions(emotion='HAPPY', emo_time=4))
         Sequence.add(
             'HEAD_MOVE',
-            head_move.MoveTo(pose='center_center'))
+            head_move.MoveTo(pose='center_center'),
+            transitions={'aborted': 'failed'})
         Sequence.add(
             'SAY_ATTENTION',
             speech_output.sayText(info='ATTENTION_I_AM_MOVING_MY_ARM_OUT')
@@ -183,7 +184,8 @@ def main():
                 hobbit_move.Move(goal='back', distance=0.25))
         Sequence.add(
             'HEAD_MOVE_2',
-            head_move.MoveTo(pose='down_center'))
+            head_move.MoveTo(pose='down_center'),
+            transitions={'aborted': 'failed'})
         Sequence.add(
             'MMUI_SAY_GRASPING',
             speech_output.sayText(info='GRASPING_THE_TURNTABLE'))
@@ -206,7 +208,8 @@ def main():
                 hobbit_move.Move(goal='front', distance=0.25))
         Sequence.add(
             'HEAD_MOVE_3',
-            head_move.MoveTo(pose='to_turntable'))
+            head_move.MoveTo(pose='to_turntable'),
+            transitions={'aborted': 'failed'})
 
         with seq2:
             Sequence.add(
