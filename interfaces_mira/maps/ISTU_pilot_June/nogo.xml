@@ -1,0 +1,10 @@
+<root>
+  <Map>
+    <Image>nogo.png</Image>
+    <CellSize>0.025</CellSize>
+    <Offset>
+      <X>400</X>
+      <Y>400</Y>
+    </Offset>
+  </Map>
+</root>
