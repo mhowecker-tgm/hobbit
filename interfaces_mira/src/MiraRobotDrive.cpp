@@ -206,10 +206,10 @@ void MiraRobotDrive::odometry_data_callback(mira::ChannelRead<mira::robot::Odome
 	odom_tf.header.stamp = odom_time;
 	odom_tf.header.frame_id = "/odom";
        // correct tf mira etc
-       odom_tf.child_frame_id = "/base_footprint";
+       //odom_tf.child_frame_id = "/base_footprint";
 
        //ROS navigation requires //FIXME
-       //odom_tf.child_frame_id = "/base_link"; //originally it was "/base_footprint", did not work for amcl
+       odom_tf.child_frame_id = "/base_link"; //originally it was "/base_footprint", did not work for amcl
 
 	odom_tf.transform.translation.x = data->value().pose.x();
 	odom_tf.transform.translation.y = data->value().pose.y();

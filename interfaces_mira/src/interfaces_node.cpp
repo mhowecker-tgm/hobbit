@@ -41,8 +41,15 @@ int main(int argc, char **argv) {
         
         std::string config_file, port_number, mira_modules;
         std::vector<std::string> args;
+        
+	bool using_mira_navigation = true;
 
         if (argc < 2) { // no arguments, so use ROS parameters.
+
+	if(ros::param::get("~using_mira_navigation", using_mira_navigation))
+	{
+
+	}
 
          if (ros::param::get("~config_file", config_file)) {
                 args.push_back(std::string("-c"));
