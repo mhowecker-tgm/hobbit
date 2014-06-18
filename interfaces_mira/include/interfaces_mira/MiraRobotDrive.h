@@ -63,6 +63,7 @@ ros::ServiceServer emergency_stop_service_;
 ros::ServiceServer enable_motors_service_;
 
 ros::Publisher state_pub;
+
 };
 
 #endif

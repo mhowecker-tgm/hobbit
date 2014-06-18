@@ -23,7 +23,7 @@ void MiraRobotDrive::initialize()
   mileage_pub_ = robot_->getRosNode().advertise<std_msgs::Float32>("/mileage", 20);
   motorstatus_pub_ = robot_->getRosNode().advertise<mira_msgs::MotorStatus>("/motor_status", 20);
 
-  state_pub = robot_->getRosNode().advertise<std_msgs::String>("/DiscreteMotionState", 1);
+  //state_pub = robot_->getRosNode().advertise<std_msgs::String>("/DiscreteMotionState", 1);
   
   robot_->getMiraAuthority().subscribe<mira::robot::Odometry2>("/robot/Odometry", //&ScitosBase::odometry_cb);
 &MiraRobotDrive::odometry_data_callback, this);
@@ -193,11 +193,11 @@ void MiraRobotDrive::odometry_data_callback(mira::ChannelRead<mira::robot::Odome
 	odom_msg.twist.twist.linear.x = data->value().velocity.x();
 	odom_msg.twist.twist.angular.z = data->value().velocity.phi();
 
-	std_msgs::String stateString;
+	/*std_msgs::String stateString;
         if (fabs(odom_msg.twist.twist.linear.x) > 0) stateString.data = "Moving";
 	else if (fabs(odom_msg.twist.twist.angular.z) > 0) stateString.data = "Turning";
         else stateString.data = "Idle";
-        state_pub.publish (stateString);
+        state_pub.publish (stateString);*/
 
 	odometry_pub_.publish(odom_msg);
 
