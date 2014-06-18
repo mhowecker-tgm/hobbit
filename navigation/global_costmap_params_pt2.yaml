@@ -6,6 +6,7 @@ global_costmap:
   publish_frequency: 5.0
   static_map: true
   transform_tolerance: 0.25
+  footprint: [[0.19, 0.25], [-0.39, 0.25], [-0.39, -0.32], [0.19, -0.32]]
   plugins:
    -
      name: footprint

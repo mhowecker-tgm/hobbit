@@ -6,5 +6,5 @@ inflation_radius: 0.32
 
 my_obstacle_layer:
   observation_sources: laser_scan_sensor
-  laser_scan_sensor: {sensor_frame: loc_link, data_type: LaserScan, topic: loc_scan, marking: true, clearing: true, min_range: 0.80, obstacle_range: 4.5, observation_persistence: 1.5}
+  laser_scan_sensor: {sensor_frame: loc_link, data_type: LaserScan, topic: loc_scan, marking: true, clearing: true, min_range: 0.72, obstacle_range: 4.5, observation_persistence: 1.5}
 
