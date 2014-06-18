@@ -1,0 +1,29 @@
+<package>
+  <description brief="TableObjectDetector">
+
+     TableObjectDetector from the PCL Tutorials, modified to meet our needs, works with Kinect at my Place ;)
+
+  </description>
+  <author>walter</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/TableObjectDetector</url>
+  <!-- ROS dependencies -->
+  <depend package="pcl" />
+  <depend package="pcl_ros" />
+  
+  <depend package="diagnostic_msgs" />
+  <depend package="recognition_msgs" />
+  <depend package="image_transport" />
+  <depend package="opencv2" />
+  <depend package="cv_bridge" />
+  <depend package="sensor_msgs" />
+  <depend package="image_geometry" />
+  <depend package="HobbitMsgs" />
+  
+    
+
+  <platform os="ubuntu" version="12.04"/>
+</package>
+
+

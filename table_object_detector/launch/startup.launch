@@ -1,0 +1,16 @@
+<launch>
+	
+	<node name="TOD" pkg="TableObjectDetector" type="thor" args= "" output="screen">        
+	    <remap from="~input" to="/SS/points2" />
+	    <remap from="~caminfo" to="/SS/rgb/camera_info" />
+        <remap from="~img" to="/SS/rgb/image_color" />
+        <remap from="~disp" to="/SS/disparity_img" />
+	    
+    </node>
+<!-- <include file="$(find Trigger)/launch/startup.launch"/> -->
+</launch>
+
+
+
+
+
