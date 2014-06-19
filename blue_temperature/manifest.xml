@@ -1,0 +1,16 @@
+<package>
+  <description brief="blue_temperature">
+
+     blue_temperature
+
+  </description>
+  <author>pi</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/blue_temperature</url>
+  <depend package="rospy"/>
+  <depend package="roscpp"/>
+
+</package>
+
+

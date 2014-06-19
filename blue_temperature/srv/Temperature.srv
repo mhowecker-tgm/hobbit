@@ -1,0 +1,5 @@
+int32 average
+---
+float64 air
+float64 object
+float64 elapsedtime
