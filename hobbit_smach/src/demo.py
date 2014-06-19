@@ -41,6 +41,9 @@ def callback(data):
 	    print(room)
 	    print(place)
 	    goto(room, place)
+        elif data.command == 'C_LEARN':
+	    print('START learn object:')
+	    learn_object()
     except AttributeError as e:
         print('EVENT: Not suitable here.')
         print(e)
