@@ -26,14 +26,14 @@ def callback(data):
     #rospy.loginfo(rospy.get_caller_id()+"I heard %s",data.data)
     print('Event')
     print(data)
-    try: 
+    try:
         if data.command[:-1] == 'C_AWAY':
             print('START User goes away:')
-	    index = data.command[-1] -1 
+	    index = int(data.command[-1] -1)
 	    away('away', index)
         elif data.command[:-1] == 'C_SLEEP':
 	    print('START User goes to sleep:')
-	    index = data.command[-1] - 1
+	    index = int(data.command[-1] -1)
 	    away('sleep', index)
         elif data.command == 'C_GOTOPOINT':
 	    print('START goto point:')
@@ -45,14 +45,14 @@ def callback(data):
         print('EVENT: Not suitable here.')
         print(e)
 
-    try: 
+    try:
         if data.event == 'E_HELP':
 	    print('START User initiated emergency:')
 	    sos()
     except AttributeError as e:
         print('EVENT: Not suitable here.')
         print(e)
-    
+
 def listener():
 
     rospy.init_node('demo', anonymous=True)
@@ -141,6 +141,6 @@ def goto(room, place):
     client.wait_for_result()
 
     return client.get_result()
-        
+
 if __name__ == '__main__':
     listener()
