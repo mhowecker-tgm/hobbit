@@ -52,9 +52,9 @@ class DavidLookForObject(State):
             output_keys=['goal_position_x', 'goal_position_y', 'goal_position_yaw']
         )
         self.rec = TD(useRFR=False)
-    self.restrictfind = False
-    self.robotDistFromGraspPntForGrasping = 0.6
-    self.robotOffsetRotationForGrasping = math.pi/4
+        self.restrictfind = False
+        self.robotDistFromGraspPntForGrasping = 0.6
+        self.robotOffsetRotationForGrasping = math.pi/4
 
     def execute(self, ud):
         if self.preempt_requested():
@@ -70,7 +70,7 @@ class DavidLookForObject(State):
 
             (robot_x, robot_y, robot_yaw) = util.get_current_robot_position(frame='/map')
             posRobot = [robot_x, robot_y] #Bajo, please fill in
-        # self.graspable_center_of_cluster_wcs  #center of graspable point cluster
+            # self.graspable_center_of_cluster_wcs  #center of graspable point cluster
             robotApproachDir = [self.graspable_center_of_cluster_wcs[0] - posRobot[0], self.graspable_center_of_cluster_wcs[1] - posRobot[1]]
             robotApproachDir = [robotApproachDir[0]/numpy.linalg.norm(robotApproachDir), robotApproachDir[1]/numpy.linalg.norm(robotApproachDir)]       #normalized
 
@@ -102,8 +102,8 @@ class DavidLookForObject(State):
                     #print "findobject(): cluster saved and published"
                     return True
 
-    print "findobect(): no graspable object found"
-    return false
+        print "findobect(): no graspable object found"
+        return false
 
 
     #checks if object is suitable for grasping for camera center/down (later extension e.g. check distance to wall)
@@ -170,7 +170,6 @@ class DavidLookForObject(State):
 
         while True:
             try:
-
                 #self.Hpub.publish("down")
                 t = rospy.Time(0)
                 point_cloud.header.stamp = t
@@ -321,7 +320,6 @@ class DavidLookForObject(State):
             offset += point_cloud.point_step
             narr.append(p[0:3])
 
-
         while True:
             try:
                 t = rospy.Time(0)
@@ -343,11 +341,6 @@ class DavidLookForObject(State):
         #r.points = [xf(p) for p in point_cloud.points]
         r.points = [xf(p) for p in narr]
         return r
-
-
-
-
-
 
 
 class DavidLookingPose(State):

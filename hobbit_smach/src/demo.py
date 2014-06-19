@@ -15,8 +15,8 @@ def callback(data):
     print(data.command)
     try:
         if data.command == 'C_LEARN':
-	    print('START learn object:')
-	    learn_object()
+        print('START learn object:')
+        learn_object()
     except AttributeError as e:
         print('Command: Not suitable here.')
         print(e)
@@ -29,29 +29,29 @@ def callback(data):
     try:
         if data.command[:-1] == 'C_AWAY':
             print('START User goes away:')
-	    index = int(data.command[-1] -1)
-	    away('away', index)
+        index = int(data.command[-1] -1)
+        away('away', index)
         elif data.command[:-1] == 'C_SLEEP':
-	    print('START User goes to sleep:')
-	    index = int(data.command[-1] -1)
-	    away('sleep', index)
+        print('START User goes to sleep:')
+        index = int(data.command[-1] -1)
+        away('sleep', index)
         elif data.command == 'C_GOTOPOINT':
-	    print('START goto point:')
-	    room, place = data.params[0].value.lower().split(' ')
-	    print(room)
-	    print(place)
-	    goto(room, place)
+        print('START goto point:')
+        room, place = data.params[0].value.lower().split(' ')
+        print(room)
+        print(place)
+        goto(room, place)
         elif data.command == 'C_LEARN':
-	    print('START learn object:')
-	    learn_object()
+        print('START learn object:')
+        learn_object()
     except AttributeError as e:
         print('EVENT: Not suitable here.')
         print(e)
 
     try:
         if data.event == 'E_HELP':
-	    print('START User initiated emergency:')
-	    sos()
+        print('START User initiated emergency:')
+        sos()
     except AttributeError as e:
         print('EVENT: Not suitable here.')
         print(e)

@@ -202,7 +202,7 @@ class AskYesNo(smach.State):
                 elif v.name == 'result' and v.value == 'D_NO':
                     return 'no'
                 elif v.name == 'result' and v.value == 'D_CANCEL':
-                    return 'yes'
+                    return 'no'
                 elif v.name == 'result' and v.value == 'D_TIMEOUT':
                     self.timeout_count += 1
                     return 'timeout'
