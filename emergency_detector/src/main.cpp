@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include <image_transport/image_transport.h>
 
+#include "process.h"
 
 #include <message_filters/subscriber.h>
 #include <message_filters/sync_policies/approximate_time.h>
@@ -53,9 +54,6 @@ unsigned int frameTimestamp=0;
 ros::NodeHandle * nhPtr=0;
 unsigned int paused=0;
 
-
-unsigned int emergencyDetected=0;
-float temperatureDetected=0.0;
 
 
 void broadcastEmergency(unsigned int frameNumber)
@@ -113,20 +111,9 @@ bool resume(std_srvs::Empty::Request& request, std_srvs::Empty::Response& respon
     return true;
 }
 
-int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int colorWidth , unsigned int colorHeight ,
-                                       unsigned short * depthFrame  , unsigned int depthWidth , unsigned int depthHeight ,
-                                        void * calib ,
-                                          unsigned int frameTimestamp )
-{
- return 0;
-}
-
 void bboxReceived(const emergency_detector::SkeletonBBox & msg)
 {
-  if (msg.depth!=0)
-  {
-   fprintf(stderr,"Received BBOX %f , %f , %f \n",msg.width , msg.height ,msg.depth );
-  }
+   processBoundingBox(msg.width , msg.height ,msg.depth );
 }
 
 //RGBd Callback is called every time we get a new pair of frames , it is synchronized to the main thread

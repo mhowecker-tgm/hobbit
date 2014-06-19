@@ -20,8 +20,29 @@ catkin_package()
 include_directories(${catkin_INCLUDEDIR} 
 		    ${OpenCV_INCLUDEDIR})
 
-
-add_executable(emergency_detector src/main.cpp )
+add_executable(emergency_detector 
+               src/main.cpp
+               src/process.cpp
+               src/RGBDAcquisition/acquisitionSegment/AcquisitionSegment.c
+               src/RGBDAcquisition/acquisitionSegment/automaticPlaneSegmentation.c
+               src/RGBDAcquisition/acquisitionSegment/colorSelector.c
+               src/RGBDAcquisition/acquisitionSegment/combineRGBAndDepthOutput.c
+               src/RGBDAcquisition/acquisitionSegment/depthSelector.c
+               src/RGBDAcquisition/acquisitionSegment/imageProcessing.c 
+               src/RGBDAcquisition/tools/Quasirandomness/quasirandomness.c
+               src/RGBDAcquisition/tools/Calibration/calibration.c 
+               src/RGBDAcquisition/tools/Calibration/calibration.h 
+               src/RGBDAcquisition/tools/AmMatrix/matrix3x3Tools.c 
+               src/RGBDAcquisition/tools/AmMatrix/matrix3x3Tools.h
+               src/RGBDAcquisition/tools/AmMatrix/matrix4x4Tools.c
+               src/RGBDAcquisition/tools/AmMatrix/matrix4x4Tools.h
+               src/RGBDAcquisition/tools/AmMatrix/matrixCalculations.c
+               src/RGBDAcquisition/tools/AmMatrix/matrixCalculations.h
+               src/RGBDAcquisition/tools/AmMatrix/solveLinearSystemGJ.c
+               src/RGBDAcquisition/tools/AmMatrix/solveLinearSystemGJ.h
+               src/RGBDAcquisition/tools/AmMatrix/solveHomography.c
+               src/RGBDAcquisition/tools/AmMatrix/solveHomography.h
+              )
 
 target_link_libraries(emergency_detector ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 
