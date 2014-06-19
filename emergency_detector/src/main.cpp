@@ -133,9 +133,13 @@ void rgbdCallbackNoCalibration(const sensor_msgs::Image::ConstPtr rgb_img_msg,
   orig_depth_img->image.copyTo(depth);
 
   //doDrawOut();
-  runServicesThatNeedColorAndDepth((unsigned char*) rgb.data, colorWidth , colorHeight ,
+
+  if (frameTimestamp%3==0)
+  { //Preserve resources
+   runServicesThatNeedColorAndDepth((unsigned char*) rgb.data, colorWidth , colorHeight ,
                                    (unsigned short*) depth.data ,  depthWidth , depthHeight ,
                                      0 , frameTimestamp );
+  }
  //After running (at least) once it is not a first run any more!
  first = false;
  ++frameTimestamp;
@@ -200,6 +204,8 @@ int main(int argc, char **argv)
      #if BROADCAST_HOBBIT
       gestureEventBroadcaster = nh->advertise <hobbit_msgs::Event> ("Event", 1000);
      #endif
+
+     initializeProcess();
 
       //Create our context
       //---------------------------------------------------------------------------------------------------

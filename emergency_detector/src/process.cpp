@@ -63,14 +63,12 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
                                         void * calib ,
                                           unsigned int frameTimestamp )
 {
-        fprintf(stderr,"runServicesThatNeedColorAndDepth is deactivated\n");
-        return 0;
         fprintf(stderr,"runServicesThatNeedColorAndDepth called \n");
         unsigned char * segmentedRGB = copyRGB(colorFrame ,colorWidth , colorHeight);
         unsigned short * segmentedDepth = copyDepth(depthFrame ,depthWidth , depthHeight);
         fprintf(stderr,"Copied rgb/depth\n");
 
-        fprintf(stderr,"Segmenting \n");
+        fprintf(stderr,"Segmenting 2 frames sized  %ux%u and %ux%u \n",colorWidth , colorHeight,depthWidth , depthHeight);
         segmentRGBAndDepthFrame (
                                    segmentedRGB ,
                                    segmentedDepth ,
@@ -89,4 +87,27 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
        fprintf(stderr,"Done\n");
 
  return 0;
+}
+
+
+void initializeProcess()
+{
+ initializeRGBSegmentationConfiguration(&segConfRGB,640,480);
+ initializeDepthSegmentationConfiguration(&segConfDepth,640,480);
+
+
+ segConfDepth.maxDepth=1800;
+ //Hobbit orientation according to camera
+
+ segConfDepth.doNotGenerateNormalFrom3Points=1;
+
+ segConfDepth.normal[0]=-0.02;
+ segConfDepth.normal[1]=-0.78;
+ segConfDepth.normal[2]=-0.62;
+
+ segConfDepth.center[0]=114.95;
+ segConfDepth.center[1]=501.61;
+ segConfDepth.center[2]=1338.0;
+
+ segConfDepth.planeNormalOffset=40.0;
 }

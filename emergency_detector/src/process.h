@@ -22,6 +22,9 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
                                         void * calib ,
                                           unsigned int frameTimestamp );
 
+
+void initializeProcess();
+
 #ifdef __cplusplus
 }
 #endif
