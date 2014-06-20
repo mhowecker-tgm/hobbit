@@ -175,7 +175,12 @@ class sqlitedb:
     
 def main(args):        
     #rospy.init_node('sqlitedb', anonymous=False)
-    c = sqlitedb()
+        con = sqlite3.connect('hobbit.db')
+        cur=con.cursor()
+        cur.execute("DELETE FROM HOBBIT")
+        cur.execute("VACUUM")
+        con.commit()
+        
 
     #rospy.spin()
 
