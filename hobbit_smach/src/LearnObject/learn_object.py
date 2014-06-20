@@ -9,17 +9,13 @@ MMUI_IS_DOING_IT = True
 import roslib
 roslib.load_manifest(PKG)
 import rospy
-import smach
-#import uashh_smach.util as util
 from uashh_smach.util import SleepState
-#import uashh_smach.platform.move_base as move_base
 import hobbit_smach.hobbit_move_import as hobbit_move
 
 from std_msgs.msg import String
-from hobbit_msgs.msg import GeneralHobbitAction, Event
-from hobbit_msgs.srv import GetCoordinates
+from hobbit_msgs.msg import GeneralHobbitAction
 from smach_ros import ActionServerWrapper, IntrospectionServer
-from smach import StateMachine, State, Sequence
+from smach import StateMachine, State, Sequence, Concurrence
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 import hobbit_smach.learn_object_import as learn_object
 import hobbit_smach.head_move_import as head_move
@@ -69,7 +65,7 @@ class CleanUp(State):
             input_keys=['command'],
             output_keys=['result', 'command']
         )
-        self.pub_face = rospy.Publisher('/Hobbit/Emoticon', String)
+        self.pub_face = rospy.Publisher('/head/emo', String, queue_size=50)
 
     def execute(self, ud):
         self.pub_face.publish('EMO_SAD')
@@ -88,8 +84,8 @@ class SetSuccess(State):
             outcomes=['succeeded', 'preempted'],
             output_keys=['result']
         )
-        self.pub = rospy.Publisher('/DiscreteMotionCmd', String)
-        self.pub_face = rospy.Publisher('/Hobbit/Emoticon', String)
+        self.pub = rospy.Publisher('/DiscreteMotionCmd', String, queue_size=50)
+        self.pub_face = rospy.Publisher('/head/emo', String, queue_size=50)
 
     def execute(self, ud):
         self.pub_face.publish('EMO_HAPPY')
@@ -113,8 +109,8 @@ class SetFailure(State):
             outcomes=['succeeded', 'preempted'],
             output_keys=['result']
         )
-        self.pub = rospy.Publisher('/DiscreteMotionCmd', String)
-        self.pub_face = rospy.Publisher('/Hobbit/Emoticon', String)
+        self.pub = rospy.Publisher('/DiscreteMotionCmd', String, queue_size=50)
+        self.pub_face = rospy.Publisher('/Hobbit/Emoticon', String, queue_size=50)
 
     def execute(self, ud):
         self.pub_face.publish('EMO_SAD')
@@ -140,8 +136,8 @@ class Dummy(State):
         )
 
     def execute(self, ud):
-        #ud.result = String('')
-        #rospy.sleep(2.0)
+        # ud.result = String('')
+        # rospy.sleep(2.0)
         return 'succeeded'
 
 
@@ -166,17 +162,46 @@ def main():
     learn_object_sm.userdata.emotion = 'WONDERING'
     learn_object_sm.userdata.emo_time = 4
 
+    cc1 = Concurrence(
+        outcomes=['succeeded', 'preempted', 'failed'],
+        default_outcome='failed'
+    )
+
+    cc2 = Concurrence(
+        outcomes=['succeeded', 'preempted', 'failed'],
+        default_outcome='failed'
+    )
+
+    with cc1:
+        Concurrence.add(
+            'EMO_HAPPY',
+            HobbitEmotions.ShowEmotions(emotion='HAPPY', emo_time=4)
+        )
+        Concurrence.add(
+            'SAY_ATTENTION',
+            speech_output.sayText(info='ATTENTION_I_AM_MOVING_MY_ARM_OUT')
+        )
+
+    with cc2:
+        Concurrence.add(
+            'EMO_WONDERING',
+            HobbitEmotions.ShowEmotions(emotion='WONDERING', emo_time=4)
+        )
+        Concurrence.add(
+            'SAY_LEARN_NEW_OBJECT',
+            speech_output.sayText(
+                info='LEARNING_NEW_SET_OF_OBJECTS_I_AM_THINKING')
+        )
+
     with seq1:
         Sequence.add(
-            'EMO_HAPPY',
-            HobbitEmotions.ShowEmotions(emotion='HAPPY', emo_time=4))
+            'SAY_HAPPY',
+            cc1
+        )
         Sequence.add(
             'HEAD_MOVE',
             head_move.MoveTo(pose='center_center'),
-            transitions={'aborted': 'failed'})
-        Sequence.add(
-            'SAY_ATTENTION',
-            speech_output.sayText(info='ATTENTION_I_AM_MOVING_MY_ARM_OUT')
+            transitions={'aborted': 'failed'}
         )
         if not DEBUG:
             Sequence.add(
@@ -189,15 +214,15 @@ def main():
         Sequence.add(
             'MMUI_SAY_GRASPING',
             speech_output.sayText(info='GRASPING_THE_TURNTABLE'))
-        #Sequence.add(
-        #    'ARM_MOVE_TT_POSE',
-        #    arm_move.goToPosition(pose='storage'))
-        #Sequence.add(
-        #    'Close_GRIPPER',
-        #    arm_move.CloseGripper())
-        #Sequence.add(
-        #    'ARM_MOVE_LEARN_POSE',
-        #    arm_move.goToPosition(pose='learn'))
+        # Sequence.add(
+        #     'ARM_MOVE_TT_POSE',
+        #     arm_move.goToPosition(pose='storage'))
+        # Sequence.add(
+        #     'Close_GRIPPER',
+        #     arm_move.CloseGripper())
+        # Sequence.add(
+        #     'ARM_MOVE_LEARN_POSE',
+        #     arm_move.goToPosition(pose='learn'))
         Sequence.add(
             'MOVE_TT_LEARN_POSITION',
             arm_move.goToLearnPosition()
@@ -214,12 +239,7 @@ def main():
         with seq2:
             Sequence.add(
                 'SAY_LEARN_NEW_OBJECT',
-                speech_output.sayText(
-                    info='LEARNING_NEW_SET_OF_OBJECTS_I_AM_THINKING')
-            )
-            Sequence.add(
-                'EMO_HAPPY',
-                HobbitEmotions.ShowEmotions(emotion='HAPPY', emo_time=4)
+                cc2
             )
             Sequence.add(
                 'WAIT_3',
@@ -244,34 +264,34 @@ def main():
         StateMachine.add(
             'SEQ1',
             seq1,
-            transitions={'succeeded': 'MMUI_ASK_HELP_OBJECT',
+            transitions={'succeeded': 'CONFIRM_PUT_OBJECT_ON_TRAY',
                          'failed': 'SET_FAILURE',
                          'preempted': 'SET_FAILURE'}
         )
-        StateMachine.add(
-            'MMUI_ASK_HELP_OBJECT',
-            HobbitMMUI.AskYesNo(question='HELP_PUTTING_OBJECT_ONTO_TURNTABLE'),
-            transitions={'yes': 'CONFIRM_PUT_OBJECT_ON_TRAY',
-                         'no': 'SHALL_I_STOP_1',
-                         'timeout': 'MMUI_ASK_HELP_OBJECT',
-                         '3times': 'SHALL_I_STOP_1',
-                         'failed': 'SHALL_I_STOP_1'}
-        )
-        StateMachine.add(
-            'SHALL_I_STOP_1',
-            HobbitMMUI.AskYesNo(question='SHALL_I_STOP_LEARNING'),
-            transitions={'yes': 'STOP_SEQ',
-                         'no': 'EMO_HAPPY',
-                         'timeout': 'SHALL_I_STOP_1',
-                         '3times': 'STOP_SEQ',
-                         'failed': 'STOP_SEQ'}
-        )
-        StateMachine.add(
-            'EMO_HAPPY',
-            HobbitEmotions.ShowEmotions(emotion='HAPPY', emo_time=4),
-            transitions={'succeeded': 'CONFIRM_PUT_OBJECT_ON_TRAY',
-                         'failed': 'SET_FAILURE'}
-        )
+        # StateMachine.add(
+        #     'MMUI_ASK_HELP_OBJECT',
+        #     HobbitMMUI.AskYesNo(question='HELP_PUTTING_OBJECT_ONTO_TURNTABLE'),
+        #     transitions={'yes': 'CONFIRM_PUT_OBJECT_ON_TRAY',
+        #                  'no': 'SHALL_I_STOP_1',
+        #                  'timeout': 'MMUI_ASK_HELP_OBJECT',
+        #                  '3times': 'SHALL_I_STOP_1',
+        #                  'failed': 'SHALL_I_STOP_1'}
+        # )
+        # StateMachine.add(
+        #     'SHALL_I_STOP_1',
+        #     HobbitMMUI.AskYesNo(question='SHALL_I_STOP_LEARNING'),
+        #     transitions={'yes': 'STOP_SEQ',
+        #                  'no': 'EMO_HAPPY',
+        #                  'timeout': 'SHALL_I_STOP_1',
+        #                  '3times': 'STOP_SEQ',
+        #                  'failed': 'STOP_SEQ'}
+        # )
+        # StateMachine.add(
+        #     'EMO_HAPPY',
+        #     HobbitEmotions.ShowEmotions(emotion='HAPPY', emo_time=4),
+        #     transitions={'succeeded': 'CONFIRM_PUT_OBJECT_ON_TRAY',
+        #                  'failed': 'SET_FAILURE'}
+        # )
         StateMachine.add(
             'STOP_SEQ',
             learn_object.unloadReturnTurntable(),
@@ -329,7 +349,8 @@ def main():
         )
         StateMachine.add(
             'CONFIRM_TURN_OBJECT',
-            HobbitMMUI.ConfirmInfo(info='TURN_ OBJECT_UPSIDE_DOWN_OR_LAY_IT_DOWN'),
+            HobbitMMUI.ConfirmInfo(
+                info='TURN_ OBJECT_UPSIDE_DOWN_OR_LAY_IT_DOWN'),
             transitions={'succeeded': 'CHECK_FOR_OBJECT_2',
                          'failed': 'FAIL_COUNT_CONFIRM_2'}
         )
@@ -411,7 +432,7 @@ def main():
                          'preempted': 'preempted'}
         )
         StateMachine.add(
-            'MAIN_MENU', 
+            'MAIN_MENU',
             HobbitMMUI.ShowMenu(menu='MAIN'),
             transitions={'succeeded': 'failure',
                          'preempted': 'preempted',

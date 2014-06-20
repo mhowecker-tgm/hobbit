@@ -91,6 +91,9 @@ def returnTurntable():
 
     with seq:
         Sequence.add(
+            'SAY_REMOVE_OBJECT',
+            HobbitMMUI.ConfirmInfo(info='Please remove the object'))
+        Sequence.add(
             'SAY_RETURN_TURNTABLE',
             speech_output.sayText(info='RETURNING_TURNTABLE'))
         Sequence.add(

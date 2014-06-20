@@ -229,7 +229,7 @@ class ConfirmInfo(smach.State):
         mmui = MMUI.MMUIInterface()
         resp = mmui.showMMUI_OK(text=self.info)
         print(resp)
-        # TODO: needs checkfor resp content
+        # TODO: needs check for resp content
         if resp:
             return 'succeeded'
         else:
