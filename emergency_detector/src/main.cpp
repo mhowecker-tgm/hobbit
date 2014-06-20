@@ -14,7 +14,11 @@
 #include <message_filters/sync_policies/approximate_time.h>
 #include <message_filters/time_synchronizer.h>
 
+
 #include <cv_bridge/cv_bridge.h>
+ #include <opencv2/imgproc/imgproc_c.h>
+ #include <opencv2/legacy/legacy.hpp>
+ #include "opencv2/highgui/highgui.hpp"
 
 #include <std_srvs/Empty.h>
 
@@ -77,6 +81,9 @@ void broadcastEmergency(unsigned int frameNumber)
     evt.params.resize(0);
     fprintf(stderr,"Publishing a new Emergency Event ( %u ) \n",emergencyDetected);
     gestureEventBroadcaster.publish(evt);
+
+    //No longer at an emergency state
+    emergencyDetected=0;
    #endif
 
  return ;
@@ -111,10 +118,53 @@ bool resume(std_srvs::Empty::Request& request, std_srvs::Empty::Response& respon
     return true;
 }
 
+bool visualizeOn(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    doCVOutput=1;
+    return true;
+}
+
+bool visualizeOff(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    doCVOutput=0;
+    cv::destroyAllWindows();
+    cv::destroyWindow("emergency_detector rgb");
+    cv::destroyWindow("emergency_detector depth");
+    cv::destroyWindow("emergency_detector segmented depth");
+
+    cv::waitKey(1);
+    return true;
+}
+
 void bboxReceived(const emergency_detector::SkeletonBBox & msg)
 {
    processBoundingBox(msg.width , msg.height ,msg.depth );
 }
+
+
+
+int doDrawOut()
+{
+     if (!doCVOutput) { return 0; }
+     /*Don't add this on output ( reduce cluttering )*/
+     cv::Mat rgbTmp = rgb.clone();
+     //Take care of drawing stuff as visual output
+
+     cv::Size s = rgb.size();
+	 cv::Mat bgrMat,rgbMat(s.height,s.width,CV_8UC3,rgbTmp.data,3*s.width);
+	 cv::cvtColor(rgbMat,bgrMat, CV_RGB2BGR);// opencv expects the image in BGR format
+     cv::Mat depthNorm;
+	 cv::normalize(depth,depthNorm,0,255,CV_MINMAX,CV_8UC1);
+
+     //After we have our bgr Frame ready and we added the FPS text , lets show it!
+	 cv::imshow("emergency_detector rgb",depthNorm);
+	 cv::imshow("emergency_detector depth",bgrMat);
+
+	 cv::waitKey(1);
+
+ return 1;
+}
+
 
 //RGBd Callback is called every time we get a new pair of frames , it is synchronized to the main thread
 void rgbdCallbackNoCalibration(const sensor_msgs::Image::ConstPtr rgb_img_msg,
@@ -132,7 +182,7 @@ void rgbdCallbackNoCalibration(const sensor_msgs::Image::ConstPtr rgb_img_msg,
   orig_depth_img = cv_bridge::toCvCopy(depth_img_msg, sensor_msgs::image_encodings::TYPE_16UC1);
   orig_depth_img->image.copyTo(depth);
 
-  //doDrawOut();
+  doDrawOut();
 
   if (frameTimestamp%3==0)
   { //Preserve resources
@@ -182,6 +232,8 @@ int main(int argc, char **argv)
 
 
      //We advertise the services we want accessible using "rosservice call *w/e*"
+     ros::ServiceServer visualizeOnService      = nh.advertiseService(name+"/visualize_on" , visualizeOn);
+     ros::ServiceServer visualizeOffService     = nh.advertiseService(name+"/visualize_off", visualizeOff);
      ros::ServiceServer pauseGestureRecognitionService    = nh.advertiseService("emergency_detector/pause", pause);
      ros::ServiceServer resumeGestureRecognitionService   = nh.advertiseService("emergency_detector/resume", resume);
      ros::ServiceServer stopGestureRecognitionService     = nh.advertiseService("emergency_detector/terminate", terminate);

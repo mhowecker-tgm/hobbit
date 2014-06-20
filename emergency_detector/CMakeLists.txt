@@ -42,6 +42,11 @@ add_executable(emergency_detector
                src/RGBDAcquisition/tools/AmMatrix/solveLinearSystemGJ.h
                src/RGBDAcquisition/tools/AmMatrix/solveHomography.c
                src/RGBDAcquisition/tools/AmMatrix/solveHomography.h
+
+               src/RGBDAcquisition/processors/ViewpointChange/main.c
+               src/RGBDAcquisition/processors/ViewpointChange/ViewpointChange.h
+               src/RGBDAcquisition/processors/ViewpointChange/viewpoint_change.c
+               src/RGBDAcquisition/processors/ViewpointChange/viewpoint_change.h
               )
 
 target_link_libraries(emergency_detector ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})

@@ -4,6 +4,12 @@
 #include <string.h>
 
 #include "RGBDAcquisition/acquisitionSegment/AcquisitionSegment.h"
+#include "RGBDAcquisition/processors/ViewpointChange/ViewpointChange.h"
+
+
+ #include <opencv2/imgproc/imgproc_c.h>
+ #include <opencv2/legacy/legacy.hpp>
+ #include "opencv2/highgui/highgui.hpp"
 
 
 struct SegmentationFeaturesRGB segConfRGB={0};
@@ -11,8 +17,9 @@ struct SegmentationFeaturesDepth segConfDepth={0};
 unsigned int combinationMode=0;
 
 
+unsigned int doCVOutput=0;
 unsigned int emergencyDetected=0;
-float temperatureDetected=0.0;
+float temperatureDetected=36.0;
 
 
 int processNewTemperatureReading(float temperature)
@@ -58,11 +65,14 @@ unsigned short * copyDepth(unsigned short * source , unsigned int width , unsign
 }
 
 
+
 int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int colorWidth , unsigned int colorHeight ,
                                        unsigned short * depthFrame  , unsigned int depthWidth , unsigned int depthHeight ,
                                         void * calib ,
                                           unsigned int frameTimestamp )
 {
+  if ( (35<temperatureDetected) && (temperatureDetected<37)  )
+    {
         fprintf(stderr,"runServicesThatNeedColorAndDepth called \n");
         unsigned char * segmentedRGB = copyRGB(colorFrame ,colorWidth , colorHeight);
         unsigned short * segmentedDepth = copyDepth(depthFrame ,depthWidth , depthHeight);
@@ -79,14 +89,34 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
                                    combinationMode
                                 );
 
+      unsigned int depthAvg = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , 147 , 169 , 300 , 200 , 1000 );
+      fprintf(stderr,"RECT Score is %u \n",depthAvg);
+
+      if (doCVOutput)
+      {
+        cv::Mat segDepth(depthHeight,depthWidth,CV_16UC1 ,segmentedDepth,depthWidth);
+	    cv::Mat segDepthNorm;
+	    cv::normalize(segDepth,segDepthNorm,0,65536,CV_MINMAX,CV_16UC1);
+	    cv::imshow("emergency_detector segmented depth",segDepthNorm);
+      }
+
+      if (
+           ( depthAvg > 1000) &&
+           ( depthAvg < 2000)
+         )
+                       {
+                        fprintf(stderr,"\n\n EMERGENCY ?  \n\n");
+                        emergencyDetected=1; //<- We dont have a temperature sensor yet
+                       }
+
 
 
        fprintf(stderr,"Freeing\n");
        free (segmentedRGB);
        free (segmentedDepth);
        fprintf(stderr,"Done\n");
-
- return 0;
+    }
+ return emergencyDetected;
 }
 
 
