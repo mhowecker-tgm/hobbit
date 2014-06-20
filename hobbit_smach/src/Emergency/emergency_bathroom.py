@@ -24,7 +24,7 @@ from datetime import datetime, time
 import hobbit_smach.sos_call_import as sos_call
 import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.hobbit_move_import as hobbit_move
-
+import hobbit_smach.aal_lights_import as aal_lights
 
 class bcolors:
     HEADER = '\033[95m'
@@ -270,8 +270,7 @@ def main():
         )
         StateMachine.add(
             'ACTIVATE_LIGHTS',
-            Dummy(),
-            #ActivateLights(),
+            aal_lights.SetLights(active = True)
             transitions={'succeeded': 'MMUI_SAY_YesIAmComing',
                          'failed': 'MMUI_SAY_YesIAmComing',
                          'preempted': 'preempted'}

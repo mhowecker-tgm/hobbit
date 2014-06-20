@@ -25,6 +25,7 @@ from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 import hobbit_smach.sos_call_import as sos_call
 import hobbit_smach.speech_output_import as speech_output
 from datetime import datetime, time
+import hobbit_smach.aal_lights_import as aal_lights
 
 
 class bcolors:
@@ -271,8 +272,7 @@ def main():
         )
         StateMachine.add(
             'ACTIVATE_LIGHTS',
-            Dummy(),
-            #ActivateLights(),
+            aal_lights.SetLights(active = True)
             transitions={'succeeded': 'MMUI_CONFIRM_DoYouNeedHelp',
                          'failed': 'MMUI_CONFIRM_DoYouNeedHelp',
                          'preempted': 'preempted'}

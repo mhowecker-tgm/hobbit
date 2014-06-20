@@ -216,24 +216,6 @@ class TimeCheck(State):
             return 'night'
 
 
-class ActivateLights(State):
-    """
-    Class to activate the ligths in the users appartement during the night
-    """
-    def __init__(self):
-        State.__init__(
-            self,
-            outcomes=['succeeded', 'preempted', 'aborted']
-        )
-
-    def execute(self, ud):
-        if self.preempt_requested():
-            ud.result = String('preempted')
-            self.service_preempt()
-            return 'preempted'
-        # TODO: Call tcp client to communicate with the light switch
-        return 'succeeded'
-
 
 @cb_interface(input_keys=['room_name'])
 def set_nav_goal_cb(userdata, request):
