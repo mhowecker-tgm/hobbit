@@ -32,8 +32,8 @@ include_directories(... ${PCL_INCLUDE_DIRS})
 add_library(map_layer src/map_layer.cpp)
 target_link_libraries(map_layer ${PCL_LIBRARIES})
 
-add_library(nav_layer2 src/nav_layer2.cpp)
-target_link_libraries(nav_layer2 ${PCL_LIBRARIES})
+add_library(nav_layer src/nav_layer.cpp)
+target_link_libraries(nav_layer ${PCL_LIBRARIES})
 
 add_library(nav_layer_global src/nav_layer_global.cpp)
 target_link_libraries(nav_layer_global ${PCL_LIBRARIES})

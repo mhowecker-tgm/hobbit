@@ -1,6 +1,6 @@
 <class_libraries>
-<library path="lib/libnav_layer2">
-    <class type="costmap_2d::NavLayer2" base_class_type="costmap_2d::Layer">
+<library path="lib/libnav_layer">
+    <class type="costmap_2d::NavLayer" base_class_type="costmap_2d::Layer">
       <description>layer for RGB-D</description>
     </class>
   </library>
