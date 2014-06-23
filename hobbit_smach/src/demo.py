@@ -86,17 +86,20 @@ def learn_object():
     print "start client"
     client = actionlib.SimpleActionClient(
         'learn_object', GeneralHobbitAction)
-    client.wait_for_server()
-    print('connected to server')
-    par = []
-    goal = GeneralHobbitGoal(command=String('learn_object'),
+    if client.wait_for_server(rospy.Duration(2)):
+        print('connected to server')
+        par = []
+        goal = GeneralHobbitGoal(command=String('learn_object'),
                              previous_state=String('call_hobbit'),
                              parameters=par)
-    print('learn_object')
-    client.send_goal(goal)
-    print('waiting for result')
-    client.wait_for_result()
-    return client.get_result()
+        print('learn_object')
+        client.send_goal(goal)
+        print('waiting for result')
+        client.wait_for_result()
+        return client.get_result()
+    else:
+        print('Unable to connect to server')
+        return 'Timeout'
 
 
 def sos():
@@ -104,62 +107,68 @@ def sos():
     client = actionlib.SimpleActionClient(
         'emergency_user',
         GeneralHobbitAction)
-    client.wait_for_server()
-    print "connected to server"
-    par = []
-    par.append(String('user_initiated'))
-    goal = GeneralHobbitGoal(
+    if client.wait_for_server(rospy.Duration(2)):
+        print "connected to server"
+        par = []
+        par.append(String('user_initiated'))
+        goal = GeneralHobbitGoal(
         command=String('Emergency'),
         parameters=par)
-    print goal
-    print "send goal"
-    client.send_goal(goal)
-    print "waiting for result"
-    client.wait_for_result()
-
-    return client.get_result()
+        print goal
+        print "send goal"
+        client.send_goal(goal)
+        print "waiting for result"
+        client.wait_for_result()
+        return client.get_result()
+    else:
+        print('Unable to connect to server')
+        return 'Timeout'
 
 def away(input_cmd, index):
     times = [1, 2, 4, 6, 12, 24]
     print "start client"
     client = actionlib.SimpleActionClient(
         'away', GeneralHobbitAction)
-    client.wait_for_server()
-    print('connected to server')
-    par = []
-    par.append(String(times[index]))
-    goal = GeneralHobbitGoal(command=String(input_cmd),
-                             previous_state=String('call_hobbit'),
-                             parameters=par)
-    print(goal)
-    print(type(goal))
-    print(input_cmd)
-    client.send_goal(goal)
-    print('waiting for result')
-    client.wait_for_result()
-
-    return client.get_result()
+    if client.wait_for_server(rospy.Duration(2)):
+        print('connected to server')
+        par = []
+        par.append(String(times[index]))
+        goal = GeneralHobbitGoal(command=String(input_cmd),
+                     previous_state=String('call_hobbit'),
+                     parameters=par)
+        print(goal)
+        print(type(goal))
+        print(input_cmd)
+        client.send_goal(goal)
+        print('waiting for result')
+        client.wait_for_result()
+        return client.get_result()
+    else:
+        print('Unable to connect to server')
+        return 'Timeout'
 
 def goto(room, place):
     print "start client"
     client = actionlib.SimpleActionClient(
         'goto', GeneralHobbitAction)
-    client.wait_for_server()
-    print('connected to server')
-    par = []
-    par.append(String(room))
-    par.append(String(place))
-    goal = GeneralHobbitGoal(command=String('goto'),
-                             previous_state=String('call_hobbit'),
-                             parameters=par)
-    print(goal)
-    print(type(goal))
-    print('goto')
-    client.send_goal(goal)
-    print('waiting for result')
-    client.wait_for_result()
-
-    return client.get_result()
+    if client.wait_for_server(rospy.Duration(2)):
+        print('connected to server')
+        par = []
+        par.append(String(room))
+        par.append(String(place))
+        goal = GeneralHobbitGoal(command=String('goto'),
+                     previous_state=String('call_hobbit'),
+                     parameters=par)
+        print(goal)
+        print(type(goal))
+        print('goto')
+        client.send_goal(goal)
+        print('waiting for result')
+        client.wait_for_result()
+        return client.get_result()
+    else:
+        print('Unable to connect to server')
+        return 'Timeout'
 
 if __name__ == '__main__':
     listener()
