@@ -64,7 +64,7 @@ class CheckPoseRoom(smach.State):
         print('ROBOT: room name')
         print ud.robots_room_name
         print ud.robots_room_name2
-        print bcolors.ENDC 
+        print bcolors.ENDC
         #print(len(ud.search_poses))
         #if ud.room_name.data.lower() == ud.robots_room_name.name.lower():
         if ud.room_name.data.lower() == ud.robots_room_name2.data.lower():
@@ -217,15 +217,15 @@ class Check(smach.State):
         if ud.rotation_counter < 12:
             return 'progress'
         else:
-		print(bcolors.OKGREEN+'length of ud.search_poses: '+str(len(ud.search_poses))+bcolors.ENDC)
-		for position in ud.search_poses:
-		    # poses are only generated and published to show them in rviz
-		    self.poses.header.frame_id = 'map'
-		    pose = Pose()
-		    pose.position = Point(position.x, position.y, 0.0)
-		    pose.orientation = Quaternion(*tf.transformations.quaternion_from_euler(0, 0, position.theta)) 
-		    self.poses.poses.append(pose)
-		    #self.pub_poses.publish(self.poses)
+        print(bcolors.OKGREEN+'length of ud.search_poses: '+str(len(ud.search_poses))+bcolors.ENDC)
+        for position in ud.search_poses:
+            # poses are only generated and published to show them in rviz
+            self.poses.header.frame_id = 'map'
+            pose = Pose()
+            pose.position = Point(position.x, position.y, 0.0)
+            pose.orientation = Quaternion(*tf.transformations.quaternion_from_euler(0, 0, position.theta))
+            self.poses.poses.append(pose)
+            #self.pub_poses.publish(self.poses)
 
         ud.rotation_counter = 0
         self.pub_head.publish('down')
@@ -516,7 +516,7 @@ class PlanPath2(smach.State):
             self.search_poses.header.frame_id = 'map'
             search_pose = Pose()
             search_pose.position = Point(end_pose.x, end_pose.y, 0.0)
-            search_pose.orientation = Quaternion(*tf.transformations.quaternion_from_euler(0, 0, end_pose.theta)) 
+            search_pose.orientation = Quaternion(*tf.transformations.quaternion_from_euler(0, 0, end_pose.theta))
             self.search_poses.poses.append(search_pose)
             self.pub_search_poses.publish(self.search_poses)
             ud.search_poses.remove(position)
@@ -542,7 +542,7 @@ class MoveBase2(smach.State):
         self.pub_goal.publish(ud.robot_end_pose)
         rospy.sleep(2.0)
         return 'succeeded'
- 
+
 
 class MoveBase(smach.State):
     def __init__(self):
@@ -791,12 +791,12 @@ def main():
                             'preempted': 'preempted'}
             )
             smach.StateMachine.add(
-                'GET_CURRENT_ROOM2', 
+                'GET_CURRENT_ROOM2',
                 ServiceState(
-                    'getCurrentRoom', 
-                    GetName, 
+                    'getCurrentRoom',
+                    GetName,
                     response_key='robots_room_name'
-                ), 
+                ),
                 transitions={'succeeded':'GET_SEARCH_POSITIONS'})
             smach.StateMachine.add(
                 'GET_SEARCH_POSITIONS',
@@ -904,7 +904,7 @@ def main():
                     transitions={'succeeded':'OBJECT_DETECTED', 'preempted':'aborted', 'aborted':'MOVE_HEAD'})
             smach.StateMachine.add('OBJECT_DETECTED', ObjectDetected(), transitions={'succeeded':'GRASP_OBJECT', 'failure':'MOVE_HEAD', 'preempted':'aborted', 'aborted':'PLAN_PATH_2'})
             smach.StateMachine.add('GRASP_OBJECT', DummyGrasp(), transitions={'succeeded':'succeeded', 'failure':'aborted', 'preempted':'aborted'})
-            
+
 
         smach.StateMachine.add('INIT', Init(), transitions={'succeeded':'GET_ALL_POSITIONS', 'canceled':'CLEAN_UP'})
         smach.StateMachine.add('GET_ALL_POSITIONS', ServiceState('getRooms', GetRooms, response_key='response'), transitions={'succeeded':'GET_ROBOT_POSE'})

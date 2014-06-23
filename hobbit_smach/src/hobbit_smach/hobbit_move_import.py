@@ -9,7 +9,7 @@ import roslib
 roslib.load_manifest(PKG)
 import rospy
 
-from smach import State, Sequence, Concurrence, StateMachine
+from smach import State, Sequence, Concurrence, StateMachine, Iterator
 from smach_ros import ServiceState
 from hobbit_msgs.srv import GetCoordinates, GetCoordinatesRequest
 from std_msgs.msg import String
@@ -259,23 +259,69 @@ def rotateRobot(angle=0, frame='/map'):
     frame: defaults to /map
     """
 
-    seq = Sequence(
-        outcomes=['succeeded', 'preempted', 'aborted'],
-        connector_outcome='succeeded'
-    )
-    frame = '/map'
+    # seq = Sequence(
+    #     outcomes=['succeeded', 'preempted', 'aborted'],
+    #     connector_outcome='succeeded'
+    # )
+    # frame = '/map'
 
-    with seq:
-        Sequence.add('GET_ROBOT_POSE', move_base.ReadRobotPositionState())
-        Sequence.add('SET_ROT_GOAL', SetRotationGoal(angle=angle/4))
-        Sequence.add('ROTATE_ROBOT', move_base.MoveBaseState(frame))
-        Sequence.add('SET_ROT_GOAL_2', SetRotationGoal(angle=angle/4))
-        Sequence.add('ROTATE_ROBOT_2', move_base.MoveBaseState(frame))
-        Sequence.add('SET_ROT_GOAL_3', SetRotationGoal(angle=angle/4))
-        Sequence.add('ROTATE_ROBOT_3', move_base.MoveBaseState(frame))
-        Sequence.add('SET_ROT_GOAL_4', SetRotationGoal(angle=angle/4))
-        Sequence.add('ROTATE_ROBOT_4', move_base.MoveBaseState(frame))
-        return seq
+    # with seq:
+    #     Sequence.add('GET_ROBOT_POSE', move_base.ReadRobotPositionState())
+    #     Sequence.add('SET_ROT_GOAL', SetRotationGoal(angle=angle/4))
+    #     Sequence.add('ROTATE_ROBOT', move_base.MoveBaseState(frame))
+    #     Sequence.add('SET_ROT_GOAL_2', SetRotationGoal(angle=angle/4))
+    #     Sequence.add('ROTATE_ROBOT_2', move_base.MoveBaseState(frame))
+    #     Sequence.add('SET_ROT_GOAL_3', SetRotationGoal(angle=angle/4))
+    #     Sequence.add('ROTATE_ROBOT_3', move_base.MoveBaseState(frame))
+    #     Sequence.add('SET_ROT_GOAL_4', SetRotationGoal(angle=angle/4))
+    #     Sequence.add('ROTATE_ROBOT_4', move_base.MoveBaseState(frame))
+    #     return seq
+
+    steps = 12
+    print('angle:')
+    print(angle)
+    sm = StateMachine(
+        outcomes=['succeeded', 'preempted', 'aborted']
+    )
+    sm.userdata.degree = angle
+    with sm:
+        rot_it = Iterator(
+            outcomes=['succeeded', 'preempted', 'aborted'],
+            input_keys=['degree'],
+            it=lambda: range(0, steps),
+            it_label='index',
+            exhausted_outcome='aborted'
+        )
+
+        with rot_it:
+            rot_sm = StateMachine(
+                outcomes=['succeeded', 'preempted', 'aborted']
+            )
+
+            with rot_sm:
+                StateMachine.add(
+                    'GET_ROBOT_POSE',
+                    move_base.ReadRobotPositionState())
+                StateMachine.add(
+                    'SET_ROT_GOAL',
+                    SetRotationGoal(angle=angle/12))
+                StateMachine.add(
+                    'ROTATE_ROBOT',
+                    move_base.MoveBaseState(frame))
+
+            Iterator.set_contained_state(
+                'CONTAINER_STATE',
+                rot_sm,
+                loop_outcomes='continue')
+        StateMachine.add(
+            'ITERATOR',
+            rot_it,
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'aborted',
+                         'preempted': 'preempted'}
+        )
+    return sm
+
 
 
 def get_set_nav_goal_state(room_name=None, location_name='dock'):
