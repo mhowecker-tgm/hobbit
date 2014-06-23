@@ -26,7 +26,7 @@ import hobbit_smach.hobbit_move_import as hobbit_move
 from hobbit_smach import bcolors
 from rgbd_acquisition.msg import Person
 import hobbit_smach.head_move_import as head_move
-from uashh_smach.util import SleepState, WaitForMsgState
+from uashh_smach.
 
 class bcolors:
     HEADER = '\033[95m'
@@ -541,12 +541,26 @@ def main():
             detect_sm,
             transitions={'succeeded': 'SET_SUCCESS',
                          'preempted': 'CLEAN_UP',
+                         'aborted': 'WAIT_1'}
+        )
+        smach.StateMachine.add(
+            'WAIT_1',
+            util.SleepState(duration=2),
+            transitions={'succeeded': 'DETECTION_2',
+                         'preempted': 'CLEAN_UP',
                          'aborted': 'DETECTION_2'}
         )
         smach.StateMachine.add(
             'DETECTION_2',
             detect_sm,
             transitions={'succeeded': 'SET_SUCCESS',
+                         'preempted': 'preempted',
+                         'aborted': 'WAIT_2'}
+        )
+        smach.StateMachine.add(
+            'WAIT_2',
+            util.SleepState(duration=2),
+            transitions={'succeeded': 'GET_ROBOT_POSE',
                          'preempted': 'preempted',
                          'aborted': 'GET_ROBOT_POSE'}
         )
