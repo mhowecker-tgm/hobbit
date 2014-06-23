@@ -12,6 +12,9 @@
 #include <std_msgs/Float32.h>
 #include <interfaces_mira/MiraRobot.h>
 
+#include <ros/subscribe_options.h>
+#include <ros/callback_queue.h>
+
 MiraRobotDrive::MiraRobotDrive() : MiraRobotModule(std::string ("Drive")) {
 }
 
@@ -36,12 +39,20 @@ void MiraRobotDrive::initialize()
 
   cmd_vel_subscriber_ = robot_->getRosNode().subscribe("/cmd_vel", 1000, &MiraRobotDrive::velocity_command_callback,this);
 
-  discrete_sub = robot_->getRosNode().subscribe("/DiscreteMotionCmd", 1, &MiraRobotDrive::discrete_motion_cmd_callback, this);
+  ros::SubscribeOptions ops = ros::SubscribeOptions::create<std_msgs::String>("/DiscreteMotionCmd",1, boost::bind(&MiraRobotDrive::discrete_motion_cmd_callback, this, _1),ros::VoidPtr(),&robot_->getMyQueue());
+
+  discrete_sub = robot_->getRosNode().subscribe(ops);
+
+  //discrete_sub = robot_->getRosNode().subscribe("/DiscreteMotionCmd", 1, &MiraRobotDrive::discrete_motion_cmd_callback, this);
   
   reset_motor_stop_service_ = robot_->getRosNode().advertiseService("/reset_motorstop", &MiraRobotDrive::reset_motor_stop, this);
   reset_odometry_service_ = robot_->getRosNode().advertiseService("/reset_odometry", &MiraRobotDrive::reset_odometry, this);
   emergency_stop_service_ = robot_->getRosNode().advertiseService("/emergency_stop", &MiraRobotDrive::emergency_stop, this);
   enable_motors_service_ = robot_->getRosNode().advertiseService("/enable_motors", &MiraRobotDrive::enable_motors, this);
+
+
+   this->callback_queue_thread_ = boost::thread(boost::bind(&MiraRobotDrive::QueueThread, this));
+
 }
 
 void MiraRobotDrive::velocity_command_callback(const geometry_msgs::Twist::ConstPtr& msg) 
@@ -92,7 +103,9 @@ void MiraRobotDrive::discrete_motion_cmd_callback(const std_msgs::String::ConstP
         mira::RPCFuture<void> r = robot_->getMiraAuthority().callService<void>("/robot/Robot","driveDistance", v, t, vMax);
 	r.wait();
 
+        std::cout << "sleep " << std::endl;
 	sleep (t);
+	std::cout << "done " << std::endl;
 	set_mira_param_("MainControlUnit.DriveMode", "0");
 	
 
@@ -108,7 +121,7 @@ void MiraRobotDrive::discrete_motion_cmd_callback(const std_msgs::String::ConstP
 	int sign = 1;
 	if (MotionValue < 0) sign = -1;
 
-	float rot_speed = sign*10*M_PI/180; //FIXME
+	float rot_speed = sign*25*M_PI/180; //FIXME
 	float vMax = 0.1; //FIXME
         float t= MotionValue*M_PI/(180*rot_speed);
 
@@ -119,7 +132,9 @@ void MiraRobotDrive::discrete_motion_cmd_callback(const std_msgs::String::ConstP
         mira::RPCFuture<void> r = robot_->getMiraAuthority().callService<void>("/robot/Robot","driveDistance", v, t, vMax);
 
 	r.wait();
+	std::cout << "sleep " << std::endl;
 	sleep (t);
+	std::cout << "done " << std::endl;
 	set_mira_param_("MainControlUnit.DriveMode", "0");
 
   }
@@ -259,4 +274,12 @@ bool MiraRobotDrive::enable_motors(mira_msgs::EnableMotors::Request &req, mira_m
   r.get();
 
   return true;
+}
+
+void MiraRobotDrive::QueueThread() 
+{
+     while ((&robot_->getRosNode())->ok()) 
+     {
+       (robot_->getMyQueue()).callAvailable(ros::WallDuration());
+     }
 }

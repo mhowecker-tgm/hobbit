@@ -17,6 +17,8 @@
 #include <vector>
 #include <string>
 
+#include <ros/callback_queue.h>
+
 class MiraRobot{
 public:
   MiraRobot(std::vector<std::string> modules);
@@ -24,6 +26,7 @@ public:
 
   mira::Authority& getMiraAuthority();
   ros::NodeHandle& getRosNode();
+  ros::CallbackQueue& getMyQueue();
 
   void initialize();
   void spin();
@@ -37,6 +40,8 @@ private:
   ros::NodeHandle node_;
   std::vector<MiraRobotModule*> modules_;
   std::vector< boost::function<void ()> > spin_functions_;
+
+  ros::CallbackQueue my_queue; 
 
 };
 

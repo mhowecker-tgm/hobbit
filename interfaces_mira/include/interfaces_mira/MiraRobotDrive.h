@@ -64,6 +64,9 @@ ros::ServiceServer enable_motors_service_;
 
 ros::Publisher state_pub;
 
+boost::thread callback_queue_thread_;
+void QueueThread();
+
 };
 
 #endif
