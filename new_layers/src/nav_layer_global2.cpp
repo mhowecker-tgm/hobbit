@@ -405,9 +405,9 @@
    min_j = 0;
    max_j = size_y_;
 
-   //std::cout << "c_num " << c_num << std::endl;
+   int c_num_count = 5;
 
-   if (c_num < 5)
+   if (c_num < c_num_count)
    {
      c_num++;
      return;
@@ -415,7 +415,7 @@
 
    unsigned char* master = master_grid.getCharMap();
 	
-   if(c_num == 5)  //the robot should start at a clean area with no obstacles
+   if(c_num == c_num_count)  //the robot should start at a clean area with no obstacles!!
    {
 	   for (int it_i= 0; it_i<size_x_; it_i++)
 	   {
