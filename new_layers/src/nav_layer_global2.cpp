@@ -53,7 +53,7 @@
  
      source_node.param("topic", topic, source);
      source_node.param("sensor_frame", sensor_frame, std::string(""));
-     source_node.param("observation_persistence", observation_keep_time, 0.0);
+     source_node.param("observation_persistence", observation_keep_time, 1.0);
      source_node.param("expected_update_rate", expected_update_rate, 0.0);
      source_node.param("data_type", data_type, std::string("PointCloud"));
      source_node.param("min_obstacle_height", min_obstacle_height, 0.0);
@@ -186,6 +186,8 @@
    min_range_cells = cellDistance(min_range);
    costmap_copy = new unsigned char[4*min_range_cells];
 
+   //std::cout << "min_range " << min_range << std::endl;
+
    int size_x_cells = getSizeInCellsX();
    int size_y_cells = getSizeInCellsY();
    std::cout << "size_x " << size_x_cells << std::endl;
@@ -306,7 +308,11 @@
  {
    //std::cout << "updateBounds" << std::endl;
    if (rolling_window_)
+   {
+     std::cout << "rolling window" << std::endl;
      updateOrigin(robot_x - getSizeInMetersX() / 2, robot_y - getSizeInMetersY() / 2);
+	
+   }
    if (!enabled_)
      return;
    if (has_been_reset_)
@@ -399,11 +405,6 @@
    // The footprint layer clears the footprint in this NavLayerGlobal2
    // before we merge this obstacle layer into the master_grid.
    //footprint_layer_.updateCosts(*this, min_i, min_j, max_i, max_j);
- 
-   min_i = 0;
-   max_i = size_x_;
-   min_j = 0;
-   max_j = size_y_;
 
    int c_num_count = 5;
 
@@ -433,7 +434,7 @@
 	   c_num++;
    }
 
-   footprint_layer_.updateCosts(*this, min_i, min_j, max_i, max_j);
+   //footprint_layer_.updateCosts(*this, min_i, min_j, max_i, max_j);
 
    for (int it_i= 0; it_i<size_x_; it_i++)
    {
