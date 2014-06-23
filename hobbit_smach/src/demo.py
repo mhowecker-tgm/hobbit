@@ -29,21 +29,25 @@ def callback(data):
     try:
         if data.command[:-1] == 'C_AWAY':
             print('START User goes away:')
-        index = int(data.command[-1] -1)
-        away('away', index)
+            index = int(data.command[-1] -1)
+            away('away', index)
         elif data.command[:-1] == 'C_SLEEP':
         print('START User goes to sleep:')
-        index = int(data.command[-1] -1)
-        away('sleep', index)
+            index = int(data.command[-1] -1)
+            away('sleep', index)
         elif data.command == 'C_GOTOPOINT':
         print('START goto point:')
-        room, place = data.params[0].value.lower().split(' ')
-        print(room)
-        print(place)
-        goto(room, place)
+            room, place = data.params[0].value.lower().split(' ')
+            print(room)
+            print(place)
+            goto(room, place)
         elif data.command == 'C_LEARN':
         print('START learn object:')
-        learn_object()
+            learn_object()
+        elif data.event == 'E_CALLHOBBIT':
+            print(type(data.params))
+            print(data.params)
+
     except AttributeError as e:
         print('EVENT: Not suitable here.')
         print(e)
