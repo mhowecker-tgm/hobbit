@@ -4,7 +4,7 @@ import roslib
 roslib.load_manifest('hobbit_smach')
 import rospy
 import actionlib
-from hobbit_msgs.msg import Command, Event
+from hobbit_msgs.msg import Command, Event, Parameter
 from hobbit_msgs.msg import GeneralHobbitAction, GeneralHobbitGoal
 from std_msgs.msg import String
 
@@ -15,8 +15,8 @@ def callback(data):
     print(data.command)
     try:
         if data.command == 'C_LEARN':
-        print('START learn object:')
-        learn_object()
+            print('START learn object:')
+            learn_object()
     except AttributeError as e:
         print('Command: Not suitable here.')
         print(e)
@@ -29,33 +29,45 @@ def callback(data):
     try:
         if data.command[:-1] == 'C_AWAY':
             print('START User goes away:')
-            index = int(data.command[-1] -1)
-            away('away', index)
+        #index = data.command[-1] -1 
+            away('away', 0)
         elif data.command[:-1] == 'C_SLEEP':
-        print('START User goes to sleep:')
-            index = int(data.command[-1] -1)
-            away('sleep', index)
+            print('START User goes to sleep:')
+            #index = data.command[-1] - 1
+            away('sleep', 0)
         elif data.command == 'C_GOTOPOINT':
-        print('START goto point:')
+            print('START goto point:')
             room, place = data.params[0].value.lower().split(' ')
             print(room)
             print(place)
             goto(room, place)
         elif data.command == 'C_LEARN':
-        print('START learn object:')
+            print('START learn object:')
             learn_object()
-        elif data.event == 'E_CALLHOBBIT':
-            print(type(data.params))
-            print(data.params)
-
+        elif data.command == 'C_LEARN':
+            print('START learn object:')
+            learn_object()
     except AttributeError as e:
         print('EVENT: Not suitable here.')
         print(e)
 
     try:
         if data.event == 'E_HELP':
-        print('START User initiated emergency:')
-        sos()
+            print('START User initiated emergency:')
+            # sos()
+        elif data.event == 'E_CALLHOBBIT':
+            # print(type(data.params))
+            # print(data.params)
+            bathroom = Parameter('bathroom', 'true')
+            if bathroom in data.params:
+                print('Bathroom emergency button pressed')
+                # sos_bathroom()
+            else:
+                print('Call button pressed')
+                place = data.params[1].value 
+                goto(None, place)
+
+                
     except AttributeError as e:
         print('EVENT: Not suitable here.')
         print(e)
