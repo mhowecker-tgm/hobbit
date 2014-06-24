@@ -43,7 +43,7 @@ void broadcastDetectedFace(unsigned int frameNumber ,struct detectedFace * faceF
     fprintf(stderr,"Broadcasting a head \n");
 
      actualTimestamp=frameNumber;
-     actualConfidence=0.4; // We aren't particularly sure
+     actualConfidence=0.6; // We aren't particularly sure
      actualX=faceFound->headX;
      actualY=faceFound->headY;
      actualZ=faceFound->headZ;
