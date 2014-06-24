@@ -269,12 +269,12 @@ def rotateRobot(angle=0, frame='/map'):
         Sequence.add('GET_ROBOT_POSE', move_base.ReadRobotPositionState())
         Sequence.add('SET_ROT_GOAL', SetRotationGoal(angle=angle/4))
         Sequence.add('ROTATE_ROBOT', move_base.MoveBaseState(frame))
-        Sequence.add('SET_ROT_GOAL_2', SetRotationGoal(angle=angle/4))
-        Sequence.add('ROTATE_ROBOT_2', move_base.MoveBaseState(frame))
-        Sequence.add('SET_ROT_GOAL_3', SetRotationGoal(angle=angle/4))
-        Sequence.add('ROTATE_ROBOT_3', move_base.MoveBaseState(frame))
-        Sequence.add('SET_ROT_GOAL_4', SetRotationGoal(angle=angle/4))
-        Sequence.add('ROTATE_ROBOT_4', move_base.MoveBaseState(frame))
+        #Sequence.add('SET_ROT_GOAL_2', SetRotationGoal(angle=angle/4))
+        #Sequence.add('ROTATE_ROBOT_2', move_base.MoveBaseState(frame))
+        #Sequence.add('SET_ROT_GOAL_3', SetRotationGoal(angle=angle/4))
+        #Sequence.add('ROTATE_ROBOT_3', move_base.MoveBaseState(frame))
+        #Sequence.add('SET_ROT_GOAL_4', SetRotationGoal(angle=angle/4))
+        #Sequence.add('ROTATE_ROBOT_4', move_base.MoveBaseState(frame))
         return seq
 
     # steps = 12

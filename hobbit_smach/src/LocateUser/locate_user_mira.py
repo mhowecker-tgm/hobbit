@@ -3,6 +3,7 @@
 
 PKG = 'hobbit_msgs'
 NAME = 'LocateUser'
+steps = 12
 
 import roslib; roslib.load_manifest(PKG)
 import rospy
@@ -42,8 +43,54 @@ def disable(self):
         self.FAIL = ''
         self.ENDC = ''
 
+def detectUser():
+    sm = StateMachine(
+        outcomes=['succeeded', 'preempted', 'failed']
+    )
+    with sm:
+        StateMachine.add(
+            'ROTATE',
+            hobbit_move.rotateRobot(angle=360/steps, frame='/map'),
+            transitions={'succeeded': 'DETECTION',
+                         'aborted': 'failed',
+                         'preempted': 'preempted'}
+        )
+        StateMachine.add(
+            'DETECTION',
+            WaitForMsgState(
+                '/persons',
+                Person,
+                userdetection_cb,
+                timeout=1),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'COUNTER',
+                         'preempted': 'preempted'}
+        )
+        StateMachine.add(
+            'COUNTER',
+            UserCounter(),
+            transitions={'succeeded': 'ROTATE',
+                         'aborted': 'failed',
+                         'preempted': 'preempted'}
+        )
+        return sm
 
+class UserCounter(smach.State):
+    def __init__(self):
+        smach.State.__init__(self, outcomes=['succeeded', 'preempted', 'aborted'])
+        self.counter = 0
 
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        print('Counter: %d' % self.counter)
+        ud.counter += 1
+        if ud.counter < 12:
+            return 'succeeded'
+        else:
+            ud.counter = 0
+            return 'aborted'
 
 class Init(smach.State):
     """Class to initialize certain parameters"""
@@ -198,7 +245,10 @@ class PlanPath(smach.State):
                     print(position['theta'])
                 else:
                     pass
+        print('len(ud.visited_places) %d' % len(ud.visited_places))
+        print('len(ud.positions) %d' % len(ud.positions))
         if len(ud.visited_places) == len(ud.positions):
+            print bcolors.FAIL+'Visited all positions'+bcolors.ENDC
             return 'failure'
         else:
             ud.visited_places = []
@@ -299,11 +349,14 @@ def userdetection_cb(msg, ud):
     print bcolors.OKGREEN + 'received message: '
     print msg
     print bcolors.ENDC
-    if msg.confidence > 0.6:
-        print bcolors.OKGREEN + 'User detected!' + bcolors.ENDC
+    if 0.39 < msg.confidence <= 0.61:
+        print bcolors.OKGREEN + 'Face detected!' + bcolors.ENDC
+        return True
+    elif msg.confidence > 0.61:
+        print bcolors.OKGREEN + 'Skeleton detected!' + bcolors.ENDC
         return True
     else:
-        print bcolors.WARNING + 'NO USER' + bcolors.ENDC
+        print bcolors.FAIL+ 'NO USER' + bcolors.ENDC
         return False
 
 
@@ -535,31 +588,38 @@ def main():
             util.SleepState(duration=1),
             transitions={'succeeded': 'DETECTION_1'}
         )
-        smach.StateMachine.add(
-            'DETECTION_1',
-            detect_sm,
-            transitions={'succeeded': 'SET_SUCCESS',
-                         'preempted': 'CLEAN_UP',
-                         'aborted': 'WAIT_1'}
+        StateMachine.add(
+            'USER_DETECTION',
+            detectUser(),
+            transitions={'succeeded': 'succeeded',
+                         'preempted': 'preempted',
+                         'aborted': 'PLAN_PATH'}
         )
-        smach.StateMachine.add(
-            'WAIT_1',
-            util.SleepState(duration=2),
-            transitions={'succeeded': 'DETECTION_2',
-                         'preempted': 'CLEAN_UP'}
-        )
-        smach.StateMachine.add(
-            'DETECTION_2',
-            detect_sm,
-            transitions={'succeeded': 'SET_SUCCESS',
-                         'preempted': 'CLEAN_UP',
-                         'aborted': 'WAIT_2'}
-        )
-        smach.StateMachine.add(
-            'WAIT_2',
-            util.SleepState(duration=2),
-            transitions={'succeeded': 'GET_ROBOT_POSE',
-                         'preempted': 'CLEAN_UP'}
+        #smach.StateMachine.add(
+        #    'DETECTION_1',
+        #    detect_sm,
+        #    transitions={'succeeded': 'SET_SUCCESS',
+        #                 'preempted': 'CLEAN_UP',
+        #                 'aborted': 'WAIT_1'}
+        #)
+        #smach.StateMachine.add(
+        #    'WAIT_1',
+        #    util.SleepState(duration=2),
+        #    transitions={'succeeded': 'DETECTION_2',
+        #                 'preempted': 'CLEAN_UP'}
+        #)
+        #smach.StateMachine.add(
+        #    'DETECTION_2',
+        #    detect_sm,
+        #    transitions={'succeeded': 'SET_SUCCESS',
+        #                 'preempted': 'CLEAN_UP',
+        #                 'aborted': 'WAIT_2'}
+        #)
+        #smach.StateMachine.add(
+        #    'WAIT_2',
+        #    util.SleepState(duration=2),
+        #    transitions={'succeeded': 'GET_ROBOT_POSE',
+        #                 'preempted': 'CLEAN_UP'}
         )
         #smach.StateMachine.add(
         #    'ROTATE_180',
