@@ -26,7 +26,6 @@ import hobbit_smach.hobbit_move_import as hobbit_move
 from hobbit_smach import bcolors
 from rgbd_acquisition.msg import Person
 import hobbit_smach.head_move_import as head_move
-from uashh_smach.
 
 class bcolors:
     HEADER = '\033[95m'
@@ -389,13 +388,13 @@ def main():
         )
 
 
-    with cc:
-        Concurrence.add(
-            'ROTATE',
-            hobbit_move.rotateRobot(angle=360, frame='/map'))
-        Concurrence.add(
-            'DETECT_USER',
-            seq)
+    #with cc:
+    #    Concurrence.add(
+    #        'ROTATE',
+    #        hobbit_move.rotateRobot(angle=360, frame='/map'))
+    #    Concurrence.add(
+    #        'DETECT_USER',
+    #        seq)
 
     detect_sm = smach.StateMachine(
         outcomes=['succeeded', 'aborted', 'preempted'],
@@ -416,10 +415,10 @@ def main():
             util.WaitForMsgState('/DiscreteMotionState',
                                  String,
                                  rotating_cb,
-                                 timeout=0.5
+                                 timeout=1
                                  ),
             transitions={'aborted':'ROTATION',
-                         'succeeded':'ROTATION_FINISHED',
+                         'succeeded':'USER_DETECTION',
                          'preempted':'preempted'}
         )
         smach.StateMachine.add(
@@ -427,7 +426,7 @@ def main():
             util.WaitForMsgState('/DiscreteMotionState',
                                  String,
                                  rotation_cb,
-                                 timeout=0.5
+                                 timeout=1
                                  ),
             transitions={'aborted':'USER_DETECTION',
                          'preempted':'preempted',
@@ -533,7 +532,7 @@ def main():
         )
         smach.StateMachine.add(
             'WAIT',
-            SleepState(duration=1),
+            util.SleepState(duration=1),
             transitions={'succeeded': 'DETECTION_1'}
         )
         smach.StateMachine.add(
@@ -547,22 +546,20 @@ def main():
             'WAIT_1',
             util.SleepState(duration=2),
             transitions={'succeeded': 'DETECTION_2',
-                         'preempted': 'CLEAN_UP',
-                         'aborted': 'DETECTION_2'}
+                         'preempted': 'CLEAN_UP'}
         )
         smach.StateMachine.add(
             'DETECTION_2',
             detect_sm,
             transitions={'succeeded': 'SET_SUCCESS',
-                         'preempted': 'preempted',
+                         'preempted': 'CLEAN_UP',
                          'aborted': 'WAIT_2'}
         )
         smach.StateMachine.add(
             'WAIT_2',
             util.SleepState(duration=2),
             transitions={'succeeded': 'GET_ROBOT_POSE',
-                         'preempted': 'preempted',
-                         'aborted': 'GET_ROBOT_POSE'}
+                         'preempted': 'CLEAN_UP'}
         )
         #smach.StateMachine.add(
         #    'ROTATE_180',
