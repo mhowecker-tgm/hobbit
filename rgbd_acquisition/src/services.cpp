@@ -21,7 +21,8 @@ unsigned char dontPublishPointEvents=0;
 
 unsigned int actualTimestamp=0;
 unsigned int actualInFieldOfView=0;
-float actualX=0.0,actualY=0.0,actualZ=0.0,actualTheta=0.0,actualConfidence=0.0;
+float actualConfidence=0.5;
+float actualX=0.0,actualY=0.0,actualZ=0.0,actualTheta=0.0;
 
 
 void broadcastNewPerson()
@@ -149,7 +150,7 @@ void broadcastSkeleton(unsigned int frameNumber ,struct skeletonHuman * skeleton
      for ( i=0; i<8; i++ )
       {
        sprintf(tag,"bbox/point%u",i);
-       postPoseTransform(tag,/*-1.0**/skeletonFound->bbox[i].x/1000,/*-1.0**/skeletonFound->bbox[i].y/1000,skeletonFound->bbox[i].z/1000);
+       postPoseTransform(tag,/*-1.0**/skeletonFound->bbox[i].x/1000, -1.0* skeletonFound->bbox[i].y/1000,skeletonFound->bbox[i].z/1000);
       }
      broadcastNewPerson();
 

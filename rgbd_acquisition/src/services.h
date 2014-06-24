@@ -7,6 +7,10 @@
 extern unsigned char dontPublishPersons;
 extern unsigned char dontPublishPointEvents;
 
+extern float actualConfidence;
+
+void broadcastNewPerson();
+
 int registerServices(ros::NodeHandle * nh);
 
 

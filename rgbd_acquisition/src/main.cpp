@@ -44,7 +44,7 @@
 //These are the static declarations of the various parts of this ROS package
 int key = 0;
 double  virtual_baseline=0.0; //This is 0 and should be zero since we have a registered depth/rgb stream , however it can be changed to allow fake disparity to be generated
-volatile int paused = 0;
+volatile int paused = 0; 
 
 ros::NodeHandle * nhPtr=0;
 image_transport::Publisher pubRGB;
@@ -65,6 +65,14 @@ bool visualizeOn(std_srvs::Empty::Request& request, std_srvs::Empty::Response& r
 bool visualizeOff(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
     switchDrawOutTo(0);
+    return true;
+}
+
+
+bool trigger(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{ 
+    actualConfidence=0.5;
+    broadcastNewPerson();
     return true;
 }
 
@@ -314,6 +322,7 @@ int main(int argc, char **argv)
      ros::ServiceServer terminateService        = nh.advertiseService(name+"/terminate", terminate);
      ros::ServiceServer pauseService            = nh.advertiseService(name+"/pause_peopletracker", pause);
      ros::ServiceServer resumeService           = nh.advertiseService(name+"/resume_peopletracker", resume);
+     ros::ServiceServer triggerPeopleTracker    = nh.advertiseService(name+"/trigger_peopletracker", trigger);
      ros::ServiceServer pausePointingService    = nh.advertiseService(name+"/pause_pointing_gesture_messages", pausePointingMessages);
      ros::ServiceServer resumePointingService   = nh.advertiseService(name+"/resume_pointing_gesture_messages", resumePointingMessages);
      ros::ServiceServer setQualityService       = nh.advertiseService(name+"/setQuality", setQuality);
