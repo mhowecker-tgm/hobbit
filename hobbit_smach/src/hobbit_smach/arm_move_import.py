@@ -13,9 +13,29 @@ from smach import Sequence, State
 from uashh_smach.util import SleepState
 from ArmControllerClientFunctions import ArmClientFunctions
 
+class ArmClientSingleton(object):
+    """To avoid running multiple arm clients, this singleton class
+    provides one ArmClientFunctions that is initialised and retrieved
+    via class methods init() and get()
+    """
+    _arm = None
+
+    @classmethod
+    def init(cls):
+        """Ignore multiple calls."""
+        if cls._arm is None:
+            cls._arm = ArmClientFunctions('192.168.2.190')
+
+    @classmethod
+    def get(cls):
+        """Does initialise if needed, too."""
+        cls.init()
+        return cls._arm
+
 if not DEBUG:
-    arm = ArmClientFunctions('192.168.2.190')
-    arm.SetEnableArm()
+    arm = ArmClientSingleton.get()
+    #arm = ArmClientFunctions('192.168.2.190')
+    #arm.SetEnableArm()
 else:
     arm = True
 
