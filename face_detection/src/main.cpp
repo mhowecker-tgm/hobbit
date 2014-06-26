@@ -26,6 +26,7 @@
 #include <image_transport/image_transport.h>
 
 #include "face_detection/SetQuality.h"
+#include "FaceDetection.h"
 #include "calibration.h"
 #include "pose.h"
 #include "services.h"
@@ -63,6 +64,17 @@ message_filters::Subscriber<sensor_msgs::CameraInfo> *depth_cam_info_sub;
 //OpenCV
 cv::Mat rgb,depth;
 //----------------------------------------------------------
+
+
+
+bool strictFalsePositives(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{ 
+    ROS_INFO("Strict False Positive Discarding is now enabled");
+    useDepthHeadMinMaxSizeHeuristic=1;
+    useHistogramHeuristic=1;
+    return true;
+}
+
 
 bool visualizeOn(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
@@ -237,6 +249,7 @@ int main(int argc, char **argv)
 
 
      //We advertise the services we want accessible using "rosservice call *w/e*"
+     ros::ServiceServer strictFalsePositivesService = nh.advertiseService(name+"/strictFalsePositives" , strictFalsePositives);
      ros::ServiceServer visualizeOnService      = nh.advertiseService(name+"/visualize_on" , visualizeOn);
      ros::ServiceServer visualizeOffService     = nh.advertiseService(name+"/visualize_off", visualizeOff);
      ros::ServiceServer terminateService        = nh.advertiseService(name+"/terminate"    , terminate);
