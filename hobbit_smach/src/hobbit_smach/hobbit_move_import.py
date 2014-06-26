@@ -3,7 +3,7 @@
 
 PKG = 'hobbit_smach'
 NAME = 'hobbit_move'
-DEBUG = False
+DEBUG = True
 
 import roslib
 roslib.load_manifest(PKG)
@@ -267,7 +267,7 @@ def rotateRobot(angle=0, frame='/map'):
 
     with seq:
         Sequence.add('GET_ROBOT_POSE', move_base.ReadRobotPositionState())
-        Sequence.add('SET_ROT_GOAL', SetRotationGoal(angle=angle/4))
+        Sequence.add('SET_ROT_GOAL', SetRotationGoal(angle=angle))
         Sequence.add('ROTATE_ROBOT', move_base.MoveBaseState(frame))
         #Sequence.add('SET_ROT_GOAL_2', SetRotationGoal(angle=angle/4))
         #Sequence.add('ROTATE_ROBOT_2', move_base.MoveBaseState(frame))

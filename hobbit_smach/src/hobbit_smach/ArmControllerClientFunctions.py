@@ -146,6 +146,9 @@ class ArmClientFunctions():
         elif ReceiveDataList[0] == 'ArmAtPreGraspFromFloorPos':
             if ReceiveDataList[1]=='COMMAND_OK':
                 State = ArmControllerFunctions.CHAR_TO_BOOL(ReceiveDataList[2])
+        elif ReceiveDataList[0] == 'ArmAtPreGraspFromTablePos':
+            if ReceiveDataList[1]=='COMMAND_OK':
+                State = ArmControllerFunctions.CHAR_TO_BOOL(ReceiveDataList[2])
         elif ReceiveDataList[0] == 'ArmSoftLimitMax':
             if ReceiveDataList[1]=='COMMAND_OK':
                 State = ArmControllerFunctions.CHAR_TO_BOOL(ReceiveDataList[2])
@@ -211,6 +214,12 @@ class ArmClientFunctions():
     
     def SetMoveToPreGraspFromFloorPos(self):
         buf = 'SET;MoveToPreGraspFromFloorPos;'
+        ReceiveDataList = self.SendTCP(buf)
+        #ArmControllerFunctions.PublishToROS(ReceiveDataList)
+        return ReceiveDataList
+    
+    def SetMoveToPreGraspFromTablePos(self):
+        buf = 'SET;MoveToPreGraspFromTablePos;'
         ReceiveDataList = self.SendTCP(buf)
         #ArmControllerFunctions.PublishToROS(ReceiveDataList)
         return ReceiveDataList    

@@ -3,9 +3,12 @@ import rospy
 from rgbd_acquisition.msg import Person
 
 def callback(msg):
-    rospy.loginfo(rospy.get_caller_id()+"I heard %s",str(msg))
-    if msg.confidence > 0.5:
-        print('USER detected')
+    # rospy.loginfo(rospy.get_caller_id()+"I heard %s",str(msg))
+    print(rospy.Time.now())
+    if 0.39 < msg.confidence <= 0.65:
+        print('FACE')
+    elif msg.confidence > 0.65:
+        print('SKELETON')
     else:
         print('NO DETECTION!')
     

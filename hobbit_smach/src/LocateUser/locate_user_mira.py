@@ -44,20 +44,20 @@ def disable(self):
         self.ENDC = ''
 
 def detectUser():
-    sm = StateMachine(
+    sm = smach.StateMachine(
         outcomes=['succeeded', 'preempted', 'failed']
     )
     with sm:
-        StateMachine.add(
+        smach.StateMachine.add(
             'ROTATE',
             hobbit_move.rotateRobot(angle=360/steps, frame='/map'),
             transitions={'succeeded': 'DETECTION',
                          'aborted': 'failed',
                          'preempted': 'preempted'}
         )
-        StateMachine.add(
+        smach.StateMachine.add(
             'DETECTION',
-            WaitForMsgState(
+            util.WaitForMsgState(
                 '/persons',
                 Person,
                 userdetection_cb,
@@ -66,7 +66,7 @@ def detectUser():
                          'aborted': 'COUNTER',
                          'preempted': 'preempted'}
         )
-        StateMachine.add(
+        smach.StateMachine.add(
             'COUNTER',
             UserCounter(),
             transitions={'succeeded': 'ROTATE',
@@ -85,8 +85,8 @@ class UserCounter(smach.State):
             self.service_preempt()
             return 'preempted'
         print('Counter: %d' % self.counter)
-        ud.counter += 1
-        if ud.counter < 12:
+        self.counter += 1
+        if self.counter < 12:
             return 'succeeded'
         else:
             ud.counter = 0
@@ -586,14 +586,14 @@ def main():
         smach.StateMachine.add(
             'WAIT',
             util.SleepState(duration=1),
-            transitions={'succeeded': 'DETECTION_1'}
+            transitions={'succeeded': 'USER_DETECTION'}
         )
-        StateMachine.add(
+        smach.StateMachine.add(
             'USER_DETECTION',
             detectUser(),
             transitions={'succeeded': 'succeeded',
                          'preempted': 'preempted',
-                         'aborted': 'PLAN_PATH'}
+                         'failed': 'PLAN_PATH'}
         )
         #smach.StateMachine.add(
         #    'DETECTION_1',
@@ -620,7 +620,7 @@ def main():
         #    util.SleepState(duration=2),
         #    transitions={'succeeded': 'GET_ROBOT_POSE',
         #                 'preempted': 'CLEAN_UP'}
-        )
+        #)
         #smach.StateMachine.add(
         #    'ROTATE_180',
         #    Rotate180(),
