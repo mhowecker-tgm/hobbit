@@ -16,6 +16,10 @@ struct detectedFace
 
 
 
+extern int useDepthHeadMinMaxSizeHeuristic;
+extern int useHistogramHeuristic;
+
+
 
 int InitFaceDetection(char * haarCascadePath);
 int CloseFaceDetection() ;
