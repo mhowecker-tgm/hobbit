@@ -10,9 +10,6 @@ local_costmap:
   resolution: 0.025
   transform_tolerance: 0.25
   plugins:
-   -
-     name: footprint
-     type: "costmap_2d::FootprintLayer"
    - 
      name: my_obstacle_layer
      type: "costmap_2d::NavLayer"

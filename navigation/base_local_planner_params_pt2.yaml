@@ -25,9 +25,9 @@ TrajectoryPlannerROS:
 #  controller_frequency: 10.0
 
   meter_scoring: false
-  path_distance_bias: 1.2
-  goal_distance_bias: 0.6
-  occdist_scale: 0.01
+  p_dist_scale: 0.6
+  g_dist_scale: 0.2
+  occdist_scale: 0.2
   heading_lookahead: 0.325
   heading_scoring: true
   heading_scoring_timestep: 0.8
