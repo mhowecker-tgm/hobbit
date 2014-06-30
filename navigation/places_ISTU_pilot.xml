@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<rooms>
+	<room>
+		<name>livingroom</name>
+		<vertices>
+			<vertex x="0.200000" y="4.550000" />
+			<vertex x="-0.700000" y="0.500000" />
+			<vertex x="0.250000" y="0.200000" />
+			<vertex x="0.150001" y="-0.250000" />
+			<vertex x="1.300000" y="-0.400001" />
+			<vertex x="1.300000" y="0.599999" />
+			<vertex x="1.650001" y="0.500000" />
+			<vertex x="1.850000" y="1.200000" />
+			<vertex x="2.650001" y="1.150000" />
+			<vertex x="2.750000" y="2.100000" />
+			<vertex x="2.300000" y="2.200000" />
+			<vertex x="2.650001" y="4.150000" />
+		</vertices>
+		<places>
+			<place>
+				<name>default</name>
+				<type>default</type>
+				<pose x="0.946370" y="1.980075" theta="-0.199628" />
+			</place>
+			<place>
+				<name>userchair</name>
+				<type>goto</type>
+				<pose x="1.893907" y="2.787283" theta="1.218919" />
+			</place>
+			<place>
+				<name>armchair</name>
+				<type>goTo</type>
+				<pose x="0.724281" y="1.128806" theta="-2.206060" />
+			</place>
+		</places>
+	</room>
+	<room>
+		<name>videoroom</name>
+		<vertices>
+			<vertex x="0.050000" y="-0.350000" />
+			<vertex x="-0.099999" y="-0.600000" />
+			<vertex x="-1.200000" y="-0.150001" />
+			<vertex x="-1.849999" y="-1.750000" />
+			<vertex x="-0.400000" y="-2.250000" />
+			<vertex x="0.400001" y="-2.550000" />
+			<vertex x="1.250000" y="-2.750000" />
+			<vertex x="1.700000" y="-2.300000" />
+			<vertex x="1.900001" y="-1.200000" />
+			<vertex x="1.250000" y="-0.600000" />
+		</vertices>
+		<places>
+			<place>
+				<name>center</name>
+				<type>goTo</type>
+				<pose x="0.374868" y="-1.507294" theta="-0.234119" />
+			</place>
+		</places>
+	</room>
+	<room>
+		<name>office</name>
+		<vertices>
+			<vertex x="-1.800000" y="-2.000000" />
+			<vertex x="-2.900000" y="-4.600000" />
+			<vertex x="2.250000" y="-6.750000" />
+			<vertex x="3.500000" y="-3.450000" />
+		</vertices>
+	</room>
+</rooms>
