@@ -37,7 +37,7 @@
 
 	<namespace name="robot">
 	    <link child="TopCameraMountFrame" parent="RobotFrame">
-		<X>0.5</X>
+		<X>0.5</X>  <!-- FIXME -0.2? -->
 		<Y>0.02</Y>
 		<Z>1.2</Z>
 		<Yaw>0</Yaw>

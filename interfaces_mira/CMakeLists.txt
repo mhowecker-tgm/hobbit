@@ -108,7 +108,8 @@ add_executable(interfaces_node src/interfaces_node.cpp
 							src/MiraGetPath.cpp
 							src/MiraGoRecharge.cpp
 							src/MiraRobotDrive.cpp
-							src/MiraRobotCharger.cpp)
+							src/MiraRobotCharger.cpp
+							src/MiraRobotDriveRos.cpp)
 # make sure configure headers are build before node using them
 add_dependencies(interfaces_node ${PROJECT_NAME}_gencfg mira_msgs_gencpp) #FIXME
 
