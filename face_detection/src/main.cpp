@@ -71,6 +71,7 @@ bool strictFalsePositives(std_srvs::Empty::Request& request, std_srvs::Empty::Re
 { 
     ROS_INFO("Strict False Positive Discarding is now enabled");
     useDepthHeadMinMaxSizeHeuristic=1;
+    useDepthClassifier=1;
     useHistogramHeuristic=1;
     return true;
 }
