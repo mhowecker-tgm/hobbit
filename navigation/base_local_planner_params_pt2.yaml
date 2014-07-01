@@ -22,18 +22,18 @@ TrajectoryPlannerROS:
   angular_sim_granularity: 0.05
   vx_samples: 8
   vtheta_samples: 20
-#  controller_frequency: 10.0
+  controller_frequency: 2.0
 
   meter_scoring: false
-  p_dist_scale: 0.6
-  g_dist_scale: 0.2
-  occdist_scale: 0.2
+  p_dist_scale: 0.8
+  g_dist_scale: 0.6
+  occdist_scale: 0.05
   heading_lookahead: 0.325
   heading_scoring: true
   heading_scoring_timestep: 0.8
   dwa: false
   publish_cost_grid_pc: false
   goal_frame_id: odom
-  oscillation_reset_dist: 0.05
+  oscillation_reset_dist: 0.1
   prune_plan: true
 

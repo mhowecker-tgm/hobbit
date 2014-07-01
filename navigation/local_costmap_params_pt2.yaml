@@ -12,7 +12,7 @@ local_costmap:
   plugins:
    - 
      name: my_obstacle_layer
-     type: "costmap_2d::NavLayer"
+     type: "costmap_2d::ObstacleLayer"
    - 
      name: inflater
      type: "costmap_2d::InflationLayer"

@@ -1,13 +1,12 @@
-obstacle_range: 1.75
-raytrace_range: 1.0
+raytrace_range: 3.0
 
 footprint: [[0.19, 0.25], [-0.39, 0.25], [-0.39, -0.32], [0.19, -0.32]]
 inflation_radius: 0.32
 
 my_layer:
   observation_sources: laser_scan_sensor
-  laser_scan_sensor: {sensor_frame: loc_link, data_type: LaserScan, topic: loc_scan, marking: true, clearing: false, min_range: 0.45, obstacle_range: 4.5, observation_persistence: 1.5}
+  laser_scan_sensor: {sensor_frame: loc_link, data_type: LaserScan, topic: loc_scan, marking: true, clearing: false, min_range: 0.58, obstacle_range: 4.5, observation_persistence: 1.5}
 
 my_obstacle_layer:
   observation_sources: laser_scan_sensor
-  laser_scan_sensor: {sensor_frame: loc_link, data_type: LaserScan, topic: loc_scan, marking: true, clearing: true, min_range: 0.45, obstacle_range: 4.5, observation_persistence: 1.5}
+  laser_scan_sensor: {sensor_frame: loc_link, data_type: LaserScan, topic: loc_scan, marking: true, clearing: true, min_range: 0.45, obstacle_range: 4.5, raytrace_range: 3.0, observation_persistence: 2}
