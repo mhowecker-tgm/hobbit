@@ -10,6 +10,8 @@ from smach import StateMachine, Concurrence, State
 from std_msgs.msg import String
 from hobbit_msgs.msg import Command, Event, GeneralHobbitAction,\
     GeneralHobbitGoal
+import hobbit_smach.helper_import as helper
+import hobbit_smach.recharge_import as recharge
 import uashh_smach.util as util
 
 commands = [['emergency', 'G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP', 'C_HELP', 'F_CALLSOS', 'G_EMERGENCY'],
@@ -30,6 +32,7 @@ commands = [['emergency', 'G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP', 'C_HELP',
 def event_cb(msg, ud):
     rospy.loginfo('/Event data received:')
     print(msg.event)
+    night = helper.IsItNight()
     if rospy.has_param('active_task'):
         active_task = rospy.get_param('active_task')
     else:
@@ -37,7 +40,16 @@ def event_cb(msg, ud):
     print(active_task)
     for index, item in enumerate(commands):
         if msg.event in item:
-            if index + 1 >= active_task:
+            if index == 4:
+                ud.command = item[0]
+                ud.params = msg.params
+                rospy.set_param('active_task', index)
+                return True
+            elif index == 1 and night:
+                ud.command = 'silent_recharge'
+                rospy.set_param('active_task', index)
+                return True
+            elif index + 1 >= active_task and not night:
                 rospy.loginfo('New task has lower priority. Do nothing')
                 return False
             else:
@@ -145,7 +157,7 @@ class SelectTask(State):
     def __init__(self):
         State.__init__(
             self,
-            input_keys=['command', 'params'],
+            input_keys=['command', 'params', 'active_task'],
             outcomes=['emergency',
                       'recharge',
                       'reminder',
@@ -161,6 +173,8 @@ class SelectTask(State):
                       'patrol',
                       'surprise',
                       'reward',
+                      'silent_recharge',
+                      'social_role',
                       'preempted',
                       'none'])
 
@@ -170,7 +184,6 @@ class SelectTask(State):
             return 'preempted'
         print('Task Selection')
         print(ud.command)
-        # print(ud.params)
         if ud.command == 'IDLE':
             return 'none'
         return ud.command
@@ -189,25 +202,6 @@ class FakeForAllWithoutRunningActionSever(State):
             self.service_preempt()
             return 'preempted'
         print('FakeForAllWithoutRunningActionSever')
-        return 'succeeded'
-
-
-class TestASW(State):
-    """class to test the ASW functionality
-    """
-    def __init__(self):
-        State.__init__(
-            self,
-            input_keys=['command'],
-            outcomes=['succeeded', 'preempted', 'aborted'])
-
-    def execute(self, ud):
-        if self.preempt_requested():
-            self.service_preempt()
-            return 'preempted'
-        print('TestASW')
-        print(ud.command)
-        rospy.sleep(10)
         return 'succeeded'
 
 
@@ -234,7 +228,7 @@ def main():
         outcomes=['succeeded',
                   'preempted',
                   'failed'],
-        input_keys=['command', 'params'],
+        input_keys=['command', 'params', 'active_task'],
         output_keys=['command', 'active_task']
     )
 
@@ -251,7 +245,7 @@ def main():
     cc1 = Concurrence(
         outcomes=['succeeded', 'aborted', 'preempted'],
         default_outcome='aborted',
-        input_keys=['command', 'params'],
+        input_keys=['command', 'params', 'active_task'],
         output_keys=['command'],
         child_termination_cb=child_cb1,
         outcome_map={'succeeded': {'ASW': 'succeeded'},
@@ -290,7 +284,6 @@ def main():
     with cc1:
         Concurrence.add(
             'ASW',
-            # TestASW()
             sm2
         )
         Concurrence.add(
@@ -332,6 +325,8 @@ def main():
                          'patrol': 'PATROL',
                          'surprise': 'SURPRISE',
                          'reward': 'REWARD',
+                         'silent_recharge': 'SILENT_RECHARGE',
+                         'social_role': 'SOCIAL_ROLE',
                          'preempted': 'preempted',
                          'none': 'succeeded'}
         )
@@ -437,10 +432,22 @@ def main():
             transitions={'succeeded': 'succeeded',
                          'aborted': 'failed'}
         )
+        StateMachine.add(
+            'SILENT_RECHARGE',
+            FakeForAllWithoutRunningActionSever(),
+            # recharge.getRecharge(),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'failed'}
+        )
+        StateMachine.add(
+            'SOCIAL_ROLE',
+            FakeForAllWithoutRunningActionSever(),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'failed'}
+        )
 
     sis = IntrospectionServer('master', sm1, '/MASTER')
     sis.start()
-
     outcome = sm1.execute()
     rospy.loginfo(NAME + ' returned outcome ' + str(outcome))
     rospy.spin()
