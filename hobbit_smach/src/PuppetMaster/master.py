@@ -2,7 +2,6 @@
 
 PKG = 'hobbit_smach'
 NAME = 'HOBBIT_MASTER'
-task = 'nothing'
 import roslib
 roslib.load_manifest(PKG)
 import rospy
@@ -13,84 +12,19 @@ from hobbit_msgs.msg import Command, Event, GeneralHobbitAction,\
     GeneralHobbitGoal
 import uashh_smach.util as util
 
-# sos = ['G_FALL', 'E_SOSBUTTON', 'C_HELP']
-# recharge = ['E_RECHARGE']
-# stop = ['C_STOP']
-# call_hobbit = ['E_CALLHOBBIT']
-# break_away = ['C_BREAK']
-# reminder = ['E_REMINDER']
-# in_call = ['E_CALLRING', 'E_CALLESTABLISHED', 'E_CALLENDED']
-# start_call = ['C_MAKECALL']
-# clear_floor = ['E_CLEARFLOOR']
-# equal = ['C_PICKUP', 'C_FOLLOW', 'C_LEARN', 'C_BRING', 'C_GOTO']
-# patrol = ['E_PATROL']
-# surprise = ['C_SURPRISE']
-# reward = ['C_REWARD']
-
-actions = [['G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP'],
-           ['E_RECHARGE'],
-           ['C_STOP'],
-           ['E_CALLHOBBIT'],
-           ['C_BREAK'],
-           ['E_REMINDER'],
-           ['E_CALLRING', 'E_CALLESTABLISHED', 'E_CALLENDED'],
-           ['C_MAKECALL'],
-           ['E_CLEARFLOOR'],
-           ['C_PICKUP', 'C_FOLLOW', 'C_LEARN', 'C_BRING', 'C_GOTO'],
-           ['E_PATROL'],
-           ['C_SURPRISE'],
-           ['C_REWARD']]
-commands = [['G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP', 'C_HELP', 'F_CALLSOS', 'G_EMERGENCY'],
-            ['E_RECHARGE', 'C_RECHARGE'],
-            ['E_REMINDER'],
-            ['C_STOP', 'G_STOP'],
-            ['C_CALLHOBBIT'],
-            ['E_CALLRING', 'E_CALLESTABLISHED', 'E_CALLENDED', 'C_MAKECALL'],
-            ['E_CLEARFLOOR'],
-            ['C_PICKUP', 'C_FOLLOW', 'C_LEARN', 'C_BRING', 'C_GOTO', 'G_POINTING'],
-            ['E_PATROL'],
-            ['C_SURPRISE'],
-            ['C_REWARD', 'G_REWARD']
+commands = [['emergency', 'G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP', 'C_HELP', 'F_CALLSOS', 'G_EMERGENCY'],
+            ['recharge', 'E_RECHARGE', 'C_RECHARGE'],
+            ['reminder', 'E_REMINDER'],
+            ['stop', 'C_STOP', 'G_STOP'],
+            ['call_hobbit', 'C_CALLHOBBIT'],
+            ['call', 'E_CALLRING', 'E_CALLESTABLISHED', 'E_CALLENDED', 'C_MAKECALL'],
+            ['clear_floor', 'E_CLEARFLOOR'],
+            ['pickup', 'follow', 'learn_object', 'bring_object', 'goto', 'pickup'
+             'C_PICKUP', 'C_FOLLOW', 'C_LEARN', 'C_BRING', 'C_GOTO', 'G_POINTING'],
+            ['patrol', 'E_PATROL'],
+            ['surprise', 'C_SURPRISE'],
+            ['reward', 'C_REWARD', 'G_REWARD']
             ]
-
-class SimpleActionStateName(SimpleActionState):
-    def __init__(self,
-            # Action info
-            action_name,
-            action_spec,
-            # Default goal
-            goal = None,
-            goal_key = None,
-            goal_slots = [],
-            goal_cb = None,
-            goal_cb_args = [],
-            goal_cb_kwargs = {},
-            # Result modes
-            result_key = None,
-            result_slots = [],
-            result_cb = None,
-            result_cb_args = [],
-            result_cb_kwargs = {},
-            # Keys
-            input_keys = [],
-            output_keys = [],
-            outcomes = [],
-            # Timeouts
-            exec_timeout = None,
-            preempt_timeout = rospy.Duration(60.0),
-            server_wait_timeout = rospy.Duration(60.0)
-            ):
-        print('Inside subclass')
-        print(action_name)
-        print(action_spec)
-        print(server_wait_timeout)
-        global task
-        action_name = task
-        print(action_name)
-        print('subclass: action_name = %s' % action_name)
-        SimpleActionState.__init__(self,
-                                   action_name,
-                                   action_spec)
 
 
 def event_cb(msg, ud):
@@ -100,16 +34,26 @@ def event_cb(msg, ud):
         active_task = rospy.get_param('active_task')
     else:
         active_task = 100
+    print(active_task)
     for index, item in enumerate(commands):
         if msg.event in item:
             if index + 1 >= active_task:
                 rospy.loginfo('New task has lower priority. Do nothing')
-                ud.command = msg.event
-                ud.params = msg.params
                 return False
             else:
                 rospy.loginfo('New task has higher priority. Start it.')
-                rospy.set_param('active_task', index)
+                if index == 7:
+                    i = item.index(msg.event)
+                    ud.command = item[i-6]
+                    pass
+                else:
+                    ud.command = item[0]
+                ud.params = msg.params
+                if item[0] == 'stop':
+                    print('Reset active_task value')
+                    rospy.set_param('active_task', 100)
+                else:
+                    rospy.set_param('active_task', index)
                 return True
     rospy.loginfo('Unknown event received %s' % msg.event)
     return False
@@ -117,22 +61,31 @@ def event_cb(msg, ud):
 
 def command_cb(msg, ud):
     rospy.loginfo('/Command data received:')
-    rospy.loginfo(str(msg))
-    print(msg)
+    print(msg.command)
     if rospy.has_param('active_task'):
         active_task = rospy.get_param('active_task')
     else:
         active_task = 100
+    print(active_task)
     for index, item in enumerate(commands):
         if msg.command in item:
             if index + 1 >= active_task:
                 rospy.loginfo('New task has lower priority. Do nothing')
-                ud.command = msg.event
-                ud.params = msg.params
                 return False
             else:
                 rospy.loginfo('New task has higher priority. Start it.')
-                rospy.set_param('active_task', index)
+                if index == 7:
+                    i = item.index(msg.command)
+                    ud.command = item[i-6]
+                    pass
+                else:
+                    ud.command = item[0]
+                ud.params = msg.params
+                if item[0] == 'stop':
+                    print('Reset active_task value')
+                    rospy.set_param('active_task', 100)
+                else:
+                    rospy.set_param('active_task', index)
                 return True
     rospy.loginfo('Unknown command received %s' % msg.command)
     return False
@@ -152,15 +105,21 @@ def child_cb1(outcome_map):
         return False
 
 
-def task_goal_cb(ud, goal):
-    global task
-    task = 'learn_object'
+def task_reminder_cb(ud, goal):
+    goal = GeneralHobbitGoal(
+        command=String('reminder'),
+        previous_state=String('IDLE'),
+        parameters=[String('command')]
+    )
+    return goal
+
+
+def task_lo_cb(ud, goal):
     goal = GeneralHobbitGoal(
         command=String('learn_object'),
         previous_state=String('IDLE'),
         parameters=[]
     )
-    print('Trying to set goal')
     return goal
 
 
@@ -186,19 +145,50 @@ class SelectTask(State):
     def __init__(self):
         State.__init__(
             self,
-            input_keys=['name'],
-            output_keys=['name'],
-            outcomes=['succeeded', 'preempted'])
+            input_keys=['command', 'params'],
+            outcomes=['emergency',
+                      'recharge',
+                      'reminder',
+                      'stop',
+                      'call_hobbit',
+                      'call',
+                      'clear_floor',
+                      'pickup',
+                      'follow',
+                      'learn_object',
+                      'bring_object',
+                      'goto',
+                      'patrol',
+                      'surprise',
+                      'reward',
+                      'preempted',
+                      'none'])
 
     def execute(self, ud):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
         print('Task Selection')
-        global task
-        print(task)
-        task = 'learn_object'
-        print(task)
+        print(ud.command)
+        # print(ud.params)
+        if ud.command == 'IDLE':
+            return 'none'
+        return ud.command
+
+
+class FakeForAllWithoutRunningActionSever(State):
+    """Initialize a few data structures
+    """
+    def __init__(self):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'preempted', 'aborted'])
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        print('FakeForAllWithoutRunningActionSever')
         return 'succeeded'
 
 
@@ -261,7 +251,7 @@ def main():
     cc1 = Concurrence(
         outcomes=['succeeded', 'aborted', 'preempted'],
         default_outcome='aborted',
-        input_keys=['command'],
+        input_keys=['command', 'params'],
         output_keys=['command'],
         child_termination_cb=child_cb1,
         outcome_map={'succeeded': {'ASW': 'succeeded'},
@@ -300,7 +290,7 @@ def main():
     with cc1:
         Concurrence.add(
             'ASW',
-            #TestASW()
+            # TestASW()
             sm2
         )
         Concurrence.add(
@@ -324,21 +314,126 @@ def main():
         )
 
     with sm2:
-        global task
         StateMachine.add(
             'SELECT_TASK',
             SelectTask(),
-            transitions={'succeeded': 'TASK'}
+            transitions={'emergency': 'EMERGENCY',
+                         'recharge': 'RECHARGE',
+                         'reminder': 'REMINDER',
+                         'stop': 'STOP',
+                         'call_hobbit': 'CALL_HOBBIT',
+                         'call': 'CALL',
+                         'clear_floor': 'CLEAR_FLOOR',
+                         'pickup': 'PICKUP',
+                         'follow': 'FOLLOW',
+                         'learn_object': 'LEARN_OBJECT',
+                         'bring_object': 'BRING_OBJECT',
+                         'goto': 'GOTO',
+                         'patrol': 'PATROL',
+                         'surprise': 'SURPRISE',
+                         'reward': 'REWARD',
+                         'preempted': 'preempted',
+                         'none': 'succeeded'}
         )
         StateMachine.add(
-            'TASK',
-            SimpleActionStateName(
-                'idle',
+            'LEARN_OBJECT',
+            SimpleActionState(
+                'learn_object',
                 GeneralHobbitAction,
-                goal_cb=task_goal_cb,
+                goal_cb=task_lo_cb,
                 preempt_timeout=rospy.Duration(5),
                 server_wait_timeout=rospy.Duration(10)
             ),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'failed'}
+        )
+        StateMachine.add(
+            'REMINDER',
+            SimpleActionState(
+                'reminder',
+                GeneralHobbitAction,
+                goal_cb=task_reminder_cb,
+                preempt_timeout=rospy.Duration(5),
+                server_wait_timeout=rospy.Duration(10)
+            ),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'failed'}
+        )
+        StateMachine.add(
+            'EMERGENCY',
+            FakeForAllWithoutRunningActionSever(),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'failed'}
+        )
+        StateMachine.add(
+            'CLEAR_FLOOR',
+            FakeForAllWithoutRunningActionSever(),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'failed'}
+        )
+        StateMachine.add(
+            'PATROL',
+            FakeForAllWithoutRunningActionSever(),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'failed'}
+        )
+        StateMachine.add(
+            'GOTO',
+            FakeForAllWithoutRunningActionSever(),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'failed'}
+        )
+        StateMachine.add(
+            'STOP',
+            FakeForAllWithoutRunningActionSever(),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'failed'}
+        )
+        StateMachine.add(
+            'CALL_HOBBIT',
+            FakeForAllWithoutRunningActionSever(),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'failed'}
+        )
+        StateMachine.add(
+            'PICKUP',
+            FakeForAllWithoutRunningActionSever(),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'failed'}
+        )
+        StateMachine.add(
+            'CALL',
+            FakeForAllWithoutRunningActionSever(),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'failed'}
+        )
+        StateMachine.add(
+            'SURPRISE',
+            FakeForAllWithoutRunningActionSever(),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'failed'}
+        )
+        StateMachine.add(
+            'FOLLOW',
+            FakeForAllWithoutRunningActionSever(),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'failed'}
+        )
+        StateMachine.add(
+            'REWARD',
+            FakeForAllWithoutRunningActionSever(),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'failed'}
+        )
+        StateMachine.add(
+            'BRING_OBJECT',
+            FakeForAllWithoutRunningActionSever(),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'failed'}
+        )
+        StateMachine.add(
+            'RECHARGE',
+            FakeForAllWithoutRunningActionSever(),
             transitions={'succeeded': 'succeeded',
                          'aborted': 'failed'}
         )
