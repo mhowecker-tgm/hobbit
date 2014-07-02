@@ -3,7 +3,7 @@
 
 PKG = 'hobbit_smach'
 NAME = 'hobbit_move'
-DEBUG = True
+DEBUG = False
 
 import roslib
 roslib.load_manifest(PKG)
@@ -52,7 +52,7 @@ class Undock(State):
     def __init__(self, angle=0):
         State.__init__(
             self,
-            outcomes=['succeeded', 'preempted']
+            outcomes=['succeeded', 'preempted', 'aborted']
         )
         self.stop_pub = rospy.Publisher('/docking_task', String,
                                         latch=False, queue_size=50)
@@ -64,8 +64,8 @@ class Undock(State):
             self.service_preempt()
             return 'preempted'
         # self.stop_pub.publish('docking_off')
-        self.motion_pub('Move -0.8')
-        rospy.sleep(3.0)
+        self.motion_pub.publish('Move -0.5')
+        #rospy.sleep(3.0)
         return 'succeeded'
 
 
@@ -145,7 +145,7 @@ class SetNavigationGoal(ServiceState):
     Given place and room the x,y,theta values are retrieved
     and stored in the userdata.
     """
-    def __init__(self, frame='/map', room=None, place='dock'):
+    def __init__(self, frame='/map', room=String('None'), place='dock'):
         print('Inside SetNavigationGoal __init__')
         ServiceState.__init__(
             self,
@@ -168,6 +168,10 @@ class SetNavigationGoal(ServiceState):
                 self.place = ud.location_name
             else:
                 self.place = String('default')
+        else:
+            print('No userdata received.')
+            print(self.room)
+            print(self.place)
         request = GetCoordinatesRequest()
         #request.header.stamp = rospy.Time.now()
         request.room_name.data = self.room
@@ -184,20 +188,21 @@ class SetNavigationGoal(ServiceState):
         return 'succeeded'
 
 
-def goToPosition(frame='/map', room='', place='dock'):
+def goToPosition(frame='/map', room='None', place='dock'):
     """
     Return a SMACH Sequence for navigation to a new position.
     The default values will move the robot to the docking station.
 
     frame: defaults to /map
-    room: defaults to None
-    place: defaults to dock
+    room: defaults to 'None'
+    place: defaults to 'dock'
     """
 
 
     seq = Sequence(
         outcomes=['succeeded', 'preempted', 'aborted'],
-        connector_outcome='succeeded'
+        connector_outcome='succeeded',
+        input_keys=['room_name', 'location_name']
     )
 
     with seq:
@@ -208,7 +213,7 @@ def goToPosition(frame='/map', room='', place='dock'):
         Sequence.add('WAIT', SleepState(duration=1))
         Sequence.add('ACTIVATE_OBSTACLES',
                      SetObstacles(active=True))
-        # Sequence.add('SET_NAV_GOAL', SetNavigationGoal(room, place))
+        Sequence.add('SET_NAV_GOAL', SetNavigationGoal(room, place))
         if not DEBUG:
             Sequence.add('MOVE_HOBBIT', move_base.MoveBaseState(frame))
     return seq

@@ -19,7 +19,7 @@ commands = [['emergency', 'G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP', 'C_HELP',
             ['recharge', 'E_RECHARGE', 'C_RECHARGE'],
             ['reminder', 'E_REMINDER'],
             ['stop', 'C_STOP', 'G_STOP'],
-            ['call_hobbit', 'C_CALLHOBBIT'],
+            ['call_hobbit', 'C_CALLHOBBIT', 'E_CALLHOBBIT'],
             ['call', 'E_CALLRING', 'E_CALLESTABLISHED', 'E_CALLENDED', 'C_MAKECALL'],
             ['clear_floor', 'E_CLEARFLOOR'],
             ['pickup', 'follow', 'learn_object', 'bring_object', 'goto', 'pickup'
@@ -46,7 +46,7 @@ def event_cb(msg, ud):
                 ud.params = msg.params
                 rospy.set_param('active_task', index)
                 return True
-            elif index == 1 and night:
+            elif index == 1 and not night:
                 ud.command = 'silent_recharge'
                 rospy.set_param('active_task', index)
                 return True
@@ -438,8 +438,8 @@ def main():
         )
         StateMachine.add(
             'SILENT_RECHARGE',
-            FakeForAllWithoutRunningActionSever(),
-            # recharge.getRecharge(),
+            # FakeForAllWithoutRunningActionSever(),
+            recharge.getRecharge(),
             transitions={'succeeded': 'succeeded',
                          'aborted': 'failed'}
         )

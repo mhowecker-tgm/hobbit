@@ -218,7 +218,7 @@ def getCoordinates(req):
     print('Inside: getCoordinates')
     print(rooms)
     print req.room_name.data, req.location_name.data
-    if req.room_name.data == None:
+    if req.room_name.data == 'dock':
         gen = (x for x in rooms.rooms_vector)
     else:
         gen = (x for x in rooms.rooms_vector if req.room_name.data in x.room_name)

@@ -12,7 +12,7 @@ import rospy
 from smach import Sequence, State
 import hobbit_smach.hobbit_move_import as hobbit_move
 from hobbit_user_interaction import HobbitMMUI
-from uashh.util import SleepState
+from uashh_smach.util import SleepState
 
 
 class Dummy(State):
@@ -22,10 +22,13 @@ class Dummy(State):
         State.__init__(
             self,
             outcomes=['succeeded'],
+            output_keys=['room_name', 'location_name']
         )
 
     def execute(self, ud):
         rospy.sleep(2.0)
+        ud.room_name = 'maincorridor'
+        ud.location_name = 'default'
         return 'succeeded'
 
 
@@ -36,34 +39,46 @@ def getRecharge():
     """
 
     seq = Sequence(
-        outcomes=['succeeded', 'failed', 'preempted'],
-        connector_outcome='succeeded'
+        outcomes=['succeeded', 'aborted', 'preempted'],
+        connector_outcome='succeeded',
     )
+    seq.userdata.room_name = 'dock'
+    seq.userdata.location_name = 'dock'
 
     with seq:
         if not DEBUG:
             Sequence.add(
                 'MOVE_TO_DOCK',
-                hobbit_move.goToPosition(frame='/map', place='dock'))
+                hobbit_move.goToPosition(frame='/map'))
             Sequence.add(
                 'DOCKING',
                 hobbit_move.Dock())
+            Sequence.add(
+                'WAIT_FOR_MIRA',
+                SleepState(duration=10)
+            )
         else:
-            Sequence.add('MOVE_TO_DOCK', Dummy())
-            Sequence.add('DOCKING', Dummy())
-        Sequence.add('MMUI_MAIN_MENU', HobbitMMUI.ShowMenu(menu='MAIN'))
+            pass
+        #    Sequence.add('MOVE_TO_DOCK', Dummy())
+        #    Sequence.add('DOCKING', Dummy())
+        # TODO: Add check to make sure we are charging
+        Sequence.add('MMUI_MAIN_MENU', HobbitMMUI.ShowMenu(menu='MAIN'),
+                     transitions={'failed': 'aborted'})
     return seq
 
-def getRecharge():
+
+def getEndRecharge():
     """This function handles the autonomous charging sequence.
     It is without the user interaction and is mainly used during
     the night or as part of the recharging scenario.
     """
 
     seq = Sequence(
-        outcomes=['succeeded', 'failed', 'preempted'],
+        outcomes=['succeeded', 'aborted', 'preempted'],
         connector_outcome='succeeded'
     )
+    seq.userdata.room_name = 'maincorridor'
+    seq.userdata.location_name = 'default'
 
     with seq:
         Sequence.add(
@@ -72,6 +87,20 @@ def getRecharge():
         )
         Sequence.add(
             'WAIT_FOR_MIRA',
-            SleepState(duration=3)
+            SleepState(duration=5)
         )
+        Sequence.add(
+            'MOVE_AWAY_FROM_DOCK',
+            hobbit_move.goToPosition(frame='/map'))
+        #Sequence.add(
+        #    'WAIT_FOR_MIRA_2',
+        #    SleepState(duration=3)
+        #)
+        #Sequence.add(
+        #    'SET_SOME_GOAL',
+        #    Dummy())
+        #Sequence.add(
+        #    'MOVE_AWAY',
+        #    hobbit_move.goToPosition(frame='/map'))
+    return seq
 
