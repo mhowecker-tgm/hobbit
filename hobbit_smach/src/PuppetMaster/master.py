@@ -13,6 +13,7 @@ from hobbit_msgs.msg import Command, Event, GeneralHobbitAction,\
 import hobbit_smach.helper_import as helper
 import hobbit_smach.recharge_import as recharge
 import uashh_smach.util as util
+from hobbit_user_interaction import HobbitEmotions
 
 commands = [['emergency', 'G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP', 'C_HELP', 'F_CALLSOS', 'G_EMERGENCY'],
             ['recharge', 'E_RECHARGE', 'C_RECHARGE'],
@@ -314,7 +315,8 @@ def main():
                          'recharge': 'RECHARGE',
                          'reminder': 'REMINDER',
                          'stop': 'STOP',
-                         'call_hobbit': 'CALL_HOBBIT',
+                         # 'call_hobbit': 'CALL_HOBBIT',
+                         'call_hobbit': 'UNDOCK',
                          'call': 'CALL',
                          'clear_floor': 'CLEAR_FLOOR',
                          'pickup': 'PICKUP',
@@ -428,9 +430,11 @@ def main():
         )
         StateMachine.add(
             'RECHARGE',
-            FakeForAllWithoutRunningActionSever(),
+            HobbitEmotions.ShowEmotions(emotion='VERY_HAPPY',
+                                                 emo_time=4),
             transitions={'succeeded': 'succeeded',
-                         'aborted': 'failed'}
+                         'failed': 'failed',
+                         'preempted': 'preempted'}
         )
         StateMachine.add(
             'SILENT_RECHARGE',
@@ -445,11 +449,20 @@ def main():
             transitions={'succeeded': 'succeeded',
                          'aborted': 'failed'}
         )
+        StateMachine.add(
+            'UNDOCK',
+            recharge.getEndRecharge(),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'failed'}
+        )
 
+    """
+    Now we actually start the IntrospectionServer to visualize the StateMachine
+    as a dot graph, and execute the main StateMachine.
+    """
     sis = IntrospectionServer('master', sm1, '/MASTER')
     sis.start()
-    outcome = sm1.execute()
-    rospy.loginfo(NAME + ' returned outcome ' + str(outcome))
+    sm1.execute()
     rospy.spin()
     sis.stop()
 
