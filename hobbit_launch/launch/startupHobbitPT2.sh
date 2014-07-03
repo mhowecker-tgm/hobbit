@@ -67,14 +67,14 @@ sleep $DELAY_BETWEEN_STEPS
 
 
 # Start interfaces_mira, which starts the platform driver and the ros-mira interface for virtual lasers
-#cd /opt/ros/hobbit_hydro/src/interfaces_mira/launch
-#roslaunch startup.launch&
+cd /opt/ros/hobbit_hydro/src/interfaces_mira/launch
+roslaunch startup.launch&
 
 sleep $DELAY_BETWEEN_STEPS
 
 # Start mira center
-#cd /opt/ros/hobbit_hydro/src/interfaces_mira/resources
-#miracenter mira_config.xml
+cd /opt/ros/hobbit_hydro/src/interfaces_mira/resources
+miracenter mira_config.xml
 
 
 
