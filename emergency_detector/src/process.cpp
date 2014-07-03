@@ -19,7 +19,7 @@ unsigned int combinationMode=0;
 
 unsigned int doCVOutput=0;
 unsigned int emergencyDetected=0;
-float temperatureDetected=36.0;
+float temperatureDetected=36.0; //<- YODO : default value should be 0
 
 
 int processNewTemperatureReading(float temperature)
@@ -105,7 +105,7 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
            ( depthAvg < 2000)
          )
                        {
-                        fprintf(stderr,"\n\n EMERGENCY ?  \n\n");
+                        fprintf(stderr,"\n\n ? EMERGENCY ?  \n\n");
                         emergencyDetected=1; //<- We dont have a temperature sensor yet
                        }
 
