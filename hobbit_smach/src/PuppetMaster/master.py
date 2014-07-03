@@ -5,6 +5,7 @@ NAME = 'HOBBIT_MASTER'
 import roslib
 roslib.load_manifest(PKG)
 import rospy
+<<<<<<< HEAD
 from smach_ros import SimpleActionState, IntrospectionServer
 from smach import StateMachine, Concurrence, State
 from std_msgs.msg import String
@@ -28,16 +29,55 @@ commands = [['emergency', 'G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP', 'C_HELP',
             ['surprise', 'C_SURPRISE'],
             ['reward', 'C_REWARD', 'G_REWARD']
             ]
+=======
+import smach_ros
+from smach import StateMachine, Concurrence, Sequence
+from hobbit_msgs.msg import Command, Status, Event
+import uashh_smach.util as util
+
+# sos = ['G_FALL', 'E_SOSBUTTON', 'C_HELP']
+# recharge = ['E_RECHARGE']
+# stop = ['C_STOP']
+# call_hobbit = ['E_CALLHOBBIT']
+# break_away = ['C_BREAK']
+# reminder = ['E_REMINDER']
+# in_call = ['E_CALLRING', 'E_CALLESTABLISHED', 'E_CALLENDED']
+# start_call = ['C_MAKECALL']
+# clear_floor = ['E_CLEARFLOOR']
+# equal = ['C_PICKUP', 'C_FOLLOW', 'C_LEARN', 'C_BRING', 'C_GOTO']
+# patrol = ['E_PATROL']
+# surprise = ['C_SURPRISE']
+# reward = ['C_REWARD']
+
+commands = [['G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP'],
+            ['E_RECHARGE'],
+            ['C_STOP'],
+            ['E_CALLHOBBIT'],
+            ['C_BREAK'],
+            ['E_REMINDER'],
+            ['E_CALLRING', 'E_CALLESTABLISHED', 'E_CALLENDED'],
+            ['C_MAKECALL'],
+            ['E_CLEARFLOOR'],
+            ['C_PICKUP', 'C_FOLLOW', 'C_LEARN', 'C_BRING', 'C_GOTO'],
+            ['E_PATROL'],
+            ['C_SURPRISE'],
+            ['C_REWARD']]
+>>>>>>> Start work on the main statemachine. All hail the puppet master. ;-)
 
 
 def event_cb(msg, ud):
     rospy.loginfo('/Event data received:')
+<<<<<<< HEAD
     print(msg.event)
     night = helper.IsItNight()
+=======
+    rospy.loginfo(str(msg))
+>>>>>>> Start work on the main statemachine. All hail the puppet master. ;-)
     if rospy.has_param('active_task'):
         active_task = rospy.get_param('active_task')
     else:
         active_task = 100
+<<<<<<< HEAD
     print(active_task)
     for index, item in enumerate(commands):
         if msg.event in item:
@@ -51,10 +91,16 @@ def event_cb(msg, ud):
                 rospy.set_param('active_task', index)
                 return True
             elif index + 1 >= active_task and not night:
+=======
+    for index, item in enumerate(commands):
+        if msg.event in item:
+            if index + 1 >= active_task:
+>>>>>>> Start work on the main statemachine. All hail the puppet master. ;-)
                 rospy.loginfo('New task has lower priority. Do nothing')
                 return False
             else:
                 rospy.loginfo('New task has higher priority. Start it.')
+<<<<<<< HEAD
                 if index == 7:
                     i = item.index(msg.event)
                     ud.command = item[i-6]
@@ -69,17 +115,30 @@ def event_cb(msg, ud):
                     rospy.set_param('active_task', index)
                 return True
     rospy.loginfo('Unknown event received %s' % msg.event)
+=======
+                rospy.set_param('active_task', index)
+                return True
+        else:
+            rospy.loginfo('Unknown event received %s' % msg.event)
+>>>>>>> Start work on the main statemachine. All hail the puppet master. ;-)
     return False
 
 
 def command_cb(msg, ud):
     rospy.loginfo('/Command data received:')
+<<<<<<< HEAD
     print(msg.command)
+=======
+    rospy.loginfo(str(msg))
+>>>>>>> Start work on the main statemachine. All hail the puppet master. ;-)
     if rospy.has_param('active_task'):
         active_task = rospy.get_param('active_task')
     else:
         active_task = 100
+<<<<<<< HEAD
     print(active_task)
+=======
+>>>>>>> Start work on the main statemachine. All hail the puppet master. ;-)
     for index, item in enumerate(commands):
         if msg.command in item:
             if index + 1 >= active_task:
@@ -87,6 +146,7 @@ def command_cb(msg, ud):
                 return False
             else:
                 rospy.loginfo('New task has higher priority. Start it.')
+<<<<<<< HEAD
                 if index == 7:
                     i = item.index(msg.command)
                     ud.command = item[i-6]
@@ -206,11 +266,21 @@ class FakeForAllWithoutRunningActionSever(State):
         return 'succeeded'
 
 
+=======
+                rospy.set_param('active_task', index)
+                return True
+        else:
+            rospy.loginfo('Unknown command received %s' % msg.command)
+    return False
+
+
+>>>>>>> Start work on the main statemachine. All hail the puppet master. ;-)
 def main():
     rospy.init_node(NAME)
     sm = StateMachine(
         outcomes=['succeeded',
                   'preempted',
+<<<<<<< HEAD
                   'failed'],
         input_keys=['command', 'active_task', 'params'],
         output_keys=['command', 'active_task', 'params']
@@ -232,17 +302,25 @@ def main():
         input_keys=['command', 'params', 'active_task'],
         output_keys=['command', 'active_task']
     )
+=======
+                  'failed']
+    )
+>>>>>>> Start work on the main statemachine. All hail the puppet master. ;-)
 
     cc = Concurrence(
         outcomes=['succeeded', 'aborted', 'preempted'],
         default_outcome='aborted',
+<<<<<<< HEAD
         input_keys=['command', 'active_task', 'params'],
         output_keys=['command', 'params'],
         child_termination_cb=child_cb,
+=======
+>>>>>>> Start work on the main statemachine. All hail the puppet master. ;-)
         outcome_map={'succeeded': {'Event_Listener': 'succeeded'},
                      'aborted': {'Event_Listener': 'aborted'}}
     )
 
+<<<<<<< HEAD
     cc1 = Concurrence(
         outcomes=['succeeded', 'aborted', 'preempted'],
         default_outcome='aborted',
@@ -253,14 +331,20 @@ def main():
                      'aborted': {'Commands': 'failed'}}
     )
 
+=======
+>>>>>>> Start work on the main statemachine. All hail the puppet master. ;-)
     with cc:
         Concurrence.add(
             'Event_Listener',
             util.WaitForMsgState(
                 '/Event',
                 Event,
+<<<<<<< HEAD
                 msg_cb=event_cb,
                 output_keys=['command', 'params']
+=======
+                msg_cb=event_cb
+>>>>>>> Start work on the main statemachine. All hail the puppet master. ;-)
             )
         )
         Concurrence.add(
@@ -268,6 +352,7 @@ def main():
             util.WaitForMsgState(
                 '/Command',
                 Command,
+<<<<<<< HEAD
                 msg_cb=command_cb,
                 output_keys=['command', 'params']
             )
@@ -278,10 +363,36 @@ def main():
             'WAIT_FOR_E_C',
             cc,
             transitions={'succeeded': 'succeeded',
+=======
+                msg_cb=command_cb
+            )
+        )
+        # Concurrence.add(
+        #     'Status_Listener',
+        #     util.WaitForMsgState(
+        #         '/Status',
+        #         Status,
+        #         msg_cb=status_cb
+        #     )
+        # )
+
+    with sm:
+        # StateMachine.add(
+        #     'START',
+        #     Start(),
+        #     transitions={'succeeded': 'WAIT_FOR_E_C',
+        #                  'aborted': 'SET_FAILURE'}
+        # )
+        StateMachine.add(
+            'WAIT_FOR_E_C',
+            cc,
+            transitions={'succeeded': 'WAIT_FOR_E_C',
+>>>>>>> Start work on the main statemachine. All hail the puppet master. ;-)
                          'aborted': 'WAIT_FOR_E_C',
                          'preempted': 'preempted'}
         )
 
+<<<<<<< HEAD
     with cc1:
         Concurrence.add(
             'ASW',
@@ -463,6 +574,13 @@ def main():
     sis = IntrospectionServer('master', sm1, '/MASTER')
     sis.start()
     sm1.execute()
+=======
+    sis = smach_ros.IntrospectionServer('master', sm, '/MASTER')
+    sis.start()
+
+    outcome = sm.execute()
+    rospy.loginfo(NAME + ' returned outcome' + str(outcome))
+>>>>>>> Start work on the main statemachine. All hail the puppet master. ;-)
     rospy.spin()
     sis.stop()
 
