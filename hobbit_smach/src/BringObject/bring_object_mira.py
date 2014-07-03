@@ -126,7 +126,7 @@ class CleanPositions(smach.State):
                 #print resp
                 pose = PoseStamped()
                 pose.header.frame_id = 'map'
-                pose.pose.position = Point(resp.pose.x, resp.pose.y, 0.0)
+                pose.pose.position = Point(resp.pose.x, resp.pose.y, resp.pose.theta)
                 pose.pose.orientation = Quaternion(*tf.transformations.quaternion_from_euler(0, 0, resp.pose.theta))
                 ud.positions.append({'pose': pose, 'room': pos.room, 'distance': 'None', 'place_name': pos.location, 'penalty':1, 'theta': resp.pose.theta})
             except rospy.ServiceException:
