@@ -64,13 +64,8 @@ class Undock(State):
             self.service_preempt()
             return 'preempted'
         # self.stop_pub.publish('docking_off')
-<<<<<<< HEAD
         self.motion_pub.publish('Move -0.5')
         #rospy.sleep(3.0)
-=======
-        self.motion_pub('Move -0.8')
-        rospy.sleep(3.0)
->>>>>>> small changes to test dock/undock at the charging station.
         return 'succeeded'
 
 
