@@ -9,7 +9,7 @@ import roslib
 roslib.load_manifest(PKG)
 import rospy
 
-from smach import State, Sequence, Concurrence, StateMachine, Iterator
+from smach import State, Sequence, StateMachine
 from smach_ros import ServiceState
 from hobbit_msgs.srv import GetCoordinates, GetCoordinatesRequest
 from std_msgs.msg import String
@@ -30,7 +30,8 @@ class SetObstacles(State):
             self,
             outcomes=['succeeded', 'preempted']
         )
-        self.obstacles = rospy.Publisher('headcam/active', String, latch=False, queue_size=50)
+        self.obstacles = rospy.Publisher('headcam/active', String,
+                                         latch=False, queue_size=50)
         self.active = active
 
     def execute(self, ud):
@@ -65,7 +66,6 @@ class Undock(State):
             return 'preempted'
         # self.stop_pub.publish('docking_off')
         self.motion_pub.publish('Move -0.5')
-        #rospy.sleep(3.0)
         return 'succeeded'
 
 
@@ -79,7 +79,8 @@ class Dock(State):
             self,
             outcomes=['succeeded', 'preempted']
         )
-        self.stop_pub = rospy.Publisher('/docking_task', String, latch=False, queue_size=50)
+        self.stop_pub = rospy.Publisher('/docking_task', String,
+                                        latch=False, queue_size=50)
 
     def execute(self, ud):
         if self.preempt_requested():
@@ -99,7 +100,8 @@ class Stop(State):
             self,
             outcomes=['succeeded', 'preempted']
         )
-        self.stop_pub = rospy.Publisher('/stop_request', String, latch=False, queue_size=50)
+        self.stop_pub = rospy.Publisher('/stop_request', String,
+                                        latch=False, queue_size=50)
 
     def execute(self, ud):
         if self.preempt_requested():
@@ -199,7 +201,6 @@ def goToPosition(frame='/map', room='None', place='dock'):
     place: defaults to 'dock'
     """
 
-
     seq = Sequence(
         outcomes=['succeeded', 'preempted', 'aborted'],
         connector_outcome='succeeded',
@@ -210,9 +211,7 @@ def goToPosition(frame='/map', room='None', place='dock'):
 
     with seq:
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
-                     head_move.MoveTo(pose='down_center'),
-        #             transitions={'failed': 'aborted'}
-        )
+                     head_move.MoveTo(pose='down_center'))
         Sequence.add('WAIT', SleepState(duration=1))
         Sequence.add('ACTIVATE_OBSTACLES',
                      SetObstacles(active=True))
@@ -236,19 +235,16 @@ def goToPose():
 
     with seq:
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
-                     head_move.MoveTo(pose='down_center'),
-                     # transitions={'failed': 'aborted'}
-        )
+                     head_move.MoveTo(pose='down_center'))
         Sequence.add('WAIT', SleepState(duration=1))
         Sequence.add('ACTIVATE_OBSTACLES',
                      SetObstacles(active=True))
         if not DEBUG:
             Sequence.add('MOVE_BASE_GOAL', move_base.MoveBaseState(frame),
-                            remapping={'x': 'x',
+                         remapping={'x': 'x',
                                     'y': 'y',
                                     'yaw': 'yaw'})
     return seq
-    #return move_base.MoveBaseState(frame)
 
 
 def getRobotPose():
@@ -282,12 +278,12 @@ def rotateRobot(angle=0, frame='/map'):
         Sequence.add('GET_ROBOT_POSE', move_base.ReadRobotPositionState())
         Sequence.add('SET_ROT_GOAL', SetRotationGoal(angle=angle))
         Sequence.add('ROTATE_ROBOT', move_base.MoveBaseState(frame))
-        #Sequence.add('SET_ROT_GOAL_2', SetRotationGoal(angle=angle/4))
-        #Sequence.add('ROTATE_ROBOT_2', move_base.MoveBaseState(frame))
-        #Sequence.add('SET_ROT_GOAL_3', SetRotationGoal(angle=angle/4))
-        #Sequence.add('ROTATE_ROBOT_3', move_base.MoveBaseState(frame))
-        #Sequence.add('SET_ROT_GOAL_4', SetRotationGoal(angle=angle/4))
-        #Sequence.add('ROTATE_ROBOT_4', move_base.MoveBaseState(frame))
+        # Sequence.add('SET_ROT_GOAL_2', SetRotationGoal(angle=angle/4))
+        # Sequence.add('ROTATE_ROBOT_2', move_base.MoveBaseState(frame))
+        # Sequence.add('SET_ROT_GOAL_3', SetRotationGoal(angle=angle/4))
+        # Sequence.add('ROTATE_ROBOT_3', move_base.MoveBaseState(frame))
+        # Sequence.add('SET_ROT_GOAL_4', SetRotationGoal(angle=angle/4))
+        # Sequence.add('ROTATE_ROBOT_4', move_base.MoveBaseState(frame))
         return seq
 
     # steps = 12
@@ -336,7 +332,6 @@ def rotateRobot(angle=0, frame='/map'):
     # return sm
 
 
-
 def get_set_nav_goal_state(room_name=None, location_name='dock'):
     return SetNavigationGoal(room=None, place='dock')
 
@@ -344,7 +339,7 @@ def get_set_nav_goal_state(room_name=None, location_name='dock'):
 def battery_cb(msg, ud):
     print('Received battery_state message')
     print(msg)
-    if msg.charging:
+    if msg.charging == 'True':
         return True
     else:
         return False
@@ -362,26 +357,28 @@ def child_term_cb(outcome_map):
 
 
 def startDockProcedure():
-    cc = Concurrence(
-        outcomes=['succeeded', 'preempted', 'failed'],
-        default_outcome='failed',
-        child_termination_cb=child_term_cb,
-        outcome_cb=out_cb
+    seq = Sequence(
+        outcomes=['succeeded', 'preempted', 'aborted'],
+        connector_outcome='succeeded'
     )
 
     sm = StateMachine(
         outcomes=['succeeded', 'aborted', 'preempted'])
 
-    with cc:
-        Concurrence.add(
+    with seq:
+        Sequence.add(
             'DOCK_TIMER',
             SleepState(duration=10))
-        Concurrence.add(
+        Sequence.add(
             'CHARGE_CHECK',
             WaitForMsgState('/battery_state', BatteryState, msg_cb=battery_cb),
         )
 
     with sm:
-        StateMachine.add('START_DOCK', Dock())
-        StateMachine.add('CHECK')
+        StateMachine.add('START_DOCK', Dock(),
+                         transitions={'succeeded': 'CHECK',
+                                      'aborted': 'START_DOCK'})
+        StateMachine.add('CHECK', seq,
+                         transitions={'succeeded': 'succeeded',
+                                      'aborted': 'START_DOCK'})
     return sm

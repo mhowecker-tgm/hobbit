@@ -52,7 +52,8 @@ def getRecharge():
                 hobbit_move.goToPosition(frame='/map', place='dock'))
             Sequence.add(
                 'DOCKING',
-                hobbit_move.Dock())
+                # hobbit_move.Dock())
+                hobbit_move.startDockProcedure())
             Sequence.add(
                 'WAIT_FOR_MIRA',
                 SleepState(duration=10)
@@ -77,8 +78,8 @@ def getEndRecharge():
         outcomes=['succeeded', 'aborted', 'preempted'],
         connector_outcome='succeeded'
     )
-    seq.userdata.room_name = 'maincorridor'
-    seq.userdata.location_name = 'default'
+    # seq.userdata.room_name = 'maincorridor'
+    # seq.userdata.location_name = 'default'
 
     with seq:
         Sequence.add(
@@ -91,16 +92,15 @@ def getEndRecharge():
         )
         Sequence.add(
             'MOVE_AWAY_FROM_DOCK',
-            hobbit_move.goToPosition(frame='/map'))
-        #Sequence.add(
-        #    'WAIT_FOR_MIRA_2',
-        #    SleepState(duration=3)
-        #)
-        #Sequence.add(
-        #    'SET_SOME_GOAL',
-        #    Dummy())
-        #Sequence.add(
-        #    'MOVE_AWAY',
-        #    hobbit_move.goToPosition(frame='/map'))
+            hobbit_move.goToPosition(frame='/map', room='dock', place='dock'))
+        # Sequence.add(
+        #     'WAIT_FOR_MIRA_2',
+        #     SleepState(duration=3)
+        # )
+        # Sequence.add(
+        #     'SET_SOME_GOAL',
+        #     Dummy())
+        # Sequence.add(
+        #     'MOVE_AWAY',
+        #     hobbit_move.goToPosition(frame='/map'))
     return seq
-
