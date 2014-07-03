@@ -309,6 +309,8 @@ def main():
         )
 
     with sm2:
+        sm2.userdata.room_name = 'dock'
+        sm2.userdata.location_name = 'dock'
         StateMachine.add(
             'SELECT_TASK',
             SelectTask(),

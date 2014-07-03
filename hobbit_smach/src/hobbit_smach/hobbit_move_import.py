@@ -47,8 +47,7 @@ class SetObstacles(State):
 
 class Undock(State):
     """
-    Publish the docking message to mira
-    topic: /docking_task
+    Move out of the docking station
     """
     def __init__(self, angle=0):
         State.__init__(
@@ -165,6 +164,7 @@ class SetNavigationGoal(ServiceState):
     def __request_cb(self, ud, request):
         print('Inside SetNavigationGoal')
         print(ud.room_name, ud.location_name)
+        print(self.room, self.place)
         if ud.room_name:
             self.room = ud.room_name
             if ud.location_name:
@@ -206,16 +206,18 @@ def goToPosition(frame='/map', room='None', place='dock'):
         connector_outcome='succeeded',
         input_keys=['room_name', 'location_name']
     )
+    rospy.loginfo('goToPosition: {0} {1}'.format(room, place))
     seq.userdata.room_name = room
     seq.userdata.location_name = place
 
+    print(room, place)
     with seq:
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
                      head_move.MoveTo(pose='down_center'))
         Sequence.add('WAIT', SleepState(duration=1))
         Sequence.add('ACTIVATE_OBSTACLES',
                      SetObstacles(active=True))
-        Sequence.add('SET_NAV_GOAL', SetNavigationGoal(room, place))
+        Sequence.add('SET_NAV_GOAL', SetNavigationGoal())
         if not DEBUG:
             Sequence.add('MOVE_HOBBIT', move_base.MoveBaseState(frame))
     return seq
@@ -336,14 +338,6 @@ def get_set_nav_goal_state(room_name=None, location_name='dock'):
     return SetNavigationGoal(room=None, place='dock')
 
 
-def battery_cb(msg, ud):
-    print('Received battery_state message')
-    print(msg)
-    if msg.charging == 'True':
-        return True
-    else:
-        return False
-
 
 def out_cb(outcome_map):
     if outcome_map['CHARGE_CHECK'] == 'succeeded':
@@ -356,29 +350,3 @@ def child_term_cb(outcome_map):
     return True
 
 
-def startDockProcedure():
-    seq = Sequence(
-        outcomes=['succeeded', 'preempted', 'aborted'],
-        connector_outcome='succeeded'
-    )
-
-    sm = StateMachine(
-        outcomes=['succeeded', 'aborted', 'preempted'])
-
-    with seq:
-        Sequence.add(
-            'DOCK_TIMER',
-            SleepState(duration=10))
-        Sequence.add(
-            'CHARGE_CHECK',
-            WaitForMsgState('/battery_state', BatteryState, msg_cb=battery_cb),
-        )
-
-    with sm:
-        StateMachine.add('START_DOCK', Dock(),
-                         transitions={'succeeded': 'CHECK',
-                                      'aborted': 'START_DOCK'})
-        StateMachine.add('CHECK', seq,
-                         transitions={'succeeded': 'succeeded',
-                                      'aborted': 'START_DOCK'})
-    return sm
