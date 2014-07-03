@@ -108,12 +108,15 @@ def event_cb(msg, ud):
 <<<<<<< HEAD
     print(msg.event)
     night = helper.IsItNight()
+<<<<<<< HEAD
 =======
     rospy.loginfo(str(msg))
 >>>>>>> Start work on the main statemachine. All hail the puppet master. ;-)
 =======
     print(msg.event)
 >>>>>>> master handles event,command data.
+=======
+>>>>>>> master handles time now
     if rospy.has_param('active_task'):
         active_task = rospy.get_param('active_task')
     else:
@@ -128,11 +131,16 @@ def event_cb(msg, ud):
                 ud.params = msg.params
                 rospy.set_param('active_task', index)
                 return True
+<<<<<<< HEAD
             elif index == 1 and not night:
+=======
+            elif index == 1 and night:
+>>>>>>> master handles time now
                 ud.command = 'silent_recharge'
                 rospy.set_param('active_task', index)
                 return True
             elif index + 1 >= active_task and not night:
+<<<<<<< HEAD
 =======
 =======
     print(active_task)
@@ -141,6 +149,8 @@ def event_cb(msg, ud):
         if msg.event in item:
             if index + 1 >= active_task:
 >>>>>>> Start work on the main statemachine. All hail the puppet master. ;-)
+=======
+>>>>>>> master handles time now
                 rospy.loginfo('New task has lower priority. Do nothing')
                 return False
             else:
@@ -290,6 +300,7 @@ class SelectTask(State):
         State.__init__(
             self,
             input_keys=['command', 'params', 'active_task'],
+<<<<<<< HEAD
             outcomes=['emergency',
                       'recharge',
                       'reminder',
@@ -413,6 +424,8 @@ class SelectTask(State):
         State.__init__(
             self,
             input_keys=['command', 'params'],
+=======
+>>>>>>> master handles time now
             outcomes=['emergency',
                       'recharge',
                       'reminder',
@@ -428,6 +441,8 @@ class SelectTask(State):
                       'patrol',
                       'surprise',
                       'reward',
+                      'silent_recharge',
+                      'social_role',
                       'preempted',
                       'none'])
 
@@ -437,7 +452,6 @@ class SelectTask(State):
             return 'preempted'
         print('Task Selection')
         print(ud.command)
-        # print(ud.params)
         if ud.command == 'IDLE':
             return 'none'
         return ud.command
@@ -459,6 +473,7 @@ class FakeForAllWithoutRunningActionSever(State):
         return 'succeeded'
 
 
+<<<<<<< HEAD
 class TestASW(State):
     """class to test the ASW functionality
     """
@@ -479,6 +494,8 @@ class TestASW(State):
 
 
 >>>>>>> master handles event,command data.
+=======
+>>>>>>> master handles time now
 def main():
     rospy.init_node(NAME)
     sm = StateMachine(
@@ -541,7 +558,7 @@ def main():
         outcomes=['succeeded',
                   'preempted',
                   'failed'],
-        input_keys=['command', 'params'],
+        input_keys=['command', 'params', 'active_task'],
         output_keys=['command', 'active_task']
     )
 >>>>>>> tried to reuse SimpleActionState based on task. Does not work this way.
@@ -576,6 +593,7 @@ def main():
         outcomes=['succeeded', 'aborted', 'preempted'],
         default_outcome='aborted',
         input_keys=['command', 'params', 'active_task'],
+<<<<<<< HEAD
 =======
     cc1 = Concurrence(
         outcomes=['succeeded', 'aborted', 'preempted'],
@@ -586,6 +604,8 @@ def main():
 =======
         input_keys=['command', 'params'],
 >>>>>>> master is now working with a dummy function. Real scenarios will be added shortly.
+=======
+>>>>>>> master handles time now
         output_keys=['command'],
         child_termination_cb=child_cb1,
         outcome_map={'succeeded': {'ASW': 'succeeded'},
@@ -668,6 +688,7 @@ def main():
             'ASW',
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
             TestASW()
 >>>>>>> master handles event,command data.
 =======
@@ -675,6 +696,8 @@ def main():
 =======
             # TestASW()
 >>>>>>> master is now working with a dummy function. Real scenarios will be added shortly.
+=======
+>>>>>>> master handles time now
             sm2
 >>>>>>> tried to reuse SimpleActionState based on task. Does not work this way.
         )
@@ -751,6 +774,8 @@ def main():
                          'patrol': 'PATROL',
                          'surprise': 'SURPRISE',
                          'reward': 'REWARD',
+                         'silent_recharge': 'SILENT_RECHARGE',
+                         'social_role': 'SOCIAL_ROLE',
                          'preempted': 'preempted',
                          'none': 'succeeded'}
         )
@@ -896,6 +921,7 @@ def main():
                          'aborted': 'failed'}
         )
 <<<<<<< HEAD
+<<<<<<< HEAD
         StateMachine.add(
             'UNDOCK',
             recharge.getEndRecharge(),
@@ -922,11 +948,25 @@ def main():
 =======
 =======
 >>>>>>> master is now working with a dummy function. Real scenarios will be added shortly.
+=======
+        StateMachine.add(
+            'SILENT_RECHARGE',
+            FakeForAllWithoutRunningActionSever(),
+            # recharge.getRecharge(),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'failed'}
+        )
+        StateMachine.add(
+            'SOCIAL_ROLE',
+            FakeForAllWithoutRunningActionSever(),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'failed'}
+        )
+>>>>>>> master handles time now
 
     sis = IntrospectionServer('master', sm1, '/MASTER')
 >>>>>>> tried to reuse SimpleActionState based on task. Does not work this way.
     sis.start()
-
     outcome = sm1.execute()
     rospy.loginfo(NAME + ' returned outcome ' + str(outcome))
 >>>>>>> master handles event,command data.
