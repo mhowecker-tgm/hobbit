@@ -119,7 +119,8 @@ def startDockProcedure():
     with seq:
         Sequence.add(
             'CHARGE_CHECK',
-            WaitForMsgState('/battery_state', BatteryState, msg_cb=battery_cb))
+            WaitForMsgState('/battery_state', BatteryState, msg_cb=battery_cb),
+                transitions={'aborted': 'CHARGE_CHECK'})
 
     def child_term_cb(outcome_map):
             return True
@@ -142,7 +143,8 @@ def startDockProcedure():
             'WAIT', SleepState(duration=60))
         Concurrence.add(
             'CHARGE_CHECK',
-            WaitForMsgState('/battery_state', BatteryState, msg_cb=battery_cb))
+            seq)
+            #WaitForMsgState('/battery_state', BatteryState, msg_cb=battery_cb))
 
     with sm:
         StateMachine.add('START_DOCK', hobbit_move.Dock(),
