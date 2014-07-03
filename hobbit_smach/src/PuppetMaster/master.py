@@ -2,6 +2,7 @@
 
 PKG = 'hobbit_smach'
 NAME = 'HOBBIT_MASTER'
+
 import roslib
 roslib.load_manifest(PKG)
 import rospy
