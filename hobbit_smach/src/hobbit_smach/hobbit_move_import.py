@@ -188,8 +188,8 @@ class SetNavigationGoal(ServiceState):
         ud.x = response.pose.x
         ud.y = response.pose.y
         ud.yaw = response.pose.theta
-        ud.room_name = None
-        ud.location_name = None
+        ud.room_name = 'None'
+        ud.location_name = 'None'
         return 'succeeded'
 
 

@@ -122,12 +122,13 @@ def startDockProcedure():
             WaitForMsgState('/battery_state', BatteryState, msg_cb=battery_cb))
 
     def child_term_cb(outcome_map):
-        if outcome_map['ROTATE'] == 'succeeded':
             return True
 
     def out_cb(outcome_map):
-        if outcome_map['ROTATE'] == 'succeeded':
+        if outcome_map['CHARGE_CHECK'] == 'succeeded':
             return 'succeeded'
+        elif outcome_map['WAIT'] == 'succeeded':
+            return 'failed'
 
     cc = Concurrence(
         outcomes=['succeeded', 'preempted', 'failed'],
@@ -148,7 +149,7 @@ def startDockProcedure():
                          transitions={'succeeded': 'CHECK'})
         StateMachine.add('CHECK', cc,
                          transitions={'succeeded': 'STOP',
-                                      'aborted': 'RETRY'})
+                                      'failed': 'RETRY'})
         StateMachine.add('RETRY', hobbit_move.Undock(),
                          transitions={'succeeded': 'GOTO_DOCK'})
         StateMachine.add('GOTO_DOCK', hobbit_move.Undock(),

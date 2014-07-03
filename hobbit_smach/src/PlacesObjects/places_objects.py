@@ -218,13 +218,16 @@ def getCoordinates(req):
     print('Inside: getCoordinates')
     #print(rooms)
     print req.room_name.data, req.location_name.data
-    if req.room_name.data == 'dock':
+    if req.room_name.data == 'dock' or req.room_name.data == None:
         gen = (x for x in rooms.rooms_vector)
+        print('most likely dock')	
     else:
         gen = (x for x in rooms.rooms_vector if req.room_name.data in x.room_name)
     for x in gen:
+        # print(x)
         gen1 = (k for k in x.places_vector if req.location_name.data in k.place_name)
         for k in gen1:
+            # print(k)
             pose = Pose2D(float(k.x), float(k.y), float(k.theta))
             print(pose)
             return pose
