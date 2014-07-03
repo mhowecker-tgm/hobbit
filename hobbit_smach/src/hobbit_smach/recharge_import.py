@@ -9,18 +9,17 @@ import roslib
 roslib.load_manifest(PKG)
 import rospy
 
-from smach import Sequence, State, StateMachine
+from smach import Sequence, State, StateMachine, Concurrence
 from uashh_smach.util import SleepState, WaitForMsgState
 from mira_msgs.msg import BatteryState
 import hobbit_smach.hobbit_move_import as hobbit_move
 from hobbit_user_interaction import HobbitMMUI
-from uashh_smach.util import SleepState
 
 
 def battery_cb(msg, ud):
     print('Received battery_state message')
     print(msg.charging)
-    if msg.charging == True:
+    if msg.charging:
         print('I am charging')
         return True
     else:
@@ -88,8 +87,6 @@ def getEndRecharge():
         input_keys=['room_name', 'location_name'],
         connector_outcome='succeeded'
     )
-    # seq.userdata.room_name = 'maincorridor'
-    # seq.userdata.location_name = 'default'
 
     with seq:
         Sequence.add(
@@ -103,13 +100,6 @@ def getEndRecharge():
         Sequence.add(
             'MOVE_AWAY_FROM_DOCK',
             hobbit_move.goToPosition(frame='/map', room='dock', place='dock'))
-        # Sequence.add(
-        #     'WAIT_FOR_MIRA_2',
-        #     SleepState(duration=3)
-        # )
-        # Sequence.add(
-        #     'SET_SOME_GOAL',
-        #     Dummy())
         Sequence.add(
             'MOVE_AWAY',
             hobbit_move.goToPosition(frame='/map', room='maincorridor',
@@ -129,15 +119,34 @@ def startDockProcedure():
     with seq:
         Sequence.add(
             'CHARGE_CHECK',
-            WaitForMsgState('/battery_state', BatteryState, msg_cb=battery_cb),
-        )
+            WaitForMsgState('/battery_state', BatteryState, msg_cb=battery_cb))
+
+    def child_term_cb(outcome_map):
+        if outcome_map['ROTATE'] == 'succeeded':
+            return True
+
+    def out_cb(outcome_map):
+        if outcome_map['ROTATE'] == 'succeeded':
+            return 'succeeded'
+
+    cc = Concurrence(
+        outcomes=['succeeded', 'preempted', 'failed'],
+        default_outcome='failed',
+        child_termination_cb=child_term_cb,
+        outcome_cb=out_cb
+    )
+
+    with cc:
+        Concurrence.add(
+            'WAIT', SleepState(duration=60))
+        Concurrence.add(
+            'CHARGE_CHECK',
+            WaitForMsgState('/battery_state', BatteryState, msg_cb=battery_cb))
 
     with sm:
         StateMachine.add('START_DOCK', hobbit_move.Dock(),
-                         transitions={'succeeded': 'WAIT'})
-        StateMachine.add('WAIT', SleepState(duration=30),
                          transitions={'succeeded': 'CHECK'})
-        StateMachine.add('CHECK', seq,
+        StateMachine.add('CHECK', cc,
                          transitions={'succeeded': 'STOP',
                                       'aborted': 'RETRY'})
         StateMachine.add('RETRY', hobbit_move.Undock(),
@@ -148,6 +157,4 @@ def startDockProcedure():
                          transitions={'succeeded': 'START_DOCK'})
         StateMachine.add('STOP', hobbit_move.Stop(),
                          transitions={'succeeded': 'succeeded'})
-        
-        
     return sm

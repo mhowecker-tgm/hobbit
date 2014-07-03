@@ -155,7 +155,7 @@ class SetNavigationGoal(ServiceState):
             request_cb=self.__request_cb,
             response_cb=self.__response_cb,
             input_keys=['room_name', 'location_name'],
-            output_keys=['x', 'y', 'yaw']
+            output_keys=['x', 'y', 'yaw', 'room_name', 'location_name']
         )
         self.frame = frame
         self.room = room
@@ -188,12 +188,13 @@ class SetNavigationGoal(ServiceState):
         ud.x = response.pose.x
         ud.y = response.pose.y
         ud.yaw = response.pose.theta
+        ud.room_name = None
+        ud.location_name = None
         return 'succeeded'
 
 
 class SetNavGoal(State):
     """
-
     """
     def __init__(self, active=True):
         State.__init__(
@@ -214,6 +215,7 @@ class SetNavGoal(State):
             self.obstacles.publish('inactive')
         return 'succeeded'
 
+
 def getPosition(room='none', place='dock'):
     serv = rospy.ServiceProxy(
         'get_coordinates',
@@ -223,6 +225,7 @@ def getPosition(room='none', place='dock'):
     req = GetCoordinatesRequest(String(room), String(place))
     resp = serv(req)
     return (resp.pose.x, resp.pose.y, resp.pose.theta)
+
 
 def goToPosition(frame='/map', room='None', place='dock'):
     """
