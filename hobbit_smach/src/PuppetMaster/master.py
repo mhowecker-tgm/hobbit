@@ -2,7 +2,6 @@
 
 PKG = 'hobbit_smach'
 NAME = 'HOBBIT_MASTER'
-task = 'nothing'
 import roslib
 roslib.load_manifest(PKG)
 import rospy
@@ -42,6 +41,7 @@ from hobbit_msgs.msg import Command, Event, GeneralHobbitAction,\
     GeneralHobbitGoal
 import uashh_smach.util as util
 
+<<<<<<< HEAD
 # sos = ['G_FALL', 'E_SOSBUTTON', 'C_HELP']
 # recharge = ['E_RECHARGE']
 # stop = ['C_STOP']
@@ -84,47 +84,22 @@ commands = [['G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP', 'C_HELP', 'F_CALLSOS',
 >>>>>>> Start work on the main statemachine. All hail the puppet master. ;-)
 =======
             ['C_REWARD', 'G_REWARD']
+=======
+commands = [['emergency', 'G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP', 'C_HELP', 'F_CALLSOS', 'G_EMERGENCY'],
+            ['recharge', 'E_RECHARGE', 'C_RECHARGE'],
+            ['reminder', 'E_REMINDER'],
+            ['stop', 'C_STOP', 'G_STOP'],
+            ['call_hobbit', 'C_CALLHOBBIT'],
+            ['call', 'E_CALLRING', 'E_CALLESTABLISHED', 'E_CALLENDED', 'C_MAKECALL'],
+            ['clear_floor', 'E_CLEARFLOOR'],
+            ['pickup', 'follow', 'learn_object', 'bring_object', 'goto', 'pickup'
+             'C_PICKUP', 'C_FOLLOW', 'C_LEARN', 'C_BRING', 'C_GOTO', 'G_POINTING'],
+            ['patrol', 'E_PATROL'],
+            ['surprise', 'C_SURPRISE'],
+            ['reward', 'C_REWARD', 'G_REWARD']
+>>>>>>> master is now working with a dummy function. Real scenarios will be added shortly.
             ]
 >>>>>>> master handles event,command data.
-
-class SimpleActionStateName(SimpleActionState):
-    def __init__(self,
-            # Action info
-            action_name,
-            action_spec,
-            # Default goal
-            goal = None,
-            goal_key = None,
-            goal_slots = [],
-            goal_cb = None,
-            goal_cb_args = [],
-            goal_cb_kwargs = {},
-            # Result modes
-            result_key = None,
-            result_slots = [],
-            result_cb = None,
-            result_cb_args = [],
-            result_cb_kwargs = {},
-            # Keys
-            input_keys = [],
-            output_keys = [],
-            outcomes = [],
-            # Timeouts
-            exec_timeout = None,
-            preempt_timeout = rospy.Duration(60.0),
-            server_wait_timeout = rospy.Duration(60.0)
-            ):
-        print('Inside subclass')
-        print(action_name)
-        print(action_spec)
-        print(server_wait_timeout)
-        global task
-        action_name = task
-        print(action_name)
-        print('subclass: action_name = %s' % action_name)
-        SimpleActionState.__init__(self,
-                                   action_name,
-                                   action_spec)
 
 
 def event_cb(msg, ud):
@@ -144,6 +119,7 @@ def event_cb(msg, ud):
     else:
         active_task = 100
 <<<<<<< HEAD
+<<<<<<< HEAD
     print(active_task)
     for index, item in enumerate(commands):
         if msg.event in item:
@@ -158,17 +134,21 @@ def event_cb(msg, ud):
                 return True
             elif index + 1 >= active_task and not night:
 =======
+=======
+    print(active_task)
+>>>>>>> master is now working with a dummy function. Real scenarios will be added shortly.
     for index, item in enumerate(commands):
         if msg.event in item:
             if index + 1 >= active_task:
 >>>>>>> Start work on the main statemachine. All hail the puppet master. ;-)
                 rospy.loginfo('New task has lower priority. Do nothing')
-                ud.command = msg.event
-                ud.params = msg.params
                 return False
             else:
                 rospy.loginfo('New task has higher priority. Start it.')
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> master is now working with a dummy function. Real scenarios will be added shortly.
                 if index == 7:
                     i = item.index(msg.event)
                     ud.command = item[i-6]
@@ -181,10 +161,13 @@ def event_cb(msg, ud):
                     rospy.set_param('active_task', 100)
                 else:
                     rospy.set_param('active_task', index)
+<<<<<<< HEAD
                 return True
     rospy.loginfo('Unknown event received %s' % msg.event)
 =======
                 rospy.set_param('active_task', index)
+=======
+>>>>>>> master is now working with a dummy function. Real scenarios will be added shortly.
                 return True
 <<<<<<< HEAD
         else:
@@ -199,6 +182,7 @@ def event_cb(msg, ud):
 def command_cb(msg, ud):
     rospy.loginfo('/Command data received:')
 <<<<<<< HEAD
+<<<<<<< HEAD
     print(msg.command)
 =======
     rospy.loginfo(str(msg))
@@ -207,24 +191,32 @@ def command_cb(msg, ud):
 =======
     print(msg)
 >>>>>>> master handles event,command data.
+=======
+    print(msg.command)
+>>>>>>> master is now working with a dummy function. Real scenarios will be added shortly.
     if rospy.has_param('active_task'):
         active_task = rospy.get_param('active_task')
     else:
         active_task = 100
 <<<<<<< HEAD
+<<<<<<< HEAD
     print(active_task)
 =======
 >>>>>>> Start work on the main statemachine. All hail the puppet master. ;-)
+=======
+    print(active_task)
+>>>>>>> master is now working with a dummy function. Real scenarios will be added shortly.
     for index, item in enumerate(commands):
         if msg.command in item:
             if index + 1 >= active_task:
                 rospy.loginfo('New task has lower priority. Do nothing')
-                ud.command = msg.event
-                ud.params = msg.params
                 return False
             else:
                 rospy.loginfo('New task has higher priority. Start it.')
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> master is now working with a dummy function. Real scenarios will be added shortly.
                 if index == 7:
                     i = item.index(msg.command)
                     ud.command = item[i-6]
@@ -237,6 +229,7 @@ def command_cb(msg, ud):
                     rospy.set_param('active_task', 100)
                 else:
                     rospy.set_param('active_task', index)
+<<<<<<< HEAD
                 return True
     rospy.loginfo('Unknown command received %s' % msg.command)
     return False
@@ -346,6 +339,8 @@ class FakeForAllWithoutRunningActionSever(State):
 
 =======
                 rospy.set_param('active_task', index)
+=======
+>>>>>>> master is now working with a dummy function. Real scenarios will be added shortly.
                 return True
     rospy.loginfo('Unknown command received %s' % msg.command)
     return False
@@ -367,18 +362,30 @@ def child_cb1(outcome_map):
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> Start work on the main statemachine. All hail the puppet master. ;-)
 =======
 =======
 def task_goal_cb(ud, goal):
     global task
     task = 'learn_object'
+=======
+def task_reminder_cb(ud, goal):
+    goal = GeneralHobbitGoal(
+        command=String('reminder'),
+        previous_state=String('IDLE'),
+        parameters=[String('command')]
+    )
+    return goal
+
+
+def task_lo_cb(ud, goal):
+>>>>>>> master is now working with a dummy function. Real scenarios will be added shortly.
     goal = GeneralHobbitGoal(
         command=String('learn_object'),
         previous_state=String('IDLE'),
         parameters=[]
     )
-    print('Trying to set goal')
     return goal
 
 >>>>>>> tried to reuse SimpleActionState based on task. Does not work this way.
@@ -405,19 +412,50 @@ class SelectTask(State):
     def __init__(self):
         State.__init__(
             self,
-            input_keys=['name'],
-            output_keys=['name'],
-            outcomes=['succeeded', 'preempted'])
+            input_keys=['command', 'params'],
+            outcomes=['emergency',
+                      'recharge',
+                      'reminder',
+                      'stop',
+                      'call_hobbit',
+                      'call',
+                      'clear_floor',
+                      'pickup',
+                      'follow',
+                      'learn_object',
+                      'bring_object',
+                      'goto',
+                      'patrol',
+                      'surprise',
+                      'reward',
+                      'preempted',
+                      'none'])
 
     def execute(self, ud):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
         print('Task Selection')
-        global task
-        print(task)
-        task = 'learn_object'
-        print(task)
+        print(ud.command)
+        # print(ud.params)
+        if ud.command == 'IDLE':
+            return 'none'
+        return ud.command
+
+
+class FakeForAllWithoutRunningActionSever(State):
+    """Initialize a few data structures
+    """
+    def __init__(self):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'preempted', 'aborted'])
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        print('FakeForAllWithoutRunningActionSever')
         return 'succeeded'
 
 
@@ -542,8 +580,12 @@ def main():
     cc1 = Concurrence(
         outcomes=['succeeded', 'aborted', 'preempted'],
         default_outcome='aborted',
+<<<<<<< HEAD
         input_keys=['command'],
 >>>>>>> master handles event,command data.
+=======
+        input_keys=['command', 'params'],
+>>>>>>> master is now working with a dummy function. Real scenarios will be added shortly.
         output_keys=['command'],
         child_termination_cb=child_cb1,
         outcome_map={'succeeded': {'ASW': 'succeeded'},
@@ -625,10 +667,14 @@ def main():
         Concurrence.add(
             'ASW',
 <<<<<<< HEAD
+<<<<<<< HEAD
             TestASW()
 >>>>>>> master handles event,command data.
 =======
             #TestASW()
+=======
+            # TestASW()
+>>>>>>> master is now working with a dummy function. Real scenarios will be added shortly.
             sm2
 >>>>>>> tried to reuse SimpleActionState based on task. Does not work this way.
         )
@@ -687,25 +733,57 @@ def main():
                 goal_cb=task_lo_cb,
 =======
     with sm2:
-        global task
         StateMachine.add(
             'SELECT_TASK',
             SelectTask(),
-            transitions={'succeeded': 'TASK'}
+            transitions={'emergency': 'EMERGENCY',
+                         'recharge': 'RECHARGE',
+                         'reminder': 'REMINDER',
+                         'stop': 'STOP',
+                         'call_hobbit': 'CALL_HOBBIT',
+                         'call': 'CALL',
+                         'clear_floor': 'CLEAR_FLOOR',
+                         'pickup': 'PICKUP',
+                         'follow': 'FOLLOW',
+                         'learn_object': 'LEARN_OBJECT',
+                         'bring_object': 'BRING_OBJECT',
+                         'goto': 'GOTO',
+                         'patrol': 'PATROL',
+                         'surprise': 'SURPRISE',
+                         'reward': 'REWARD',
+                         'preempted': 'preempted',
+                         'none': 'succeeded'}
         )
         StateMachine.add(
-            'TASK',
-            SimpleActionStateName(
-                'idle',
+            'LEARN_OBJECT',
+            SimpleActionState(
+                'learn_object',
                 GeneralHobbitAction,
-                goal_cb=task_goal_cb,
->>>>>>> tried to reuse SimpleActionState based on task. Does not work this way.
+                goal_cb=task_lo_cb,
                 preempt_timeout=rospy.Duration(5),
                 server_wait_timeout=rospy.Duration(10)
             ),
             transitions={'succeeded': 'succeeded',
                          'aborted': 'failed'}
         )
+        StateMachine.add(
+            'REMINDER',
+            SimpleActionState(
+                'reminder',
+                GeneralHobbitAction,
+<<<<<<< HEAD
+                goal_cb=task_goal_cb,
+>>>>>>> tried to reuse SimpleActionState based on task. Does not work this way.
+=======
+                goal_cb=task_reminder_cb,
+>>>>>>> master is now working with a dummy function. Real scenarios will be added shortly.
+                preempt_timeout=rospy.Duration(5),
+                server_wait_timeout=rospy.Duration(10)
+            ),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'failed'}
+        )
+<<<<<<< HEAD
 <<<<<<< HEAD
         StateMachine.add(
             'REMINDER',
@@ -719,6 +797,8 @@ def main():
             transitions={'succeeded': 'succeeded',
                          'aborted': 'failed'}
         )
+=======
+>>>>>>> master is now working with a dummy function. Real scenarios will be added shortly.
         StateMachine.add(
             'EMERGENCY',
             FakeForAllWithoutRunningActionSever(),
@@ -793,6 +873,7 @@ def main():
         )
         StateMachine.add(
             'RECHARGE',
+<<<<<<< HEAD
             HobbitEmotions.ShowEmotions(emotion='VERY_HAPPY',
                                                  emo_time=4),
             transitions={'succeeded': 'succeeded',
@@ -808,10 +889,13 @@ def main():
         )
         StateMachine.add(
             'SOCIAL_ROLE',
+=======
+>>>>>>> master is now working with a dummy function. Real scenarios will be added shortly.
             FakeForAllWithoutRunningActionSever(),
             transitions={'succeeded': 'succeeded',
                          'aborted': 'failed'}
         )
+<<<<<<< HEAD
         StateMachine.add(
             'UNDOCK',
             recharge.getEndRecharge(),
@@ -836,6 +920,8 @@ def main():
 =======
     sis = smach_ros.IntrospectionServer('master', sm1, '/MASTER')
 =======
+=======
+>>>>>>> master is now working with a dummy function. Real scenarios will be added shortly.
 
     sis = IntrospectionServer('master', sm1, '/MASTER')
 >>>>>>> tried to reuse SimpleActionState based on task. Does not work this way.
