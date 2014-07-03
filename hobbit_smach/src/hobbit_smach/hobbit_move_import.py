@@ -191,6 +191,39 @@ class SetNavigationGoal(ServiceState):
         return 'succeeded'
 
 
+class SetNavGoal(State):
+    """
+
+    """
+    def __init__(self, active=True):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'preempted']
+        )
+        self.obstacles = rospy.Publisher('headcam/active', String,
+                                         latch=False, queue_size=50)
+        self.active = active
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        if self.active:
+            self.obstacles.publish('active')
+        else:
+            self.obstacles.publish('inactive')
+        return 'succeeded'
+
+def getPosition(room='none', place='dock'):
+    serv = rospy.ServiceProxy(
+        'get_coordinates',
+        GetCoordinates,
+        persistent=False
+    )
+    req = GetCoordinatesRequest(String(room), String(place))
+    resp = serv(req)
+    return (resp.pose.x, resp.pose.y, resp.pose.theta)
+
 def goToPosition(frame='/map', room='None', place='dock'):
     """
     Return a SMACH Sequence for navigation to a new position.
