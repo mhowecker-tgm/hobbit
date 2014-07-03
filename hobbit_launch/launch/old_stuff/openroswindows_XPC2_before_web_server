@@ -1,0 +1,294 @@
+#!/usr/bin/env bash
+
+# requires xdotool, install via ubuntu package manager
+
+#setxkbmap dvorak  # fixes wrong keyboard mapping
+
+xdotool sleep 7
+
+
+gnome-terminal -t "console1"
+xdotool sleep 5
+xdotool type "sudo ptpd –b eth0"
+xdotool sleep 1
+xdotool key Return
+xdotool sleep 1
+xdotool type "hobbit"
+xdotool key Return
+xdotool sleep 3
+xdotool key alt+t
+xdotool sleep 1
+xdotool key s
+xdotool sleep 1
+xdotool type "roscore"
+xdotool key Return
+xdotool sleep 1
+xdotool type "roscore"
+xdotool key Return
+xdotool sleep 4
+
+xdotool key ctrl+shift+t
+xdotool key alt+t
+xdotool sleep 1
+xdotool key s
+xdotool sleep 1
+xdotool type "DecisionService"
+xdotool key Return
+xdotool sleep 1
+#xdotool type "roslaunch DecisionService startup.launch "
+xdotool type "screen -S 'Decision Service' bash -c '~/ScreenScripts/decisionService.sh;bash'"
+xdotool key Return
+xdotool sleep 1
+
+xdotool key ctrl+shift+t
+xdotool key alt+t
+xdotool sleep 1
+xdotool key s
+xdotool sleep 1
+xdotool type "Coordinator"
+xdotool key Return
+xdotool sleep 1
+#xdotool type "roslaunch Coordinator startup.launch "
+xdotool type "screen -S 'Coordinator' bash -c '~/ScreenScripts/coordinator.sh;bash'"
+xdotool key Return
+xdotool sleep 1
+
+xdotool key ctrl+shift+t
+xdotool key alt+t
+xdotool sleep 1
+xdotool key s
+xdotool sleep 1
+xdotool type "AalS"
+xdotool key Return
+xdotool sleep 1
+xdotool type "roslaunch AalService startup.launch "
+xdotool key Return
+xdotool sleep 1
+
+xdotool key ctrl+shift+t
+xdotool key alt+t
+xdotool sleep 1
+xdotool key s
+xdotool type "AS sleep"
+xdotool key Return
+xdotool sleep 1
+xdotool type "rosrun ActionSequencer sleep.py "
+xdotool key Return
+xdotool sleep 1
+
+xdotool key ctrl+shift+t
+xdotool key alt+t
+xdotool sleep 1
+xdotool key s
+xdotool type "AS help"
+xdotool key Return
+xdotool sleep 1
+xdotool type "rosrun ActionSequencer helpme.py "
+xdotool key Return
+xdotool sleep 1
+
+xdotool key ctrl+shift+t
+xdotool key alt+t
+xdotool sleep 1
+xdotool key s
+xdotool type "AS Reference"
+xdotool key Return
+xdotool sleep 1
+xdotool type "rosrun ActionSequencer ReferenceArm.py "
+xdotool key Return
+xdotool sleep 1
+
+xdotool key ctrl+shift+t
+xdotool key alt+t
+xdotool sleep 1
+xdotool key s
+xdotool type "AS surprise"
+xdotool key Return
+xdotool sleep 1
+xdotool type "rosrun ActionSequencer surpriseme.py "
+xdotool key Return
+xdotool sleep 1
+
+xdotool key ctrl+shift+t
+xdotool key alt+t
+xdotool sleep 1
+xdotool key s
+xdotool type "ASMoveto"
+xdotool key Return
+xdotool sleep 1
+#xdotool type "rosrun ActionSequencer movetolocation.py "
+xdotool type "screen -S 'Move To Location' bash -c '~/ScreenScripts/moveToLocation.sh;bash'"
+xdotool key Return
+xdotool sleep 1
+
+xdotool key ctrl+shift+t
+xdotool key alt+t
+xdotool sleep 1
+xdotool key s
+xdotool type "ASCleanup"
+xdotool key Return
+xdotool sleep 1
+#xdotool type "rosrun ActionSequencer clearfloor.py "
+xdotool type "screen -S 'Clear Floor' bash -c '~/ScreenScripts/clearFloor.sh;bash'"
+xdotool key Return
+xdotool sleep 1
+
+xdotool key ctrl+shift+t
+xdotool key alt+t
+xdotool sleep 1
+xdotool key s
+xdotool type "ASLearn"
+xdotool key Return
+xdotool sleep 1
+#xdotool type "rosrun ActionSequencer learnobject.py "
+xdotool type "screen -S 'Learn Object' bash -c '~/ScreenScripts/learnObject.sh;bash'"
+xdotool key Return
+xdotool sleep 1
+
+xdotool key ctrl+shift+t
+xdotool key alt+t
+xdotool sleep 1
+xdotool key s
+xdotool type "ASBringme"
+xdotool key Return
+xdotool sleep 1
+#xdotool type "rosrun ActionSequencer bringme.py "
+xdotool type "screen -S 'Bring Me' bash -c '~/ScreenScripts/bringMe.sh;bash'"
+xdotool key Return
+xdotool sleep 1
+
+
+
+gnome-terminal -t "console2"
+xdotool sleep 1
+
+xdotool key ctrl+shift+t
+xdotool key alt+t
+xdotool sleep 1
+xdotool key s
+xdotool type "topcamera"
+xdotool key Return
+xdotool sleep 1
+xdotool type "roslaunch HobbitLaunch top_camera_xpc2.launch "
+xdotool key Return
+xdotool sleep 1
+
+
+xdotool key ctrl+shift+t
+xdotool key alt+t
+xdotool sleep 1
+xdotool key s
+xdotool type "HobbitPlatform"
+xdotool key Return
+xdotool sleep 1
+xdotool type "roscd HobbitPlatform"
+xdotool key Return
+xdotool sleep 0.5
+xdotool type "rosrun HobbitPlatform HobbitPlatform ./bin/dsPIC30F4011.xml"
+xdotool key Return
+xdotool sleep 1
+
+xdotool key ctrl+shift+t
+xdotool key alt+t
+xdotool sleep 1
+xdotool key s
+xdotool type "Marker TS"
+xdotool key Return
+xdotool sleep 1
+xdotool type "roslaunch ar_marker touch.launch "
+xdotool key Return
+xdotool sleep 1
+
+xdotool key ctrl+shift+t
+xdotool key alt+t
+xdotool sleep 1
+xdotool key s
+xdotool type "Head"
+xdotool key Return
+xdotool sleep 1
+xdotool type "roslaunch Head startup_xpc2.launch "
+xdotool key Return
+xdotool sleep 1
+
+xdotool key ctrl+shift+t
+xdotool key alt+t
+xdotool sleep 1
+xdotool sleep 1
+xdotool key s
+xdotool type "Joystick"
+xdotool key Return
+xdotool sleep 3
+#xdotool type "roslaunch joy2twist startup.launch "
+xdotool type "screen -S 'Joystick' bash -c '~/ScreenScripts/joystick.sh;bash'"
+xdotool key Return
+xdotool sleep 1
+
+xdotool key ctrl+shift+t
+xdotool key alt+t
+xdotool sleep 1
+xdotool key s
+xdotool sleep 1
+xdotool type "ROOT Joystick"
+xdotool key Return
+xdotool sleep 1
+xdotool type "sudo bash"
+xdotool key Return
+xdotool sleep 1
+xdotool type "hobbit"
+xdotool key Return
+xdotool sleep 1
+xdotool type "rosrun ps3joy ps3joy.py"
+xdotool key Return
+xdotool sleep 1
+
+
+xdotool key ctrl+shift+t
+xdotool key alt+t
+xdotool sleep 1
+xdotool key s
+xdotool type "TOD feature"
+xdotool key Return
+xdotool sleep 1
+xdotool type "rosrun TableObjectDetector shapefeature"
+xdotool key Return
+xdotool sleep 1
+
+xdotool key ctrl+shift+t
+xdotool key alt+t
+xdotool sleep 1
+xdotool key s
+xdotool type "TOD detector"
+xdotool key Return
+xdotool sleep 1
+xdotool type "rosrun TableObjectDetector thor"
+xdotool key Return
+xdotool sleep 1
+
+xdotool key ctrl+shift+t
+xdotool key alt+t
+xdotool sleep 1
+xdotool key s
+xdotool sleep 1
+xdotool type "Emotionator"
+xdotool key Return
+xdotool sleep 1
+xdotool type "roslaunch Emotionator startup.launch "
+xdotool key Return
+xdotool sleep 1
+
+xdotool key ctrl+shift+t
+xdotool key alt+t
+xdotool sleep 1
+xdotool key s
+xdotool type "Face"
+xdotool key Return
+xdotool sleep 1
+xdotool type "roslaunch Face startup.launch "
+xdotool key Return
+xdotool sleep 1
+
+
+
+
+
+

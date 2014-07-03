@@ -67,14 +67,14 @@ sleep $DELAY_BETWEEN_STEPS
 
 
 # Start interfaces_mira, which starts the platform driver and the ros-mira interface for virtual lasers
-cd /opt/ros/hobbit_hydro/src/interfaces_mira/launch
-roslaunch startup.launch&
+#cd /opt/ros/hobbit_hydro/src/interfaces_mira/launch
+#roslaunch startup.launch&
 
 sleep $DELAY_BETWEEN_STEPS
 
 # Start mira center
-cd /opt/ros/hobbit_hydro/src/interfaces_mira/resources
-miracenter mira_config.xml
+#cd /opt/ros/hobbit_hydro/src/interfaces_mira/resources
+#miracenter mira_config.xml
 
 
 
@@ -83,11 +83,12 @@ miracenter mira_config.xml
 
 # Load Hobbit PT2 parameters
 cd /opt/ros/hobbit_hydro/src/
-rosparams load hobbit_paramy.yaml
+rosparams load hobbit_params.yaml
 
 # Start SMACH handling of rooms, places, objects.
 cd /opt/ros/hobbit_hydro/src/hobbit_smach/src/PlacesObjects
 rosrun hobbit_smach places_objects.py
+roslaunch hobbit_smach SavePCD.launch
 # Start SMACH handling for the demo on 19th June 2014
 rosrun hobbit_smach learn_object.py
 rosrun hobbit_smach away.py

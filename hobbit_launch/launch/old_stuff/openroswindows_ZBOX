@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+# requires xdotool, install via ubuntu package manager
+
+xdotool sleep 5
+gnome-terminal -t "console"
+
+xdotool key ctrl+shift+t
+xdotool sleep 1
+xdotool key alt+t
+xdotool sleep 1
+xdotool key s
+xdotool sleep 1
+xdotool type "botti startup"
+xdotool sleep 1
+xdotool key Return
+xdotool sleep 1
+xdotool type "roslaunch botti startup.launch "
+xdotool key Return
+xdotool sleep 1
+
+
+xdotool key ctrl+shift+t
+xdotool sleep 1
+xdotool key alt+t
+xdotool sleep 1
+xdotool key s
+xdotool sleep 1
+xdotool type "ptpd"
+xdotool sleep 1
+xdotool key Return
+xdotool sleep 1
+xdotool type "sudo ptpd -g –b eth0"
+xdotool sleep 1
+xdotool key Return
+xdotool sleep 1
+xdotool type "botti-client"
+xdotool key Return
+xdotool sleep 1
+
+
+
+
+
+
+
+
+
