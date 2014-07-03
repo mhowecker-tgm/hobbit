@@ -31,9 +31,10 @@ commands = [['emergency', 'G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP', 'C_HELP',
             ]
 =======
 import smach_ros
-from smach import StateMachine, Concurrence, Sequence
-from hobbit_msgs.msg import Command, Status, Event
+from smach import StateMachine, Concurrence, State
+from hobbit_msgs.msg import Command, Event
 import uashh_smach.util as util
+from std_msgs.msg import String
 
 # sos = ['G_FALL', 'E_SOSBUTTON', 'C_HELP']
 # recharge = ['E_RECHARGE']
@@ -49,30 +50,50 @@ import uashh_smach.util as util
 # surprise = ['C_SURPRISE']
 # reward = ['C_REWARD']
 
-commands = [['G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP'],
-            ['E_RECHARGE'],
-            ['C_STOP'],
-            ['E_CALLHOBBIT'],
-            ['C_BREAK'],
+actions = [['G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP'],
+           ['E_RECHARGE'],
+           ['C_STOP'],
+           ['E_CALLHOBBIT'],
+           ['C_BREAK'],
+           ['E_REMINDER'],
+           ['E_CALLRING', 'E_CALLESTABLISHED', 'E_CALLENDED'],
+           ['C_MAKECALL'],
+           ['E_CLEARFLOOR'],
+           ['C_PICKUP', 'C_FOLLOW', 'C_LEARN', 'C_BRING', 'C_GOTO'],
+           ['E_PATROL'],
+           ['C_SURPRISE'],
+           ['C_REWARD']]
+commands = [['G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP', 'C_HELP', 'F_CALLSOS', 'G_EMERGENCY'],
+            ['E_RECHARGE', 'C_RECHARGE'],
             ['E_REMINDER'],
-            ['E_CALLRING', 'E_CALLESTABLISHED', 'E_CALLENDED'],
-            ['C_MAKECALL'],
+            ['C_STOP', 'G_STOP'],
+            ['C_CALLHOBBIT'],
+            ['E_CALLRING', 'E_CALLESTABLISHED', 'E_CALLENDED', 'C_MAKECALL'],
             ['E_CLEARFLOOR'],
-            ['C_PICKUP', 'C_FOLLOW', 'C_LEARN', 'C_BRING', 'C_GOTO'],
+            ['C_PICKUP', 'C_FOLLOW', 'C_LEARN', 'C_BRING', 'C_GOTO', 'G_POINTING'],
             ['E_PATROL'],
             ['C_SURPRISE'],
+<<<<<<< HEAD
             ['C_REWARD']]
 >>>>>>> Start work on the main statemachine. All hail the puppet master. ;-)
+=======
+            ['C_REWARD', 'G_REWARD']
+            ]
+>>>>>>> master handles event,command data.
 
 
 def event_cb(msg, ud):
     rospy.loginfo('/Event data received:')
+<<<<<<< HEAD
 <<<<<<< HEAD
     print(msg.event)
     night = helper.IsItNight()
 =======
     rospy.loginfo(str(msg))
 >>>>>>> Start work on the main statemachine. All hail the puppet master. ;-)
+=======
+    print(msg.event)
+>>>>>>> master handles event,command data.
     if rospy.has_param('active_task'):
         active_task = rospy.get_param('active_task')
     else:
@@ -97,6 +118,8 @@ def event_cb(msg, ud):
             if index + 1 >= active_task:
 >>>>>>> Start work on the main statemachine. All hail the puppet master. ;-)
                 rospy.loginfo('New task has lower priority. Do nothing')
+                ud.command = msg.event
+                ud.params = msg.params
                 return False
             else:
                 rospy.loginfo('New task has higher priority. Start it.')
@@ -118,9 +141,13 @@ def event_cb(msg, ud):
 =======
                 rospy.set_param('active_task', index)
                 return True
+<<<<<<< HEAD
         else:
             rospy.loginfo('Unknown event received %s' % msg.event)
 >>>>>>> Start work on the main statemachine. All hail the puppet master. ;-)
+=======
+    rospy.loginfo('Unknown event received %s' % msg.event)
+>>>>>>> master handles event,command data.
     return False
 
 
@@ -130,7 +157,11 @@ def command_cb(msg, ud):
     print(msg.command)
 =======
     rospy.loginfo(str(msg))
+<<<<<<< HEAD
 >>>>>>> Start work on the main statemachine. All hail the puppet master. ;-)
+=======
+    print(msg)
+>>>>>>> master handles event,command data.
     if rospy.has_param('active_task'):
         active_task = rospy.get_param('active_task')
     else:
@@ -143,6 +174,8 @@ def command_cb(msg, ud):
         if msg.command in item:
             if index + 1 >= active_task:
                 rospy.loginfo('New task has lower priority. Do nothing')
+                ud.command = msg.event
+                ud.params = msg.params
                 return False
             else:
                 rospy.loginfo('New task has higher priority. Start it.')
@@ -269,26 +302,79 @@ class FakeForAllWithoutRunningActionSever(State):
 =======
                 rospy.set_param('active_task', index)
                 return True
-        else:
-            rospy.loginfo('Unknown command received %s' % msg.command)
+    rospy.loginfo('Unknown command received %s' % msg.command)
     return False
 
 
+def child_cb(outcome_map):
+    print('child_cb')
+    return True
+
+
+def child_cb1(outcome_map):
+    print('child_cb1')
+    return False
+
+
+<<<<<<< HEAD
 >>>>>>> Start work on the main statemachine. All hail the puppet master. ;-)
+=======
+
+class Init(State):
+    """Initialize a few data structures
+    """
+    def __init__(self):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'preempted'])
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        print('Init')
+        return 'succeeded'
+
+class TestASW(State):
+    """class to test the ASW functionality
+    """
+    def __init__(self):
+        State.__init__(
+            self,
+            input_keys=['command'],
+            outcomes=['succeeded', 'preempted', 'aborted'])
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        print('TestASW')
+        print(ud.command)
+        return 'succeeded'
+
+
+>>>>>>> master handles event,command data.
 def main():
     rospy.init_node(NAME)
     sm = StateMachine(
         outcomes=['succeeded',
                   'preempted',
 <<<<<<< HEAD
+<<<<<<< HEAD
                   'failed'],
         input_keys=['command', 'active_task', 'params'],
         output_keys=['command', 'active_task', 'params']
+=======
+                  'failed'],
+        input_keys=['command'],
+        output_keys=['command'],
+>>>>>>> master handles event,command data.
     )
 
     sm1 = StateMachine(
         outcomes=['succeeded',
                   'preempted',
+<<<<<<< HEAD
                   'failed']
     )
     sm1.userdata.command = 'IDLE'
@@ -306,33 +392,56 @@ def main():
                   'failed']
     )
 >>>>>>> Start work on the main statemachine. All hail the puppet master. ;-)
+=======
+                  'failed'],
+        input_keys=['command'],
+        output_keys=['command'],
+    )
+    sm1.userdata.command = 'IDLE'
+>>>>>>> master handles event,command data.
 
     cc = Concurrence(
         outcomes=['succeeded', 'aborted', 'preempted'],
         default_outcome='aborted',
+<<<<<<< HEAD
 <<<<<<< HEAD
         input_keys=['command', 'active_task', 'params'],
         output_keys=['command', 'params'],
         child_termination_cb=child_cb,
 =======
 >>>>>>> Start work on the main statemachine. All hail the puppet master. ;-)
+=======
+        input_keys=['command'],
+        output_keys=['command'],
+        child_termination_cb=child_cb,
+>>>>>>> master handles event,command data.
         outcome_map={'succeeded': {'Event_Listener': 'succeeded'},
                      'aborted': {'Event_Listener': 'aborted'}}
     )
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     cc1 = Concurrence(
         outcomes=['succeeded', 'aborted', 'preempted'],
         default_outcome='aborted',
         input_keys=['command', 'params', 'active_task'],
+=======
+    cc1 = Concurrence(
+        outcomes=['succeeded', 'aborted', 'preempted'],
+        default_outcome='aborted',
+        input_keys=['command'],
+>>>>>>> master handles event,command data.
         output_keys=['command'],
         child_termination_cb=child_cb1,
         outcome_map={'succeeded': {'ASW': 'succeeded'},
                      'aborted': {'Commands': 'failed'}}
     )
 
+<<<<<<< HEAD
 =======
 >>>>>>> Start work on the main statemachine. All hail the puppet master. ;-)
+=======
+>>>>>>> master handles event,command data.
     with cc:
         Concurrence.add(
             'Event_Listener',
@@ -340,11 +449,16 @@ def main():
                 '/Event',
                 Event,
 <<<<<<< HEAD
+<<<<<<< HEAD
                 msg_cb=event_cb,
                 output_keys=['command', 'params']
 =======
                 msg_cb=event_cb
 >>>>>>> Start work on the main statemachine. All hail the puppet master. ;-)
+=======
+                msg_cb=event_cb,
+                output_keys=['command', 'params']
+>>>>>>> master handles event,command data.
             )
         )
         Concurrence.add(
@@ -352,6 +466,7 @@ def main():
             util.WaitForMsgState(
                 '/Command',
                 Command,
+<<<<<<< HEAD
 <<<<<<< HEAD
                 msg_cb=command_cb,
                 output_keys=['command', 'params']
@@ -365,38 +480,39 @@ def main():
             transitions={'succeeded': 'succeeded',
 =======
                 msg_cb=command_cb
+=======
+                msg_cb=command_cb,
+                output_keys=['command', 'params']
+>>>>>>> master handles event,command data.
             )
         )
-        # Concurrence.add(
-        #     'Status_Listener',
-        #     util.WaitForMsgState(
-        #         '/Status',
-        #         Status,
-        #         msg_cb=status_cb
-        #     )
-        # )
 
     with sm:
-        # StateMachine.add(
-        #     'START',
-        #     Start(),
-        #     transitions={'succeeded': 'WAIT_FOR_E_C',
-        #                  'aborted': 'SET_FAILURE'}
-        # )
         StateMachine.add(
             'WAIT_FOR_E_C',
             cc,
+<<<<<<< HEAD
             transitions={'succeeded': 'WAIT_FOR_E_C',
 >>>>>>> Start work on the main statemachine. All hail the puppet master. ;-)
+=======
+            transitions={'succeeded': 'succeeded',
+>>>>>>> master handles event,command data.
                          'aborted': 'WAIT_FOR_E_C',
                          'preempted': 'preempted'}
         )
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     with cc1:
         Concurrence.add(
             'ASW',
             sm2
+=======
+    with cc1:
+        Concurrence.add(
+            'ASW',
+            TestASW()
+>>>>>>> master handles event,command data.
         )
         Concurrence.add(
             'Commands',
@@ -418,6 +534,7 @@ def main():
                          'preempted': 'preempted'}
         )
 
+<<<<<<< HEAD
     with sm2:
         StateMachine.add(
             'SELECT_TASK',
@@ -581,6 +698,13 @@ def main():
     outcome = sm.execute()
     rospy.loginfo(NAME + ' returned outcome' + str(outcome))
 >>>>>>> Start work on the main statemachine. All hail the puppet master. ;-)
+=======
+    sis = smach_ros.IntrospectionServer('master', sm1, '/MASTER')
+    sis.start()
+
+    outcome = sm1.execute()
+    rospy.loginfo(NAME + ' returned outcome ' + str(outcome))
+>>>>>>> master handles event,command data.
     rospy.spin()
     sis.stop()
 
