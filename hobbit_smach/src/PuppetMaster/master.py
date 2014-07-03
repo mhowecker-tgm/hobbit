@@ -132,10 +132,14 @@ def event_cb(msg, ud):
                 rospy.set_param('active_task', index)
                 return True
 <<<<<<< HEAD
+<<<<<<< HEAD
             elif index == 1 and not night:
 =======
             elif index == 1 and night:
 >>>>>>> master handles time now
+=======
+            elif index == 1 and not night:
+>>>>>>> small changes
                 ud.command = 'silent_recharge'
                 rospy.set_param('active_task', index)
                 return True

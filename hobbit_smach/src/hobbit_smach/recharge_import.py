@@ -77,6 +77,7 @@ def getRecharge():
             Sequence.add(
                 'MOVE_TO_DOCK',
 <<<<<<< HEAD
+<<<<<<< HEAD
                 hobbit_move.goToPosition(frame='/map'))
             Sequence.add(
                 'DOCKING',
@@ -134,6 +135,9 @@ def getEndRecharge():
 
 =======
                 hobbit_move.goToPosition(frame='/map', place='dock'))
+=======
+                hobbit_move.goToPosition(frame='/map', room='dock', place='dock'))
+>>>>>>> small changes
             Sequence.add(
                 'DOCKING',
                 hobbit_move.Dock())
@@ -145,6 +149,7 @@ def getEndRecharge():
 <<<<<<< HEAD
 >>>>>>> master handles time now
 =======
+
 
 def getRecharge():
     """This function handles the autonomous charging sequence.

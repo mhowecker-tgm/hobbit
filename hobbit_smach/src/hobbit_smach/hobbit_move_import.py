@@ -79,7 +79,7 @@ class Dock(State):
     Publish the docking message to mira
     topic: /docking_task
     """
-    def __init__(self, angle=0):
+    def __init__(self):
         State.__init__(
             self,
             outcomes=['succeeded', 'preempted']
@@ -99,7 +99,7 @@ class Stop(State):
     Publish the stop message to mira
     topic: /stop_request
     """
-    def __init__(self, angle=0):
+    def __init__(self):
         State.__init__(
             self,
             outcomes=['succeeded', 'preempted']
@@ -167,6 +167,7 @@ class SetNavigationGoal(ServiceState):
 
     def __request_cb(self, ud, request):
         print('Inside SetNavigationGoal')
+        print(ud.room_name, ud.location_name)
         if ud.room_name:
             self.room = ud.room_name
             if ud.location_name:
@@ -178,7 +179,7 @@ class SetNavigationGoal(ServiceState):
             print(self.room)
             print(self.place)
         request = GetCoordinatesRequest()
-        #request.header.stamp = rospy.Time.now()
+        # request.header.stamp = rospy.Time.now()
         request.room_name.data = self.room
         request.location_name.data = self.place
         print(request)
@@ -209,6 +210,8 @@ def goToPosition(frame='/map', room='None', place='dock'):
         connector_outcome='succeeded',
         input_keys=['room_name', 'location_name']
     )
+    seq.userdata.room_name = room
+    seq.userdata.location_name = place
 
     with seq:
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
