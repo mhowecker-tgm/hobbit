@@ -763,7 +763,8 @@ def main():
                          'recharge': 'RECHARGE',
                          'reminder': 'REMINDER',
                          'stop': 'STOP',
-                         'call_hobbit': 'CALL_HOBBIT',
+                         # 'call_hobbit': 'CALL_HOBBIT',
+                         'call_hobbit': 'UNDOCK',
                          'call': 'CALL',
                          'clear_floor': 'CLEAR_FLOOR',
                          'pickup': 'PICKUP',
@@ -899,6 +900,7 @@ def main():
         StateMachine.add(
             'RECHARGE',
 <<<<<<< HEAD
+<<<<<<< HEAD
             HobbitEmotions.ShowEmotions(emotion='VERY_HAPPY',
                                                  emo_time=4),
             transitions={'succeeded': 'succeeded',
@@ -917,8 +919,13 @@ def main():
 =======
 >>>>>>> master is now working with a dummy function. Real scenarios will be added shortly.
             FakeForAllWithoutRunningActionSever(),
+=======
+            HobbitEmotions.ShowEmotions(emotion='VERY_HAPPY',
+                                                 emo_time=4),
+>>>>>>> small changes to test dock/undock at the charging station.
             transitions={'succeeded': 'succeeded',
-                         'aborted': 'failed'}
+                         'failed': 'failed',
+                         'preempted': 'preempted'}
         )
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -962,14 +969,31 @@ def main():
             transitions={'succeeded': 'succeeded',
                          'aborted': 'failed'}
         )
+<<<<<<< HEAD
 >>>>>>> master handles time now
+=======
+        StateMachine.add(
+            'UNDOCK',
+            recharge.getEndRecharge(),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'failed'}
+        )
+>>>>>>> small changes to test dock/undock at the charging station.
 
+    """
+    Now we actually start the IntrospectionServer to visualize the StateMachine
+    as a dot graph, and execute the main StateMachine.
+    """
     sis = IntrospectionServer('master', sm1, '/MASTER')
 >>>>>>> tried to reuse SimpleActionState based on task. Does not work this way.
     sis.start()
+<<<<<<< HEAD
     outcome = sm1.execute()
     rospy.loginfo(NAME + ' returned outcome ' + str(outcome))
 >>>>>>> master handles event,command data.
+=======
+    sm1.execute()
+>>>>>>> small changes to test dock/undock at the charging station.
     rospy.spin()
     sis.stop()
 
