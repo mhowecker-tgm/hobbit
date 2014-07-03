@@ -83,7 +83,7 @@ sleep $DELAY_BETWEEN_STEPS
 
 # Load Hobbit PT2 parameters
 cd /opt/ros/hobbit_hydro/src/
-rosparams load hobbit_params.yaml
+rosparam load hobbit_params.yaml
 
 # Start SMACH handling of rooms, places, objects.
 cd /opt/ros/hobbit_hydro/src/hobbit_smach/src/PlacesObjects
