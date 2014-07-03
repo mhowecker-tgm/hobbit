@@ -2,9 +2,11 @@
 
 PKG = 'hobbit_smach'
 NAME = 'HOBBIT_MASTER'
+task = 'nothing'
 import roslib
 roslib.load_manifest(PKG)
 import rospy
+<<<<<<< HEAD
 <<<<<<< HEAD
 from smach_ros import SimpleActionState, IntrospectionServer
 from smach import StateMachine, Concurrence, State
@@ -31,10 +33,14 @@ commands = [['emergency', 'G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP', 'C_HELP',
             ]
 =======
 import smach_ros
+=======
+from smach_ros import SimpleActionState, IntrospectionServer
+>>>>>>> tried to reuse SimpleActionState based on task. Does not work this way.
 from smach import StateMachine, Concurrence, State
-from hobbit_msgs.msg import Command, Event
-import uashh_smach.util as util
 from std_msgs.msg import String
+from hobbit_msgs.msg import Command, Event, GeneralHobbitAction,\
+    GeneralHobbitGoal
+import uashh_smach.util as util
 
 # sos = ['G_FALL', 'E_SOSBUTTON', 'C_HELP']
 # recharge = ['E_RECHARGE']
@@ -80,6 +86,45 @@ commands = [['G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP', 'C_HELP', 'F_CALLSOS',
             ['C_REWARD', 'G_REWARD']
             ]
 >>>>>>> master handles event,command data.
+
+class SimpleActionStateName(SimpleActionState):
+    def __init__(self,
+            # Action info
+            action_name,
+            action_spec,
+            # Default goal
+            goal = None,
+            goal_key = None,
+            goal_slots = [],
+            goal_cb = None,
+            goal_cb_args = [],
+            goal_cb_kwargs = {},
+            # Result modes
+            result_key = None,
+            result_slots = [],
+            result_cb = None,
+            result_cb_args = [],
+            result_cb_kwargs = {},
+            # Keys
+            input_keys = [],
+            output_keys = [],
+            outcomes = [],
+            # Timeouts
+            exec_timeout = None,
+            preempt_timeout = rospy.Duration(60.0),
+            server_wait_timeout = rospy.Duration(60.0)
+            ):
+        print('Inside subclass')
+        print(action_name)
+        print(action_spec)
+        print(server_wait_timeout)
+        global task
+        action_name = task
+        print(action_name)
+        print('subclass: action_name = %s' % action_name)
+        SimpleActionState.__init__(self,
+                                   action_name,
+                                   action_spec)
 
 
 def event_cb(msg, ud):
@@ -313,12 +358,30 @@ def child_cb(outcome_map):
 
 def child_cb1(outcome_map):
     print('child_cb1')
-    return False
+    print(outcome_map)
+    if outcome_map['Commands'] == 'succeeded':
+        return True
+    else:
+        return False
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> Start work on the main statemachine. All hail the puppet master. ;-)
 =======
+=======
+def task_goal_cb(ud, goal):
+    global task
+    task = 'learn_object'
+    goal = GeneralHobbitGoal(
+        command=String('learn_object'),
+        previous_state=String('IDLE'),
+        parameters=[]
+    )
+    print('Trying to set goal')
+    return goal
+
+>>>>>>> tried to reuse SimpleActionState based on task. Does not work this way.
 
 class Init(State):
     """Initialize a few data structures
@@ -335,6 +398,29 @@ class Init(State):
         print('Init')
         return 'succeeded'
 
+
+class SelectTask(State):
+    """Select the task for execution
+    """
+    def __init__(self):
+        State.__init__(
+            self,
+            input_keys=['name'],
+            output_keys=['name'],
+            outcomes=['succeeded', 'preempted'])
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        print('Task Selection')
+        global task
+        print(task)
+        task = 'learn_object'
+        print(task)
+        return 'succeeded'
+
+
 class TestASW(State):
     """class to test the ASW functionality
     """
@@ -350,6 +436,7 @@ class TestASW(State):
             return 'preempted'
         print('TestASW')
         print(ud.command)
+        rospy.sleep(10)
         return 'succeeded'
 
 
@@ -366,14 +453,20 @@ def main():
         output_keys=['command', 'active_task', 'params']
 =======
                   'failed'],
+<<<<<<< HEAD
         input_keys=['command'],
         output_keys=['command'],
 >>>>>>> master handles event,command data.
+=======
+        input_keys=['command', 'active_task', 'params'],
+        output_keys=['command', 'active_task', 'params']
+>>>>>>> tried to reuse SimpleActionState based on task. Does not work this way.
     )
 
     sm1 = StateMachine(
         outcomes=['succeeded',
                   'preempted',
+<<<<<<< HEAD
 <<<<<<< HEAD
                   'failed']
     )
@@ -399,10 +492,26 @@ def main():
     )
     sm1.userdata.command = 'IDLE'
 >>>>>>> master handles event,command data.
+=======
+                  'failed']
+    )
+    sm1.userdata.command = 'IDLE'
+    sm1.userdata.active_task = 'IDLE'
+    sm1.userdata.params = []
+
+    sm2 = StateMachine(
+        outcomes=['succeeded',
+                  'preempted',
+                  'failed'],
+        input_keys=['command', 'params'],
+        output_keys=['command', 'active_task']
+    )
+>>>>>>> tried to reuse SimpleActionState based on task. Does not work this way.
 
     cc = Concurrence(
         outcomes=['succeeded', 'aborted', 'preempted'],
         default_outcome='aborted',
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
         input_keys=['command', 'active_task', 'params'],
@@ -413,6 +522,10 @@ def main():
 =======
         input_keys=['command'],
         output_keys=['command'],
+=======
+        input_keys=['command', 'active_task', 'params'],
+        output_keys=['command', 'params'],
+>>>>>>> tried to reuse SimpleActionState based on task. Does not work this way.
         child_termination_cb=child_cb,
 >>>>>>> master handles event,command data.
         outcome_map={'succeeded': {'Event_Listener': 'succeeded'},
@@ -511,8 +624,13 @@ def main():
     with cc1:
         Concurrence.add(
             'ASW',
+<<<<<<< HEAD
             TestASW()
 >>>>>>> master handles event,command data.
+=======
+            #TestASW()
+            sm2
+>>>>>>> tried to reuse SimpleActionState based on task. Does not work this way.
         )
         Concurrence.add(
             'Commands',
@@ -534,6 +652,7 @@ def main():
                          'preempted': 'preempted'}
         )
 
+<<<<<<< HEAD
 <<<<<<< HEAD
     with sm2:
         StateMachine.add(
@@ -566,12 +685,28 @@ def main():
                 'learn_object',
                 GeneralHobbitAction,
                 goal_cb=task_lo_cb,
+=======
+    with sm2:
+        global task
+        StateMachine.add(
+            'SELECT_TASK',
+            SelectTask(),
+            transitions={'succeeded': 'TASK'}
+        )
+        StateMachine.add(
+            'TASK',
+            SimpleActionStateName(
+                'idle',
+                GeneralHobbitAction,
+                goal_cb=task_goal_cb,
+>>>>>>> tried to reuse SimpleActionState based on task. Does not work this way.
                 preempt_timeout=rospy.Duration(5),
                 server_wait_timeout=rospy.Duration(10)
             ),
             transitions={'succeeded': 'succeeded',
                          'aborted': 'failed'}
         )
+<<<<<<< HEAD
         StateMachine.add(
             'REMINDER',
             SimpleActionState(
@@ -700,6 +835,10 @@ def main():
 >>>>>>> Start work on the main statemachine. All hail the puppet master. ;-)
 =======
     sis = smach_ros.IntrospectionServer('master', sm1, '/MASTER')
+=======
+
+    sis = IntrospectionServer('master', sm1, '/MASTER')
+>>>>>>> tried to reuse SimpleActionState based on task. Does not work this way.
     sis.start()
 
     outcome = sm1.execute()
