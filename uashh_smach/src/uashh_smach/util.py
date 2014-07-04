@@ -276,6 +276,7 @@ def get_current_robot_position(frame='/map'):
     frame: defaults to /map
     """
     try:
+        TransformListenerSingleton.get().waitForTransform(frame, '/base_link', rospy.Time(0), rospy.Duration(4.0))
         trans, rot = TransformListenerSingleton.get().lookupTransform(frame, '/base_link', rospy.Time(0))
         (_roll, _pitch, yaw) = tf.transformations.euler_from_quaternion(rot)
         return trans[0], trans[1], yaw
