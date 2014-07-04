@@ -8,6 +8,9 @@ DEBUG = False
 import roslib
 roslib.load_manifest(PKG)
 import rospy
+import smach
+import uashh_smach.util as util
+import math
 
 from smach import State, Sequence, StateMachine
 from smach_ros import ServiceState

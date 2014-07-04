@@ -8,6 +8,7 @@ DEBUG = False
 import roslib
 roslib.load_manifest(PKG)
 import rospy
+import smach
 
 from smach import Sequence, State, StateMachine, Concurrence
 from uashh_smach.util import SleepState, WaitForMsgState
@@ -149,9 +150,9 @@ def startDockProcedure():
     with sm:
         StateMachine.add('START_DOCK', hobbit_move.Dock(),
                          transitions={'succeeded': 'WAIT'})
-        StateMachine.add('WAIT', SleepState(duration=10),
+        StateMachine.add('WAIT', SleepState(duration=1),
                          transitions={'succeeded': 'DID_WE_MOVE'})
-        StateMachine.add('DID_WE_MOVE', HasMovedState(minimum_distance=0.5),
+        StateMachine.add('DID_WE_MOVE', hobbit_move.HasMovedFromPreDock(minimum_distance=0.3),
                          transitions={'movement_exceeds_distance': 'CHECK',
                                       'movement_within_distance': 'DID_WE_MOVE'})
         StateMachine.add('CHECK', cc,
