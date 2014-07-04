@@ -147,18 +147,17 @@ class Srv(LineReceiver):
           if self.key in callactivityset.keys(): #it is a call button
              self.sensor=callactivityset[self.key]
              if self.sensor and self.value == "SWITCH=1":
-                print self.sensor
+                print "-got CALL sensor-", "\x1B[31m"+self.sensor+"\x1B[0m"
                 self.pubecall_event(self.place,self.sensor) #issue call request
                 t=str(int(time.time()))
-                #setparam("ENV.Sensor."+self.sensor+".Time",t)
-                #setparam("ENV.Sensor."+self.sensor+".Value", self.value)
-                print "-got CALL sensor-"
+                setparam("USER.Action.Time",t)
+                setparam("USER.Action.Place", self.place)
 
           #=== check sensor.type ACTIVITY
           if self.key in activityset.keys(): #it is an activity related sensor
              self.sensor=activityset[self.key]
-             if self.sensor:
-                print self.sensor
+             if self.sensor and (self.value == "SWITCH=1" or self.value == "PIR=1"):
+                print "-got ACTIVITY sensor-", "\x1B[31m"+self.sensor+"\x1B[0m"
                 self.pubAALevent(self.place,self.sensor,self.value)
                 t=str(int(time.time()))
                 #setparam("ENV.Sensor."+self.sensor+".Time",t)
@@ -167,7 +166,6 @@ class Srv(LineReceiver):
                 #=== remember location of ACTIVITY(user)
                 setparam("USER.Sensor.Time",t)
                 setparam("USER.Sensor.Place", self.place)
-                print "-got ACTIVITY sensor-"
 
           if mysensor==True:
            #=== check sensor.type EHOME
@@ -190,7 +188,7 @@ class Srv(LineReceiver):
                 setparam("ENV.Sensor."+self.sensor+".Time",t)
                 setparam("ENV.Sensor."+self.sensor+".Value", self.value)
 
-                print "-got ENO sensor-"
+                #print "-got ENO sensor-"
 
            elif self.skey == '2':
              self.sensor=self.key
@@ -246,12 +244,12 @@ class Srv(LineReceiver):
 
     def rawDataReceived(self, line):
         now=datetime.now()
-        print now.strftime("%a, %d %b %Y %H:%M:%S.%f"),line
+        print "\n",now.strftime("%a, %d %b %Y %H:%M:%S.%f"),line
         #print "Peer:",self.transport.getPeer().host
         self.do_GET(line)
 
     def connectionMade(self):
-        print "sensor connected"
+        #print "sensor connected"
         self.setRawMode()
 
     #=== place a CALL event
