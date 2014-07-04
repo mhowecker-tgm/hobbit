@@ -47,7 +47,8 @@ class SetObstacles(State):
 
 class Undock(State):
     """
-    Move out of the docking station
+    Publish the docking message to mira
+    topic: /docking_task
     """
     def __init__(self, angle=0):
         State.__init__(
@@ -65,6 +66,7 @@ class Undock(State):
             return 'preempted'
         # self.stop_pub.publish('docking_off')
         self.motion_pub.publish('Move -0.5')
+        #rospy.sleep(3.0)
         return 'succeeded'
 
 
@@ -253,7 +255,7 @@ def goToPosition(frame='/map', room='None', place='dock'):
         Sequence.add('WAIT', SleepState(duration=1))
         Sequence.add('ACTIVATE_OBSTACLES',
                      SetObstacles(active=True))
-        Sequence.add('SET_NAV_GOAL', SetNavigationGoal())
+        Sequence.add('SET_NAV_GOAL', SetNavigationGoal(room, place))
         if not DEBUG:
             Sequence.add('MOVE_HOBBIT', move_base.MoveBaseState(frame))
     return seq
@@ -384,5 +386,3 @@ def out_cb(outcome_map):
 
 def child_term_cb(outcome_map):
     return True
-
-

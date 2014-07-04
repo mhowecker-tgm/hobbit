@@ -9,9 +9,7 @@ import roslib
 roslib.load_manifest(PKG)
 import rospy
 
-from smach import Sequence, State, StateMachine, Concurrence
-from uashh_smach.util import SleepState, WaitForMsgState
-from mira_msgs.msg import BatteryState
+from smach import Sequence, State
 import hobbit_smach.hobbit_move_import as hobbit_move
 from hobbit_user_interaction import HobbitMMUI
 
@@ -99,13 +97,18 @@ def getEndRecharge():
         )
         Sequence.add(
             'MOVE_AWAY_FROM_DOCK',
-            hobbit_move.goToPosition(frame='/map', room='dock', place='dock'))
-        Sequence.add(
-            'MOVE_AWAY',
-            hobbit_move.goToPosition(frame='/map', room='maincorridor',
-                                     place='default'))
+            hobbit_move.goToPosition(frame='/map'))
+        #Sequence.add(
+        #    'WAIT_FOR_MIRA_2',
+        #    SleepState(duration=3)
+        #)
+        #Sequence.add(
+        #    'SET_SOME_GOAL',
+        #    Dummy())
+        #Sequence.add(
+        #    'MOVE_AWAY',
+        #    hobbit_move.goToPosition(frame='/map'))
     return seq
-
 
 def startDockProcedure():
     seq = Sequence(
