@@ -110,14 +110,16 @@ function updateFormRandomNumber()
 
                    <strong>Daily Routines</strong><br/>
                      Latest Waking Up Time: <input type="time" name="latestWakingUpTime"> <br/>
-                     Latest Sleeping Time: <input type="time" name="latestSleepingTime">  <br/>
+                     Latest Sleeping Time: <input type="time" name="latestSleepingTime">  <br/> 
                   <hr /> 
 
                    <strong>Reminders</strong><br/>
                      <input type="checkbox" name="medicationReminders" value="medicationReminders">Use Medication Reminders<br/> 
-                     <input type="checkbox" name="waterReminders" value="waterReminders">Use Water Reminders<br/> 
+                     <input type="checkbox" name="waterReminders" value="waterReminders">Use Water Reminders<br/> <br/>
 
 
+                     Reminder #1 : <input type="text" name="reminderLabel"  style="width: 20%;"> 
+                                 Date : <input type="datetime" name="reminderDate"  style="width: 20%;"> <br/>  <br/>
                   <hr /> 
                   Facebook Username :  
                   <input type="text" name="fbUser"  style="width: 20%;">   Password :  
@@ -126,10 +128,8 @@ function updateFormRandomNumber()
                   Twitter Username :  
                   <input type="text" name="twitterUser"  style="width: 20%;">   Password :  
                   <input type="text" name="twitterPass"  style="width: 20%;"> <br/>
- 
- 
-• ask for special events to add to the calendar (i.e.: birthday<br/>
-reminders, doctors appointments, etc) (?)<br/>  
+   
+
                       <input type="submit" value="Set" onclick="updateFormRandomNumber()" style="float: right">
                      </div> 
                      <input id="FormRandomField" type="hidden" name="t" value="somethingRandomHere"> 
@@ -137,9 +137,7 @@ reminders, doctors appointments, etc) (?)<br/>
                 </td>
               </tr>
               </table>
-
-
-</div>
+           </div>
  
 
                 </td>
