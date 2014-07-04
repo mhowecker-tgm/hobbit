@@ -39,6 +39,10 @@ function updateFormRandomNumber()
                 <td>
                   <form action="settings.html" accept-charset="utf-8" >  
 
+             <table>
+              <tr>
+               <td>
+
                   User Name :   
                   <input type="text" name="userName"  style="width: 40%;"> <br/>
 
@@ -60,7 +64,6 @@ function updateFormRandomNumber()
                         <option value="male">Male</option> 
                       </select>   <br/>
  
-                  UI Background color : <input class="color" value="66ff00"> <br/> <!-- class="color"-->
 
                   Volume : 
                       <select id="volume">
@@ -80,6 +83,19 @@ function updateFormRandomNumber()
                         <option value="metric">Metric</option> 
                         <option value="imperial">Imperial (Feet)</option> 
                       </select>   <br/>
+            
+                  </td>
+                  <td>
+                      <div id="LuiBackground" style="background-color:#66FF00;clear:both;text-align:center;" >
+                       <img src="lui.png" width=300><br/>
+                      </div> 
+                    UI color : <input id="LuiBackgroundSelector" type="color" value="#66ff00" onchange="document.getElementById('LuiBackground').style.backgroundColor=document.getElementById('LuiBackgroundSelector').value;" > <br/> <!-- class="color"-->
+                  </td>
+            </tr>
+          </table>
+
+
+
 
                   <hr /> 
                    <strong>Emergencies</strong><br/>
