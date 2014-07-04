@@ -188,6 +188,7 @@ class HasMovedState(State):
         self.minimum_distance = minimum_distance
         self.frame = frame
         self.lastX, self.lastY = self._getXY()
+        print('HasMovedState INIT: {0} {1}'.format(self.lastX, self.lastY))
 
     def _getXY(self):
         x, y, _yaw = util.get_current_robot_position(self.frame)

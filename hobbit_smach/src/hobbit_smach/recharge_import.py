@@ -148,16 +148,16 @@ def startDockProcedure():
 
     with sm:
         StateMachine.add('START_DOCK', hobbit_move.Dock(),
-                         transitions={'succeeded': 'CHECK'})
-        StateMachine.add('DID_WE_MOVE', HasMovedState(minimum_distance=0.2),
+                         transitions={'succeeded': 'WAIT'})
+        StateMachine.add('WAIT', SleepState(duration=10),
+                         transitions={'succeeded': 'DID_WE_MOVE'})
+        StateMachine.add('DID_WE_MOVE', HasMovedState(minimum_distance=0.5),
                          transitions={'movement_exceeds_distance': 'CHECK',
                                       'movement_within_distance': 'DID_WE_MOVE'})
         StateMachine.add('CHECK', cc,
                          transitions={'succeeded': 'STOP',
                                       'failed': 'RETRY'})
         StateMachine.add('RETRY', hobbit_move.Undock(),
-                         transitions={'succeeded': 'GOTO_DOCK'})
-        StateMachine.add('GOTO_DOCK', hobbit_move.Undock(),
                          transitions={'succeeded': 'WAIT1'})
         StateMachine.add('WAIT1', SleepState(duration=10),
                          transitions={'succeeded': 'START_DOCK'})
