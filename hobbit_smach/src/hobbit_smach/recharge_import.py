@@ -9,7 +9,10 @@ import roslib
 roslib.load_manifest(PKG)
 import rospy
 
-from smach import Sequence, State
+from smach import Sequence, State, StateMachine, Concurrence
+from uashh_smach.util import SleepState, WaitForMsgState
+from uashh_smach.platform.move_base import HasMovedState
+from mira_msgs.msg import BatteryState
 import hobbit_smach.hobbit_move_import as hobbit_move
 from hobbit_user_interaction import HobbitMMUI
 
@@ -97,18 +100,13 @@ def getEndRecharge():
         )
         Sequence.add(
             'MOVE_AWAY_FROM_DOCK',
-            hobbit_move.goToPosition(frame='/map'))
-        #Sequence.add(
-        #    'WAIT_FOR_MIRA_2',
-        #    SleepState(duration=3)
-        #)
-        #Sequence.add(
-        #    'SET_SOME_GOAL',
-        #    Dummy())
-        #Sequence.add(
-        #    'MOVE_AWAY',
-        #    hobbit_move.goToPosition(frame='/map'))
+            hobbit_move.goToPosition(frame='/map', room='dock', place='dock'))
+        Sequence.add(
+            'MOVE_AWAY',
+            hobbit_move.goToPosition(frame='/map', room='maincorridor',
+                                     place='default'))
     return seq
+
 
 def startDockProcedure():
     seq = Sequence(
@@ -123,7 +121,7 @@ def startDockProcedure():
         Sequence.add(
             'CHARGE_CHECK',
             WaitForMsgState('/battery_state', BatteryState, msg_cb=battery_cb),
-                transitions={'aborted': 'CHARGE_CHECK'})
+            transitions={'aborted': 'CHARGE_CHECK'})
 
     def child_term_cb(outcome_map):
             return True
@@ -143,15 +141,17 @@ def startDockProcedure():
 
     with cc:
         Concurrence.add(
-            'WAIT', SleepState(duration=60))
+            'WAIT', SleepState(duration=30))
         Concurrence.add(
             'CHARGE_CHECK',
             seq)
-            #WaitForMsgState('/battery_state', BatteryState, msg_cb=battery_cb))
 
     with sm:
         StateMachine.add('START_DOCK', hobbit_move.Dock(),
                          transitions={'succeeded': 'CHECK'})
+        StateMachine.add('DID_WE_MOVE', HasMovedState(minimum_distance=0.2),
+                         transitions={'movement_exceeds_distance': 'CHECK',
+                                      'movement_within_distance': 'DID_WE_MOVE'})
         StateMachine.add('CHECK', cc,
                          transitions={'succeeded': 'STOP',
                                       'failed': 'RETRY'})
