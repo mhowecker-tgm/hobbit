@@ -4,6 +4,19 @@
         <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>  
 	<title>Hobbit Facilitator Initialization ControlPanel</title>
         <link rel="stylesheet" type="text/css" href="hobbit.css">
+
+	<script type="text/javascript" src="jscolor/jscolor.js"></script>
+
+   <script type="text/javascript">  
+function updateFormRandomNumber()
+    {
+       var randomnumber=Math.floor(Math.random()*100000);
+       document.getElementById("FormRandomField").value = randomnumber;
+    }
+   </script>
+
+
+
        <body> 
   <center>
 	<!--a href="controlpanel.html?nothing=true"> <img src="header.png" border=0/> </a--> 
@@ -20,26 +33,107 @@
          <td>
 
 	<div class="rtd">
-          <strong>HEAD CONTROL</strong><br/>
+          <strong>FACILITATOR ROBOT INITIALIZATION</strong><br/>
             <table>
               <tr>
                 <td>
-  • UI background color    ( is there a list of colors ? )<br/>
-• volume                       ( how many levels )<br/>
-• f vs m                        ( )<br/>
-• velocity of speech       (how many levels ?)<br/>
-• name of robot  (string)<br/>
-• name of user   (string)<br/>
-• latest sleeping time (time-format)<br/>
-• latest waking up time (time-format)<br/>
-• reminders for meds and/or drinking water (?)<br/>
-• ask for special events to add to the calendar (i.e.: birthday<br/>
-reminders, doctors appointments, etc) (?)<br/>
-• 3 contact numbers can be setup for the emergency calls, and 6 for<br/>
-friends and relatives (strings or integers)<br/>
-• social account logins and digital pictures can also be setup by the<br/>
-facilitator if the user provides them.<br/>
+                  <form action="settings.html" accept-charset="utf-8" >  
 
+                  User Name :   
+                  <input type="text" name="userName"  style="width: 40%;"> <br/>
+
+                  Robot Name :  
+                  <input type="text" name="robotName"  style="width: 40%;"> <br/>
+ 
+                  Talking Speed : 
+                      <select id="talkingSpeed"  >
+                        <option value="ltired">Normal</option> 
+                        <option value="happy">Very Slow</option>
+                        <option value="vhappy">Slow</option>
+                        <option value="vtired">Fast</option>
+                        <option value="concerned">Very Fast</option> 
+                      </select>   <br/>
+
+                  Gender : 
+                      <select id="gender"  >
+                        <option value="fale">Female</option> 
+                        <option value="male">Male</option> 
+                      </select>   <br/>
+ 
+                  UI Background color : <input class="color" value="66ff00"> <br/> <!-- class="color"-->
+
+                  Volume : 
+                      <select id="volume">
+                        <option value="normal">Normal</option> 
+                        <option value="full">Full</option>
+                        <option value="veryhigh">Very High</option>
+                        <option value="high">High</option>
+                        <option value="low">Low</option>
+                        <option value="verylow">Very Low</option>
+                        <option value="off">Off</option> 
+                      </select>   
+                  <br/>
+
+
+                  Unit System : 
+                      <select id="units"  >
+                        <option value="metric">Metric</option> 
+                        <option value="imperial">Imperial (Feet)</option> 
+                      </select>   <br/>
+
+                  <hr /> 
+                   <strong>Emergencies</strong><br/>
+
+                    #1 :  Name : <input type="text" name="emergencyContactName1"  style="width: 20%;"> 
+                          Tel : <input type="text" name="emergencyContactTel1"  style="width: 20%;"> <br/> 
+
+                    #2 :  Name : <input type="text" name="emergencyContactName2"  style="width: 20%;"> 
+                          Tel : <input type="text" name="emergencyContactTel2"  style="width: 20%;"> <br/> 
+
+                    #3 :  Name : <input type="text" name="emergencyContactName3"  style="width: 20%;"> 
+                          Tel : <input type="text" name="emergencyContactTel3"  style="width: 20%;"> <br/> 
+                  <hr />  
+                   <strong>Relatives And Friends</strong><br/>
+                    #1 - Name : <input type="text" name="contactName1"  style="width: 20%;"> 
+                                Tel : <input type="text" name="contactTel1"  style="width: 20%;"> <br/>
+                    #2 - Name : <input type="text" name="contactName2"  style="width: 20%;"> 
+                                Tel : <input type="text" name="contactTel2"  style="width: 20%;"> <br/>
+                    #3 - Name : <input type="text" name="contactName3"  style="width: 20%;"> 
+                                Tel : <input type="text" name="contactTel3"  style="width: 20%;"> <br/>
+                    #4 - Name : <input type="text" name="contactName4"  style="width: 20%;"> 
+                                Tel : <input type="text" name="contactTel4"  style="width: 20%;"> <br/>
+                    #5 - Name : <input type="text" name="contactName5"  style="width: 20%;"> 
+                                Tel : <input type="text" name="contactTel5"  style="width: 20%;"> <br/>
+                    #6 - Name : <input type="text" name="contactName6"  style="width: 20%;"> 
+                                Tel : <input type="text" name="contactTel6"  style="width: 20%;"> <br/> 
+                  <hr /> 
+
+                   <strong>Daily Routines</strong><br/>
+                     Latest Waking Up Time: <input type="time" name="latestWakingUpTime"> <br/>
+                     Latest Sleeping Time: <input type="time" name="latestSleepingTime">  <br/>
+                  <hr /> 
+
+                   <strong>Reminders</strong><br/>
+                     <input type="checkbox" name="medicationReminders" value="medicationReminders">Use Medication Reminders<br/> 
+                     <input type="checkbox" name="waterReminders" value="waterReminders">Use Water Reminders<br/> 
+
+
+                  <hr /> 
+                  Facebook Username :  
+                  <input type="text" name="fbUser"  style="width: 20%;">   Password :  
+                  <input type="text" name="fbPass"  style="width: 20%;"> <br/>
+
+                  Twitter Username :  
+                  <input type="text" name="twitterUser"  style="width: 20%;">   Password :  
+                  <input type="text" name="twitterPass"  style="width: 20%;"> <br/>
+ 
+ 
+• ask for special events to add to the calendar (i.e.: birthday<br/>
+reminders, doctors appointments, etc) (?)<br/>  
+                      <input type="submit" value="Set" onclick="updateFormRandomNumber()" style="float: right">
+                     </div> 
+                     <input id="FormRandomField" type="hidden" name="t" value="somethingRandomHere"> 
+                   </form>
                 </td>
               </tr>
               </table>
