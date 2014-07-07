@@ -21,6 +21,7 @@ import hobbit_smach.speech_output_import as speech_output
 def battery_cb(msg, ud):
     print('Received battery_state message')
     print(msg.charging)
+    rospy.sleep(1.0)
     if msg.charging:
         print('I am charging')
         return True
@@ -156,7 +157,7 @@ def startDockProcedure():
 
     with cc:
         Concurrence.add(
-            'WAIT', SleepState(duration=30))
+            'WAIT', SleepState(duration=25))
         Concurrence.add(
             'CHARGE_CHECK',
             seq)
@@ -167,9 +168,10 @@ def startDockProcedure():
         StateMachine.add('WAIT', SleepState(duration=1),
                          transitions={'succeeded': 'DID_WE_MOVE'})
         StateMachine.add('DID_WE_MOVE',
-                         hobbit_move.HasMovedFromPreDock(minimum_distance=0.3),
+                         hobbit_move.HasMovedFromPreDock(minimum_distance=0.5),
                          transitions={'movement_exceeds_distance': 'CHECK',
-                                      'movement_within_distance': 'DID_WE_MOVE'})
+                                      'movement_within_distance': 'DID_WE_MOVE',
+                                      'counter': 'CHECK'})
         StateMachine.add('CHECK', cc,
                          transitions={'succeeded': 'STOP',
                                       'failed': 'RETRY'})

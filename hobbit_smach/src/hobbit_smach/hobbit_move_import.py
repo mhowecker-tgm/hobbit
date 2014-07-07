@@ -402,6 +402,7 @@ def rotateRobot(angle=0, frame='/map'):
     #     )
     # return sm
 
+
 class HasMovedFromPreDock(State):
     """Return whether the robot moved beyond a given minimum distance in a given frame
     from the pre-dock pose.
@@ -410,11 +411,12 @@ class HasMovedFromPreDock(State):
     frame: frame in which to retrieve the robot's pose, defaults to /map
     """
     def __init__(self, minimum_distance, frame='/map'):
-        smach.State.__init__(self, outcomes=['movement_exceeds_distance', 'movement_within_distance'])
+        smach.State.__init__(self, outcomes=['movement_exceeds_distance', 'movement_within_distance', 'counter'])
         util.TransformListenerSingleton.init()
         self.minimum_distance = minimum_distance
         self.frame = frame
         self.lastX, self.lastY = self._getXYDock()
+	self.counter = 0
 
     def _getXY(self):
         x, y, _yaw = util.get_current_robot_position(self.frame)
@@ -428,23 +430,28 @@ class HasMovedFromPreDock(State):
         )
         req = GetCoordinatesRequest(String('dock'), String('dock'))
         resp = serv(req)
+        print(resp)
         return (resp.pose.x, resp.pose.y)
 
 
     def execute(self, userdata):
+        rospy.sleep(1.5)
         currentX, currentY = self._getXY()
         current_distance = math.sqrt(
             math.pow(currentX - self.lastX, 2) +
-            math.pow(currentY - lastY, 2)
+            math.pow(currentY - self.lastY, 2)
         )
         rospy.loginfo("current XY: %f,%f last XY: %f,%f current distance: %f minimum distance: %f",
-                       self.lastX, self.lastY, currentX, currentY, current_distance, self.minimum_distance)
+                       currentX, currentY, self.lastX, self.lastY, current_distance, self.minimum_distance)
         if current_distance >= self.minimum_distance:
-            self.lastX = currentX
-            self.lastY = currentY
             return 'movement_exceeds_distance'
         else:
-            return 'movement_within_distance'
+            if self.counter > 10:
+		self.counter = 0
+                return 'counter'
+            else:
+                self.counter += 1
+                return 'movement_within_distance'
 
 
 def get_set_nav_goal_state(room_name=None, location_name='dock'):
