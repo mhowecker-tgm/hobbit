@@ -118,6 +118,7 @@ struct AmmServer_Instance  * admin_server=0;
 struct AmmServer_RequestOverride_Context GET_override={{0}};
 
 struct AmmServer_RH_Context indexPage={0};
+struct AmmServer_RH_Context settings={0};
 struct AmmServer_RH_Context stats={0};
 struct AmmServer_RH_Context form={0};
 struct AmmServer_RH_Context chatbox={0};
@@ -502,31 +503,31 @@ void execute(char * command,char * param)
 //This function prepares the content of  form context , ( content )
 void * store_new_configuration_callback(struct AmmServer_DynamicRequest  * rqst)
 {
-  strncpy(rqst->content,page,pageLength);
-  rqst->content[pageLength]=0;
-  rqst->contentSize=pageLength;
+  unsigned int successfullStore = 0; 
+  rqst->content[pageLength]=0; //Clear content 
 
   if  ( rqst->GET_request != 0 )
     {
       if ( strlen(rqst->GET_request)>0 )
-       {
-         char * bufferCommand = (char *) malloc ( 256 * sizeof(char) );
-         if (bufferCommand!=0)
-          {
-            if ( _GET(default_server,rqst,(char*)"camera",bufferCommand,256) )  { execute((char*)"camera",bufferCommand);  } else
-            if ( _GET(default_server,rqst,(char*)"head",bufferCommand,256) )  { execute((char*)"head",bufferCommand);  }
-
-            //TODO saveDynamicRequestToFile(*rqst);
-            //  AmmServer_SaveDynamicRequest("hobbit.ini",default_server,rqst);
-
-            free(bufferCommand);
-          }
-
+       { 
+         if ( AmmServer_SaveDynamicRequest("hobbit_raw.ini",default_server,rqst) )
+           {  
+             int i=system("tr \"\\&\" \"\\n\" < hobbit_raw.ini > hobbit.ini"); 
+             if (i==0) {  successfullStore = 1; }
+           }  
        }
     }
 
-
-  //form.content_size=strlen(content);
+if (successfullStore)
+     {
+         strcpy(rqst->content,"<html><head><meta http-equiv=\"refresh\" content=\"3; url=controlpanel.html\" /></head>\
+                  <body><center><br><br><br><h1>Settings stored..</h1><br><br><h3><a href=\"controlpanel.html\">You are beeing redirected to control panel</a></h3></body></html> ");
+     } else
+     { 
+         strcpy(rqst->content,"<html><body><center><br><br><br><h1>FAILED to store settings :( </h1><br><br><h3><a href=\"#\" onclick=\"javascript:window.history.go(-1)\">Click here to go back</a></h3></body></html> ");
+     }
+   
+  rqst->contentSize=strlen(rqst->content);
   return 0;
 }
 
@@ -594,7 +595,7 @@ void init_dynamic_content()
   if (! AmmServer_AddResourceHandler(default_server,&indexPage,(char*)"/index.html",webserver_root,4096,0,(void* ) &prepare_index_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding stats page\n"); }
   if (! AmmServer_AddResourceHandler(default_server,&stats,(char*)"/stats.html",webserver_root,4096,0,(void* ) &prepare_stats_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding stats page\n"); }
 
-  if (! AmmServer_AddResourceHandler(default_server,&stats,(char*)"/settings.html",webserver_root,4096,0,(void* ) &store_new_configuration_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding settings page\n"); }
+  if (! AmmServer_AddResourceHandler(default_server,&settings,(char*)"/settings.html",webserver_root,4096,0,(void* ) &store_new_configuration_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding settings page\n"); }
 
 
   fprintf(stderr,"Please note that control panel , is only refreshed once per startup for min resource consumption\n");

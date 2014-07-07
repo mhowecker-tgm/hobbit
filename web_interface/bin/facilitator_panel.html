@@ -50,23 +50,23 @@ function updateFormRandomNumber()
                   <input type="text" name="robotName"  style="width: 40%;"> <br/>
  
                   Talking Speed : 
-                      <select id="talkingSpeed"  >
-                        <option value="ltired">Normal</option> 
-                        <option value="happy">Very Slow</option>
-                        <option value="vhappy">Slow</option>
-                        <option value="vtired">Fast</option>
-                        <option value="concerned">Very Fast</option> 
+                      <select name="talkingSpeed"  >
+                        <option value="normal">Normal</option> 
+                        <option value="vslow">Very Slow</option>
+                        <option value="slow">Slow</option>
+                        <option value="fast">Fast</option>
+                        <option value="vfast">Very Fast</option> 
                       </select>   <br/>
 
                   Gender : 
-                      <select id="gender"  >
+                      <select name="gender"  >
                         <option value="fale">Female</option> 
                         <option value="male">Male</option> 
                       </select>   <br/>
  
 
                   Volume : 
-                      <select id="volume">
+                      <select name="volume">
                         <option value="normal">Normal</option> 
                         <option value="full">Full</option>
                         <option value="veryhigh">Very High</option>
@@ -76,20 +76,13 @@ function updateFormRandomNumber()
                         <option value="off">Off</option> 
                       </select>   
                   <br/>
-
-
-                  Unit System : 
-                      <select id="units"  >
-                        <option value="metric">Metric</option> 
-                        <option value="imperial">Imperial (Feet)</option> 
-                      </select>   <br/>
-            
+  
                   </td>
                   <td>
                       <div id="LuiBackground" style="background-color:#66FF00;clear:both;text-align:center;" >
                        <img src="lui.png" width=300><br/>
                       </div> 
-                    UI color : <input id="LuiBackgroundSelector" type="color" value="#66ff00" onchange="document.getElementById('LuiBackground').style.backgroundColor=document.getElementById('LuiBackgroundSelector').value;" > <br/> <!-- class="color"-->
+                    UI color : <input id="LuiBackgroundSelector" name="LuiBackgroundSelector" type="color" value="#66ff00" onchange="document.getElementById('LuiBackground').style.backgroundColor=document.getElementById('LuiBackgroundSelector').value;" > <br/> <!-- class="color"-->
                   </td>
             </tr>
           </table>
