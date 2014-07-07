@@ -8,11 +8,10 @@ DEBUG = False
 import roslib
 roslib.load_manifest(PKG)
 import rospy
-import smach
 
 from smach import Sequence, State, StateMachine, Concurrence
 from uashh_smach.util import SleepState, WaitForMsgState
-from uashh_smach.platform.move_base import HasMovedState
+# from uashh_smach.platform.move_base import HasMovedState
 from mira_msgs.msg import BatteryState
 import hobbit_smach.hobbit_move_import as hobbit_move
 from hobbit_user_interaction import HobbitMMUI
@@ -69,10 +68,8 @@ def getRecharge():
             Sequence.add(
                 'MOVE_TO_DOCK',
                 hobbit_move.goToPose())
-                # hobbit_move.goToPosition(frame='/map', place='dock'))
             Sequence.add(
                 'DOCKING',
-                # hobbit_move.Dock())
                 startDockProcedure())
         else:
             pass
@@ -116,7 +113,6 @@ def getEndRecharge():
         Sequence.add(
             'MOVE_AWAY_FROM_DOCK',
             hobbit_move.goToPose())
-            # hobbit_move.goToPosition(frame='/map', room='dock', place='dock'))
         Sequence.add(
             'SET_NAV_GOAL_RANDOM',
             hobbit_move.SetNavGoal(room='maincorridor', place='default')
@@ -124,8 +120,6 @@ def getEndRecharge():
         Sequence.add(
             'MOVE_AWAY',
             hobbit_move.goToPose())
-            # hobbit_move.goToPosition(frame='/map', room='maincorridor',
-            #                         place='default'))
     return seq
 
 
@@ -172,7 +166,8 @@ def startDockProcedure():
                          transitions={'succeeded': 'WAIT'})
         StateMachine.add('WAIT', SleepState(duration=1),
                          transitions={'succeeded': 'DID_WE_MOVE'})
-        StateMachine.add('DID_WE_MOVE', hobbit_move.HasMovedFromPreDock(minimum_distance=0.3),
+        StateMachine.add('DID_WE_MOVE',
+                         hobbit_move.HasMovedFromPreDock(minimum_distance=0.3),
                          transitions={'movement_exceeds_distance': 'CHECK',
                                       'movement_within_distance': 'DID_WE_MOVE'})
         StateMachine.add('CHECK', cc,
