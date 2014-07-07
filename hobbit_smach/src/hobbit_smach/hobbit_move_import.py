@@ -226,7 +226,7 @@ class SetNavGoal(State):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
-        ud.x, ud.y, ud.x = (self.goalX, self.goalY, self.goalYAW)
+        ud.x, ud.y, ud.yaw = (self.goalX, self.goalY, self.goalYAW)
         return 'succeeded'
 
 
@@ -434,7 +434,7 @@ class HasMovedFromPreDock(State):
     def execute(self, userdata):
         currentX, currentY = self._getXY()
         current_distance = math.sqrt(math.pow(currentX, 2) + math.pow(currentY, 2))
-        rospy.logdebug("current XY: %f,%f last XY: %f,%f current distance: %f minimum distance: %f",
+        rospy.loginfo("current XY: %f,%f last XY: %f,%f current distance: %f minimum distance: %f",
                        self.lastX, self.lastY, currentX, currentY, current_distance, self.minimum_distance)
         if current_distance >= self.minimum_distance:
             self.lastX = currentX

@@ -105,6 +105,32 @@ class AskForName(State):
         return 'failed'
 
 
+class PlayAudio(State):
+    """
+    Wrap the askForName function from MMUIInterface in a SMACH state.
+    The returned String is stored in the userdata key object_name.
+    """
+
+    def __init__(self, text='Moving out', audio='move_out.mp3'):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'failed', 'preempted']
+        )
+        self.text = text
+        self.audio= audio
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        mmui = MMUI.MMUIInterface()
+        resp = mmui.showMMUI_Info(text=self.text, audio=self.audio)
+        print(resp)
+        if not resp:
+            return 'failed'
+        return 'succeeded'
+
+
 def playMoveOut():
     """
     Return a SMACH Sequence that will play a sound file and later
@@ -112,24 +138,25 @@ def playMoveOut():
     """
 
     seq = Sequence(
-        outcomes=['succeeded', 'preempted', 'failed'],
+        outcomes=['succeeded', 'preempted', 'aborted'],
         connector_outcome='succeeded'
     )
 
     with seq:
         Sequence.add(
             'PLAY_SOUND',
-            MMUI.ShowInfo(info='Moving out',
-                          audio='moveout.mp3')
+            PlayAudio(text='Moving out',
+                      audio='moveout.mp3'),
+	    transitions={'failed': 'aborted'}
         )
         Sequence.add(
             'WAIT_FOR_MMUI',
             HobbitMMUI.WaitforSoundEnd('/Event', Event),
-            transitions={'aborted': 'WAIT_FOR_MMUI',
-                         'succeeded': 'succeeded'}
+            transitions={'aborted': 'WAIT_FOR_MMUI'}
         )
         Sequence.add(
             'MAIN_MENU',
-            HobbitMMUI.ShowMenu(menu='MAIN')
+            HobbitMMUI.ShowMenu(menu='MAIN'),
+	    transitions={'failed': 'aborted'}
         )
         return seq
