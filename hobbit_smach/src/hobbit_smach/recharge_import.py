@@ -16,6 +16,7 @@ from uashh_smach.platform.move_base import HasMovedState
 from mira_msgs.msg import BatteryState
 import hobbit_smach.hobbit_move_import as hobbit_move
 from hobbit_user_interaction import HobbitMMUI
+import hobbit_smach.speech_output_import as speech_output
 
 
 def battery_cb(msg, ud):
@@ -99,6 +100,10 @@ def getEndRecharge():
         Sequence.add(
             'UNDOCK',
             hobbit_move.Undock()
+        )
+        Sequence.add(
+            'SOUND',
+            speech_output.playMoveOut()
         )
         Sequence.add(
             'WAIT_FOR_MIRA',

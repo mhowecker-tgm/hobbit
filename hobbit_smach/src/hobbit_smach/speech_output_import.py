@@ -103,3 +103,33 @@ class AskForName(State):
                     ud.object_name = item.value.lower()
                     return 'succeeded'
         return 'failed'
+
+
+def playMoveOut():
+    """
+    Return a SMACH Sequence that will play a sound file and later
+    return to the main menu of the MMUI.
+    """
+
+    seq = Sequence(
+        outcomes=['succeeded', 'preempted', 'failed'],
+        connector_outcome='succeeded'
+    )
+
+    with seq:
+        Sequence.add(
+            'PLAY_SOUND',
+            MMUI.ShowInfo(info='Moving out',
+                          audio='moveout.mp3')
+        )
+        Sequence.add(
+            'WAIT_FOR_MMUI',
+            HobbitMMUI.WaitforSoundEnd('/Event', Event),
+            transitions={'aborted': 'WAIT_FOR_MMUI',
+                         'succeeded': 'succeeded'}
+        )
+        Sequence.add(
+            'MAIN_MENU',
+            HobbitMMUI.ShowMenu(menu='MAIN')
+        )
+        return seq

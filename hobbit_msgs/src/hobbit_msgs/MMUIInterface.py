@@ -40,7 +40,7 @@ class MMUIInterface:
         print "##",msg.command,"##"
 
 
-    def showMMUI_Info(self, text, wait="1", prm="", prm2="", prm3=""):
+    def showMMUI_Info(self, text, wait="1", prm="", prm2="", prm3="", audio=""):
         parr = []
         p = Parameter('type', 'D_PLAIN')
         parr.append(p)
@@ -62,6 +62,9 @@ class MMUIInterface:
             parr.append(p)
         if prm3 != "":
             p = Parameter('parameter', prm3)
+            parr.append(p)
+        if audio != "":
+            p = Parameter('play', audio)
             parr.append(p)
         return self.callMMUIService('0', 'create', parr)
 
