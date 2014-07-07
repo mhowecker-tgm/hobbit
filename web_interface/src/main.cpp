@@ -166,11 +166,12 @@ void replaceChar(char * input , char findChar , char replaceWith)
 void * prepare_index_content_callback(struct AmmServer_DynamicRequest  * rqst)
 {
   //No range check but since everything here is static max_stats_size should be big enough not to segfault with the strcat calls!
-  strcpy(rqst->content,"<html><head><title>Welcome</title>\
+  strcpy(rqst->content,"<html><head><title>Welcome to The Hobbit WebInterface</title>\
+                                     <meta http-equiv=\"refresh\" content=\"0; url=controlpanel.html\" />\
                   <body><center><br><br><br>\
                    <h1>The incredibly minimal WebInterface for Hobbit</h1><br><br>\
-                   <h3><a href=\"controlpanel.html\">Click Here to open Control Panel</a></h3>\
-                   <h3><a href=\"stats.html\">Click Here for stats (not ready yet)</a></h3>\
+                   <h3><a href=\"controlpanel.html\">Click Here for remote operation control panel</a></h3>\
+                   <h3><a href=\"facilitator_panel.html\">Click Here for facilitator panel</a></h3>\
                    </body></html> ");
   rqst->contentSize=strlen(rqst->content);
   return 0;
@@ -418,6 +419,14 @@ void execute(char * command,char * param)
     if (strcmp(param,"sugar")==0) { strcpy(commandToRun,"rostopic pub /ActionSequence HobbitMsgs/Command \"{command: 'C_BRING' , params: [ {name: 'Name' , value: 'ΖΆΧΑΡΗ'} ] }\" -1  "); }
   }
    else
+  if (strcmp(command,"move")==0)
+  {
+    if (strcmp(param,"charging")==0) { strcpy(commandToRun,"rostopic pub /ActionSequence HobbitMsgs/Command \"{command: 'C_BRING' , params: [ {name: 'Name' , value: 'ΑΣΠΙΡΊΝΗ'} ] }\" -1  "); } else
+    if (strcmp(param,"kitchen")==0) { strcpy(commandToRun,"rostopic pub /ActionSequence HobbitMsgs/Command \"{command: 'C_BRING' , params: [ {name: 'Name' , value: 'ΑΣΠΙΡΊΝΗ'} ] }\" -1  "); } else
+    if (strcmp(param,"livingroom")==0) { strcpy(commandToRun,"rostopic pub /ActionSequence HobbitMsgs/Command \"{command: 'C_BRING' , params: [ {name: 'Name' , value: 'ΑΣΠΙΡΊΝΗ'} ] }\" -1  "); } else
+    if (strcmp(param,"bedroom")==0) { strcpy(commandToRun,"rostopic pub /ActionSequence HobbitMsgs/Command \"{command: 'C_BRING' , params: [ {name: 'Name' , value: 'ΑΣΠΙΡΊΝΗ'} ] }\" -1  "); }
+  }
+   else
   if (strcmp(command,"robot")==0)
   { ///bin/bash -c \"
 
@@ -490,6 +499,37 @@ void execute(char * command,char * param)
 
 
 
+//This function prepares the content of  form context , ( content )
+void * store_new_configuration_callback(struct AmmServer_DynamicRequest  * rqst)
+{
+  strncpy(rqst->content,page,pageLength);
+  rqst->content[pageLength]=0;
+  rqst->contentSize=pageLength;
+
+  if  ( rqst->GET_request != 0 )
+    {
+      if ( strlen(rqst->GET_request)>0 )
+       {
+         char * bufferCommand = (char *) malloc ( 256 * sizeof(char) );
+         if (bufferCommand!=0)
+          {
+            if ( _GET(default_server,rqst,(char*)"camera",bufferCommand,256) )  { execute((char*)"camera",bufferCommand);  } else
+            if ( _GET(default_server,rqst,(char*)"head",bufferCommand,256) )  { execute((char*)"head",bufferCommand);  }
+
+            //TODO saveDynamicRequestToFile(*rqst);
+            //  AmmServer_SaveDynamicRequest("hobbit.ini",default_server,rqst);
+
+            free(bufferCommand);
+          }
+
+       }
+    }
+
+
+  //form.content_size=strlen(content);
+  return 0;
+}
+
 
 
 //This function prepares the content of  form context , ( content )
@@ -530,6 +570,7 @@ void * prepare_form_content_callback(struct AmmServer_DynamicRequest  * rqst)
                          }
                  } else
             if ( _GET(default_server,rqst,(char*)"bring",bufferCommand,256) )  { execute((char*)"bring",bufferCommand);  } else
+            if ( _GET(default_server,rqst,(char*)"move",bufferCommand,256) )  { execute((char*)"move",bufferCommand);  } else
             if ( _GET(default_server,rqst,(char*)"robot",bufferCommand,256) ) { execute((char*)"robot",bufferCommand); } else
             if ( _GET(default_server,rqst,(char*)"rtd",bufferCommand,256) ) { execute((char*)"rtd",bufferCommand); } else
             if ( _GET(default_server,rqst,(char*)"say",bufferCommand,256) )   { execute((char*)"say",bufferCommand);   }
@@ -552,6 +593,9 @@ void init_dynamic_content()
 {
   if (! AmmServer_AddResourceHandler(default_server,&indexPage,(char*)"/index.html",webserver_root,4096,0,(void* ) &prepare_index_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding stats page\n"); }
   if (! AmmServer_AddResourceHandler(default_server,&stats,(char*)"/stats.html",webserver_root,4096,0,(void* ) &prepare_stats_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding stats page\n"); }
+
+  if (! AmmServer_AddResourceHandler(default_server,&stats,(char*)"/settings.html",webserver_root,4096,0,(void* ) &store_new_configuration_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding settings page\n"); }
+
 
   fprintf(stderr,"Please note that control panel , is only refreshed once per startup for min resource consumption\n");
   page=AmmServer_ReadFileToMemory((char*)"controlpanel.html",&pageLength);
