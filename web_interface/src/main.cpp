@@ -66,6 +66,7 @@ ros::NodeHandle * nhPtr=0;
 char webserver_root[MAX_FILE_PATH]="./"; // <- change this to the directory that contains your content if you dont want to use the default public_html dir..
 char templates_root[MAX_FILE_PATH]="./";
 
+unsigned int stopWebInterface=0;
 char * page=0;
 unsigned int pageLength=0;
 
@@ -73,8 +74,8 @@ unsigned int pageLength=0;
 //Advertised Service switches
 bool terminate(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    ROS_INFO("Stopping Emergency Detector");
-    exit(0);
+    ROS_INFO("Stopping Web Interface");
+    stopWebInterface=1;
     return true;
 }
 
@@ -503,18 +504,18 @@ void execute(char * command,char * param)
 //This function prepares the content of  form context , ( content )
 void * store_new_configuration_callback(struct AmmServer_DynamicRequest  * rqst)
 {
-  unsigned int successfullStore = 0; 
-  rqst->content[pageLength]=0; //Clear content 
+  unsigned int successfullStore = 0;
+  rqst->content[pageLength]=0; //Clear content
 
   if  ( rqst->GET_request != 0 )
     {
       if ( strlen(rqst->GET_request)>0 )
-       { 
+       {
          if ( AmmServer_SaveDynamicRequest("hobbit_raw.ini",default_server,rqst) )
-           {  
-             int i=system("tr \"\\&\" \"\\n\" < hobbit_raw.ini > hobbit.ini"); 
+           {
+             int i=system("tr \"\\&\" \"\\n\" < hobbit_raw.ini > hobbit.ini");
              if (i==0) {  successfullStore = 1; }
-           }  
+           }
        }
     }
 
@@ -523,10 +524,10 @@ if (successfullStore)
          strcpy(rqst->content,"<html><head><meta http-equiv=\"refresh\" content=\"3; url=controlpanel.html\" /></head>\
                   <body><center><br><br><br><h1>Settings stored..</h1><br><br><h3><a href=\"controlpanel.html\">You are beeing redirected to control panel</a></h3></body></html> ");
      } else
-     { 
+     {
          strcpy(rqst->content,"<html><body><center><br><br><br><h1>FAILED to store settings :( </h1><br><br><h3><a href=\"#\" onclick=\"javascript:window.history.go(-1)\">Click here to go back</a></h3></body></html> ");
      }
-   
+
   rqst->contentSize=strlen(rqst->content);
   return 0;
 }
@@ -612,6 +613,12 @@ void init_dynamic_content()
 //This function destroys all Resource Handlers and free's all allocated memory..!
 void close_dynamic_content()
 {
+    AmmServer_RemoveResourceHandler(default_server,&indexPage,1);
+    AmmServer_RemoveResourceHandler(default_server,&settings,1);
+    AmmServer_RemoveResourceHandler(default_server,&form,1);
+    AmmServer_RemoveResourceHandler(default_server,&base_image,1);
+    AmmServer_RemoveResourceHandler(default_server,&top_image,1);
+
     AmmServer_RemoveResourceHandler(default_server,&stats,1);
     AmmServer_RemoveResourceHandler(default_server,&form,1);
 }
@@ -638,9 +645,9 @@ int main(int argc, char **argv)
      nhPtr = &nh;
 
      //We advertise the services we want accessible using "rosservice call *w/e*"
-     ros::ServiceServer pauseGestureRecognitionService    = nh.advertiseService("emergency_detector/pause", pause);
-     ros::ServiceServer resumeGestureRecognitionService   = nh.advertiseService("emergency_detector/resume", resume);
-     ros::ServiceServer stopGestureRecognitionService     = nh.advertiseService("emergency_detector/terminate", terminate);
+     ros::ServiceServer pauseWebService    = nh.advertiseService("web_interface/pause", pause);
+     ros::ServiceServer resumeWebService   = nh.advertiseService("web_interface/resume", resume);
+     ros::ServiceServer stopWebService     = nh.advertiseService("web_interface/terminate", terminate);
 
 
      printf("\nAmmar Server %s starting up..\n",AmmServer_Version());
@@ -674,9 +681,9 @@ int main(int argc, char **argv)
       //Create our context
       //---------------------------------------------------------------------------------------------------
 	  //////////////////////////////////////////////////////////////////////////
-	  while ( (AmmServer_Running(default_server))  && (ros::ok()) )
+	  while ( (AmmServer_Running(default_server))  && (ros::ok()) && (!stopWebInterface) )
 		{
-                  ros::spinOnce();//<- this keeps our ros node messages handled up until synergies take control of the main thread
+             ros::spinOnce();//<- this keeps our ros node messages handled up until synergies take control of the main thread
 
              //Main thread should just sleep and let the background threads do the hard work..!
              //In other applications the programmer could use the main thread to do anything he likes..
