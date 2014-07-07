@@ -342,8 +342,12 @@ def main():
             #    transitions={'aborted': 'WAIT_FOR_MMUI'})
             if not DEBUG:
                 Sequence.add(
+                    'SET_NAV_GOAL',
+                    hobbit_move.SetNavGoal(room='dock', place='dock')
+                )
+                Sequence.add(
                     'MOVE_TO_DOCK',
-                    hobbit_move.goToPosition(frame='/map', place='dock'))
+                    hobbit_move.goToPose())
                 Sequence.add(
                     'DOCKING',
                     hobbit_move.Dock())

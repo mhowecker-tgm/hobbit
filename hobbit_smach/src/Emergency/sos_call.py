@@ -306,8 +306,12 @@ def main():
                          'preempted': 'preempted'}
         )
         StateMachine.add(
+            'SET_NAV_GOAL',
+            hobbit_move.SetNavGoal(room='dock', place='dock')
+            )
+        StateMachine.add(
             'MOVE_TO_DOCK',
-            hobbit_move.goToPosition(room=None, place='dock'),
+            hobbit_move.goToPose(),
             transitions={'succeeded': 'succeeded',
                          'aborted': 'aborted',
                          'preempted': 'preempted'}

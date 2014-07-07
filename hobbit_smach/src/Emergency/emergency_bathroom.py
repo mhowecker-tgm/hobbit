@@ -291,8 +291,12 @@ def main():
         #)
         if not DEBUG:
             StateMachine.add(
+                'SET_NAV_GOAL',
+                hobbit_move.SetNavGoal(room='bathroom', place='door')
+            )
+            StateMachine.add(
                 'MOVE_TO_BATHROOM',
-                hobbit_move.goToPosition(room='bathroom', place='door'),
+                hobbit_move.goToPose()
                 transitions={'failed': 'SET_FAILURE',
                              'succeeded': 'MMUI_CONFIRM_DoYouNeedHelp'}
             )

@@ -202,23 +202,31 @@ class SetNavigationGoal(ServiceState):
 class SetNavGoal(State):
     """
     """
-    def __init__(self, active=True):
+    def __init__(self, room, place):
         State.__init__(
             self,
+            output_keys=['x', 'y', 'yaw'],
             outcomes=['succeeded', 'preempted']
         )
-        self.obstacles = rospy.Publisher('headcam/active', String,
-                                         latch=False, queue_size=50)
-        self.active = active
+        self.goalX, self.goalY, self.goalYAW = self._getGoal(room, place)
+
+    def _getGoal(self, room, place):
+        serv = rospy.ServiceProxy(
+            'get_coordinates',
+            GetCoordinates,
+            persistent=False
+        )
+        req = GetCoordinatesRequest(String(room), String(place))
+        resp = serv(req)
+        print('SetNavGoal:')
+        print(resp.pose.x, resp.pose.y, resp.pose.theta)
+        return (resp.pose.x, resp.pose.y, resp.pose.theta)
 
     def execute(self, ud):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
-        if self.active:
-            self.obstacles.publish('active')
-        else:
-            self.obstacles.publish('inactive')
+        ud.x, ud.y, ud.x = (self.goalX, self.goalY, self.goalYAW)
         return 'succeeded'
 
 
@@ -262,6 +270,25 @@ def goToPosition(frame='/map', room='None', place='dock'):
         Sequence.add('SET_NAV_GOAL', SetNavigationGoal(room, place))
         if not DEBUG:
             Sequence.add('MOVE_HOBBIT', move_base.MoveBaseState(frame))
+    return seq
+
+
+def prepareMovement():
+    """
+    Returns a SMACH Sequence which has to be executed before each
+    navigation command.
+    """
+
+    seq = Sequence(
+        outcomes=['succeeded', 'preempted', 'aborted'],
+        connector_outcome='succeeded')
+
+    with seq:
+        Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
+                     head_move.MoveTo(pose='down_center'))
+        Sequence.add('WAIT', SleepState(duration=1))
+        Sequence.add('ACTIVATE_OBSTACLES',
+                     SetObstacles(active=True))
     return seq
 
 

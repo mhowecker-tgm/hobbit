@@ -326,8 +326,13 @@ def get_call_sos():
                          'preempted': 'preempted'}
         )
         StateMachine.add(
+            'SET_NAV_GOAL',
+            hobbit_move.SetNavGoal(room='dock', place='dock'),
+            transitions={'succeeded': 'MOVE_TO_DOCK'}
+            )
+        StateMachine.add(
             'MOVE_TO_DOCK',
-            hobbit_move.goToPosition(room=None, place='dock'),
+            hobbit_move.goToPose(),
             transitions={'succeeded': 'MMUI_MAIN_MENU',
                          'aborted': 'aborted',
                          'preempted': 'preempted'}

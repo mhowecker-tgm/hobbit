@@ -62,8 +62,13 @@ def getRecharge():
     with seq:
         if not DEBUG:
             Sequence.add(
+                'SET_NAV_GOAL',
+                hobbit_move.SetNavGoal(room='dock', place='dock')
+            )
+            Sequence.add(
                 'MOVE_TO_DOCK',
-                hobbit_move.goToPosition(frame='/map', place='dock'))
+                hobbit_move.goToPose())
+                # hobbit_move.goToPosition(frame='/map', place='dock'))
             Sequence.add(
                 'DOCKING',
                 # hobbit_move.Dock())
@@ -100,12 +105,22 @@ def getEndRecharge():
             SleepState(duration=5)
         )
         Sequence.add(
+            'SET_NAV_GOAL_DOCK',
+            hobbit_move.SetNavGoal(room='dock', place='dock')
+        )
+        Sequence.add(
             'MOVE_AWAY_FROM_DOCK',
-            hobbit_move.goToPosition(frame='/map', room='dock', place='dock'))
+            hobbit_move.goToPose())
+            # hobbit_move.goToPosition(frame='/map', room='dock', place='dock'))
+        Sequence.add(
+            'SET_NAV_GOAL_RANDOM',
+            hobbit_move.SetNavGoal(room='maincorridor', place='default')
+        )
         Sequence.add(
             'MOVE_AWAY',
-            hobbit_move.goToPosition(frame='/map', room='maincorridor',
-                                     place='default'))
+            hobbit_move.goToPose())
+            # hobbit_move.goToPosition(frame='/map', room='maincorridor',
+            #                         place='default'))
     return seq
 
 

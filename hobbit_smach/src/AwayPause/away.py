@@ -328,9 +328,16 @@ def main():
             #    'WAIT_FOR_MMUI',
             #    HobbitMMUI.WaitforSoundEnd('/Event', Event, timeout=5),
             #    transitions={'aborted': 'WAIT_FOR_MMUI'})
-            Sequence.add('MOVE_TO_DOCK',
-                         hobbit_move.goToPosition(room=None, place='dock'),
-                         transitions={'aborted': 'failed'})
+            Sequence.add(
+                'SET_NAV_GOAL',
+                hobbit_move.SetNavGoal(room='dock', place='dock')
+            )
+            Sequence.add(
+                'MOVE_TO_DOCK',
+                hobbit_move.goToPose())
+            # Sequence.add('MOVE_TO_DOCK',
+            #              hobbit_move.goToPosition(room=None, place='dock'),
+            #              transitions={'aborted': 'failed'})
 
             seq2.userdata.text = 'Tell me when you are back/awake again.'
             # TODO: menu='MAIN' has to be changed to the 'User is back menu'
