@@ -8,6 +8,7 @@
 
 #include "interfaces_mira/MiraRobotDrive.h"
 #include "interfaces_mira/MiraRobotCharger.h"
+#include "interfaces_mira/MiraRobotDriveRos.h"
 
 ModuleFactory::ModuleFactory() {
         Register("VirtualLaser", &MiraVirtualLaser::Create);
@@ -17,7 +18,7 @@ ModuleFactory::ModuleFactory() {
 	Register("MiraGoRecharge", &MiraGoRecharge::Create);
 	Register("MiraRobotDrive", &MiraRobotDrive::Create);
 	Register("MiraRobotCharger", &MiraRobotCharger::Create);
-	Register("MiraRobotDriveRos", &MiraRobotDrive::Create);
+	Register("MiraRobotDriveRos", &MiraRobotDriveRos::Create);
 }
 
 void ModuleFactory::Register(const std::string &name, ModuleCreator func) {
