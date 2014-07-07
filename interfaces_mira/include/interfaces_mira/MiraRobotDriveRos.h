@@ -7,8 +7,8 @@
 
 //Modified by Paloma de la Puente
 
-#ifndef ROBOTBASE_H
-#define ROBOTBASE_H
+#ifndef ROBOTBASEROS_H
+#define ROBOTBASEROS_H
 
 //#include <ros/ros.h>
 //#include <fw/Framework.h>
