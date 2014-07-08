@@ -61,6 +61,7 @@ ros::NodeHandle * nhPtr=0;
 
 
 #define DEFAULT_BINDING_PORT 8080  // <--- Change this to 80 if you want to bind to the default http port..!
+#define MAX_COMMAND_SIZE 2048
 
 //char webserver_root[MAX_FILE_PATH]="ammar.gr/"; //<- This is my dev dir.. itshould be commented out or removed in stable release..
 char webserver_root[MAX_FILE_PATH]="./"; // <- change this to the directory that contains your content if you dont want to use the default public_html dir..
@@ -78,18 +79,6 @@ bool terminate(std_srvs::Empty::Request& request, std_srvs::Empty::Response& res
     stopWebInterface=1;
     return true;
 }
-
-
-bool pause(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
-{
-    return true;
-}
-
-bool resume(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
-{
-    return true;
-}
-
 
 
 /*! Dynamic content code ..! START!*/
@@ -116,16 +105,13 @@ bool resume(std_srvs::Empty::Request& request, std_srvs::Empty::Response& respon
 //The decleration of some dynamic content resources..
 struct AmmServer_Instance  * default_server=0;
 struct AmmServer_Instance  * admin_server=0;
-struct AmmServer_RequestOverride_Context GET_override={{0}};
 
 struct AmmServer_RH_Context indexPage={0};
 struct AmmServer_RH_Context settings={0};
 struct AmmServer_RH_Context stats={0};
 struct AmmServer_RH_Context form={0};
-struct AmmServer_RH_Context chatbox={0};
 struct AmmServer_RH_Context base_image={0};
 struct AmmServer_RH_Context top_image={0};
-struct AmmServer_RH_Context random_chars={0};
 
 
 char FileExistsTest(char * filename)
@@ -207,42 +193,28 @@ int getBackCommandLine(char *  command , char * what2GetBack , unsigned int what
 
 
 
-
-
-/*
-rostopic echo /battery_state
-
-header:
-  seq: 10374
-  stamp:
-    secs: 1402062613
-    nsecs: 430198039
-  frame_id: ''
-voltage: 26.0810012817
-current: 3.8780002594
-lifePercent: 41
-lifeTime: -1
-charging: False
-powerSupplyPresent: False
-cellVoltage: [3.264000177383423, 3.259000062942505, 3.267000198364258, 3.2680001258850098, 3.261000156402588, 3.258000135421753, 3.258000135421753, 3.252000093460083]
-
-rostopic echo /battery_state -n 1 | grep lifePercent | cut -d ':' -f2
-
-*/
-
 //This function prepares the content of  stats context , ( stats.content )
 void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
 {
   time_t t = time(NULL);
   struct tm tm = *localtime(&t);
 
-  char batteryState[1000]={0};
-  getBackCommandLine("rostopic echo /battery_state -n 1 | grep lifePercent | cut -d ':' -f2", batteryState , 1000 );
-  char chargingState[1000]={0};
-  getBackCommandLine("rostopic echo /battery_state -n 1 | grep charging | cut -d ':' -f2", chargingState , 1000 );
-  char mileageState[1000]={0};
-  getBackCommandLine("rostopic echo /mileage -n 1 | grep data | cut -d ':' -f2", mileageState , 1000 );
+/*
+rostopic echo /battery_state
+voltage: 26.0810012817
+current: 3.8780002594
+lifePercent: 41
+lifeTime: -1
+charging: False
+powerSupplyPresent: False
+*/
 
+  char batteryState[MAX_COMMAND_SIZE]={0};
+  getBackCommandLine("timeout 1 rostopic echo /battery_state -n 1 | grep lifePercent | cut -d ':' -f2", batteryState , MAX_COMMAND_SIZE );
+  char chargingState[MAX_COMMAND_SIZE]={0};
+  getBackCommandLine("timeout 1 rostopic echo /battery_state -n 1 | grep charging | cut -d ':' -f2", chargingState , MAX_COMMAND_SIZE );
+  char mileageState[MAX_COMMAND_SIZE]={0};
+  getBackCommandLine("timeout 1 rostopic echo /mileage -n 1 | grep data | cut -d ':' -f2", mileageState , MAX_COMMAND_SIZE );
 
   //No range check but since everything here is static max_stats_size should be big enough not to segfault with the strcat calls!
   sprintf(rqst->content,"<html><head><body>Time is<br> %02d-%02d-%02d %02d:%02d:%02d\n <br>Battery is : %s<br>Charging : %s<br>Mileage : %s<br>",
@@ -253,12 +225,10 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
 }
 
 
-
-
 //This function prepares the content of  stats context , ( stats.content )
 void * prepare_base_image(struct AmmServer_DynamicRequest  * rqst)
 {
-  unsigned int length;
+  unsigned int length=0;
   char * readContent = AmmServer_ReadFileToMemory("/opt/ros/hobbit_hydro/src/rgbd_acquisition/bin/frames/base/left0000.jpg",&length);
 
   if(readContent==0)
@@ -274,6 +244,7 @@ void * prepare_base_image(struct AmmServer_DynamicRequest  * rqst)
      }
      memcpy(rqst->content,readContent,length);
      rqst->contentSize=length;
+     free(readContent);
   }
   return 0;
 }
@@ -282,7 +253,7 @@ void * prepare_base_image(struct AmmServer_DynamicRequest  * rqst)
 //This function prepares the content of  stats context , ( stats.content )
 void * prepare_top_image(struct AmmServer_DynamicRequest  * rqst)
 {
-  unsigned int length;
+  unsigned int length=0;
   char * readContent = AmmServer_ReadFileToMemory("/opt/ros/hobbit_hydro/src/rgbd_acquisition/bin/frames/top/left0000.jpg",&length);
 
   if(readContent==0)
@@ -298,6 +269,7 @@ void * prepare_top_image(struct AmmServer_DynamicRequest  * rqst)
      }
      memcpy(rqst->content,readContent,length);
      rqst->contentSize=length;
+     free(readContent);
   }
   return 0;
 }
@@ -307,7 +279,7 @@ void joystickExecute(float x , float y )
 {
    AmmServer_Warning("Joystick(%0.2f,%0.2f)\n",x,y);
 
-   char commandToRun[1024]={0};
+   char commandToRun[MAX_COMMAND_SIZE]={0};
     sprintf(commandToRun,
            "rostopic pub /joy sensor_msgs/Joy \"{ axes: [ %0.2f , %0.2f , 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ] , buttons: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }\" -1&"
             ,x,y
@@ -337,7 +309,7 @@ void execute(char * command,char * param)
 {
   fprintf(stderr,"Execute(%s,%s) \n",command,param);
   int i=0;
-  char commandToRun[1024]={0};
+  char commandToRun[MAX_COMMAND_SIZE]={0};
 
 
   if (strcmp(command,"camera")==0)
@@ -460,7 +432,7 @@ void execute(char * command,char * param)
    else
   if (strcmp(command,"say")==0)
   {
-     char internalString[1024]={0};
+     char internalString[MAX_COMMAND_SIZE]={0};
      if (strcmp(param,"test")==0) {  strcpy(internalString,"Θα σας κάνω μια έκπληξη , θα σταματήσω να δουλεύω σε ένα τυχαίο σημείο.!"); } else
                                   {  strcpy(internalString,param); }
 
@@ -588,26 +560,22 @@ void * prepare_form_content_callback(struct AmmServer_DynamicRequest  * rqst)
   return 0;
 }
 
-
-
 //This function adds a Resource Handler for the pages stats.html and formtest.html and associates stats , form and their callback functions
 void init_dynamic_content()
 {
-  if (! AmmServer_AddResourceHandler(default_server,&indexPage,(char*)"/index.html",webserver_root,4096,0,(void* ) &prepare_index_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding stats page\n"); }
-  if (! AmmServer_AddResourceHandler(default_server,&stats,(char*)"/stats.html",webserver_root,4096,0,(void* ) &prepare_stats_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding stats page\n"); }
+  fprintf(stderr,"Please note that control panel , is only refreshed once per startup for min resource consumption\n");
+  //page=AmmServer_ReadFileToMemory((char*)"controlpanel.html",&pageLength);
+  //if (! AmmServer_AddResourceHandler(default_server,&form,(char*)"/controlpanel.html",webserver_root,pageLength+1,0,(void* ) &prepare_form_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding form testing page\n"); }
+  //AmmServer_DoNOTCacheResourceHandler(default_server,&form);
+
+  if (! AmmServer_AddResourceHandler(default_server,&indexPage,(char*)"/index.html",webserver_root,4096,0,(void*) &prepare_index_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding stats page\n"); }
+  if (! AmmServer_AddResourceHandler(default_server,&stats,(char*) "/stats.html",webserver_root,4096,0,(void*) &prepare_stats_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { AmmServer_Warning("Failed adding stats page\n"); }
 
   if (! AmmServer_AddResourceHandler(default_server,&settings,(char*)"/settings.html",webserver_root,4096,0,(void* ) &store_new_configuration_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding settings page\n"); }
 
-
-  fprintf(stderr,"Please note that control panel , is only refreshed once per startup for min resource consumption\n");
-  page=AmmServer_ReadFileToMemory((char*)"controlpanel.html",&pageLength);
-  if (! AmmServer_AddResourceHandler(default_server,&form,(char*)"/controlpanel.html",webserver_root,pageLength+1,0,(void* ) &prepare_form_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding form testing page\n"); }
-
   if (! AmmServer_AddResourceHandler(default_server,&base_image,(char*)"/base_image.jpg",webserver_root,640*480*3,0,(void* ) &prepare_base_image,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding prepare base_image page\n"); }
+  //if (! AmmServer_AddResourceHandler(default_server,&top_image,(char*)"/top_image.jpg",webserver_root,640*480*3,0,(void* ) &prepare_top_image,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding prepare top_image page\n"); }
 
-  if (! AmmServer_AddResourceHandler(default_server,&top_image,(char*)"/top_image.jpg",webserver_root,640*480*3,0,(void* ) &prepare_top_image,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding prepare top_image page\n"); }
-
-  AmmServer_DoNOTCacheResourceHandler(default_server,&form);
  }
 
 //This function destroys all Resource Handlers and free's all allocated memory..!
@@ -634,7 +602,6 @@ int main(int argc, char **argv)
    try
    {
      ROS_INFO("Initializing ROS");
-
      char regName[128]={0};
      sprintf(regName,"web_interface_%u",getpid());
      fprintf(stderr,"Node named %s \n",regName);
@@ -645,8 +612,6 @@ int main(int argc, char **argv)
      nhPtr = &nh;
 
      //We advertise the services we want accessible using "rosservice call *w/e*"
-     ros::ServiceServer pauseWebService    = nh.advertiseService("web_interface/pause", pause);
-     ros::ServiceServer resumeWebService   = nh.advertiseService("web_interface/resume", resume);
      ros::ServiceServer stopWebService     = nh.advertiseService("web_interface/terminate", terminate);
 
 
@@ -673,6 +638,9 @@ int main(int argc, char **argv)
 
     if (!default_server) { AmmServer_Error((char*) "Could not start server , shutting down everything.."); exit(1); }
 
+    ros::spinOnce();
+    ros::spinOnce();
+
     //Create dynamic content allocations and associate context to the correct files
     init_dynamic_content();
     //pages should be availiable from now on..!
@@ -692,6 +660,7 @@ int main(int argc, char **argv)
              //usleep(60000);
              sleep(1);
 		 }
+     AmmServer_Warning("Web Interface is now Shutting down.. ");
 
 
     //Delete dynamic content allocations and remove stats.html and formtest.html from the server
