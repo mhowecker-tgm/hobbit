@@ -54,7 +54,7 @@ def event_cb(msg, ud):
                 ud.params = msg.params
                 rospy.set_param('active_task', index)
                 return True
-            elif index == 1 and not night and index + 1 >= active_task:
+            elif index == 1 and not night and index + 1 <= active_task:
                 ud.command = 'silent_recharge'
                 rospy.set_param('active_task', index)
                 return True
@@ -327,7 +327,7 @@ def main():
                          'reminder': 'REMINDER',
                          'stop': 'STOP',
                          # 'call_hobbit': 'CALL_HOBBIT',
-                         'call_hobbit': 'UNDOCK',
+                         'call_hobbit': 'GET_OUT_OF_DOCK',
                          'call': 'CALL',
                          'clear_floor': 'CLEAR_FLOOR',
                          'pickup': 'PICKUP',
@@ -461,7 +461,7 @@ def main():
                          'aborted': 'failed'}
         )
         StateMachine.add(
-            'UNDOCK',
+            'GET_OUT_OF_DOCK',
             recharge.getEndRecharge(),
             transitions={'succeeded': 'succeeded',
                          'aborted': 'failed'}

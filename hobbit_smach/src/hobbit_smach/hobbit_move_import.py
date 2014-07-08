@@ -456,15 +456,3 @@ class HasMovedFromPreDock(State):
 
 def get_set_nav_goal_state(room_name=None, location_name='dock'):
     return SetNavigationGoal(room=None, place='dock')
-
-
-
-def out_cb(outcome_map):
-    if outcome_map['CHARGE_CHECK'] == 'succeeded':
-        return 'succeeded'
-    else:
-        return 'failed'
-
-
-def child_term_cb(outcome_map):
-    return True

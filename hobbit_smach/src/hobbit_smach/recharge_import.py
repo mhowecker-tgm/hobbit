@@ -30,6 +30,22 @@ def battery_cb(msg, ud):
         return False
 
 
+class PreemptChecker(State):
+    """
+    """
+    def __init__(self):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'aborted', 'preempted']
+        )
+
+    def execute(self, ud):
+        rospy.sleep(1.0)
+        if self.preempt_requested():
+            return 'preempted'
+        return 'aborted'
+
+
 class Dummy(State):
     """Dummy SMACH State class that sleeps for 2 seconds and returns succeeded
     """
@@ -99,10 +115,10 @@ def getEndRecharge():
             'UNDOCK',
             hobbit_move.Undock()
         )
-        Sequence.add(
-            'SOUND',
-            speech_output.playMoveOut()
-        )
+        #  Sequence.add(
+        #      'SOUND',
+        #      speech_output.playMoveOut()
+        #  )
         Sequence.add(
             'WAIT_FOR_MIRA',
             SleepState(duration=5)
@@ -137,7 +153,13 @@ def startDockProcedure():
         Sequence.add(
             'CHARGE_CHECK',
             WaitForMsgState('/battery_state', BatteryState, msg_cb=battery_cb),
-            transitions={'aborted': 'CHARGE_CHECK'})
+            transitions={'aborted': 'CHARGE_CHECK',
+                         'preempted': 'preempted'})
+        Sequence.add(
+            'PREEMPT',
+            PreemptChecker(),
+            transitions={'preempted': 'preempted',
+                         'aborted': 'CHARGE_CHECK'})
 
     def child_term_cb(outcome_map):
             return True
