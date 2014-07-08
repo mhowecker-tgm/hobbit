@@ -10,23 +10,43 @@
 
 #define BROADCAST_HOBBIT 1
 
-#include "hand_gestures/HandGesture.h"
+#include "skeleton_detector/Person.h" 
+ 
+ros::Publisher personBroadcaster; 
 
-#if BROADCAST_HOBBIT
-#include "hobbit_msgs/Event.h"
-ros::Publisher gestureEventBroadcaster;
-#endif
-
-
+#define divisor 1000 
 //ros::Publisher gestureBroadcaster;
 
 unsigned char dontPublishSkeletons=0;
+unsigned char dontPublishPersons=0;
+unsigned int simplePersonDetector = 1;
 
 unsigned int actualTimestamp=0;
-float actualX=0.0,actualY=0.0,actualZ=0.0,actualTheta=0.0,actualConfidence=0.0;
+unsigned int actualInFieldOfView=0;
+float actualX=0.0,actualY=0.0,actualZ=0.0,actualTheta=0.0,actualConfidence=0.49;
 
 unsigned char * colorFrameCopy=0;
 unsigned short * depthFrameCopy =0;
+ 
+
+void broadcastNewPerson()
+{
+  if (dontPublishPersons) { return ; }
+
+  skeleton_detector::Person msg;
+  msg.x = actualX;
+  msg.y = actualY;
+  msg.z = actualZ;
+  msg.theta = actualTheta;
+
+  msg.inFieldOfView = actualInFieldOfView;
+  msg.confidence = actualConfidence;
+  msg.timestamp=actualTimestamp;
+
+  fprintf(stderr,"Publishing a new Person\n");
+  personBroadcaster.publish(msg);
+  //ros::spinOnce();
+}
 
 
 void broadcastNewSkeleton(unsigned int frameNumber,unsigned int skeletonID , struct skeletonHuman * skeletonFound )
@@ -40,14 +60,20 @@ void broadcastNewSkeleton(unsigned int frameNumber,unsigned int skeletonID , str
      for ( i=0; i<HUMAN_SKELETON_PARTS; i++ )
       {
        sprintf(tag,"%s%s",SKPREFIX,jointNames[i]);
-        postPoseTransform(tag,/*-1.0**/skeletonFound->joint[i].x/1000,-1.0*skeletonFound->joint[i].y/1000,skeletonFound->joint[i].z/1000);
+        postPoseTransform(tag,/*-1.0**/skeletonFound->joint[i].x/divisor,-1.0*skeletonFound->joint[i].y/divisor,skeletonFound->joint[i].z/divisor);
       }
 
      for ( i=0; i<8; i++ )
       {
        sprintf(tag,SKPREFIX "bbox/point%u",i);
-       postPoseTransform(tag,/*-1.0**/skeletonFound->bbox[i].x/1000,/*-1.0**/skeletonFound->bbox[i].y/1000,skeletonFound->bbox[i].z/1000);
+       postPoseTransform(tag,/*-1.0**/skeletonFound->bbox[i].x/divisor,-1.0*skeletonFound->bbox[i].y/divisor,skeletonFound->bbox[i].z/divisor);
       }
+    
+      actualTimestamp=frameNumber;
+      actualX=skeletonFound->joint[HUMAN_SKELETON_HEAD].x; 
+      actualY=-1.0*skeletonFound->joint[HUMAN_SKELETON_HEAD].y; 
+      actualZ=skeletonFound->joint[HUMAN_SKELETON_HEAD].z;   
+      broadcastNewPerson();
 
     return ;
 }
@@ -64,7 +90,9 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
 
   int retres = hobbitUpperBodyTracker_NewFrame(colorFrameCopy , colorWidth , colorHeight ,
                                                depthFrameCopy  , depthWidth , depthHeight ,
-                                               calib , frameTimestamp );
+                                               calib ,
+                                               simplePersonDetector , 
+                                               frameTimestamp );
 
 
 
@@ -81,6 +109,8 @@ int registerServices(ros::NodeHandle * nh,unsigned int width,unsigned int height
 
   hobbitUpperBodyTracker_Initialize(width , height);
   hobbitUpperBodyTracker_RegisterSkeletonDetectedEvent((void *) &broadcastNewSkeleton);
+
+  personBroadcaster = nh->advertise <skeleton_detector::Person> ("persons", divisor);
 }
 
 int stopServices()

@@ -86,6 +86,21 @@ bool terminate(std_srvs::Empty::Request& request, std_srvs::Empty::Response& res
 }
 
 
+bool simple(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    ROS_INFO("Simple Mode on");
+    simplePersonDetector=1;
+    return true;
+}
+
+bool advanced(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    ROS_INFO("Advanced Mode on");
+    simplePersonDetector=0;
+    return true;
+}
+
+
 bool pause(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
     ROS_INFO("Skeleton Detector is now paused");
@@ -218,7 +233,7 @@ int main(int argc, char **argv)
      private_node_handle_.param("fromRGBTopic", fromRGBTopic, std::string("headcam/rgb/image_rect_color"));
      private_node_handle_.param("fromRGBTopicInfo", fromRGBTopicInfo, std::string("/headcam/rgb/camera_info"));
      private_node_handle_.param("name", name, std::string("hand_gestures"));
-     private_node_handle_.param("rate", rate, int(11));
+     private_node_handle_.param("rate", rate, int(5));
      ros::Rate loop_rate(rate); //  hz should be our target performance
 
      //We advertise the services we want accessible using "rosservice call *w/e*"
@@ -227,6 +242,8 @@ int main(int argc, char **argv)
      ros::ServiceServer terminateService        = nh.advertiseService(name+"/terminate"    , terminate);
      ros::ServiceServer resumeService           = nh.advertiseService(name+"/pause"        , pause);
      ros::ServiceServer pauseService            = nh.advertiseService(name+"/resume"       , resume);
+     ros::ServiceServer simpleService           = nh.advertiseService(name+"/simple"        , simple);
+     ros::ServiceServer advancedService         = nh.advertiseService(name+"/advanced"       , advanced);
      ros::ServiceServer setQualityService       = nh.advertiseService(name+"/set_quality"  , setQuality);
 
      //Make our rostopic cmaera grabber

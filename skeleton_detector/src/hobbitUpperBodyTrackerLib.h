@@ -225,6 +225,7 @@ int hobbitUpperBodyTracker_RegisterSkeletonDetectedEvent(void * callback);
 int hobbitUpperBodyTracker_NewFrame(unsigned char * colorFrame , unsigned int colorWidth , unsigned int colorHeight ,
                                     unsigned short * depthFrame  , unsigned int depthWidth , unsigned int depthHeight ,
                                     struct calibrationHUBT * frameCalibration ,
+                                    unsigned int simplePersonDetector ,
                                     unsigned int frameTimestamp );
 
 #ifdef __cplusplus
