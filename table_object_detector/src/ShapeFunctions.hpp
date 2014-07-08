@@ -17,7 +17,7 @@
 #include <pcl/features/vfh.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <pcl/common/pca.h>
-#include "HobbitMsgs/PointCloud2FeatureHistogram.h"
+#include "hobbit_msgs/PointCloud2FeatureHistogram.h"
 
 #define _USE_MATH_DEFINES
 

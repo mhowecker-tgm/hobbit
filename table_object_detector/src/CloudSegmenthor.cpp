@@ -1,3 +1,4 @@
+#include <pcl_conversions/pcl_conversions.h>
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <std_msgs/String.h>
@@ -34,9 +35,9 @@
 #include <pcl/segmentation/sac_segmentation.h>
 #include <pcl/segmentation/extract_clusters.h>
 #include <sensor_msgs/PointCloud2.h>
-#include "HobbitMsgs/PointCloud2FeatureHistogram.h"
-#include "HobbitMsgs/ClustersOnPlane.h"
-#include "HobbitMsgs/SingleShotPC.h"
+#include "hobbit_msgs/PointCloud2FeatureHistogram.h"
+#include "hobbit_msgs/ClustersOnPlane.h"
+#include "hobbit_msgs/SingleShotPC.h"
 #include <string>
 
 class CloudSegmenthor {
@@ -90,8 +91,8 @@ public:
 
 	// input: pointcloud2, output: float array
 	bool do_service_touchScreenOutCheck(
-			HobbitMsgs::PointCloud2FeatureHistogram::Request& req,
-			HobbitMsgs::PointCloud2FeatureHistogram::Response& res) {
+			hobbit_msgs::PointCloud2FeatureHistogram::Request& req,
+			hobbit_msgs::PointCloud2FeatureHistogram::Response& res) {
 		ROS_INFO("SERVICE_CALL touchScreenOutCheck");
 		ros::Time t1 = ros::Time::now();
 		pcl::PointCloud<pcl::PointXYZRGB> cloud;
@@ -104,8 +105,8 @@ public:
 
 	// input: pointcloud2, output: float array
 	bool do_service_findGroundPlane(
-			HobbitMsgs::PointCloud2FeatureHistogram::Request& req,
-			HobbitMsgs::PointCloud2FeatureHistogram::Response& res) {
+			hobbit_msgs::PointCloud2FeatureHistogram::Request& req,
+			hobbit_msgs::PointCloud2FeatureHistogram::Response& res) {
 		ROS_INFO("SERVICE_CALL findGroundPlane");
 		ros::Time t1 = ros::Time::now();
 		pcl::PointCloud<pcl::PointXYZRGB> cloud;
@@ -119,8 +120,8 @@ public:
 	//df start 31.01.2013
 	// input: pointcloud2, output: float array
 	bool do_service_findTablePlane(
-			HobbitMsgs::PointCloud2FeatureHistogram::Request& req,
-			HobbitMsgs::PointCloud2FeatureHistogram::Response& res) {
+			hobbit_msgs::PointCloud2FeatureHistogram::Request& req,
+			hobbit_msgs::PointCloud2FeatureHistogram::Response& res) {
 		ROS_INFO("SERVICE_CALL findTablePlane");
 		ros::Time t1 = ros::Time::now();
 		pcl::PointCloud<pcl::PointXYZRGB> cloud;
@@ -134,8 +135,8 @@ public:
 
 	// input: pointcloud2, output: float array
 	bool do_service_findTurnTablePlane(
-			HobbitMsgs::PointCloud2FeatureHistogram::Request& req,
-			HobbitMsgs::PointCloud2FeatureHistogram::Response& res) {
+			hobbit_msgs::PointCloud2FeatureHistogram::Request& req,
+			hobbit_msgs::PointCloud2FeatureHistogram::Response& res) {
 		ROS_INFO("SERVICE_CALL findTurnTablePlane");
 		ros::Time t1 = ros::Time::now();
 		pcl::PointCloud<pcl::PointXYZRGB> cloud;
@@ -148,8 +149,8 @@ public:
 
 	// input: turntable plane as float array, output: vector of pointcloud2
 	bool do_service_findObjectOnTurnTable(
-			HobbitMsgs::ClustersOnPlane::Request& req,
-			HobbitMsgs::ClustersOnPlane::Response& res) {
+			hobbit_msgs::ClustersOnPlane::Request& req,
+			hobbit_msgs::ClustersOnPlane::Response& res) {
 		ROS_INFO("SERVICE_CALL findOBJECTonTurnTablePlane");
 		ros::Time t1 = ros::Time::now();
 		pcl::PointCloud<pcl::PointXYZRGB> cloud;
@@ -165,8 +166,8 @@ public:
 
 	// input: turntable plane as float array, output: vector of pointcloud2
 	bool do_service_findObjectsOnFloor(
-			HobbitMsgs::ClustersOnPlane::Request& req,
-			HobbitMsgs::ClustersOnPlane::Response& res) {
+			hobbit_msgs::ClustersOnPlane::Request& req,
+			hobbit_msgs::ClustersOnPlane::Response& res) {
 		ROS_INFO("SERVICE_CALL findOBJECTonFLOOR");
 		ROS_INFO(" %s ",req.point_cloud.header.frame_id.c_str());
 		ros::Time t1 = ros::Time::now();
@@ -187,8 +188,8 @@ public:
 	//df start 31.01.2013
 	// input: table plane as float array, output: vector of pointcloud2
 	bool do_service_findObjectsOnTable(
-			HobbitMsgs::ClustersOnPlane::Request& req,
-			HobbitMsgs::ClustersOnPlane::Response& res) {
+			hobbit_msgs::ClustersOnPlane::Request& req,
+			hobbit_msgs::ClustersOnPlane::Response& res) {
 		ROS_INFO("SERVICE_CALL findOBJECTonTABLE");
 		ROS_INFO(" %s ",req.point_cloud.header.frame_id.c_str());
 		ros::Time t1 = ros::Time::now();
@@ -209,8 +210,8 @@ public:
 
 
 	// input: string, output: pointcloud2
-	bool do_service_getSingleShot(HobbitMsgs::SingleShotPC::Request& req,
-			HobbitMsgs::SingleShotPC::Response& res) {
+	bool do_service_getSingleShot(hobbit_msgs::SingleShotPC::Request& req,
+			hobbit_msgs::SingleShotPC::Response& res) {
 		ros::Time t1 = ros::Time::now();
 		//pcl::toROSMsg (this->pc, res.point_cloud);
 		pcl::toROSMsg(*this->cloud_, res.point_cloud);
