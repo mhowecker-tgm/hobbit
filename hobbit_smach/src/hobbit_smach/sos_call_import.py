@@ -6,6 +6,7 @@ PKG = 'hobbit_smach'
 import roslib
 roslib.load_manifest(PKG)
 import rospy
+import threading
 
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 import hobbit_smach.hobbit_move_import as hobbit_move
@@ -17,6 +18,7 @@ from smach_ros import ActionServerWrapper, \
 from smach import StateMachine, State, Sequence
 import hobbit_smach.speech_output_import as speech_output
 
+param_server_lock = threading.RLock()
 
 class bcolors:
     HEADER = '\033[95m'
@@ -48,10 +50,11 @@ class Init(State):
             output_keys=['social_role'])
 
     def execute(self, ud):
-        if rospy.has_param('/hobbit/social_role'):
-            ud.social_role = rospy.get_param('/hobbit/social_role')
-        else:
-            pass
+        with param_server_lock:
+            if rospy.has_param('/hobbit/social_role'):
+                ud.social_role = rospy.get_param('/hobbit/social_role')
+            else:
+                pass
         return 'succeeded'
 
 

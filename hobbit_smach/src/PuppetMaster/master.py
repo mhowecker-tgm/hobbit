@@ -6,6 +6,7 @@ NAME = 'HOBBIT_MASTER'
 import roslib
 roslib.load_manifest(PKG)
 import rospy
+import threading
 from smach_ros import SimpleActionState, IntrospectionServer
 from smach import StateMachine, Concurrence, State
 from std_msgs.msg import String
@@ -15,6 +16,8 @@ import hobbit_smach.helper_import as helper
 import hobbit_smach.recharge_import as recharge
 import uashh_smach.util as util
 from hobbit_user_interaction import HobbitEmotions
+
+param_server_lock = threading.RLock()
 
 commands = [['emergency', 'G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP', 'C_HELP', 'F_CALLSOS', 'G_EMERGENCY'],
             ['recharge', 'E_RECHARGE', 'C_RECHARGE'],
@@ -36,10 +39,11 @@ def event_cb(msg, ud):
     print(msg.event)
     night = helper.IsItNight()
     rospy.sleep(2.0)
-    if rospy.has_param('active_task'):
-        active_task = rospy.get_param('active_task')
-    else:
-        active_task = 100
+    with param_server_lock:
+        if rospy.has_param('active_task'):
+            active_task = rospy.get_param('active_task')
+        else:
+            active_task = 100
     print('active_task and night')
     print(active_task)
     print(night)
@@ -79,8 +83,9 @@ def event_cb(msg, ud):
 def command_cb(msg, ud):
     rospy.loginfo('/Command data received:')
     print(msg.command)
-    if rospy.has_param('active_task'):
-        active_task = rospy.get_param('active_task')
+    with param_server_lock:
+        if rospy.has_param('active_task'):
+            active_task = rospy.get_param('active_task')
     else:
         active_task = 100
     print(active_task)

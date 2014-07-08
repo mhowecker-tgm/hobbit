@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 
 import rospy
+import threading
 from smach import State
 from datetime import datetime, time
+
+param_server_lock = threading.RLock()
 
 
 class TimeCheck(State):
@@ -19,14 +22,15 @@ class TimeCheck(State):
         self.wakeup_time = '06:30'
 
     def execute(self, ud):
-        if rospy.has_param('/sleep_time'): 
-            self.sleep_time = rospy.get_param('/sleep_time')
-     	else:
-	    sleep_time = '22:00'
-	if rospy.has_param('/wakeup_time'):
-            self.wakeup_time = rospy.get_param('/wakeup_time')
-    	else:
-	    wakeup_time = '06:30'
+        with param_server_lock:
+            if rospy.has_param('/sleep_time'):
+                self.sleep_time = rospy.get_param('/sleep_time')
+            else:
+                self.sleep_time = '22:00'
+            if rospy.has_param('/wakeup_time'):
+                self.wakeup_time = rospy.get_param('/wakeup_time')
+            else:
+                self.wakeup_time = '06:30'
 
         wake = self.wakeup_time.split(':')
         sleep = self.sleep_time.split(':')
@@ -41,14 +45,15 @@ class TimeCheck(State):
 
 
 def IsItNight():
-    if rospy.has_param('/sleep_time'): 
-    	self.sleep_time = rospy.get_param('/sleep_time')
-    else:
-    	sleep_time = '22:00'
-    if rospy.has_param('/wakeup_time'):
-    	self.wakeup_time = rospy.get_param('/wakeup_time')
-    else:
-    	wakeup_time = '06:30'
+    with param_server_lock:
+        if rospy.has_param('/sleep_time'):
+            sleep_time = rospy.get_param('/sleep_time')
+        else:
+            sleep_time = '22:00'
+        if rospy.has_param('/wakeup_time'):
+            wakeup_time = rospy.get_param('/wakeup_time')
+        else:
+            wakeup_time = '06:30'
 
     wake = wakeup_time.split(':')
     sleep = sleep_time.split(':')
