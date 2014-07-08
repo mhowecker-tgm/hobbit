@@ -27,8 +27,8 @@ def talker(level):
 
 
 def battery_cb(msg):
-    print('received msg on topic /battery_state')
-    print(msg)
+    #print('received msg on topic /battery_state')
+    #print(msg)
     if msg.lifePercent < UPPER_LIMIT:
         rospy.loginfo('Battery level is low')
         talker('E_RECHARGE')

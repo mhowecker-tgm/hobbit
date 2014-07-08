@@ -19,9 +19,14 @@ class TimeCheck(State):
         self.wakeup_time = '06:30'
 
     def execute(self, ud):
-        if rospy.has_param('sleep_time') and rospy.has_param('wakeup_time'):
-            self.sleep_time = rospy.get_param('sleep_time')
-            self.wakeup_time = rospy.get_param('wakeup_time')
+        if rospy.has_param('/sleep_time'): 
+            self.sleep_time = rospy.get_param('/sleep_time')
+     	else:
+	    sleep_time = '22:00'
+	if rospy.has_param('/wakeup_time'):
+            self.wakeup_time = rospy.get_param('/wakeup_time')
+    	else:
+	    wakeup_time = '06:30'
 
         wake = self.wakeup_time.split(':')
         sleep = self.sleep_time.split(':')
@@ -36,12 +41,14 @@ class TimeCheck(State):
 
 
 def IsItNight():
-    sleep_time = '22:00'
-    wakeup_time = '06:30'
-
-    if rospy.has_param('sleep_time') and rospy.has_param('wakeup_time'):
-        sleep_time = rospy.get_param('sleep_time')
-        wakeup_time = rospy.get_param('wakeup_time')
+    if rospy.has_param('/sleep_time'): 
+    	self.sleep_time = rospy.get_param('/sleep_time')
+    else:
+    	sleep_time = '22:00'
+    if rospy.has_param('/wakeup_time'):
+    	self.wakeup_time = rospy.get_param('/wakeup_time')
+    else:
+    	wakeup_time = '06:30'
 
     wake = wakeup_time.split(':')
     sleep = sleep_time.split(':')

@@ -35,11 +35,14 @@ def event_cb(msg, ud):
     rospy.loginfo('/Event data received:')
     print(msg.event)
     night = helper.IsItNight()
+    rospy.sleep(2.0)
     if rospy.has_param('active_task'):
         active_task = rospy.get_param('active_task')
     else:
         active_task = 100
+    print('active_task and night')
     print(active_task)
+    print(night)
     for index, item in enumerate(commands):
         if msg.event in item:
             if index == 4:
@@ -47,7 +50,7 @@ def event_cb(msg, ud):
                 ud.params = msg.params
                 rospy.set_param('active_task', index)
                 return True
-            elif index == 1 and not night:
+            elif index == 1 and not night and index + 1 >= active_task:
                 ud.command = 'silent_recharge'
                 rospy.set_param('active_task', index)
                 return True
