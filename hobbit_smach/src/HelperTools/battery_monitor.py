@@ -11,7 +11,7 @@ UPPER_LIMIT = 95 # High values to test the master node
 LOWER_LIMIT = 90
 
 
-def talker(self, level):
+def talker(level):
     data = Event()
     data.header = Header()
     data.header.stamp = rospy.Time.now()
@@ -26,7 +26,7 @@ def talker(self, level):
         i += 1
 
 
-def battery_cb(self, msg):
+def battery_cb(msg):
     print('received msg on topic /battery_state')
     print(msg)
     if msg.lifePercent < UPPER_LIMIT:
