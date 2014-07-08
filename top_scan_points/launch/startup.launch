@@ -1,0 +1,4 @@
+<launch>
+  <node pkg="top_scan_points" type="top_scan_points" name="top_scan_points" output="screen"/>
+</launch>
+
