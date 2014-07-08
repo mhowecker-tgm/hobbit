@@ -165,6 +165,8 @@ def startDockProcedure():
             return True
 
     def out_cb(outcome_map):
+        print('CHECK: outcome_map')
+        print(outcome_map)
         if outcome_map['CHARGE_CHECK'] == 'succeeded':
             return 'succeeded'
         elif outcome_map['WAIT'] == 'succeeded':
@@ -188,12 +190,12 @@ def startDockProcedure():
         StateMachine.add('START_DOCK', hobbit_move.Dock(),
                          transitions={'succeeded': 'WAIT'})
         StateMachine.add('WAIT', SleepState(duration=1),
-                         transitions={'succeeded': 'DID_WE_MOVE'})
-        StateMachine.add('DID_WE_MOVE',
-                         hobbit_move.HasMovedFromPreDock(minimum_distance=0.5),
-                         transitions={'movement_exceeds_distance': 'CHECK',
-                                      'movement_within_distance': 'DID_WE_MOVE',
-                                      'counter': 'CHECK'})
+                         transitions={'succeeded': 'CHECK'})
+        # StateMachine.add('DID_WE_MOVE',
+        #                  hobbit_move.HasMovedFromPreDock(minimum_distance=0.5),
+        #                  transitions={'movement_exceeds_distance': 'CHECK',
+        #                               'movement_within_distance': 'DID_WE_MOVE',
+        #                               'counter': 'CHECK'})
         StateMachine.add('CHECK', cc,
                          transitions={'succeeded': 'STOP',
                                       'failed': 'RETRY'})
