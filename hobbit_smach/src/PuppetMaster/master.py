@@ -86,8 +86,8 @@ def command_cb(msg, ud):
     with param_server_lock:
         if rospy.has_param('active_task'):
             active_task = rospy.get_param('active_task')
-    else:
-        active_task = 100
+        else:
+            active_task = 100
     print(active_task)
     for index, item in enumerate(commands):
         if msg.command in item:
