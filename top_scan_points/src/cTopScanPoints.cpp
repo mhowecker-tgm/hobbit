@@ -58,6 +58,7 @@ cTopScanPoints::~cTopScanPoints()
   //Pointcloud and tf transform received
 void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 {
+	//std::cout << "callback " << std::endl;
 	sensor_msgs::PointCloud2 point_cloud2;
 	point_cloud2.data = msg-> data;
 
@@ -87,9 +88,9 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 	{
 
 		tf::StampedTransform headcam_trans;
-  		headcam_trans.setOrigin(tf::Vector3(0, 0, 0));
+  		headcam_trans.setOrigin(tf::Vector3(-0.248, 0, 1.108));
   		//headcam_trans.setRotation(tf::createQuaternionFromRPY(0,140*M_PI/180,-90*M_PI/180));
-		headcam_trans.setRotation(tf::createQuaternionFromRPY(-0.005, 0.682, -0.014));
+		headcam_trans.setRotation(tf::createQuaternionFromRPY(0.87, M_PI, M_PI/2));
 
 		//Transform pointcloud to new reference frame
 		pcl_ros::transformPointCloud(pcl_cloud, point_cloud_new_frame, headcam_trans);
@@ -108,9 +109,12 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 	uint32_t ranges_size = std::ceil((output.angle_max - output.angle_min) / output.angle_increment);
 	output.ranges.assign(ranges_size, output.range_max + 1.0);
 
+        bool process = false;
 	//"Thin" laser height from pointcloud
 	for (pcl::PointCloud<pcl::PointXYZ>::const_iterator it = point_cloud_new_frame.begin(); it != point_cloud_new_frame.end(); ++it)
 	{
+		process = !process;
+		if (!process) continue;
 		const float &x = it->x;
 		const float &y = it->y;
 		const float &z = it->z;
@@ -132,7 +136,7 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 			continue;
 		}
 
-		std::cout << "Point " << x << " " << y << " " << z << std::endl;
+		//std::cout << "Point " << x << " " << y << " " << z << std::endl;
 		
 		double angle = atan2(y, x);
 		//std::cout << "angle " << angle * 180/M_PI << std::endl;
@@ -166,7 +170,7 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 void cTopScanPoints::Run(void)
 {
 
-	min_height_ = -2;
+	min_height_ = 0.1;
         max_height_ = 1;
 
 	 ros::init(init_argc, init_argv, "topScan");
