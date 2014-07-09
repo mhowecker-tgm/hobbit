@@ -111,7 +111,7 @@ void MiraGoRecharge::docking_task_callback(const std_msgs::String::ConstPtr& msg
 	}
 	else if (msg->data.compare("docking_off") == 0)
 	{
-		const int s = 1; //FIXME
+		unsigned int s = 1; //FIXME
 
 		std::cout << "Docking off" << std::endl;
 
@@ -128,6 +128,8 @@ void MiraGoRecharge::docking_task_callback(const std_msgs::String::ConstPtr& msg
 
 		//docking_off
 		auto rpcFuture = robot_->getMiraAuthority().callService<void>(service, "dockOff", s);
+
+		rpcFuture.get();
 
 	}
 
