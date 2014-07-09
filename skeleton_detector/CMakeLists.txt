@@ -38,6 +38,7 @@ target_link_libraries(skeleton_detector
                       ${CMAKE_CURRENT_SOURCE_DIR}/bin/libMBVCore.so 
                       ${CMAKE_CURRENT_SOURCE_DIR}/bin/libMBVUtils.so  
                       ${CMAKE_CURRENT_SOURCE_DIR}/bin/libMBVDecoding.so
+                      ${CMAKE_CURRENT_SOURCE_DIR}/bin/libglog.so.0
                       ${catkin_LIBRARIES} ${OpenCV_LIBRARIES}  ${Boost_LIBRARIES}   )
 
 install(TARGETS skeleton_detector RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
