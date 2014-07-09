@@ -12,7 +12,7 @@ from smach import StateMachine, Concurrence, State
 from std_msgs.msg import String
 from hobbit_msgs.msg import Command, Event, GeneralHobbitAction,\
     GeneralHobbitGoal
-# import hobbit_smach.helper_import as helper
+import hobbit_smach.helper_import as helper
 import hobbit_smach.recharge_import as recharge
 import uashh_smach.util as util
 from hobbit_user_interaction import HobbitEmotions
@@ -25,21 +25,16 @@ commands = [['emergency', 'G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP', 'C_HELP',
             ['call', 'E_CALLRING', 'E_CALLESTABLISHED', 'E_CALLENDED', 'C_MAKECALL'],
             ['clear_floor', 'E_CLEARFLOOR'],
             ['pickup', 'follow', 'learn_object', 'bring_object', 'goto', 'pickup'
-             'C_PICKUP', 'C_FOLLOW', 'C_LEARN', 'C_BRING', 'C_GOTO', 'G_POINTING'],
+             'C_PICKUP', 'C_FOLLOW', 'C_LEARN', 'C_BRING', 'C_GOTOPOINT', 'G_POINTING'],
             ['patrol', 'E_PATROL'],
             ['surprise', 'C_SURPRISE'],
             ['reward', 'C_REWARD', 'G_REWARD']
             ]
 
-def IsItNight():
-    if rospy.has_param('~sleep_time'):
-        sleep_time = rospy.get_param('~sleep_time')
-    else:
-        sleep_time = '22:00'
-    if rospy.has_param('~wakeup_time'):
-        wakeup_time = rospy.get_param('~wakeup_time')
-    else:
-        wakeup_time = '06:30'
+
+def IsItNight(ud):
+    sleep_time = ud.parameters['sleep_time']
+    wakeup_time = ud.parameters['wakeup_time']
 
     wake = wakeup_time.split(':')
     sleep = sleep_time.split(':')
@@ -55,13 +50,10 @@ def IsItNight():
 def event_cb(msg, ud):
     rospy.loginfo('/Event data received:')
     print(msg.event)
-    night = IsItNight()
+    night = IsItNight(ud)
     rospy.sleep(2.0)
-    if rospy.has_param('~active_task'):
-        active_task = rospy.get_param('~active_task')
-    else:
-        active_task = 100
     print('active_task and night')
+    active_task = ud.parameters['active_task']
     print(active_task)
     print(night)
     for index, item in enumerate(commands):
@@ -70,11 +62,11 @@ def event_cb(msg, ud):
                 ud.command = item[0]
                 ud.params = msg.params
                 print(msg.params)
-                rospy.set_param('~active_task', index)
+                ud.active_task = index
                 return True
             elif index == 1 and not night and index + 1 <= active_task:
                 ud.command = 'silent_recharge'
-                rospy.set_param('~active_task', index)
+                ud.active_task = index
                 return True
             elif index + 1 >= active_task and not night:
                 rospy.loginfo('New task has lower priority. Do nothing')
@@ -90,9 +82,9 @@ def event_cb(msg, ud):
                 ud.params = msg.params
                 if item[0] == 'stop':
                     print('Reset active_task value')
-                    rospy.set_param('~active_task', 100)
+                    ud.active_task = 100
                 else:
-                    rospy.set_param('~active_task', index)
+                    ud.active_task = index
                 return True
     rospy.loginfo('Unknown event received %s' % msg.event)
     return False
@@ -185,12 +177,22 @@ class Init(State):
     def __init__(self):
         State.__init__(
             self,
+            input_keys=['parameters'],
+            output_keys=['parameters'],
             outcomes=['succeeded', 'preempted'])
+        # load a few needed parameters from server
+        self.sleep_time = rospy.get_param('/sleep_time', '22:00')
+        self.wakeup_time = rospy.get_param('/wakeup_time', '06:30')
+        self.active_task = 100
 
     def execute(self, ud):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
+        ud.parameters = {}
+        ud.parameters['sleep_time'] = self.sleep_time
+        ud.parameters['wakeup_time'] = self.wakeup_time
+        ud.parameters['active_task'] = self.active_task
         print('Init')
         return 'succeeded'
 
@@ -248,6 +250,15 @@ class FakeForAllWithoutRunningActionSever(State):
         print('FakeForAllWithoutRunningActionSever')
         return 'succeeded'
 
+def goto_cb(ud, goal):
+    room, place = ud.params[0].value.lower().split(' ')
+    par = []
+    par.append(String(room))
+    par.append(String(place))
+    goal = GeneralHobbitGoal(command=String('goto'),
+                             previous_state=String(ud.parameters['previous_task']),
+                             parameters=par)
+    return goal
 
 def main():
     rospy.init_node(NAME)
@@ -255,8 +266,8 @@ def main():
         outcomes=['succeeded',
                   'preempted',
                   'failed'],
-        input_keys=['command', 'active_task', 'params'],
-        output_keys=['command', 'active_task', 'params']
+        input_keys=['command', 'active_task', 'params', 'parameters'],
+        output_keys=['command', 'active_task', 'params', 'parameters']
     )
 
     sm1 = StateMachine(
@@ -272,15 +283,15 @@ def main():
         outcomes=['succeeded',
                   'preempted',
                   'failed'],
-        input_keys=['command', 'params', 'active_task'],
-        output_keys=['command', 'active_task']
+        input_keys=['command', 'params', 'active_task', 'parameters'],
+        output_keys=['command', 'active_task', 'parameters']
     )
 
     cc = Concurrence(
         outcomes=['succeeded', 'aborted', 'preempted'],
         default_outcome='aborted',
-        input_keys=['command', 'active_task', 'params'],
-        output_keys=['command', 'params'],
+        input_keys=['command', 'active_task', 'params', 'parameters'],
+        output_keys=['command', 'params', 'parameters'],
         child_termination_cb=child_cb,
         outcome_map={'succeeded': {'Event_Listener': 'succeeded'},
                      'aborted': {'Event_Listener': 'aborted'}}
@@ -289,7 +300,7 @@ def main():
     cc1 = Concurrence(
         outcomes=['succeeded', 'aborted', 'preempted'],
         default_outcome='aborted',
-        input_keys=['command', 'params', 'active_task'],
+        input_keys=['command', 'params', 'active_task', 'parameters'],
         output_keys=['command'],
         child_termination_cb=child_cb1,
         outcome_map={'succeeded': {'ASW': 'succeeded'},
@@ -303,6 +314,7 @@ def main():
                 '/Event',
                 Event,
                 msg_cb=event_cb,
+                input_keys=['parameters'],
                 output_keys=['command', 'params']
             )
         )
@@ -312,6 +324,7 @@ def main():
                 '/Command',
                 Command,
                 msg_cb=command_cb,
+                input_keys=['parameters'],
                 output_keys=['command', 'params']
             )
         )
@@ -421,13 +434,18 @@ def main():
         )
         StateMachine.add(
             'GOTO',
-            FakeForAllWithoutRunningActionSever(),
+            # FakeForAllWithoutRunningActionSever(),
+            SimpleActionState('goto',
+                              GeneralHobbitAction,
+                              goal_cb=goto_cb,
+                              input_keys=['parameters', 'params']),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'failed'}
         )
         StateMachine.add(
             'STOP',
-            FakeForAllWithoutRunningActionSever(),
+            # FakeForAllWithoutRunningActionSever(),
+            helper.get_hobbit_full_stop(),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'failed'}
         )
@@ -463,9 +481,10 @@ def main():
         )
         StateMachine.add(
             'REWARD',
-            FakeForAllWithoutRunningActionSever(),
+            HobbitEmotions.ShowEmotions(emotion='VERY_HAPPY',
+                                                 emo_time=4),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
-                         'aborted': 'failed'}
+                         'failed': 'failed'}
         )
         StateMachine.add(
             'BRING_OBJECT',
@@ -476,7 +495,7 @@ def main():
         StateMachine.add(
             'RECHARGE',
             HobbitEmotions.ShowEmotions(emotion='VERY_HAPPY',
-                                                 emo_time=4),
+                                        emo_time=4),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'failed': 'failed',
                          'preempted': 'preempted'}

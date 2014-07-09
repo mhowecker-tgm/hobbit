@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
 import rospy
-from smach import State
+from smach import State, Sequence
 from datetime import datetime, time
-
+from hobbit_user_interaction import HobbitMMUI
+import hobbit_smach.hobbit_move_import as hobbit_move
 
 
 class TimeCheck(State):
@@ -25,9 +26,8 @@ class TimeCheck(State):
         else:
             self.wakeup_time = '06:30'
 
-
     def execute(self, ud):
-                wake = self.wakeup_time.split(':')
+        wake = self.wakeup_time.split(':')
         sleep = self.sleep_time.split(':')
         now = datetime.now()
         if time(int(wake[0]), int(wake[1]))\
@@ -58,3 +58,26 @@ def IsItNight():
         return False
     else:
         return True
+
+
+def get_hobbit_full_stop():
+    """
+    Return a SMACH sequence that will stop all movement of Hobbit and
+    returns to the main menu of the MMUI.
+    """
+    seq = Sequence(
+        outcomes=['succeeded', 'failed', 'preempted'],
+        connector_outcome='succeeded'
+    )
+
+    with seq:
+        Sequence.add(
+            'STOP_MOVEMENT',
+            hobbit_move.Stop()
+        )
+        Sequence.add(
+            'MAIN_MENU',
+            HobbitMMUI.ShowMenu(menu='MAIN'),
+            transitions={'failed': 'aborted'}
+        )
+    return seq
