@@ -61,16 +61,16 @@ class Undock(State):
         )
         self.stop_pub = rospy.Publisher('/docking_task', String,
                                         latch=False, queue_size=50)
-        self.motion_pub = rospy.Publisher('DiscreteMotionCmd', String,
-                                          latch=False, queue_size=50)
+        # self.motion_pub = rospy.Publisher('DiscreteMotionCmd', String,
+        #                                  latch=False, queue_size=50)
 
     def execute(self, ud):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
-        # self.stop_pub.publish('docking_off')
-        self.motion_pub.publish('Move -0.5')
-        #rospy.sleep(3.0)
+        self.stop_pub.publish('docking_off')
+        # self.motion_pub.publish('Move -0.5')
+        # rospy.sleep(3.0)
         return 'succeeded'
 
 
