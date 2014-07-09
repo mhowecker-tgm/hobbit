@@ -21,7 +21,7 @@ import hobbit_smach.speech_output_import as speech_output
 def battery_cb(msg, ud):
     print('Received battery_state message')
     print(msg.charging)
-    rospy.sleep(1.0)
+    rospy.sleep(2.0)
     if msg.charging:
         print('I am charging')
         return True
@@ -42,25 +42,9 @@ class PreemptChecker(State):
     def execute(self, ud):
         rospy.sleep(1.0)
         if self.preempt_requested():
+            self.service_preempt()
             return 'preempted'
         return 'aborted'
-
-
-class Dummy(State):
-    """Dummy SMACH State class that sleeps for 2 seconds and returns succeeded
-    """
-    def __init__(self):
-        State.__init__(
-            self,
-            outcomes=['succeeded'],
-            output_keys=['room_name', 'location_name']
-        )
-
-    def execute(self, ud):
-        rospy.sleep(2.0)
-        ud.room_name = 'maincorridor'
-        ud.location_name = 'default'
-        return 'succeeded'
 
 
 def getRecharge():
@@ -90,9 +74,6 @@ def getRecharge():
                 startDockProcedure())
         else:
             pass
-        #    Sequence.add('MOVE_TO_DOCK', Dummy())
-        #    Sequence.add('DOCKING', Dummy())
-        # TODO: Add check to make sure we are charging
         Sequence.add('MMUI_MAIN_MENU', HobbitMMUI.ShowMenu(menu='MAIN'),
                      transitions={'failed': 'aborted'})
     return seq
@@ -153,7 +134,7 @@ def startDockProcedure():
         Sequence.add(
             'CHARGE_CHECK',
             WaitForMsgState('/battery_state', BatteryState, msg_cb=battery_cb),
-            transitions={'aborted': 'CHARGE_CHECK',
+            transitions={'aborted': 'PREEMPT',
                          'preempted': 'preempted'})
         Sequence.add(
             'PREEMPT',
@@ -189,7 +170,7 @@ def startDockProcedure():
     with sm:
         StateMachine.add('START_DOCK', hobbit_move.Dock(),
                          transitions={'succeeded': 'WAIT'})
-        StateMachine.add('WAIT', SleepState(duration=1),
+        StateMachine.add('WAIT', SleepState(duration=20),
                          transitions={'succeeded': 'CHECK'})
         # StateMachine.add('DID_WE_MOVE',
         #                  hobbit_move.HasMovedFromPreDock(minimum_distance=0.5),
