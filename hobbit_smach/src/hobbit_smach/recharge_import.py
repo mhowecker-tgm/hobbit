@@ -11,12 +11,11 @@ import rospy
 
 from smach import Sequence, State, StateMachine, Concurrence
 from uashh_smach.util import SleepState, WaitForMsgState
-from uashh_smach.platform.move_base import HasMovedState
-from std_msgs.msg import String
+# from uashh_smach.platform.move_base import HasMovedState
 from mira_msgs.msg import BatteryState
 import hobbit_smach.hobbit_move_import as hobbit_move
 from hobbit_user_interaction import HobbitMMUI
-# import hobbit_smach.speech_output_import as speech_output
+import hobbit_smach.speech_output_import as speech_output
 
 
 def battery_cb(msg, ud):
@@ -72,8 +71,7 @@ def getRecharge():
                 hobbit_move.goToPose())
             Sequence.add(
                 'DOCKING',
-                startDockProcedure2(),
-                transitions={'aborted': 'SET_NAV_GOAL'})
+                startDockProcedure())
         else:
             pass
         Sequence.add('MMUI_MAIN_MENU', HobbitMMUI.ShowMenu(menu='MAIN'),
@@ -102,10 +100,10 @@ def getEndRecharge():
         #      'SOUND',
         #      speech_output.playMoveOut()
         #  )
-        # Sequence.add(
-        #     'WAIT_FOR_MIRA',
-        #     SleepState(duration=5)
-        # )
+        Sequence.add(
+            'WAIT_FOR_MIRA',
+            SleepState(duration=5)
+        )
         Sequence.add(
             'SET_NAV_GOAL_DOCK',
             hobbit_move.SetNavGoal(room='dock', place='dock')
@@ -189,141 +187,3 @@ def startDockProcedure():
         StateMachine.add('STOP', hobbit_move.Stop(),
                          transitions={'succeeded': 'succeeded'})
     return sm
-
-
-def startDockProcedure2():
-    sm = StateMachine(
-        outcomes=['succeeded', 'aborted', 'preempted'])
-
-    seq = Sequence(
-        outcomes=['succeeded', 'preempted', 'aborted'],
-        connector_outcome='succeeded'
-    )
-
-    with seq:
-        Sequence.add(
-            'CHARGE_CHECK',
-            WaitForMsgState('/battery_state', BatteryState, msg_cb=battery_cb),
-            transitions={'aborted': 'PREEMPT',
-                         'preempted': 'preempted'})
-        Sequence.add(
-            'PREEMPT',
-            PreemptChecker(),
-            transitions={'preempted': 'preempted',
-                         'aborted': 'CHARGE_CHECK'})
-
-    with sm:
-        StateMachine.add(
-            'SET_POSE',
-            HasMovedState(distance=0.2),
-            transitions={'movement_exceeds_distance': 'MIRA_DOCK',
-                         'movement_within_distance': 'MIRA_DOCK'}
-        )
-        StateMachine.add(
-            'MIRA_DOCK',
-            hobbit_move.Dock(),
-            transitions={'succeeded': 'DID_WE_MOVE',
-                         'aborted': 'DID_WE_MOVE'}
-        )
-        StateMachine.add(
-            'DID_WE_MOVE',
-            HasMovedState(distance=0.2),
-            transitions={'movement_exceeds_distance': 'WAIT_20',
-                         'movement_within_distance': 'COUNT'}
-        )
-        StateMachine.add(
-            'WAIT_20',
-            SleepState(durarion=20),
-            transitions={'succeeded': 'CHARGE_CHECK',
-                         'preempted': 'preempted'}
-        )
-        StateMachine.add(
-            'CHARGE_CHECK',
-            seq,
-            transitions={'succeeded': 'succeeded',
-                         'aborted': 'MIRA_DOCK'}
-        )
-        StateMachine.add(
-            'COUNT',
-            Count(),
-            transitions={'first': 'CCW',
-                         'second': 'CW',
-                         'third': 'aborted'}
-        )
-        StateMachine.add(
-            'CCW',
-            RotateCCW(),
-            transitions={'succeeded': 'SET_POSE',
-                         'aborted': 'SET_POSE',
-                         'preempted': 'preempted'}
-        )
-        StateMachine.add(
-            'CW',
-            RotateCW(),
-            transitions={'succeeded': 'SET_POSE',
-                         'aborted': 'SET_POSE',
-                         'preempted': 'preempted'}
-        )
-        return sm
-
-
-class Count(State):
-    """
-    """
-    def __init__(self, angle=0):
-        State.__init__(
-            self,
-            outcomes=['first', 'second', 'third', 'preempted']
-        )
-        self.counter = 0
-
-    def execute(self, ud):
-        if self.preempt_requested():
-            self.service_preempt()
-            return 'preempted'
-        self.counter += 1
-        if self.counter == 1:
-            return 'first'
-        elif self.counter == 2:
-            return 'second'
-        else:
-            self.counter = 0
-            return 'third'
-
-
-class RotateCCW(State):
-    """
-    """
-    def __init__(self, angle=0):
-        State.__init__(
-            self,
-            outcomes=['succeeded', 'preempted', 'aborted']
-        )
-        self.motion_pub = rospy.Publisher('DiscreteMotionCmd', String,
-                                          latch=False, queue_size=50)
-
-    def execute(self, ud):
-        if self.preempt_requested():
-            self.service_preempt()
-            return 'preempted'
-        self.motion_pub.publish('Turn 15')
-        return 'succeeded'
-
-
-class RotateCW(State):
-    """
-    """
-    def __init__(self, angle=0):
-        State.__init__(
-            self,
-            outcomes=['succeeded', 'preempted', 'aborted']
-        )
-        self.motion_pub = rospy.Publisher('DiscreteMotionCmd', String,
-                                          latch=False, queue_size=50)
-
-    def execute(self, ud):
-        if self.preempt_requested():
-            self.service_preempt()
-            return 'preempted'
-        self.motion_pub.publish('Turn -30')
-        return 'succeeded'
