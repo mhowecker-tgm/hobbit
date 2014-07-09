@@ -447,7 +447,7 @@ def main():
             # FakeForAllWithoutRunningActionSever(),
             helper.get_hobbit_full_stop(),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
-                         'aborted': 'failed'}
+                         'failed': 'failed'}
         )
         StateMachine.add(
             'CALL_HOBBIT',

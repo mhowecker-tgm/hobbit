@@ -77,7 +77,6 @@ def get_hobbit_full_stop():
         )
         Sequence.add(
             'MAIN_MENU',
-            HobbitMMUI.ShowMenu(menu='MAIN'),
-            transitions={'failed': 'aborted'}
+            HobbitMMUI.ShowMenu(menu='MAIN')
         )
     return seq
