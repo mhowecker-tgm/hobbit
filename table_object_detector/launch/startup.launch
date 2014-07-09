@@ -1,6 +1,6 @@
 <launch>
 	
-	<node name="TOD" pkg="TableObjectDetector" type="thor" args= "" output="screen">        
+	<node name="TOD" pkg="table_object_detector" type="thor" args= "" output="screen">        
 	    <remap from="~input" to="/SS/points2" />
 	    <remap from="~caminfo" to="/SS/rgb/camera_info" />
         <remap from="~img" to="/SS/rgb/image_color" />
