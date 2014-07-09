@@ -11,20 +11,28 @@ set(PCL_DIR CACHE PATH "pcl directory")
 find_package(PCL REQUIRED)
 set(FAAT_PCL_DIR CACHE PATH "faat pcl directory")
 
-find_package(PCL REQUIRED)
+find_package(FAAT_PCL REQUIRED)
 
 find_package( OpenCV 2.4 REQUIRED )
 
-link_directories(${FAAT_PCL_DIR}/build/lib/)
+link_directories(${FAAT_PCL_DIR}/lib/)
 include_directories(${PCL_INCLUDE_DIRS}
-                    ${FAAT_PCL_DIR}/3d_rec_framework/include/
-                    ${FAAT_PCL_DIR}/utils/include/
-                    ${FAAT_PCL_DIR}/recognition/include/
-                    ${FAAT_PCL_DIR}/utils/
-                    ${FAAT_PCL_DIR}/registration/include
-                    ${FAAT_PCL_DIR}/segmentation/include)
+                    ${FAAT_PCL_INCLUDE_DIRS}
+                    #${FAAT_PCL_DIR}/3d_rec_framework/include/
+                    #${FAAT_PCL_DIR}/utils/include/
+                    #${FAAT_PCL_DIR}/recognition/include/
+                    #${FAAT_PCL_DIR}/utils/
+                    #${FAAT_PCL_DIR}/registration/include
+                    #${FAAT_PCL_DIR}/segmentation/include
+                    )
 
+message(STATUS ${FAAT_PCL_INCLUDE_DIRS})
+message(STATUS ${FAAT_PCL_LIBRARIES})
 set(FAAT_PCL_LIBRARIES FAAT_PCL_3d_rec_frameworkrd FAAT_PCL_utilsrd FAAT_PCL_recognitionrd FAAT_PCL_utilsrd siftgpurd boost_regex)
+#eventually use this:
+#set(FAAT_PCL_LIBRARIES FAAT_PCL_3d_rec_framework FAAT_PCL_utils FAAT_PCL_recognition FAAT_PCL_utils siftgpu boost_regex)
+
+
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)

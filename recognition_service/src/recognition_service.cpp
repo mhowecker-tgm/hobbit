@@ -40,6 +40,8 @@
 //#define USE_SIFT_GPU 
 //#define SOC_VISUALIZE
 
+bool use_indices_above_plane_ = false;
+
 struct camPosConstraints
 {
     bool
@@ -149,23 +151,37 @@ private:
 
     std::vector<pcl::PointIndices> indices;
     Eigen::Vector4f table_plane;
-    doSegmentation<PointT>(scene, normal_cloud, indices, table_plane);
 
-    std::vector<int> indices_above_plane;
-    for (int k = 0; k < scene->points.size (); k++)
+    if(multi_recog_->isSegmentationRequired())
     {
-        Eigen::Vector3f xyz_p = scene->points[k].getVector3fMap ();
-        if (!pcl_isfinite (xyz_p[0]) || !pcl_isfinite (xyz_p[1]) || !pcl_isfinite (xyz_p[2]))
-            continue;
-
-        float val = xyz_p[0] * table_plane[0] + xyz_p[1] * table_plane[1] + xyz_p[2] * table_plane[2] + table_plane[3];
-        if (val >= 0.01)
-            indices_above_plane.push_back (static_cast<int> (k));
+        doSegmentation<PointT>(scene, normal_cloud, indices, table_plane);
     }
 
     multi_recog_->setSceneNormals(normal_cloud);
-    multi_recog_->setSegmentation(indices);
-    multi_recog_->setIndices(indices_above_plane);
+
+    if(multi_recog_->isSegmentationRequired())
+    {
+        multi_recog_->setSegmentation(indices);
+
+        if(use_indices_above_plane_)
+        {
+
+            std::vector<int> indices_above_plane;
+            for (int k = 0; k < scene->points.size (); k++)
+            {
+                Eigen::Vector3f xyz_p = scene->points[k].getVector3fMap ();
+                if (!pcl_isfinite (xyz_p[0]) || !pcl_isfinite (xyz_p[1]) || !pcl_isfinite (xyz_p[2]))
+                    continue;
+
+                float val = xyz_p[0] * table_plane[0] + xyz_p[1] * table_plane[1] + xyz_p[2] * table_plane[2] + table_plane[3];
+                if (val >= 0.01)
+                    indices_above_plane.push_back (static_cast<int> (k));
+            }
+
+            multi_recog_->setIndices(indices_above_plane);
+        }
+    }
+
     multi_recog_->setInputCloud (scene);
     {
         pcl::ScopeTime ttt ("Recognition");
@@ -459,6 +475,8 @@ public:
                                                                                                                                         new_sift_local_);
       multi_recog_->addRecognizer (cast_recog);
     }
+
+    //TODO: Add SHOT.
 
     if(do_ourcvfh_)
     {
