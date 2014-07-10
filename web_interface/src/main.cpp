@@ -588,21 +588,22 @@ void * prepare_form_content_callback(struct AmmServer_DynamicRequest  * rqst)
 }
 
 //This function adds a Resource Handler for the pages stats.html and formtest.html and associates stats , form and their callback functions
-void init_dynamic_content()
+int init_dynamic_content()
 {
   fprintf(stderr,"Please note that control panel , is only refreshed once per startup for min resource consumption\n");
   page=AmmServer_ReadFileToMemory((char*)"controlpanel.html",&pageLength);
-  if (! AmmServer_AddResourceHandler(default_server,&form,(char*)"/controlpanel.html",webserver_root,pageLength+1,0,(void* ) &prepare_form_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding form testing page\n"); }
+  if ( (page==0) || (pageLength==0) ) { fprintf(stderr,"Cannot initialize dynamic content , controlpanel.html is missing or cannot be read\n"); return 0; }
+  if (! AmmServer_AddResourceHandler(default_server,&form,(char*)"/controlpanel.html",webserver_root,pageLength+1,0,(void* ) &prepare_form_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { AmmServer_Error("Failed adding control page\n"); }
   AmmServer_DoNOTCacheResourceHandler(default_server,&form);
 
-  if (! AmmServer_AddResourceHandler(default_server,&indexPage,(char*)"/index.html",webserver_root,4096,0,(void*) &prepare_index_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding stats page\n"); }
-  if (! AmmServer_AddResourceHandler(default_server,&stats,(char*) "/stats.html",webserver_root,4096,0,(void*) &prepare_stats_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { AmmServer_Warning("Failed adding stats page\n"); }
+  if (! AmmServer_AddResourceHandler(default_server,&indexPage,(char*)"/index.html",webserver_root,4096,0,(void*) &prepare_index_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { AmmServer_Error("Failed adding index page\n"); }
+  if (! AmmServer_AddResourceHandler(default_server,&stats,(char*) "/stats.html",webserver_root,4096,0,(void*) &prepare_stats_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { AmmServer_Error("Failed adding stats page\n"); }
 
-  if (! AmmServer_AddResourceHandler(default_server,&settings,(char*)"/settings.html",webserver_root,4096,0,(void* ) &store_new_configuration_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding settings page\n"); }
+  if (! AmmServer_AddResourceHandler(default_server,&settings,(char*)"/settings.html",webserver_root,4096,0,(void* ) &store_new_configuration_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { AmmServer_Error("Failed adding settings page\n"); }
 
-  if (! AmmServer_AddResourceHandler(default_server,&base_image,(char*)"/base_image.jpg",webserver_root,640*480*3,0,(void* ) &prepare_base_image,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding prepare base_image page\n"); }
+  if (! AmmServer_AddResourceHandler(default_server,&base_image,(char*)"/base_image.jpg",webserver_root,640*480*3,0,(void* ) &prepare_base_image,SAME_PAGE_FOR_ALL_CLIENTS) ) { AmmServer_Error("Failed adding prepare base_image page\n"); }
   //if (! AmmServer_AddResourceHandler(default_server,&top_image,(char*)"/top_image.jpg",webserver_root,640*480*3,0,(void* ) &prepare_top_image,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding prepare top_image page\n"); }
-
+  return 1;
  }
 
 //This function destroys all Resource Handlers and free's all allocated memory..!
@@ -669,14 +670,13 @@ int main(int argc, char **argv)
     ros::spinOnce();
 
     //Create dynamic content allocations and associate context to the correct files
-    init_dynamic_content();
-    //pages should be availiable from now on..!
-
-
-      //Create our context
-      //---------------------------------------------------------------------------------------------------
-	  //////////////////////////////////////////////////////////////////////////
-	  while ( (AmmServer_Running(default_server))  && (ros::ok()) && (!stopWebInterface) )
+    if ( init_dynamic_content() )
+    {
+       //pages should be availiable from now on..!
+       //Create our context
+       //---------------------------------------------------------------------------------------------------
+	   //////////////////////////////////////////////////////////////////////////
+	   while ( (AmmServer_Running(default_server))  && (ros::ok()) && (!stopWebInterface) )
 		{
              ros::spinOnce();//<- this keeps our ros node messages handled up until synergies take control of the main thread
 
@@ -687,11 +687,12 @@ int main(int argc, char **argv)
              //usleep(60000);
              sleep(1);
 		 }
-     AmmServer_Warning("Web Interface is now Shutting down.. ");
+      AmmServer_Warning("Web Interface is now Shutting down.. ");
 
 
-    //Delete dynamic content allocations and remove stats.html and formtest.html from the server
-    close_dynamic_content();
+     //Delete dynamic content allocations and remove stats.html and formtest.html from the server
+     close_dynamic_content();
+    }
 
     //Stop the server and clean state
     AmmServer_Stop(default_server);
