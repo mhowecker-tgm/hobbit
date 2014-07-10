@@ -1,3 +1,15 @@
+/** @file AmmServerlib.h
+* @brief The Main Header for AmmarServer
+*
+* Any application that may want to interface with AmmarServer will probably want to link to libAmmarServer.a
+* and include this header. It provides the entry point for setting up a web share and access to
+* sub-modules on runtime.
+*
+* @author Ammar Qammaz (AmmarkoV)
+* @bug AmmarServer is not properly pentested yet
+*/
+
+
 #ifndef AMMSERVERLIB_H_INCLUDED
 #define AMMSERVERLIB_H_INCLUDED
 
@@ -33,8 +45,8 @@ enum TypesOfRequests
 
 
 #define MAX_IP_STRING_SIZE 32
-#define MAX_QUERY 512
-#define MAX_RESOURCE 512
+#define MAX_QUERY 2048
+#define MAX_RESOURCE 2048
 #define MAX_FILE_PATH 1024
 #define MAX_INSTANCE_NAME_STRING 128
 

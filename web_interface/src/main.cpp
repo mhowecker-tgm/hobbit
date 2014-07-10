@@ -128,7 +128,7 @@ char EraseFile(char * filename)
  if( fp ) { /* exists */ fclose(fp); return 1; }
  return 0;
 }
-
+   
 
 unsigned int StringIsHTMLSafe(char * str)
 {
@@ -688,7 +688,7 @@ int main(int argc, char **argv)
 	   //////////////////////////////////////////////////////////////////////////
 	   while ( (AmmServer_Running(default_server))  && (ros::ok()) && (!stopWebInterface) )
 		{
-             ros::spinOnce();//<- this keeps our ros node messages handled up until synergies take control of the main thread
+                  ros::spinOnce();//<- this keeps our ros node messages handled up until synergies take control of the main thread
 
              //Main thread should just sleep and let the background threads do the hard work..!
              //In other applications the programmer could use the main thread to do anything he likes..
