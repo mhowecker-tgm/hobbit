@@ -63,11 +63,13 @@ def event_cb(msg, ud):
                 ud.command = item[0]
                 ud.params = msg.params
                 print(msg.params)
-                ud.active_task = index
+                #print(ud.params)
+                ud.parameters['active_task'] = index
                 return True
             elif index == 1 and not night and index + 1 <= active_task:
                 ud.command = 'silent_recharge'
-                ud.active_task = index
+                #ud.active_task = index
+                ud.parameters['active_task'] = index
                 return True
             elif index + 1 >= active_task and not night:
                 rospy.loginfo('New task has lower priority. Do nothing')
@@ -83,9 +85,10 @@ def event_cb(msg, ud):
                 ud.params = msg.params
                 if item[0] == 'stop':
                     print('Reset active_task value')
-                    ud.active_task = 100
+                    ud.parameters['active_task'] = 100
+                    # ud.active_task = 100
                 else:
-                    ud.active_task = index
+                    ud.parameters['active_task'] = index
                 return True
     rospy.loginfo('Unknown event received %s' % msg.event)
     return False
@@ -178,8 +181,8 @@ class Init(State):
     def __init__(self):
         State.__init__(
             self,
-            input_keys=['parameters'],
-            output_keys=['parameters'],
+            input_keys=['parameters', 'params'],
+            output_keys=['parameters', 'params'],
             outcomes=['succeeded', 'preempted'])
         # load a few needed parameters from server
         self.sleep_time = rospy.get_param('/sleep_time', '22:00')
@@ -195,6 +198,7 @@ class Init(State):
         ud.parameters['wakeup_time'] = self.wakeup_time
         ud.parameters['active_task'] = self.active_task
         print('Init')
+        #print(ud.params)
         return 'succeeded'
 
 
@@ -231,6 +235,7 @@ class SelectTask(State):
             return 'preempted'
         print('Task Selection')
         print(ud.command)
+        print(ud.params)
         if ud.command == 'IDLE':
             return 'none'
         return ud.command
@@ -285,7 +290,7 @@ def main():
                   'preempted',
                   'failed'],
         input_keys=['command', 'params', 'active_task', 'parameters'],
-        output_keys=['command', 'active_task', 'parameters']
+        output_keys=['command', 'active_task', 'parameters', 'params']
     )
 
     cc = Concurrence(
@@ -302,7 +307,7 @@ def main():
         outcomes=['succeeded', 'aborted', 'preempted'],
         default_outcome='aborted',
         input_keys=['command', 'params', 'active_task', 'parameters'],
-        output_keys=['command'],
+        output_keys=['command', 'params', 'parameters'],
         child_termination_cb=child_cb1,
         outcome_map={'succeeded': {'ASW': 'succeeded'},
                      'aborted': {'Commands': 'failed'}}
@@ -315,7 +320,7 @@ def main():
                 '/Event',
                 Event,
                 msg_cb=event_cb,
-                input_keys=['parameters'],
+                input_keys=['parameters', 'params'],
                 output_keys=['command', 'params']
             )
         )
@@ -450,7 +455,7 @@ def main():
         )
         StateMachine.add(
             'CALL_HOBBIT',
-            call_hobbit.get_end_recharge(),
+            call_hobbit.call_hobbit(),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'failed'}
         )
@@ -501,8 +506,8 @@ def main():
         )
         StateMachine.add(
             'SILENT_RECHARGE',
-            FakeForAllWithoutRunningActionSever(),
-            # recharge.getRecharge(),
+            #FakeForAllWithoutRunningActionSever(),
+            recharge.getRecharge(),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'failed'}
         )

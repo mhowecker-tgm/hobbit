@@ -21,6 +21,7 @@ import hobbit_smach.speech_output_import as speech_output
 def battery_cb(msg, ud):
     print('Received battery_state message')
     print(msg.charging)
+    #print(ud.params)
     rospy.sleep(2.0)
     if msg.charging:
         print('I am charging')
@@ -36,7 +37,7 @@ class ExtractGoal(State):
     def __init__(self):
         State.__init__(
             self,
-            input_keys=['params'],
+            input_keys=['params', 'room_name', 'location_name'],
             output_keys=['room_name', 'location_name'],
             outcomes=['succeeded', 'aborted', 'preempted']
         )
@@ -46,9 +47,13 @@ class ExtractGoal(State):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
-        print(ud.params)
-        ud.room_name, ud.location_name = ud.params[0].value.lower().split(' ')
-        return 'aborted'
+        print('NAME: ', ud.params[0].name)
+        print('VALUE: ', ud.params[0].value)
+        ud.room_name  = ud.params[0].name.lower()
+        ud.location_name = ud.params[0].value.lower()
+        print(ud.room_name)
+        print(ud.location_name)
+        return 'succeeded'
 
 
 class PreemptChecker(State):
@@ -150,22 +155,27 @@ def call_hobbit():
     with sm:
         StateMachine.add(
             'CHARGE_CHECK',
-            WaitForMsgState('/battery_state', BatteryState, msg_cb=battery_cb),
+            WaitForMsgState('/battery_state', BatteryState, msg_cb=battery_cb, input_keys=['params']),
             transitions={'succeeded': 'UNDOCK',
-                         'aborted': 'GOTO',
+                         'aborted': 'EXTRACT_GOAL',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
             'UNDOCK',
             get_end_recharge(),
-            transitions={'succeeded': 'GOTO',
+            transitions={'succeeded': 'EXTRACT_GOAL',
                          'aborted': 'aborted',
                          'preempted': 'preempted'}
         )
         StateMachine.add_auto(
             'EXTRACT_GOAL',
             ExtractGoal(),
-            connector_outcome=['succeeded']
+            connector_outcomes=['succeeded']
+        )
+        StateMachine.add_auto(
+	    'SET_NAV_GOAL',
+	    hobbit_move.SetNavigationGoal(),
+            connector_outcomes=['succeeded']
         )
         StateMachine.add(
             'MOVE_TO_GOAL',

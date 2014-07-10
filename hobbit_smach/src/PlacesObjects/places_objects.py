@@ -216,13 +216,15 @@ def getCoordinates(req):
     """
     global rooms
     print('Inside: getCoordinates')
-    #print(rooms)
+    # print(rooms)
     print req.room_name.data, req.location_name.data
-    if req.room_name.data == 'dock' or req.room_name.data == None:
-        gen = (x for x in rooms.rooms_vector)
+    # print 'call' in req.location_name.data
+    if req.room_name.data == 'dock' or req.room_name.data == None or 'call' in req.location_name.data:
         print('most likely dock')	
+        gen = (x for x in rooms.rooms_vector)
     else:
         gen = (x for x in rooms.rooms_vector if req.room_name.data in x.room_name)
+    
     for x in gen:
         # print(x)
         gen1 = (k for k in x.places_vector if req.location_name.data in k.place_name)

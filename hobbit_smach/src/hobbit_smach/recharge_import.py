@@ -102,7 +102,7 @@ def getEndRecharge():
         #  )
         Sequence.add(
             'WAIT_FOR_MIRA',
-            SleepState(duration=5)
+            SleepState(duration=30)
         )
         Sequence.add(
             'SET_NAV_GOAL_DOCK',
@@ -123,6 +123,11 @@ def getEndRecharge():
 
 def startDockProcedure():
     seq = Sequence(
+        outcomes=['succeeded', 'preempted', 'aborted'],
+        connector_outcome='succeeded'
+    )
+
+    seq1 = Sequence(
         outcomes=['succeeded', 'preempted', 'aborted'],
         connector_outcome='succeeded'
     )
@@ -167,23 +172,22 @@ def startDockProcedure():
             'CHARGE_CHECK',
             seq)
 
-    with sm:
-        StateMachine.add('START_DOCK', hobbit_move.Dock(),
-                         transitions={'succeeded': 'WAIT'})
-        StateMachine.add('WAIT', SleepState(duration=20),
-                         transitions={'succeeded': 'CHECK'})
-        # StateMachine.add('DID_WE_MOVE',
-        #                  hobbit_move.HasMovedFromPreDock(minimum_distance=0.5),
-        #                  transitions={'movement_exceeds_distance': 'CHECK',
-        #                               'movement_within_distance': 'DID_WE_MOVE',
-        #                               'counter': 'CHECK'})
-        StateMachine.add('CHECK', cc,
-                         transitions={'succeeded': 'STOP',
+    with seq1:
+        Sequence.add('START_DOCK', hobbit_move.Dock())
+        Sequence.add('WAIT', SleepState(duration=30))
+        Sequence.add('CHECK', cc,
+                         transitions={'succeeded': 'aborted',
                                       'failed': 'RETRY'})
-        StateMachine.add('RETRY', hobbit_move.Undock(),
-                         transitions={'succeeded': 'WAIT1'})
-        StateMachine.add('WAIT1', SleepState(duration=10),
-                         transitions={'succeeded': 'START_DOCK'})
+        Sequence.add('RETRY', hobbit_move.Undock())
+        Sequence.add('WAIT1', SleepState(duration=10))
+        Sequence.add('CHECK_1', cc,
+                         transitions={'succeeded': 'aborted',
+                                      'failed': 'RETRY'})
+
+    with sm:
+        StateMachine.add('DOCKING_PROCEDURE', seq1,
+                         transitions={'succeeded': 'succeeded',
+                                      'aborted': 'STOP'})
         StateMachine.add('STOP', hobbit_move.Stop(),
-                         transitions={'succeeded': 'succeeded'})
+                         transitions={'succeeded': 'aborted'})
     return sm
