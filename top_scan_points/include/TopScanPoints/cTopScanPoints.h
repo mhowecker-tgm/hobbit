@@ -25,7 +25,6 @@ public:
 
 private:
 
-  double min_height_, max_height_;
   std::string baseFrame;  //ground plane referenced by laser
   std::string laserFrame; //pan frame simulating projected laser
   bool result;

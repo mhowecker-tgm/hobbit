@@ -88,14 +88,11 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 	{
 
 		tf::StampedTransform headcam_trans;
-  		headcam_trans.setOrigin(tf::Vector3(-0.248, 0, 1.108));
-  		//headcam_trans.setRotation(tf::createQuaternionFromRPY(0,140*M_PI/180,-90*M_PI/180));
-		headcam_trans.setRotation(tf::createQuaternionFromRPY(0.87, M_PI, M_PI/2));
+  		headcam_trans.setOrigin(tf::Vector3(0, 0, 1.108));
+		headcam_trans.setRotation(tf::createQuaternionFromRPY(0.96, M_PI, M_PI/2));
 
 		//Transform pointcloud to new reference frame
 		pcl_ros::transformPointCloud(pcl_cloud, point_cloud_new_frame, headcam_trans);
-		
-		//pcl_ros::transformPointCloud(pcl_cloud, point_cloud_new_frame, transform);
 
 	}
 	catch (tf::TransformException& e)
@@ -121,25 +118,33 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 		
 		float robot_front = 0.22;
 		float robot_width = 0.44;
+		
+		float cam_disp_x = -0.248;
+		float cam_disp_y = -0.208;
 
-		//points from robot base or tablet should be ignored
-		if ( fabs(x) < robot_front && fabs(y) < 0.5*robot_width)
-			continue;
+		float min_height_ = 0.4;
+        	float max_height_ = 1;
 
 		if ( std::isnan(x) || std::isnan(y) || std::isnan(z) )
 		{
 			continue;  
 		}
-		
-		if (z > max_height_ || z < min_height_)
+
+		//points from robot base or tablet should be ignored
+		if ( fabs(x) < (robot_front - cam_disp_x) && y < (0.5*robot_width-cam_disp_y) && y > -cam_disp_y - 0.5*robot_width)
 		{
 			continue;
 		}
 
 		//std::cout << "Point " << x << " " << y << " " << z << std::endl;
 		
+		if (z > max_height_ || z < min_height_)
+		{
+			continue;
+		}
+		
 		double angle = atan2(y, x);
-		//std::cout << "angle " << angle * 180/M_PI << std::endl;
+		
 		if (angle < output.angle_min || angle > output.angle_max)
 		{
 			continue;
@@ -154,6 +159,8 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 			output.ranges[index] = sqrt(range_sq);
 			//std::cout << "index " << index << std::endl;
 			//std::cout << "dis " << output.ranges[index] << std::endl;
+			//std::cout << "Point " << x << " " << y << " " << z << std::endl;
+			//std::cout << "angle " << angle * 180/M_PI << std::endl;
 		}
 	} //for it
 
@@ -169,9 +176,6 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 //run
 void cTopScanPoints::Run(void)
 {
-
-	min_height_ = 0.1;
-        max_height_ = 1;
 
 	 ros::init(init_argc, init_argv, "topScan");
          ros::NodeHandle n;
