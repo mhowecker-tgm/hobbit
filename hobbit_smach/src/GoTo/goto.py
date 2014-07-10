@@ -330,12 +330,12 @@ def main():
                 HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=1))
             Sequence.add(
                 'MMUI_SAY_GoingToPlace',
-                #speech_output.sayText(info='T_GT_GoingToPlace'))
-                speech_output.sayText(info='Going To Place'))
+                speech_output.sayText(info='T_GT_GoingToPlace'))
+                #speech_output.sayText(info='Going To Place'))
             if not DEBUGGOTO:
                 Sequence.add(
                     'SET_NAV_GOAL',
-	            hobbit_move.get_set_nav_goal_state(),
+	                hobbit_move.get_set_nav_goal_state(),
                     #hobbit_move.SetNavigationGoal(frame='/map'),
                     transitions={'aborted': 'failed'}
                 )
@@ -359,8 +359,8 @@ def main():
                 HobbitEmotions.ShowEmotions(emotion='EMO_SAD', emo_time=1))
             Sequence.add(
                 'MMUI_SAY_WayBlocked',
-                #HobbitMMUI.ShowInfo(info='T_GT_WayBlocked'))
-                speech_output.sayText(info='Way blocked'))
+                HobbitMMUI.ShowInfo(info='T_GT_WayBlocked'))
+                #speech_output.sayText(info='Way blocked'))
             Sequence.add(
                 'SHOW_MENU_MAIN',
                 HobbitMMUI.ShowMenu(menu='MAIN'),
@@ -371,8 +371,8 @@ def main():
                 HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=1))
             Sequence.add(
                 'MMUI_SAY_ReachedPlace',
-                #speech_output.sayText(info='T_GT_ReachedMyDestionation'))
-                speech_output.sayText(info='Reached my destionation'))
+                speech_output.sayText(info='T_GT_ReachedMyDestionation'))
+                # speech_output.sayText(info='Reached my destionation'))
             Sequence.add(
                 'SHOW_MENU_MAIN_1',
                 HobbitMMUI.ShowMenu(menu='MAIN'))

@@ -14,6 +14,7 @@ from hobbit_msgs.msg import Command, Event, GeneralHobbitAction,\
     GeneralHobbitGoal
 import hobbit_smach.helper_import as helper
 import hobbit_smach.recharge_import as recharge
+import hobbit_smach.call_hobbit_import as call_hobbit
 import uashh_smach.util as util
 from hobbit_user_interaction import HobbitEmotions
 
@@ -373,8 +374,7 @@ def main():
                          'recharge': 'RECHARGE',
                          'reminder': 'REMINDER',
                          'stop': 'STOP',
-                         # 'call_hobbit': 'CALL_HOBBIT',
-                         'call_hobbit': 'GET_OUT_OF_DOCK',
+                         'call_hobbit': 'CALL_HOBBIT',
                          'call': 'CALL',
                          'clear_floor': 'CLEAR_FLOOR',
                          'pickup': 'PICKUP',
@@ -444,14 +444,13 @@ def main():
         )
         StateMachine.add(
             'STOP',
-            # FakeForAllWithoutRunningActionSever(),
             helper.get_hobbit_full_stop(),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'failed': 'failed'}
         )
         StateMachine.add(
             'CALL_HOBBIT',
-            FakeForAllWithoutRunningActionSever(),
+            call_hobbit.get_end_recharge(),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'failed'}
         )
@@ -510,12 +509,6 @@ def main():
         StateMachine.add(
             'SOCIAL_ROLE',
             FakeForAllWithoutRunningActionSever(),
-            transitions={'succeeded': 'RESET_ACTIVE_TASK',
-                         'aborted': 'failed'}
-        )
-        StateMachine.add(
-            'GET_OUT_OF_DOCK',
-            ResetActiveTask(),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'failed'}
         )
