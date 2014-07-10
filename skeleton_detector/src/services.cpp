@@ -87,11 +87,11 @@ void broadcastNewSkeleton(unsigned int frameNumber,unsigned int skeletonID , str
              postPoseTransform(tag,skeletonFound->joint[i].x/divisor,skeletonFound->joint[i].y/divisor,skeletonFound->joint[i].z/divisor);
             }
       }
-
+  
      for ( i=0; i<8; i++ )
       {
        sprintf(tag,SKPREFIX "bbox/point%u",i);
-       postPoseTransform(tag,skeletonFound->bbox[i].x/divisor,skeletonFound->bbox[i].y/divisor,skeletonFound->bbox[i].z/divisor);
+       postPoseTransform(tag,skeletonFound->bbox[i].x/divisor,skeletonFound->bbox[i].y/divisor,-1* skeletonFound->bbox[i].z/divisor);
       }
        
       actualTimestamp=frameNumber;
