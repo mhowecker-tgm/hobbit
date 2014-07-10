@@ -30,7 +30,7 @@ cTopScanPoints::cTopScanPoints(int argc, char **argv) : init_argc(argc), init_ar
     	obstacle_trans.transform.translation.x = -0.248;
     	obstacle_trans.transform.translation.y = -0.208;
    	obstacle_trans.transform.translation.z = 0.5;
-    	obstacle_trans.transform.rotation.x = 0.0;
+    	obstacle_trans.transform.rotation.x = 1.108;
     	obstacle_trans.transform.rotation.y = 0.0;
     	obstacle_trans.transform.rotation.z = 0.0;
     	obstacle_trans.transform.rotation.w = 1.0;
@@ -55,7 +55,7 @@ cTopScanPoints::~cTopScanPoints()
 
 
 ////************************************************************************************
-  //Pointcloud and tf transform received
+  //Pointcloud received
 void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 {
 	//std::cout << "callback " << std::endl;
@@ -80,6 +80,7 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 		}
 	}
 
+	//fromROSMsg not working
 
 	pcl::PointCloud<pcl::PointXYZ> point_cloud_new_frame;
 
@@ -89,7 +90,7 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 		// Define the tf transformation
 		tf::StampedTransform headcam_trans;
 		//Vertical translation in order to check heights
-  		headcam_trans.setOrigin(tf::Vector3(0, 0, 1.108)); //FIXME, check height value
+  		headcam_trans.setOrigin(tf::Vector3(0, 0, 1.18)); //FIXME, check height value
 		//RPY angles obtained from the matrix composition of the following transformations:
                 // 1.) 90 degrees rotation around fixed global y axis
 		// 2.) -90 degrees around fixed global x axis
@@ -109,7 +110,7 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 
 
 	uint32_t ranges_size = std::ceil((output.angle_max - output.angle_min) / output.angle_increment);
-	output.ranges.assign(ranges_size, output.range_max + 1.0);
+	output.ranges.assign(ranges_size, output.range_max);
 
         bool process = false;
 	//"Thin" laser height from pointcloud
@@ -127,7 +128,7 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 		float cam_disp_x = -0.248;
 		float cam_disp_y = -0.208;
 
-		float min_height_ = 0.4;
+		float min_height_ = 0.3;
         	float max_height_ = 1;
 
 		if ( std::isnan(x) || std::isnan(y) || std::isnan(z) )
@@ -136,9 +137,9 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 		}
 
 		//points from robot base or tablet should be ignored
-		if ( fabs(x) < (robot_front - cam_disp_x) && y < (0.5*robot_width-cam_disp_y) && y > -cam_disp_y - 0.5*robot_width)
+		//if ( fabs(x) < (robot_front - cam_disp_x) && y < (0.5*robot_width-cam_disp_y) && y > -cam_disp_y - 0.5*robot_width)
 		{
-			continue;
+			//continue;
 		}
 
 		//std::cout << "Point " << x << " " << y << " " << z << std::endl;
@@ -155,7 +156,7 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 			continue;
 		}
 		int index = (angle - output.angle_min) / output.angle_increment;
-		//Calculate hypoteneuse distance to point
+
 		double range_sq = y*y+x*x;
 		//std::cout << "range sq " << range_sq << std::endl;
 
