@@ -591,9 +591,9 @@ void * prepare_form_content_callback(struct AmmServer_DynamicRequest  * rqst)
 void init_dynamic_content()
 {
   fprintf(stderr,"Please note that control panel , is only refreshed once per startup for min resource consumption\n");
-  //page=AmmServer_ReadFileToMemory((char*)"controlpanel.html",&pageLength);
-  //if (! AmmServer_AddResourceHandler(default_server,&form,(char*)"/controlpanel.html",webserver_root,pageLength+1,0,(void* ) &prepare_form_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding form testing page\n"); }
-  //AmmServer_DoNOTCacheResourceHandler(default_server,&form);
+  page=AmmServer_ReadFileToMemory((char*)"controlpanel.html",&pageLength);
+  if (! AmmServer_AddResourceHandler(default_server,&form,(char*)"/controlpanel.html",webserver_root,pageLength+1,0,(void* ) &prepare_form_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding form testing page\n"); }
+  AmmServer_DoNOTCacheResourceHandler(default_server,&form);
 
   if (! AmmServer_AddResourceHandler(default_server,&indexPage,(char*)"/index.html",webserver_root,4096,0,(void*) &prepare_index_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding stats page\n"); }
   if (! AmmServer_AddResourceHandler(default_server,&stats,(char*) "/stats.html",webserver_root,4096,0,(void*) &prepare_stats_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { AmmServer_Warning("Failed adding stats page\n"); }
