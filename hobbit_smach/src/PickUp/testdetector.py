@@ -21,7 +21,7 @@ from hobbit_msgs.srv import PointCloud2FeatureHistogram, ClustersOnPlane
 from sensor_msgs.msg import CameraInfo, Image, PointCloud2
 from sensor_msgs.msg import PointField
 
-from RandomForestRecognition import RFR  
+#from RandomForestRecognition import RFR  
 
 import subprocess
 import struct
