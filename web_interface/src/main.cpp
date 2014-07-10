@@ -128,7 +128,7 @@ char EraseFile(char * filename)
  if( fp ) { /* exists */ fclose(fp); return 1; }
  return 0;
 }
-   
+
 
 unsigned int StringIsHTMLSafe(char * str)
 {
@@ -402,7 +402,7 @@ void execute(char * command,char * param)
    else
   if (strcmp(command,"body")==0)
   {
-    if (strcmp(param,"reset")==0) { strcpy(commandToRun,"rosservice call /reset_motorstop service,mira_msgs::ResetMotorStop::Request"); } else
+    if (strcmp(param,"reset")==0) { strcpy(commandToRun,"rosservice call /reset_motorstop"); } else
     if (strcmp(param,"360")==0) { strcpy(commandToRun,"rostopic pub /DiscreteMotionCmd std_msgs/String \"data: 'Turn 360'\" -1"); } else
     if (strcmp(param,"360ccw")==0) { strcpy(commandToRun,"rostopic pub /DiscreteMotionCmd std_msgs/String \"data: 'Turn 360'\" -1"); } else
     if (strcmp(param,"360cw")==0) { strcpy(commandToRun,"rostopic pub /DiscreteMotionCmd std_msgs/String \"data: 'Turn -360'\" -1"); } else
