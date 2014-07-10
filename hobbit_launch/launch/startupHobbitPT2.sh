@@ -74,8 +74,10 @@ sleep $DELAY_BETWEEN_STEPS
 
 # Start mira center
 cd /opt/ros/hobbit_hydro/src/interfaces_mira/resources
-miracenter mira_config.xml
+miracenter mira_config.xml&
 
+# Start AAL sensor node
+roslaunch aal_service startup.launch&
 
 
 #Start MMUI TTS interface
@@ -83,17 +85,17 @@ miracenter mira_config.xml
 
 # Load Hobbit PT2 parameters
 cd /opt/ros/hobbit_hydro/src/
-rosparam load hobbit_params.yaml
+rosparam load hobbit_params.yamli&
 
 # Start SMACH handling of rooms, places, objects.
 cd /opt/ros/hobbit_hydro/src/hobbit_smach/src/PlacesObjects
-rosrun hobbit_smach places_objects.py
-roslaunch hobbit_smach SavePCD.launch
+rosrun hobbit_smach places_objects.py&
+roslaunch hobbit_smach SavePCD.launch&
 # Start SMACH handling for the demo on 19th June 2014
-rosrun hobbit_smach learn_object.py
-rosrun hobbit_smach away.py
-rosrun hobbit_smach goto.py 
-rosrun hobbit_smach emergency_user.py
+rosrun hobbit_smach learn_object.py&
+rosrun hobbit_smach away.py&
+rosrun hobbit_smach goto.py&
+rosrun hobbit_smach emergency_user.py&
 
 
 cd $STARTDIR
