@@ -55,8 +55,8 @@ screen -d -m -S "face_detection" /bin/bash -c "source ~/.bashrc && source $HOBBI
 echo "Starting up emergency_detection"
 screen -d -m -S "emergency_detector" /bin/bash -c "source ~/.bashrc && source $HOBBITDIR/devel/setup.bash && roslaunch emergency_detector emergency_detector.launch"
 
-echo "Skeleton Detector is deactivated for now"
-#screen -d -m -S "skeleton_detector" /bin/bash -c "source ~/.bashrc && source $HOBBITDIR/devel/setup.bash && roslaunch skeleton_detector skeleton_detector.launch"
+echo "Starting up Skeleton Detector"
+screen -d -m -S "skeleton_detector" /bin/bash -c "source ~/.bashrc && source $HOBBITDIR/devel/setup.bash && roslaunch skeleton_detector skeleton_detector.launch"
  
 
 
