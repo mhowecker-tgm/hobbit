@@ -8,3 +8,10 @@ alias updateHead="source /opt/ros/hobbit_hydro/src/hobbit_launch/launch/HeadScri
 alias dfb="sudo gedit ~/.bashrc"
 #short cut for sourcing .bashrc 
 alias dfbs="source ~/.bashrc"
+
+# Call hobbit to one of the call buttons
+alias call1="rostopic pub -1 /Event hobbit_msgs/Event '{header: auto, event: E_CALLHOBBIT, confidence: 0.8, params: [{name: 'place', value: 'CALL1'}, {name: sensor, value: 'CALL1'}]}'"
+alias call2="rostopic pub -1 /Event hobbit_msgs/Event '{header: auto, event: E_CALLHOBBIT, confidence: 0.8, params: [{name: 'place', value: 'CALL2'}, {name: sensor, value: 'CALL2'}]}'"
+alias call3="rostopic pub -1 /Event hobbit_msgs/Event '{header: auto, event: E_CALLHOBBIT, confidence: 0.8, params: [{name: 'place', value: 'CALL3'}, {name: sensor, value: 'CALL3'}]}'"
+alias call4="rostopic pub -1 /Event hobbit_msgs/Event '{header: auto, event: E_CALLHOBBIT, confidence: 0.8, params: [{name: 'place', value: 'CALL4'}, {name: sensor, value: 'CALL4'}]}'"
+alias callb="rostopic pub -1 /Event hobbit_msgs/Event '{header: auto, event: E_CALLHOBBIT, confidence: 0.8, params: [{name: 'place', value: 'CALLb'}, {name: sensor, value: 'CALLb'}]}'"
