@@ -54,21 +54,46 @@ void broadcastNewSkeleton(unsigned int frameNumber,unsigned int skeletonID , str
     if ( (dontPublishSkeletons) || (skeletonFound==0) ) { return ; }
 
     fprintf(stderr,"Broadcasting a skeleton at TF\n");
+  unsigned int i=0;
+  for (i=0; i<HUMAN_SKELETON_PARTS; i++)
+    {
+      //DO flips here ? 
+      skeletonFound->joint[i].z = -1 * skeletonFound->joint[i].z;
+      fprintf(stderr,"%s(%f,%f,%f)\n",humanSkeletonJointNames[i],skeletonFound->joint[i].x,skeletonFound->joint[i].y,skeletonFound->joint[i].z);
+    }
+   fprintf(stderr,"\n\n");  
+
+   fprintf(stderr,"2DPOSE(");
+   for (i=0; i<HUMAN_SKELETON_PARTS; i++)
+    {
+      if (i<HUMAN_SKELETON_PARTS-1) {  fprintf(stderr,"%f, %f,",humanSkeletonJointNames[i],skeletonFound->joint2D[i].x,skeletonFound->joint2D[i].y); } else
+                                    {  fprintf(stderr,"%f, %f)\n",humanSkeletonJointNames[i],skeletonFound->joint2D[i].x,skeletonFound->joint2D[i].y); }
+    }
+   fprintf(stderr,"\n\n");
+
+
+
      //Do TF Broadcast here
-     char tag[256]={0};
-     unsigned int i =0;
+     char tag[256]={0}; 
      for ( i=0; i<HUMAN_SKELETON_PARTS; i++ )
       {
-       sprintf(tag,"%s%s",SKPREFIX,jointNames[i]);
-        postPoseTransform(tag,/*-1.0**/skeletonFound->joint[i].x/divisor,-1.0*skeletonFound->joint[i].y/divisor,skeletonFound->joint[i].z/divisor);
+        if (
+              (skeletonFound->joint[i].x!=0) ||
+              (skeletonFound->joint[i].y!=0) ||
+              (skeletonFound->joint[i].z!=0)  
+           ) 
+            {
+             sprintf(tag,"%s%s",SKPREFIX,jointNames[i]);
+             postPoseTransform(tag,skeletonFound->joint[i].x/divisor,skeletonFound->joint[i].y/divisor,skeletonFound->joint[i].z/divisor);
+            }
       }
 
      for ( i=0; i<8; i++ )
       {
        sprintf(tag,SKPREFIX "bbox/point%u",i);
-       postPoseTransform(tag,/*-1.0**/skeletonFound->bbox[i].x/divisor,-1.0*skeletonFound->bbox[i].y/divisor,skeletonFound->bbox[i].z/divisor);
+       postPoseTransform(tag,skeletonFound->bbox[i].x/divisor,skeletonFound->bbox[i].y/divisor,skeletonFound->bbox[i].z/divisor);
       }
-    
+       
       actualTimestamp=frameNumber;
       actualX=skeletonFound->joint[HUMAN_SKELETON_HEAD].x; 
       actualY=-1.0*skeletonFound->joint[HUMAN_SKELETON_HEAD].y; 

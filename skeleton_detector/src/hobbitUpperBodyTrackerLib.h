@@ -214,7 +214,7 @@ struct skeletonPointing
 
 
 
-
+int hobbitUpperBodyTracker_setDumpToFiles(int doDump);
 
 int hobbitUpperBodyTracker_Initialize(unsigned int targetWidth,unsigned int targetHeight);
 
