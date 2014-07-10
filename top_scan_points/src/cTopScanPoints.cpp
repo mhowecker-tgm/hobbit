@@ -27,8 +27,8 @@ cTopScanPoints::cTopScanPoints(int argc, char **argv) : init_argc(argc), init_ar
 
 	obstacle_trans.header.frame_id = "base_link";
     	obstacle_trans.child_frame_id = "obstacle_link";
-    	obstacle_trans.transform.translation.x = -0.05;
-    	obstacle_trans.transform.translation.y = 0.019;
+    	obstacle_trans.transform.translation.x = -0.248;
+    	obstacle_trans.transform.translation.y = -0.208;
    	obstacle_trans.transform.translation.z = 0.5;
     	obstacle_trans.transform.rotation.x = 0.0;
     	obstacle_trans.transform.rotation.y = 0.0;
@@ -86,9 +86,14 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 
 	try
 	{
-
+		// Define the tf transformation
 		tf::StampedTransform headcam_trans;
-  		headcam_trans.setOrigin(tf::Vector3(0, 0, 1.108));
+		//Vertical translation in order to check heights
+  		headcam_trans.setOrigin(tf::Vector3(0, 0, 1.108)); //FIXME, check height value
+		//RPY angles obtained from the matrix composition of the following transformations:
+                // 1.) 90 degrees rotation around fixed global y axis
+		// 2.) -90 degrees around fixed global x axis
+		// 3.)-35 degrees around new x axis
 		headcam_trans.setRotation(tf::createQuaternionFromRPY(0.96, M_PI, M_PI/2));
 
 		//Transform pointcloud to new reference frame
