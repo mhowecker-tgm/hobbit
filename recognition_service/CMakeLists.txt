@@ -28,9 +28,9 @@ include_directories(${PCL_INCLUDE_DIRS}
 
 message(STATUS ${FAAT_PCL_INCLUDE_DIRS})
 message(STATUS ${FAAT_PCL_LIBRARIES})
-set(FAAT_PCL_LIBRARIES FAAT_PCL_3d_rec_frameworkrd FAAT_PCL_utilsrd FAAT_PCL_recognitionrd FAAT_PCL_utilsrd siftgpurd boost_regex)
+set(FAAT_PCL_LIBRARIES FAAT_PCL_3d_rec_frameworkrd FAAT_PCL_utilsrd FAAT_PCL_recognitionrd FAAT_PCL_utilsrd siftpprd siftgpurd boost_regex)
 #eventually use this:
-#set(FAAT_PCL_LIBRARIES FAAT_PCL_3d_rec_framework FAAT_PCL_utils FAAT_PCL_recognition FAAT_PCL_utils siftgpu boost_regex)
+#set(FAAT_PCL_LIBRARIES FAAT_PCL_3d_rec_framework FAAT_PCL_utils FAAT_PCL_recognition FAAT_PCL_utils siftpp siftgpu boost_regex)
 
 
 
@@ -99,6 +99,7 @@ include_directories(include
 
 ## Declare a cpp executable
 add_executable(recognition_service src/recognition_service.cpp)
+add_executable(test_with_live_cam src/test_with_live_cam.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -107,6 +108,13 @@ add_executable(recognition_service src/recognition_service.cpp)
 ## Specify libraries to link a library or executable target against
 target_link_libraries(recognition_service
    ${catkin_LIBRARIES} 
+   ${PCL_LIBRARIES}
+   ${FAAT_PCL_LIBRARIES}
+   ${OpenCV_LIBS}
+)
+
+target_link_libraries(test_with_live_cam
+   ${catkin_LIBRARIES}
    ${PCL_LIBRARIES}
    ${FAAT_PCL_LIBRARIES}
    ${OpenCV_LIBS}

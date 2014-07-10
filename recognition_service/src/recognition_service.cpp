@@ -36,7 +36,9 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/lexical_cast.hpp>
 #include <faat_pcl/3d_rec_framework/feature_wrapper/local/image/opencv_sift_local_estimator.h>
+#include <faat_pcl/3d_rec_framework/feature_wrapper/local/image/vedaldi_sift_local_estimator.h>
 
+#define USE_SIFT_VEDALDI
 //#define USE_SIFT_GPU 
 //#define SOC_VISUALIZE
 
@@ -450,11 +452,21 @@ public:
       boost::shared_ptr < faat_pcl::rec_3d_framework::LocalEstimator<PointT, pcl::Histogram<128> > > cast_estimator;
       cast_estimator = boost::dynamic_pointer_cast<faat_pcl::rec_3d_framework::SIFTLocalEstimation<PointT, pcl::Histogram<128> > > (estimator);
 #else
-	  boost::shared_ptr < faat_pcl::rec_3d_framework::OpenCVSIFTLocalEstimation<PointT, pcl::Histogram<128> > > estimator;	
-      estimator.reset (new faat_pcl::rec_3d_framework::OpenCVSIFTLocalEstimation<PointT, pcl::Histogram<128> >);
+
+    #ifdef USE_SIFT_VEDALDI
+      boost::shared_ptr < faat_pcl::rec_3d_framework::VedaldiSIFTLocalEstimation<PointT, pcl::Histogram<128> > > estimator;
+      estimator.reset (new faat_pcl::rec_3d_framework::VedaldiSIFTLocalEstimation<PointT, pcl::Histogram<128> >);
 
       boost::shared_ptr < faat_pcl::rec_3d_framework::LocalEstimator<PointT, pcl::Histogram<128> > > cast_estimator;
-      cast_estimator = boost::dynamic_pointer_cast<faat_pcl::rec_3d_framework::OpenCVSIFTLocalEstimation<PointT, pcl::Histogram<128> > > (estimator);
+      cast_estimator = boost::dynamic_pointer_cast<faat_pcl::rec_3d_framework::VedaldiSIFTLocalEstimation<PointT, pcl::Histogram<128> > > (estimator);
+    #else
+          boost::shared_ptr < faat_pcl::rec_3d_framework::OpenCVSIFTLocalEstimation<PointT, pcl::Histogram<128> > > estimator;
+          estimator.reset (new faat_pcl::rec_3d_framework::OpenCVSIFTLocalEstimation<PointT, pcl::Histogram<128> >);
+
+          boost::shared_ptr < faat_pcl::rec_3d_framework::LocalEstimator<PointT, pcl::Histogram<128> > > cast_estimator;
+          cast_estimator = boost::dynamic_pointer_cast<faat_pcl::rec_3d_framework::OpenCVSIFTLocalEstimation<PointT, pcl::Histogram<128> > > (estimator);
+    #endif
+
 #endif
 
       boost::shared_ptr<faat_pcl::rec_3d_framework::LocalRecognitionPipeline<flann::L1, PointT, pcl::Histogram<128> > > new_sift_local_;
@@ -466,7 +478,7 @@ public:
       new_sift_local_->setFeatureEstimator (cast_estimator);
       new_sift_local_->setUseCache (true);
       new_sift_local_->setCGAlgorithm (cast_cg_alg);
-      new_sift_local_->setKnn (5);
+      new_sift_local_->setKnn (3);
       new_sift_local_->setUseCache (true);
       new_sift_local_->initialize (false);
 
