@@ -312,6 +312,32 @@ void execute(char * command,char * param)
   char commandToRun[MAX_COMMAND_SIZE]={0};
 
 
+
+  if (strcmp(command,"node")==0)
+  {
+    if (strcmp(param,"niteTrigger")==0) {  strcpy(commandToRun,"/bin/bash -c \"rosservice call /rgbd_acquisition/trigger_peopletracker\" "); } else
+    if (strcmp(param,"nitePause")==0) {  strcpy(commandToRun,"/bin/bash -c \"rosservice call /rgbd_acquisition/pause_peopletracker\" "); } else
+    if (strcmp(param,"niteResume")==0) {  strcpy(commandToRun,"/bin/bash -c \"rosservice call /rgbd_acquisition/resume_peopletracker\" "); } else
+    if (strcmp(param,"nitePausePoint")==0) {  strcpy(commandToRun,"/bin/bash -c \"rosservice call /rgbd_acquisition/pause_pointing_gesture_messages\" "); } else
+    if (strcmp(param,"niteResumePoint")==0) {  strcpy(commandToRun,"/bin/bash -c \"rosservice call /rgbd_acquisition/resume__pointing_gesture_messages\" "); } else
+
+    if (strcmp(param,"forthSKPause")==0) {  strcpy(commandToRun,"/bin/bash -c \"rosservice call /skeleton_detector/pause\" "); } else
+    if (strcmp(param,"forthSKResume")==0) {  strcpy(commandToRun,"/bin/bash -c \"rosservice call /skeleton_detector/resume\" "); } else
+
+    if (strcmp(param,"emergencyTrigger")==0) {  strcpy(commandToRun,"/bin/bash -c \"rosservice call /emergency_detector/trigger\" "); } else
+    if (strcmp(param,"emergencyPause")==0) {  strcpy(commandToRun,"/bin/bash -c \"rosservice call /emergency_detector/pause\" "); } else
+    if (strcmp(param,"emergencyResume")==0) {  strcpy(commandToRun,"/bin/bash -c \"rosservice call /emergency_detector/resume\" "); } else
+
+    if (strcmp(param,"gesturePause")==0) {  strcpy(commandToRun,"/bin/bash -c \"rosservice call /hand_gestures/pause\" "); } else
+    if (strcmp(param,"gestureResume")==0) {  strcpy(commandToRun,"/bin/bash -c \"rosservice call /hand_gestures/resume\" "); } else
+
+    if (strcmp(param,"faceTrigger")==0) {  strcpy(commandToRun,"/bin/bash -c \"rosservice call /face_detection/trigger\" "); } else
+    if (strcmp(param,"facePause")==0) {  strcpy(commandToRun,"/bin/bash -c \"rosservice call /face_detection/pause\" "); } else
+    if (strcmp(param,"faceResume")==0) {  strcpy(commandToRun,"/bin/bash -c \"rosservice call /face_detection/resume\" "); } else
+                                      { fprintf(stderr,"Unknown node command ( param %s ) \n", param); }
+
+  } else
+
   if (strcmp(command,"camera")==0)
   {
     if (strcmp(param,"refresh")==0)
@@ -521,6 +547,7 @@ void * prepare_form_content_callback(struct AmmServer_DynamicRequest  * rqst)
          char * bufferCommand = (char *) malloc ( 256 * sizeof(char) );
          if (bufferCommand!=0)
           {
+            if ( _GET(default_server,rqst,(char*)"node",bufferCommand,256) )  { execute((char*)"node",bufferCommand);  } else
             if ( _GET(default_server,rqst,(char*)"camera",bufferCommand,256) )  { execute((char*)"camera",bufferCommand);  } else
             if ( _GET(default_server,rqst,(char*)"head",bufferCommand,256) )  { execute((char*)"head",bufferCommand);  } else
             if ( _GET(default_server,rqst,(char*)"hand",bufferCommand,256) )  { execute((char*)"hand",bufferCommand);  } else
