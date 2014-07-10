@@ -154,13 +154,13 @@ void replaceChar(char * input , char findChar , char replaceWith)
 void * prepare_index_content_callback(struct AmmServer_DynamicRequest  * rqst)
 {
   //No range check but since everything here is static max_stats_size should be big enough not to segfault with the strcat calls!
-  strcpy(rqst->content,"<html><head><title>Welcome to The Hobbit WebInterface</title>\
-                                     <meta http-equiv=\"refresh\" content=\"0; url=controlpanel.html\" />\
+  strncpy(rqst->content,"<html><head><title>Welcome to The Hobbit WebInterface</title>\
+                  <meta http-equiv=\"refresh\" content=\"0; url=controlpanel.html\" />\
                   <body><center><br><br><br>\
                    <h1>The incredibly minimal WebInterface for Hobbit</h1><br><br>\
                    <h3><a href=\"controlpanel.html\">Click Here for remote operation control panel</a></h3>\
                    <h3><a href=\"facilitator_panel.html\">Click Here for facilitator panel</a></h3>\
-                   </body></html> ");
+                   </body></html> ",rqst->MAXcontentSize);
   rqst->contentSize=strlen(rqst->content);
   return 0;
 }
@@ -309,8 +309,9 @@ void execute(char * command,char * param)
 {
   fprintf(stderr,"Execute(%s,%s) \n",command,param);
   int i=0;
-  char commandToRun[MAX_COMMAND_SIZE]={0};
+  char * commandToRun = (char*) malloc(MAX_COMMAND_SIZE * sizeof(char));
 
+  if (commandToRun==0) { AmmServer_Error("Could not allocate enough space for command execution"); return ; }
 
 
   if (strcmp(command,"node")==0)
@@ -479,6 +480,8 @@ void execute(char * command,char * param)
      fprintf(stderr,"Execute with unknown command or parameter\n");
    }
 
+   if (commandToRun!=0) { free(commandToRun); }
+
   return ;
 }
 
@@ -574,7 +577,8 @@ void * prepare_form_content_callback(struct AmmServer_DynamicRequest  * rqst)
             if ( _GET(default_server,rqst,(char*)"move",bufferCommand,256) )  { execute((char*)"move",bufferCommand);  } else
             if ( _GET(default_server,rqst,(char*)"robot",bufferCommand,256) ) { execute((char*)"robot",bufferCommand); } else
             if ( _GET(default_server,rqst,(char*)"rtd",bufferCommand,256) ) { execute((char*)"rtd",bufferCommand); } else
-            if ( _GET(default_server,rqst,(char*)"say",bufferCommand,256) )   { execute((char*)"say",bufferCommand);   }
+            if ( _GET(default_server,rqst,(char*)"say",bufferCommand,256) )   { execute((char*)"say",bufferCommand);   } else
+                                                                              {  AmmServer_Warning("Could not understand command to be executed ( ? not updated binary ? )\n"); }
 
             free(bufferCommand);
           }
@@ -583,7 +587,6 @@ void * prepare_form_content_callback(struct AmmServer_DynamicRequest  * rqst)
     }
 
 
-  //form.content_size=strlen(content);
   return 0;
 }
 
@@ -591,17 +594,24 @@ void * prepare_form_content_callback(struct AmmServer_DynamicRequest  * rqst)
 int init_dynamic_content()
 {
   fprintf(stderr,"Please note that control panel , is only refreshed once per startup for min resource consumption\n");
+
   page=AmmServer_ReadFileToMemory((char*)"controlpanel.html",&pageLength);
   if ( (page==0) || (pageLength==0) ) { fprintf(stderr,"Cannot initialize dynamic content , controlpanel.html is missing or cannot be read\n"); return 0; }
-  if (! AmmServer_AddResourceHandler(default_server,&form,(char*)"/controlpanel.html",webserver_root,pageLength+1,0,(void* ) &prepare_form_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { AmmServer_Error("Failed adding control page\n"); }
+  if (! AmmServer_AddResourceHandler(default_server,&form,(char*)"/controlpanel.html",webserver_root,pageLength+1,0,(void* ) &prepare_form_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) )
+               { AmmServer_Error("Failed adding control page\n"); }
   AmmServer_DoNOTCacheResourceHandler(default_server,&form);
 
-  if (! AmmServer_AddResourceHandler(default_server,&indexPage,(char*)"/index.html",webserver_root,4096,0,(void*) &prepare_index_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { AmmServer_Error("Failed adding index page\n"); }
-  if (! AmmServer_AddResourceHandler(default_server,&stats,(char*) "/stats.html",webserver_root,4096,0,(void*) &prepare_stats_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { AmmServer_Error("Failed adding stats page\n"); }
+  if (! AmmServer_AddResourceHandler(default_server,&indexPage,(char*)"/index.html",webserver_root,4096,0,(void*) &prepare_index_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) )
+              { AmmServer_Error("Failed adding index page\n"); }
+  if (! AmmServer_AddResourceHandler(default_server,&stats,(char*) "/stats.html",webserver_root,4096,0,(void*) &prepare_stats_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) )
+              { AmmServer_Error("Failed adding stats page\n"); }
 
-  if (! AmmServer_AddResourceHandler(default_server,&settings,(char*)"/settings.html",webserver_root,4096,0,(void* ) &store_new_configuration_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { AmmServer_Error("Failed adding settings page\n"); }
+  if (! AmmServer_AddResourceHandler(default_server,&settings,(char*)"/settings.html",webserver_root,4096,0,(void* ) &store_new_configuration_callback,SAME_PAGE_FOR_ALL_CLIENTS) )
+              { AmmServer_Error("Failed adding settings page\n"); }
 
-  if (! AmmServer_AddResourceHandler(default_server,&base_image,(char*)"/base_image.jpg",webserver_root,640*480*3,0,(void* ) &prepare_base_image,SAME_PAGE_FOR_ALL_CLIENTS) ) { AmmServer_Error("Failed adding prepare base_image page\n"); }
+  if (! AmmServer_AddResourceHandler(default_server,&base_image,(char*)"/base_image.jpg",webserver_root,640*480*3,0,(void* ) &prepare_base_image,SAME_PAGE_FOR_ALL_CLIENTS) )
+              { AmmServer_Error("Failed adding prepare base_image page\n"); }
+
   //if (! AmmServer_AddResourceHandler(default_server,&top_image,(char*)"/top_image.jpg",webserver_root,640*480*3,0,(void* ) &prepare_top_image,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding prepare top_image page\n"); }
   return 1;
  }
