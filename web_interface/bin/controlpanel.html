@@ -538,6 +538,8 @@ function drop(ev)
              )    
 
           {
+          
+           speedMultiplier = document.getElementById("joystickSpeed").getValue();
            var joyX = (x - centerX) * speedMultiplier;
            var joyY = (y - centerY) * speedMultiplier;
            
@@ -600,6 +602,14 @@ function drop(ev)
       ------------------------------------------------------------------------------   -->
 
                 <a href="javascript:joystickExecute(-0.5,0);"><img class="turnControls" src="turnRight.png" id="turnRight"></a>
+                <br/> 
+                 <center>
+                  <select id="joystickSpeed"> 
+                    <option value="0.04">Normal Speed</option> 
+                    <option value="0.07">Fast</option> 
+                    <option value="0.01">Slow</option>    
+                  </select> 
+                 </center>     
                 <br/> 
                 <label><input id="joystickActiveSwitch" type="checkbox" onchange='handleJoystickActiveSwitch(this);' >Joystick Active</label> <br/>
                 <a href="javascript:joystickExecute(0,0);">STOP ALL MOVEMENT</a>
