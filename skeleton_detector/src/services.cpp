@@ -23,7 +23,7 @@ unsigned int simplePersonDetector = 1;
 
 unsigned int actualTimestamp=0;
 unsigned int actualInFieldOfView=0;
-float actualX=0.0,actualY=0.0,actualZ=0.0,actualTheta=0.0,actualConfidence=0.49;
+float actualX=0.0,actualY=0.0,actualZ=0.0,actualTheta=0.0,actualConfidence=0.51;
 
 unsigned char * colorFrameCopy=0;
 unsigned short * depthFrameCopy =0;
