@@ -210,11 +210,11 @@ powerSupplyPresent: False
 */
 
   char batteryState[MAX_COMMAND_SIZE]={0};
-  getBackCommandLine("timeout 1 rostopic echo /battery_state -n 1 | grep lifePercent | cut -d ':' -f2", batteryState , MAX_COMMAND_SIZE );
+  getBackCommandLine((char*) "timeout 1 rostopic echo /battery_state -n 1 | grep lifePercent | cut -d ':' -f2", batteryState , MAX_COMMAND_SIZE );
   char chargingState[MAX_COMMAND_SIZE]={0};
-  getBackCommandLine("timeout 1 rostopic echo /battery_state -n 1 | grep charging | cut -d ':' -f2", chargingState , MAX_COMMAND_SIZE );
+  getBackCommandLine((char*) "timeout 1 rostopic echo /battery_state -n 1 | grep charging | cut -d ':' -f2", chargingState , MAX_COMMAND_SIZE );
   char mileageState[MAX_COMMAND_SIZE]={0};
-  getBackCommandLine("timeout 1 rostopic echo /mileage -n 1 | grep data | cut -d ':' -f2", mileageState , MAX_COMMAND_SIZE );
+  getBackCommandLine((char*) "timeout 1 rostopic echo /mileage -n 1 | grep data | cut -d ':' -f2", mileageState , MAX_COMMAND_SIZE );
 
   //No range check but since everything here is static max_stats_size should be big enough not to segfault with the strcat calls!
   sprintf(rqst->content,"<html><head><body>Time is<br> %02d-%02d-%02d %02d:%02d:%02d\n <br>Battery is : %s<br>Charging : %s<br>Mileage : %s<br>",
@@ -229,7 +229,7 @@ powerSupplyPresent: False
 void * prepare_base_image(struct AmmServer_DynamicRequest  * rqst)
 {
   unsigned int length=0;
-  char * readContent = AmmServer_ReadFileToMemory("/opt/ros/hobbit_hydro/src/rgbd_acquisition/bin/frames/base/left0000.jpg",&length);
+  char * readContent = AmmServer_ReadFileToMemory((char*) "/opt/ros/hobbit_hydro/src/rgbd_acquisition/bin/frames/base/left0000.jpg",&length);
 
   if(readContent==0)
   {
@@ -254,7 +254,7 @@ void * prepare_base_image(struct AmmServer_DynamicRequest  * rqst)
 void * prepare_top_image(struct AmmServer_DynamicRequest  * rqst)
 {
   unsigned int length=0;
-  char * readContent = AmmServer_ReadFileToMemory("/opt/ros/hobbit_hydro/src/rgbd_acquisition/bin/frames/top/left0000.jpg",&length);
+  char * readContent = AmmServer_ReadFileToMemory((char*) "/opt/ros/hobbit_hydro/src/rgbd_acquisition/bin/frames/top/left0000.jpg",&length);
 
   if(readContent==0)
   {
@@ -512,7 +512,7 @@ void * store_new_configuration_callback(struct AmmServer_DynamicRequest  * rqst)
     {
       if ( strlen(rqst->GET_request)>0 )
        {
-         if ( AmmServer_SaveDynamicRequest("hobbit_raw.ini",default_server,rqst) )
+         if ( AmmServer_SaveDynamicRequest((char*) "hobbit_raw.ini",default_server,rqst) )
            {
              int i=system("tr \"\\&\" \"\\n\" < hobbit_raw.ini > hobbit.ini");
              if (i==0) {  successfullStore = 1; }
