@@ -91,7 +91,7 @@ bool visualizeOff(std_srvs::Empty::Request& request, std_srvs::Empty::Response& 
 
 bool terminate(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    ROS_INFO("Stopping Hand Gestures");
+    ROS_INFO("Stopping Face Detector");
     exit(0);
     return true;
 }
@@ -99,14 +99,14 @@ bool terminate(std_srvs::Empty::Request& request, std_srvs::Empty::Response& res
 
 bool pause(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    ROS_INFO("Hand Gestures are now paused");
+    ROS_INFO("Face Detector is now paused");
     paused =1;
     return true;
 }
 
 bool resume(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    ROS_INFO("Hand Gestures are now resuming");
+    ROS_INFO("Face Detector is now resuming");
     paused =0;
     return true;
 }
@@ -229,7 +229,7 @@ int main(int argc, char **argv)
      private_node_handle_.param("fromDepthTopicInfo", fromDepthTopicInfo, std::string("/headcam/depth_registered/camera_info"));
      private_node_handle_.param("fromRGBTopic", fromRGBTopic, std::string("headcam/rgb/image_rect_color"));
      private_node_handle_.param("fromRGBTopicInfo", fromRGBTopicInfo, std::string("/headcam/rgb/camera_info"));
-     private_node_handle_.param("name", name, std::string("hand_gestures"));
+     private_node_handle_.param("name", name, std::string("face_detection"));
      private_node_handle_.param("frame", frame, std::string("frame"));
      private_node_handle_.param("rate", rate, int(DEFAULT_FRAME_RATE));
      ros::Rate loop_rate(rate); //  hz should be our target performance
