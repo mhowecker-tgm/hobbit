@@ -21,7 +21,7 @@ from hobbit_user_interaction import HobbitEmotions
 commands = [['emergency', 'G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP', 'C_HELP', 'F_CALLSOS', 'G_EMERGENCY'],
             ['recharge', 'E_RECHARGE', 'C_RECHARGE'],
             ['reminder', 'E_REMINDER'],
-            ['stop', 'C_STOP', 'G_STOP'],
+            ['stop', 'C_STOP', 'G_STOP', 'E_STOP'],
             ['call_hobbit', 'C_CALLHOBBIT', 'E_CALLHOBBIT'],
             ['call', 'E_CALLRING', 'E_CALLESTABLISHED', 'E_CALLENDED', 'C_MAKECALL'],
             ['clear_floor', 'E_CLEARFLOOR'],
@@ -50,7 +50,7 @@ def IsItNight(ud):
 
 def event_cb(msg, ud):
     rospy.loginfo('/Event data received:')
-    print(msg.event)
+    print(msg)
     night = IsItNight(ud)
     rospy.sleep(2.0)
     print('active_task and night')
@@ -71,7 +71,7 @@ def event_cb(msg, ud):
                 #ud.active_task = index
                 ud.parameters['active_task'] = index
                 return True
-            elif index + 1 >= active_task and not night:
+            elif index + 1 > active_task and not night:
                 rospy.loginfo('New task has lower priority. Do nothing')
                 return False
             else:
@@ -118,6 +118,7 @@ def command_cb(msg, ud):
                 ud.params = msg.params
                 if item[0] == 'stop':
                     print('Reset active_task value')
+                    ud.command = item[0]
                     rospy.set_param('active_task', 100)
                 else:
                     rospy.set_param('active_task', index)
