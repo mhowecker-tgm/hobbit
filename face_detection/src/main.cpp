@@ -233,7 +233,7 @@ int main(int argc, char **argv)
      private_node_handle_.param("frame", frame, std::string("frame"));
      private_node_handle_.param("rate", rate, int(DEFAULT_FRAME_RATE));
      ros::Rate loop_rate(rate); //  hz should be our target performance
-
+  
 
      //Pass root frame for TF poses
      strcpy(tfRoot,frame.c_str());
