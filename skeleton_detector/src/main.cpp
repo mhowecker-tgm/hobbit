@@ -19,7 +19,7 @@
 
 #include <std_srvs/Empty.h>
 
-  
+    
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
 #include <sensor_msgs/CameraInfo.h>
