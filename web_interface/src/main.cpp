@@ -317,13 +317,13 @@ void execute(char * command,char * param)
   // ULTRA UNSAFE , INJECTION PRONE PARAMS HERE
   //-------------------------------------------------
   #warning "This code is injection prone , there needs to be sanitization for param , that unfortunately I haven't done yet"
-  if (strcmp(command,"setUserName")==0) { sprintf(commandToRun,"/bin/bash -c \"rosparam set /Hobbit/askistu \"%s\" \" ",param); }  else
-  if (strcmp(command,"setRobotName")==0) { sprintf(commandToRun,"/bin/bash -c \"rosparam set /Hobbit/askistu \"%s\" \" ",param); }  else
+  if (strcmp(command,"setUserName")==0) { sprintf(commandToRun,"/bin/bash -c \"rosparam set /Hobbit/robot_name \"%s\" \" ",param); }  else
+  if (strcmp(command,"setRobotName")==0) { sprintf(commandToRun,"/bin/bash -c \"rosparam set /Hobbit/user_name \"%s\" \" ",param); }  else
   if (strcmp(command,"setSocialRole")==0) { sprintf(commandToRun,"/bin/bash -c \"rosparam set /Hobbit/social_role \"%s\" \" ",param); }  else
   if (strcmp(command,"setUserAway")==0) { sprintf(commandToRun,"/bin/bash -c \"rosparam set /Hobbit/user_away \"%s\" \" ",param); }  else
   if (strcmp(command,"setCurrentEmotion")==0) { sprintf(commandToRun,"/bin/bash -c \"rosparam set /Hobbit/current_emotion \"%s\" \" ",param); }  else
-  if (strcmp(command,"TODO")==0) { sprintf(commandToRun,"/bin/bash -c \"rosparam set /Hobbit/askistu \"%s\" \" ",param); }  else
-  if (strcmp(command,"TODO")==0) { sprintf(commandToRun,"/bin/bash -c \"rosparam set /Hobbit/askistu \"%s\" \" ",param); }  else
+  if (strcmp(command,"setLatestWakingUpTime")==0) { sprintf(commandToRun,"/bin/bash -c \"rosparam set /Hobbit/wakeup_time \"%s\" \" ",param); }  else
+  if (strcmp(command,"setLatestSleepingTime")==0) { sprintf(commandToRun,"/bin/bash -c \"rosparam set /Hobbit/sleep_time \"%s\" \" ",param); }  else
   if (strcmp(command,"TODO")==0) { sprintf(commandToRun,"/bin/bash -c \"rosparam set /Hobbit/askistu \"%s\" \" ",param); }  else
   if (strcmp(command,"TODO")==0) { sprintf(commandToRun,"/bin/bash -c \"rosparam set /Hobbit/askistu \"%s\" \" ",param); }  else
   if (strcmp(command,"TODO")==0) { sprintf(commandToRun,"/bin/bash -c \"rosparam set /Hobbit/askistu \"%s\" \" ",param); }  else
@@ -548,6 +548,9 @@ void * store_new_configuration_callback(struct AmmServer_DynamicRequest  * rqst)
             if ( _GET(default_server,rqst,(char*)"socialRole",bufferCommand,256) )  { execute((char*)"setSocialRole",bufferCommand);  }
             if ( _GET(default_server,rqst,(char*)"userAway",bufferCommand,256) )  { execute((char*)"setUserAway",bufferCommand);  }
             if ( _GET(default_server,rqst,(char*)"currentEmotion",bufferCommand,256) )  { execute((char*)"setCurrentEmotion",bufferCommand);  }
+            if ( _GET(default_server,rqst,(char*)"latestWakingUpTime",bufferCommand,256) )  { execute((char*)"setLatestWakingUpTime",bufferCommand);  }
+            if ( _GET(default_server,rqst,(char*)"latestSleepingTime",bufferCommand,256) )  { execute((char*)"setLatestSleepingTime",bufferCommand);  }
+
             free(bufferCommand);
           }
         }
