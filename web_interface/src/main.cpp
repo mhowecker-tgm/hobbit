@@ -313,7 +313,23 @@ void execute(char * command,char * param)
 
   if (commandToRun==0) { AmmServer_Error("Could not allocate enough space for command execution"); return ; }
 
-
+  //-------------------------------------------------
+  // ULTRA UNSAFE , INJECTION PRONE PARAMS HERE
+  //-------------------------------------------------
+  #warning "This code is injection prone , there needs to be sanitization for param , that unfortunately I haven't done yet"
+  if (strcmp(command,"setUserName")==0) { sprintf(commandToRun,"/bin/bash -c \"rosparam set /Hobbit/askistu \"%s\" \" ",param); }  else
+  if (strcmp(command,"setRobotName")==0) { sprintf(commandToRun,"/bin/bash -c \"rosparam set /Hobbit/askistu \"%s\" \" ",param); }  else
+  if (strcmp(command,"setSocialRole")==0) { sprintf(commandToRun,"/bin/bash -c \"rosparam set /Hobbit/social_role \"%s\" \" ",param); }  else
+  if (strcmp(command,"setUserAway")==0) { sprintf(commandToRun,"/bin/bash -c \"rosparam set /Hobbit/user_away \"%s\" \" ",param); }  else
+  if (strcmp(command,"setCurrentEmotion")==0) { sprintf(commandToRun,"/bin/bash -c \"rosparam set /Hobbit/current_emotion \"%s\" \" ",param); }  else
+  if (strcmp(command,"TODO")==0) { sprintf(commandToRun,"/bin/bash -c \"rosparam set /Hobbit/askistu \"%s\" \" ",param); }  else
+  if (strcmp(command,"TODO")==0) { sprintf(commandToRun,"/bin/bash -c \"rosparam set /Hobbit/askistu \"%s\" \" ",param); }  else
+  if (strcmp(command,"TODO")==0) { sprintf(commandToRun,"/bin/bash -c \"rosparam set /Hobbit/askistu \"%s\" \" ",param); }  else
+  if (strcmp(command,"TODO")==0) { sprintf(commandToRun,"/bin/bash -c \"rosparam set /Hobbit/askistu \"%s\" \" ",param); }  else
+  if (strcmp(command,"TODO")==0) { sprintf(commandToRun,"/bin/bash -c \"rosparam set /Hobbit/askistu \"%s\" \" ",param); }  else
+  if (strcmp(command,"TODO")==0) { sprintf(commandToRun,"/bin/bash -c \"rosparam set /Hobbit/askistu \"%s\" \" ",param); }  else
+  // ULTRA UNSAFE , INJECTION PRONE PARAMS HERE
+  //-------------------------------------------------
   if (strcmp(command,"node")==0)
   {
     if (strcmp(param,"niteTrigger")==0) {  strcpy(commandToRun,"/bin/bash -c \"rosservice call /rgbd_acquisition/trigger_peopletracker\" "); } else
@@ -338,7 +354,6 @@ void execute(char * command,char * param)
                                       { fprintf(stderr,"Unknown node command ( param %s ) \n", param); }
 
   } else
-
   if (strcmp(command,"camera")==0)
   {
     if (strcmp(param,"refresh")==0)
@@ -519,6 +534,24 @@ void * store_new_configuration_callback(struct AmmServer_DynamicRequest  * rqst)
            }
        }
     }
+
+  if  ( rqst->GET_request != 0 )
+    {
+      if ( strlen(rqst->GET_request)>0 )
+       {
+         AmmServer_Warning("Setting variables at once is unsafe since it doesnt check for injection");
+         char * bufferCommand = (char *) malloc ( 256 * sizeof(char) );
+         if (bufferCommand!=0)
+          {
+            if ( _GET(default_server,rqst,(char*)"userName",bufferCommand,256) )  { execute((char*)"setUserName",bufferCommand);  }
+            if ( _GET(default_server,rqst,(char*)"robotName",bufferCommand,256) )  { execute((char*)"setRobotName",bufferCommand);  }
+            if ( _GET(default_server,rqst,(char*)"socialRole",bufferCommand,256) )  { execute((char*)"setSocialRole",bufferCommand);  }
+            if ( _GET(default_server,rqst,(char*)"userAway",bufferCommand,256) )  { execute((char*)"setUserAway",bufferCommand);  }
+            if ( _GET(default_server,rqst,(char*)"currentEmotion",bufferCommand,256) )  { execute((char*)"setCurrentEmotion",bufferCommand);  }
+            free(bufferCommand);
+          }
+        }
+     }
 
 if (successfullStore)
      {
