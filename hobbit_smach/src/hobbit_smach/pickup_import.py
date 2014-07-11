@@ -7,11 +7,12 @@ DEBUG = True
 
 import roslib
 roslib.load_manifest(PKG)
-# import rospy
+import rospy
 
 from smach import Concurrence, Sequence, State
 from hobbit_user_interaction import HobbitEmotions, HobbitMMUI
 from sensor_msgs.msg import PointCloud2
+from geometry_msgs.msg import Point, PointStamped
 import uashh_smach.util as util
 import hobbit_smach.speech_output_import as speech_output
 # import hobbit_smach.head_move_import as head_move
@@ -19,6 +20,7 @@ import hobbit_smach.hobbit_move_import as hobbit_move
 import hobbit_smach.arm_move_import as arm_move
 import math, struct
 from testdetector import TD
+import tf
 
 class DavidLookForObject(State):
     """
@@ -374,6 +376,7 @@ class DavidLookingPose(State):
             input_keys=['pointing_msg', 'goal_position_x', 'goal_position_y', 'goal_position_yaw'],
             output_keys=['goal_position_x', 'goal_position_y', 'goal_position_yaw']
         )
+	self.listener = tf.TransformListener()
 
     def execute(self, ud):
         if self.preempt_requested():
@@ -789,6 +792,7 @@ def getStartLooking():
     """
     seq = Sequence(
         outcomes=['succeeded', 'preempted', 'failed'],
+        input_keys=['pointing_msg'],
         connector_outcome='succeeded'
     )
     if DEBUG:

@@ -3,7 +3,7 @@
 
 PKG = 'hobbit_smach'
 PROJECT = 'Hobbit'
-NAME = 'BringObject'
+NAME = 'pickup_object'
 
 import roslib
 roslib.load_manifest(PKG)
@@ -13,7 +13,6 @@ import smach_ros
 import uashh_smach.util as util
 import tf
 import math
-
 from smach import StateMachine, State
 
 from std_msgs.msg import String
@@ -48,6 +47,7 @@ def disable(self):
 def pointevents_cb(msg, ud):
     print('pointevents_cb')
     print(msg)
+    ud.pointing_msg = msg
     return True
 
 
@@ -232,9 +232,8 @@ def main():
                 '/pointEvents',
                 PointEvents,
                 msg_cb=pointevents_cb,
-                timeout=5,
-                output_keys=['pointEvent'],
-		input_keys=['pointEvent']
+                timeout=15,
+                output_keys=['pointing_msg']
                 ),
             transitions={'succeeded': 'START_LOOKING',
                          'aborted': 'POINTING_COUNTER',

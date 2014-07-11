@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   hobbit_msgs
   rospy
   std_msgs
+  tf
 #  semantic_segmentation
 )
 
