@@ -370,7 +370,7 @@ class DavidLookingPose(State):
     def __init__(self):
         State.__init__(
             self,
-            outcomes=['succeeded', 'aborted', 'preempted'],
+            outcomes=['succeeded', 'failed', 'preempted'],
             input_keys=['pointing_msg', 'goal_position_x', 'goal_position_y', 'goal_position_yaw'],
             output_keys=['goal_position_x', 'goal_position_y', 'goal_position_yaw']
         )
@@ -477,7 +477,7 @@ class DavidPickingUp(State):
     def __init__(self):
         State.__init__(
             self,
-            outcomes=['succeeded', 'aborted', 'preempted']
+            outcomes=['succeeded', 'failed', 'preempted']
         )
 
     def execute(self, ud):
@@ -847,7 +847,7 @@ def getEndPickupSeq():
         return seq
 
 
-def getEndPickupSeq():
+def getPickupSeq():
     """
     Return a SMACH Sequence that gives feedback to the user, stores a grasped
     object on the tray and searches for the user.

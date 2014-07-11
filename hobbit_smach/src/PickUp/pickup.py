@@ -233,7 +233,8 @@ def main():
                 PointEvents,
                 msg_cb=pointevents_cb,
                 timeout=5,
-                output_keys=['pointEvent']
+                output_keys=['pointEvent'],
+		input_keys=['pointEvent']
                 ),
             transitions={'succeeded': 'START_LOOKING',
                          'aborted': 'POINTING_COUNTER',
@@ -287,7 +288,7 @@ def main():
             'LOOK_FOR_OBJECT',
             pickup.DavidLookForObject(),
             transitions={'succeeded': 'EMO_SAY_OBJECT_FOUND',
-                         'aborted': 'EMO_SAY_OBJECT_NOT_DETECTED',
+                         'failed': 'EMO_SAY_OBJECT_NOT_DETECTED',
                          'preempted': 'preempted'}
         )
         #StateMachine.add(
@@ -355,7 +356,7 @@ def main():
             pickup.getPickupSeq(),
             #pickup.DavidPickingUp(),
             transitions={'succeeded': 'CHECK_GRASP',
-                         'aborted': 'EMO_SAY_DID_NOT_PICKUP',
+                         'failed': 'EMO_SAY_DID_NOT_PICKUP',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
