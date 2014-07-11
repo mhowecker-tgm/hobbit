@@ -9,7 +9,7 @@
    var centerX=51;
    var centerY=54;
    
-   var speedMultiplier=0.05;  
+   var speedMultiplier=0.04; //Normal Speed selected by default 
    
    var deadZoneSize = 6; 
    var deadZoneLeft = centerX-deadZoneSize;
@@ -255,7 +255,9 @@ function drop(ev)
 
   <center>
 	<!--a href="controlpanel.html?nothing=true"> <img src="header.png" border=0/> </a--> 
-        <img src="banner.png" width=800 /><br/> 
+         <a href="controlpanel.html?nothing=true">  
+          <img src="banner.png" width=800 border=0 />
+         </a><br/> 
 	<hr />
 	
    <table id="content">
@@ -539,7 +541,8 @@ function drop(ev)
 
           {
           
-           //speedMultiplier = 0+document.getElementById("joystickSpeed").getValue();
+           speedMultiplier = parseFloat( document.getElementById("joystickSpeed").value );
+           //alert('SpeedMultiplier '+speedMultiplier);
            var joyX = (x - centerX) * speedMultiplier;
            var joyY = (y - centerY) * speedMultiplier;
            
@@ -599,20 +602,21 @@ function drop(ev)
 
 <!--  ------------------------------------------------------------------------------
       END OF:           THE HTML5 CANVAS CODE FOR MAKING THE JOYSTICK WORK 
-      ------------------------------------------------------------------------------   -->
-
+      ------------------------------------------------------------------------------   --> 
                 <a href="javascript:joystickExecute(-0.5,0);"><img class="turnControls" src="turnRight.png" id="turnRight"></a>
                 <br/> 
                  <center>
                   <select id="joystickSpeed"> 
-                    <option value="0.04">Normal Speed</option> 
-                    <option value="0.07">Fast</option> 
+                    <option value="0.04">Normal Speed</option>  
                     <option value="0.01">Slow</option>    
+                    <option value="0.07">Fast</option> 
+                    <option value="0.09">Turbo</option> 
                   </select> 
+                 <br/> 
+                 <label><input id="joystickActiveSwitch" type="checkbox" onchange='handleJoystickActiveSwitch(this);' >Joystick Active</label> <br/>
+                 <a href="javascript:joystickExecute(0,0);">STOP ALL MOVEMENT</a>
                  </center>     
-                <br/> 
-                <label><input id="joystickActiveSwitch" type="checkbox" onchange='handleJoystickActiveSwitch(this);' >Joystick Active</label> <br/>
-                <a href="javascript:joystickExecute(0,0);">STOP ALL MOVEMENT</a>
+
 
 
 </td>
