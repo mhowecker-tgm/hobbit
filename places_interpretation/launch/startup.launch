@@ -1,0 +1,4 @@
+<launch>
+  <node pkg="places_interpretation" type="places_interpretation" name="places_interpretation" args="$(find places_interpretation)/../navigation/places.xml" output="screen"/>
+</launch>
+
