@@ -110,6 +110,8 @@ class WaitForMsgState(smach.State):
     def __init__(self, topic, msg_type, msg_cb=None, input_keys=None, output_keys=None, latch=False, timeout=None):
         if output_keys is None:
             output_keys = []
+        if input_keys is None:
+            input_keys = []
         smach.State.__init__(self, outcomes=['succeeded', 'aborted', 'preempted'], input_keys=input_keys, output_keys=output_keys)
         self.latch = latch
         self.timeout = timeout
