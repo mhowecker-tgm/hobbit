@@ -31,7 +31,7 @@ env
 echo "We are user"
 whoami
 
-ntpdate 192.168.2.122 # synchronizes time with xpc
+sudo ntpdate 192.168.2.122 # synchronizes time with xpc
 /etc/init.d/chrony start #starts chrony df 10.7.2014 [sudo needed missing?]
 
 echo "Starting blue_eyes"
