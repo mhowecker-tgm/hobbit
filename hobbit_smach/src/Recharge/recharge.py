@@ -10,7 +10,7 @@ import roslib
 roslib.load_manifest(PKG)
 import rospy
 # import smach
-# import uashh_smach.util as util
+from uashh_smach.util import SleepState
 
 from std_msgs.msg import String
 import hobbit_smach.hobbit_move_import as hobbit_move
@@ -269,7 +269,7 @@ def main():
                     'locate_user',
                     LocateUserAction,
                     goal=LocateUserGoal(command=String('locateUser'))),
-                {'succeeded': 'APPROACH_USER',
+                {'succeeded': 'SKIP_APPROACH_USER',
                     'failed': 'SET_FAILURE',
                     'preempted': 'preempted'}
             )
@@ -279,6 +279,13 @@ def main():
                     'approach_user',
                     ApproachUserAction,
                     goal=ApproachUserGoal(command=String('approachUser'))),
+                {'succeeded': 'MMUI_CONFIRM',
+                    'failed': 'SET_FAILURE',
+                    'preempted': 'preempted'}
+            )
+            StateMachine.add(
+                'SKIP_APPROACH_USER',
+                SleepState(),
                 {'succeeded': 'MMUI_CONFIRM',
                     'failed': 'SET_FAILURE',
                     'preempted': 'preempted'}

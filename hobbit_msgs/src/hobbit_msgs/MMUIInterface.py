@@ -162,12 +162,15 @@ class MMUIInterface:
 
     def askForName(
         self,
-        text='What is the name of this object?'
+        text='What is the name of this object?',
+        timeout=30
     ):
         parr = []
         p = Parameter('type', 'D_NAME')
         parr.append(p)
         p = Parameter('text', text)
+        parr.append(p)
+        p = Parameter('Timeout', timeout)
         parr.append(p)
         return self.callMMUIService('0', 'create', parr)
 

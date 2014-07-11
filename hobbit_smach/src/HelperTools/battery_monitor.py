@@ -7,8 +7,7 @@ from mira_msgs.msg import BatteryState
 
 LIMIT = 5
 NAME = 'BATTERY_CHECK'
-UPPER_LIMIT = 95 # High values to test the master node
-LOWER_LIMIT = 90
+VOLT_LIMIT = 26.0
 
 
 def talker(level):
@@ -27,14 +26,11 @@ def talker(level):
 
 
 def battery_cb(msg):
-    #print('received msg on topic /battery_state')
-    #print(msg)
-    if msg.lifePercent < UPPER_LIMIT:
+    # print('received msg on topic /battery_state')
+    # print(msg)
+    if msg.voltage < VOLT_LIMIT:
         rospy.loginfo('Battery level is low')
         talker('E_RECHARGE')
-    if msg.lifePercent < LOWER_LIMIT:
-        rospy.loginfo('Battery level is low')
-        talker('E_RECHARGE_LOW')
     else:
         pass
 
@@ -48,4 +44,5 @@ def main():
 if __name__ == '__main__':
     try:
         main()
-    except rospy.ROSInterruptException: pass
+    except rospy.ROSInterruptException:
+        pass

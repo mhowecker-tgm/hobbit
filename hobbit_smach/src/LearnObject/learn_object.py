@@ -213,7 +213,7 @@ def main():
             transitions={'aborted': 'failed'})
         Sequence.add(
             'MMUI_SAY_GRASPING',
-            speech_output.sayText(info='GRASPING_THE_TURNTABLE'))
+            speech_output.sayText(info='T_LO_GRASPING_THE_TURNTABLE'))
         # Sequence.add(
         #     'ARM_MOVE_TT_POSE',
         #     arm_move.goToPosition(pose='storage'))
@@ -251,7 +251,7 @@ def main():
             )
             Sequence.add(
                 'SAY_THANKS',
-                speech_output.sayText(info='ThankYouTeachingNewObject')
+                speech_output.sayText(info='T_LO_ThankYouTeachingNewObject')
             )
             Sequence.add('MMUI_MAIN_MENU', HobbitMMUI.ShowMenu(menu='MAIN'))
 
@@ -301,7 +301,7 @@ def main():
         )
         StateMachine.add(
             'CONFIRM_PUT_OBJECT_ON_TRAY',
-            HobbitMMUI.ConfirmInfo(info='PLEASE_PUT_OBJECT_ONTO_TURNTABLE'),
+            HobbitMMUI.ConfirmInfo(info='T_LO_PLEASE_PUT_OBJECT_ONTO_TURNTABLE'),
             transitions={'succeeded': 'CHECK_FOR_OBJECT_1',
                          'failed': 'FAIL_COUNT_CONFIRM_1'}
         )
@@ -331,13 +331,13 @@ def main():
         )
         StateMachine.add(
             'SAY_UNABLE_TO_SEE_OBJECT',
-            speech_output.sayText(info='I_COULD:NOT_FIND_OBJECT_ON_TURNTABLE'),
+            speech_output.sayText(info='T_LO_I_COULD:NOT_FIND_OBJECT_ON_TURNTABLE'),
             transitions={'succeeded': 'CONFIRM_PUT_OBJECT_ON_TRAY',
                          'failed': 'SET_FAILURE'}
         )
         StateMachine.add(
             'SAY_I_AM_LEARNING',
-            speech_output.sayText(info='I_AM_LEARNING_THE_OBJECT'),
+            speech_output.sayText(info='T_LO_I_AM_LEARNING_THE_OBJECT'),
             transitions={'succeeded': 'LEARN_OBJECT_1',
                          'failed': 'SET_FAILURE'}
         )
@@ -350,7 +350,7 @@ def main():
         StateMachine.add(
             'CONFIRM_TURN_OBJECT',
             HobbitMMUI.ConfirmInfo(
-                info='TURN_ OBJECT_UPSIDE_DOWN_OR_LAY_IT_DOWN'),
+                info='T_LO_TURN_ OBJECT_UPSIDE_DOWN_OR_LAY_IT_DOWN'),
             transitions={'succeeded': 'CHECK_FOR_OBJECT_2',
                          'failed': 'FAIL_COUNT_CONFIRM_2'}
         )
@@ -368,7 +368,7 @@ def main():
         )
         StateMachine.add(
             'SAY_UNABLE_TO_SEE_OBJECT_2',
-            speech_output.sayText(info='I_COULD:NOT_FIND_OBJECT_ON_TURNTABLE'),
+            speech_output.sayText(info='T_LO_I_COULD:NOT_FIND_OBJECT_ON_TURNTABLE'),
             transitions={'succeeded': 'CONFIRM_TURN_OBJECT',
                          'failed': 'STOP_SEQ_2'}
         )
@@ -380,7 +380,7 @@ def main():
         )
         StateMachine.add(
             'SHALL_I_STOP_2',
-            HobbitMMUI.AskYesNo(question='SHALL_I_STOP_LEARNING'),
+            HobbitMMUI.AskYesNo(question='T_LO_SHALL_I_STOP_LEARNING'),
             transitions={'yes': 'STOP_SEQ',
                          'no': 'CONFIRM_TURN_OBJECT',
                          'failed': 'STOP_SEQ',
@@ -396,14 +396,14 @@ def main():
         StateMachine.add(
             'SAY_WHAT_IS_THE_NAME',
             speech_output.sayText(
-                info='WHAT_IS_THE_NAME_OF_THIS_OBJECT'),
+                info='T_LO_WHAT_IS_THE_NAME_OF_THIS_OBJECT'),
             transitions={'succeeded': 'GET_THE_NAME_OF_THE_OBJECT',
                          'failed': 'STOP_SEQ'}
         )
         StateMachine.add(
             'SAY_LEARN_FROM_DIFFERENT_ANGLE',
             speech_output.sayText(
-                info='WAIT_LEARNING_OBJECT_FROM_NEW_ANGLE'),
+                info='T_LO_WAIT_LEARNING_OBJECT_FROM_NEW_ANGLE'),
             transitions={'succeeded': 'LEARN_OBJECT_2',
                          'failed': 'STOP_SEQ'}
         )

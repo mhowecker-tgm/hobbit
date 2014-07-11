@@ -48,9 +48,22 @@ def IsItNight(ud):
         return True
 
 
-def event_cb(msg, ud):
-    rospy.loginfo('/Event data received:')
-    print(msg)
+def command_cb(msg, ud):
+    try:
+        print msg.command
+        input_ce = msg.command
+        rospy.loginfo('/Command data received:')
+    except AttributeError, e:
+        print(e)
+        pass
+    try:
+        print msg.event
+        input_ce = msg.event
+        rospy.loginfo('/Event data received:')
+    except AttributeError, e:
+        print(e)
+        pass
+
     night = IsItNight(ud)
     rospy.sleep(2.0)
     print('active_task and night')
@@ -58,17 +71,17 @@ def event_cb(msg, ud):
     print(active_task)
     print(night)
     for index, item in enumerate(commands):
-        if msg.event in item:
-            if index == 4:
+        if input_ce in item:
+            # if index == 4:
+            if item[0] == 'call_hobbit':
                 ud.command = item[0]
                 ud.params = msg.params
                 print(msg.params)
-                #print(ud.params)
                 ud.parameters['active_task'] = index
                 return True
-            elif index == 1 and not night and index + 1 <= active_task:
+            # elif index == 1 and night and index + 1 <= active_task:
+            elif item[0] == 'recharge' and night and index + 1 <= active_task:
                 ud.command = 'silent_recharge'
-                #ud.active_task = index
                 ud.parameters['active_task'] = index
                 return True
             elif index + 1 > active_task and not night:
@@ -76,8 +89,9 @@ def event_cb(msg, ud):
                 return False
             else:
                 rospy.loginfo('New task has higher priority. Start it.')
-                if index == 7:
-                    i = item.index(msg.event)
+                # if index == 7:
+                if item[0] == 'pickup':
+                    i = item.index(input_ce)
                     ud.command = item[i - 6]
                     pass
                 else:
@@ -86,44 +100,10 @@ def event_cb(msg, ud):
                 if item[0] == 'stop':
                     print('Reset active_task value')
                     ud.parameters['active_task'] = 100
-                    # ud.active_task = 100
                 else:
                     ud.parameters['active_task'] = index
                 return True
-    rospy.loginfo('Unknown event received %s' % msg.event)
-    return False
-
-
-def command_cb(msg, ud):
-    rospy.loginfo('/Command data received:')
-    print(msg.command)
-    if rospy.has_param('~active_task'):
-        active_task = rospy.get_param('~active_task')
-    else:
-        active_task = 100
-    print(active_task)
-    for index, item in enumerate(commands):
-        if msg.command in item:
-            if index + 1 >= active_task:
-                rospy.loginfo('New task has lower priority. Do nothing')
-                return False
-            else:
-                rospy.loginfo('New task has higher priority. Start it.')
-                if index == 7:
-                    i = item.index(msg.command)
-                    ud.command = item[i - 6]
-                    pass
-                else:
-                    ud.command = item[0]
-                ud.params = msg.params
-                if item[0] == 'stop':
-                    print('Reset active_task value')
-                    ud.command = item[0]
-                    rospy.set_param('active_task', 100)
-                else:
-                    rospy.set_param('active_task', index)
-                return True
-    rospy.loginfo('Unknown command received %s' % msg.command)
+    rospy.loginfo('Unknown event/command received %s' % input_ce)
     return False
 
 
@@ -199,7 +179,6 @@ class Init(State):
         ud.parameters['wakeup_time'] = self.wakeup_time
         ud.parameters['active_task'] = self.active_task
         print('Init')
-        #print(ud.params)
         return 'succeeded'
 
 
@@ -245,17 +224,23 @@ class SelectTask(State):
 class FakeForAllWithoutRunningActionSever(State):
     """Initialize a few data structures
     """
-    def __init__(self):
+    def __init__(self, name=None):
         State.__init__(
             self,
-            outcomes=['succeeded', 'preempted', 'aborted'])
+            outcomes=['succeeded', 'preempted', 'aborted', 'failed'])
+        if name == None:
+            self.name = 'HOW_DID_WE_END_HERE?'
+        else:
+            self.name = name
 
     def execute(self, ud):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
         print('FakeForAllWithoutRunningActionSever')
+        print(self.name)
         return 'succeeded'
+
 
 def goto_cb(ud, goal):
     room, place = ud.params[0].value.lower().split(' ')
@@ -263,9 +248,19 @@ def goto_cb(ud, goal):
     par.append(String(room))
     par.append(String(place))
     goal = GeneralHobbitGoal(command=String('goto'),
-                             previous_state=String(ud.parameters['previous_task']),
+                             previous_state=String(
+                                 ud.parameters['previous_task']),
                              parameters=par)
     return goal
+
+
+def sos_cb(ud, goal):
+    par = []
+    par.append(String('user_initiated'))
+    goal = GeneralHobbitGoal(command=String('Emergency'),
+                             parameters=par)
+    return goal
+
 
 def main():
     rospy.init_node(NAME)
@@ -320,7 +315,7 @@ def main():
             util.WaitForMsgState(
                 '/Event',
                 Event,
-                msg_cb=event_cb,
+                msg_cb=command_cb,
                 input_keys=['parameters', 'params'],
                 output_keys=['command', 'params']
             )
@@ -398,6 +393,7 @@ def main():
         )
         StateMachine.add(
             'LEARN_OBJECT',
+            # FakeForAllWithoutRunningActionSever(name='LEARN_OBJECT'),
             SimpleActionState(
                 'learn_object',
                 GeneralHobbitAction,
@@ -410,6 +406,7 @@ def main():
         )
         StateMachine.add(
             'REMINDER',
+            # FakeForAllWithoutRunningActionSever(name='REMINDER'),
             SimpleActionState(
                 'reminder',
                 GeneralHobbitAction,
@@ -422,25 +419,29 @@ def main():
         )
         StateMachine.add(
             'EMERGENCY',
-            FakeForAllWithoutRunningActionSever(),
+            # FakeForAllWithoutRunningActionSever(name='EMERGENCY'),
+            SimpleActionState('emergency_user',
+                              GeneralHobbitAction,
+                              goal_cb=sos_cb,
+                              input_keys=['parameters', 'params']),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'failed'}
         )
         StateMachine.add(
             'CLEAR_FLOOR',
-            FakeForAllWithoutRunningActionSever(),
+            FakeForAllWithoutRunningActionSever(name='CLEAR_FLOOR'),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'failed'}
         )
         StateMachine.add(
             'PATROL',
-            FakeForAllWithoutRunningActionSever(),
+            FakeForAllWithoutRunningActionSever(name='PATROL'),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'failed'}
         )
         StateMachine.add(
             'GOTO',
-            # FakeForAllWithoutRunningActionSever(),
+            # FakeForAllWithoutRunningActionSever(name='GOTO'),
             SimpleActionState('goto',
                               GeneralHobbitAction,
                               goal_cb=goto_cb,
@@ -451,36 +452,39 @@ def main():
         StateMachine.add(
             'STOP',
             helper.get_hobbit_full_stop(),
+            # FakeForAllWithoutRunningActionSever(name='STOP'),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
+                         'aborted': 'failed',
                          'failed': 'failed'}
         )
         StateMachine.add(
             'CALL_HOBBIT',
             call_hobbit.call_hobbit(),
+            # FakeForAllWithoutRunningActionSever(name='CALL_HOBBIT'),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'failed'}
         )
         StateMachine.add(
             'PICKUP',
-            FakeForAllWithoutRunningActionSever(),
+            FakeForAllWithoutRunningActionSever(name='PICKUP'),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'failed'}
         )
         StateMachine.add(
             'CALL',
-            FakeForAllWithoutRunningActionSever(),
+            FakeForAllWithoutRunningActionSever(name='CALL'),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'failed'}
         )
         StateMachine.add(
             'SURPRISE',
-            FakeForAllWithoutRunningActionSever(),
+            FakeForAllWithoutRunningActionSever(name='SURPRISE'),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'failed'}
         )
         StateMachine.add(
             'FOLLOW',
-            FakeForAllWithoutRunningActionSever(),
+            FakeForAllWithoutRunningActionSever(name='FOLLOW'),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'failed'}
         )
@@ -493,28 +497,30 @@ def main():
         )
         StateMachine.add(
             'BRING_OBJECT',
-            FakeForAllWithoutRunningActionSever(),
+            FakeForAllWithoutRunningActionSever(name='BRING_OBJECT'),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
+                         'failed': 'failed',
                          'aborted': 'failed'}
         )
         StateMachine.add(
             'RECHARGE',
-            HobbitEmotions.ShowEmotions(emotion='VERY_HAPPY',
-                                        emo_time=4),
+            # FakeForAllWithoutRunningActionSever(name='RECHARGE'),
+            recharge.getRecharge(),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'failed': 'failed',
+                         'aborted': 'failed',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
             'SILENT_RECHARGE',
-            #FakeForAllWithoutRunningActionSever(),
+            # FakeForAllWithoutRunningActionSever(name='SILENT_RECHARGE'),
             recharge.getRecharge(),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'failed'}
         )
         StateMachine.add(
             'SOCIAL_ROLE',
-            FakeForAllWithoutRunningActionSever(),
+            FakeForAllWithoutRunningActionSever(name='SOCIAL_ROLE'),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'failed'}
         )
