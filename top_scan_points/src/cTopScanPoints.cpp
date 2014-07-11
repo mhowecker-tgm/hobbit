@@ -4,6 +4,8 @@
 #include "pcl_ros/transforms.h"
 #include <pcl_ros/point_cloud.h>
 
+//#include <pcl/visualization/cloud_viewer.h>
+
 /* PARTIALLY based on SOURCE cloud_to_scanHoriz.cpp: 
 * Copyright (c) 2010, Willow Garage, Inc.
 * All rights reserved. 
@@ -122,7 +124,8 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 		//RPY angles obtained from the matrix composition of the following transformations:
                 // 1.) 90 degrees rotation around fixed global y axis
 		// 2.) -90 degrees around fixed global x axis
-		// 3.)-35 degrees around new x axis
+		// 3.)-35 degrees around new x axis (head_inclination_angle)
+		//roll value is obtained as asin(cos(head_inclination_angle))
 		headcam_trans.setRotation(tf::createQuaternionFromRPY(0.96, M_PI, M_PI/2));
 
 		//Transform pointcloud to new reference frame
@@ -136,6 +139,11 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 		return;
 	}
 
+	/*pcl::visualization::CloudViewer viewer ("Simple Cloud Viewer");
+
+	pcl::PointCloud<pcl::PointXYZ>::Ptr mycloudPtr (new pcl::PointCloud<pcl::PointXYZ> (point_cloud_new_frame)); 
+        viewer.showCloud(mycloudPtr);
+	sleep (50);*/
 
 	uint32_t ranges_size = std::ceil((output.angle_max - output.angle_min) / output.angle_increment);
 	output.ranges.assign(ranges_size, output.range_max);
