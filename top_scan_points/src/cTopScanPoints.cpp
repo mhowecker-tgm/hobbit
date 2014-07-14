@@ -4,7 +4,7 @@
 #include "pcl_ros/transforms.h"
 #include <pcl_ros/point_cloud.h>
 
-#include <pcl/visualization/cloud_viewer.h>
+//#include <pcl/visualization/cloud_viewer.h>
 
 /* PARTIALLY based on SOURCE cloud_to_scanHoriz.cpp: 
 * Copyright (c) 2010, Willow Garage, Inc.
