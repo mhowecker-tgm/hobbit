@@ -8,7 +8,7 @@ DEBUG = True
 import roslib
 roslib.load_manifest(PKG)
 import rospy
-
+import numpy
 from smach import Concurrence, Sequence, State
 from hobbit_user_interaction import HobbitEmotions, HobbitMMUI
 from sensor_msgs.msg import PointCloud2
@@ -21,6 +21,7 @@ import hobbit_smach.arm_move_import as arm_move
 import math, struct
 from testdetector import TD
 import tf
+from tf.transformations import euler_from_quaternion, quaternion_matrix
 
 class DavidLookForObject(State):
     """
@@ -420,6 +421,8 @@ class DavidLookingPose(State):
                 continue
 
 
+	(robot_x, robot_y, robot_yaw) = util.get_current_robot_position(frame='/map')
+        posRobot = [robot_x, robot_y] #Bajo, please fill in
         gpOnFloor = self.calcIntersectionPointingDirWithFloor(pspWCS, pvecWCS)
         print "X:  ", gpOnFloor[0], "   Y:  ", gpOnFloor[1], "   Z:  ", gpOnFloor[2]
         robotApproachDir = [gpOnFloor[0] - posRobot[0], gpOnFloor[1] - posRobot[1]]
