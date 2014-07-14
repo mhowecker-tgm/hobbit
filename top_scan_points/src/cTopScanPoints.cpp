@@ -4,7 +4,7 @@
 #include "pcl_ros/transforms.h"
 #include <pcl_ros/point_cloud.h>
 
-//#include <pcl/visualization/cloud_viewer.h>
+#include <pcl/visualization/cloud_viewer.h>
 
 /* PARTIALLY based on SOURCE cloud_to_scanHoriz.cpp: 
 * Copyright (c) 2010, Willow Garage, Inc.
@@ -59,8 +59,8 @@ cTopScanPoints::cTopScanPoints(int argc, char **argv) : init_argc(argc), init_ar
     	obstacle_trans.child_frame_id = "obstacle_link";
     	obstacle_trans.transform.translation.x = -0.248;
     	obstacle_trans.transform.translation.y = -0.208;
-   	obstacle_trans.transform.translation.z = 0.5;
-    	obstacle_trans.transform.rotation.x = 1.108;
+   	obstacle_trans.transform.translation.z = 1.108;
+    	obstacle_trans.transform.rotation.x = 0.0;
     	obstacle_trans.transform.rotation.y = 0.0;
     	obstacle_trans.transform.rotation.z = 0.0;
     	obstacle_trans.transform.rotation.w = 1.0;
@@ -120,7 +120,7 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 		// Define the tf transformation
 		tf::StampedTransform headcam_trans;
 		//Vertical translation in order to check heights
-  		headcam_trans.setOrigin(tf::Vector3(0, 0, 1.18)); //FIXME, check height value
+  		headcam_trans.setOrigin(tf::Vector3(0, 0, 1.108)); //FIXME, check height value
 		//RPY angles obtained from the matrix composition of the following transformations:
                 // 1.) 90 degrees rotation around fixed global y axis
 		// 2.) -90 degrees around fixed global x axis
