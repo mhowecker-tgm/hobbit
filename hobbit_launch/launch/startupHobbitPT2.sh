@@ -64,6 +64,9 @@ roslaunch startup.launch&
 
 sleep $DELAY_BETWEEN_STEPS
 
+# Start AAL service
+roslaunch aal_service startup.launch&
+
 # Load Hobbit PT2 parameters
 #cd /opt/ros/hobbit_hydro/src/
 rosparam load /opt/ros/hobbit_hydro/src/hobbit_params.yaml&
