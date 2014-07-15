@@ -41,6 +41,7 @@ void MiraGetPose::loc_pose_callback(mira::ChannelRead<mira::Pose2> data)
   pose_msg.pose.pose.position.z = 0;
 
   pose_msg.pose.pose.orientation = tf::createQuaternionMsgFromYaw(robotPose.phi());
+  //std::cout << "mira orientation " << robotPose.phi() << std::endl; 
 
   int cov_size = 36;
   for (int i=0; i<cov_size; i++)
