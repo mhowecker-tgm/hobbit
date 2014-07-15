@@ -52,7 +52,7 @@ cTopScanPoints::cTopScanPoints(int argc, char **argv) : init_argc(argc), init_ar
 	output.time_increment = 0.0;
 	output.scan_time = 1.0/30.0;
 	output.range_min = 0.1;
-	output.range_max = 2;
+	output.range_max = 1;
 
 
 	obstacle_trans.header.frame_id = "base_link";
