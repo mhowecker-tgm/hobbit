@@ -10,7 +10,8 @@ NAME = 'place_handler'
 PROJECT = 'Hobbit'
 
 # FILE='places.xml'
-FILE='/opt/ros/hobbit_hydro/src/navigation/places.xml'
+FILE='/home/bajo/work/development/catkin/src/navigation/places.xml'
+#FILE='/opt/ros/hobbit_hydro/src/navigation/places.xml'
 
 import roslib; roslib.load_manifest(PKG)
 import rospy
@@ -69,7 +70,7 @@ def readXml(inFile):
         return None
 
     rooms = RoomsVector()
-    
+
     root = tree.getroot()
     if not 'rooms' in root.tag:
         print 'xml file does not contain \'rooms\' as root node.\n Please check the xml file'
@@ -223,11 +224,11 @@ def getCoordinates(req):
     print req.room_name.data, req.location_name.data
     # print 'call' in req.location_name.data
     if req.room_name.data == 'dock' or req.room_name.data == None or 'call' in req.location_name.data:
-        print('most likely dock')	
+        print('most likely dock')
         gen = (x for x in rooms.rooms_vector)
     else:
         gen = (x for x in rooms.rooms_vector if req.room_name.data in x.room_name)
-    
+
     for x in gen:
         # print(x)
         gen1 = (k for k in x.places_vector if req.location_name.data in k.place_name)
@@ -252,8 +253,8 @@ def getAllRooms(req):
 
 def getCurrentRoom(req):
     print('Returning random room name: MainCorridor')
-    return 'MainCorridor' 
-    
+    return 'MainCorridor'
+
 
 def main():
     rospy.init_node(NAME)

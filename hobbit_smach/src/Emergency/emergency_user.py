@@ -63,26 +63,6 @@ class Init(State):
         return 'succeeded'
 
 
-class Dummy(State):
-    """
-    Class for setting the result message and clean up persistent variables
-    """
-    def __init__(self):
-        State.__init__(
-            self,
-            outcomes=['succeeded', 'preempted', 'failed'],
-            input_keys=['command'],
-            output_keys=['result', 'command']
-        )
-        self.pub_face = rospy.Publisher('/Hobbit/Emoticon', String)
-
-    def execute(self, ud):
-        self.pub_face.publish('EMO_SAD')
-        #ud.result = String('')
-        #rospy.sleep(2.0)
-        return 'succeeded'
-
-
 class CallCheck(State):
     """
     Class which checks from where the reminder scenario was called.

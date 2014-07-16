@@ -57,7 +57,8 @@ class CallDecison(smach.State):
         smach.State.__init__(
             self,
             input_keys=['call_state'],
-            outcomes=['succeeded', 'failed', 'preempted', 'stop', 'ended']
+            outcomes=['succeeded', 'failed', 'preempted',
+                      'stop', 'ended', 'established', 'confirmed']
         )
 
     def execute(self, ud):
@@ -65,6 +66,10 @@ class CallDecison(smach.State):
             return 'stop'
         elif ud.call_state == 'ended':
             return 'ended'
+        elif ud.call_state == 'established':
+            return 'established'
+        elif ud.call_state == 'confirmed':
+            return 'confirmed'
         else:
             return 'succeeded'
 
@@ -129,6 +134,9 @@ class WaitforConfirmedCall(util.WaitForMsgState):
                         return 'failed'
             if msg.event == 'E_CALLCONFIRMED':
                 ud.call_state = 'confirmed'
+                return 'succeeded'
+            elif msg.event == 'E_CALLESTABLISHED':
+                ud.call_state = 'established'
                 return 'succeeded'
             elif msg.event == 'B_STOPSOS':
                 ud.call_state = 'stop'

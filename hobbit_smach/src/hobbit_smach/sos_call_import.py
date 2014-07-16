@@ -106,24 +106,6 @@ class SetSuccess(State):
         return 'succeeded'
 
 
-class Dummy(State):
-
-    """
-    Class for setting the result message and clean up persistent variables
-    """
-
-    def __init__(self):
-        State.__init__(
-            self,
-            outcomes=['succeeded', 'failed', 'preempted'],
-            input_keys=['command'],
-            output_keys=['result', 'command']
-        )
-
-    def execute(self, ud):
-        return 'succeeded'
-
-
 class CheckCaller(State):
 
     """
@@ -222,7 +204,23 @@ def get_call_sos():
             'CALL_DECISION',
             HobbitMMUI.CallDecison(),
             transitions={'stop': 'END_CALL',
-                         'ended': 'failed'}
+                         'ended': 'failed',
+                         'established': 'CHECK_CALL_STATE_2',
+                         'succeeded': 'CHECK_CALL_ENDED'}
+        )
+        Sequence.add(
+            'CHECK_CALL_STATE_2',
+            HobbitMMUI.WaitforConfirmedCall(
+                '/Event', Event, output_keys=['call_state']),
+            transitions={'aborted': 'CHECK_CALL_STATE_2'}
+        )
+        Sequence.add(
+            'CALL_DECISION_2',
+            HobbitMMUI.CallDecison(),
+            transitions={'stop': 'END_CALL',
+                         'ended': 'failed',
+                         'confirmed': 'CHECK_CALL_ENDED',
+                         'succeeded': 'CHECK_CALL_ENDED'}
         )
         Sequence.add(
             'CHECK_CALL_ENDED',

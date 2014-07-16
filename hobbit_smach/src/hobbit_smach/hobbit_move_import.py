@@ -17,10 +17,12 @@ from smach_ros import ServiceState
 from hobbit_msgs.srv import GetCoordinates, GetCoordinatesRequest
 from std_msgs.msg import String
 from mira_msgs.msg import BatteryState
+from hobbit_user_interaction import HobbitMMUI
 from uashh_smach.util import SleepState, WaitForMsgState, \
     TransformListenerSingleton
 import uashh_smach.platform.move_base as move_base
 import head_move_import as head_move
+import speech_output_import as speech_output
 from math import pi
 
 
@@ -270,6 +272,18 @@ def goToPosition(frame='/map', room='None', place='dock'):
         Sequence.add('SET_NAV_GOAL', SetNavigationGoal(room, place))
         if not DEBUG:
             Sequence.add('MOVE_HOBBIT', move_base.MoveBaseState(frame))
+        Sequence.add(
+            'HEAD_UP_AFTER_MOVEMENT',
+            head_move.MoveTo(pose='center_center')
+        )
+        Sequence.add(
+            'MMUI_SAY_ReachedPlace',
+            speech_output.sayText(info='T_GT_ReachedMyDestination')
+        )
+        Sequence.add(
+            'SHOW_MENU_MAIN_1',
+            HobbitMMUI.ShowMenu(menu='MAIN')
+        )
     return seq
 
 
@@ -315,6 +329,18 @@ def goToPose():
                          remapping={'x': 'x',
                                     'y': 'y',
                                     'yaw': 'yaw'})
+        Sequence.add(
+            'HEAD_UP_AFTER_MOVEMENT',
+            head_move.MoveTo(pose='center_center')
+        )
+        Sequence.add(
+            'MMUI_SAY_ReachedPlace',
+            speech_output.sayText(info='T_GT_ReachedMyDestination')
+        )
+        Sequence.add(
+            'SHOW_MENU_MAIN_1',
+            HobbitMMUI.ShowMenu(menu='MAIN')
+        )
     return seq
 
 

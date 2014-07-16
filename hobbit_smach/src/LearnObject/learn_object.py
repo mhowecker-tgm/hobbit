@@ -331,7 +331,7 @@ def main():
         )
         StateMachine.add(
             'SAY_UNABLE_TO_SEE_OBJECT',
-            speech_output.sayText(info='T_LO_I_COULD:NOT_FIND_OBJECT_ON_TURNTABLE'),
+            speech_output.sayText(info='T_LO_I_COULD_NOT_FIND_OBJECT_ON_TURNTABLE'),
             transitions={'succeeded': 'CONFIRM_PUT_OBJECT_ON_TRAY',
                          'failed': 'SET_FAILURE'}
         )
@@ -349,7 +349,7 @@ def main():
         )
         StateMachine.add(
             'CONFIRM_TURN_OBJECT',
-            HobbitMMUI.ConfirmInfo(
+            obbitMMUI.ConfirmInfo(
                 info='T_LO_TURN_OBJECT_UPSIDE_DOWN_OR_LAY_IT_DOWN'),
             transitions={'succeeded': 'CHECK_FOR_OBJECT_2',
                          'failed': 'FAIL_COUNT_CONFIRM_2'}
@@ -390,6 +390,12 @@ def main():
         StateMachine.add(
             'LEARN_OBJECT_2',
             learn_object.getDataCW(),
+            transitions={'succeeded': 'HEAD_UP',
+                         'failed': 'SET_FAILURE'}
+        )
+        StateMachine.add(
+            'HEAD_UP',
+            head_move.MoveTo(pose='center_center'),
             transitions={'succeeded': 'SAY_WHAT_IS_THE_NAME',
                          'failed': 'SET_FAILURE'}
         )

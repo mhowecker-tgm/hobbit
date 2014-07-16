@@ -288,7 +288,19 @@ def main():
         StateMachine.add(
             'CONFIRM_SWITCH_OFF_OVEN',
             HobbitMMUI.ConfirmInfo(info='T_BR_SwitchOffOven'),
-            transitions={'succeeded': 'SEQ2',
+            transitions={'succeeded': 'CONFIRM_CLOSE_WINDOWS',
+                         'failed': 'SET_FAILURE'}
+        )
+        StateMachine.add(
+            'CONFIRM_CLOSE_WINDOWS',
+            HobbitMMUI.ConfirmInfo(info='T_BR_CloseAllWindows'),
+            transitions={'succeeded': 'CONFIRM_BRING_KEYS',
+                         'failed': 'SET_FAILURE'}
+        )
+        StateMachine.add(
+            'CONFIRM_BRING_KEYS',
+            HobbitMMUI.ConfirmInfo(info='T_BR_BringYourKeys'),
+            transitions={'succeeded': '',
                          'failed': 'SET_FAILURE'}
         )
         StateMachine.add(
