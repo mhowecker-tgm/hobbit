@@ -72,17 +72,17 @@ roslaunch aal_service startup.launch&
 rosparam load /opt/ros/hobbit_hydro/src/hobbit_params.yaml&
 
 # Start SMACH handling of rooms, places, objects.
-cd /opt/ros/hobbit_hydro/src/hobbit_smach/src/PlacesObjects
 rosrun hobbit_smach places_objects.py&
 roslaunch hobbit_smach SavePCD.launch&
 # Start SMACH handling for the demo on 14,15th July 2014
 # Start SMACH handling for the demo on 19th June 2014
- rosrun hobbit_smach learn_object.py&
- rosrun hobbit_smach away.py&
- rosrun hobbit_smach goto.py&
- rosrun hobbit_smach emergency_user.py&
- rosrun hobbit_smach battery_monitor.py&
- rosrun hobbit_smach recharge&
+rosrun hobbit_smach learn_object.py&
+rosrun hobbit_smach away.py&
+rosrun hobbit_smach goto.py&
+rosrun hobbit_smach emergency_user.py&
+rosrun hobbit_smach battery_monitor.py&
+rosrun hobbit_smach recharge&
+rosrun hobbit_smach sos_monitor.py
 
 # Start interfaces_mira, which starts the platform driver and the ros-mira interface for virtual lasers
 cd /opt/ros/hobbit_hydro/src/interfaces_mira/launch

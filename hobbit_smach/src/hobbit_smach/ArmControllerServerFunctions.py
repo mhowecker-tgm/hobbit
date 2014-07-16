@@ -6,14 +6,14 @@ Created on 19.09.2013
 import socket
 import ArmControllerFunctions
 
-#HOST = ''
-#PORT = 5020
+# HOST = ''
+# PORT = 5020
 
 class ServerApp():
     def __init__(self):
         self.Port = 5020
         self.Addr = ''
-        
+
     def ServerProgram(self):
         csocket = self.OpenServerSocket()
         # Publish to ROS
@@ -22,45 +22,44 @@ class ServerApp():
                 try:
                     c, self.Addr = csocket.accept()
                     c.setblocking(1)
-                    
+
                 except socket.error, e:
-                    print 'XPC Server:',e
+                    print 'XPC Server:', e
                     # Publish to Ros?
                     exit()
-                    
+
                 while True:
-                    #self.SetServerConnectedEvent(True)
+                    # self.SetServerConnectedEvent(True)
                     data = c.recv(1024)
-                    #Allocate Lock, or event?
-                    ReceiveDataList = self.CheckReceiveData(data,c)
+                    # Allocate Lock, or event?
+                    ReceiveDataList = self.CheckReceiveData(data, c)
                     if not data:
                         break
-                    
-        finally:    
-            csocket.close()   
+
+        finally:
+            csocket.close()
             # Publish to ROS
-                 
+
     def OpenServerSocket(self):
         csocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         csocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         try:
-            csocket.bind(('',self.Port))
+            csocket.bind(('', self.Port))
             csocket.listen(1)
-            
+
         except socket.error, e:
             print e
             try:
                 csocket.close()
                 # Publish to ROS
                 print 'Socket closed'
-            except socket.error, e: 
+            except socket.error, e:
                 print e
                 print 'Socket was not closed'
             exit()
         return csocket
-    
-    
-    def SendEcho(self, data,s):
+
+    def SendEcho(self, data, s):
         # Sending Echo when receiving data:
         try:
             s.send(data)
@@ -70,9 +69,8 @@ class ServerApp():
             # Publish to ROS
             Sendstatus = False
         return Sendstatus
-    
-    
-    def CheckReceiveData(self,data,s):
+
+    def CheckReceiveData(self, data, s):
         ReceiveDataList = ArmControllerFunctions.CutString(data)
         Status = {}
         if ReceiveDataList[0]=='STATE':
@@ -86,5 +84,4 @@ class ServerApp():
                         Status[ArmControllerFunctions.AxisStateNames[i]]=ArmControllerFunctions.CHAR_TO_BOOL(ReceiveDataList[2])
                         # Publish to ROS
                         print Status
-        return Status            
-    
+        return Status
