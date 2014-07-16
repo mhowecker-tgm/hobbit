@@ -139,7 +139,8 @@ def startDockProcedure():
         Sequence.add(
             'CHARGE_CHECK',
             WaitForMsgState('/battery_state', BatteryState, msg_cb=battery_cb),
-            transitions={'aborted': 'PREEMPT',
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'PREEMPT',
                          'preempted': 'preempted'})
         Sequence.add(
             'PREEMPT',
