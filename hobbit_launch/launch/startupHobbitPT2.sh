@@ -82,6 +82,7 @@ roslaunch hobbit_smach SavePCD.launch&
  rosrun hobbit_smach goto.py&
  rosrun hobbit_smach emergency_user.py&
  rosrun hobbit_smach battery_monitor.py&
+ rosrun hobbit_smach recharge&
 
 # Start interfaces_mira, which starts the platform driver and the ros-mira interface for virtual lasers
 cd /opt/ros/hobbit_hydro/src/interfaces_mira/launch
