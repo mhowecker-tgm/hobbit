@@ -539,6 +539,11 @@ void * store_new_configuration_callback(struct AmmServer_DynamicRequest  * rqst)
     {
       if ( strlen(rqst->GET_request)>0 )
        {
+
+         int i=system("cp startupClean.dcfg startup.dcfg");
+         if (i==0) {  successfullStore = 1; }
+
+
          AmmServer_Warning("Setting variables at once is unsafe since it doesnt check for injection");
          char * bufferCommand = (char *) malloc ( 256 * sizeof(char) );
          if (bufferCommand!=0)
@@ -550,6 +555,39 @@ void * store_new_configuration_callback(struct AmmServer_DynamicRequest  * rqst)
             if ( _GET(default_server,rqst,(char*)"currentEmotion",bufferCommand,256) )  { execute((char*)"setCurrentEmotion",bufferCommand);  }
             if ( _GET(default_server,rqst,(char*)"latestWakingUpTime",bufferCommand,256) )  { execute((char*)"setLatestWakingUpTime",bufferCommand);  }
             if ( _GET(default_server,rqst,(char*)"latestSleepingTime",bufferCommand,256) )  { execute((char*)"setLatestSleepingTime",bufferCommand);  }
+
+
+
+            char * commandToRun = (char*) malloc(MAX_COMMAND_SIZE * sizeof(char));
+            if (commandToRun!=0)
+            {
+              if ( _GET(default_server,rqst,(char*)"LuiBackgroundSelector",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/$$$$$COLOR$$$$$/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"city",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/$$$$$CITY$$$$$/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"voice",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/$$$$$VOICE$$$$$/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"emergencyContactTel1",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/$$$$$EMERGENCYTEL$$$$$/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"contactTel1",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/$$$$$TELEPHONE1NUM$$$$$/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"contactName1",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/$$$$$TELEPHONE1NAME$$$$$/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+
+              if ( _GET(default_server,rqst,(char*)"contactTel2",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/$$$$$TELEPHONE2NUM$$$$$/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"contactName2",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/$$$$$TELEPHONE2NAME$$$$$/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+
+              if ( _GET(default_server,rqst,(char*)"contactTel3",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/$$$$$TELEPHONE3NUM$$$$$/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"contactName3",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/$$$$$TELEPHONE3NAME$$$$$/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+
+              if ( _GET(default_server,rqst,(char*)"contactTel4",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/$$$$$TELEPHONE4NUM$$$$$/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"contactName4",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/$$$$$TELEPHONE4NAME$$$$$/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+
+              if ( _GET(default_server,rqst,(char*)"contactTel5",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/$$$$$TELEPHONE5NUM$$$$$/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"contactName5",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/$$$$$TELEPHONE5NAME$$$$$/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+
+              if ( _GET(default_server,rqst,(char*)"contactTel6",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/$$$$$TELEPHONE6NUM$$$$$/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"contactName6",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/$$$$$TELEPHONE6NAME$$$$$/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+
+              free(commandToRun);
+            }
+
+
+
 
             free(bufferCommand);
           }
