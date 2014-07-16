@@ -272,7 +272,7 @@ def main():
         )
         StateMachine.add(
             'ACTIVATE_LIGHTS',
-            aal_lights.SetLights(active = True)
+            aal_lights.SetLights(active = True),
             transitions={'succeeded': 'MMUI_CONFIRM_DoYouNeedHelp',
                          'failed': 'MMUI_CONFIRM_DoYouNeedHelp',
                          'preempted': 'preempted'}
@@ -309,7 +309,7 @@ def main():
         #)
         StateMachine.add(
             'MMUI_CONFIRM_DoYouNeedHelp',
-            HobbitMMUI.AskYesNo(question='DoYouNeedHelp'),
+            HobbitMMUI.AskYesNo(question='T_HM_DoYouNeedHelp'),
             transitions={'yes': 'MMUI_CONFIRM_ShallICallHelp',
                          'no': 'succeeded',
                          'timeout': 'MMUI_CONFIRM_DoYouNeedHelp',

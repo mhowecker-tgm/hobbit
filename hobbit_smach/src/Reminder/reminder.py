@@ -228,8 +228,7 @@ def main():
             'SKIP_APPROACH_USER',
             SleepState(duration=0.1),
             {'succeeded': 'MMUI_CONFIRM',
-             'aborted': 'CLEAN_UP',
-             'preempted': 'CLEAN_UP'})
+             'preempted': 'CLEAN_UP'}
         )
         StateMachine.add(
             'SET_SUCCESS',

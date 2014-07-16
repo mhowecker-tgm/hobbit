@@ -255,7 +255,7 @@ def main():
         StateMachine.add(
             'SAY_T_HM_IWillCallFirstPersonInList',
             #HobbitMMUI.ShowInfo(info='IWillCallFirstPersonInList'),
-            speech_output.sayText(info='IWillCallFirstPersonInList'),
+            speech_output.sayText(info='T_HM_IWillCallFirstPersonInList'),
             transitions={'succeeded': 'SEQ',
                          'failed': 'SEQ',
                          'preempted': 'preempted'}
@@ -263,7 +263,7 @@ def main():
         StateMachine.add(
             'SAY_T_HM_IWillCallSecondPersonInList',
             #HobbitMMUI.ShowInfo(info='IWillCallSecondPersonInList'),
-            speech_output.sayText(info='IWillCallSecondPersonInList'),
+            speech_output.sayText(info='T_HM_IWillCallSecondPersonInList'),
             transitions={'succeeded': 'SEQ',
                          'failed': 'SEQ',
                          'preempted': 'preempted'}
@@ -271,7 +271,7 @@ def main():
         StateMachine.add(
             'SAY_T_HM_IWillCallThirdPersonInList',
             #HobbitMMUI.ShowInfo(info='IWillCallThirdPersonInList'),
-            speech_output.sayText(info='IWillCallThirdPersonInList'),
+            speech_output.sayText(info='T_HM_IWillCallThirdPersonInList'),
             transitions={'succeeded': 'SEQ',
                          'failed': 'SEQ',
                          'preempted': 'preempted'}
@@ -279,7 +279,7 @@ def main():
         StateMachine.add(
             'SAY_T_HM_NoAnswersIWillCallFirstPersonAgain',
             #HobbitMMUI.ShowInfo(info='NoAnswersIWillCallFirstPersonAgain'),
-            speech_output.sayText(info='NoAnswersIWillCallFirstPersonAgain'),
+            speech_output.sayText(info='T_HM_NoAnswersIWillCallFirstPersonAgain'),
             transitions={'succeeded': 'SEQ',
                          'failed': 'SEQ',
                          'preempted': 'preempted'}
@@ -287,7 +287,7 @@ def main():
         StateMachine.add(
             'SAY_NoAnswersSayOrPressHelpAgainToTryAgain',
             #HobbitMMUI.ShowInfo(info='NoAnswersSayOrPressHelpAgainToTryAgain'),
-            speech_output.sayText(info='NoAnswersSayOrPressHelpAgainToTryAgain'),
+            speech_output.sayText(info='T_HM_NoAnswersSayOrPressHelpAgainToTryAgain'),
             transitions={'succeeded': 'MMUI_MAIN_MENU',
                          'failed': 'aborted',
                          'preempted': 'preempted'}
@@ -319,7 +319,7 @@ def main():
         StateMachine.add(
             'SAY_IAmWithYou',
             #HobbitMMUI.ShowInfo(info='IAmWithYou'),
-            speech_output.sayText(info='IAmWithYou'),
+            speech_output.sayText(info='T_HM_IAmWithYou'),
             transitions={'succeeded': 'succeeded',
                          'failed': 'aborted',
                          'preempted': 'preempted'}

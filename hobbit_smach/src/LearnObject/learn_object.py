@@ -3,7 +3,7 @@
 
 PKG = 'hobbit_smach'
 NAME = 'learn_object'
-DEBUG = True
+DEBUG =  False
 MMUI_IS_DOING_IT = True
 
 import roslib
@@ -179,7 +179,7 @@ def main():
         )
         Concurrence.add(
             'SAY_ATTENTION',
-            speech_output.sayText(info='ATTENTION_I_AM_MOVING_MY_ARM_OUT')
+            speech_output.sayText(info='T_LO_ATTENTION_I_AM_MOVING_MY_ARM_OUT')
         )
 
     with cc2:
@@ -190,23 +190,23 @@ def main():
         Concurrence.add(
             'SAY_LEARN_NEW_OBJECT',
             speech_output.sayText(
-                info='LEARNING_NEW_SET_OF_OBJECTS_I_AM_THINKING')
+                info='T_LO_LEARNING_NEW_SET_OF_OBJECTS_I_AM_THINKING')
         )
 
     with seq1:
-        Sequence.add(
-            'SAY_HAPPY',
-            cc1
-        )
+        #Sequence.add(
+        #    'SAY_HAPPY',
+        #    cc1
+        #)
         Sequence.add(
             'HEAD_MOVE',
             head_move.MoveTo(pose='center_center'),
             transitions={'aborted': 'failed'}
         )
-        if not DEBUG:
-            Sequence.add(
-                'MOVE_BACK',
-                hobbit_move.Move(goal='back', distance=0.25))
+        #if not DEBUG:
+        #    Sequence.add(
+        #        'MOVE_BACK',
+        #        hobbit_move.Move(goal='back', distance=0.25))
         Sequence.add(
             'HEAD_MOVE_2',
             head_move.MoveTo(pose='down_center'),
@@ -227,10 +227,10 @@ def main():
             'MOVE_TT_LEARN_POSITION',
             arm_move.goToLearnPosition()
         )
-        if not DEBUG:
-            Sequence.add(
-                'MOVE_FRONT',
-                hobbit_move.Move(goal='front', distance=0.25))
+        #if not DEBUG:
+        #    Sequence.add(
+        #        'MOVE_FRONT',
+        #        hobbit_move.Move(goal='front', distance=0.25))
         Sequence.add(
             'HEAD_MOVE_3',
             head_move.MoveTo(pose='to_turntable'),
@@ -350,7 +350,7 @@ def main():
         StateMachine.add(
             'CONFIRM_TURN_OBJECT',
             HobbitMMUI.ConfirmInfo(
-                info='T_LO_TURN_ OBJECT_UPSIDE_DOWN_OR_LAY_IT_DOWN'),
+                info='T_LO_TURN_OBJECT_UPSIDE_DOWN_OR_LAY_IT_DOWN'),
             transitions={'succeeded': 'CHECK_FOR_OBJECT_2',
                          'failed': 'FAIL_COUNT_CONFIRM_2'}
         )

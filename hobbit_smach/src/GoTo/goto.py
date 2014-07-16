@@ -19,6 +19,7 @@ from hobbit_msgs.srv import GetCoordinates
 from smach_ros import ActionServerWrapper, IntrospectionServer
 from smach import StateMachine, State, Sequence
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
+import hobbit_smach.head_move_import as head_move
 
 
 class Init(State):
@@ -369,10 +370,13 @@ def main():
                 'EMO_HAPPY_1',
                 #HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=4))
                 HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=1))
+            Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
+                     head_move.MoveTo(pose='center_center'),
+                     transitions={'aborted': 'MMUI_SAY_ReachedPlace'})
             Sequence.add(
                 'MMUI_SAY_ReachedPlace',
-                speech_output.sayText(info='T_GT_ReachedMyDestionation'))
-                # speech_output.sayText(info='Reached my destionation'))
+                speech_output.sayText(info='T_GT_ReachedMyDestination'))
+                # speech_output.sayText(info='Reached my destination'))
             Sequence.add(
                 'SHOW_MENU_MAIN_1',
                 HobbitMMUI.ShowMenu(menu='MAIN'))

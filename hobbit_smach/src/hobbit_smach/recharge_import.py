@@ -182,7 +182,7 @@ def startDockProcedure():
         Sequence.add('WAIT1', SleepState(duration=10))
         Sequence.add('CHECK_1', cc,
                          transitions={'succeeded': 'aborted',
-                                      'failed': 'RETRY'})
+                                      'failed': 'START_DOCK'})
 
     with sm:
         StateMachine.add('DOCKING_PROCEDURE', seq1,

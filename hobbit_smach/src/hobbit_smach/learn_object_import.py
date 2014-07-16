@@ -95,7 +95,7 @@ def returnTurntable():
             HobbitMMUI.ConfirmInfo(info='T_LO_PLEASE_REMOVE_OBJECT_FROM_TURNTABLE'))
         Sequence.add(
             'SAY_RETURN_TURNTABLE',
-            speech_output.sayText(info='RETURNING_TURNTABLE'))
+            speech_output.sayText(info='T_LO_RETURNING_TURNTABLE'))
         Sequence.add(
             'MOVE_ARM_TT_POSE',
         #    move_arm.goToPosition(pose='storage'))
@@ -121,7 +121,7 @@ def returnTurntable():
             transitions={'aborted': 'failed'})
         Sequence.add(
             'MMUI_SAY_STOPPED_LEARNING',
-            speech_output.sayText(info='I_STOPPED_LEARNING'))
+            speech_output.sayText(info='T_LO_I_STOPPED_LEARNING'))
         Sequence.add('MMUI_MAIN_MENU', HobbitMMUI.ShowMenu(menu='MAIN'))
     return seq
 
@@ -145,7 +145,7 @@ def unloadReturnTurntable():
         )
         Sequence.add(
             'SAY_I_WILL_PUT_THE_OBJECT_INTO_TRAY',
-            speech_output.sayText(info='I_WILL_PUT_THE_OBJECT_INTO_TRAY')
+            speech_output.sayText(info='T_LO_I_WILL_PUT_THE_OBJECT_INTO_TRAY')
         )
         #Sequence.add(
         #    'MOVE_ARM_TRAY_POSE',

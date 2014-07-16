@@ -6,10 +6,11 @@
 #
 
 PKG = 'hobbit_msgs' # this package name
-NAME = 'ObjectService'
+NAME = 'place_handler'
 PROJECT = 'Hobbit'
 
-FILE='places.xml'
+# FILE='places.xml'
+FILE='/opt/ros/hobbit_hydro/src/navigation/places.xml'
 
 import roslib; roslib.load_manifest(PKG)
 import rospy
@@ -22,6 +23,7 @@ from matplotlib.path import Path
 from operator import itemgetter
 from std_msgs.msg import String
 from xml.dom import minidom
+
 
 try:
       from lxml import etree as ET
@@ -67,6 +69,7 @@ def readXml(inFile):
         return None
 
     rooms = RoomsVector()
+    
     root = tree.getroot()
     if not 'rooms' in root.tag:
         print 'xml file does not contain \'rooms\' as root node.\n Please check the xml file'
@@ -104,7 +107,7 @@ def readXml(inFile):
 
 def writeXml(inFile, rooms):
     """ Read and modify the updated probabilities of the objects to the xml file"""
-    outFile = 'out-'+inFile
+    outFile = inFile[:-4]+'-out.xml'
 
     r = ET.Element('rooms')
     for room in rooms.rooms_vector:

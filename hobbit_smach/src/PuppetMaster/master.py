@@ -18,12 +18,14 @@ import hobbit_smach.call_hobbit_import as call_hobbit
 import uashh_smach.util as util
 from hobbit_user_interaction import HobbitEmotions
 
-commands = [['emergency', 'G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP', 'C_HELP', 'F_CALLSOS', 'G_EMERGENCY'],
+commands = [['emergency', 'G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP', 'G_HELP', 'A_HELP','C_HELP', 'F_CALLSOS', 'G_EMERGENCY'],
             ['recharge', 'E_RECHARGE', 'C_RECHARGE'],
             ['reminder', 'E_REMINDER'],
             ['stop', 'C_STOP', 'G_STOP', 'E_STOP'],
             ['call_hobbit', 'C_CALLHOBBIT', 'E_CALLHOBBIT'],
             ['call', 'E_CALLRING', 'E_CALLESTABLISHED', 'E_CALLENDED', 'C_MAKECALL'],
+            ['away', 'C_AWAY1', 'C_AWAY2', 'C_AWAY3', 'C_AWAY4', 'C_AWAY5', 'C_AWAY6',
+            'C_SLEEP1','C_SLEEP2','C_SLEEP3','C_SLEEP4','C_SLEEP5','C_SLEEP6',],
             ['clear_floor', 'E_CLEARFLOOR'],
             ['pickup', 'follow', 'learn_object', 'bring_object', 'goto', 'pickup'
              'C_PICKUP', 'C_FOLLOW', 'C_LEARN', 'C_BRING', 'C_GOTOPOINT', 'G_POINTING'],
@@ -71,6 +73,7 @@ def command_cb(msg, ud):
     print(active_task)
     print(night)
     for index, item in enumerate(commands):
+        print(input_ce)
         if input_ce in item:
             # if index == 4:
             if item[0] == 'call_hobbit':
@@ -80,11 +83,12 @@ def command_cb(msg, ud):
                 ud.parameters['active_task'] = index
                 return True
             # elif index == 1 and night and index + 1 <= active_task:
-            elif item[0] == 'recharge' and night and index + 1 <= active_task:
-                ud.command = 'silent_recharge'
+            elif item[0] == 'recharge' and not night and index  <= active_task:
+                print('RECHARGING')
+                ud.command = 'recharge'
                 ud.parameters['active_task'] = index
                 return True
-            elif index + 1 > active_task and not night:
+            elif index + 1 >= active_task and not night:
                 rospy.loginfo('New task has lower priority. Do nothing')
                 return False
             else:
@@ -92,7 +96,9 @@ def command_cb(msg, ud):
                 # if index == 7:
                 if item[0] == 'pickup':
                     i = item.index(input_ce)
-                    ud.command = item[i - 6]
+                    ud.command = item[i - 5]
+                    print('COMMAND')
+                    print(item[i-5])
                     pass
                 else:
                     ud.command = item[0]
@@ -145,6 +151,7 @@ class ResetActiveTask(State):
     def __init__(self):
         State.__init__(
             self,
+            input_keys=['parameters'],
             outcomes=['succeeded', 'preempted', 'aborted'])
 
     def execute(self, ud):
@@ -153,6 +160,7 @@ class ResetActiveTask(State):
             return 'preempted'
         print('ResetActiveTask')
         rospy.set_param('active_task', 100)
+        ud.parameters['active_task']  = 100
         return 'succeeded'
 
 
@@ -162,7 +170,7 @@ class Init(State):
     def __init__(self):
         State.__init__(
             self,
-            input_keys=['parameters', 'params'],
+            input_keys=['parameters', 'params', 'command', 'active_task'],
             output_keys=['parameters', 'params'],
             outcomes=['succeeded', 'preempted'])
         # load a few needed parameters from server
@@ -188,13 +196,14 @@ class SelectTask(State):
     def __init__(self):
         State.__init__(
             self,
-            input_keys=['command', 'params', 'active_task'],
+            input_keys=['command', 'params', 'active_task', 'parameters'],
             outcomes=['emergency',
                       'recharge',
                       'reminder',
                       'stop',
                       'call_hobbit',
                       'call',
+                      'away',
                       'clear_floor',
                       'pickup',
                       'follow',
@@ -215,7 +224,6 @@ class SelectTask(State):
             return 'preempted'
         print('Task Selection')
         print(ud.command)
-        print(ud.params)
         if ud.command == 'IDLE':
             return 'none'
         return ud.command
@@ -242,15 +250,25 @@ class FakeForAllWithoutRunningActionSever(State):
         return 'succeeded'
 
 
+def away_cb(ud, goal):
+    par = []
+    par.append(String('2'))
+    goal = GeneralHobbitGoal(command=String('away'),
+                             previous_state=String('call_hobbit'),
+                             parameters=par)
+    print goal
+    return goal
+
+
 def goto_cb(ud, goal):
     room, place = ud.params[0].value.lower().split(' ')
     par = []
     par.append(String(room))
     par.append(String(place))
     goal = GeneralHobbitGoal(command=String('goto'),
-                             previous_state=String(
-                                 ud.parameters['previous_task']),
-                             parameters=par)
+                             previous_state=String('previous_task'),
+                                 parameters=par)
+    print goal
     return goal
 
 
@@ -273,13 +291,14 @@ def main():
     )
 
     sm1 = StateMachine(
+        input_keys=['command', 'params', 'parameters', 'active_task'],
         outcomes=['succeeded',
                   'preempted',
                   'failed']
     )
     sm1.userdata.command = 'IDLE'
-    sm1.userdata.active_task = 'IDLE'
-    sm1.userdata.params = []
+    sm1.userdata.active_task = 'CALL'
+    # sm1.userdata.params = []
 
     sm2 = StateMachine(
         outcomes=['succeeded',
@@ -288,6 +307,13 @@ def main():
         input_keys=['command', 'params', 'active_task', 'parameters'],
         output_keys=['command', 'active_task', 'parameters', 'params']
     )
+    def cc_out_cb(outcome_map):
+        if outcome_map['Event_Listener'] == 'succeeded':
+            return 'succeeded'
+        elif outcome_map['Command_Listener'] == 'succeeded':
+            return 'succeeded'
+        else: 
+            return 'aborted'
 
     cc = Concurrence(
         outcomes=['succeeded', 'aborted', 'preempted'],
@@ -295,8 +321,9 @@ def main():
         input_keys=['command', 'active_task', 'params', 'parameters'],
         output_keys=['command', 'params', 'parameters'],
         child_termination_cb=child_cb,
-        outcome_map={'succeeded': {'Event_Listener': 'succeeded'},
-                     'aborted': {'Event_Listener': 'aborted'}}
+        outcome_cb=cc_out_cb,
+        # outcome_map={'succeeded': {'Event_Listener': 'succeeded'},
+        #             'aborted': {'Event_Listener': 'aborted'}}
     )
 
     cc1 = Concurrence(
@@ -316,8 +343,8 @@ def main():
                 '/Event',
                 Event,
                 msg_cb=command_cb,
-                input_keys=['parameters', 'params'],
-                output_keys=['command', 'params']
+                input_keys=['parameters', 'params', 'command', 'active_task'],
+                output_keys=['parameters', 'params', 'command', 'active_task']
             )
         )
         Concurrence.add(
@@ -326,8 +353,8 @@ def main():
                 '/Command',
                 Command,
                 msg_cb=command_cb,
-                input_keys=['parameters'],
-                output_keys=['command', 'params']
+                input_keys=['parameters', 'params', 'command', 'active_task'],
+                output_keys=['parameters', 'params', 'command', 'active_task']
             )
         )
 
@@ -366,8 +393,8 @@ def main():
         )
 
     with sm2:
-        sm2.userdata.room_name = 'dock'
-        sm2.userdata.location_name = 'dock'
+        # sm2.userdata.room_name = 'dock'
+        # sm2.userdata.location_name = 'dock'
         StateMachine.add(
             'SELECT_TASK',
             SelectTask(),
@@ -378,6 +405,7 @@ def main():
                          'call_hobbit': 'CALL_HOBBIT',
                          'call': 'CALL',
                          'clear_floor': 'CLEAR_FLOOR',
+                         'away': 'AWAY',
                          'pickup': 'PICKUP',
                          'follow': 'FOLLOW',
                          'learn_object': 'LEARN_OBJECT',
@@ -402,7 +430,7 @@ def main():
                 server_wait_timeout=rospy.Duration(10)
             ),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
-                         'aborted': 'failed'}
+                         'aborted': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'REMINDER',
@@ -415,7 +443,7 @@ def main():
                 server_wait_timeout=rospy.Duration(10)
             ),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
-                         'aborted': 'failed'}
+                         'aborted': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'EMERGENCY',
@@ -425,19 +453,19 @@ def main():
                               goal_cb=sos_cb,
                               input_keys=['parameters', 'params']),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
-                         'aborted': 'failed'}
+                         'aborted': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'CLEAR_FLOOR',
             FakeForAllWithoutRunningActionSever(name='CLEAR_FLOOR'),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
-                         'aborted': 'failed'}
+                         'aborted': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'PATROL',
             FakeForAllWithoutRunningActionSever(name='PATROL'),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
-                         'aborted': 'failed'}
+                         'aborted': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'GOTO',
@@ -447,68 +475,68 @@ def main():
                               goal_cb=goto_cb,
                               input_keys=['parameters', 'params']),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
-                         'aborted': 'failed'}
+                         'aborted': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'STOP',
             helper.get_hobbit_full_stop(),
             # FakeForAllWithoutRunningActionSever(name='STOP'),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
-                         'aborted': 'failed',
-                         'failed': 'failed'}
+                         # 'aborted': 'failed',
+                         'failed': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'CALL_HOBBIT',
             call_hobbit.call_hobbit(),
             # FakeForAllWithoutRunningActionSever(name='CALL_HOBBIT'),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
-                         'aborted': 'failed'}
+                         'aborted': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'PICKUP',
             FakeForAllWithoutRunningActionSever(name='PICKUP'),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
-                         'aborted': 'failed'}
+                         'aborted': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'CALL',
             FakeForAllWithoutRunningActionSever(name='CALL'),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
-                         'aborted': 'failed'}
+                         'aborted': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'SURPRISE',
             FakeForAllWithoutRunningActionSever(name='SURPRISE'),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
-                         'aborted': 'failed'}
+                         'aborted': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'FOLLOW',
             FakeForAllWithoutRunningActionSever(name='FOLLOW'),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
-                         'aborted': 'failed'}
+                         'aborted': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'REWARD',
-            HobbitEmotions.ShowEmotions(emotion='VERY_HAPPY',
+            HobbitEmotions.ShowEmotions(emotion='HAPPY',
                                                  emo_time=4),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
-                         'failed': 'failed'}
+                         'failed': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'BRING_OBJECT',
             FakeForAllWithoutRunningActionSever(name='BRING_OBJECT'),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
-                         'failed': 'failed',
-                         'aborted': 'failed'}
+                         'aborted': 'RESET_ACTIVE_TASK',
+                         'failed': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'RECHARGE',
             # FakeForAllWithoutRunningActionSever(name='RECHARGE'),
             recharge.getRecharge(),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
-                         'failed': 'failed',
-                         'aborted': 'failed',
+                         #'failed': 'failed',
+                         'aborted': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
@@ -516,19 +544,29 @@ def main():
             # FakeForAllWithoutRunningActionSever(name='SILENT_RECHARGE'),
             recharge.getRecharge(),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
-                         'aborted': 'failed'}
+                         'aborted': 'RESET_ACTIVE_TASK'}
+        )
+        StateMachine.add(
+            'AWAY',
+            # FakeForAllWithoutRunningActionSever(name='GOTO'),
+            SimpleActionState('away',
+                              GeneralHobbitAction,
+                              goal_cb=away_cb,
+                              input_keys=['parameters', 'params']),
+            transitions={'succeeded': 'RESET_ACTIVE_TASK',
+                         'aborted': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'SOCIAL_ROLE',
             FakeForAllWithoutRunningActionSever(name='SOCIAL_ROLE'),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
-                         'aborted': 'failed'}
+                         'aborted': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'RESET_ACTIVE_TASK',
             ResetActiveTask(),
             transitions={'succeeded': 'succeeded',
-                         'aborted': 'failed'}
+                         'aborted': 'RESET_ACTIVE_TASK'}
         )
 
     """
