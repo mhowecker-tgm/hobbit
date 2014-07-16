@@ -1,0 +1,175 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <fromto caption="Settings" transa="0">
+    <bgcolor caption="Background color" vtype="list" vprops="MistyRose|PapayaWhip|LightYellow|Honeydew|AliceBlue|Lavender|WhiteSmoke|LimeGreen" transa="1">$$$$$COLOR$$$$$</bgcolor>
+    <use_1 caption="Use 1" vtype="bool" transa="2">true</use_1>
+    <anruf_1 caption="Number 1" vtype="string" transa="3">$$$$$TELEPHONE1NUM$$$$$</anruf_1>
+    <dest_1 caption="Name 1" vtype="string" transa="4">$$$$$TELEPHONE1NAME$$$$$</dest_1>
+    <video_1 caption="Show Video 1" vtype="bool" transa="5">true</video_1>
+    <bild_1 caption="Picture 1" vtype="string" transa="6">Picture1</bild_1>
+    <use_2 caption="Use 2" vtype="bool" transa="7">true</use_2>
+    <anruf_2 caption="Number 2" vtype="string" transa="8">$$$$$TELEPHONE2NUM$$$$$</anruf_2>
+    <dest_2 caption="Name 2" vtype="string" transa="9">$$$$$TELEPHONE2NAME$$$$$</dest_2>
+    <video_2 caption="Show Video 2" vtype="bool" transa="10">true</video_2>
+    <bild_2 caption="Picture 2" vtype="string" transa="11">Picture2</bild_2>
+    <use_3 caption="Use 3" vtype="bool" transa="12">true</use_3>
+    <anruf_3 caption="Number 3" vtype="string" transa="13">$$$$$TELEPHONE3NUM$$$$$</anruf_3>
+    <dest_3 caption="Name 3" vtype="string" transa="14">$$$$$TELEPHONE3NAME$$$$$</dest_3>
+    <video_3 caption="Show Video 3" vtype="bool" transa="15">true</video_3>
+    <bild_3 caption="Picture 3" vtype="string" transa="16">Picture3</bild_3>
+    <use_4 caption="Use 4" vtype="bool" transa="17">true</use_4>
+    <anruf_4 caption="Number 4" vtype="string" transa="18">$$$$$TELEPHONE4NUM$$$$$</anruf_4>
+    <dest_4 caption="Name 4" vtype="string" transa="19">$$$$$TELEPHONE4NAME$$$$$</dest_4>
+    <video_4 caption="Show Video 4" vtype="bool" transa="20">true</video_4>
+    <bild_4 caption="Picture 4" vtype="string" transa="21">Picture4</bild_4>
+    <use_5 caption="Use 5" vtype="bool" transa="22">true</use_5>
+    <anruf_5 caption="Number 5" vtype="string" transa="23">$$$$$TELEPHONE5NUM$$$$$</anruf_5>
+    <dest_5 caption="Name 5" vtype="string" transa="24">$$$$$TELEPHONE5NAME$$$$$</dest_5>
+    <video_5 caption="Show Video 5" vtype="bool" transa="25">true</video_5>
+    <bild_5 caption="Picture 5" vtype="string" transa="26">Picture5</bild_5>
+    <use_6 caption="Use 6" vtype="bool" transa="27">true</use_6>
+    <anruf_6 caption="Number 6" vtype="string" transa="28">$$$$$TELEPHONE6NUM$$$$$</anruf_6>
+    <dest_6 caption="Name 6" vtype="string" transa="29">$$$$$TELEPHONE6NAME$$$$$</dest_6>
+    <video_6 caption="Show Video 6" vtype="bool" transa="30">true</video_6>
+    <bild_6 caption="Picture 6" vtype="string" transa="31">Picture6</bild_6>
+    <VoiceBox caption="Voice Box" vtype="string" transa="32">50000</VoiceBox>
+    <VoiceBoxVisible caption="Voice Box visible" vtype="bool" transa="33">true</VoiceBoxVisible>
+    <notruf caption="Emergency Number" vtype="string" transa="34">$$$$$EMERGENCYTEL$$$$$</notruf>
+    <VolVisible caption="Volume Control" vtype="bool" transa="35">true</VolVisible>
+    <browserf1 caption="Browser Favorit 1" vtype="string" transyes="true" transa="36" trans="75">http://www.bbc.co.uk/news/world/europe/</browserf1>
+    <bbild_1 caption="Browser Picture 1" vtype="string" transa="37">BBild1</bbild_1>
+    <browserf2 caption="Browser Favorit 2" vtype="string" transyes="true" transa="38" trans="76">http://europe.bbcentertainment.com/schedule/?utm_content=nav</browserf2>
+    <bbild_2 caption="Browser Picture 2" vtype="string" transa="39">BBild2</bbild_2>
+    <browserf3 caption="Browser Favorit 3" vtype="string" transyes="true" transa="40" trans="77">http://www.bbc.co.uk/weather/</browserf3>
+    <bbild_3 caption="Browser Picture 3" vtype="string" transa="41">BBild3</bbild_3>
+    <browserf4 caption="Browser Favorit 4" vtype="string" transyes="true" transa="42" trans="78">http://www.aat.tuwien.ac.at/index_en.html</browserf4>
+    <bbild_4 caption="Browser Picture 4" vtype="string" transa="43">BBild4</bbild_4>
+    <browserf5 caption="Browser Favorit 5" vtype="string" transyes="true" transa="44" trans="79">http://www.hobbit-project.eu/</browserf5>
+    <bbild_5 caption="Browser Picture 5" vtype="string" transa="45">BBild5</bbild_5>
+    <brightnesslownight caption="Brightness at night time [0..100]" vtype="num" transa="46">10</brightnesslownight>
+    <brightnesslowday caption="Brightness at day time [0..100]" vtype="num" transa="47">80</brightnesslowday>
+    <brightnesshigh caption="Full Brightness [0..100]" vtype="num" transa="48">100</brightnesshigh>
+    <gongsound caption="Gong filename [empty=default]" vtype="string" transa="49"/>
+    <gongenabled caption="Use gong sound" vtype="bool" transa="50">true</gongenabled>
+    <DiagWaitTime caption="Wait time between dialogues" vtype="num" transa="51">1000</DiagWaitTime>
+    <SurpriseVideo caption="Video file for the surprise video" type="string" transa="52">hobbit/surprise.mp4</SurpriseVideo>
+    <SurpriseSound caption="Sound file for the surprise music" type="string" transa="53">hobbit/surprise.mp3</SurpriseSound>
+    <SurpriseSoundText caption="Header of the music menu" vtype="string" transyes="true" transa="54" trans="80">This is music for you!</SurpriseSoundText>
+    <SurpriseTTS caption="Text of the surprise joke" vtype="string" transyes="true" transa="55" trans="81">Two things are infinite: The universe and the human stupidity; and I am not sure about the universe.</SurpriseTTS>
+    <robotadvanced caption="Show advanced robot commands" vtype="bool" transa="84">true</robotadvanced>
+    <TestMessage1 caption="Message for Dialog with F2" vtype="string" transa="85">This is a short message</TestMessage1>
+    <TestMessage2 caption="Message for Dialog with F3" vtype="string" transa="86">This is a little bit longer Message. Just try to keep it short.</TestMessage2>
+    <Radio1 caption="Name of the first Radio station" vtype="string" transa="87" transyes="true" trans="98">Ö1</Radio1>
+    <Radio1URL caption="URL of the first Radio station" vtype="string" transa="97">mms://apasf.apa.at/oe1_live_worldwide</Radio1URL>
+    <Radio2 caption="Name of the second Radio station" vtype="string" transa="89" transyes="true" trans="99">Radio Wien</Radio2>
+    <Radio2URL caption="URL of the second Radio station" vtype="string" transa="90" transyes="true" trans="100">mms://apasf.apa.at/radio_wien_worldwide</Radio2URL>
+    <Music1 caption="Name of the first Music list" vtype="string" transa="91" transyes="true" trans="101">Classic</Music1>
+    <Music1URL caption="URL of the first Music list" vtype="string" transa="92" transyes="true" trans="102">media\classic.m3u</Music1URL>
+    <Music2 caption="Name of the second Music list" vtype="string" transa="93" transyes="true" trans="103">Folk</Music2>
+    <Music2URL caption="URL of the second Music list" vtype="string" transa="94" transyes="true" trans="104">media\folk.m3u</Music2URL>
+  </fromto>
+  <user_profile>
+    <screen>
+      <kioskmode vtype="bool">false</kioskmode>
+      <hidecursor vtype="bool">false</hidecursor>
+      <cmdlog>false</cmdlog>
+    </screen>
+    <driversettings>
+      <driver name="SAPI5">
+        <voice caption="SAPI Voice (part strings are enough)" vtype="string" transyes="true" transa="56" trans="82">$$$$$VOICE$$$$$</voice>
+        <voicematch>false</voicematch>
+      </driver>
+    </driversettings>
+    <internaldriversettings>
+      <driver name="skype">
+        <active vtype="bool">false</active>
+      </driver>
+      <driver name="socialnet">
+        <active vtype="bool">true</active>
+        <usefacebook vtype="bool">true</usefacebook>
+        <usetwitter vtype="bool">true</usetwitter>
+      </driver>
+      <driver name="picture">
+        <active vtype="bool">true</active>
+        <usepicasa vtype="bool">true</usepicasa>
+        <picasauser vtype="string" caption="Google-IDs to watch pictures from, separated by the | character" transyes="true" transa="95" trans="96">aatwien@gmail.com</picasauser>
+        <useinstagram vtype="bool">false</useinstagram>
+        <showowninstagram vtype="bool">false</showowninstagram>
+        <useflickr vtype="bool">false</useflickr>
+        <showownflickr vtype="bool">false</showownflickr>
+        <usefacebook vtype="bool">false</usefacebook>
+        <showownfacebook vtype="bool">false</showownfacebook>
+      </driver>
+      <driver name="sip">
+        <active vtype="bool">false</active>
+        <sipserver vtype="string">free3.voipgateway.org</sipserver>
+        <sipid vtype="string">43720513657</sipid>
+        <sippass vtype="string">rsln1ubc</sippass>
+        <displayname vtype="string">LUI Test</displayname>
+        <localport vtype="num">10000</localport>
+        <toport vtype="num">11000</toport>
+        <aec vtype="bool" caption="Automatic Echo Control" transa="57">true</aec>
+        <agc vtype="bool" caption="Automatic Gain Control" transa="58">true</agc>
+        <cng vtype="bool" caption="Comfort Noise Generator" transa="59">false</cng>
+        <ans vtype="bool" caption="Automatic Noise Control" transa="60">true</ans>
+        <audioindeviceindex vtype="num">-1</audioindeviceindex>
+        <audiooutdeviceindex vtype="num">-1</audiooutdeviceindex>
+        <videoindeviceindex vtype="num" caption="videoindeviceindex (5000 = no device)" transa="61">0</videoindeviceindex>
+        <videosize vtype="list" vprops="qcif|cif|qvga|vga|svga|xvga">qvga</videosize>
+        <videocodecs>H264</videocodecs>
+        <audiocodecs>G722|PCMA|G729|GSM</audiocodecs>
+        <delayvideo vtype="num">1000</delayvideo>
+        <showlocalvideo vtype="bool">false</showlocalvideo>
+        <failurebusy vtype="bool">true</failurebusy>
+        <autovideo vtype="bool">true</autovideo>
+        <autoanswer vtype="bool">false</autoanswer>
+        <noserver vtype="bool">false</noserver>
+        <localip vtype="string">#0</localip>
+        <timeout vtype="num">7000</timeout>
+      </driver>
+      <driver name="weather">
+        <active vtype="bool">true</active>
+        <city vtype="string">$$$$$CITY$$$$$</city>
+        <locale vtype="list" vprops="en|de|el|sv">en</locale>
+      </driver>
+      <driver name="chain">
+        <chain id="emergencycall">
+          <arguments caption="list of telefon numbers, separated by |" vtype="string" transa="62">50000|10005</arguments>
+          <repeattime caption="time until the next number is dialed [ms]" vtype="num" transa="63">20000</repeattime>
+          <repeats caption="number of repetitions of all numbers" vtype="num" transa="64">3</repeats>
+        </chain>
+      </driver>
+    </internaldriversettings>
+    <input>
+      <general>
+        <autopause caption="Time to screensaver (in sec)" vtype="num" transa="65">86400</autopause>
+      </general>
+    </input>
+  </user_profile>
+  <objectlist>
+    <object id="O_Browser" caption="Browser" transa="66">
+      <browser>
+        <starturl vtype="string" transyes="true" trans="83">http://www.aat.tuwien.ac.at/hobbit/index_en.html</starturl>
+        <textzoom caption="Textzoom [0..4, 2=normal]" vtype="list" vprops="0|1|2|3|4" transa="67">3</textzoom>
+        <zoom vtype="num" caption="Zoom in % [10..1000]" transa="68">100</zoom>
+        <lasturl/>
+      </browser>
+    </object>
+    <object id="O_Clock" caption="Screensaver Clock" transa="69">
+      <custom type="intdriver">
+        <drawsecond vtype="bool" caption="Second arm" transa="70">true</drawsecond>
+      </custom>
+    </object>
+    <object id="O_ClockButton" caption="Button Clock" transa="71">
+      <custom type="intdriver">
+        <drawsecond vtype="bool" caption="Second arm" transa="72">false</drawsecond>
+      </custom>
+    </object>
+    <object id="O_Hourglass" caption="Waitscreen between Dialogues" transa="73">
+      <visible vtype="bool" caption="Show hourglass" transa="74">false</visible>
+    </object>
+  </objectlist>
+  <translation>
+    <language>en</language>
+  </translation>
+</configuration>
