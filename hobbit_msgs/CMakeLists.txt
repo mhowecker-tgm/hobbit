@@ -21,6 +21,7 @@ add_message_files(
   FILES
   Command.msg
   Event.msg
+  Fitness.msg
   Object.msg
   ObjectLocation.msg
   ObjectLocationVector.msg
