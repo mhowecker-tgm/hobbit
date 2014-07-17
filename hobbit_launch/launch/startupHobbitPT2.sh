@@ -82,7 +82,14 @@ rosrun hobbit_smach goto.py&
 rosrun hobbit_smach emergency_user.py&
 rosrun hobbit_smach battery_monitor.py&
 rosrun hobbit_smach recharge&
-rosrun hobbit_smach sos_monitor.py
+rosrun hobbit_smach sos_monitor.py&
+
+# Start places_interpretation
+cd /opt/ros/hobbit_hydro/src/places_interpretation/launch
+roslaunch startup.launch&
+# Start get room stuff needed for mmui
+cd /opt/ros/hobbit_hydro/src/get_current_room/launch
+roslaunch startup.launch&
 
 # Start interfaces_mira, which starts the platform driver and the ros-mira interface for virtual lasers
 cd /opt/ros/hobbit_hydro/src/interfaces_mira/launch
