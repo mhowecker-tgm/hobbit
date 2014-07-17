@@ -18,6 +18,22 @@ import hobbit_smach.call_hobbit_import as call_hobbit
 import uashh_smach.util as util
 from hobbit_user_interaction import HobbitEmotions
 
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+def disable(self):
+        self.HEADER = ''
+        self.OKBLUE = ''
+        self.OKGREEN = ''
+        self.WARNING = ''
+        self.FAIL = ''
+        self.ENDC = ''
+
 commands = [['emergency', 'G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP', 'G_HELP', 'A_HELP','C_HELP', 'F_CALLSOS', 'G_EMERGENCY'],
             ['recharge', 'E_RECHARGE', 'C_RECHARGE'],
             ['reminder', 'E_REMINDER'],
@@ -90,9 +106,15 @@ def command_cb(msg, ud):
                 return True
             elif index + 1 >= active_task and not night:
                 rospy.loginfo('New task has lower priority. Do nothing')
+                print(bcolors.OKGREEN +
+                      'New task has lower priority. Do nothing' +
+                      bcolors.ENDC)
                 return False
             else:
                 rospy.loginfo('New task has higher priority. Start it.')
+                print(bcolors.OKGREEN +
+                      'New task has higher priority. Start it.' +
+                      bcolors.ENDC)
                 # if index == 7:
                 if item[0] == 'pickup':
                     i = item.index(input_ce)

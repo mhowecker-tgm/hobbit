@@ -237,6 +237,7 @@ def getCoordinates(req):
             pose = Pose2D(float(k.x), float(k.y), float(k.theta))
             print(pose)
             return pose
+    return (Pose2D(float(0.0), float(0.0), float(0.0)))
 
 def getAllRooms(req):
     """
