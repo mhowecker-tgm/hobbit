@@ -278,11 +278,13 @@ def goToPosition(frame='/map', room='None', place='dock'):
         )
         Sequence.add(
             'MMUI_SAY_ReachedPlace',
-            speech_output.sayText(info='T_GT_ReachedMyDestination')
+            speech_output.sayText(info='T_GT_ReachedMyDestination'),
+            transitions={'failed': 'aborted'}
         )
         Sequence.add(
-            'SHOW_MENU_MAIN_1',
-            HobbitMMUI.ShowMenu(menu='MAIN')
+            'SHOW_MENU_MAIN',
+            HobbitMMUI.ShowMenu(menu='MAIN'),
+            transitions={'failed': 'aborted'}
         )
     return seq
 
@@ -335,11 +337,13 @@ def goToPose():
         )
         Sequence.add(
             'MMUI_SAY_ReachedPlace',
-            speech_output.sayText(info='T_GT_ReachedMyDestination')
+            speech_output.sayText(info='T_GT_ReachedMyDestination'),
+            transitions={'failed': 'aborted'}
         )
         Sequence.add(
-            'SHOW_MENU_MAIN_1',
-            HobbitMMUI.ShowMenu(menu='MAIN')
+            'SHOW_MENU_MAIN',
+            HobbitMMUI.ShowMenu(menu='MAIN'),
+            transitions={'failed': 'aborted'}
         )
     return seq
 

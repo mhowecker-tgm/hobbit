@@ -399,20 +399,48 @@ class DavidLookingPose(State):
         p.point.y = self.pointingDirCCS[1]
         p.point.z = self.pointingDirCCS[2]
         pspWCS = self.listener.transformPoint('/map', p) #pspWCS: PointingStartPoint of the pointing gesture, i.e. the position of the shoulder in WCS (world coordinate system)
-        #print "shoulder coordinates in world coordinate system: ", pspWCS
+        print "shoulder coordinates in world coordinate system: ", pspWCS
         #calculate pointing vector in world coordinate system
         target_frame = "/map"
         pvecWCS = (0,0,0)
         while True:
             try:
                 t = rospy.Time(0)
+                ##point_cloud.header.stamp = t
+                #(trans,rot) = self.listener.lookupTransform('/headcam_rgb_optical_frame', target_frame, rospy.Time(0))
+		#print "rot1: ", rot
+                #rot = quaternion_matrix(rot)[0:3,0:3]
+		#print "rot quat 0:3: ", rot
+                #pvec = (self.pointingDirCCS[3],self.pointingDirCCS[4],self.pointingDirCCS[5])
+		#pvec = (pvec[0]/numpy.linalg.norm(pvec),pvec[1]/numpy.linalg.norm(pvec),pvec[2]/numpy.linalg.norm(pvec))  #normalize
+                #print "======================================================="
+		#print "pvec (CCS, normalized): ", pvec # (CCS)
+		##print "roation matrix: ", rot                
+		##pvecWCS = numpy.dot(rot,pvec)
+		##pvecWCS = rot*pvec                
+		#pvecWCS = numpy.dot(rot,pvec)
+		#print "Pointing Vector in WCS: ", pvecWCS
+
                 #point_cloud.header.stamp = t
                 (trans,rot) = self.listener.lookupTransform('/headcam_rgb_optical_frame', target_frame, rospy.Time(0))
-                rot = quaternion_matrix(rot)[0:3,0:3]
+		#print "rot1: ", rot
+                ##rot = quaternion_matrix(rot)[0:3,0:3]
+		rot = quaternion_matrix(rot)
+		rot[0:3,0:3] = numpy.linalg.inv(rot[0:3,0:3])
+		#print "trans: ", trans
+		rot[0:3,3]=trans
+		print "rot quat plus trans", rot
                 pvec = (self.pointingDirCCS[3],self.pointingDirCCS[4],self.pointingDirCCS[5])
-                #print "pvec: ", pvec (CCS)
-                pvecWCS = numpy.dot(pvec,rot)
-                #print "Pointing Vector in RCS: ", pvecWCS
+		pvec = (pvec[0]/numpy.linalg.norm(pvec),pvec[1]/numpy.linalg.norm(pvec),pvec[2]/numpy.linalg.norm(pvec))  #normalize
+                print "======================================================="
+		print "pvec (CCS, normalized): ", pvec # (CCS)
+		print "roation matrix: ", rot  
+		
+		pvec_hom = (pvec[0],pvec[1],pvec[2],1)  
+		#rot = numpy.linalg.inv(rot)            
+		pvecWCS = numpy.dot(rot,pvec_hom)[0:3]
+		print "Pointing Vector in WCS: ", pvecWCS
+
 
                 break
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
@@ -424,7 +452,7 @@ class DavidLookingPose(State):
 	(robot_x, robot_y, robot_yaw) = util.get_current_robot_position(frame='/map')
         posRobot = [robot_x, robot_y] #Bajo, please fill in
         gpOnFloor = self.calcIntersectionPointingDirWithFloor(pspWCS, pvecWCS)
-        print "X:  ", gpOnFloor[0], "   Y:  ", gpOnFloor[1], "   Z:  ", gpOnFloor[2]
+        print "grasp point on floor: X:  ", gpOnFloor[0], "   Y:  ", gpOnFloor[1], "   Z:  ", gpOnFloor[2]
         robotApproachDir = [gpOnFloor[0] - posRobot[0], gpOnFloor[1] - posRobot[1]]
         robotApproachDir = [robotApproachDir[0]/numpy.linalg.norm(robotApproachDir), robotApproachDir[1]/numpy.linalg.norm(robotApproachDir)]       #normalized
 

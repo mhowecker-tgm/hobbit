@@ -202,25 +202,25 @@ def get_call_sos():
         )
         Sequence.add(
             'CALL_DECISION',
-            HobbitMMUI.CallDecison(),
-            transitions={'stop': 'END_CALL',
-                         'ended': 'failed',
-                         'established': 'CHECK_CALL_STATE_2',
-                         'succeeded': 'CHECK_CALL_ENDED'}
-        )
-        Sequence.add(
-            'CHECK_CALL_STATE_2',
-            HobbitMMUI.WaitforConfirmedCall(
-                '/Event', Event, output_keys=['call_state']),
-            transitions={'aborted': 'CHECK_CALL_STATE_2'}
-        )
-        Sequence.add(
-            'CALL_DECISION_2',
-            HobbitMMUI.CallDecison(),
-            transitions={'stop': 'END_CALL',
-                         'ended': 'failed',
-                         'confirmed': 'CHECK_CALL_ENDED',
-                         'succeeded': 'CHECK_CALL_ENDED'}
+            HobbitMMUI.CallDecision(),
+            transitions={'stop': 'END_CALL'}
+        #                 'ended': 'failed',
+        #                 'established': 'CHECK_CALL_STATE_2',
+        #                 'succeeded': 'CHECK_CALL_ENDED'}
+        #)
+        #Sequence.add(
+        #    'CHECK_CALL_STATE_2',
+        #    HobbitMMUI.WaitforConfirmedCall(
+        #        '/Event', Event, output_keys=['call_state']),
+        #    transitions={'aborted': 'CHECK_CALL_STATE_2'}
+        #)
+        #Sequence.add(
+        #    'CALL_DECISION_2',
+        #    HobbitMMUI.CallDecision(),
+        #    transitions={'stop': 'END_CALL',
+        #                 'ended': 'failed',
+        #                 'confirmed': 'CHECK_CALL_ENDED',
+        #                 'succeeded': 'CHECK_CALL_ENDED'}
         )
         Sequence.add(
             'CHECK_CALL_ENDED',
@@ -269,7 +269,7 @@ def get_call_sos():
         StateMachine.add(
             'SAY_T_HM_IWillCallFirstPersonInList',
             #HobbitMMUI.ShowInfo(info='IWillCallFirstPersonInList'),
-            speech_output.sayText(info='IWillCallFirstPersonInList'),
+            speech_output.sayText(info='T_HM_IWillCallFirstPersonInList'),
             transitions={'succeeded': 'SEQ',
                          'failed': 'SEQ',
                          'preempted': 'preempted'}
@@ -277,7 +277,7 @@ def get_call_sos():
         StateMachine.add(
             'SAY_T_HM_IWillCallSecondPersonInList',
             #HobbitMMUI.ShowInfo(info='IWillCallSecondPersonInList'),
-            speech_output.sayText(info='IWillCallSecondPersonInList'),
+            speech_output.sayText(info='T_HM_IWillCallSecondPersonInList'),
             transitions={'succeeded': 'SEQ',
                          'failed': 'SEQ',
                          'preempted': 'preempted'}
@@ -285,7 +285,7 @@ def get_call_sos():
         StateMachine.add(
             'SAY_T_HM_IWillCallThirdPersonInList',
             #HobbitMMUI.ShowInfo(info='IWillCallThirdPersonInList'),
-            speech_output.sayText(info='IWillCallThirdPersonInList'),
+            speech_output.sayText(info='T_HM_IWillCallThirdPersonInList'),
             transitions={'succeeded': 'SEQ',
                          'failed': 'SEQ',
                          'preempted': 'preempted'}
@@ -293,7 +293,7 @@ def get_call_sos():
         StateMachine.add(
             'SAY_T_HM_NoAnswersIWillCallFirstPersonAgain',
             #HobbitMMUI.ShowInfo(info='NoAnswersIWillCallFirstPersonAgain'),
-            speech_output.sayText(info='NoAnswersIWillCallFirstPersonAgain'),
+            speech_output.sayText(info='T_HM_NoAnswersIWillCallFirstPersonAgain'),
             transitions={'succeeded': 'SEQ',
                          'failed': 'SEQ',
                          'preempted': 'preempted'}
