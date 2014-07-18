@@ -57,7 +57,7 @@ class CallDecison(smach.State):
         smach.State.__init__(
             self,
             input_keys=['call_state'],
-            outcomes=['succeeded', 'failed', 'preempted',
+            outcomes=['succeeded', 'failed', 'preempted', \
                       'stop', 'ended', 'established', 'confirmed']
         )
 
