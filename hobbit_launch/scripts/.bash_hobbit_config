@@ -2,7 +2,7 @@
 alias sshpi='ssh -X pi@192.168.2.199'
 
 #update (=>copy) files on robot head (pi)
-alias updateHead="source /opt/ros/hobbit_hydro/src/hobbit_launch/launch/HeadScripts/updateHead.sh"
+#alias updateHead="source /opt/ros/hobbit_hydro/src/hobbit_launch/launch/HeadScripts/updateHead.sh"
 
 #short cut for changing .bashrc 
 alias dfb="sudo gedit ~/.bashrc"
@@ -17,9 +17,10 @@ alias call4="rostopic pub -1 /Event hobbit_msgs/Event '{header: auto, event: E_C
 alias callb="rostopic pub -1 /Event hobbit_msgs/Event '{header: auto, event: E_CALLHOBBIT, confidence: 0.8, params: [{name: 'place', value: 'CALLb'}, {name: sensor, value: 'CALLb'}]}'"
 
 # trigger pointing gesture
-alias pntges="rostopic pub /pointEvents rgbd_acquisition/PointEvents '{x: 600, y: 600.0, z: 1400.0, vectorX: 8.0, vectorY: 200.0, vectorZ: -100.0, leftHand: 1, rightHand: 0,
-  timestamp: 0}' -1"
+alias pntges="rostopic pub /pointEvents rgbd_acquisition/PointEvents '{x: 0, y: 0, z: 2, vectorX: 0, vectorY: 1, vectorZ: 0, leftHand: 1, rightHand: 0,  timestamp: 0}' -1"
 
 # create and show visualization of tf-frames
 alias tfc="rosrun tf2_tools view_frames.py"
 alias tfs="gnome-open frames.pdf"
+
+#/etc/init.d/chrony start
