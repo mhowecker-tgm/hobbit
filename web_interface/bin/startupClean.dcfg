@@ -1,40 +1,40 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <configuration>
   <fromto caption="Settings" transa="0">
-    <bgcolor caption="Background color" vtype="list" vprops="MistyRose|PapayaWhip|LightYellow|Honeydew|AliceBlue|Lavender|WhiteSmoke|LimeGreen" transa="1">$$$$$COLOR$$$$$</bgcolor>
+    <bgcolor caption="Background color" vtype="list" vprops="MistyRose|PapayaWhip|LightYellow|Honeydew|AliceBlue|Lavender|WhiteSmoke|LimeGreen" transa="1">XXXXXCOLORXXXXX</bgcolor>
     <use_1 caption="Use 1" vtype="bool" transa="2">true</use_1>
-    <anruf_1 caption="Number 1" vtype="string" transa="3">$$$$$TELEPHONE1NUM$$$$$</anruf_1>
-    <dest_1 caption="Name 1" vtype="string" transa="4">$$$$$TELEPHONE1NAME$$$$$</dest_1>
+    <anruf_1 caption="Number 1" vtype="string" transa="3">XXXXXTELEPHONE1NUMXXXXX</anruf_1>
+    <dest_1 caption="Name 1" vtype="string" transa="4">XXXXXTELEPHONE1NAMEXXXXX</dest_1>
     <video_1 caption="Show Video 1" vtype="bool" transa="5">true</video_1>
     <bild_1 caption="Picture 1" vtype="string" transa="6">Picture1</bild_1>
     <use_2 caption="Use 2" vtype="bool" transa="7">true</use_2>
-    <anruf_2 caption="Number 2" vtype="string" transa="8">$$$$$TELEPHONE2NUM$$$$$</anruf_2>
-    <dest_2 caption="Name 2" vtype="string" transa="9">$$$$$TELEPHONE2NAME$$$$$</dest_2>
+    <anruf_2 caption="Number 2" vtype="string" transa="8">XXXXXTELEPHONE2NUMXXXXX</anruf_2>
+    <dest_2 caption="Name 2" vtype="string" transa="9">XXXXXTELEPHONE2NAMEXXXXX</dest_2>
     <video_2 caption="Show Video 2" vtype="bool" transa="10">true</video_2>
     <bild_2 caption="Picture 2" vtype="string" transa="11">Picture2</bild_2>
     <use_3 caption="Use 3" vtype="bool" transa="12">true</use_3>
-    <anruf_3 caption="Number 3" vtype="string" transa="13">$$$$$TELEPHONE3NUM$$$$$</anruf_3>
-    <dest_3 caption="Name 3" vtype="string" transa="14">$$$$$TELEPHONE3NAME$$$$$</dest_3>
+    <anruf_3 caption="Number 3" vtype="string" transa="13">XXXXXTELEPHONE3NUMXXXXX</anruf_3>
+    <dest_3 caption="Name 3" vtype="string" transa="14">XXXXXTELEPHONE3NAMEXXXXX</dest_3>
     <video_3 caption="Show Video 3" vtype="bool" transa="15">true</video_3>
     <bild_3 caption="Picture 3" vtype="string" transa="16">Picture3</bild_3>
     <use_4 caption="Use 4" vtype="bool" transa="17">true</use_4>
-    <anruf_4 caption="Number 4" vtype="string" transa="18">$$$$$TELEPHONE4NUM$$$$$</anruf_4>
-    <dest_4 caption="Name 4" vtype="string" transa="19">$$$$$TELEPHONE4NAME$$$$$</dest_4>
+    <anruf_4 caption="Number 4" vtype="string" transa="18">XXXXXTELEPHONE4NUMXXXXX</anruf_4>
+    <dest_4 caption="Name 4" vtype="string" transa="19">XXXXXTELEPHONE4NAMEXXXXX</dest_4>
     <video_4 caption="Show Video 4" vtype="bool" transa="20">true</video_4>
     <bild_4 caption="Picture 4" vtype="string" transa="21">Picture4</bild_4>
     <use_5 caption="Use 5" vtype="bool" transa="22">true</use_5>
-    <anruf_5 caption="Number 5" vtype="string" transa="23">$$$$$TELEPHONE5NUM$$$$$</anruf_5>
-    <dest_5 caption="Name 5" vtype="string" transa="24">$$$$$TELEPHONE5NAME$$$$$</dest_5>
+    <anruf_5 caption="Number 5" vtype="string" transa="23">XXXXXTELEPHONE5NUMXXXXX</anruf_5>
+    <dest_5 caption="Name 5" vtype="string" transa="24">XXXXXTELEPHONE5NAMEXXXXX</dest_5>
     <video_5 caption="Show Video 5" vtype="bool" transa="25">true</video_5>
     <bild_5 caption="Picture 5" vtype="string" transa="26">Picture5</bild_5>
     <use_6 caption="Use 6" vtype="bool" transa="27">true</use_6>
-    <anruf_6 caption="Number 6" vtype="string" transa="28">$$$$$TELEPHONE6NUM$$$$$</anruf_6>
-    <dest_6 caption="Name 6" vtype="string" transa="29">$$$$$TELEPHONE6NAME$$$$$</dest_6>
+    <anruf_6 caption="Number 6" vtype="string" transa="28">XXXXXTELEPHONE6NUMXXXXX</anruf_6>
+    <dest_6 caption="Name 6" vtype="string" transa="29">XXXXXTELEPHONE6NAMEXXXXX</dest_6>
     <video_6 caption="Show Video 6" vtype="bool" transa="30">true</video_6>
     <bild_6 caption="Picture 6" vtype="string" transa="31">Picture6</bild_6>
     <VoiceBox caption="Voice Box" vtype="string" transa="32">50000</VoiceBox>
     <VoiceBoxVisible caption="Voice Box visible" vtype="bool" transa="33">true</VoiceBoxVisible>
-    <notruf caption="Emergency Number" vtype="string" transa="34">$$$$$EMERGENCYTEL$$$$$</notruf>
+    <notruf caption="Emergency Number" vtype="string" transa="34">XXXXXEMERGENCYTELXXXXX</notruf>
     <VolVisible caption="Volume Control" vtype="bool" transa="35">true</VolVisible>
     <browserf1 caption="Browser Favorit 1" vtype="string" transyes="true" transa="36" trans="75">http://www.bbc.co.uk/news/world/europe/</browserf1>
     <bbild_1 caption="Browser Picture 1" vtype="string" transa="37">BBild1</bbild_1>
@@ -76,7 +76,7 @@
     </screen>
     <driversettings>
       <driver name="SAPI5">
-        <voice caption="SAPI Voice (part strings are enough)" vtype="string" transyes="true" transa="56" trans="82">$$$$$VOICE$$$$$</voice>
+        <voice caption="SAPI Voice (part strings are enough)" vtype="string" transyes="true" transa="56" trans="82">XXXXXVOICEXXXXX</voice>
         <voicematch>false</voicematch>
       </driver>
     </driversettings>
@@ -129,7 +129,7 @@
       </driver>
       <driver name="weather">
         <active vtype="bool">true</active>
-        <city vtype="string">$$$$$CITY$$$$$</city>
+        <city vtype="string">XXXXXCITYXXXXX</city>
         <locale vtype="list" vprops="en|de|el|sv">en</locale>
       </driver>
       <driver name="chain">
