@@ -63,9 +63,10 @@ ros::NodeHandle * nhPtr=0;
 #define DEFAULT_BINDING_PORT 8080  // <--- Change this to 80 if you want to bind to the default http port..!
 #define MAX_COMMAND_SIZE 2048
 
-//char webserver_root[MAX_FILE_PATH]="ammar.gr/"; //<- This is my dev dir.. itshould be commented out or removed in stable release..
-char webserver_root[MAX_FILE_PATH]="./"; // <- change this to the directory that contains your content if you dont want to use the default public_html dir..
-char templates_root[MAX_FILE_PATH]="./";
+
+#define WEBROOT "./"
+char webserver_root[MAX_FILE_PATH]=WEBROOT; // <- change this to the directory that contains your content if you dont want to use the default public_html dir..
+char templates_root[MAX_FILE_PATH]=WEBROOT;
 
 unsigned int stopWebInterface=0;
 char * page=0;
@@ -561,27 +562,27 @@ void * store_new_configuration_callback(struct AmmServer_DynamicRequest  * rqst)
             char * commandToRun = (char*) malloc(MAX_COMMAND_SIZE * sizeof(char));
             if (commandToRun!=0)
             {
-              if ( _GET(default_server,rqst,(char*)"LuiBackgroundSelector",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/$$$$$COLOR$$$$$/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
-              if ( _GET(default_server,rqst,(char*)"city",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/$$$$$CITY$$$$$/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
-              if ( _GET(default_server,rqst,(char*)"voice",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/$$$$$VOICE$$$$$/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
-              if ( _GET(default_server,rqst,(char*)"emergencyContactTel1",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/$$$$$EMERGENCYTEL$$$$$/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
-              if ( _GET(default_server,rqst,(char*)"contactTel1",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/$$$$$TELEPHONE1NUM$$$$$/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
-              if ( _GET(default_server,rqst,(char*)"contactName1",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/$$$$$TELEPHONE1NAME$$$$$/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"LuiBackgroundSelector",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/XXXXXCOLORXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"city",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/XXXXXCITYXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"voice",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/XXXXXVOICEXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"emergencyContactTel1",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/XXXXXEMERGENCYTELXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"contactTel1",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/XXXXXTELEPHONE1NUMXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"contactName1",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/XXXXXTELEPHONE1NAMEXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
 
-              if ( _GET(default_server,rqst,(char*)"contactTel2",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/$$$$$TELEPHONE2NUM$$$$$/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
-              if ( _GET(default_server,rqst,(char*)"contactName2",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/$$$$$TELEPHONE2NAME$$$$$/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"contactTel2",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/XXXXXTELEPHONE2NUMXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"contactName2",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/XXXXXTELEPHONE2NAMEXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
 
-              if ( _GET(default_server,rqst,(char*)"contactTel3",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/$$$$$TELEPHONE3NUM$$$$$/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
-              if ( _GET(default_server,rqst,(char*)"contactName3",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/$$$$$TELEPHONE3NAME$$$$$/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"contactTel3",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/XXXXXTELEPHONE3NUMXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"contactName3",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/XXXXXTELEPHONE3NAMEXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
 
-              if ( _GET(default_server,rqst,(char*)"contactTel4",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/$$$$$TELEPHONE4NUM$$$$$/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
-              if ( _GET(default_server,rqst,(char*)"contactName4",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/$$$$$TELEPHONE4NAME$$$$$/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"contactTel4",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/XXXXXTELEPHONE4NUMXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"contactName4",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/XXXXXTELEPHONE4NAMEXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
 
-              if ( _GET(default_server,rqst,(char*)"contactTel5",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/$$$$$TELEPHONE5NUM$$$$$/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
-              if ( _GET(default_server,rqst,(char*)"contactName5",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/$$$$$TELEPHONE5NAME$$$$$/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"contactTel5",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/XXXXXTELEPHONE5NUMXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"contactName5",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/XXXXXTELEPHONE5NAMEXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
 
-              if ( _GET(default_server,rqst,(char*)"contactTel6",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/$$$$$TELEPHONE6NUM$$$$$/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
-              if ( _GET(default_server,rqst,(char*)"contactName6",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/$$$$$TELEPHONE6NAME$$$$$/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"contactTel6",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/XXXXXTELEPHONE6NUMXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"contactName6",bufferCommand,256) )  {  sprintf(commandToRun,"sed -i 's/XXXXXTELEPHONE6NAMEXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
 
               free(commandToRun);
             }
@@ -674,6 +675,11 @@ int init_dynamic_content()
   if (! AmmServer_AddResourceHandler(default_server,&form,(char*)"/controlpanel.html",webserver_root,pageLength+1,0,(void* ) &prepare_form_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) )
                { AmmServer_Error("Failed adding control page\n"); }
   AmmServer_DoNOTCacheResourceHandler(default_server,&form);
+
+  //startup.dcfg / startupClean.dcfg  should always be served fresh
+  AmmServer_DoNOTCacheResource(default_server,WEBROOT "startup.dcfg");
+  AmmServer_DoNOTCacheResource(default_server,WEBROOT "startupClean.dcfg");
+
 
   if (! AmmServer_AddResourceHandler(default_server,&indexPage,(char*)"/index.html",webserver_root,4096,0,(void*) &prepare_index_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) )
               { AmmServer_Error("Failed adding index page\n"); }
