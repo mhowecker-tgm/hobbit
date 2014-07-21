@@ -597,8 +597,9 @@ void * store_new_configuration_callback(struct AmmServer_DynamicRequest  * rqst)
 
 if (successfullStore)
      {
-         strcpy(rqst->content,"<html><head><meta http-equiv=\"refresh\" content=\"3; url=controlpanel.html\" /></head>\
-                  <body><center><br><br><br><h1>Settings stored..</h1><br><br><h3><a href=\"controlpanel.html\">You are beeing redirected to control panel</a></h3></body></html> ");
+         strcpy(rqst->content,"<html><head><meta http-equiv=\"refresh\" content=\"15; url=controlpanel.html\" /></head>\
+                  <body><center><br><br><br><h1>Settings stored , dcfg file is ready..</h1><br><br><h3><a href=\"controlpanel.html\">You are beeing redirected to control panel</a><br>\
+                   <a href=\"startup.dcfg\">Right click here and save as to download dcfg file</a></h3></body></html> ");
      } else
      {
          strcpy(rqst->content,"<html><body><center><br><br><br><h1>FAILED to store settings :( </h1><br><br><h3><a href=\"#\" onclick=\"javascript:window.history.go(-1)\">Click here to go back</a></h3></body></html> ");
