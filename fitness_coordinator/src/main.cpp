@@ -37,6 +37,8 @@ ros::Publisher gestureEventBroadcaster;
 
 #define NODE_NAME "fitness_coordinator"
 #define SKELETON_PREFIX "SK_"
+#define MAX_CMD_STR 1024
+#define MAX_NUM_STR 128
 
 #define DEFAULT_FRAME_RATE 1
 
@@ -97,16 +99,7 @@ struct skeletonHuman
 {
   unsigned int observationNumber , observationTotal;
   unsigned int userID;
-
-  unsigned char isNew,isVisible,isOutOfScene,isLost;
-  unsigned char statusCalibrating,statusStoppedTracking, statusTracking,statusFailed;
-
-  struct point3D bbox[8];
-  struct point3D bboxDimensions;
-  struct point3D centerOfMass;
   struct point3D joint[HUMAN_SKELETON_PARTS];
-  struct point2D joint2D[HUMAN_SKELETON_PARTS];
-  float jointAccuracy[HUMAN_SKELETON_PARTS];
 };
 
 struct skeletonHuman sk;
@@ -139,35 +132,35 @@ int collectSkeletonFromTF(struct skeletonHuman * sk)
 }
 
 
-void broadcastEmergency(unsigned int frameNumber)
+int broadcastExcerciseGeneric(char * tag , char * name , char * value)
 {
-  //if ( (!emergencyDetected) ) { return ; }
-
-  #if BROADCAST_HOBBIT
-    hobbit_msgs::Event evt;
-    std::stringstream ss;
-     case GESTURE_NONE   : break;
-     if (emergencyDetected) { ss<<"G_FALL"; } else
-                             { ss<<"G_NONE"; }
-
-    //sROS.data=ss.str();
-    evt.event=ss.str();
-    evt.header.seq = frameNumber;
-    evt.header.frame_id = "emergency_detector";
-    evt.header.stamp = ros::Time::now();
-    evt.sessionID  = "SessionID";
-    evt.confidence = 1.0;
-    evt.params.resize(0);
-    fprintf(stderr,"Publishing a new Emergency Event ( %u ) \n",emergencyDetected);
-    gestureEventBroadcaster.publish(evt);
-
-    //No longer at an emergency state
-    emergencyDetected=0;
-   #endif
-
- return ;
+  char what2execute[MAX_CMD_STR]={0};
+  snprintf(what2execute,MAX_CMD_STR,"rostopic pub /fitness hobbit_msgs/Fitness \"{command: '%s' , params: [ {name: '%s' , value: '%s'} ] }\" -1",tag,name,value);
 }
 
+
+
+int broadcastExcerciseRepetition(unsigned int exerciseNumber,unsigned int repetitionNumber)
+{
+  char exerciseStr[MAX_NUM_STR]={0};
+  snprintf(exerciseStr,MAX_NUM_STR,"%u",exerciseNumber);
+
+  char repetitionStr[MAX_NUM_STR]={0};
+  snprintf(repetitionStr,MAX_NUM_STR,"%u",repetitionNumber);
+
+  return broadcastExcerciseGeneric("C_EXERCISE_REP",exerciseStr,repetitionStr);
+}
+
+
+int broadcastExcerciseStarted(char * name , char * value)
+{
+  return broadcastExcerciseGeneric("C_EXERCISE_STARTED",name,value);
+}
+
+int broadcastExcerciseFinished(char * name , char * value)
+{
+  return broadcastExcerciseGeneric("C_EXERCISE_FINISHED",name,value);
+}
 
 //----------------------------------------------------------
 //Advertised Service switches
