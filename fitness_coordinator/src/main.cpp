@@ -27,7 +27,7 @@
 #include <sensor_msgs/CameraInfo.h>
 #include <image_transport/image_transport.h>
 
-#include "emergency_detector/SkeletonBBox.h"
+#include "hobbit_msgs/Fitness.h"
 
 #if BROADCAST_HOBBIT
 #include "hobbit_msgs/Event.h"
@@ -208,9 +208,13 @@ bool visualizeOff(std_srvs::Empty::Request& request, std_srvs::Empty::Response& 
     return true;
 }
 
-void bboxReceived(const emergency_detector::SkeletonBBox & msg)
+void fitnessMessage(const hobbit_msgs::Fitness & msg)
 {
+ //Test Trigger with rostopic pub /fitness hobbit_msgs/Fitness " { command: C_USER_SEATED , params: [  { name: 'testName' , value: 'testValue' } ] } " -1
+
+
  // processBoundingBox(msg.width , msg.height ,msg.depth );
+  fprintf(stderr,"\n\n\n\n\n\n\n\n\n\nGOT A %s MESSAGE\n\n\n\n\n\n\n\n",msg.command.c_str());
 }
 
 
@@ -326,7 +330,7 @@ int main(int argc, char **argv)
      sync = new message_filters::Synchronizer<RgbdSyncPolicy>(RgbdSyncPolicy(rate), *rgb_img_sub, *depth_img_sub); //*rgb_cam_info_sub,
 	 sync->registerCallback(rgbdCallbackNoCalibration);
 
-     ros::Subscriber sub = nh.subscribe("jointsBBox",1000,bboxReceived);
+     ros::Subscriber sub = nh.subscribe("fitness",1000,fitnessMessage);
      #if BROADCAST_HOBBIT
       gestureEventBroadcaster = nh->advertise <hobbit_msgs::Event> ("Event", 1000);
      #endif
