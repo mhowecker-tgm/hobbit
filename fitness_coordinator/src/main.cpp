@@ -13,6 +13,7 @@
 #include <message_filters/sync_policies/approximate_time.h>
 #include <message_filters/time_synchronizer.h>
 
+#include <tf/transform_listener.h>
 
 #include <cv_bridge/cv_bridge.h>
  #include <opencv2/imgproc/imgproc_c.h>
@@ -35,6 +36,7 @@ ros::Publisher gestureEventBroadcaster;
 #endif
 
 #define NODE_NAME "fitness_coordinator"
+#define SKELETON_PREFIX "SK_"
 
 #define DEFAULT_FRAME_RATE 1
 
@@ -58,6 +60,83 @@ unsigned int frameTimestamp=0;
 ros::NodeHandle * nhPtr=0;
 unsigned int paused=0;
 unsigned int doCVOutput=0;
+
+
+#define HUMAN_SKELETON_PARTS 15
+static const char * jointNames[] =
+{"head",
+ "neck",
+ "torso",
+ "left_shoulder",
+ "right_shoulder",
+ "left_elbow",
+ "right_elbow",
+ "left_hand",
+ "right_hand",
+ "left_hip",
+ "right_hip",
+ "left_knee",
+ "right_knee",
+ "left_foot",
+ "right_foot"
+};
+
+struct point3D
+{
+    float x,y,z;
+};
+
+struct point2D
+{
+    float x,y;
+};
+
+
+
+struct skeletonHuman
+{
+  unsigned int observationNumber , observationTotal;
+  unsigned int userID;
+
+  unsigned char isNew,isVisible,isOutOfScene,isLost;
+  unsigned char statusCalibrating,statusStoppedTracking, statusTracking,statusFailed;
+
+  struct point3D bbox[8];
+  struct point3D bboxDimensions;
+  struct point3D centerOfMass;
+  struct point3D joint[HUMAN_SKELETON_PARTS];
+  struct point2D joint2D[HUMAN_SKELETON_PARTS];
+  float jointAccuracy[HUMAN_SKELETON_PARTS];
+};
+
+struct skeletonHuman sk;
+
+
+int collectSkeletonFromTF(struct skeletonHuman * sk)
+{
+  tf::TransformListener listener;
+  tf::StampedTransform transform;
+
+  for (unsigned int i=0; i<HUMAN_SKELETON_PARTS; i++)
+                  {
+                    try
+                    {
+                     listener.waitForTransform(jointNames[i],"frame",ros::Time(0),ros::Duration(10.0));
+                     listener.lookupTransform(jointNames[i],"frame",ros::Time(0),transform);
+                     sk->joint[i].x = transform.getOrigin().x();
+                     sk->joint[i].y = transform.getOrigin().y();
+                     sk->joint[i].z = transform.getOrigin().z();
+
+                     fprintf(stderr,"%s is %f %f %f \n",jointNames[i],sk->joint[i].x,sk->joint[i].y,sk->joint[i].z);
+                    }
+                    catch (...)
+                    {
+                       //fprintf(stderr,"... no tf ... \n");
+                       return 0;
+                    }
+                  }
+   return 1;
+}
 
 
 void broadcastEmergency(unsigned int frameNumber)
@@ -241,6 +320,7 @@ int main(int argc, char **argv)
      ros::ServiceServer triggerService     = nh.advertiseService(name+"/trigger", trigger);
 
 
+
      //Make our rostopic cmaera grabber
      message_filters::Synchronizer<RgbdSyncPolicy> *sync;
 
@@ -267,7 +347,11 @@ int main(int argc, char **argv)
 		{
                   ros::spinOnce();//<- this keeps our ros node messages handled up until synergies take control of the main thread
                   usleep(1000);
-		 }
+
+
+                  collectSkeletonFromTF(&sk);
+
+	    }
 
 
 
