@@ -8,7 +8,6 @@
 #include <stdexcept>
 #include <image_transport/image_transport.h>
 
-#include "process.h"
 
 #include <message_filters/subscriber.h>
 #include <message_filters/sync_policies/approximate_time.h>
@@ -58,12 +57,12 @@ int key = 0;
 unsigned int frameTimestamp=0;
 ros::NodeHandle * nhPtr=0;
 unsigned int paused=0;
-
+unsigned int doCVOutput=0;
 
 
 void broadcastEmergency(unsigned int frameNumber)
 {
-  if ( (!emergencyDetected) ) { return ; }
+  //if ( (!emergencyDetected) ) { return ; }
 
   #if BROADCAST_HOBBIT
     hobbit_msgs::Event evt;
@@ -95,7 +94,7 @@ void broadcastEmergency(unsigned int frameNumber)
 //Advertised Service switches
 bool terminate(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    ROS_INFO("Stopping Emergency Detector");
+    ROS_INFO("Stopping Node " NODE_NAME);
     exit(0);
     return true;
 }
@@ -103,7 +102,7 @@ bool terminate(std_srvs::Empty::Request& request, std_srvs::Empty::Response& res
 
 bool trigger(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    emergencyDetected=1;
+   // emergencyDetected=1;
     return true;
 }
 
@@ -139,7 +138,7 @@ bool visualizeOff(std_srvs::Empty::Request& request, std_srvs::Empty::Response& 
 
 void bboxReceived(const emergency_detector::SkeletonBBox & msg)
 {
-   processBoundingBox(msg.width , msg.height ,msg.depth );
+ // processBoundingBox(msg.width , msg.height ,msg.depth );
 }
 
 
@@ -158,8 +157,8 @@ int doDrawOut()
 	 cv::normalize(depth,depthNorm,0,255,CV_MINMAX,CV_8UC1);
 
      //After we have our bgr Frame ready and we added the FPS text , lets show it!
-	 cv::imshow("emergency_detector rgb",depthNorm);
-	 cv::imshow("emergency_detector depth",bgrMat);
+	 cv::imshow("fitness_coordinator rgb",depthNorm);
+	 cv::imshow("fitness_coordinator depth",bgrMat);
 
 	 cv::waitKey(1);
 
@@ -187,9 +186,10 @@ void rgbdCallbackNoCalibration(const sensor_msgs::Image::ConstPtr rgb_img_msg,
 
   if (frameTimestamp%3==0)
   { //Preserve resources
+      /*
    runServicesThatNeedColorAndDepth((unsigned char*) rgb.data, colorWidth , colorHeight ,
                                    (unsigned short*) depth.data ,  depthWidth , depthHeight ,
-                                     0 , frameTimestamp );
+                                     0 , frameTimestamp );*/
   }
  //After running (at least) once it is not a first run any more!
  first = false;
@@ -258,7 +258,7 @@ int main(int argc, char **argv)
       gestureEventBroadcaster = nh->advertise <hobbit_msgs::Event> ("Event", 1000);
      #endif
 
-     initializeProcess();
+     //initializeProcess();
 
       //Create our context
       //---------------------------------------------------------------------------------------------------
