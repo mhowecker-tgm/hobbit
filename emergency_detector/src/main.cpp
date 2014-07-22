@@ -234,10 +234,10 @@ int main(int argc, char **argv)
      //We advertise the services we want accessible using "rosservice call *w/e*"
      ros::ServiceServer visualizeOnService      = nh.advertiseService(name+"/visualize_on" , visualizeOn);
      ros::ServiceServer visualizeOffService     = nh.advertiseService(name+"/visualize_off", visualizeOff);
-     ros::ServiceServer pauseGestureRecognitionService    = nh.advertiseService("emergency_detector/pause", pause);
-     ros::ServiceServer resumeGestureRecognitionService   = nh.advertiseService("emergency_detector/resume", resume);
-     ros::ServiceServer stopGestureRecognitionService     = nh.advertiseService("emergency_detector/terminate", terminate);
-     ros::ServiceServer triggerGestureRecognitionService     = nh.advertiseService("emergency_detector/trigger", trigger);
+     ros::ServiceServer pauseGestureRecognitionService    = nh.advertiseService(name+"/pause", pause);
+     ros::ServiceServer resumeGestureRecognitionService   = nh.advertiseService(name+"/resume", resume);
+     ros::ServiceServer stopGestureRecognitionService     = nh.advertiseService(name+"/terminate", terminate);
+     ros::ServiceServer triggerGestureRecognitionService     = nh.advertiseService(name+"/trigger", trigger);
 
 
      //Make our rostopic cmaera grabber
