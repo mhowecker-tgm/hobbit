@@ -566,7 +566,7 @@ void * store_new_configuration_callback(struct AmmServer_DynamicRequest  * rqst)
               if ( _GET(default_server,rqst,(char*)"LuiBackgroundSelector",bufferCommand,256) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXCOLORXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
               if ( _GET(default_server,rqst,(char*)"city",bufferCommand,256) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXCITYXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
               if ( _GET(default_server,rqst,(char*)"voice",bufferCommand,256) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXVOICEXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
-              if ( _GET(default_server,rqst,(char*)"emergencyContactTel1",bufferCommand,256) )  {  snprintf(commandToRun,"sed -i 's/XXXXXEMERGENCYTELXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"emergencyContactTel1",bufferCommand,256) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXEMERGENCYTELXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
               if ( _GET(default_server,rqst,(char*)"contactTel1",bufferCommand,256) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXTELEPHONE1NUMXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
               if ( _GET(default_server,rqst,(char*)"contactName1",bufferCommand,256) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXTELEPHONE1NAMEXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
 
