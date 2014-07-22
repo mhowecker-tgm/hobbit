@@ -37,7 +37,7 @@ int main(int argc, char **argv)
 
   myPlacesInterpretation.LoadFile(file_name);
 
-  ros::ServiceServer service = n.advertiseService("getRooms", &PlacesInterpretation::cPlacesInterpretation::getRooms, &myPlacesInterpretation);
+  ros::ServiceServer service = n.advertiseService("getRooms_", &PlacesInterpretation::cPlacesInterpretation::getRooms, &myPlacesInterpretation);
   ROS_INFO("Service ready");
 
   ROS_INFO("Init loop");
