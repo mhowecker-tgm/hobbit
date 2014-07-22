@@ -476,9 +476,9 @@ void execute(char * command,char * param)
    else
   if (strcmp(command,"say")==0)
   {
-     char internalString[MAX_COMMAND_SIZE]={0};
-     if (strcmp(param,"test")==0) {  strcpy(internalString,"Θα σας κάνω μια έκπληξη , θα σταματήσω να δουλεύω σε ένα τυχαίο σημείο.!"); } else
-                                  {  strcpy(internalString,param); }
+     char internalString[MAX_COMMAND_SIZE+1]={0};
+     if (strcmp(param,"test")==0) {  strncpy(internalString,"Θα σας κάνω μια έκπληξη , θα σταματήσω να δουλεύω σε ένα τυχαίο σημείο.!",MAX_COMMAND_SIZE); } else
+                                  {  strncpy(internalString,param,MAX_COMMAND_SIZE); }
 
 
      replaceChar(internalString,'+',' ');
@@ -598,12 +598,12 @@ void * store_new_configuration_callback(struct AmmServer_DynamicRequest  * rqst)
 
 if (successfullStore)
      {
-         strcpy(rqst->content,"<html><head><meta http-equiv=\"refresh\" content=\"15; url=controlpanel.html\" /></head>\
+         strncpy(rqst->content,"<html><head><meta http-equiv=\"refresh\" content=\"15; url=controlpanel.html\" /></head>\
                   <body><center><br><br><br><h1>Settings stored , dcfg file is ready..</h1><br><br><h3><a href=\"controlpanel.html\">You are beeing redirected to control panel</a><br>\
-                   <a href=\"startup.dcfg\">Right click here and save as to download dcfg file</a></h3></body></html> ");
+                   <a href=\"startup.dcfg\">Right click here and save as to download dcfg file</a></h3></body></html> ",rqst->MAXcontentSize);
      } else
      {
-         strcpy(rqst->content,"<html><body><center><br><br><br><h1>FAILED to store settings :( </h1><br><br><h3><a href=\"#\" onclick=\"javascript:window.history.go(-1)\">Click here to go back</a></h3></body></html> ");
+         strncpy(rqst->content,"<html><body><center><br><br><br><h1>FAILED to store settings :( </h1><br><br><h3><a href=\"#\" onclick=\"javascript:window.history.go(-1)\">Click here to go back</a></h3></body></html> ",rqst->MAXcontentSize);
      }
 
   rqst->contentSize=strlen(rqst->content);
@@ -679,8 +679,8 @@ int init_dynamic_content()
   AmmServer_DoNOTCacheResourceHandler(default_server,&form);
 
   //startup.dcfg / startupClean.dcfg  should always be served fresh
-  AmmServer_DoNOTCacheResource(default_server,WEBROOT "startup.dcfg");
-  AmmServer_DoNOTCacheResource(default_server,WEBROOT "startupClean.dcfg");
+  AmmServer_DoNOTCacheResource(default_server,(char*) WEBROOT "startup.dcfg");
+  AmmServer_DoNOTCacheResource(default_server,(char*) WEBROOT "startupClean.dcfg");
 
 
   if (! AmmServer_AddResourceHandler(default_server,&indexPage,(char*)"/index.html",webserver_root,4096,0,(void*) &prepare_index_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) )
