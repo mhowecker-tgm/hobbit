@@ -40,13 +40,10 @@
 
 int rate=DEFAULT_FRAME_RATE;
 
-bool first=false;
 int key = 0;
 unsigned int frameTimestamp=0;
 ros::NodeHandle * nhPtr=0;
 unsigned int paused=0;
-unsigned int doCVOutput=0;
-
 
 
 struct fitnessState state;
@@ -58,11 +55,12 @@ int collectSkeletonFromTF(struct skeletonHuman * sk)
   tf::TransformListener listener;
   tf::StampedTransform transform;
 
+  listener.waitForTransform(jointNames[0],"frame",ros::Time(0),ros::Duration(0.5));
+
   for (unsigned int i=0; i<HUMAN_SKELETON_PARTS; i++)
                   {
                     try
                     {
-                     listener.waitForTransform(jointNames[i],"frame",ros::Time(0),ros::Duration(0.2));
                      listener.lookupTransform(jointNames[i],"frame",ros::Time(0),transform);
                      sk->joint[i].x = transform.getOrigin().x();
                      sk->joint[i].y = transform.getOrigin().y();
@@ -194,7 +192,7 @@ int main(int argc, char **argv)
      std::string name;
 
      private_node_handle_.param("name", name, std::string(NODE_NAME));
-     private_node_handle_.param("rate", rate , int(DEFAULT_FRAME_RATE)); //11 should me optimal  less for a little less CPU Usage
+     private_node_handle_.param("rate", rate , int(DEFAULT_FRAME_RATE));
      ros::Rate loop_rate(rate); //  hz should be our target performance
 
 
@@ -211,6 +209,7 @@ int main(int argc, char **argv)
 	  //////////////////////////////////////////////////////////////////////////
 	  while ( ( key!='q' ) && (ros::ok()) )
 		{
+		          fprintf(stderr,".");
                   ros::spinOnce();//<- this keeps our ros node messages handled up until synergies take control of the main thread
                   //usleep(1000);
 
