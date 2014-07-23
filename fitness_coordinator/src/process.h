@@ -2,6 +2,8 @@
 #ifndef PROCESS_H_INCLUDED
 #define PROCESS_H_INCLUDED
 
+#define MAX_CMD_STR 1024
+#define MAX_NUM_STR 128
 
 struct fitnessState
 {
@@ -50,6 +52,11 @@ struct skeletonHuman
   struct point3D joint[HUMAN_SKELETON_PARTS];
 };
 
+
+int broadcastExcerciseGeneric(char * tag , char * name , char * value);
+int broadcastExcerciseRepetition(unsigned int exerciseNumber,unsigned int repetitionNumber);
+int broadcastExcerciseStarted(char * name , char * value);
+int broadcastExcerciseFinished(char * name , char * value);
 
 
 int signalRepetition(struct fitnessState * state);

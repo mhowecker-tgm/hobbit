@@ -78,36 +78,6 @@ int collectSkeletonFromTF(struct skeletonHuman * sk)
 }
 
 
-int broadcastExcerciseGeneric(char * tag , char * name , char * value)
-{
-  char what2execute[MAX_CMD_STR]={0};
-  snprintf(what2execute,MAX_CMD_STR,"rostopic pub /fitness hobbit_msgs/Fitness \"{command: '%s' , params: [ {name: '%s' , value: '%s'} ] }\" -1",tag,name,value);
-}
-
-
-
-int broadcastExcerciseRepetition(unsigned int exerciseNumber,unsigned int repetitionNumber)
-{
-  char exerciseStr[MAX_NUM_STR]={0};
-  snprintf(exerciseStr,MAX_NUM_STR,"%u",exerciseNumber);
-
-  char repetitionStr[MAX_NUM_STR]={0};
-  snprintf(repetitionStr,MAX_NUM_STR,"%u",repetitionNumber);
-
-  return broadcastExcerciseGeneric("C_EXERCISE_REP",exerciseStr,repetitionStr);
-}
-
-
-int broadcastExcerciseStarted(char * name , char * value)
-{
-  return broadcastExcerciseGeneric("C_EXERCISE_STARTED",name,value);
-}
-
-int broadcastExcerciseFinished(char * name , char * value)
-{
-  return broadcastExcerciseGeneric("C_EXERCISE_FINISHED",name,value);
-}
-
 //----------------------------------------------------------
 //Advertised Service switches
 bool terminate(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
