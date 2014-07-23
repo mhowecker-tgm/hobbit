@@ -14,23 +14,45 @@ struct fitnessState
 };
 
 
-#define HUMAN_SKELETON_PARTS 15
+
 static const char * jointNames[] =
 {"head",
  "neck",
  "torso",
- "left_shoulder",
  "right_shoulder",
- "left_elbow",
+ "left_shoulder",
  "right_elbow",
- "left_hand",
+ "left_elbow",
  "right_hand",
- "left_hip",
+ "left_hand",
  "right_hip",
- "left_knee",
+ "left_hip",
  "right_knee",
- "left_foot",
- "right_foot"
+ "left_knee",
+ "right_foot",
+ "left_foot"
+};
+
+
+enum humanSkeletonJoints
+{
+   HUMAN_SKELETON_HEAD = 0,
+   HUMAN_SKELETON_NECK,
+   HUMAN_SKELETON_TORSO,
+   HUMAN_SKELETON_RIGHT_SHOULDER,
+   HUMAN_SKELETON_LEFT_SHOULDER,
+   HUMAN_SKELETON_RIGHT_ELBOW,
+   HUMAN_SKELETON_LEFT_ELBOW,
+   HUMAN_SKELETON_RIGHT_HAND,
+   HUMAN_SKELETON_LEFT_HAND,
+   HUMAN_SKELETON_RIGHT_HIP,
+   HUMAN_SKELETON_LEFT_HIP,
+   HUMAN_SKELETON_RIGHT_KNEE,
+   HUMAN_SKELETON_LEFT_KNEE,
+   HUMAN_SKELETON_RIGHT_FOOT,
+   HUMAN_SKELETON_LEFT_FOOT,
+   //---------------------
+   HUMAN_SKELETON_PARTS
 };
 
 struct point3D
