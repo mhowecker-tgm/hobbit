@@ -101,6 +101,10 @@ sleep $DELAY_BETWEEN_STEPS
 cd /opt/ros/hobbit_hydro/src/interfaces_mira/resources
 miracenter mira_config.xml&
 
+#Startup Joystick node , ( it allows webinterface joystick emulation also )
+roslaunch joy2twist startup.launch& 
+
+
 cd $STARTDIR
 
 exit 0
