@@ -349,7 +349,7 @@ def main():
         )
         StateMachine.add(
             'CONFIRM_TURN_OBJECT',
-            obbitMMUI.ConfirmInfo(
+            HobbitMMUI.ConfirmInfo(
                 info='T_LO_TURN_OBJECT_UPSIDE_DOWN_OR_LAY_IT_DOWN'),
             transitions={'succeeded': 'CHECK_FOR_OBJECT_2',
                          'failed': 'FAIL_COUNT_CONFIRM_2'}
