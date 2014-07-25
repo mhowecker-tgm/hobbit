@@ -307,6 +307,35 @@ void joystickExecute(float x , float y )
       ===========================================================================================================================
       ===========================================================================================================================
 */
+
+void MMUISTuffExecute(char * command,char * param)
+{
+  char * commandToRun = (char*) malloc((MAX_COMMAND_SIZE+1) * sizeof(char));
+  if (commandToRun==0) { AmmServer_Error("Could not allocate enough space for MMUI command execution"); return ; }
+
+  commandToRun[0]=0;
+
+  //rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_VOICE],[Value, "Susan"]]}'
+  if (strcmp(command,"talkingSpeed")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_SPEED],[Value, \"%s\"]]}' \" ",param); }  else
+  if (strcmp(command,"voiceFemale")==0)  { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_VOICE],[Value, \"%s\"]]}' \" ",param); }  else
+  if (strcmp(command,"voiceMale")==0)    { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_VOICE],[Value, \"%s\"]]}' \" ",param); } else
+  if (strcmp(command,"volume")==0)       { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_ABSVOLUME],[Value, \"%s\"]]}' \" ",param); }
+
+  if ( strlen(commandToRun)!=0 )
+   {
+     i=system(commandToRun);
+     if (i!=0) { AmmServer_Error("Command %s failed\n",commandToRun); } else
+               { AmmServer_Success("Command %s success\n",commandToRun); }
+   } else
+   {
+     fprintf(stderr,"Execute with unknown command or parameter\n");
+   }
+
+
+  free(commandToRun);
+}
+
+
 void execute(char * command,char * param)
 {
   fprintf(stderr,"Execute(%s,%s) \n",command,param);
@@ -314,6 +343,7 @@ void execute(char * command,char * param)
   char * commandToRun = (char*) malloc((MAX_COMMAND_SIZE+1) * sizeof(char));
 
   if (commandToRun==0) { AmmServer_Error("Could not allocate enough space for command execution"); return ; }
+  commandToRun[0]=0;
 
   //-------------------------------------------------
   // ULTRA UNSAFE , INJECTION PRONE PARAMS HERE
@@ -326,11 +356,12 @@ void execute(char * command,char * param)
   if (strcmp(command,"setCurrentEmotion")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set /Hobbit/current_emotion \"%s\" \" ",param); }  else
   if (strcmp(command,"setLatestWakingUpTime")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set /Hobbit/wakeup_time \"%s\" \" ",param); }  else
   if (strcmp(command,"setLatestSleepingTime")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set /Hobbit/sleep_time \"%s\" \" ",param); }  else
-  if (strcmp(command,"talkingSpeed")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set USER/Voice/Speed \"%s\" \" ",param); }  else
-  if (strcmp(command,"gender")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set USER/Voice/Default \"%s\" \" ",param); }  else
-  if (strcmp(command,"voiceFemale")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set USER/Voice/FEMALE \"%s\" \" ",param); }  else
-  if (strcmp(command,"voiceMale")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set USER/Voice/MALE \"%s\" \" ",param); }  else
-  if (strcmp(command,"volume")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set USER/Voice/Volume \"%s\" \" ",param); }  else
+
+  if (strcmp(command,"talkingSpeed")==0) { MMUISTuffExecute(command,param); snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set USER/Voice/Speed \"%s\" \" ",param); }  else
+  if (strcmp(command,"gender")==0)       { MMUISTuffExecute(command,param); snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set USER/Voice/Default \"%s\" \" ",param); }  else
+  if (strcmp(command,"voiceFemale")==0)  { MMUISTuffExecute(command,param); snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set USER/Voice/FEMALE \"%s\" \" ",param); }  else
+  if (strcmp(command,"voiceMale")==0)    { MMUISTuffExecute(command,param); snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set USER/Voice/MALE \"%s\" \" ",param); }  else
+  if (strcmp(command,"volume")==0)       { MMUISTuffExecute(command,param); snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set USER/Voice/Volume \"%s\" \" ",param); }  else
 
   /*
 
