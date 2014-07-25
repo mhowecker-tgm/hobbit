@@ -326,10 +326,11 @@ void execute(char * command,char * param)
   if (strcmp(command,"setCurrentEmotion")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set /Hobbit/current_emotion \"%s\" \" ",param); }  else
   if (strcmp(command,"setLatestWakingUpTime")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set /Hobbit/wakeup_time \"%s\" \" ",param); }  else
   if (strcmp(command,"setLatestSleepingTime")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set /Hobbit/sleep_time \"%s\" \" ",param); }  else
-  if (strcmp(command,"TODO")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set /Hobbit/askistu \"%s\" \" ",param); }  else
-  if (strcmp(command,"TODO")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set /Hobbit/askistu \"%s\" \" ",param); }  else
-  if (strcmp(command,"TODO")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set /Hobbit/askistu \"%s\" \" ",param); }  else
-  if (strcmp(command,"TODO")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set /Hobbit/askistu \"%s\" \" ",param); }  else
+  if (strcmp(command,"talkingSpeed")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set USER/Voice/Speed \"%s\" \" ",param); }  else
+  if (strcmp(command,"gender")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set USER/Voice/Default \"%s\" \" ",param); }  else
+  if (strcmp(command,"voiceFemale")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set USER/Voice/FEMALE \"%s\" \" ",param); }  else
+  if (strcmp(command,"voiceMale")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set USER/Voice/MALE \"%s\" \" ",param); }  else
+  if (strcmp(command,"volume")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set USER/Voice/Volume \"%s\" \" ",param); }  else
   // ULTRA UNSAFE , INJECTION PRONE PARAMS HERE
   //-------------------------------------------------
   if (strcmp(command,"node")==0)
