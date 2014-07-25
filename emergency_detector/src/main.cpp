@@ -31,6 +31,8 @@
 
 #include <std_msgs/Float32.h>
 
+#define BROADCAST_HOBBIT 1
+
 #if BROADCAST_HOBBIT
 #include "hobbit_msgs/Event.h"
 #include <std_msgs/String.h>

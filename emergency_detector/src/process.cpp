@@ -112,7 +112,7 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
          )
                        {
                         fprintf(stderr,MAGENTA "\n\n ? EMERGENCY ?  \n\n" NORMAL);
-                        emergencyDetected=1; //<- We dont have a temperature sensor yet
+                         // emergencyDetected=1;
                        }
 
 
