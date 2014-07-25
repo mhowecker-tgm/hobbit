@@ -331,6 +331,24 @@ void execute(char * command,char * param)
   if (strcmp(command,"voiceFemale")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set USER/Voice/FEMALE \"%s\" \" ",param); }  else
   if (strcmp(command,"voiceMale")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set USER/Voice/MALE \"%s\" \" ",param); }  else
   if (strcmp(command,"volume")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set USER/Voice/Volume \"%s\" \" ",param); }  else
+
+  /*
+
+params:
+Type=F_ABSVOLUME, Value=0..100 sets MMUI volume, default 50
+Type=F_SPEED, Value=0..100 sets absolute TTS speed, default 50
+Type=F_VOICE, Value=Voicename sets TTS voice (partial match, so unique short name is enough) -> it would be good if the webinterface had a list of available voices
+new Type=F_SETBG, Value=colourname
+
+(Type=F_REBOOT reboot MMUI, causing reload of dcfg)
+
+examples:
+rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_VOICE],[Value, "Susan"]]}'
+rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, D_OK],[Text, "Demonstration of voice"],[Speak, "text to speak"],["wait", "1"]]}'
+
+  */
+
+
   // ULTRA UNSAFE , INJECTION PRONE PARAMS HERE
   //-------------------------------------------------
   if (strcmp(command,"node")==0)
@@ -560,6 +578,11 @@ void * store_new_configuration_callback(struct AmmServer_DynamicRequest  * rqst)
             if ( _GET(default_server,rqst,(char*)"latestSleepingTime",bufferCommand,256) )  { execute((char*)"setLatestSleepingTime",bufferCommand);  }
 
 
+            if ( _GET(default_server,rqst,(char*)"talkingSpeed",bufferCommand,256) )  { execute((char*)"talkingSpeed",bufferCommand);  }
+            if ( _GET(default_server,rqst,(char*)"gender",bufferCommand,256) )  { execute((char*)"gender",bufferCommand);  }
+            if ( _GET(default_server,rqst,(char*)"voiceFemale",bufferCommand,256) )  { execute((char*)"voiceFemale",bufferCommand);  }
+            if ( _GET(default_server,rqst,(char*)"voiceMale",bufferCommand,256) )  { execute((char*)"voiceMale",bufferCommand);  }
+            if ( _GET(default_server,rqst,(char*)"volume",bufferCommand,256) )  { execute((char*)"volume",bufferCommand);  }
 
             char * commandToRun = (char*) malloc((MAX_COMMAND_SIZE+1) * sizeof(char));
             if (commandToRun!=0)
