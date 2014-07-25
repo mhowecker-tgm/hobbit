@@ -4,173 +4,17 @@
         <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>  
 	<title>Hobbinterface</title>
         <link rel="stylesheet" type="text/css" href="hobbit.css">
-   <script type="text/javascript">  
-   
-   var centerX=51;
-   var centerY=54;
-   
-   var speedMultiplier=0.04; //Normal Speed selected by default 
-   
-   var deadZoneSize = 6; 
-   var deadZoneLeft = centerX-deadZoneSize;
-   var deadZoneUp = centerY-deadZoneSize;
-   var deadZoneRight = centerX+deadZoneSize;
-   var deadZoneBottom = centerY+deadZoneSize;
-
-   var limitLeft = 25;
-   var limitUp = 27;
-   var limitRight = 75;
-   var limitBottom = 78;
- 
-   var ledX = 5;
-   var ledY = 5;
-
-   function getCommandPartOfURL(str) 
-   {
-    return str.split('?')[1];
-   }
-
-   function makeUniqueURLs()
-   {  
-     var links = document.links;
-     var i = links.length;
-     //Simple var randomnumber=Math.floor(Math.random()*100000);
-     
-     while (i--) 
-     {
-       if (links[i].href.indexOf("javascript") == -1) 
-          { 
-            //Simple links[i].href = links[i].href+"&t="+randomnumber; 
-            if (links[i].href.indexOf("controlpanel.html?") != -1) 
-              {
-                links[i].href = "javascript:command(\'"+getCommandPartOfURL(links[i].href)+"\');"; 
-              }
-          }
-     } 
-   }
- 
-    function refreshFeed(name,imageName)
-    {
-      command('camera=refresh');
-      document.getElementById(name).style.visibility='visible';
-      var randomnumber=Math.floor(Math.random()*100000);
-      document.getElementById("videoFeedImage").src="base_image.jpg?t="+randomnumber;
-    }
-
-    function makeFeedVisible(name)
-    {
-      document.getElementById(name).style.visibility='visible';
-    }
-
-    function makeFeedInvisible(name)
-    {
-      document.getElementById(name).style.visibility='hidden';
-    }
-
-    function makeTurnControlsVisible() 
-                               {
-                                       document.getElementById("turnLeft").style.visibility='visible';
-                                       document.getElementById("turnRight").style.visibility='visible';
-                               }
-
-    function makeTurnControlsInvisible() 
-                               {
-                                       document.getElementById("turnLeft").style.visibility='hidden';
-                                       document.getElementById("turnRight").style.visibility='hidden';
-                               }
-
-    function handleJoystickActiveSwitch(cb)
-    {
-       if (cb.checked)
-           {
-             makeTurnControlsVisible();
-           } else
-           {
-             makeTurnControlsInvisible();
-           }
-    }
-
-   function httpGet(theUrl)
-    {
-    var xmlHttp = null;
-
-    xmlHttp = new XMLHttpRequest();
-    xmlHttp.open( "GET", theUrl, true ); //Second parameter is async
-    xmlHttp.send( null );
-    return xmlHttp.responseText;
-    }
-
-     function joystickExecute(joyX,joyY)
-     {
-        var randomnumber=Math.floor(Math.random()*100000);
-        if ( (joyX==0) && (joyY==0) ) 
-          {
-            httpGet("controlpanel.html?body=stop&t="+randomnumber); 
-          } else
-          {
-            httpGet("controlpanel.html?body=joystick&x="+joyX+'&y='+joyY+"&t="+randomnumber); 
-          }
-     }
-
-    
-     function command(theCommand)
-     {
-       var randomnumber=Math.floor(Math.random()*100000);
-       httpGet("controlpanel.html?"+theCommand+"&t="+randomnumber); 
-     } 
-
-
-
-function updateStatusMonitor()
-{
-    var iframe = document.getElementById('statusMonitor');
-    iframe.reload(true);
-}
-
-setTimeout('updateStatusMonitor()', 10000);
-
-function updateFormRandomNumber()
-    {
-       var randomnumber=Math.floor(Math.random()*100000);
-       document.getElementById("FormRandomField").value = randomnumber;
-    }
-
- 
-function allowDrop(ev)
-{
- //ev.preventDefault();
-  return true;
-}
-
-function drag(ev)
-{  
-  ev.dataTransfer.setData("Text",ev.target.id);
-}
-
-function drop(ev)
-{
-  ev.preventDefault(); 
-  var data=ev.dataTransfer.getData("Text");
-  ev.target.appendChild(document.getElementById(data));
-  return true;
-} 
-
+   <script type="text/javascript" src="controlpanel.js">   
    </script>
 
   </head>
- <body onload="makeUniqueURLs();"> 
-
-
-
-
+ <body onload="makeUniqueURLs();">  
 
 
 
 <!-- POPUP WINDOWS -->
 
-
-
-
+ 
 
  <div class="rtdFloating" id="settingsTab" draggable="true" ondrop="drop(event)" ondragover="allowDrop(event)" ondragstart="drag(event)" >
             <table>
@@ -229,30 +73,11 @@ function drop(ev)
            </table>
 	</div> 
 
-
-
-
-
-
-
  
-
-
 
 <!-- MAIN WINDOW -->
 
-
-
-
-
-
-
-
-
-
-
-
-
+ 
   <center>
 	<!--a href="controlpanel.html?nothing=true"> <img src="header.png" border=0/> </a--> 
          <a href="controlpanel.html?nothing=true">  
@@ -473,133 +298,8 @@ function drop(ev)
 <!--  ------------------------------------------------------------------------------
       START OF:         THE HTML5 CANVAS CODE FOR MAKING THE JOYSTICK WORK 
       ------------------------------------------------------------------------------   -->
-<canvas id="joypadCanvas" width="160" height="160"></canvas>
-    <script>
-         var canvas = document.getElementById('joypadCanvas');
-         var context = canvas.getContext('2d');
-         var joypadObj = new Image();
-         var joystickObj = new Image();
-         var lastMouseX = 0;
-         var lastMouseY = 0;
-         var mouseDown = false;
-
-
-
-     function clearCanvas()
-     {
-       var context = canvas.getContext('2d');
-       context.clearRect(0, 0, canvas.width, canvas.height); 
-     }
- 
-      function getMousePos(canvas, evt) 
-    {
-        var rect = canvas.getBoundingClientRect();
-        return {
-          x: evt.clientX - rect.left,
-          y: evt.clientY - rect.top
-        };
-      }
-
-      function drawJoystick(canvas, x ,y , imageObj) 
-      {
-        var context = canvas.getContext('2d'); 
-        clearCanvas(); 
-        context.drawImage(joypadObj,  0 ,0);
-        context.drawImage(joystickObj,  x ,y);
-      }
-
-      function drawActiveStatus(canvas, x,y, width , height , color )
-      {
-        context.beginPath();
-        context.fillStyle = color;
-        context.fillRect(x, y, width, height);
-        context.strokeRect(x, y, width, height);
-      }
- 
-
-     function joystickCallback(x,y)
-     {
-        var padding = 30;
-        var canvas = document.getElementById('joypadCanvas');
-        var context = canvas.getContext('2d');
-        var joystickActiveSwitch = document.getElementById("joystickActiveSwitch").checked;
-  
-          if ( x < limitLeft )   { x = limitLeft; }
-          if ( x > limitRight )  { x = limitRight; }
-          if ( y < limitUp )     { y = limitUp; }
-          if ( y > limitBottom ) { y = limitBottom; } 
-          
-          lastMouseX=x;
-          lastMouseY=y;
-
-          drawJoystick(canvas, x,y, joystickObj );
-           
-          if ( 
-               ( ( x <= deadZoneLeft )||( x >= deadZoneRight ) ) ||
-                ( ( y <= deadZoneUp )||( y >= deadZoneBottom ) ) 
-             )    
-
-          {
-          
-           speedMultiplier = parseFloat( document.getElementById("joystickSpeed").value );
-           //alert('SpeedMultiplier '+speedMultiplier);
-           var joyX = (x - centerX) * speedMultiplier;
-           var joyY = (y - centerY) * speedMultiplier;
-           
-           joyX = (-1) * joyX;
-           joyY = (-1) * joyY;
-
-           if ( (mouseDown) && (joystickActiveSwitch) )
-              {
-                 //alert('Mouse '+x+','+y+'\n Joy : '+joyX+','+joyY);   
-                 drawActiveStatus(canvas, ledX, ledY , ledX+5 , ledY+5 , "rgb(255,0,0)" ); 
-                 joystickExecute(joyX,joyY);
-                 mouseDown=false; 
-              } else
-              {   
-                 drawActiveStatus(canvas, ledX, ledY , ledX+5 , ledY+5 , "rgb(0,255,0)" );
-              } 
-          } else
-          {
-                 drawActiveStatus(canvas, ledX, ledY , ledX+5 , ledY+5 , "rgb(0,0,255)" );
-           if ( (mouseDown)&&(joystickActiveSwitch) )
-              {
-                 joystickExecute(0,0);
-              }
-                 mouseDown=false; 
-          }
- 
-     }
-
-
-
-
-
-
-
-      function init() 
-    { 
-        canvas.addEventListener('mousedown', function() { mouseDown = true; joystickCallback(lastMouseX,lastMouseY); }, false);
-        canvas.addEventListener('mouseup', function() { mouseDown = false; }, false); 
-        canvas.addEventListener('mousemove', function(evt) 
-                                               { 
-                                                 var mousePos = getMousePos(canvas, evt);  
-                                                 joystickCallback(mousePos.x,mousePos.y); 
-                                               }, false); 
-    }
-
-
-       joypadObj.onload = function() { context.drawImage(joypadObj, 0, 0); };
-       joypadObj.src = 'joypad.png';
-
-
-       joystickObj.onload = function() { context.drawImage(joystickObj, 52, 52); };
-       joystickObj.src = 'joybtn.png';
-
-       init();  
-
- </script>
-
+    <canvas id="joypadCanvas" width="160" height="160"></canvas>
+    <script src="joystick.js"> </script> 
 <!--  ------------------------------------------------------------------------------
       END OF:           THE HTML5 CANVAS CODE FOR MAKING THE JOYSTICK WORK 
       ------------------------------------------------------------------------------   --> 
