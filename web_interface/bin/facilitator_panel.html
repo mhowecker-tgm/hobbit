@@ -4,20 +4,12 @@
         <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>  
 	<title>Hobbit Facilitator Initialization ControlPanel</title>
         <link rel="stylesheet" type="text/css" href="hobbit.css">
-
-	<script type="text/javascript" src="jscolor/jscolor.js"></script>
-
-   <script type="text/javascript">  
-function updateFormRandomNumber()
-    {
-       var randomnumber=Math.floor(Math.random()*100000);
-       document.getElementById("FormRandomField").value = randomnumber;
-    }
-   </script>
+	     <script type="text/javascript" src="jscolor/jscolor.js"></script>
+        <script type="text/javascript" src="controlpanel.js"> </script>
 
 
 
-       <body> 
+       <body onload="makeUniqueURLs();">  
   <center> 
          <a href="controlpanel.html?nothing=true">  
           <img src="banner.png" width=800 border=0 />
@@ -73,35 +65,49 @@ function updateFormRandomNumber()
 
 
                   Talking Speed : 
-                      <select name="talkingSpeed"  >
-                        <option value="normal">Normal</option> 
-                        <option value="vslow">Very Slow</option>
-                        <option value="slow">Slow</option>
-                        <option value="fast">Fast</option>
-                        <option value="vfast">Very Fast</option> 
-                      </select>  <a href="#"><img src="volume.png" height=20></a> <br/>
+                      <select name="talkingSpeed" onchange="javascript:command('talkingSpeed='+this.value);" >
+                        <option value="3">Normal</option> 
+                        <option value="0">Too Slow</option>
+                        <option value="1">Very Slow</option>
+                        <option value="2">Slow</option>
+                        <option value="4">Fast</option>
+                        <option value="5">Very Fast</option>  
+                      </select>    <a href="controlpanel.html?say=Test my voice"><img src="volume.png" height=18></a> 
+                      <br/>
 
                   Gender : 
-                      <select name="gender"  >
+                      <select name="gender" onchange="javascript:command('gender='+this.value);" >
                         <option value="fale">Female</option> 
                         <option value="male">Male</option> 
-                      </select>   <br/>
+                      </select>   <a href="controlpanel.html?say=Test my voice"><img src="volume.png" height=18></a> 
+                      <br/>
  
-                  Voice : 
-                      <select name="voice"  >
+                  Female Voice : 
+                      <select name="voiceFemale" onchange="javascript:command('voiceFemale='+this.value);" >
                         <option value="Susanne">Susanne</option>  
-                      </select>   <br/>
+                      </select>    <a href="controlpanel.html?say=Test my voice"><img src="volume.png" height=18></a> 
+                      <br/>
+                  Male Voice :  
+                      <select name="voiceMale" onchange="javascript:command('voiceMale='+this.value);" >
+                        <option value="Dave">Dave</option>  
+                      </select>   <a href="controlpanel.html?say=Test my voice"><img src="volume.png" height=18></a>  
+                      <br/>
 
                   Volume : 
-                      <select name="volume">
-                        <option value="normal">Normal</option> 
-                        <option value="full">Full</option>
-                        <option value="veryhigh">Very High</option>
-                        <option value="high">High</option>
-                        <option value="low">Low</option>
-                        <option value="verylow">Very Low</option>
-                        <option value="off">Off</option> 
-                      </select>   
+                      <select name="volume"  onchange="javascript:command('volume='+this.value);" >
+                        <option value="4">40%</option> 
+                        <option value="0">0%</option>
+                        <option value="1">10%</option>
+                        <option value="2">20%</option>
+                        <option value="3">30%</option>
+                        <option value="4">40%</option> 
+                        <option value="5">50%</option> 
+                        <option value="6">60%</option> 
+                        <option value="7">70%</option> 
+                        <option value="8">80%</option> 
+                        <option value="9">90%</option> 
+                        <option value="10">100%</option> 
+                      </select>    <a href="controlpanel.html?say=Test my voice"><img src="volume.png" height=18></a> 
                   <br/>
                   
                   City Of Operation :   
