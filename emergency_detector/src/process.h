@@ -9,7 +9,9 @@ extern "C"
 
 extern unsigned int doCVOutput;
 extern unsigned int emergencyDetected;
-extern float temperatureDetected;
+
+extern float temperatureAmbientDetected; 
+extern float temperatureObjectDetected;
 
 
 int processNewTemperatureReading(float temperature);

@@ -5,7 +5,7 @@
 #include <ros/ros.h>
 #include <ros/spinner.h>
 
-#include <stdexcept>
+//#include <stdexcept>
 #include <image_transport/image_transport.h>
 
 #include "process.h"
@@ -28,6 +28,8 @@
 #include <image_transport/image_transport.h>
 
 #include "emergency_detector/SkeletonBBox.h"
+
+#include <std_msgs/Float32.h>
 
 #if BROADCAST_HOBBIT
 #include "hobbit_msgs/Event.h"
@@ -92,6 +94,22 @@ void broadcastEmergency(unsigned int frameNumber)
 
 //----------------------------------------------------------
 //Advertised Service switches
+
+
+void getAmbientTemperature(const std_msgs::Float32::ConstPtr& request)
+{
+    temperatureAmbientDetected=request->data;
+    return;
+}
+
+
+void getObjectTemperature(const std_msgs::Float32::ConstPtr& request)
+{
+    temperatureObjectDetected=request->data;
+    return;
+}
+
+
 bool terminate(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
     ROS_INFO("Stopping Emergency Detector");
@@ -253,6 +271,8 @@ int main(int argc, char **argv)
 	 sync->registerCallback(rgbdCallbackNoCalibration);
 
      ros::Subscriber sub = nh.subscribe("jointsBBox",1000,bboxReceived);
+     ros::Subscriber subTempAmbient = nh.subscribe("/head/tempAmbient",1000,getAmbientTemperature);
+     ros::Subscriber subTempObject = nh.subscribe("/head/tempObject",1000,getObjectTemperature);
      #if BROADCAST_HOBBIT
       gestureEventBroadcaster = nh->advertise <hobbit_msgs::Event> ("Event", 1000);
      #endif

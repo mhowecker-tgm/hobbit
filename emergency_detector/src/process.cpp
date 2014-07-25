@@ -12,7 +12,7 @@
 #include <opencv2/legacy/legacy.hpp>
 #include "opencv2/highgui/highgui.hpp"
 
- 
+
 #define NORMAL "\033[0m"
 #define BLACK "\033[30m" /* Black */
 #define RED "\033[31m" /* Red */
@@ -30,13 +30,8 @@ unsigned int combinationMode=0;
 
 unsigned int doCVOutput=0;
 unsigned int emergencyDetected=0;
-float temperatureDetected=36.0; //<- YODO : default value should be 0
-
-
-int processNewTemperatureReading(float temperature)
-{
-    temperatureDetected=temperature;
-}
+float temperatureAmbientDetected=36.0; //<- YODO : default value should be 0
+float temperatureObjectDetected=36.0; //<- YODO : default value should be 0
 
 
 int processBoundingBox(float sizeX,float sizeY,float sizeZ)
@@ -82,7 +77,7 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
                                         void * calib ,
                                           unsigned int frameTimestamp )
 {
-  if ( (35<temperatureDetected) && (temperatureDetected<37)  )
+  if ( (35<temperatureObjectDetected) && (temperatureObjectDetected<37)  )
     {
         fprintf(stderr,"runServicesThatNeedColorAndDepth called \n");
         unsigned char * segmentedRGB = copyRGB(colorFrame ,colorWidth , colorHeight);
