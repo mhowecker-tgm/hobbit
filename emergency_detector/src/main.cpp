@@ -71,7 +71,7 @@ void broadcastEmergency(unsigned int frameNumber)
   #if BROADCAST_HOBBIT
     hobbit_msgs::Event evt;
     std::stringstream ss;
-     case GESTURE_NONE   : break;
+     //case GESTURE_NONE   : break;
      if (emergencyDetected) { ss<<"G_FALL"; } else
                              { ss<<"G_NONE"; }
 
@@ -276,7 +276,7 @@ int main(int argc, char **argv)
      ros::Subscriber subTempAmbient = nh.subscribe("/head/tempAmbient",1000,getAmbientTemperature);
      ros::Subscriber subTempObject = nh.subscribe("/head/tempObject",1000,getObjectTemperature);
      #if BROADCAST_HOBBIT
-      gestureEventBroadcaster = nh->advertise <hobbit_msgs::Event> ("Event", 1000);
+      gestureEventBroadcaster = nh.advertise <hobbit_msgs::Event> ("Event", 1000);
      #endif
 
      initializeProcess();
