@@ -204,7 +204,7 @@ def main():
         )
         Sequence.add(
             'CALL_DECISION',
-            HobbitMMUI.CallDecison(),
+            HobbitMMUI.CallDecision(),
             transitions={'stop': 'END_CALL',
                          'ended': 'failed'}
         )

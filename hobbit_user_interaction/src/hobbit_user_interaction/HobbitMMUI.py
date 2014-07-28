@@ -46,7 +46,7 @@ class WaitforSoundEnd(util.WaitForMsgState):
             return 'aborted'
 
 
-class CallDecison(smach.State):
+class CallDecision(smach.State):
 
     """
     Inherit from util.WaitForMsgState to wait
