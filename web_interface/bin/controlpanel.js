@@ -112,10 +112,10 @@
        httpGet("controlpanel.html?"+theCommand+"&t="+randomnumber); 
      } 
 
-     function facilitatorCommand(theCommand)
+     function settingsCommand(theCommand)
      {
        var randomnumber=Math.floor(Math.random()*100000);
-       httpGet("facilitator_panel.html?"+theCommand+"&t="+randomnumber); 
+       httpGet("settings.html?"+theCommand+"&t="+randomnumber); 
      } 
 
 
