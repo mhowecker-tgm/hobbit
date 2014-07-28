@@ -117,8 +117,8 @@
                   <td>
                       <div id="LuiBackground" style="background-color:#66FF00;clear:both;text-align:center;" >
                        <img src="lui.png" width=300><br/>
-                      </div> 
-                    UI color : <input id="LuiBackgroundSelector" name="LuiBackgroundSelector" type="color" value="#66ff00" onchange="document.getElementById('LuiBackground').style.backgroundColor=document.getElementById('LuiBackgroundSelector').value;" > <br/> <!-- class="color"-->
+                      </div>  
+                    UI color : <input id="LuiBackgroundSelector" name="LuiBackgroundSelector" type="color" value="#66ff00" onchange="document.getElementById('LuiBackground').style.backgroundColor=document.getElementById('LuiBackgroundSelector').value; settingsCommand('LuiBackgroundSelector='+this.value);" > <br/> <!-- class="color"-->
                   </td>
             </tr>
           </table>
