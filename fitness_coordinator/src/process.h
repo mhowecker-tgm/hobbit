@@ -9,6 +9,7 @@ struct fitnessState
 {
     unsigned int started;
     unsigned int repetitions;
+    unsigned int lastTransmittedRepetitions;
     unsigned int exercise;
 
 };

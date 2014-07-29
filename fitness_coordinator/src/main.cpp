@@ -44,6 +44,7 @@ int key = 0;
 unsigned int frameTimestamp=0;
 ros::NodeHandle * nhPtr=0;
 unsigned int paused=0;
+unsigned int autotrigger=0;
 
 
 struct fitnessState state;
@@ -90,7 +91,7 @@ bool terminate(std_srvs::Empty::Request& request, std_srvs::Empty::Response& res
 
 bool trigger(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-   // emergencyDetected=1;
+    autotrigger=1;
     return true;
 }
 
@@ -177,6 +178,8 @@ int main(int argc, char **argv)
       //Create our context
       //---------------------------------------------------------------------------------------------------
 	  //////////////////////////////////////////////////////////////////////////
+
+	  int repetitions=0;
 	  while ( ( key!='q' ) && (ros::ok()) )
 		{
 		          fprintf(stderr,".");
@@ -185,6 +188,12 @@ int main(int argc, char **argv)
 
                   collectSkeletonFromTF(&sk);
                   checkSkeletonForRepetition(&state,&sk);
+
+                  ++repetitions;
+                  if ( (autotrigger) && (repetitions%10==0) )
+                  {
+                    ++state.repetitions;
+                  }
 	    }
 
 	}

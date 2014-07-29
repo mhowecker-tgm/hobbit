@@ -34,12 +34,23 @@ int broadcastExcerciseFinished(char * name , char * value)
 int signalRepetition(struct fitnessState * state)
 {
   //This should be called after doing a ++state->repetitions;
+  state->lastTransmittedRepetitions = state->repetitions;
   return broadcastExcerciseRepetition(state->exercise,state->repetitions);
 }
 
 int checkSkeletonForRepetition(struct fitnessState * state , struct skeletonHuman * skeleton)
 {
-  //TODO : Check for repetition here by accessing skeleton information
+  //Check skeleton here
+
+  // If skeleton is changed ++state->repetitions
+
+  //------------------------------------------------------------
+  // this should then broadcast the change
+  if (state->lastTransmittedRepetitions != state->repetitions)
+  {
+    return signalRepetition(state);
+  }
+
   return 0;
 }
 
