@@ -341,7 +341,7 @@ rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params
   if (strcmp(command,"volume")==0)       { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_ABSVOLUME],[Value, \"%s\"]]}' \" ",param); }
   if (strcmp(command,"say")==0)
     {
-       snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, D_OK],[Text, \\\"Saying something\\\"],[Speak, \\\"%s\\\"],[\\\"wait\\\", \\\"1\\\"]]}'\"",param);
+       snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, D_OK],[Text, \\\"%s\\\"],[Speak, \\\"%s\\\"],[\\\"wait\\\", \\\"1\\\"]]}'\"",param,param);
     }
 
   if ( strlen(commandToRun)!=0 )
