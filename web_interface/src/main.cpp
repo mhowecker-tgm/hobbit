@@ -466,7 +466,7 @@ void execute(char * command,char * param)
    else
   if (strcmp(command,"hand")==0)
   {
-    if (strcmp(param,"calibrate")==0) {  rostopic_pub(cR,cRLen,(char *) "/ActionSequence",(char *) "hobbit_msgs/Command",(char *) "\"command: 'C_ARM_REFERENCE'\"");
+    if (strcmp(param,"calibrate")==0) {  rostopic_pub(cR,cRLen,(char *) "/ActionSequence",(char *) "hobbit_msgs/Command",(char *) "\"command: 'C_ARM_REFERENCE'\""); }
   }
    else
   if (strcmp(command,"body")==0)
