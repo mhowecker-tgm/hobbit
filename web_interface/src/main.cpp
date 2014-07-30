@@ -423,7 +423,8 @@ void execute(char * command,char * param)
   if (strcmp(command,"head")==0)
   {
     if (strcmp(param,"default")==0)       { rostopic_pub(cR,cRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"center_center\"");  } else
-    if (strcmp(param,"restart")==0)       { rostopic_pub(cR,cRLen,(char *) "/head/cmd ",(char *) "std_msgs/String",(char *) "\"startup\"");        } else
+    if (strcmp(param,"restart")==0)       { rostopic_pub(cR,cRLen,(char *) "/head/cmd ",(char *) "std_msgs/String",(char *) "\"restart\"");        } else
+    if (strcmp(param,"start")==0)         { rostopic_pub(cR,cRLen,(char *) "/head/cmd ",(char *) "std_msgs/String",(char *) "\"startup\"");        } else
     //------------------
     if (strcmp(param,"up_right")==0)      { rostopic_pub(cR,cRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"up_right\"");       } else
     if (strcmp(param,"up_center")==0)     { rostopic_pub(cR,cRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"up_center\"");      } else
