@@ -438,10 +438,8 @@ void execute(char * command,char * param)
   } else
   if (strcmp(command,"head")==0)
   {
-    if (strcmp(param,"default")==0)  {
-                                        execute((char*)"head",(char*)"center_center");
-                                        return;
-                                     } else
+    if (strcmp(param,"default")==0)       { rostopic_pub(cR,cRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"center_center\"");  } else
+    //------------------
     if (strcmp(param,"up_right")==0)      { rostopic_pub(cR,cRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"up_right\"");       } else
     if (strcmp(param,"up_center")==0)     { rostopic_pub(cR,cRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"up_center\"");      } else
     if (strcmp(param,"up_left")==0)       { rostopic_pub(cR,cRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"up_left\"");        } else
@@ -455,7 +453,6 @@ void execute(char * command,char * param)
    else
   if (strcmp(command,"emotion")==0)
   {
-    //HAPPY VHAPPY LTIRED VTIRED CONCERNED SAD WONDERING NEUTRAL SLEEPING
     if (strcmp(param,"happy")==0)     {  rostopic_pub(cR,cRLen,(char *) "/head/emo",(char *) "std_msgs/String",(char *) "\"HAPPY\"");       } else
     if (strcmp(param,"vhappy")==0)    {  rostopic_pub(cR,cRLen,(char *) "/head/emo",(char *) "std_msgs/String",(char *) "\"VHAPPY\"");      } else
     if (strcmp(param,"ltired")==0)    {  rostopic_pub(cR,cRLen,(char *) "/head/emo",(char *) "std_msgs/String",(char *) "\"LTIRED\"");      } else
@@ -467,43 +464,25 @@ void execute(char * command,char * param)
     if (strcmp(param,"sleeping")==0)  {  rostopic_pub(cR,cRLen,(char *) "/head/emo",(char *) "std_msgs/String",(char *) "\"SLEEPING\"");    }
   }
    else
-  if (strcmp(command,"rtd")==0)
-  {
-    if (strcmp(param,"home")==0) 		{ strncpy(cR,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PoseHome.py",cRLen); 			} else
-    if (strcmp(param,"almosthome")==0) 		{ strncpy(cR,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PoseAlmostHome.py",cRLen);		} else
-    if (strcmp(param,"armatside")==0) 		{ strncpy(cR,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PoseArmAtSide.py",cRLen); 		} else
-    if (strcmp(param,"cfaftergrasp")==0)	{ strncpy(cR,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PoseCFAfterGrasp.py",cRLen); 		} else
-    if (strcmp(param,"lowerlearn")==0) 		{ strncpy(cR,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PoseLearn.py",cRLen);			} else
-    if (strcmp(param,"tablepregrasp")==0) 	{ strncpy(cR,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PoseTPregrasp.py",cRLen); 		} else
-    if (strcmp(param,"tablefinalgrasp")==0) 	{ strncpy(cR,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PoseTFinalGrasp.py",cRLen); 		} else
-    if (strcmp(param,"trayprerelease")==0) 	{ strncpy(cR,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PosePreReleaseInTray.py",cRLen); 	} else
-    if (strcmp(param,"trayrelease")==0) 	{ strncpy(cR,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PoseReleaseInTray.py",cRLen); 		} else
-    if (strcmp(param,"clearfloorpregrasp")==0) 	{ strncpy(cR,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PoseCFPregrasp.py",cRLen); 		} else
-    if (strcmp(param,"clearfloorfinalgrasp")==0){ strncpy(cR,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PoseCFFinalGrasp.py",cRLen); 		} else
-    if (strcmp(param,"opengripper")==0) 	{ strncpy(cR,"/home/hobbit/hobbit/ActionSequencer/src/RTD_COMMANDS/RTD_OpenGripper.py",cRLen); 		} else
-    if (strcmp(param,"closegripper")==0) 	{ strncpy(cR,"/home/hobbit/hobbit/ActionSequencer/src/RTD_COMMANDS/RTD_CloseGripper.py",cRLen); 		} else
-    if (strcmp(param,"disableallaxis")==0) 	{ strncpy(cR,"/home/hobbit/hobbit/ActionSequencer/src/RTD_COMMANDS/RTD_DisableAllAxis.py",cRLen); 		} else
-    if (strcmp(param,"graspfromtable")==0) 	{ strncpy(cR,"/home/hobbit/hobbit/ActionSequencer/src/RTD_SCENARIOS/RTD_GraspFromTable.sh",cRLen); 		} else
-    if (strcmp(param,"graspfromfloor")==0) 	{ strncpy(cR,"/home/hobbit/hobbit/ActionSequencer/src/RTD_SCENARIOS/RTD_GraspFromFloor.sh",cRLen); 		}
-  }
-   else
   if (strcmp(command,"hand")==0)
   {
-    if (strcmp(param,"calibrate")==0) { strncpy(cR,"rostopic pub /ActionSequence hobbit_msgs/Command \"command: 'C_ARM_REFERENCE'\" -1  ",cRLen); }
+    if (strcmp(param,"calibrate")==0) {  rostopic_pub(cR,cRLen,(char *) "/ActionSequence",(char *) "hobbit_msgs/Command",(char *) "\"command: 'C_ARM_REFERENCE'\"");
   }
    else
   if (strcmp(command,"body")==0)
   {
-    if (strcmp(param,"reset")==0) { strncpy(cR,"rosservice call /reset_motorstop",cRLen); } else
-    if (strcmp(param,"360")==0) { strncpy(cR,"rostopic pub /DiscreteMotionCmd std_msgs/String \"data: 'Turn 360'\" -1",cRLen); } else
-    if (strcmp(param,"360ccw")==0) { strncpy(cR,"rostopic pub /DiscreteMotionCmd std_msgs/String \"data: 'Turn 360'\" -1",cRLen); } else
-    if (strcmp(param,"360cw")==0) { strncpy(cR,"rostopic pub /DiscreteMotionCmd std_msgs/String \"data: 'Turn -360'\" -1",cRLen); } else
-    if (strcmp(param,"right")==0) { strncpy(cR,"rostopic pub /DiscreteMotionCmd std_msgs/String \"data: 'Turn -30'\" -1",cRLen); } else
-    if (strcmp(param,"left")==0) { strncpy(cR,"rostopic pub /DiscreteMotionCmd std_msgs/String \"data: 'Turn 30'\" -1",cRLen); } else
-    if (strcmp(param,"forward")==0) { strncpy(cR,"rostopic pub /DiscreteMotionCmd std_msgs/String \"data: 'Move 0.30'\" -1",cRLen); } else
-    if (strcmp(param,"back")==0) { strncpy(cR,"rostopic pub /DiscreteMotionCmd std_msgs/String \"data: 'Move -0.30'\" -1",cRLen); }else
-    if (strcmp(param,"stop")==0) {  joystickExecute(0.0,0.0);
-                                    strncpy(cR,"rostopic pub /DiscreteMotionCmd std_msgs/String \"data: 'Stop'\" -1",cRLen); }
+    if (strcmp(param,"reset")==0)   { rosservice_call(cR,cRLen,(char *) "/reset_motorstop");  } else
+    if (strcmp(param,"360")==0)     { rostopic_pub(cR,cRLen,(char *) "/DiscreteMotionCmd",(char *) "std_msgs/String",(char *) "\"data: 'Turn 360'\"");   } else
+    if (strcmp(param,"360ccw")==0)  { rostopic_pub(cR,cRLen,(char *) "/DiscreteMotionCmd",(char *) "std_msgs/String",(char *) "\"data: 'Turn 360'\"");   } else
+    if (strcmp(param,"360cw")==0)   { rostopic_pub(cR,cRLen,(char *) "/DiscreteMotionCmd",(char *) "std_msgs/String",(char *) "\"data: 'Turn -360'\"");  } else
+    if (strcmp(param,"right")==0)   { rostopic_pub(cR,cRLen,(char *) "/DiscreteMotionCmd",(char *) "std_msgs/String",(char *) "\"data: 'Turn -30'\"");   } else
+    if (strcmp(param,"left")==0)    { rostopic_pub(cR,cRLen,(char *) "/DiscreteMotionCmd",(char *) "std_msgs/String",(char *) "\"data: 'Turn 30'\"");    } else
+    if (strcmp(param,"forward")==0) { rostopic_pub(cR,cRLen,(char *) "/DiscreteMotionCmd",(char *) "std_msgs/String",(char *) "\"data: 'Move 0.30'\"");  } else
+    if (strcmp(param,"back")==0)    { rostopic_pub(cR,cRLen,(char *) "/DiscreteMotionCmd",(char *) "std_msgs/String",(char *) "\"data: 'Move -0.30'\"");  }else
+    if (strcmp(param,"stop")==0)    {
+                                      joystickExecute(0.0,0.0);
+                                      rostopic_pub(cR,cRLen,(char *) "/DiscreteMotionCmd",(char *) "std_msgs/String",(char *) "\"data: 'Stop'\"");
+                                    }
   }
    else
   if (strcmp(command,"bring")==0)
