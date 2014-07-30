@@ -339,6 +339,10 @@ rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params
   if (strcmp(command,"voiceFemale")==0)  { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_VOICE],[Value, \"%s\"]]}' \" ",param); }  else
   if (strcmp(command,"voiceMale")==0)    { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_VOICE],[Value, \"%s\"]]}' \" ",param); } else
   if (strcmp(command,"volume")==0)       { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_ABSVOLUME],[Value, \"%s\"]]}' \" ",param); }
+  if (strcmp(command,"say")==0)
+    {
+       snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, D_OK],[Text, \"Saying something\"],[Speak, \"%s\"],[\"wait\", \"1\"]]}'\"",param);
+    }
 
   if ( strlen(commandToRun)!=0 )
    {
@@ -504,44 +508,41 @@ void execute(char * command,char * param)
     if (strcmp(param,"systemRestart")==0)  { strncpy(cR,"sudo init 6",cRLen); } else
     if (strcmp(param,"systemShutdown")==0) { strncpy(cR,"sudo init 0",cRLen); } else
     if (strcmp(param,"systemUpdate")==0)   { strncpy(cR,"/bin/bash -c \"cd /opt/ros/hobbit_hydro/ && source devel/setup.bash && svn update src/ && catkin_make\"",cRLen); } else
-
-    if (strcmp(param,"yes")==0) { strncpy(cR,"rostopic pub /Event hobbit_msgs/Event \"event: 'G_YES'\" -1  ",cRLen); } else
-    if (strcmp(param,"no")==0) { strncpy(cR,"rostopic pub /Event hobbit_msgs/Event \"event: 'G_NO'\" -1  ",cRLen); } else
-    if (strcmp(param,"stop")==0) { strncpy(cR,"rostopic pub /Command hobbit_msgs/Command \"command: 'C_STOP'\" -1  ",cRLen); } else
-    if (strcmp(param,"reward")==0) { strncpy(cR,"rostopic pub /Command hobbit_msgs/Command \"command: 'C_REWARD'\" -1  ",cRLen); } else
-    if (strcmp(param,"cancel")==0) { strncpy(cR,"rostopic pub /ActionSequence hobbit_msgs/Command \"{command: 'C_SPEAK' , params: [ {name: 'CANCEL' , value: ''} ] }\" -1\n",cRLen); } else
-
-    if (strcmp(param,"call")==0) { strncpy(cR,"rostopic pub /ActionSequence hobbit_msgs/Command \"command: 'E_CALLHOBBIT'\" -1  ",cRLen); } else
-    if (strcmp(param,"settings")==0) { strncpy(cR,"rostopic pub /Command hobbit_msgs/Command \"command: 'F_SETTINGS'\" -1  ",cRLen); } else
-    if (strcmp(param,"closemic")==0) { strncpy(cR,"rostopic pub /Command hobbit_msgs/Command \"command: 'F_ASR_OFF'\" -1  ",cRLen); } else
-    if (strcmp(param,"openmic")==0) { strncpy(cR,"rostopic pub /Command hobbit_msgs/Command \"command: 'F_ASR_ON'\" -1  ",cRLen); } else
-
-
-    if (strcmp(param,"hobbit")==0) { strncpy(cR,"rostopic pub /ActionSequence hobbit_msgs/Command \"command: 'C_WAKEUP'\" -1  ",cRLen); } else
-    if (strcmp(param,"wake")==0) { strncpy(cR,"rostopic pub /ActionSequence hobbit_msgs/Command \"command: 'C_WAKEUP'\" -1  ",cRLen); } else
-    if (strcmp(param,"sleep")==0) { strncpy(cR,"rostopic pub /ActionSequence hobbit_msgs/Command \"command: 'C_SLEEP'\" -1  ",cRLen); } else
-    if (strcmp(param,"clearfloor")==0) { strncpy(cR,"rostopic pub /ActionSequence hobbit_msgs/Command \"command: 'C_CLEARFLOOR'\" -1  ",cRLen); } else
-    if (strcmp(param,"bringobject")==0) { strncpy(cR,"rostopic pub /ActionSequence hobbit_msgs/Command \"command: 'C_BRING'\" -1  ",cRLen); } else
-
-           //name: Name     value: ΑΣΠΙΡΊΝΗ
-
-
-    if (strcmp(param,"learnobject")==0) { strncpy(cR,"rostopic pub /ActionSequence hobbit_msgs/Command \"command: 'C_LEARN'\" -1  ",cRLen); } else
-    if (strcmp(param,"helpme")==0) { strncpy(cR,"rostopic pub /ActionSequence hobbit_msgs/Command \"command: 'G_FALL'\" -1  ",cRLen); }
-
+    //-------------------------------
+    if (strcmp(param,"yes")==0)    { rostopic_pub(cR,cRLen,(char *) "/Event",(char *) "hobbit_msgs/Event",(char *) "\"event: 'G_YES'\"");           } else
+    if (strcmp(param,"no")==0)     { rostopic_pub(cR,cRLen,(char *) "/Event",(char *) "hobbit_msgs/Event",(char *) "\"event: 'G_NO'\"");            } else
+    if (strcmp(param,"stop")==0)   { rostopic_pub(cR,cRLen,(char *) "/Command",(char *) "hobbit_msgs/Command",(char *) "\"command: 'C_STOP'\"");   } else
+    if (strcmp(param,"reward")==0) { rostopic_pub(cR,cRLen,(char *) "/Command",(char *) "hobbit_msgs/Command",(char *) "\"command: 'C_REWARD'\""); } else
+    if (strcmp(param,"cancel")==0) { rostopic_pub(cR,cRLen,(char *) "/ActionSequence",(char *) "hobbit_msgs/Command",(char *) "\"{command: 'C_SPEAK' , params: [ {name: 'CANCEL' , value: ''} ] }\""); } else
+    //-------------------------------
+    if (strcmp(param,"call")==0)     { rostopic_pub(cR,cRLen,(char *) "/ActionSequence",(char *) "hobbit_msgs/Command",(char *) "\"command: 'E_CALLHOBBIT'\""); } else
+    if (strcmp(param,"settings")==0) { rostopic_pub(cR,cRLen,(char *) "/Command",(char *) "hobbit_msgs/Command",(char *) "\"command: 'F_SETTINGS'\""); } else
+    if (strcmp(param,"closemic")==0) { rostopic_pub(cR,cRLen,(char *) "/Command",(char *) "hobbit_msgs/Command",(char *) "\"command: 'F_ASR_OFF'\""); } else
+    if (strcmp(param,"openmic")==0)  { rostopic_pub(cR,cRLen,(char *) "/Command",(char *) "hobbit_msgs/Command",(char *) "\"command: 'F_ASR_ON'\""); } else
+    //-------------------------------
+    if (strcmp(param,"hobbit")==0)      { rostopic_pub(cR,cRLen,(char *) "/ActionSequence",(char *) "hobbit_msgs/Command",(char *) "\"command: 'C_WAKEUP'\"");      } else
+    if (strcmp(param,"wake")==0)        { rostopic_pub(cR,cRLen,(char *) "/ActionSequence",(char *) "hobbit_msgs/Command",(char *) "\"command: 'C_WAKEUP'\"");      } else
+    if (strcmp(param,"sleep")==0)       { rostopic_pub(cR,cRLen,(char *) "/ActionSequence",(char *) "hobbit_msgs/Command",(char *) "\"command: 'C_SLEEP'\"");       } else
+    if (strcmp(param,"clearfloor")==0)  { rostopic_pub(cR,cRLen,(char *) "/ActionSequence",(char *) "hobbit_msgs/Command",(char *) "\"command: 'C_CLEARFLOOR'\"");  } else
+    if (strcmp(param,"bringobject")==0) { rostopic_pub(cR,cRLen,(char *) "/ActionSequence",(char *) "hobbit_msgs/Command",(char *) "\"command: 'C_BRING'\"");       } else
+    //-------------------------------
+    if (strcmp(param,"learnobject")==0) { rostopic_pub(cR,cRLen,(char *) "/ActionSequence",(char *) "hobbit_msgs/Command",(char *) "\"command: 'C_LEARN'\"");       } else
+    if (strcmp(param,"helpme")==0)      { rostopic_pub(cR,cRLen,(char *) "/ActionSequence",(char *) "hobbit_msgs/Command",(char *) "\"command: 'G_FALL'\"");        }
   }
    else
   if (strcmp(command,"say")==0)
   {
      char internalString[MAX_COMMAND_SIZE+1]={0};
-     if (strcmp(param,"test")==0) {  strncpy(internalString,"Θα σας κάνω μια έκπληξη , θα σταματήσω να δουλεύω σε ένα τυχαίο σημείο.!",cRLen); } else
-                                  {  strncpy(internalString,param,cRLen); }
-
-
+     strncpy(internalString,param,cRLen);
      replaceChar(internalString,'+',' ');
 
-     //rostopic pub /ActionSequence HobbitMsgs/Command "{command: 'C_SPEAK' , params: [ name: 'INFO' , value: 'lobbit' ] }" -1
-     snprintf(cR,cRLen,"rostopic pub /ActionSequence hobbit_msgs/Command \"{command: 'C_SPEAK' , params: [ {name: 'INFO' , value: '%s'} ] }\" -1\n",internalString);
+     #if USE_OLD_SAY_COMMAND
+      //rostopic pub /ActionSequence HobbitMsgs/Command "{command: 'C_SPEAK' , params: [ name: 'INFO' , value: 'lobbit' ] }" -1
+      snprintf(cR,cRLen,"rostopic pub /ActionSequence hobbit_msgs/Command \"{command: 'C_SPEAK' , params: [ {name: 'INFO' , value: '%s'} ] }\" -1\n",internalString);
+     #else
+      MMUIStuffExecute("say",internalString);
+      return ;
+     #endif // USE_OLD_SAY_COMMAND
   }
 
   if ( strlen(cR)!=0 )
