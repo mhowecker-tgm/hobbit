@@ -308,7 +308,7 @@ void joystickExecute(float x , float y )
       ===========================================================================================================================
 */
 
-void MMUIStuffExecute(char * command,char * param)
+void MMUIExecute(char * command,char * param)
 {
 
   /*
@@ -402,11 +402,11 @@ void execute(char * command,char * param)
   if (strcmp(command,"setLatestSleepingTime")==0) { rosparam_set(cR,cRLen,(char *) "/Hobbit/sleep_time",param);      }  else
   if (strcmp(command,"LuiBackgroundSelector")==0) { rosparam_set(cR,cRLen,(char *) "USER/BGCOLOUR",param);           }  else
   //---------------
-  if (strcmp(command,"talkingSpeed")==0) { MMUIStuffExecute(command,param); rosparam_set(cR,cRLen,(char *) "USER/Voice/Speed",param);   }  else
-  if (strcmp(command,"gender")==0)       { MMUIStuffExecute(command,param); rosparam_set(cR,cRLen,(char *) "USER/Voice/Default",param); }  else
-  if (strcmp(command,"voiceFemale")==0)  { MMUIStuffExecute(command,param); rosparam_set(cR,cRLen,(char *) "USER/Voice/FEMALE",param);  }  else
-  if (strcmp(command,"voiceMale")==0)    { MMUIStuffExecute(command,param); rosparam_set(cR,cRLen,(char *) "USER/Voice/MALE",param);    }  else
-  if (strcmp(command,"volume")==0)       { MMUIStuffExecute(command,param); rosparam_set(cR,cRLen,(char *) "USER/Voice/Volume",param);  }  else
+  if (strcmp(command,"talkingSpeed")==0) { MMUIExecute(command,param); rosparam_set(cR,cRLen,(char *) "USER/Voice/Speed",param);   }  else
+  if (strcmp(command,"gender")==0)       { MMUIExecute(command,param); rosparam_set(cR,cRLen,(char *) "USER/Voice/Default",param); }  else
+  if (strcmp(command,"voiceFemale")==0)  { MMUIExecute(command,param); rosparam_set(cR,cRLen,(char *) "USER/Voice/FEMALE",param);  }  else
+  if (strcmp(command,"voiceMale")==0)    { MMUIExecute(command,param); rosparam_set(cR,cRLen,(char *) "USER/Voice/MALE",param);    }  else
+  if (strcmp(command,"volume")==0)       { MMUIExecute(command,param); rosparam_set(cR,cRLen,(char *) "USER/Voice/Volume",param);  }  else
 
 
   // ULTRA UNSAFE , INJECTION PRONE PARAMS HERE
@@ -540,7 +540,7 @@ void execute(char * command,char * param)
       //rostopic pub /ActionSequence HobbitMsgs/Command "{command: 'C_SPEAK' , params: [ name: 'INFO' , value: 'lobbit' ] }" -1
       snprintf(cR,cRLen,"rostopic pub /ActionSequence hobbit_msgs/Command \"{command: 'C_SPEAK' , params: [ {name: 'INFO' , value: '%s'} ] }\" -1\n",internalString);
      #else
-      MMUIStuffExecute("say",internalString);
+      MMUIExecute("say",internalString);
       return ;
      #endif // USE_OLD_SAY_COMMAND
   }
