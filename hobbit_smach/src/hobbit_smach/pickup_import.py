@@ -22,6 +22,17 @@ import math, struct
 from testdetector import TD
 import tf
 from tf.transformations import euler_from_quaternion, quaternion_matrix
+from sensor_msgs.msg import PointField
+
+_DATATYPES = {}
+_DATATYPES[PointField.INT8]    = ('b', 1)
+_DATATYPES[PointField.UINT8]   = ('B', 1)
+_DATATYPES[PointField.INT16]   = ('h', 2)
+_DATATYPES[PointField.UINT16]  = ('H', 2)
+_DATATYPES[PointField.INT32]   = ('i', 4)
+_DATATYPES[PointField.UINT32]  = ('I', 4)
+_DATATYPES[PointField.FLOAT32] = ('f', 4)
+_DATATYPES[PointField.FLOAT64] = ('d', 8)
 
 class DavidLookForObject(State):
     """
@@ -54,49 +65,20 @@ class DavidLookForObject(State):
             input_keys=['cloud', 'goal_position_x', 'goal_position_y', 'goal_position_yaw'],
             output_keys=['goal_position_x', 'goal_position_y', 'goal_position_yaw']
         )
-        self.rec = TD(useRFR=False)
+	self.listener = tf.TransformListener()
+        self.rec = TD()
         self.restrictfind = False
         self.robotDistFromGraspPntForGrasping = 0.6
-        self.robotOffsetRotationForGrasping = math.pi/4
-
-    def execute(self, ud):
-        if self.preempt_requested():
-            return 'preempted'
-        # TODO: David please put the pose calculations in here
-        # The acquired point cloud is stored in ud.cloud
-        # (sensor_msgs/PointCloud2)
-        # The head will already be looking down to the floor.
-
-
-
-        if findobject(ud):
-
-            (robot_x, robot_y, robot_yaw) = util.get_current_robot_position(frame='/map')
-            posRobot = [robot_x, robot_y] #Bajo, please fill in
-            # self.graspable_center_of_cluster_wcs  #center of graspable point cluster
-            robotApproachDir = [self.graspable_center_of_cluster_wcs[0] - posRobot[0], self.graspable_center_of_cluster_wcs[1] - posRobot[1]]
-            robotApproachDir = [robotApproachDir[0]/numpy.linalg.norm(robotApproachDir), robotApproachDir[1]/numpy.linalg.norm(robotApproachDir)]       #normalized
-
-
-            ud.goal_position_x = self.graspable_center_of_cluster_wcs[0] - robotDistFromGraspPntForGrasping * robotApproachDir[0]
-            ud.goal_position_y = self.graspable_center_of_cluster_wcs[1] - robotDistFromGraspPntForGrasping * robotApproachDir[1]
-            ud.goal_position_yaw = math.atan2(robotApproachDir[1],robotApproachDir[0]) + robotOffsetRotationForGrasping #can be negative!  180/math.pi*math.atan2(y,x) = angle in degree of vector (x,y)
-
-            return 'succeeded'
-        else:
-            return 'failed'
-
+        self.robotOffsetRotationForGrasping = math.pi/3
 
     def findobject(self, ud):
-        random.seed(rospy.get_time())
+	print "===> pickup_import.py: DavidLookForObject.findobject()"
+        #random.seed(rospy.get_time())
         pointcloud = ud.cloud
-        clusters = self.rec.findObjectsOnFloor(pointcloud, [0,0,0,0])
-        print len(clusters)
+	clusters = self.rec.findObjectsOnFloor(pointcloud, [0,0,0,0])
+        print "number of object clusters on floor found: ", len(clusters)
 
         for cluster in clusters:
-            #cn = random.randrange(1,9000000)
-            #name = "object"
-            #self.rec.savePointCloud2File(cluster, "/home/walter/tmp", "cluster", name + "_" + str(cn))
             self.pc = cluster
             #self.pubClust.publish(cluster)
             if self.isGraspableObject():
@@ -106,12 +88,53 @@ class DavidLookForObject(State):
                     return True
 
         print "findobect(): no graspable object found"
-        return false
+        return False
+
+
+
+    def execute(self, ud):
+	print "===> pickup_import.py: DavidLookForObject.execute()"
+        if self.preempt_requested():
+            return 'preempted'
+        # TODO: David please put the pose calculations in here
+        # The acquired point cloud is stored in ud.cloud
+        # (sensor_msgs/PointCloud2)
+        # The head will already be looking down to the floor.
+
+
+
+        if self.findobject(ud):
+
+            (robot_x, robot_y, robot_yaw) = util.get_current_robot_position(frame='/map')
+            posRobot = [robot_x, robot_y] #Bajo, please fill in
+	    print "actual robot position: ", posRobot
+	    print "graspable center of cluster: ", self.graspable_center_of_cluster_wcs  #center of graspable point cluster
+            robotApproachDir = [self.graspable_center_of_cluster_wcs[0] - posRobot[0], self.graspable_center_of_cluster_wcs[1] - posRobot[1]]
+            robotApproachDir = [robotApproachDir[0]/numpy.linalg.norm(robotApproachDir), robotApproachDir[1]/numpy.linalg.norm(robotApproachDir)]       #normalized
+	    print "normalized robot approach direction: ", robotApproachDir
+
+
+            ud.goal_position_x = self.graspable_center_of_cluster_wcs[0] - robotDistFromGraspPntForGrasping * robotApproachDir[0]
+            ud.goal_position_y = self.graspable_center_of_cluster_wcs[1] - robotDistFromGraspPntForGrasping * robotApproachDir[1]
+            ud.goal_position_yaw = math.atan2(robotApproachDir[1],robotApproachDir[0]) + robotOffsetRotationForGrasping #can be negative!  180/math.pi*math.atan2(y,x) = angle in degree of vector (x,y)
+	    print "robotDistFromGraspPntForGrasping: ", robotDistFromGraspPntForGrasping
+	    print "robotOffsetRotationForGrasping: ", robotOffsetRotationForGrasping
+	    print "robot goal position:"
+	    print "ud.goal_position_x:   ", ud.goal_position_x
+	    print "ud.goal_position_y:   ", ud.goal_position_y
+	    print "ud.goal_position_yaw:   ", ud.goal_position_yaw
+
+
+            return 'succeeded'
+        else:
+            return 'failed'
+
+
 
 
     #checks if object is suitable for grasping for camera center/down (later extension e.g. check distance to wall)
     def isGraspableObject(self):
-        print "\n F(): isGraspableObject start"
+        print "\n ===> F(): isGraspableObject start"
 
         print "trying to get tf transform"
         while True:
@@ -154,6 +177,7 @@ class DavidLookForObject(State):
 
         Transforms a geometry_msgs PoseStamped message to frame target_frame, returns a new PoseStamped message.
         """
+	print "===> pickup_import.py: DavidLookForObject.transformPointCloud()"
         r = PointCloud()
         r.header.stamp = rospy.Time.now() #point_cloud.header.stamp
         r.header.frame_id = target_frame
@@ -196,6 +220,7 @@ class DavidLookForObject(State):
 
 
     def ispossibleobject(self, pnt):    #pnt is in rcs
+	print "===> pickup_import.py: DavidLookForObject.ispossibleobject()"
         #criteria for valid objects
         x_min = -0.5
         x_max = 1.0
@@ -224,6 +249,7 @@ class DavidLookForObject(State):
 
 
     def getCenterOfCluster(self):
+	print "===> pickup_import.py: DavidLookForObject.getCenterOfCluster()"
         #extract points from PointCloud2 in python....
         fmt = self._get_struct_fmt(self.pc)
         narr = list()
@@ -250,6 +276,7 @@ class DavidLookForObject(State):
 
 
     def getRollForPointCloud(self):
+	print "===> pickup_import.py: DavidLookForObject.getRollForPointCloud()"
         #finds and return good roll angle (assuming its good to grasp where object is slim)
         # returned angle has to be added to cf_pregrasp and cf_finalgrasp
         print "start of getRollForPointCloud"
@@ -388,8 +415,8 @@ class DavidLookingPose(State):
 
     #def savePointingDirection(self, msg):
         mm2m = 1000
-        robotDistFromGraspPnt = 1 #in meters
-        robotOffsetRotationForLooking = math.pi/4
+        robotDistFromGraspPnt = 0.6 #in meters
+        robotOffsetRotationForLooking = math.pi/3
 
         self.pointingDirCCS = [float(ud.pointing_msg.x)/mm2m,float(ud.pointing_msg.y)/mm2m,float(ud.pointing_msg.z)/mm2m,float(ud.pointing_msg.vectorX)/mm2m,float(ud.pointing_msg.vectorY)/mm2m,float(ud.pointing_msg.vectorZ)/mm2m]
         #calculate hand wrist point in robot coordinate system
@@ -406,39 +433,20 @@ class DavidLookingPose(State):
         while True:
             try:
                 t = rospy.Time(0)
-                ##point_cloud.header.stamp = t
-                #(trans,rot) = self.listener.lookupTransform('/headcam_rgb_optical_frame', target_frame, rospy.Time(0))
-		#print "rot1: ", rot
-                #rot = quaternion_matrix(rot)[0:3,0:3]
-		#print "rot quat 0:3: ", rot
-                #pvec = (self.pointingDirCCS[3],self.pointingDirCCS[4],self.pointingDirCCS[5])
-		#pvec = (pvec[0]/numpy.linalg.norm(pvec),pvec[1]/numpy.linalg.norm(pvec),pvec[2]/numpy.linalg.norm(pvec))  #normalize
-                #print "======================================================="
-		#print "pvec (CCS, normalized): ", pvec # (CCS)
-		##print "roation matrix: ", rot                
-		##pvecWCS = numpy.dot(rot,pvec)
-		##pvecWCS = rot*pvec                
-		#pvecWCS = numpy.dot(rot,pvec)
-		#print "Pointing Vector in WCS: ", pvecWCS
-
+              
                 #point_cloud.header.stamp = t
                 (trans,rot) = self.listener.lookupTransform('/headcam_rgb_optical_frame', target_frame, rospy.Time(0))
 		#print "rot1: ", rot
-                ##rot = quaternion_matrix(rot)[0:3,0:3]
-		rot = quaternion_matrix(rot)
-		rot[0:3,0:3] = numpy.linalg.inv(rot[0:3,0:3])
+		rot = quaternion_matrix(rot)[0:3,0:3]
 		#print "trans: ", trans
-		rot[0:3,3]=trans
+		#rot[0:3,3]=trans
 		print "rot quat plus trans", rot
                 pvec = (self.pointingDirCCS[3],self.pointingDirCCS[4],self.pointingDirCCS[5])
 		pvec = (pvec[0]/numpy.linalg.norm(pvec),pvec[1]/numpy.linalg.norm(pvec),pvec[2]/numpy.linalg.norm(pvec))  #normalize
-                print "======================================================="
+		pvecWCS = numpy.dot(pvec,rot)                
+		print "======================================================="
 		print "pvec (CCS, normalized): ", pvec # (CCS)
 		print "roation matrix: ", rot  
-		
-		pvec_hom = (pvec[0],pvec[1],pvec[2],1)  
-		#rot = numpy.linalg.inv(rot)            
-		pvecWCS = numpy.dot(rot,pvec_hom)[0:3]
 		print "Pointing Vector in WCS: ", pvecWCS
 
 
@@ -452,7 +460,9 @@ class DavidLookingPose(State):
 	(robot_x, robot_y, robot_yaw) = util.get_current_robot_position(frame='/map')
         posRobot = [robot_x, robot_y] #Bajo, please fill in
         gpOnFloor = self.calcIntersectionPointingDirWithFloor(pspWCS, pvecWCS)
-        print "grasp point on floor: X:  ", gpOnFloor[0], "   Y:  ", gpOnFloor[1], "   Z:  ", gpOnFloor[2]
+        if gpOnFloor == None:
+		return 'preempted'
+	print "grasp point on floor: X:  ", gpOnFloor[0], "   Y:  ", gpOnFloor[1], "   Z:  ", gpOnFloor[2]
         robotApproachDir = [gpOnFloor[0] - posRobot[0], gpOnFloor[1] - posRobot[1]]
         robotApproachDir = [robotApproachDir[0]/numpy.linalg.norm(robotApproachDir), robotApproachDir[1]/numpy.linalg.norm(robotApproachDir)]       #normalized
 
@@ -472,7 +482,7 @@ class DavidLookingPose(State):
         if k < 0:
             print "ERROR, pointing direction must be downwards!!"
             print "k = ", k
-            return NULL
+            return None
         gpOnFloor = [pspWCS.point.x+k*pvecWCS[0],pspWCS.point.y+k*pvecWCS[1],0]
         return gpOnFloor
 
