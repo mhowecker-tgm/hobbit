@@ -310,24 +310,6 @@ void joystickExecute(float x , float y )
 
 void MMUIExecute(char * command,char * param)
 {
-
-  /*
-
-params:
-Type=F_ABSVOLUME, Value=0..100 sets MMUI volume, default 50
-Type=F_SPEED, Value=0..100 sets absolute TTS speed, default 50
-Type=F_VOICE, Value=Voicename sets TTS voice (partial match, so unique short name is enough) -> it would be good if the webinterface had a list of available voices
-new Type=F_SETBG, Value=colourname
-
-(Type=F_REBOOT reboot MMUI, causing reload of dcfg)
-
-examples:
-rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_VOICE],[Value, "Susan"]]}'
-rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, D_OK],[Text, "Demonstration of voice"],[Speak, "text to speak"],["wait", "1"]]}'
-
-  */
-
-
   char * commandToRun = (char*) malloc((MAX_COMMAND_SIZE+1) * sizeof(char));
   if (commandToRun==0) { AmmServer_Error("Could not allocate enough space for MMUI command execution"); return ; }
 
@@ -339,10 +321,8 @@ rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params
   if (strcmp(command,"voiceFemale")==0)  { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_VOICE],[Value, \"%s\"]]}' \" ",param); }  else
   if (strcmp(command,"voiceMale")==0)    { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_VOICE],[Value, \"%s\"]]}' \" ",param); } else
   if (strcmp(command,"volume")==0)       { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_ABSVOLUME],[Value, \"%s\"]]}' \" ",param); }
-  if (strcmp(command,"say")==0)
-    {
-       snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, D_OK],[Text, \\\"%s\\\"],[Speak, \\\"%s\\\"],[\\\"wait\\\", \\\"1\\\"]]}'\"",param,param);
-    }
+  if (strcmp(command,"say")==0)          { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, D_OK],[Text, \\\"%s\\\"],[Speak, \\\"%s\\\"],[\\\"wait\\\", \\\"1\\\"]]}'\"",param,param); } else
+  if (strcmp(command,"ask")==0)          { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, D_YESNO],[Text, \\\"%s\\\"],[Speak, \\\"%s\\\"],[\\\"wait\\\", \\\"1\\\"]]}'\"",param,param); }
 
   if ( strlen(commandToRun)!=0 )
    {
@@ -506,8 +486,8 @@ void execute(char * command,char * param)
    else
   if (strcmp(command,"robot")==0)
   {
-    if (strcmp(param,"systemRestart")==0)  { strncpy(cR,"sudo init 6",cRLen); } else
-    if (strcmp(param,"systemShutdown")==0) { strncpy(cR,"sudo init 0",cRLen); } else
+    if (strcmp(param,"systemRestart")==0)  { strncpy(cR,"/opt/ros/hobbit_hydro/src/web_interface/bin/restart.sh",cRLen); } else
+    if (strcmp(param,"systemShutdown")==0) { strncpy(cR,"/opt/ros/hobbit_hydro/src/web_interface/bin/shutdown.sh",cRLen); } else
     if (strcmp(param,"systemUpdate")==0)   { strncpy(cR,"/bin/bash -c \"cd /opt/ros/hobbit_hydro/ && source devel/setup.bash && svn update src/ && catkin_make\"",cRLen); } else
     //-------------------------------
     if (strcmp(param,"yes")==0)    { rostopic_pub(cR,cRLen,(char *) "/Event",(char *) "hobbit_msgs/Event",(char *) "\"event: 'G_YES'\"");           } else
