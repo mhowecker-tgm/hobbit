@@ -487,16 +487,16 @@ void execute(char * command,char * param)
    else
   if (strcmp(command,"bring")==0)
   {
-    if (strcmp(param,"aspirin")==0) { strncpy(cR,"rostopic pub /ActionSequence hobbit_msgs/Command \"{command: 'C_BRING' , params: [ {name: 'Name' , value: 'ΑΣΠΙΡΊΝΗ'} ] }\" -1  ",cRLen); } else
-    if (strcmp(param,"sugar")==0) { strncpy(cR,"rostopic pub /ActionSequence hobbit_msgs/Command \"{command: 'C_BRING' , params: [ {name: 'Name' , value: 'ΖΆΧΑΡΗ'} ] }\" -1  ",cRLen); }
+    if (strcmp(param,"aspirin")==0) { rostopic_pub(cR,cRLen,(char *) "/ActionSequence",(char *) "hobbit_msgs/Command",(char *) "\"{command: 'C_BRING' , params: [ {name: 'Name' , value: 'ASPIRIN'} ] }\""); } else
+    if (strcmp(param,"sugar")==0)   { rostopic_pub(cR,cRLen,(char *) "/ActionSequence",(char *) "hobbit_msgs/Command",(char *) "\"{command: 'C_BRING' , params: [ {name: 'Name' , value: 'SUGAR'} ] }\""); }
   }
    else
   if (strcmp(command,"move")==0)
   {
-    if (strcmp(param,"charging")==0) { strncpy(cR,"rostopic pub /ActionSequence hobbit_msgs/Command \"{command: 'C_BRING' , params: [ {name: 'Name' , value: 'ΑΣΠΙΡΊΝΗ'} ] }\" -1  ",cRLen); } else
-    if (strcmp(param,"kitchen")==0) { strncpy(cR,"rostopic pub /ActionSequence hobbit_msgs/Command \"{command: 'C_BRING' , params: [ {name: 'Name' , value: 'ΑΣΠΙΡΊΝΗ'} ] }\" -1  ",cRLen); } else
-    if (strcmp(param,"livingroom")==0) { strncpy(cR,"rostopic pub /ActionSequence hobbit_msgs/Command \"{command: 'C_BRING' , params: [ {name: 'Name' , value: 'ΑΣΠΙΡΊΝΗ'} ] }\" -1  ",cRLen); } else
-    if (strcmp(param,"bedroom")==0) { strncpy(cR,"rostopic pub /ActionSequence hobbit_msgs/Command \"{command: 'C_BRING' , params: [ {name: 'Name' , value: 'ΑΣΠΙΡΊΝΗ'} ] }\" -1  ",cRLen); }
+    if (strcmp(param,"charging")==0)   { /*TODO IMPLEMENT THIS*/ } else
+    if (strcmp(param,"kitchen")==0)    { /*TODO IMPLEMENT THIS*/ } else
+    if (strcmp(param,"livingroom")==0) { /*TODO IMPLEMENT THIS*/ } else
+    if (strcmp(param,"bedroom")==0)    { /*TODO IMPLEMENT THIS*/ }
   }
    else
   if (strcmp(command,"robot")==0)
