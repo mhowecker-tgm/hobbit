@@ -456,15 +456,15 @@ void execute(char * command,char * param)
   if (strcmp(command,"emotion")==0)
   {
     //HAPPY VHAPPY LTIRED VTIRED CONCERNED SAD WONDERING NEUTRAL SLEEPING
-    if (strcmp(param,"happy")==0) { strncpy(cR,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"HAPPY\" -1\" ",cRLen); } else
-    if (strcmp(param,"vhappy")==0) { strncpy(cR,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"VHAPPY\" -1\" ",cRLen); } else
-    if (strcmp(param,"ltired")==0) { strncpy(cR,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"LTIRED\" -1\" ",cRLen); } else
-    if (strcmp(param,"vtired")==0) { strncpy(cR,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"VTIRED\" -1\" ",cRLen); } else
-    if (strcmp(param,"concerned")==0) { strncpy(cR,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"CONCERNED\" -1\" ",cRLen); } else
-    if (strcmp(param,"sad")==0) { strncpy(cR,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"SAD\" -1\" ",cRLen); } else
-    if (strcmp(param,"wondering")==0) { strncpy(cR,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"WONDERING\" -1\" ",cRLen); } else
-    if (strcmp(param,"neutral")==0) { strncpy(cR,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"NEUTRAL\" -1\" ",cRLen); } else
-    if (strcmp(param,"sleeping")==0) { strncpy(cR,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"SLEEPING\" -1\" ",cRLen); }
+    if (strcmp(param,"happy")==0)     {  rostopic_pub(cR,cRLen,(char *) "/head/emo",(char *) "std_msgs/String",(char *) "\"HAPPY\"");       } else
+    if (strcmp(param,"vhappy")==0)    {  rostopic_pub(cR,cRLen,(char *) "/head/emo",(char *) "std_msgs/String",(char *) "\"VHAPPY\"");      } else
+    if (strcmp(param,"ltired")==0)    {  rostopic_pub(cR,cRLen,(char *) "/head/emo",(char *) "std_msgs/String",(char *) "\"LTIRED\"");      } else
+    if (strcmp(param,"vtired")==0)    {  rostopic_pub(cR,cRLen,(char *) "/head/emo",(char *) "std_msgs/String",(char *) "\"VTIRED\"");      } else
+    if (strcmp(param,"concerned")==0) {  rostopic_pub(cR,cRLen,(char *) "/head/emo",(char *) "std_msgs/String",(char *) "\"CONCERNED\"");   } else
+    if (strcmp(param,"sad")==0)       {  rostopic_pub(cR,cRLen,(char *) "/head/emo",(char *) "std_msgs/String",(char *) "\"SAD\"");         } else
+    if (strcmp(param,"wondering")==0) {  rostopic_pub(cR,cRLen,(char *) "/head/emo",(char *) "std_msgs/String",(char *) "\"WONDERING\"");   } else
+    if (strcmp(param,"neutral")==0)   {  rostopic_pub(cR,cRLen,(char *) "/head/emo",(char *) "std_msgs/String",(char *) "\"NEUTRAL\"");     } else
+    if (strcmp(param,"sleeping")==0)  {  rostopic_pub(cR,cRLen,(char *) "/head/emo",(char *) "std_msgs/String",(char *) "\"SLEEPING\"");    }
   }
    else
   if (strcmp(command,"rtd")==0)
