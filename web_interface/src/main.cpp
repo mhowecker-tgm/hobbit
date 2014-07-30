@@ -409,25 +409,25 @@ void execute(char * command,char * param)
   //-------------------------------------------------
   if (strcmp(command,"node")==0)
   {
-    if (strcmp(param,"niteTrigger")==0)      {  rosservice_call(cR,CRLen,(char *) "/rgbd_acquisition/trigger_peopletracker");   } else
-    if (strcmp(param,"nitePause")==0)        {  rosservice_call(cR,CRLen,(char *) "/rgbd_acquisition/pause_peopletracker");     } else
-    if (strcmp(param,"niteResume")==0)       {  rosservice_call(cR,CRLen,(char *) "/rgbd_acquisition/resume_peopletracker");    } else
-    if (strcmp(param,"nitePausePoint")==0)   {  rosservice_call(cR,CRLen,(char *) "/rgbd_acquisition/pause_pointing_gesture_messages");    } else
-    if (strcmp(param,"niteResumePoint")==0)  {  rosservice_call(cR,CRLen,(char *) "/rgbd_acquisition/resume_pointing_gesture_messages");   } else
+    if (strcmp(param,"niteTrigger")==0)      {  rosservice_call(cR,cRLen,(char *) "/rgbd_acquisition/trigger_peopletracker");   } else
+    if (strcmp(param,"nitePause")==0)        {  rosservice_call(cR,cRLen,(char *) "/rgbd_acquisition/pause_peopletracker");     } else
+    if (strcmp(param,"niteResume")==0)       {  rosservice_call(cR,cRLen,(char *) "/rgbd_acquisition/resume_peopletracker");    } else
+    if (strcmp(param,"nitePausePoint")==0)   {  rosservice_call(cR,cRLen,(char *) "/rgbd_acquisition/pause_pointing_gesture_messages");    } else
+    if (strcmp(param,"niteResumePoint")==0)  {  rosservice_call(cR,cRLen,(char *) "/rgbd_acquisition/resume_pointing_gesture_messages");   } else
 
-    if (strcmp(param,"forthSKPause")==0)     {  rosservice_call(cR,CRLen,(char *) "/skeleton_detector/pause");        } else
-    if (strcmp(param,"forthSKResume")==0)    {  rosservice_call(cR,CRLen,(char *) "/skeleton_detector/resume");       } else
+    if (strcmp(param,"forthSKPause")==0)     {  rosservice_call(cR,cRLen,(char *) "/skeleton_detector/pause");        } else
+    if (strcmp(param,"forthSKResume")==0)    {  rosservice_call(cR,cRLen,(char *) "/skeleton_detector/resume");       } else
 
-    if (strcmp(param,"emergencyTrigger")==0) {  rosservice_call(cR,CRLen,(char *) "/emergency_detector/trigger");    } else
-    if (strcmp(param,"emergencyPause")==0)   {  rosservice_call(cR,CRLen,(char *) "/emergency_detector/pause");      } else
-    if (strcmp(param,"emergencyResume")==0)  {  rosservice_call(cR,CRLen,(char *) "/emergency_detector/resume");     } else
+    if (strcmp(param,"emergencyTrigger")==0) {  rosservice_call(cR,cRLen,(char *) "/emergency_detector/trigger");    } else
+    if (strcmp(param,"emergencyPause")==0)   {  rosservice_call(cR,cRLen,(char *) "/emergency_detector/pause");      } else
+    if (strcmp(param,"emergencyResume")==0)  {  rosservice_call(cR,cRLen,(char *) "/emergency_detector/resume");     } else
 
-    if (strcmp(param,"gesturePause")==0)     {  rosservice_call(cR,CRLen,(char *) "/hand_gestures/pause");          } else
-    if (strcmp(param,"gestureResume")==0)    {  rosservice_call(cR,CRLen,(char *) "/hand_gestures/resume");         } else
+    if (strcmp(param,"gesturePause")==0)     {  rosservice_call(cR,cRLen,(char *) "/hand_gestures/pause");          } else
+    if (strcmp(param,"gestureResume")==0)    {  rosservice_call(cR,cRLen,(char *) "/hand_gestures/resume");         } else
 
-    if (strcmp(param,"faceTrigger")==0)      {  rosservice_call(cR,CRLen,(char *) "/face_detection/trigger");  } else
-    if (strcmp(param,"facePause")==0)        {  rosservice_call(cR,CRLen,(char *) "/face_detection/pause");    } else
-    if (strcmp(param,"faceResume")==0)       {  rosservice_call(cR,CRLen,(char *) "/face_detection/resume");   } else
+    if (strcmp(param,"faceTrigger")==0)      {  rosservice_call(cR,cRLen,(char *) "/face_detection/trigger");  } else
+    if (strcmp(param,"facePause")==0)        {  rosservice_call(cR,cRLen,(char *) "/face_detection/pause");    } else
+    if (strcmp(param,"faceResume")==0)       {  rosservice_call(cR,cRLen,(char *) "/face_detection/resume");   } else
                                              {  fprintf(stderr,"Unknown node command ( param %s ) \n", param); }
 
   } else
@@ -442,15 +442,15 @@ void execute(char * command,char * param)
                                         execute((char*)"head",(char*)"center_center");
                                         return;
                                      } else
-    if (strcmp(param,"up_right")==0)      { rostopic_pub(cR,CRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"up_right\"");       } else
-    if (strcmp(param,"up_center")==0)     { rostopic_pub(cR,CRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"up_center\"");      } else
-    if (strcmp(param,"up_left")==0)       { rostopic_pub(cR,CRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"up_left\"");        } else
-    if (strcmp(param,"center_right")==0)  { rostopic_pub(cR,CRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"center_right\"");   } else
-    if (strcmp(param,"center_center")==0) { rostopic_pub(cR,CRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"center_center\"");  } else
-    if (strcmp(param,"center_left")==0)   { rostopic_pub(cR,CRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"center_left\"");    } else
-    if (strcmp(param,"down_right")==0)    { rostopic_pub(cR,CRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"down_right\"");     } else
-    if (strcmp(param,"down_center")==0)   { rostopic_pub(cR,CRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"down_center\"");    } else
-    if (strcmp(param,"down_left")==0)     { rostopic_pub(cR,CRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"down_left\"");      }
+    if (strcmp(param,"up_right")==0)      { rostopic_pub(cR,cRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"up_right\"");       } else
+    if (strcmp(param,"up_center")==0)     { rostopic_pub(cR,cRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"up_center\"");      } else
+    if (strcmp(param,"up_left")==0)       { rostopic_pub(cR,cRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"up_left\"");        } else
+    if (strcmp(param,"center_right")==0)  { rostopic_pub(cR,cRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"center_right\"");   } else
+    if (strcmp(param,"center_center")==0) { rostopic_pub(cR,cRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"center_center\"");  } else
+    if (strcmp(param,"center_left")==0)   { rostopic_pub(cR,cRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"center_left\"");    } else
+    if (strcmp(param,"down_right")==0)    { rostopic_pub(cR,cRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"down_right\"");     } else
+    if (strcmp(param,"down_center")==0)   { rostopic_pub(cR,cRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"down_center\"");    } else
+    if (strcmp(param,"down_left")==0)     { rostopic_pub(cR,cRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"down_left\"");      }
   }
    else
   if (strcmp(command,"emotion")==0)
