@@ -554,7 +554,7 @@ void execute(char * command,char * param)
    else
   if (strcmp(command,"say")==0)
   {
-     char internalString[cRLen+1]={0};
+     char internalString[MAX_COMMAND_SIZE+1]={0};
      if (strcmp(param,"test")==0) {  strncpy(internalString,"Θα σας κάνω μια έκπληξη , θα σταματήσω να δουλεύω σε ένα τυχαίο σημείο.!",cRLen); } else
                                   {  strncpy(internalString,param,cRLen); }
 
