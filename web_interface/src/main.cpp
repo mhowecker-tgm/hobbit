@@ -310,6 +310,24 @@ void joystickExecute(float x , float y )
 
 void MMUIStuffExecute(char * command,char * param)
 {
+
+  /*
+
+params:
+Type=F_ABSVOLUME, Value=0..100 sets MMUI volume, default 50
+Type=F_SPEED, Value=0..100 sets absolute TTS speed, default 50
+Type=F_VOICE, Value=Voicename sets TTS voice (partial match, so unique short name is enough) -> it would be good if the webinterface had a list of available voices
+new Type=F_SETBG, Value=colourname
+
+(Type=F_REBOOT reboot MMUI, causing reload of dcfg)
+
+examples:
+rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_VOICE],[Value, "Susan"]]}'
+rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, D_OK],[Text, "Demonstration of voice"],[Speak, "text to speak"],["wait", "1"]]}'
+
+  */
+
+
   char * commandToRun = (char*) malloc((MAX_COMMAND_SIZE+1) * sizeof(char));
   if (commandToRun==0) { AmmServer_Error("Could not allocate enough space for MMUI command execution"); return ; }
 
@@ -337,82 +355,86 @@ void MMUIStuffExecute(char * command,char * param)
 }
 
 
+
+void rosservice_call(char * commandToRun,unsigned int maxCommandSize,char * serviceName)
+{
+  snprintf(commandToRun,maxCommandSize,"/bin/bash -c \"rosservice call %s\"",serviceName);
+}
+
+
+void rosparam_set(char * commandToRun,unsigned int maxCommandSize,char * paramName,char * paramValue)
+{
+  snprintf(commandToRun,maxCommandSize,"/bin/bash -c \"rosparam set %s \"%s\" \"",paramName,paramValue);
+}
+
+
+void rostopic_pub(char * commandToRun,unsigned int maxCommandSize,char * topicName,char * topicType,char * topicValue)
+{
+  snprintf(commandToRun,maxCommandSize,"/bin/bash -c \"rostopic pub %s %s %s -1\"",topicName,topicType,topicValue);
+}
+
+
 void execute(char * command,char * param)
 {
   fprintf(stderr,"Execute(%s,%s) \n",command,param);
   int i=0;
-  char * commandToRun = (char*) malloc((MAX_COMMAND_SIZE+1) * sizeof(char));
+  unsigned int cRLen=MAX_COMMAND_SIZE;
+  char * cR = (char*) malloc((MAX_COMMAND_SIZE+1) * sizeof(char));
 
-  if (commandToRun==0) { AmmServer_Error("Could not allocate enough space for command execution"); return ; }
-  commandToRun[0]=0;
+  if (cR==0) { AmmServer_Error("Could not allocate enough space for command execution"); return ; }
+  cR[0]=0;
 
   //-------------------------------------------------
   // ULTRA UNSAFE , INJECTION PRONE PARAMS HERE
   //-------------------------------------------------
   #warning "This code is injection prone , there needs to be sanitization for param , that unfortunately I haven't done yet"
 
-  if (strcmp(command,"setUserName")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set /Hobbit/robot_name \"%s\" \" ",param); }  else
-  if (strcmp(command,"setRobotName")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set /Hobbit/user_name \"%s\" \" ",param); }  else
-  if (strcmp(command,"setSocialRole")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set /Hobbit/social_role \"%s\" \" ",param); }  else
-  if (strcmp(command,"setUserAway")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set /Hobbit/user_away \"%s\" \" ",param); }  else
-  if (strcmp(command,"setCurrentEmotion")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set /Hobbit/current_emotion \"%s\" \" ",param); }  else
-  if (strcmp(command,"setLatestWakingUpTime")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set /Hobbit/wakeup_time \"%s\" \" ",param); }  else
-  if (strcmp(command,"setLatestSleepingTime")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set /Hobbit/sleep_time \"%s\" \" ",param); }  else
-  if (strcmp(command,"LuiBackgroundSelector")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set USER/BGCOLOUR \"%s\" \" ",param); }  else
-
-  if (strcmp(command,"talkingSpeed")==0) { MMUIStuffExecute(command,param); snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set USER/Voice/Speed \"%s\" \" ",param); }  else
-  if (strcmp(command,"gender")==0)       { MMUIStuffExecute(command,param); snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set USER/Voice/Default \"%s\" \" ",param); }  else
-  if (strcmp(command,"voiceFemale")==0)  { MMUIStuffExecute(command,param); snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set USER/Voice/FEMALE \"%s\" \" ",param); }  else
-  if (strcmp(command,"voiceMale")==0)    { MMUIStuffExecute(command,param); snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set USER/Voice/MALE \"%s\" \" ",param); }  else
-  if (strcmp(command,"volume")==0)       { MMUIStuffExecute(command,param); snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosparam set USER/Voice/Volume \"%s\" \" ",param); }  else
-
-  /*
-
-params:
-Type=F_ABSVOLUME, Value=0..100 sets MMUI volume, default 50
-Type=F_SPEED, Value=0..100 sets absolute TTS speed, default 50
-Type=F_VOICE, Value=Voicename sets TTS voice (partial match, so unique short name is enough) -> it would be good if the webinterface had a list of available voices
-new Type=F_SETBG, Value=colourname
-
-(Type=F_REBOOT reboot MMUI, causing reload of dcfg)
-
-examples:
-rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_VOICE],[Value, "Susan"]]}'
-rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, D_OK],[Text, "Demonstration of voice"],[Speak, "text to speak"],["wait", "1"]]}'
-
-  */
+  if (strcmp(command,"setUserName")==0)           { rosparam_set(cR,cRLen,(char *) "/Hobbit/robot_name",param);      }  else
+  if (strcmp(command,"setRobotName")==0)          { rosparam_set(cR,cRLen,(char *) "/Hobbit/user_name",param);       }  else
+  if (strcmp(command,"setSocialRole")==0)         { rosparam_set(cR,cRLen,(char *) "/Hobbit/social_role",param);     }  else
+  if (strcmp(command,"setUserAway")==0)           { rosparam_set(cR,cRLen,(char *) "/Hobbit/user_away",param);       }  else
+  if (strcmp(command,"setCurrentEmotion")==0)     { rosparam_set(cR,cRLen,(char *) "/Hobbit/current_emotion",param); }  else
+  if (strcmp(command,"setLatestWakingUpTime")==0) { rosparam_set(cR,cRLen,(char *) "/Hobbit/wakeup_time",param);     }  else
+  if (strcmp(command,"setLatestSleepingTime")==0) { rosparam_set(cR,cRLen,(char *) "/Hobbit/sleep_time",param);      }  else
+  if (strcmp(command,"LuiBackgroundSelector")==0) { rosparam_set(cR,cRLen,(char *) "USER/BGCOLOUR",param);           }  else
+  //---------------
+  if (strcmp(command,"talkingSpeed")==0) { MMUIStuffExecute(command,param); rosparam_set(cR,cRLen,(char *) "USER/Voice/Speed",param);   }  else
+  if (strcmp(command,"gender")==0)       { MMUIStuffExecute(command,param); rosparam_set(cR,cRLen,(char *) "USER/Voice/Default",param); }  else
+  if (strcmp(command,"voiceFemale")==0)  { MMUIStuffExecute(command,param); rosparam_set(cR,cRLen,(char *) "USER/Voice/FEMALE",param);  }  else
+  if (strcmp(command,"voiceMale")==0)    { MMUIStuffExecute(command,param); rosparam_set(cR,cRLen,(char *) "USER/Voice/MALE",param);    }  else
+  if (strcmp(command,"volume")==0)       { MMUIStuffExecute(command,param); rosparam_set(cR,cRLen,(char *) "USER/Voice/Volume",param);  }  else
 
 
   // ULTRA UNSAFE , INJECTION PRONE PARAMS HERE
   //-------------------------------------------------
   if (strcmp(command,"node")==0)
   {
-    if (strcmp(param,"niteTrigger")==0) {  strncpy(commandToRun,"/bin/bash -c \"rosservice call /rgbd_acquisition/trigger_peopletracker\" ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"nitePause")==0) {  strncpy(commandToRun,"/bin/bash -c \"rosservice call /rgbd_acquisition/pause_peopletracker\" ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"niteResume")==0) {  strncpy(commandToRun,"/bin/bash -c \"rosservice call /rgbd_acquisition/resume_peopletracker\" ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"nitePausePoint")==0) {  strncpy(commandToRun,"/bin/bash -c \"rosservice call /rgbd_acquisition/pause_pointing_gesture_messages\" ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"niteResumePoint")==0) {  strncpy(commandToRun,"/bin/bash -c \"rosservice call /rgbd_acquisition/resume__pointing_gesture_messages\" ",MAX_COMMAND_SIZE); } else
+    if (strcmp(param,"niteTrigger")==0)      {  rosservice_call(cR,CRLen,(char *) "/rgbd_acquisition/trigger_peopletracker");   } else
+    if (strcmp(param,"nitePause")==0)        {  rosservice_call(cR,CRLen,(char *) "/rgbd_acquisition/pause_peopletracker");     } else
+    if (strcmp(param,"niteResume")==0)       {  rosservice_call(cR,CRLen,(char *) "/rgbd_acquisition/resume_peopletracker");    } else
+    if (strcmp(param,"nitePausePoint")==0)   {  rosservice_call(cR,CRLen,(char *) "/rgbd_acquisition/pause_pointing_gesture_messages");    } else
+    if (strcmp(param,"niteResumePoint")==0)  {  rosservice_call(cR,CRLen,(char *) "/rgbd_acquisition/resume_pointing_gesture_messages");   } else
 
-    if (strcmp(param,"forthSKPause")==0) {  strncpy(commandToRun,"/bin/bash -c \"rosservice call /skeleton_detector/pause\" ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"forthSKResume")==0) {  strncpy(commandToRun,"/bin/bash -c \"rosservice call /skeleton_detector/resume\" ",MAX_COMMAND_SIZE); } else
+    if (strcmp(param,"forthSKPause")==0)     {  rosservice_call(cR,CRLen,(char *) "/skeleton_detector/pause");        } else
+    if (strcmp(param,"forthSKResume")==0)    {  rosservice_call(cR,CRLen,(char *) "/skeleton_detector/resume");       } else
 
-    if (strcmp(param,"emergencyTrigger")==0) {  strncpy(commandToRun,"/bin/bash -c \"rosservice call /emergency_detector/trigger\" ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"emergencyPause")==0) {  strncpy(commandToRun,"/bin/bash -c \"rosservice call /emergency_detector/pause\" ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"emergencyResume")==0) {  strncpy(commandToRun,"/bin/bash -c \"rosservice call /emergency_detector/resume\" ",MAX_COMMAND_SIZE); } else
+    if (strcmp(param,"emergencyTrigger")==0) {  rosservice_call(cR,CRLen,(char *) "/emergency_detector/trigger");    } else
+    if (strcmp(param,"emergencyPause")==0)   {  rosservice_call(cR,CRLen,(char *) "/emergency_detector/pause");      } else
+    if (strcmp(param,"emergencyResume")==0)  {  rosservice_call(cR,CRLen,(char *) "/emergency_detector/resume");     } else
 
-    if (strcmp(param,"gesturePause")==0) {  strncpy(commandToRun,"/bin/bash -c \"rosservice call /hand_gestures/pause\" ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"gestureResume")==0) {  strncpy(commandToRun,"/bin/bash -c \"rosservice call /hand_gestures/resume\" ",MAX_COMMAND_SIZE); } else
+    if (strcmp(param,"gesturePause")==0)     {  rosservice_call(cR,CRLen,(char *) "/hand_gestures/pause");          } else
+    if (strcmp(param,"gestureResume")==0)    {  rosservice_call(cR,CRLen,(char *) "/hand_gestures/resume");         } else
 
-    if (strcmp(param,"faceTrigger")==0) {  strncpy(commandToRun,"/bin/bash -c \"rosservice call /face_detection/trigger\" ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"facePause")==0) {  strncpy(commandToRun,"/bin/bash -c \"rosservice call /face_detection/pause\" ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"faceResume")==0) {  strncpy(commandToRun,"/bin/bash -c \"rosservice call /face_detection/resume\" ",MAX_COMMAND_SIZE); } else
-                                      { fprintf(stderr,"Unknown node command ( param %s ) \n", param); }
+    if (strcmp(param,"faceTrigger")==0)      {  rosservice_call(cR,CRLen,(char *) "/face_detection/trigger");  } else
+    if (strcmp(param,"facePause")==0)        {  rosservice_call(cR,CRLen,(char *) "/face_detection/pause");    } else
+    if (strcmp(param,"faceResume")==0)       {  rosservice_call(cR,CRLen,(char *) "/face_detection/resume");   } else
+                                             {  fprintf(stderr,"Unknown node command ( param %s ) \n", param); }
 
   } else
   if (strcmp(command,"camera")==0)
   {
     if (strcmp(param,"refresh")==0)
-        { strncpy(commandToRun,"/bin/bash -c \"cd /opt/ros/hobbit_hydro/src/rgbd_acquisition/bin/frames/base/ && timeout 1 rosrun image_view image_saver image:=/basecam/rgb/image_raw\" && cd /opt/ros/hobbit_hydro/src/rgbd_acquisition/bin/frames/top/ && timeout 1 rosrun image_view image_saver image:=/headcam/rgb/image_raw ",MAX_COMMAND_SIZE); }
+        { strncpy(cR,"/bin/bash -c \"cd /opt/ros/hobbit_hydro/src/rgbd_acquisition/bin/frames/base/ && timeout 1 rosrun image_view image_saver image:=/basecam/rgb/image_raw\" && cd /opt/ros/hobbit_hydro/src/rgbd_acquisition/bin/frames/top/ && timeout 1 rosrun image_view image_saver image:=/headcam/rgb/image_raw ",cRLen); }
   } else
   if (strcmp(command,"head")==0)
   {
@@ -420,137 +442,140 @@ rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params
                                         execute((char*)"head",(char*)"center_center");
                                         return;
                                      } else
-    if (strcmp(param,"up_right")==0) { strncpy(commandToRun,"/bin/bash -c \"rostopic pub /head/move std_msgs/String \"up_right\" -1\" ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"up_center")==0)    { strncpy(commandToRun,"/bin/bash -c \"rostopic pub /head/move std_msgs/String \"up_center\" -1\" ",MAX_COMMAND_SIZE);    } else
-    if (strcmp(param,"up_left")==0)  { strncpy(commandToRun,"/bin/bash -c \"rostopic pub /head/move std_msgs/String \"up_left\" -1\" ",MAX_COMMAND_SIZE);  } else
-    if (strcmp(param,"center_right")==0) { strncpy(commandToRun,"/bin/bash -c \"rostopic pub /head/move std_msgs/String \"center_right\" -1\" ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"center_center")==0)    { strncpy(commandToRun,"/bin/bash -c \"rostopic pub /head/move std_msgs/String \"center_center\" -1\" ",MAX_COMMAND_SIZE);    } else
-    if (strcmp(param,"center_left")==0)  { strncpy(commandToRun,"/bin/bash -c \"rostopic pub /head/move std_msgs/String \"center_left\" -1\" ",MAX_COMMAND_SIZE);  } else
-    if (strcmp(param,"down_right")==0) { strncpy(commandToRun,"/bin/bash -c \"rostopic pub /head/move std_msgs/String \"down_right\" -1\" ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"down_center")==0)    { strncpy(commandToRun,"/bin/bash -c \"rostopic pub /head/move std_msgs/String \"down_center\" -1\" ",MAX_COMMAND_SIZE);    } else
-    if (strcmp(param,"down_left")==0)  { strncpy(commandToRun,"/bin/bash -c \"rostopic pub /head/move std_msgs/String \"down_left\" -1\" ",MAX_COMMAND_SIZE);  }
+    if (strcmp(param,"up_right")==0)      { rostopic_pub(cR,CRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"up_right\"");       } else
+    if (strcmp(param,"up_center")==0)     { rostopic_pub(cR,CRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"up_center\"");      } else
+    if (strcmp(param,"up_left")==0)       { rostopic_pub(cR,CRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"up_left\"");        } else
+    if (strcmp(param,"center_right")==0)  { rostopic_pub(cR,CRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"center_right\"");   } else
+    if (strcmp(param,"center_center")==0) { rostopic_pub(cR,CRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"center_center\"");  } else
+    if (strcmp(param,"center_left")==0)   { rostopic_pub(cR,CRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"center_left\"");    } else
+    if (strcmp(param,"down_right")==0)    { rostopic_pub(cR,CRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"down_right\"");     } else
+    if (strcmp(param,"down_center")==0)   { rostopic_pub(cR,CRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"down_center\"");    } else
+    if (strcmp(param,"down_left")==0)     { rostopic_pub(cR,CRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"down_left\"");      }
   }
    else
   if (strcmp(command,"emotion")==0)
   {
     //HAPPY VHAPPY LTIRED VTIRED CONCERNED SAD WONDERING NEUTRAL SLEEPING
-    if (strcmp(param,"happy")==0) { strncpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"HAPPY\" -1\" ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"vhappy")==0) { strncpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"VHAPPY\" -1\" ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"ltired")==0) { strncpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"LTIRED\" -1\" ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"vtired")==0) { strncpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"VTIRED\" -1\" ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"concerned")==0) { strncpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"CONCERNED\" -1\" ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"sad")==0) { strncpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"SAD\" -1\" ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"wondering")==0) { strncpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"WONDERING\" -1\" ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"neutral")==0) { strncpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"NEUTRAL\" -1\" ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"sleeping")==0) { strncpy(commandToRun,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"SLEEPING\" -1\" ",MAX_COMMAND_SIZE); }
+    if (strcmp(param,"happy")==0) { strncpy(cR,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"HAPPY\" -1\" ",cRLen); } else
+    if (strcmp(param,"vhappy")==0) { strncpy(cR,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"VHAPPY\" -1\" ",cRLen); } else
+    if (strcmp(param,"ltired")==0) { strncpy(cR,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"LTIRED\" -1\" ",cRLen); } else
+    if (strcmp(param,"vtired")==0) { strncpy(cR,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"VTIRED\" -1\" ",cRLen); } else
+    if (strcmp(param,"concerned")==0) { strncpy(cR,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"CONCERNED\" -1\" ",cRLen); } else
+    if (strcmp(param,"sad")==0) { strncpy(cR,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"SAD\" -1\" ",cRLen); } else
+    if (strcmp(param,"wondering")==0) { strncpy(cR,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"WONDERING\" -1\" ",cRLen); } else
+    if (strcmp(param,"neutral")==0) { strncpy(cR,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"NEUTRAL\" -1\" ",cRLen); } else
+    if (strcmp(param,"sleeping")==0) { strncpy(cR,"/bin/bash -c \"rostopic pub /head/emo std_msgs/String \"SLEEPING\" -1\" ",cRLen); }
   }
    else
   if (strcmp(command,"rtd")==0)
   {
-    if (strcmp(param,"home")==0) 		{ strncpy(commandToRun,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PoseHome.py",MAX_COMMAND_SIZE); 			} else
-    if (strcmp(param,"almosthome")==0) 		{ strncpy(commandToRun,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PoseAlmostHome.py",MAX_COMMAND_SIZE);		} else
-    if (strcmp(param,"armatside")==0) 		{ strncpy(commandToRun,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PoseArmAtSide.py",MAX_COMMAND_SIZE); 		} else
-    if (strcmp(param,"cfaftergrasp")==0)	{ strncpy(commandToRun,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PoseCFAfterGrasp.py",MAX_COMMAND_SIZE); 		} else
-    if (strcmp(param,"lowerlearn")==0) 		{ strncpy(commandToRun,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PoseLearn.py",MAX_COMMAND_SIZE);			} else
-    if (strcmp(param,"tablepregrasp")==0) 	{ strncpy(commandToRun,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PoseTPregrasp.py",MAX_COMMAND_SIZE); 		} else
-    if (strcmp(param,"tablefinalgrasp")==0) 	{ strncpy(commandToRun,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PoseTFinalGrasp.py",MAX_COMMAND_SIZE); 		} else
-    if (strcmp(param,"trayprerelease")==0) 	{ strncpy(commandToRun,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PosePreReleaseInTray.py",MAX_COMMAND_SIZE); 	} else
-    if (strcmp(param,"trayrelease")==0) 	{ strncpy(commandToRun,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PoseReleaseInTray.py",MAX_COMMAND_SIZE); 		} else
-    if (strcmp(param,"clearfloorpregrasp")==0) 	{ strncpy(commandToRun,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PoseCFPregrasp.py",MAX_COMMAND_SIZE); 		} else
-    if (strcmp(param,"clearfloorfinalgrasp")==0){ strncpy(commandToRun,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PoseCFFinalGrasp.py",MAX_COMMAND_SIZE); 		} else
-    if (strcmp(param,"opengripper")==0) 	{ strncpy(commandToRun,"/home/hobbit/hobbit/ActionSequencer/src/RTD_COMMANDS/RTD_OpenGripper.py",MAX_COMMAND_SIZE); 		} else
-    if (strcmp(param,"closegripper")==0) 	{ strncpy(commandToRun,"/home/hobbit/hobbit/ActionSequencer/src/RTD_COMMANDS/RTD_CloseGripper.py",MAX_COMMAND_SIZE); 		} else
-    if (strcmp(param,"disableallaxis")==0) 	{ strncpy(commandToRun,"/home/hobbit/hobbit/ActionSequencer/src/RTD_COMMANDS/RTD_DisableAllAxis.py",MAX_COMMAND_SIZE); 		} else
-    if (strcmp(param,"graspfromtable")==0) 	{ strncpy(commandToRun,"/home/hobbit/hobbit/ActionSequencer/src/RTD_SCENARIOS/RTD_GraspFromTable.sh",MAX_COMMAND_SIZE); 		} else
-    if (strcmp(param,"graspfromfloor")==0) 	{ strncpy(commandToRun,"/home/hobbit/hobbit/ActionSequencer/src/RTD_SCENARIOS/RTD_GraspFromFloor.sh",MAX_COMMAND_SIZE); 		}
+    if (strcmp(param,"home")==0) 		{ strncpy(cR,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PoseHome.py",cRLen); 			} else
+    if (strcmp(param,"almosthome")==0) 		{ strncpy(cR,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PoseAlmostHome.py",cRLen);		} else
+    if (strcmp(param,"armatside")==0) 		{ strncpy(cR,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PoseArmAtSide.py",cRLen); 		} else
+    if (strcmp(param,"cfaftergrasp")==0)	{ strncpy(cR,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PoseCFAfterGrasp.py",cRLen); 		} else
+    if (strcmp(param,"lowerlearn")==0) 		{ strncpy(cR,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PoseLearn.py",cRLen);			} else
+    if (strcmp(param,"tablepregrasp")==0) 	{ strncpy(cR,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PoseTPregrasp.py",cRLen); 		} else
+    if (strcmp(param,"tablefinalgrasp")==0) 	{ strncpy(cR,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PoseTFinalGrasp.py",cRLen); 		} else
+    if (strcmp(param,"trayprerelease")==0) 	{ strncpy(cR,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PosePreReleaseInTray.py",cRLen); 	} else
+    if (strcmp(param,"trayrelease")==0) 	{ strncpy(cR,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PoseReleaseInTray.py",cRLen); 		} else
+    if (strcmp(param,"clearfloorpregrasp")==0) 	{ strncpy(cR,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PoseCFPregrasp.py",cRLen); 		} else
+    if (strcmp(param,"clearfloorfinalgrasp")==0){ strncpy(cR,"/home/hobbit/hobbit/ActionSequencer/src/RTD_POSES/RTD_PoseCFFinalGrasp.py",cRLen); 		} else
+    if (strcmp(param,"opengripper")==0) 	{ strncpy(cR,"/home/hobbit/hobbit/ActionSequencer/src/RTD_COMMANDS/RTD_OpenGripper.py",cRLen); 		} else
+    if (strcmp(param,"closegripper")==0) 	{ strncpy(cR,"/home/hobbit/hobbit/ActionSequencer/src/RTD_COMMANDS/RTD_CloseGripper.py",cRLen); 		} else
+    if (strcmp(param,"disableallaxis")==0) 	{ strncpy(cR,"/home/hobbit/hobbit/ActionSequencer/src/RTD_COMMANDS/RTD_DisableAllAxis.py",cRLen); 		} else
+    if (strcmp(param,"graspfromtable")==0) 	{ strncpy(cR,"/home/hobbit/hobbit/ActionSequencer/src/RTD_SCENARIOS/RTD_GraspFromTable.sh",cRLen); 		} else
+    if (strcmp(param,"graspfromfloor")==0) 	{ strncpy(cR,"/home/hobbit/hobbit/ActionSequencer/src/RTD_SCENARIOS/RTD_GraspFromFloor.sh",cRLen); 		}
   }
    else
   if (strcmp(command,"hand")==0)
   {
-    if (strcmp(param,"calibrate")==0) { strncpy(commandToRun,"rostopic pub /ActionSequence hobbit_msgs/Command \"command: 'C_ARM_REFERENCE'\" -1  ",MAX_COMMAND_SIZE); }
+    if (strcmp(param,"calibrate")==0) { strncpy(cR,"rostopic pub /ActionSequence hobbit_msgs/Command \"command: 'C_ARM_REFERENCE'\" -1  ",cRLen); }
   }
    else
   if (strcmp(command,"body")==0)
   {
-    if (strcmp(param,"reset")==0) { strncpy(commandToRun,"rosservice call /reset_motorstop",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"360")==0) { strncpy(commandToRun,"rostopic pub /DiscreteMotionCmd std_msgs/String \"data: 'Turn 360'\" -1",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"360ccw")==0) { strncpy(commandToRun,"rostopic pub /DiscreteMotionCmd std_msgs/String \"data: 'Turn 360'\" -1",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"360cw")==0) { strncpy(commandToRun,"rostopic pub /DiscreteMotionCmd std_msgs/String \"data: 'Turn -360'\" -1",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"right")==0) { strncpy(commandToRun,"rostopic pub /DiscreteMotionCmd std_msgs/String \"data: 'Turn -30'\" -1",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"left")==0) { strncpy(commandToRun,"rostopic pub /DiscreteMotionCmd std_msgs/String \"data: 'Turn 30'\" -1",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"forward")==0) { strncpy(commandToRun,"rostopic pub /DiscreteMotionCmd std_msgs/String \"data: 'Move 0.30'\" -1",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"back")==0) { strncpy(commandToRun,"rostopic pub /DiscreteMotionCmd std_msgs/String \"data: 'Move -0.30'\" -1",MAX_COMMAND_SIZE); }else
+    if (strcmp(param,"reset")==0) { strncpy(cR,"rosservice call /reset_motorstop",cRLen); } else
+    if (strcmp(param,"360")==0) { strncpy(cR,"rostopic pub /DiscreteMotionCmd std_msgs/String \"data: 'Turn 360'\" -1",cRLen); } else
+    if (strcmp(param,"360ccw")==0) { strncpy(cR,"rostopic pub /DiscreteMotionCmd std_msgs/String \"data: 'Turn 360'\" -1",cRLen); } else
+    if (strcmp(param,"360cw")==0) { strncpy(cR,"rostopic pub /DiscreteMotionCmd std_msgs/String \"data: 'Turn -360'\" -1",cRLen); } else
+    if (strcmp(param,"right")==0) { strncpy(cR,"rostopic pub /DiscreteMotionCmd std_msgs/String \"data: 'Turn -30'\" -1",cRLen); } else
+    if (strcmp(param,"left")==0) { strncpy(cR,"rostopic pub /DiscreteMotionCmd std_msgs/String \"data: 'Turn 30'\" -1",cRLen); } else
+    if (strcmp(param,"forward")==0) { strncpy(cR,"rostopic pub /DiscreteMotionCmd std_msgs/String \"data: 'Move 0.30'\" -1",cRLen); } else
+    if (strcmp(param,"back")==0) { strncpy(cR,"rostopic pub /DiscreteMotionCmd std_msgs/String \"data: 'Move -0.30'\" -1",cRLen); }else
     if (strcmp(param,"stop")==0) {  joystickExecute(0.0,0.0);
-                                    strncpy(commandToRun,"rostopic pub /DiscreteMotionCmd std_msgs/String \"data: 'Stop'\" -1",MAX_COMMAND_SIZE); }
+                                    strncpy(cR,"rostopic pub /DiscreteMotionCmd std_msgs/String \"data: 'Stop'\" -1",cRLen); }
   }
    else
   if (strcmp(command,"bring")==0)
   {
-    if (strcmp(param,"aspirin")==0) { strncpy(commandToRun,"rostopic pub /ActionSequence hobbit_msgs/Command \"{command: 'C_BRING' , params: [ {name: 'Name' , value: 'ΑΣΠΙΡΊΝΗ'} ] }\" -1  ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"sugar")==0) { strncpy(commandToRun,"rostopic pub /ActionSequence hobbit_msgs/Command \"{command: 'C_BRING' , params: [ {name: 'Name' , value: 'ΖΆΧΑΡΗ'} ] }\" -1  ",MAX_COMMAND_SIZE); }
+    if (strcmp(param,"aspirin")==0) { strncpy(cR,"rostopic pub /ActionSequence hobbit_msgs/Command \"{command: 'C_BRING' , params: [ {name: 'Name' , value: 'ΑΣΠΙΡΊΝΗ'} ] }\" -1  ",cRLen); } else
+    if (strcmp(param,"sugar")==0) { strncpy(cR,"rostopic pub /ActionSequence hobbit_msgs/Command \"{command: 'C_BRING' , params: [ {name: 'Name' , value: 'ΖΆΧΑΡΗ'} ] }\" -1  ",cRLen); }
   }
    else
   if (strcmp(command,"move")==0)
   {
-    if (strcmp(param,"charging")==0) { strncpy(commandToRun,"rostopic pub /ActionSequence hobbit_msgs/Command \"{command: 'C_BRING' , params: [ {name: 'Name' , value: 'ΑΣΠΙΡΊΝΗ'} ] }\" -1  ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"kitchen")==0) { strncpy(commandToRun,"rostopic pub /ActionSequence hobbit_msgs/Command \"{command: 'C_BRING' , params: [ {name: 'Name' , value: 'ΑΣΠΙΡΊΝΗ'} ] }\" -1  ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"livingroom")==0) { strncpy(commandToRun,"rostopic pub /ActionSequence hobbit_msgs/Command \"{command: 'C_BRING' , params: [ {name: 'Name' , value: 'ΑΣΠΙΡΊΝΗ'} ] }\" -1  ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"bedroom")==0) { strncpy(commandToRun,"rostopic pub /ActionSequence hobbit_msgs/Command \"{command: 'C_BRING' , params: [ {name: 'Name' , value: 'ΑΣΠΙΡΊΝΗ'} ] }\" -1  ",MAX_COMMAND_SIZE); }
+    if (strcmp(param,"charging")==0) { strncpy(cR,"rostopic pub /ActionSequence hobbit_msgs/Command \"{command: 'C_BRING' , params: [ {name: 'Name' , value: 'ΑΣΠΙΡΊΝΗ'} ] }\" -1  ",cRLen); } else
+    if (strcmp(param,"kitchen")==0) { strncpy(cR,"rostopic pub /ActionSequence hobbit_msgs/Command \"{command: 'C_BRING' , params: [ {name: 'Name' , value: 'ΑΣΠΙΡΊΝΗ'} ] }\" -1  ",cRLen); } else
+    if (strcmp(param,"livingroom")==0) { strncpy(cR,"rostopic pub /ActionSequence hobbit_msgs/Command \"{command: 'C_BRING' , params: [ {name: 'Name' , value: 'ΑΣΠΙΡΊΝΗ'} ] }\" -1  ",cRLen); } else
+    if (strcmp(param,"bedroom")==0) { strncpy(cR,"rostopic pub /ActionSequence hobbit_msgs/Command \"{command: 'C_BRING' , params: [ {name: 'Name' , value: 'ΑΣΠΙΡΊΝΗ'} ] }\" -1  ",cRLen); }
   }
    else
   if (strcmp(command,"robot")==0)
-  { ///bin/bash -c \"
+  {
+    if (strcmp(param,"systemRestart")==0)  { strncpy(cR,"sudo init 6",cRLen); } else
+    if (strcmp(param,"systemShutdown")==0) { strncpy(cR,"sudo init 0",cRLen); } else
+    if (strcmp(param,"systemUpdate")==0)   { strncpy(cR,"/bin/bash -c \"cd /opt/ros/hobbit_hydro/ && source devel/setup.bash && svn update src/ && catkin_make\"",cRLen); } else
 
-    if (strcmp(param,"yes")==0) { strncpy(commandToRun,"rostopic pub /Event hobbit_msgs/Event \"event: 'G_YES'\" -1  ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"no")==0) { strncpy(commandToRun,"rostopic pub /Event hobbit_msgs/Event \"event: 'G_NO'\" -1  ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"stop")==0) { strncpy(commandToRun,"rostopic pub /Command hobbit_msgs/Command \"command: 'C_STOP'\" -1  ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"reward")==0) { strncpy(commandToRun,"rostopic pub /Command hobbit_msgs/Command \"command: 'C_REWARD'\" -1  ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"cancel")==0) { strncpy(commandToRun,"rostopic pub /ActionSequence hobbit_msgs/Command \"{command: 'C_SPEAK' , params: [ {name: 'CANCEL' , value: ''} ] }\" -1\n",MAX_COMMAND_SIZE); } else
+    if (strcmp(param,"yes")==0) { strncpy(cR,"rostopic pub /Event hobbit_msgs/Event \"event: 'G_YES'\" -1  ",cRLen); } else
+    if (strcmp(param,"no")==0) { strncpy(cR,"rostopic pub /Event hobbit_msgs/Event \"event: 'G_NO'\" -1  ",cRLen); } else
+    if (strcmp(param,"stop")==0) { strncpy(cR,"rostopic pub /Command hobbit_msgs/Command \"command: 'C_STOP'\" -1  ",cRLen); } else
+    if (strcmp(param,"reward")==0) { strncpy(cR,"rostopic pub /Command hobbit_msgs/Command \"command: 'C_REWARD'\" -1  ",cRLen); } else
+    if (strcmp(param,"cancel")==0) { strncpy(cR,"rostopic pub /ActionSequence hobbit_msgs/Command \"{command: 'C_SPEAK' , params: [ {name: 'CANCEL' , value: ''} ] }\" -1\n",cRLen); } else
 
-    if (strcmp(param,"call")==0) { strncpy(commandToRun,"rostopic pub /ActionSequence hobbit_msgs/Command \"command: 'E_CALLHOBBIT'\" -1  ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"settings")==0) { strncpy(commandToRun,"rostopic pub /Command hobbit_msgs/Command \"command: 'F_SETTINGS'\" -1  ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"closemic")==0) { strncpy(commandToRun,"rostopic pub /Command hobbit_msgs/Command \"command: 'F_ASR_OFF'\" -1  ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"openmic")==0) { strncpy(commandToRun,"rostopic pub /Command hobbit_msgs/Command \"command: 'F_ASR_ON'\" -1  ",MAX_COMMAND_SIZE); } else
+    if (strcmp(param,"call")==0) { strncpy(cR,"rostopic pub /ActionSequence hobbit_msgs/Command \"command: 'E_CALLHOBBIT'\" -1  ",cRLen); } else
+    if (strcmp(param,"settings")==0) { strncpy(cR,"rostopic pub /Command hobbit_msgs/Command \"command: 'F_SETTINGS'\" -1  ",cRLen); } else
+    if (strcmp(param,"closemic")==0) { strncpy(cR,"rostopic pub /Command hobbit_msgs/Command \"command: 'F_ASR_OFF'\" -1  ",cRLen); } else
+    if (strcmp(param,"openmic")==0) { strncpy(cR,"rostopic pub /Command hobbit_msgs/Command \"command: 'F_ASR_ON'\" -1  ",cRLen); } else
 
 
-    if (strcmp(param,"hobbit")==0) { strncpy(commandToRun,"rostopic pub /ActionSequence hobbit_msgs/Command \"command: 'C_WAKEUP'\" -1  ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"wake")==0) { strncpy(commandToRun,"rostopic pub /ActionSequence hobbit_msgs/Command \"command: 'C_WAKEUP'\" -1  ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"sleep")==0) { strncpy(commandToRun,"rostopic pub /ActionSequence hobbit_msgs/Command \"command: 'C_SLEEP'\" -1  ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"clearfloor")==0) { strncpy(commandToRun,"rostopic pub /ActionSequence hobbit_msgs/Command \"command: 'C_CLEARFLOOR'\" -1  ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"bringobject")==0) { strncpy(commandToRun,"rostopic pub /ActionSequence hobbit_msgs/Command \"command: 'C_BRING'\" -1  ",MAX_COMMAND_SIZE); } else
+    if (strcmp(param,"hobbit")==0) { strncpy(cR,"rostopic pub /ActionSequence hobbit_msgs/Command \"command: 'C_WAKEUP'\" -1  ",cRLen); } else
+    if (strcmp(param,"wake")==0) { strncpy(cR,"rostopic pub /ActionSequence hobbit_msgs/Command \"command: 'C_WAKEUP'\" -1  ",cRLen); } else
+    if (strcmp(param,"sleep")==0) { strncpy(cR,"rostopic pub /ActionSequence hobbit_msgs/Command \"command: 'C_SLEEP'\" -1  ",cRLen); } else
+    if (strcmp(param,"clearfloor")==0) { strncpy(cR,"rostopic pub /ActionSequence hobbit_msgs/Command \"command: 'C_CLEARFLOOR'\" -1  ",cRLen); } else
+    if (strcmp(param,"bringobject")==0) { strncpy(cR,"rostopic pub /ActionSequence hobbit_msgs/Command \"command: 'C_BRING'\" -1  ",cRLen); } else
 
            //name: Name     value: ΑΣΠΙΡΊΝΗ
 
 
-    if (strcmp(param,"learnobject")==0) { strncpy(commandToRun,"rostopic pub /ActionSequence hobbit_msgs/Command \"command: 'C_LEARN'\" -1  ",MAX_COMMAND_SIZE); } else
-    if (strcmp(param,"helpme")==0) { strncpy(commandToRun,"rostopic pub /ActionSequence hobbit_msgs/Command \"command: 'G_FALL'\" -1  ",MAX_COMMAND_SIZE); }
+    if (strcmp(param,"learnobject")==0) { strncpy(cR,"rostopic pub /ActionSequence hobbit_msgs/Command \"command: 'C_LEARN'\" -1  ",cRLen); } else
+    if (strcmp(param,"helpme")==0) { strncpy(cR,"rostopic pub /ActionSequence hobbit_msgs/Command \"command: 'G_FALL'\" -1  ",cRLen); }
 
   }
    else
   if (strcmp(command,"say")==0)
   {
-     char internalString[MAX_COMMAND_SIZE+1]={0};
-     if (strcmp(param,"test")==0) {  strncpy(internalString,"Θα σας κάνω μια έκπληξη , θα σταματήσω να δουλεύω σε ένα τυχαίο σημείο.!",MAX_COMMAND_SIZE); } else
-                                  {  strncpy(internalString,param,MAX_COMMAND_SIZE); }
+     char internalString[cRLen+1]={0};
+     if (strcmp(param,"test")==0) {  strncpy(internalString,"Θα σας κάνω μια έκπληξη , θα σταματήσω να δουλεύω σε ένα τυχαίο σημείο.!",cRLen); } else
+                                  {  strncpy(internalString,param,cRLen); }
 
 
      replaceChar(internalString,'+',' ');
 
      //rostopic pub /ActionSequence HobbitMsgs/Command "{command: 'C_SPEAK' , params: [ name: 'INFO' , value: 'lobbit' ] }" -1
-     snprintf(commandToRun,MAX_COMMAND_SIZE,"rostopic pub /ActionSequence hobbit_msgs/Command \"{command: 'C_SPEAK' , params: [ {name: 'INFO' , value: '%s'} ] }\" -1\n",internalString);
+     snprintf(cR,cRLen,"rostopic pub /ActionSequence hobbit_msgs/Command \"{command: 'C_SPEAK' , params: [ {name: 'INFO' , value: '%s'} ] }\" -1\n",internalString);
   }
 
-  if ( strlen(commandToRun)!=0 )
+  if ( strlen(cR)!=0 )
    {
-     i=system(commandToRun);
-     if (i!=0) { AmmServer_Error("Command %s failed\n",commandToRun); } else
-               { AmmServer_Success("Command %s success\n",commandToRun); }
+     i=system(cR);
+     if (i!=0) { AmmServer_Error("Command %s failed\n",cR); } else
+               { AmmServer_Success("Command %s success\n",cR); }
    } else
    {
      fprintf(stderr,"Execute with unknown command or parameter\n");
    }
 
-   if (commandToRun!=0) { free(commandToRun); }
+   if (cR!=0) { free(cR); }
 
   return ;
 }
@@ -713,7 +738,7 @@ void * prepare_form_content_callback(struct AmmServer_DynamicRequest  * rqst)
             if ( _GET(default_server,rqst,(char*)"robot",bufferCommand,256) ) { execute((char*)"robot",bufferCommand); } else
             if ( _GET(default_server,rqst,(char*)"rtd",bufferCommand,256) ) { execute((char*)"rtd",bufferCommand); } else
             if ( _GET(default_server,rqst,(char*)"say",bufferCommand,256) )   { execute((char*)"say",bufferCommand);   } else
-                                                                              {  AmmServer_Warning("Could not understand command to be executed ( ? not updated binary ? )\n"); }
+                                                                              {  AmmServer_Error("Could not understand command to be executed ( ? not updated binary ? )\n"); }
 
             free(bufferCommand);
           }
