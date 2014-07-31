@@ -71,6 +71,18 @@ void broadcastNewPerson()
 void broadcastPointing(unsigned int frameNumber ,struct skeletonPointing * skeletonPointingFound)
 {
   if (dontPublishPointEvents) { return ; }
+
+  if (
+       ( (skeletonPointingFound->pointingVector.x>-0.0005)&&(skeletonPointingFound->pointingVector.x<0.0005) ) &&
+       ( (skeletonPointingFound->pointingVector.y>-0.0005)&&(skeletonPointingFound->pointingVector.y<0.0005) ) &&
+       ( (skeletonPointingFound->pointingVector.z>-0.0005)&&(skeletonPointingFound->pointingVector.z<0.0005) )
+     )
+  {
+    fprintf(stderr,"Will not broadcast a null pointing event \n");
+    return ;
+  }
+
+
   fprintf(stderr,"Broadcasting a pointing event \n");
 
   //David Wants to Flip Y
@@ -113,6 +125,10 @@ int considerSkeletonPointing(unsigned int frameNumber,struct skeletonHuman * ske
 
 
   if ( (distanceLeft<MAXIMUM_DISTANCE_FOR_POINTING) && (distanceRight<MAXIMUM_DISTANCE_FOR_POINTING) ) { fprintf(stderr,"Cutting off pointing "); return 0; }
+
+
+
+
 
 
   int doHand=1; //1 = right , 2 =left
