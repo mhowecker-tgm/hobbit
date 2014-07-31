@@ -67,7 +67,7 @@ int collectSkeletonFromTF(struct skeletonHuman * sk)
                      sk->joint[i].y = transform.getOrigin().y();
                      sk->joint[i].z = transform.getOrigin().z();
 
-                     fprintf(stderr,"%s is %f %f %f \n",jointNames[i],sk->joint[i].x,sk->joint[i].y,sk->joint[i].z);
+                     //fprintf(stderr,"%s is %f %f %f \n",jointNames[i],sk->joint[i].x,sk->joint[i].y,sk->joint[i].z);
                     }
                     catch (...)
                     {
@@ -113,7 +113,7 @@ void fitnessMessage(const hobbit_msgs::Fitness & msg)
  //Test Trigger with rostopic pub /fitness hobbit_msgs/Fitness " { command: C_EXERCISE_STARTED , params: [  { name: '1' , value: 'STARTED' } ] } " -1
   if (strcmp("C_EXERCISE_STARTED",msg.command.c_str())==0)
   {
-   if (strcmp("STARTED", msg.params[0].value.c_str() )==0)
+   //if (strcmp("STARTED", msg.params[0].value.c_str() )==0)
    {
     state.started=1;
     state.repetitions=0;
@@ -122,11 +122,11 @@ void fitnessMessage(const hobbit_msgs::Fitness & msg)
     startExcercise(&state);
    }
   }
-
+  else
  //Test Trigger with rostopic pub /fitness hobbit_msgs/Fitness " { command: C_EXERCISE_STOPPED , params: [  { name: '1' , value: 'STOPPED' } ] } " -1
   if (strcmp("C_EXERCISE_STOPPED",msg.command.c_str())==0)
   {
-   if (strcmp("STOPPED", msg.params[0].value.c_str() )==0)
+   //if (strcmp("STOPPED", msg.params[0].value.c_str() )==0)
    {
     state.started=0;
     state.repetitions=0;
@@ -135,6 +135,12 @@ void fitnessMessage(const hobbit_msgs::Fitness & msg)
     stopExcercise(&state);
    }
   }
+  else
+  {
+    fprintf(stderr,"Unknown command arrived %s \n",msg.command.c_str());
+  }
+
+
 }
 
 
