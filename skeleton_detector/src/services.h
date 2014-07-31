@@ -8,6 +8,7 @@
 
 extern unsigned char dontPublishSkeletons;
 extern unsigned int simplePersonDetector;
+extern unsigned char dontPublishPointEvents;
 
 
 

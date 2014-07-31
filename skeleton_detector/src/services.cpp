@@ -9,16 +9,19 @@
 #define SKPREFIX "SK_"
 
 #define BROADCAST_HOBBIT 1
+#define MAXIMUM_DISTANCE_FOR_POINTING 400
 
-#include "skeleton_detector/Person.h" 
+#include "skeleton_detector/Person.h"
 #include "skeleton_detector/PointEvents.h"
- 
-ros::Publisher personBroadcaster; 
 
-#define divisor 1000 
+ros::Publisher personBroadcaster;
+ros::Publisher pointEventsBroadcaster;
+
+#define divisor 1000
 //ros::Publisher gestureBroadcaster;
 
 unsigned char dontPublishSkeletons=0;
+unsigned char dontPublishPointEvents=0;
 unsigned char dontPublishPersons=0;
 unsigned int simplePersonDetector = 1;
 
@@ -28,17 +31,19 @@ float actualX=0.0,actualY=0.0,actualZ=0.0,actualTheta=0.0,actualConfidence=0.51;
 
 unsigned char * colorFrameCopy=0;
 unsigned short * depthFrameCopy =0;
- 
 
-struct skeletonPointing
+
+float simpPow(float base,unsigned int exp)
 {
-  struct point3D pointStart;
-  struct point3D pointEnd;
-  struct point3D pointingVector;
-  unsigned char isLeftHand;
-  unsigned char isRightHand;
-};
-
+    if (exp==0) return 1;
+    float retres=base;
+    unsigned int i=0;
+    for (i=0; i<exp-1; i++)
+    {
+        retres*=base;
+    }
+    return retres;
+}
 
 
 void broadcastNewPerson()
@@ -60,7 +65,7 @@ void broadcastNewPerson()
   //ros::spinOnce();
 }
 
- 
+
 
 
 void broadcastPointing(unsigned int frameNumber ,struct skeletonPointing * skeletonPointingFound)
@@ -71,7 +76,7 @@ void broadcastPointing(unsigned int frameNumber ,struct skeletonPointing * skele
   //David Wants to Flip Y
   signed int YFlipper = -1;
 
-  rgbd_acquisition::PointEvents msg;
+  skeleton_detector::PointEvents msg;
   msg.x = skeletonPointingFound->pointStart.x;
   msg.y = YFlipper*skeletonPointingFound->pointStart.y;
   msg.z = skeletonPointingFound->pointStart.z;
@@ -160,11 +165,11 @@ void broadcastNewSkeleton(unsigned int frameNumber,unsigned int skeletonID , str
   unsigned int i=0;
   for (i=0; i<HUMAN_SKELETON_PARTS; i++)
     {
-      //DO flips here ? 
+      //DO flips here ?
       skeletonFound->joint[i].z = -1 * skeletonFound->joint[i].z;
       fprintf(stderr,"%s(%f,%f,%f)\n",humanSkeletonJointNames[i],skeletonFound->joint[i].x,skeletonFound->joint[i].y,skeletonFound->joint[i].z);
     }
-   fprintf(stderr,"\n\n");  
+   fprintf(stderr,"\n\n");
 
    fprintf(stderr,"2DPOSE(");
    for (i=0; i<HUMAN_SKELETON_PARTS; i++)
@@ -177,30 +182,30 @@ void broadcastNewSkeleton(unsigned int frameNumber,unsigned int skeletonID , str
 
 
      //Do TF Broadcast here
-     char tag[256]={0}; 
+     char tag[256]={0};
      for ( i=0; i<HUMAN_SKELETON_PARTS; i++ )
       {
         if (
               (skeletonFound->joint[i].x!=0) ||
               (skeletonFound->joint[i].y!=0) ||
-              (skeletonFound->joint[i].z!=0)  
-           ) 
+              (skeletonFound->joint[i].z!=0)
+           )
             {
              sprintf(tag,"%s%s",SKPREFIX,jointNames[i]);
              postPoseTransform(tag,skeletonFound->joint[i].x/divisor,skeletonFound->joint[i].y/divisor,skeletonFound->joint[i].z/divisor);
             }
       }
-  
+
      for ( i=0; i<8; i++ )
       {
        sprintf(tag,SKPREFIX "bbox/point%u",i);
        postPoseTransform(tag,skeletonFound->bbox[i].x/divisor,skeletonFound->bbox[i].y/divisor,-1* skeletonFound->bbox[i].z/divisor);
       }
-       
+
       actualTimestamp=frameNumber;
-      actualX=skeletonFound->joint[HUMAN_SKELETON_HEAD].x; 
-      actualY=-1.0*skeletonFound->joint[HUMAN_SKELETON_HEAD].y; 
-      actualZ=skeletonFound->joint[HUMAN_SKELETON_HEAD].z;   
+      actualX=skeletonFound->joint[HUMAN_SKELETON_HEAD].x;
+      actualY=-1.0*skeletonFound->joint[HUMAN_SKELETON_HEAD].y;
+      actualZ=skeletonFound->joint[HUMAN_SKELETON_HEAD].z;
       broadcastNewPerson();
 
     return ;
@@ -219,7 +224,7 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
   int retres = hobbitUpperBodyTracker_NewFrame(colorFrameCopy , colorWidth , colorHeight ,
                                                depthFrameCopy  , depthWidth , depthHeight ,
                                                calib ,
-                                               simplePersonDetector , 
+                                               simplePersonDetector ,
                                                frameTimestamp );
 
 
