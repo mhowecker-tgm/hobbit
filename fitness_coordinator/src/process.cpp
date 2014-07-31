@@ -7,9 +7,9 @@ int broadcastExcerciseGeneric(char * tag , char * name , char * value)
   char what2execute[MAX_CMD_STR]={0};
   snprintf(what2execute,MAX_CMD_STR,"rostopic pub /fitness hobbit_msgs/Fitness \"{command: '%s' , params: [ {name: '%s' , value: '%s'} ] }\" -1",tag,name,value);
 
-    int i=system(commandToRun);
-    if (i!=0) { fprintf(stderr,"Command %s failed\n",commandToRun); } else
-              { fprintf(stderr,"Command %s success\n",commandToRun); }
+    int i=system(what2execute);
+    if (i!=0) { fprintf(stderr,"Command %s failed\n",what2execute); } else
+              { fprintf(stderr,"Command %s success\n",what2execute); }
    
 }
 
