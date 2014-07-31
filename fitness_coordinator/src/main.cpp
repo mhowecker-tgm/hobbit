@@ -187,7 +187,7 @@ int main(int argc, char **argv)
                   checkSkeletonForRepetition(&state,&sk);
 
                   ++repetitions;
-                  if ( (autotrigger) && (repetitions%10==0) )
+                  if ( (autotrigger) && (repetitions%40==0) )
                   {
                     ++state.repetitions;
                   }
