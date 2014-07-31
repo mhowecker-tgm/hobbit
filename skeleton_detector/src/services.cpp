@@ -96,7 +96,7 @@ void broadcastPointing(unsigned int frameNumber ,struct skeletonPointing * skele
 }
 
 
-int considerSkeletonPointing(int devID ,unsigned int frameNumber,struct skeletonHuman * skeletonFound)
+int considerSkeletonPointing(unsigned int frameNumber,struct skeletonHuman * skeletonFound)
 {
   struct skeletonPointing skelPF={0};
 
@@ -207,6 +207,8 @@ void broadcastNewSkeleton(unsigned int frameNumber,unsigned int skeletonID , str
       actualY=-1.0*skeletonFound->joint[HUMAN_SKELETON_HEAD].y;
       actualZ=skeletonFound->joint[HUMAN_SKELETON_HEAD].z;
       broadcastNewPerson();
+
+      considerSkeletonPointing(frameNumber,skeletonFound);
 
     return ;
 }
