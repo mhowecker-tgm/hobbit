@@ -57,7 +57,14 @@ screen -d -m -S "emergency_detector" /bin/bash -c "source ~/.bashrc && source $H
 
 echo "Starting up Skeleton Detector"
 screen -d -m -S "skeleton_detector" /bin/bash -c "source ~/.bashrc && source $HOBBITDIR/devel/setup.bash && roslaunch skeleton_detector skeleton_detector.launch"
+  
+echo "Starting up Fitness Function Coordinator"
+screen -d -m -S "fitness_coordinator" /bin/bash -c "source ~/.bashrc && source $HOBBITDIR/devel/setup.bash && roslaunch fitness_coordinator fitness_coordinator.launch"
  
+
+
+
+
 
 
 exit 0
