@@ -495,10 +495,13 @@ void prepareSkeletonState(int devID,unsigned int frameNumber , nite::UserTracker
 
    //This is an event that gets fed with our newly encapsulated data
    //it should also fire up any additional events registered by clients
- if (
-        (BROADCAST_EVEN_BAD_SKELETONS) ||
-        (notAll_Z_AreZero) ||
-        (  (humanSkeleton.isVisible) && ( (humanSkeleton.statusCalibrating) || (humanSkeleton.statusTracking) ) )
+ 
+  
+   if ( (notAll_Z_AreZero) && 
+        (
+         (BROADCAST_EVEN_BAD_SKELETONS) || 
+         (  (humanSkeleton.isVisible) && ( (humanSkeleton.statusCalibrating) || (humanSkeleton.statusTracking) ) )
+        )
       )
    {
     newSkeletonDetected(devID,frameNumber,&humanSkeleton);

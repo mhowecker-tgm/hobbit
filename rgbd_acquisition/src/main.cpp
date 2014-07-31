@@ -41,6 +41,9 @@
 
 #include "extAcquisition.h"
 
+
+#define NODE_NAME "rgbd_acquisition"
+
 //These are the static declarations of the various parts of this ROS package
 int key = 0;
 double  virtual_baseline=0.0; //This is 0 and should be zero since we have a registered depth/rgb stream , however it can be changed to allow fake disparity to be generated
@@ -264,12 +267,8 @@ int main(int argc, char **argv)
 
    try
 	{
-	 ROS_INFO("Initializing ROS");
-
-	 char regName[128]={0};
-	 sprintf(regName,"rgbd_acquisition%u",getpid());
-	 fprintf(stderr,"Node named %s \n",regName);
-  	 ros::init(argc, argv, regName);
+	 ROS_INFO("Initializing ROS"); 
+  	 ros::init(argc, argv, NODE_NAME);
      ros::start();
 
      ros::NodeHandle nh;

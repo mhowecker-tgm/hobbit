@@ -224,10 +224,10 @@ int main(int argc, char **argv)
 	{
 	 ROS_INFO("Initializing ROS");
 
-	 char regName[128]={0};
-	 sprintf(regName,"EmergencyDetector%u",getpid());
-	 fprintf(stderr,"Node named %s \n",regName);
-  	 ros::init(argc, argv, regName);
+	 //char regName[128]={0};
+	 //sprintf(regName,"EmergencyDetector%u",getpid());
+	 //fprintf(stderr,"Node named %s \n",regName);
+  	 ros::init(argc, argv, "emergency_detector");
      ros::start();
 
      ros::NodeHandle nh;

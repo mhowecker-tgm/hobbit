@@ -32,10 +32,12 @@
 #include "HobbitTrackerLib.h"
 
 
+#define NODE_NAME "hand_gestures"
+
 //This will make this node also register to color/depth calibrations and
 //pass them to the gesture node instead of the defaults
 #define USE_NONDEFAULT_CALIBRATIONS 1
-#define DEFAULT_FRAME_RATE 7
+#define DEFAULT_FRAME_RATE 5
 
 int rate=DEFAULT_FRAME_RATE; 
 int first=0;
@@ -204,11 +206,9 @@ int main(int argc, char **argv)
 {
    ROS_INFO("Starting Up!!");
    try
-	{
-	 char regName[128]={0};
-	 sprintf(regName,"hand_gestures%u",getpid()); //We use pid on node name
-  	 ros::init(argc, argv, regName);
-     ros::start();
+	{ 
+  	 ros::init(argc, argv, NODE_NAME);
+         ros::start();
 
 
 

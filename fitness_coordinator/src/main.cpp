@@ -148,11 +148,8 @@ int main(int argc, char **argv)
    try
 	{
 	 ROS_INFO("Initializing ROS");
-
-	 char regName[128]={0};
-	 sprintf(regName,"%s_%u",NODE_NAME,getpid());
-	 fprintf(stderr,"Node named %s \n",regName);
-  	 ros::init(argc, argv, regName);
+ 
+  	 ros::init(argc, argv, NODE_NAME);
      ros::start();
 
      ros::NodeHandle nh;

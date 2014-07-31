@@ -50,6 +50,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #include <image_transport/image_transport.h>
 
 
+#define NODE_NAME "web_interface"
 
 ros::NodeHandle * nhPtr=0;
 
@@ -766,11 +767,8 @@ int main(int argc, char **argv)
 
    try
    {
-     ROS_INFO("Initializing ROS");
-     char regName[128]={0};
-     snprintf(regName,128,"web_interface_%u",getpid());
-     fprintf(stderr,"Node named %s \n",regName);
-     ros::init(argc, argv, regName);
+     ROS_INFO("Initializing ROS"); 
+     ros::init(argc, argv, NODE_NAME);
      ros::start();
 
      ros::NodeHandle nh;
