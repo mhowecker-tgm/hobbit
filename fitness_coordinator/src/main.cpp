@@ -183,6 +183,7 @@ int main(int argc, char **argv)
 	  //////////////////////////////////////////////////////////////////////////
 
 	  int repetitions=0;
+          state.started=1;
 	  while ( ( key!='q' ) && (ros::ok()) )
 		{
 		          fprintf(stderr,".");
