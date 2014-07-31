@@ -11,7 +11,7 @@ find_package(catkin REQUIRED COMPONENTS sensor_msgs OpenCV cv_bridge roscpp std_
  
    
 #Messages -----------------------------------
-add_message_files(DIRECTORY msg FILES Skeleton2D.msg Person.msg )
+add_message_files(DIRECTORY msg FILES Skeleton2D.msg Person.msg PointEvents.msg )
 
 #Services -----------------------------------
 add_service_files(DIRECTORY srv FILES SetQuality.srv)

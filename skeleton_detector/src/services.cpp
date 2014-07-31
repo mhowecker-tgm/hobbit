@@ -11,6 +11,7 @@
 #define BROADCAST_HOBBIT 1
 
 #include "skeleton_detector/Person.h" 
+#include "skeleton_detector/PointEvents.h"
  
 ros::Publisher personBroadcaster; 
 
@@ -29,6 +30,17 @@ unsigned char * colorFrameCopy=0;
 unsigned short * depthFrameCopy =0;
  
 
+struct skeletonPointing
+{
+  struct point3D pointStart;
+  struct point3D pointEnd;
+  struct point3D pointingVector;
+  unsigned char isLeftHand;
+  unsigned char isRightHand;
+};
+
+
+
 void broadcastNewPerson()
 {
   if (dontPublishPersons) { return ; }
@@ -46,6 +58,97 @@ void broadcastNewPerson()
   fprintf(stderr,"Publishing a new Person\n");
   personBroadcaster.publish(msg);
   //ros::spinOnce();
+}
+
+ 
+
+
+void broadcastPointing(unsigned int frameNumber ,struct skeletonPointing * skeletonPointingFound)
+{
+  if (dontPublishPointEvents) { return ; }
+  fprintf(stderr,"Broadcasting a pointing event \n");
+
+  //David Wants to Flip Y
+  signed int YFlipper = -1;
+
+  rgbd_acquisition::PointEvents msg;
+  msg.x = skeletonPointingFound->pointStart.x;
+  msg.y = YFlipper*skeletonPointingFound->pointStart.y;
+  msg.z = skeletonPointingFound->pointStart.z;
+
+  msg.vectorX = skeletonPointingFound->pointingVector.x;
+  msg.vectorY = YFlipper*skeletonPointingFound->pointingVector.y;
+  msg.vectorZ = skeletonPointingFound->pointingVector.z;
+
+  msg.leftHand = skeletonPointingFound->isLeftHand;
+  msg.rightHand = skeletonPointingFound->isRightHand;
+
+  msg.timestamp=frameNumber;
+
+  fprintf(stderr,"Publishing a new Pointing Event\n");
+  pointEventsBroadcaster.publish(msg);
+
+}
+
+
+int considerSkeletonPointing(int devID ,unsigned int frameNumber,struct skeletonHuman * skeletonFound)
+{
+  struct skeletonPointing skelPF={0};
+
+  float distanceLeft = sqrt(
+                             simpPow(skeletonFound->joint[HUMAN_SKELETON_TORSO].x - skeletonFound->joint[HUMAN_SKELETON_LEFT_HAND].x ,2)  +
+                             simpPow(skeletonFound->joint[HUMAN_SKELETON_TORSO].y - skeletonFound->joint[HUMAN_SKELETON_LEFT_HAND].y ,2)  +
+                             simpPow(skeletonFound->joint[HUMAN_SKELETON_TORSO].z - skeletonFound->joint[HUMAN_SKELETON_LEFT_HAND].z ,2)
+                           );
+  float distanceRight = sqrt(
+                             simpPow(skeletonFound->joint[HUMAN_SKELETON_TORSO].x - skeletonFound->joint[HUMAN_SKELETON_RIGHT_HAND].x ,2)  +
+                             simpPow(skeletonFound->joint[HUMAN_SKELETON_TORSO].y - skeletonFound->joint[HUMAN_SKELETON_RIGHT_HAND].y ,2)  +
+                             simpPow(skeletonFound->joint[HUMAN_SKELETON_TORSO].z - skeletonFound->joint[HUMAN_SKELETON_RIGHT_HAND].z ,2)
+                             );
+
+
+  if ( (distanceLeft<MAXIMUM_DISTANCE_FOR_POINTING) && (distanceRight<MAXIMUM_DISTANCE_FOR_POINTING) ) { fprintf(stderr,"Cutting off pointing "); return 0; }
+
+
+  int doHand=1; //1 = right , 2 =left
+  if (distanceLeft<distanceRight) { doHand=2; }
+
+  if (doHand==2)
+  {
+   skelPF.pointStart.x = skeletonFound->joint[HUMAN_SKELETON_LEFT_ELBOW].x;
+   skelPF.pointStart.y = skeletonFound->joint[HUMAN_SKELETON_LEFT_ELBOW].y;
+   skelPF.pointStart.z = skeletonFound->joint[HUMAN_SKELETON_LEFT_ELBOW].z;
+   skelPF.pointEnd.x = skeletonFound->joint[HUMAN_SKELETON_LEFT_HAND].x;
+   skelPF.pointEnd.y = skeletonFound->joint[HUMAN_SKELETON_LEFT_HAND].y;
+   skelPF.pointEnd.z = skeletonFound->joint[HUMAN_SKELETON_LEFT_HAND].z;
+   skelPF.pointingVector.x = skelPF.pointEnd.x - skelPF.pointStart.x;
+   skelPF.pointingVector.y = skelPF.pointEnd.y - skelPF.pointStart.y;
+   skelPF.pointingVector.z = skelPF.pointEnd.z - skelPF.pointStart.z;
+   skelPF.isLeftHand=1;
+   skelPF.isRightHand=0;
+
+   broadcastPointing(frameNumber,&skelPF);
+   return 1;
+  } else
+  if (doHand==1)
+  {
+   skelPF.pointStart.x = skeletonFound->joint[HUMAN_SKELETON_RIGHT_ELBOW].x;
+   skelPF.pointStart.y = skeletonFound->joint[HUMAN_SKELETON_RIGHT_ELBOW].y;
+   skelPF.pointStart.z = skeletonFound->joint[HUMAN_SKELETON_RIGHT_ELBOW].z;
+   skelPF.pointEnd.x = skeletonFound->joint[HUMAN_SKELETON_RIGHT_HAND].x;
+   skelPF.pointEnd.y = skeletonFound->joint[HUMAN_SKELETON_RIGHT_HAND].y;
+   skelPF.pointEnd.z = skeletonFound->joint[HUMAN_SKELETON_RIGHT_HAND].z;
+   skelPF.pointingVector.x = skelPF.pointEnd.x - skelPF.pointStart.x;
+   skelPF.pointingVector.y = skelPF.pointEnd.y - skelPF.pointStart.y;
+   skelPF.pointingVector.z = skelPF.pointEnd.z - skelPF.pointStart.z;
+   skelPF.isLeftHand=0;
+   skelPF.isRightHand=1;
+
+   broadcastPointing(frameNumber,&skelPF);
+   return 1;
+  }
+
+ return 0;
 }
 
 
@@ -135,6 +238,7 @@ int registerServices(ros::NodeHandle * nh,unsigned int width,unsigned int height
   hobbitUpperBodyTracker_Initialize(width , height);
   hobbitUpperBodyTracker_RegisterSkeletonDetectedEvent((void *) &broadcastNewSkeleton);
 
+  pointEventsBroadcaster = nh->advertise <skeleton_detector::PointEvents> ("pointEvents", 1000);
   personBroadcaster = nh->advertise <skeleton_detector::Person> ("persons", divisor);
 }
 
