@@ -44,7 +44,7 @@ int key = 0;
 unsigned int frameTimestamp=0;
 ros::NodeHandle * nhPtr=0;
 unsigned int paused=0;
-unsigned int autotrigger=0;
+unsigned int autotrigger=1;
 
 
 struct fitnessState state;
@@ -187,7 +187,7 @@ int main(int argc, char **argv)
                   checkSkeletonForRepetition(&state,&sk);
 
                   ++repetitions;
-                  if ( (autotrigger) && (repetitions%40==0) )
+                  if ( (autotrigger) && (repetitions%40==0) && ( state.started ) )
                   {
                     ++state.repetitions;
                   }
