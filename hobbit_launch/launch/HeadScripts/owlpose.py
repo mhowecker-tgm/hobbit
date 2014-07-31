@@ -54,7 +54,7 @@ def set_head_orientation(msg):
 		#br.sendTransform((0, 0, 0), (0.4 ,-0.61, 0.0, 1), rospy.Time.now(), base_tf,head_tf)
 
 	if msg.data == "to_grasp":
-		herkulex.setAngles(yaw=45, pitch=-70, roll=0, playtime=200)
+		herkulex.setAngles(yaw=55, pitch=-50, roll=0, playtime=200)
 		#br.sendTransform((0, 0, 0), (0.45 ,-0.70, 0.0, 1), rospy.Time.now(), base_tf,head_tf)
 
 	if msg.data == "center_left":
