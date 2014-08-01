@@ -8,6 +8,8 @@ alias updateHead="source /opt/ros/hobbit_hydro/src/hobbit_launch/launch/HeadScri
 alias dfb="sudo gedit ~/.bashrc"
 #short cut for sourcing .bashrc 
 alias dfbs="source ~/.bashrc"
+#trigger single shot of point cloud from headcamera (table_object_detector/src/trigger.py)
+alias trig="rostopic pub /SS/doSingleShot std_msgs/String "asdf" -1"
 
 # Call hobbit to one of the call buttons
 alias call1="rostopic pub -1 /Event hobbit_msgs/Event '{header: auto, event: E_CALLHOBBIT, confidence: 0.8, params: [{name: 'place', value: 'CALL1'}, {name: sensor, value: 'CALL1'}]}'"
