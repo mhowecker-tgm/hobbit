@@ -193,7 +193,14 @@ int getBackCommandLine(char *  command , char * what2GetBack , unsigned int what
   return 1;
 }
 
+int process_exists(char * safeProcessName)
+{
+  char what2Execute[MAX_COMMAND_SIZE];
+  char what2GetBack[MAX_COMMAND_SIZE];
+  unsigned int what2GetBackMaxSize=MAX_COMMAND_SIZE;
 
+  //getBackCommandLine( what2Execute ,  what2GetBack , what2GetBackMaxSize)
+}
 
 //This function prepares the content of  stats context , ( stats.content )
 void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
