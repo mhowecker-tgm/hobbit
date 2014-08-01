@@ -17,7 +17,7 @@ import uashh_smach.util as util
 import hobbit_smach.speech_output_import as speech_output
 # import hobbit_smach.head_move_import as head_move
 import hobbit_smach.hobbit_move_import as hobbit_move
-import hobbit_smach.arm_move_import as arm_move
+#import hobbit_smach.arm_move_import as arm_move                   df 31.7.2014 temporary!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 import math, struct
 from testdetector import TD
 import tf
@@ -66,7 +66,8 @@ class DavidLookForObject(State):
             output_keys=['goal_position_x', 'goal_position_y', 'goal_position_yaw']
         )
 	self.listener = tf.TransformListener()
-        self.rec = TD()
+	self.pubClust = rospy.Publisher("/objectclusters", PointCloud2)        
+	self.rec = TD()
         self.restrictfind = False
         self.robotDistFromGraspPntForGrasping = 0.6
         self.robotOffsetRotationForGrasping = math.pi/3
@@ -80,7 +81,9 @@ class DavidLookForObject(State):
 
         for cluster in clusters:
             self.pc = cluster
-            #self.pubClust.publish(cluster)
+	    print " ==============> publish cluster"
+	    self.pubClust.publish(cluster)
+	    self.pubClust.publish(pointcloud)					#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! new 31.7.2014
             if self.isGraspableObject():
                     #self.pubClust.publish(cluster)
                     #self.showMMUI_Info("T_CF_I_FOUND_OBJECT_ON_FLOOR","1")
@@ -243,7 +246,7 @@ class DavidLookForObject(State):
             print "ispossibleobject(): object ACCEPTED"
             return True
         else:
-            print "ispossibleobject(): object DENIED"
+            print "ispossibleobject(): object DENIED (x,y,z coordinates of center of cluster not in acceptable range)"
             return False
 
 

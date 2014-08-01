@@ -98,6 +98,10 @@ def command_cb(msg, ud):
                 print(msg.params)
                 ud.parameters['active_task'] = index
                 return True
+            elif item[0] == 'emergency':
+                ud.parameters['active_task'] = index
+                ud.command = item[0]
+                return True
             # elif index == 1 and night and index + 1 <= active_task:
             elif item[0] == 'recharge' and not night and index  <= active_task:
                 print('RECHARGING')

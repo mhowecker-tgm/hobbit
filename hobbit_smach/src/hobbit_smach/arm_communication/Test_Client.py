@@ -5,13 +5,13 @@ Created on 07.01.2014
 '''
 from ArmControllerClientFunctions import ArmClientFunctions
 
-ArmClient = ArmClientFunctions('192.168.25.46')
+ArmClient = ArmClientFunctions('192.168.2.190')
 
 ''' GET Functions '''
 #print ArmClient.GetArmState()                          
 #print ArmClient.GetActualPosition()                    
 #print ArmClient.GetArmAtHomePos()                      
-#print ArmClient.GetArmAtLearningPos()                  
+print ArmClient.GetArmAtLearningPos()                  
 #print ArmClient.GetArmAtTrayPos()                      
 #print ArmClient.GetArmAtTurntablePos()                 
 #print ArmClient.GetTurntableAtCCWPos()                 

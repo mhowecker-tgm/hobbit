@@ -38,43 +38,32 @@ _DATATYPES[PointField.FLOAT64] = ('d', 8)
 
 
 class TD:
-    def __init__(self, useRFR = True):
+    def __init__(self):
         self.pubM = rospy.Publisher("/wwclusters", PointCloud2)   
-        if useRFR:
-            self.rfr = RFR()
-
+        
     def run(self):
+	print "david1"
         r = rospy.Rate(10) # 10hz
         #pointcloud = self.getSingleShot()
         #groundplane = self.findGroundPlane(pointcloud)        
         while not rospy.is_shutdown():
             r.sleep()
+	    print "david2"
             pointcloud = self.getSingleShot()
             #groundplane = self.findGroundPlane(pointcloud)        
             clusters = self.findObjectsOnFloor(pointcloud, [0,0,0,0])
             print len(clusters)
             cntr = 0
-            for cluster in clusters:
-                descr = self.getDescriptor4PointCloud(cluster)
-                self.savePointCloud2File(cluster, "/home/walter/tmp", "cluster", str(cntr))
-                name, prob = self.rfr.get_objectname_from_descriptor(descr)
-                cntr += 1
-                if prob > 0.9:
-                    print "result :: ", name, prob
-                    self.pubM.publish(cluster)
-                else:
-                    print name, prob
-
             #break
             
     
     
-    def saveDescr2File(self, descr, location, classname, filename):
-        f = open(location + '/' + classname +  '/' + filename +'.descr', 'w')
-        #print descr
-        for item in descr:
-            f.write(str(item) + ' ' )
-        f.close()
+#    def saveDescr2File(self, descr, location, classname, filename):
+#        f = open(location + '/' + classname +  '/' + filename +'.descr', 'w')
+#        #print descr
+#        for item in descr:
+#            f.write(str(item) + ' ' )
+#        f.close()
         
     def savePointCloud2File(self, pc, location, classname, filename):
         #extract points from PointCloud2 in python.... 
@@ -123,6 +112,7 @@ class TD:
         
    
     def getSingleShot(self):
+	print "testdetector.getSingleShot()"
         rospy.wait_for_service('/CloudSegmenthor/getSingleShot')
         servicecall = rospy.ServiceProxy('/CloudSegmenthor/getSingleShot', SingleShotPC)
         try:
@@ -175,8 +165,10 @@ class TD:
           return None
 
     def findObjectsOnFloor(self, pointcloud, groundplane):
+	print "david3"
         rospy.wait_for_service('/CloudSegmenthor/findObjectsOnFloor')
         servicecall = rospy.ServiceProxy('/CloudSegmenthor/findObjectsOnFloor', ClustersOnPlane)
+	print "david4"
         try:
             resp = servicecall(pointcloud, groundplane)    # call the service            
             return resp.clusters
@@ -202,6 +194,7 @@ def main(args):
     rospy.init_node('ActionSequencerTD', anonymous=False)
     sbm = TD()
     sbm.run()
+    
     rospy.spin()
 
 if __name__ == "__main__":        

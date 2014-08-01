@@ -11,6 +11,7 @@ import rospy
 import smach
 import smach_ros
 import uashh_smach.util as util
+from uashh_smach.util import SleepState  #df 30.7.2014
 import tf
 import math
 from smach import StateMachine, State
@@ -267,11 +268,19 @@ def main():
         )
         StateMachine.add(
             'HEAD_TO_SEARCH',
-            head_move.MoveTo(pose='to_grasp'),
-            transitions={'succeeded': 'GET_POINT_CLOUD',
+            head_move.MoveTo(pose='to_grasp'),  #wait=True <=> df
+            transitions={'succeeded': 'WAIT_FINISH_HEAD_TO_SEARCH', #df
                          'aborted': 'EMO_SAY_OBJECT_NOT_DETECTED',
                          'preempted': 'preempted'}
         )
+	#df 30.7.2014
+	StateMachine.add(
+      	    'WAIT_FINISH_HEAD_TO_SEARCH',
+            SleepState(duration=10),
+	    transitions={'succeeded': 'GET_POINT_CLOUD',
+	                 'preempted': 'preempted'}
+        )
+	#df END
         StateMachine.add(
             'GET_POINT_CLOUD',
             util.WaitForMsgState(
