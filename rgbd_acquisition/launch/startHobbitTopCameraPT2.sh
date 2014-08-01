@@ -2,7 +2,7 @@
     <!-- name of the "camera" -->
     <arg name="camera" value="headcam"/> 
     <!-- name of the root frame -->
-    <arg name="frame" value="frame"/> 
+    <arg name="frame" value="headcam_rgb_optical_frame"/> 
     <!--  This is the kinect camera address -->  
     <arg name="deviceID" value="1d27/0601@1/3" type="str"/> 
     <!-- deviceID can have the following formats:
