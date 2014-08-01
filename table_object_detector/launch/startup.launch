@@ -3,11 +3,16 @@
 	<node name="TOD" pkg="table_object_detector" type="thor" args= "" output="screen">        
 	    <remap from="~input" to="/SS/points2" />
 	    <remap from="~caminfo" to="/SS/rgb/camera_info" />
-        <remap from="~img" to="/SS/rgb/image_color" />
-        <remap from="~disp" to="/SS/disparity_img" />
-	    
-    </node>
-<!-- <include file="$(find Trigger)/launch/startup.launch"/> -->
+	</node>
+
+	<node   name="Trigger" 
+		pkg="table_object_detector" 
+	 	type="trigger.py" 
+		args= "" 
+		output="screen" 
+		respawn="true">        
+	</node>
+
 </launch>
 
 
