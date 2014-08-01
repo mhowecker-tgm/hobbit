@@ -91,15 +91,19 @@ roslaunch startup.launch&
 cd /opt/ros/hobbit_hydro/src/get_current_room/launch
 roslaunch startup.launch&
 
+# Start table/floor object detector (for clustering) and trigger for publishing single shot point clouds from headcam
+cd /opt/ros/hobbit_hydro/src/table_object_detector/launch
+roslaunch startup.launch&
+
 # Start interfaces_mira, which starts the platform driver and the ros-mira interface for virtual lasers
 cd /opt/ros/hobbit_hydro/src/interfaces_mira/launch
 roslaunch startup.launch&
 
 sleep $DELAY_BETWEEN_STEPS
 
-# Start mira center
+# Start mira (start mira center with: miracenter -k ipaddress:1234', e.g. 'miracenter -k 127.0.0.1:1234')
 cd /opt/ros/hobbit_hydro/src/interfaces_mira/resources
-miracenter mira_config.xml&
+mira mira_config.xml -p1234&
 
 #Startup Joystick node , ( it allows webinterface joystick emulation also )
 roslaunch joy2twist startup.launch& 
