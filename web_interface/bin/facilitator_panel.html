@@ -85,7 +85,7 @@
                   Female Voice : 
                       <select name="voiceFemale" onchange="javascript:settingsCommand('voiceFemale='+this.value);" >
                         <optgroup label="English Language" >
-                          <option value="Susanne">Susanne</option>  
+                          <option value="Susan">Susan</option>  
                           <option value="Kate">Kate</option>  
                           <option value="Allison P">Allison P</option>  
                         </optgroup>  
@@ -150,7 +150,11 @@
                       <div id="LuiBackground" style="background-color:#66FF00;clear:both;text-align:center;" >
                        <img src="lui.png" width=300><br/>
                       </div>  
-                    UI color : <input id="LuiBackgroundSelector" name="LuiBackgroundSelector" type="color" value="#66ff00" onchange="document.getElementById('LuiBackground').style.backgroundColor=document.getElementById('LuiBackgroundSelector').value; settingsCommand('LuiBackgroundSelector='+this.value);" > <br/> <!-- class="color"-->
+                    UI color : <input id="LuiBackgroundSelector" name="LuiBackgroundSelector" type="color" value="#66ff00" 
+                               onchange="document.getElementById('LuiBackground').style.backgroundColor=document.getElementById('LuiBackgroundSelector').value; 
+                                         alert('LuiBackgroundSelector='+this.value);
+                                         settingsCommand('LuiBackgroundSelector='+this.value);
+                                         " > <br/>  
                   </td>
             </tr>
           </table>

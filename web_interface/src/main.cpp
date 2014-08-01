@@ -317,11 +317,13 @@ void MMUIExecute(char * command,char * param)
   commandToRun[0]=0;
 
   //rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_VOICE],[Value, "Susan"]]}'
-  if (strcmp(command,"LuiBackgroundSelector")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_SETBG],[Value, \"%s\"]]}' \" ",param); }  else
-  if (strcmp(command,"talkingSpeed")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_SPEED],[Value, \"%s\"]]}' \" ",param); }  else
-  if (strcmp(command,"voiceFemale")==0)  { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_VOICE],[Value, \"%s\"]]}' \" ",param); }  else
-  if (strcmp(command,"voiceMale")==0)    { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_VOICE],[Value, \"%s\"]]}' \" ",param); } else
-  if (strcmp(command,"volume")==0)       { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_ABSVOLUME],[Value, \"%s\"]]}' \" ",param); }
+  if (strcmp(command,"LuiBackgroundSelector")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_SETBG],[Value, \\\"%s\\\"]]}' \" ",param); }  else
+  if (strcmp(command,"talkingSpeed")==0) { unsigned int speedInt = 10*atoi(param);
+                                           snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_SPEED],[Value, \\\"%u\\\"]]}' \" ",speedInt); }  else
+  if (strcmp(command,"voiceFemale")==0)  { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_VOICE],[Value, \\\"%s\\\"]]}' \" ",param); }  else
+  if (strcmp(command,"voiceMale")==0)    { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_VOICE],[Value, \\\"%s\\\"]]}' \" ",param); } else
+  if (strcmp(command,"volume")==0)       { unsigned int volumeInt = 10*atoi(param);
+                                           snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_ABSVOLUME],[Value, \\\"%u\\\"]]}' \" ",volumeInt); }
   if (strcmp(command,"say")==0)          { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, D_OK],[Text, \\\"%s\\\"],[Speak, \\\"%s\\\"],[\\\"wait\\\", \\\"1\\\"]]}'\"",param,param); } else
   if (strcmp(command,"ask")==0)          { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, D_YESNO],[Text, \\\"%s\\\"],[Speak, \\\"%s\\\"],[\\\"wait\\\", \\\"1\\\"]]}'\"",param,param); }
 
@@ -381,13 +383,13 @@ void execute(char * command,char * param)
   if (strcmp(command,"setCurrentEmotion")==0)     { rosparam_set(cR,cRLen,(char *) "/Hobbit/current_emotion",param); }  else
   if (strcmp(command,"setLatestWakingUpTime")==0) { rosparam_set(cR,cRLen,(char *) "/Hobbit/wakeup_time",param);     }  else
   if (strcmp(command,"setLatestSleepingTime")==0) { rosparam_set(cR,cRLen,(char *) "/Hobbit/sleep_time",param);      }  else
-  if (strcmp(command,"LuiBackgroundSelector")==0) { rosparam_set(cR,cRLen,(char *) "USER/BGCOLOUR",param);           }  else
   //---------------
-  if (strcmp(command,"talkingSpeed")==0) { MMUIExecute(command,param); rosparam_set(cR,cRLen,(char *) "USER/Voice/Speed",param);   }  else
-  if (strcmp(command,"gender")==0)       { MMUIExecute(command,param); rosparam_set(cR,cRLen,(char *) "USER/Voice/Default",param); }  else
-  if (strcmp(command,"voiceFemale")==0)  { MMUIExecute(command,param); rosparam_set(cR,cRLen,(char *) "USER/Voice/FEMALE",param);  }  else
-  if (strcmp(command,"voiceMale")==0)    { MMUIExecute(command,param); rosparam_set(cR,cRLen,(char *) "USER/Voice/MALE",param);    }  else
-  if (strcmp(command,"volume")==0)       { MMUIExecute(command,param); rosparam_set(cR,cRLen,(char *) "USER/Voice/Volume",param);  }  else
+  if (strcmp(command,"LuiBackgroundSelector")==0) { MMUIExecute(command,param); rosparam_set(cR,cRLen,(char *) "USER/BGCOLOUR",param);           }  else
+  if (strcmp(command,"talkingSpeed")==0)          { MMUIExecute(command,param); rosparam_set(cR,cRLen,(char *) "USER/Voice/Speed",param);   }  else
+  if (strcmp(command,"gender")==0)                { MMUIExecute(command,param); rosparam_set(cR,cRLen,(char *) "USER/Voice/Default",param); }  else
+  if (strcmp(command,"voiceFemale")==0)           { MMUIExecute(command,param); rosparam_set(cR,cRLen,(char *) "USER/Voice/FEMALE",param);  }  else
+  if (strcmp(command,"voiceMale")==0)             { MMUIExecute(command,param); rosparam_set(cR,cRLen,(char *) "USER/Voice/MALE",param);    }  else
+  if (strcmp(command,"volume")==0)                { MMUIExecute(command,param); rosparam_set(cR,cRLen,(char *) "USER/Voice/Volume",param);  }  else
 
 
   // ULTRA UNSAFE , INJECTION PRONE PARAMS HERE
@@ -767,7 +769,7 @@ int main(int argc, char **argv)
 
    try
    {
-     ROS_INFO("Initializing ROS"); 
+     ROS_INFO("Initializing ROS");
      ros::init(argc, argv, NODE_NAME);
      ros::start();
 
