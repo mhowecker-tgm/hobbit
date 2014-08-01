@@ -82,9 +82,9 @@ public:
 		//df end
 		this->singleshot_service = nh_.advertiseService("getSingleShot",
 				&CloudSegmenthor::do_service_getSingleShot, this);
-		this->cloud_sub = nh_.subscribe("/topcamera/depth_registered/points", 1,
+		this->cloud_sub = nh_.subscribe("/SS/headcam/depth_registered/points", 1,
 				&CloudSegmenthor::callbackPointCloud, this);
-//	    this->cloud_sub = nh_.subscribe ("/topcamera/depth_registered/points", 1, &CloudSegmenthor::callbackPointCloud, this);
+//	    this->cloud_sub = nh_.subscribe ("/headcam/depth_registered/points", 1, &CloudSegmenthor::callbackPointCloud, this);
 		this->pub = nh_.advertise<sensor_msgs::PointCloud2>("/debug", 1);
 
 	}
@@ -652,7 +652,7 @@ public:
 		}
 		sensor_msgs::PointCloud2 output;
 		pcl::toROSMsg (objectcloud, output);
-		output.header.frame_id = "/topcamera_rgb_optical_frame";
+		output.header.frame_id = "/headcam_rgb_optical_frame";
 		// Publish the data
 		pub.publish (output);
 		//return;
@@ -811,7 +811,7 @@ public:
 		}
 		sensor_msgs::PointCloud2 output;
 		pcl::toROSMsg (objectcloud, output);
-		output.header.frame_id = "/topcamera_rgb_optical_frame";
+		output.header.frame_id = "/headcam_rgb_optical_frame";
 		// Publish the data
 		pub.publish (output);
 
