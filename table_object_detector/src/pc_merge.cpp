@@ -2,17 +2,17 @@
  *
  *
  * David Fischinger -TUW
- * 22.1.2014
- * earlier version: 26.03. 2012
+ * 04.08.2014
+ * earlier version: 26.03.2012
  *
  * input:
  *
- *   pointcloud from topcamera read from topic /SS/camera/depth_registered/points
+ *   pointcloud from topcamera read from topic /SS/headcam/depth_registered/points
  *
  * output:
  *   pointcloud edited
  *
- *   output point cloud w.r.t. tf_frame /lwr on topic /SS/points2_object_in_rcs
+ *   output point cloud w.r.t. tf_frame /base_link (base of hobbit) on topic /SS/headcam/depth_registered/points_edited_in_rcs
  *
  *
  */
@@ -38,10 +38,10 @@ CPCMerge::CPCMerge(ros::NodeHandle nh_)
   nh = nh_;
   pc_cam1_filled = false;
   //define publishers
-  pc_for_basketdet_pub = nh.advertise<pcl::PointCloud<pcl::PointXYZ> >("/SS/points2_object_in_rcs",1); //rcs:robot coordinate sys.
+  pc_for_basketdet_pub = nh.advertise<pcl::PointCloud<pcl::PointXYZ> >("/SS/headcam/depth_registered/points_edited_in_rcs",1); //rcs:robot coordinate sys.
   position_highestpoint_pub = nh.advertise<std_msgs::String>("/SS/basket_position",1);
   //define subscriber
-  pc_cam1_sub = nh.subscribe("/SS/camera/depth_registered/points",1, &CPCMerge::pc_cam1_callback, this);
+  pc_cam1_sub = nh.subscribe("/SS/headcam/depth_registered/points",1, &CPCMerge::pc_cam1_callback, this);
 }
 
 void CPCMerge::pc_cam1_callback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& pcl_in)
@@ -54,7 +54,7 @@ void CPCMerge::pc_cam1_callback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& 
 
   //search for tf transform for pc from cam1
   ros::Time now = ros::Time::now();
-  bool foundTransform = tf_listener.waitForTransform("/lwr", "/camera_depth_optical_frame", now
+  bool foundTransform = tf_listener.waitForTransform("/base_link", "/headcam_rgb_optical_frame", now
 		                                             /*(*pcl_in).header.stamp*/, ros::Duration(13.0));
   if (!foundTransform)
   {
@@ -64,8 +64,8 @@ void CPCMerge::pc_cam1_callback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& 
   }
 
   //ROS_INFO(tf_listener);
-  ROS_INFO("Transform pc_cam1: camera_depth_optical_frame to lwr found");
-  pcl_ros::transformPointCloud("/lwr", *pcl_in, pc_cam1, tf_listener);
+  ROS_INFO("Transform pc_cam1: headcam_rgb_optical_frame to base_link found");
+  pcl_ros::transformPointCloud("/base_link", *pcl_in, pc_cam1, tf_listener);
   this->pc_cam1_filled = true;
 
   //publishes point cloud
@@ -84,9 +84,9 @@ void CPCMerge::publish_merged_pc()
 	//Filter Data (with basket detection and basket point elimination)
 	filter_pc(pcl_cloud_merged, false); //last entry false <=> coordinates of highest points of scene are published instead of basket center point
 
-    //publish manipulated and merged point cloud data (in lwr (not world!) coordinate system)
+    //publish manipulated and merged point cloud data (in base_link (not world!) coordinate system)
     pc_for_basketdet_out = pcl_cloud_merged;
-    pc_for_basketdet_out.header.frame_id = "/lwr";
+    pc_for_basketdet_out.header.frame_id = "/base_link";
 	pc_for_basketdet_pub.publish(pc_for_basketdet_out);
 
 	ROS_INFO("point cloud of objects (rcs) and highest point position (of objects) were published");

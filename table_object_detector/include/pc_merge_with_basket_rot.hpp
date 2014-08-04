@@ -2,7 +2,8 @@
  * pc_merge_with_basket_rot.hpp
  *
  *  Created on: Dec 29, 2011
- *      Author: grasp
+ *  Changed on: Aug 04, 2014
+ *      Author: df
  */
 
 #ifndef PC_MERGE_WITH_BASKET_ROT_HPP_
@@ -101,9 +102,14 @@ public:
 	// merges point clouds from 2 different cameras
 	void publish_merged_pc();
 	// filters outliers and points outside defined region
-	void filter_pc(pcl::PointCloud<pcl::PointXYZ>& pcl_cloud_merged,
+/*	void filter_pc(pcl::PointCloud<pcl::PointXYZ>& pcl_cloud_merged,
 			       bool pub_basket_position=true, float x_min=0.25, float x_max=0.90,
 			       float y_min=-0.55, float y_max=0.25, float z_min=0.035, float z_max = 0.4);
+*/      //bigger scope
+	void filter_pc(pcl::PointCloud<pcl::PointXYZ>& pcl_cloud_merged,
+			       bool pub_basket_position=true, float x_min=0.0, float x_max=1.50,
+			       float y_min=-1.0, float y_max=0.25, float z_min=0.035, float z_max = 0.9);
+
 	void segment_pc(pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_cloud_merged );
 	// receives point clouds from camera #1
 	void pc_cam1_callback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& pcl_in);
