@@ -18,6 +18,7 @@
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>sensort_msgs</build_depend>
   <build_depend>roscpp</build_depend>
+  <build_depend>ros_pcl</build_depend>
   <build_depend>libpcl-all-dev</build_depend>
   <run_depend>sensor_msgs</run_depend>
   <run_depend>roscpp</run_depend>
