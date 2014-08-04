@@ -1,4 +1,4 @@
-##!/usr/bin/python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 PKG = 'hobbit_msgs'
@@ -96,14 +96,14 @@ class Init(smach.State):
     """Class to initialize certain parameters"""
     def __init__(self):
         smach.State.__init__(self, outcomes=['succeeded', 'canceled'], input_keys=['command'], output_keys=['social_role'])
-        self.pub_head = rospy.Publisher('HeadMove', String)
-        self.pub_obstacle = rospy.Publisher('/headcam/active', String)
-        self.pub_face = rospy.Publisher('/Hobbit/Emoticon', String)
+        # self.pub_head = rospy.Publisher('HeadMove', String, queue_size=50)
+        self.pub_obstacle = rospy.Publisher('/headcam/active', String, queue_size=50)
+        self.pub_face = rospy.Publisher('/Hobbit/Emoticon', String, queue_size=50)
         self.pub_face.publish('EMO_NEUTRAL')
 
     def execute(self,ud):
         self.pub_face.publish('EMO_NEUTRAL')
-        self.pub_head.publish('down')
+        # self.pub_head.publish('down')
         self.pub_obstacle.publish('active')
         if rospy.has_param('/hobbit/social_role'):
             ud.social_role = rospy.get_param('/hobbit/social_role')
@@ -118,7 +118,7 @@ class CleanUp(smach.State):
         smach.State.__init__(self, outcomes=['succeeded'],
                 input_keys=['command', 'visited_places'],
                 output_keys=['result','command', 'visited_places'])
-        self.pub_face = rospy.Publisher('/Hobbit/Emoticon', String)
+        self.pub_face = rospy.Publisher('/Hobbit/Emoticon', String, queue_size=50)
 
     def execute(self, ud):
         self.pub_face.publish('EMO_SAD')
@@ -132,7 +132,7 @@ class SetSuccess(smach.State):
     def __init__(self):
         smach.State.__init__(self, outcomes=['succeeded', 'preempted'],
                 output_keys=['result', 'visited_places'])
-        self.pub_face = rospy.Publisher('/Hobbit/Emoticon', String)
+        self.pub_face = rospy.Publisher('/Hobbit/Emoticon', String, queue_size=50)
 
     def execute(self, ud):
         ud.visited_places = []
@@ -172,7 +172,7 @@ class PlanPath(smach.State):
                 input_keys=['robot_current_pose', 'pose', 'positions', 'detection', 'plan', 'users_current_room', 'visited_places', 'robot_end_pose'],
                 output_keys=['detection', 'visited_places', 'robot_end_pose', 'goal_position_x', 'goal_position_y', 'goal_position_yaw'])
         self.positions=[]
-        self.pub_obstacle = rospy.Publisher('/headcam/active', String)
+        self.pub_obstacle = rospy.Publisher('/headcam/active', String, queue_size=50)
         self.getPlan = rospy.ServiceProxy('make_plan', GetPlan, persistent=True)
         self.shortest_path = 99999.99
 
@@ -257,33 +257,10 @@ class PlanPath(smach.State):
             return 'success'
 
 
-class MoveBase(smach.State):
-    def __init__(self):
-        smach.State.__init__(self, outcomes=['succeeded', 'preempted', 'failure'],
-                input_keys=['robot_end_pose', 'visited_places'],
-                output_keys=['robot_end_pose', 'visited_places'])
-        self.pub_room = rospy.Publisher('/room_name_target', String)
-        self.pub_place = rospy.Publisher('/place_name_target', String)
-        self.pub_obstacle = rospy.Publisher('/headcam/active', String)
-
-    def execute(self, ud):
-        self.pub_obstacle.publish('active')
-        print bcolors.OKGREEN+ 'Moving to %s in %s'%(ud.robot_end_pose['place'], ud.robot_end_pose['room'])  + bcolors.ENDC
-        self.pub_room.publish(String(ud.robot_end_pose['room']))
-        rospy.sleep(1.0)
-        self.pub_place.publish(String(ud.robot_end_pose['place']))
-        try:
-            ud.visited_places.append(ud.robot_end_pose)
-        except:
-            ud.visited_places = []
-            ud.visited_places.append(ud.robot_end_pose)
-        return 'succeeded'
-
-
 class Rotate180(smach.State):
     def __init__(self):
         smach.State.__init__(self, outcomes=['succeeded', 'preempted', 'failure'])
-        self.pub = rospy.Publisher('/DiscreteMotionCmd', String)
+        self.pub = rospy.Publisher('/DiscreteMotionCmd', String, queue_size=50)
 
     def execute(self, ud):
         if self.preempt_requested():

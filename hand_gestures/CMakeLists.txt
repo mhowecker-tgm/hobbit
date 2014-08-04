@@ -37,7 +37,7 @@ add_executable(hand_gestures src/main.cpp src/services.cpp)
 ## as an example, message headers may need to be generated before nodes
 add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencpp)
 
-target_link_libraries(hand_gestures  ${CMAKE_CURRENT_SOURCE_DIR}/bin/libHobbitTrackerLib.a ${catkin_LIBRARIES} ${OpenCV_LIBRARIES}  ${Boost_LIBRARIES}   )
+target_link_libraries(hand_gestures ${CMAKE_CURRENT_SOURCE_DIR}/bin/libHobbitTrackerLib.a ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} ${Boost_LIBRARIES})
 
 install(TARGETS hand_gestures RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 install(FILES hand_gestures.xml DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
