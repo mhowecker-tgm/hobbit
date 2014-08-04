@@ -19,7 +19,7 @@
 
 #include <std_srvs/Empty.h>
 
-    
+
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
 #include <sensor_msgs/CameraInfo.h>
@@ -90,6 +90,13 @@ bool dump(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
 {
     ROS_INFO("Enabling Dump to files");
     hobbitUpperBodyTracker_setDumpToFiles(1);
+    return true;
+}
+
+bool stopDump(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    ROS_INFO("Disabling Dump to files");
+    hobbitUpperBodyTracker_setDumpToFiles(0);
     return true;
 }
 
@@ -233,7 +240,7 @@ int main(int argc, char **argv)
      std::string fromDepthTopicInfo;
      std::string fromRGBTopic;
      std::string fromRGBTopicInfo;
-  
+
 
      private_node_handle_.param("fromDepthTopic", fromDepthTopic, std::string("/headcam/depth_registered/image_rect"));
      private_node_handle_.param("fromDepthTopicInfo", fromDepthTopicInfo, std::string("/headcam/depth_registered/camera_info"));
@@ -242,13 +249,14 @@ int main(int argc, char **argv)
      private_node_handle_.param("name", name, std::string("skeleton_detector"));
      private_node_handle_.param("rate", rate, int(5));
      ros::Rate loop_rate(rate); //  hz should be our target performance
-   
+
      //We advertise the services we want accessible using "rosservice call *w/e*"
      ros::ServiceServer visualizeOnService      = nh.advertiseService(name+"/visualize_on" , visualizeOn);
      ros::ServiceServer visualizeOffService     = nh.advertiseService(name+"/visualize_off", visualizeOff);
      ros::ServiceServer terminateService        = nh.advertiseService(name+"/terminate"    , terminate);
      ros::ServiceServer resumeService           = nh.advertiseService(name+"/pause"        , pause);
      ros::ServiceServer dumpService             = nh.advertiseService(name+"/dump"         , dump);
+     ros::ServiceServer dumpService             = nh.advertiseService(name+"/stopDump"         , stopDump);
      ros::ServiceServer pauseService            = nh.advertiseService(name+"/resume"       , resume);
      ros::ServiceServer simpleService           = nh.advertiseService(name+"/simple"        , simple);
      ros::ServiceServer advancedService         = nh.advertiseService(name+"/advanced"       , advanced);
