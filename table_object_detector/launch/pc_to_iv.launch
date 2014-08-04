@@ -1,0 +1,6 @@
+<launch>
+    <!--remap from="pc2_transformed/pc2" to="SS/points2" /-->
+    <node name="pc_to_iv" pkg="table_object_detector" type="pc_to_iv" output="screen" respawn="true">  </node>
+    <node name="iv_to_pc" pkg="table_object_detector" type="iv_to_pc" output="screen" respawn="true">  </node>   
+</launch>
+
