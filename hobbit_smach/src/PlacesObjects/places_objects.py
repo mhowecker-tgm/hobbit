@@ -17,7 +17,7 @@ import roslib; roslib.load_manifest(PKG)
 import rospy
 from hobbit_msgs.msg import ObjectLocationVector, ObjectLocation
 from hobbit_msgs.msg import *
-from hobbit_msgs.srv import GetObjectLocationsRequest
+from hobbit_msgs.srv import GetObjectLocationsRequest, GetRoomNameRequest
 from hobbit_msgs.srv import *
 from geometry_msgs.msg import Pose2D
 from matplotlib.path import Path
@@ -253,12 +253,16 @@ def getAllRooms(req):
     # at the front. kitchen, bedroom, livingroom, dining room
     return rooms
 
-def get_robots_current_room(req):
-    req = hobbit_msgs.GetRoomNameRequest
-    req.point.x, req.point.y, req.point.yaw = util.get_current_robot_position(frame='/map')
+def get_robots_current_room(req_old):
+    req = GetRoomNameRequest()
+    x, y, yaw = util.get_current_robot_position(frame='/map')
+    req.point.x = x
+    req.point.y = y
+    req.point.z = 0.0
     resp = get_room_name(req)
+    print(type(resp.room_name.data))
     rospy.loginfo(resp)
-    return resp
+    return resp.room_name.data
 
 def main():
     rospy.init_node(NAME)
@@ -277,7 +281,7 @@ def main():
         s2 = rospy.Service(PROJECT+'/'+NAME+'/get_room_name', GetRoomName, get_room_name)
         s3 = rospy.Service('/get_coordinates', GetCoordinates, getCoordinates)
         s4 = rospy.Service('/getRooms', GetRooms, getAllRooms)
-        s5 = rospy.Service('/get_robots_current_room', GetRoomName, get_robots_current_room)
+        s5 = rospy.Service('/get_robots_current_room', GetName, get_robots_current_room)
 
     # spin() keeps Python from exiting until node is shutdown
     rospy.spin()
