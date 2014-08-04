@@ -222,16 +222,12 @@ return;
 
 int main(int argc, char **argv)
 {
-   ROS_INFO("Starting Up!!");
+   ROS_INFO("Starting Up !!");
    try
-	{
-	 char regName[128]={0};
-	 sprintf(regName,"skeleton_detector%u",getpid()); //We use pid on node name
-  	 ros::init(argc, argv, regName);
+    { 
+     ros::init(argc, argv, "skeleton_detector");
      ros::start();
-
-
-
+ 
      ros::NodeHandle nh;
      ros::NodeHandle private_node_handle_("~");
 
