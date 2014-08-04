@@ -51,8 +51,6 @@ sleep $DELAY_BETWEEN_STEPS
 #Give some time for the first camera to come online
 sleep $DELAY_BETWEEN_STEPS
   
-
-
 #Start Head ( and bring it to level )
 /opt/ros/hobbit_hydro/src/hobbit_launch/launch/startupBlueDanubeHead.sh&
 #roslaunch head startup.launch&
