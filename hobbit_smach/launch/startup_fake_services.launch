@@ -1,6 +1,6 @@
 <launch>
 <node name="fake_get_plan" pkg="hobbit_smach" type="fake_get_plan.py" />
-<node name="fake_robot_current_room" pkg="hobbit_smach" type="fake_robot_current_room.py" />
+<!-- <node name="fake_robot_current_room" pkg="hobbit_smach" type="fake_robot_current_room.py" /> -->
 <node name="fake_get_all_rooms" pkg="hobbit_smach" type="fake_get_all_rooms.py" />
 <node name="fake_users_room" pkg="hobbit_smach" type="fake_users_room.py" />
 </launch>

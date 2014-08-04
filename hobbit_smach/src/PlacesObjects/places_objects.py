@@ -24,6 +24,7 @@ from matplotlib.path import Path
 from operator import itemgetter
 from std_msgs.msg import String
 from xml.dom import minidom
+import uashh_smach.util as util
 
 
 try:
@@ -215,7 +216,7 @@ def get_room_name(req):
     return GetRoomNameResponse(String('UNKNOWN'))
 
 def getCoordinates(req):
-    """ Given a the name of the room and the location their Pose is retrieved
+    """ Given the name of the room and of the location their Pose is retrieved
     and returned
     """
     global rooms
@@ -253,9 +254,11 @@ def getAllRooms(req):
     return rooms
 
 def get_robots_current_room(req):
-    print('Returning random room name: MainCorridor')
-    return 'MainCorridor'
-
+    req = hobbit_msgs.GetRoomNameRequest
+    req.point.x, req.point.y, req.point.yaw = util.get_current_robot_position(frame='/map')
+    resp = get_room_name(req)
+    rospy.loginfo(resp)
+    return resp
 
 def main():
     rospy.init_node(NAME)
@@ -274,7 +277,7 @@ def main():
         s2 = rospy.Service(PROJECT+'/'+NAME+'/get_room_name', GetRoomName, get_room_name)
         s3 = rospy.Service('/get_coordinates', GetCoordinates, getCoordinates)
         s4 = rospy.Service('/getRooms', GetRooms, getAllRooms)
-        s5 = rospy.Service('/get_robots_current_room', GetRoomName, get_room_name)
+        s5 = rospy.Service('/get_robots_current_room', GetRoomName, get_robots_current_room)
 
     # spin() keeps Python from exiting until node is shutdown
     rospy.spin()
