@@ -39,6 +39,7 @@ int main(int argc, char **argv)
 
   ros::ServiceServer service = n.advertiseService("getRooms_", &PlacesInterpretation::cPlacesInterpretation::getRooms, &myPlacesInterpretation);
   ROS_INFO("Service ready");
+  ros::Rate loop_rate(10);
 
   ROS_INFO("Init loop");
    //Loop
@@ -46,6 +47,7 @@ int main(int argc, char **argv)
   {
       //Read ros messages
       ros::spinOnce();
+      loop_rate.sleep();
       myPlacesInterpretation.Run();
   }
 
