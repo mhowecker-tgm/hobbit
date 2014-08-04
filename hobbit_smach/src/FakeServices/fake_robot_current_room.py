@@ -7,7 +7,6 @@ NAME = 'FakeGetRobotsCurrentRoom'
 
 import roslib; roslib.load_manifest(PKG) 
 
-# import the AddTwoInts service
 from hobbit_msgs.srv import *
 from hobbit_msgs.srv import GetName
 from random import choice

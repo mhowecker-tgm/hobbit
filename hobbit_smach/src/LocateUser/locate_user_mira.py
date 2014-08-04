@@ -1,4 +1,4 @@
-#!/usr/bin/python
+##!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 PKG = 'hobbit_msgs'
@@ -538,7 +538,7 @@ def main():
         )
         smach.StateMachine.add(
             'GET_CURRENT_ROOM',
-            ServiceState('getCurrentRoom',
+            ServiceState('get_robots_current_room',
                          GetName,
                          response_key='robots_room_name'),
             transitions={'succeeded':'GET_USERS_ROOM', 'aborted':'CLEAN_UP'}

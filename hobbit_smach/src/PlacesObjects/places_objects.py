@@ -198,7 +198,7 @@ def getObjectLocations(req):
         newlist.locations.append(tmp_obj)
     return newlist
 
-def getRoomName(req):
+def get_room_name(req):
     """ Given a x and y coordinate the room name is searched for and returned
     """
     print(req)
@@ -252,7 +252,7 @@ def getAllRooms(req):
     # at the front. kitchen, bedroom, livingroom, dining room
     return rooms
 
-def getCurrentRoom(req):
+def get_robots_current_room(req):
     print('Returning random room name: MainCorridor')
     return 'MainCorridor'
 
@@ -271,10 +271,10 @@ def main():
         getObjectLocations(mug)
         writeXml(FILE, rooms)
         s1 = rospy.Service(PROJECT+'/'+NAME+'/get_object_locations', GetObjectLocations, getObjectLocations)
-        s2 = rospy.Service(PROJECT+'/'+NAME+'/get_room_name', GetRoomName, getRoomName)
+        s2 = rospy.Service(PROJECT+'/'+NAME+'/get_room_name', GetRoomName, get_room_name)
         s3 = rospy.Service('/get_coordinates', GetCoordinates, getCoordinates)
         s4 = rospy.Service('/getRooms', GetRooms, getAllRooms)
-        s5 = rospy.Service('/get_robots_current_room', GetName, getCurrentRoom)
+        s5 = rospy.Service('/get_robots_current_room', GetRoomName, get_room_name)
 
     # spin() keeps Python from exiting until node is shutdown
     rospy.spin()
