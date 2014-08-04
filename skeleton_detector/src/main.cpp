@@ -256,7 +256,7 @@ int main(int argc, char **argv)
      ros::ServiceServer terminateService        = nh.advertiseService(name+"/terminate"    , terminate);
      ros::ServiceServer resumeService           = nh.advertiseService(name+"/pause"        , pause);
      ros::ServiceServer dumpService             = nh.advertiseService(name+"/dump"         , dump);
-     ros::ServiceServer dumpService             = nh.advertiseService(name+"/stopDump"         , stopDump);
+     ros::ServiceServer stopDumpService             = nh.advertiseService(name+"/stopDump"         , stopDump);
      ros::ServiceServer pauseService            = nh.advertiseService(name+"/resume"       , resume);
      ros::ServiceServer simpleService           = nh.advertiseService(name+"/simple"        , simple);
      ros::ServiceServer advancedService         = nh.advertiseService(name+"/advanced"       , advanced);
