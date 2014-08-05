@@ -427,8 +427,10 @@ void execute(char * command,char * param)
   } else
   if (strcmp(command,"camera")==0)
   {
-    if (strcmp(param,"refresh")==0)
-        { strncpy(cR,"/bin/bash -c \"cd /opt/ros/hobbit_hydro/src/rgbd_acquisition/bin/frames/base/ && timeout 1 rosrun image_view image_saver image:=/basecam/rgb/image_raw\" && cd /opt/ros/hobbit_hydro/src/rgbd_acquisition/bin/frames/top/ && timeout 1 rosrun image_view image_saver image:=/headcam/rgb/image_raw ",cRLen); }
+    if (strcmp(param,"refreshTop")==0)
+        { strncpy(cR,"/bin/bash -c \"cd /opt/ros/hobbit_hydro/src/rgbd_acquisition/bin/frames/top/ && timeout 1 rosrun image_view image_saver image:=/headcam/rgb/image_raw\" ",cRLen); }
+    if (strcmp(param,"refreshBottom")==0)
+        { strncpy(cR,"/bin/bash -c \"cd /opt/ros/hobbit_hydro/src/rgbd_acquisition/bin/frames/base/ && timeout 1 rosrun image_view image_saver image:=/basecam/rgb/image_raw\" ",cRLen); }
   } else
   if (strcmp(command,"head")==0)
   {

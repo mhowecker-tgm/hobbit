@@ -42,13 +42,23 @@
      } 
    }
  
-    function refreshFeed(name,imageName)
+    function refreshTopFeed(name,imageName)
     {
-      command('camera=refresh');
+      command('camera=refreshTop');
       document.getElementById(name).style.visibility='visible';
       var randomnumber=Math.floor(Math.random()*100000);
-      document.getElementById("videoFeedImage").src="base_image.jpg?t="+randomnumber;
+      document.getElementById("videoFeedTopImage").src="base_image.jpg?t="+randomnumber;
     }
+
+
+    function refreshBottomFeed(name,imageName)
+    {
+      command('camera=refreshBottom');
+      document.getElementById(name).style.visibility='visible';
+      var randomnumber=Math.floor(Math.random()*100000);
+      document.getElementById("videoFeedBottomImage").src="top_image.jpg?t="+randomnumber;
+    }
+
 
     function makeFeedVisible(name)
     {

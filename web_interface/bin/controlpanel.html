@@ -55,23 +55,45 @@
            </table>
 </div> 
 
-        <div class="rtdFloating" id="videoFeed" draggable="true" ondrop="drop(event)" ondragover="allowDrop(event)" ondragstart="drag(event)" >
+        <div class="rtdFloating" id="videoFeedBottom" draggable="true" ondrop="drop(event)" ondragover="allowDrop(event)" ondragstart="drag(event)" >
             <table>
               <tr>
-                <td width=300 ></td><td><a href="javascript:makeFeedInvisible('videoFeed');" class="xbutton" >X</a></td>
+                <td width=300 >Bottom Camera Feed</td><td><a href="javascript:makeFeedInvisible('videoFeedBottom');" class="xbutton" >X</a></td>
               </tr>
               <tr>
                 <td colspan=2> 
-                 <img src="feedNotReady.jpg" id="videoFeedImage"> <br/>
+                 <img src="feedNotReady.jpg" id="videoFeedBottomImage"> <br/>
                 </td>
               </tr>
               <tr>
                <td colspan=2>
-                 <a href="javascript:refreshFeed('videoFeed','videoFeedImage');">Refresh</a>   
+                 <a href="javascript:refreshBottomFeed('videoFeedBottom','videoFeedBottomImage');">Refresh</a>   
+               </td>
+              </tr>
+           </table>
+	     </div> 
+
+ 
+
+
+   <div class="rtdFloating" id="videoFeedTop" draggable="true" ondrop="drop(event)" ondragover="allowDrop(event)" ondragstart="drag(event)" >
+            <table>
+              <tr>
+                <td width=300 >Top Camera Feed</td><td><a href="javascript:makeFeedInvisible('videoFeedTop');" class="xbutton" >X</a></td>
+              </tr>
+              <tr>
+                <td colspan=2> 
+                 <img src="feedNotReady.jpg" id="videoFeedTopImage"> <br/>
+                </td>
+              </tr>
+              <tr>
+               <td colspan=2>
+                 <a href="javascript:refreshTopFeed('videoFeedTop','videoFeedTopImage');">Refresh</a>   
                </td>
               </tr>
            </table>
 	</div> 
+
 
  
 
@@ -160,7 +182,8 @@
          </iframe>
         <br><br>   
          <center>
-          <a href="javascript:makeFeedVisible('videoFeed');">View</a>  / <a href="javascript:makeFeedInvisible('videoFeed');">Hide</a> the Camera<br/>
+          <a href="javascript:makeFeedVisible('videoFeedTop');">View</a>  / <a href="javascript:makeFeedInvisible('videoFeedTop');">Hide</a> Head Camera<br/>
+          <a href="javascript:makeFeedVisible('videoFeedBottom');">View</a>  / <a href="javascript:makeFeedInvisible('videoFeedBottom');">Hide</a> Bottom Camera<br/>
          </center>
 	</div> 
         </td>
