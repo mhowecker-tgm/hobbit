@@ -225,7 +225,7 @@ int main(int argc, char **argv)
    ROS_INFO("Starting Up !!");
    try
     { 
-     ros::init(argc, argv, "skeleton_detector");
+     ros::init(argc, argv, "skeleton_detector"); 
      ros::start();
  
      ros::NodeHandle nh;
