@@ -55,6 +55,77 @@
            </table>
 </div> 
 
+
+
+<!-- MAIN WINDOW -->
+
+ 
+  <center>
+	<!--a href="controlpanel.html?nothing=true"> <img src="header.png" border=0/> </a--> 
+         <a href="controlpanel.html?nothing=true">  
+          <img src="banner.png" width=800 border=0 />
+         </a><br/> 
+         
+<ul><li><a href="controlpanel.html" target="_new">Home</a></li>
+  <li> <a href="facilitator_panel.html" target="_new">Facilitator Menu</a> </li>
+  <li>
+    <a href="#">Scenarios</a>
+    <ul>
+      <li><a href="#">Call to Room</a></li>
+      <li><a href="#">Follow me</a></li>
+      <li><a href="#">Clear Floor</a></li>
+      <li><a href="#">Learn Object</a></li>
+      <li><a href="#">Help Me</a></li>
+      <li><a href="#">Sleep</a></li>
+      <li><a href="#">Wake-up</a></li>
+       
+    </ul>
+  </li>   
+  
+  
+  <li>
+    <a href="#">View</a>
+    <ul>
+      <li><a href="javascript:makeFeedVisible('videoFeedTop');">Top Camera</a></li>
+      <li><a href="javascript:makeFeedVisible('videoFeedBottom');">Botom Camera</a></li>
+      <li><a href="javascript:makeFeedVisible('mapFeed');">Map Overview</a> </li>
+    </ul>
+  </li> 
+  <li> <a href="#">System</a>
+    <ul>
+      <li><a href="controlpanel.html?robot=systemUpdate">Software Update</a></li>
+      <li><a href="controlpanel.html?robot=systemRestart">System Restart</a></li>
+      <li><a href="controlpanel.html?robot=systemShutdown">System Shutdown</a></li>
+    </ul>   
+  </li>
+  <li><a href="http://hobbit.acin.tuwien.ac.at/">Hobbit Website</a></li>
+  <li><a href="mailto:hob-impl@fortec.tuwien.ac.at">Report a problem</a></li>
+</ul>         
+         
+	<hr />
+	
+
+
+        <div class="rtdFloating" id="mapFeed" draggable="true" ondrop="drop(event)" ondragover="allowDrop(event)" ondragstart="drag(event)" >
+            <table>
+              <tr>
+                <td width=300 >Map Overview</td><td><a href="javascript:makeFeedInvisible('mapFeed');" class="xbutton" >X</a></td>
+              </tr>
+              <tr>
+                <td colspan=2> 
+                 <img src="map.jpg" id="mapFeedImage"> <br/>
+                </td>
+              </tr>
+              <tr>
+               <td colspan=2>
+                 <a href="javascript:refreshBottomFeed('mapFeed','mapFeedImage');">Refresh</a>   
+               </td>
+              </tr>
+           </table>
+	     </div> 
+
+
+
         <div class="rtdFloating" id="videoFeedBottom" draggable="true" ondrop="drop(event)" ondragover="allowDrop(event)" ondragstart="drag(event)" >
             <table>
               <tr>
@@ -95,17 +166,8 @@
 	</div> 
 
 
- 
-
-<!-- MAIN WINDOW -->
-
- 
-  <center>
-	<!--a href="controlpanel.html?nothing=true"> <img src="header.png" border=0/> </a--> 
-         <a href="controlpanel.html?nothing=true">  
-          <img src="banner.png" width=800 border=0 />
-         </a><br/> 
-	<hr />
+ 	
+	
 	
    <table id="content">
     <tr>
@@ -180,11 +242,7 @@
         <strong>STATUS</strong><br/>
          <iframe id="statusMonitor" src="stats.html" frameBorder="0" scrolling="no" > 
          </iframe>
-        <br><br>   
-         <center>
-          <a href="javascript:makeFeedVisible('videoFeedTop');">View</a>  / <a href="javascript:makeFeedInvisible('videoFeedTop');">Hide</a> Head Camera<br/>
-          <a href="javascript:makeFeedVisible('videoFeedBottom');">View</a>  / <a href="javascript:makeFeedInvisible('videoFeedBottom');">Hide</a> Bottom Camera<br/>
-         </center>
+        <br><br>    
 	</div> 
         </td>
 
@@ -302,11 +360,7 @@
                     <option value="bedroom">Bed Room</option>  
                   </select>        <br/> 
            
-          <br/> 
-            <center>
-               <a href="facilitator_panel.html" target="_new">Facilitator Initialization Menu</a> 
-               <!-- a href="javascript:makeFeedVisible('settingsTab');">View</a>  / <a href="javascript:makeFeedInvisible('settingsTab');">Hide</a> Settings <br/ -->
-            </center>
+          <br/>  
           <br/> 
 
 	</div><br/>
