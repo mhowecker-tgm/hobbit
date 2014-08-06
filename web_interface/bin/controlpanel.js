@@ -134,10 +134,12 @@
 function updateStatusMonitor()
 {
     var iframe = document.getElementById('statusMonitor');
-    iframe.reload(true);
+    //iframe.reload(true);
+    iframe.contentDocument.location.reload(true);
+    //setTimeout('updateStatusMonitor()', statusMonitorUpdateDelay );
 }
+  
 
-setTimeout('updateStatusMonitor()', statusMonitorUpdateDelay );
 
 function updateFormRandomNumber()
     {
