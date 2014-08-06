@@ -200,9 +200,9 @@ int processExists(char * safeProcessName)
   unsigned int what2GetBackMaxSize=MAX_COMMAND_SIZE;
 
   snprintf(what2Execute,MAX_COMMAND_SIZE,"/bin/bash -c \"ps -A | grep %s | cut -d ' ' -f1\" ",safeProcessName);
-  getBackCommandLine( what2Execute ,  what2GetBack , what2GetBackMaxSize)
+  getBackCommandLine( what2Execute ,  what2GetBack , what2GetBackMaxSize);
 
-  if (atoi(checkPID)>0)
+  if (atoi(what2GetBack)>0)
   {
     return 1;
   }
