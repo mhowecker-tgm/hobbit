@@ -239,17 +239,38 @@ powerSupplyPresent: False
 
 
   char statusControl[MAX_COMMAND_SIZE*3]={0};
-  strcat(statusControl,"RGBDAcquisition : ");
+  strcat(statusControl,"<table><tr><td>RGBDAcquisition</td><td>");
   if (processExists("rgbd"))  { strcat(statusControl,"<img src=\"statusOk.png\" height=15>"); } else
                               { strcat(statusControl,"<img src=\"statusFailed.png\" height=15>"); }
+  strcat(statusControl,"</td></tr>");
 
 
-  strcat(statusControl,"<br>Skeleton Detector : ");
+  strcat(statusControl,"<tr><td>Skeleton Detector</td><td>");
   if (processExists("skeleton"))  { strcat(statusControl,"<img src=\"statusOk.png\" height=15>"); } else
                                   { strcat(statusControl,"<img src=\"statusFailed.png\" height=15>"); }
+  strcat(statusControl,"</td></tr>");
 
 
-  strcat(statusControl,"<br>");
+  strcat(statusControl,"<tr><td>Hand Gestures</td><td>");
+  if (processExists("hand"))  { strcat(statusControl,"<img src=\"statusOk.png\" height=15>"); } else
+                                  { strcat(statusControl,"<img src=\"statusFailed.png\" height=15>"); }
+  strcat(statusControl,"</td></tr>");
+
+  strcat(statusControl,"<tr><td>Face Detection</td><td>");
+  if (processExists("face"))  { strcat(statusControl,"<img src=\"statusOk.png\" height=15>"); } else
+                                  { strcat(statusControl,"<img src=\"statusFailed.png\" height=15>"); }
+  strcat(statusControl,"</td></tr>");
+
+
+  strcat(statusControl,"<tr><td>Emergency Detection</td><td>");
+  if (processExists("emergency"))  { strcat(statusControl,"<img src=\"statusOk.png\" height=15>"); } else
+                                  { strcat(statusControl,"<img src=\"statusFailed.png\" height=15>"); }
+  strcat(statusControl,"</td></tr>");
+
+
+  strcat(statusControl,"</table>");
+
+ 
   //No range check but since everything here is static max_stats_size should be big enough not to segfault with the strcat calls!
   snprintf(rqst->content,rqst->MAXcontentSize,
             "<html>\
@@ -259,8 +280,8 @@ powerSupplyPresent: False
                 Battery is : %s \n<br> \
                 Charging : %s<br>\
                 Mileage : %s<br>\
-                Svn Ver : %s<br>\
-                 %s <br><br>\
+                Svn Ver : %s<br><br>\
+                 %s <br>\
                </body>\
              </html>",
              tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900,   tm.tm_hour, tm.tm_min, tm.tm_sec,batteryState,chargingState,mileageState,svnVersion,statusControl);
