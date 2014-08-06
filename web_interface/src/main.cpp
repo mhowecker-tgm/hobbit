@@ -254,6 +254,11 @@ powerSupplyPresent: False
 
   char chargingState[MAX_COMMAND_SIZE]={0};
   getBackCommandLine((char*) "timeout 0.5 rostopic echo /battery_state -n 1 | grep charging | cut -d ':' -f2", chargingState , MAX_COMMAND_SIZE );
+  unsigned int charging=atoi(chargingState);
+  if (charging)  { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"plugged.png\" height=\"15\"> %u ",charging); } else
+                 { snprintf(batteryState,MAX_COMMAND_SIZE," %u ",charging); } 
+
+
   char mileageState[MAX_COMMAND_SIZE]={0};
   getBackCommandLine((char*) "timeout 0.5 rostopic echo /mileage -n 1 | grep data | cut -d ':' -f2", mileageState , MAX_COMMAND_SIZE );
 
