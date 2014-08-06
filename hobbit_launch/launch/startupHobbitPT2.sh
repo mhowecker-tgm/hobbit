@@ -86,8 +86,11 @@ rosrun hobbit_smach sos_monitor.py&
 cd /opt/ros/hobbit_hydro/src/places_interpretation/launch
 roslaunch startup.launch&
 # Start get room stuff needed for mmui
-cd /opt/ros/hobbit_hydro/src/get_current_room/launch
-roslaunch startup.launch&
+# bajo: same functionality is provided from places_objects and no other node 
+# seems to use it. 
+# Disabled unless another node needs it.
+# cd /opt/ros/hobbit_hydro/src/get_current_room/launch
+# roslaunch startup.launch&
 
 # Start table/floor object detector (for clustering) and trigger for publishing single shot point clouds from headcam
 cd /opt/ros/hobbit_hydro/src/table_object_detector/launch
