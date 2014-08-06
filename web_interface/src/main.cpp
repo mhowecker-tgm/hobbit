@@ -243,6 +243,15 @@ powerSupplyPresent: False
 
   char batteryState[MAX_COMMAND_SIZE]={0};
   getBackCommandLine((char*) "timeout 0.5 rostopic echo /battery_state -n 1 | grep lifePercent | cut -d ':' -f2", batteryState , MAX_COMMAND_SIZE );
+  float battery = atof(batteryState);
+
+  if (battery<=10)  { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_10.png\" height=\"15\"> %0.2f ",battery); } else
+  if (battery<=25)  { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_25.png\" height=\"15\"> %0.2f ",battery); } else    
+  if (battery<=50)  { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_50.png\" height=\"15\"> %0.2f ",battery); } else
+  if (battery<=75)  { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_75.png\" height=\"15\"> %0.2f ",battery); } else
+  if (battery<=100) { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_100.png\" height=\"15\"> %0.2f ",battery); } else
+                    { snprintf(batteryState,MAX_COMMAND_SIZE," %s ",batteryState); } 
+
   char chargingState[MAX_COMMAND_SIZE]={0};
   getBackCommandLine((char*) "timeout 0.5 rostopic echo /battery_state -n 1 | grep charging | cut -d ':' -f2", chargingState , MAX_COMMAND_SIZE );
   char mileageState[MAX_COMMAND_SIZE]={0};
