@@ -13,7 +13,10 @@ from std_msgs.msg import String, Header
 from sensor_msgs.msg import Joy
 from hobbit_msgs.msg import Command, Status, Event, Parameter
 
-pubA = rospy.Publisher("/ActionSequence", Command)
+# bajo: nobody is listening to the ActionSequence topic, therefore it does not
+# make any sense to still publish any data onto it. 
+# Commands should go to /Command and Events to /Event
+#pubA = rospy.Publisher("/ActionSequence", Command)
 pubC = rospy.Publisher("/Command", Command) 
 pubE = rospy.Publisher("/Event", Event)    
 oneclick = True
@@ -54,9 +57,9 @@ def joyCallback(msg):
     if msg.buttons[10] == 1:    #1-button left
         a = Command()   #action sequenz
         a.header = Header()
-        a.command = "E_CALLHOBBIT"
+        a.command = "C_CALLHOBBIT"
         a.sessionID = 'abc'
-        pubA.publish(a)
+        pubC.publish(a)
         print a.command
         oneclick = False
 
