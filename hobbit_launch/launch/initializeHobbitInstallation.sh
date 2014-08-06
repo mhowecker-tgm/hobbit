@@ -42,7 +42,10 @@ sh -c 'echo "#!/bin/bash \n \
              cd ..        \n \
              cd ..        \n \
              cd ..        \n \
-             svn update . \n exit 0 \n" > System/update.sh' 
+             svn update . \n \
+             cd ..        \n \
+             catkin_make  \n \
+             exit 0 \n" > System/update.sh' 
 
 sudo chown "$OURUSER":"$OURUSER" System/update.sh
 #sudo chmod 777 System/update.sh
