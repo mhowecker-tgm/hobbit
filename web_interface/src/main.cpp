@@ -240,13 +240,13 @@ powerSupplyPresent: False
 
   char statusControl[MAX_COMMAND_SIZE*3]={0};
   strcat(statusControl,"<br>RGBDAcquisition : ");
-  if (processExists("rgbd"))  { strcat(statusControl,"<img src=\"statusOk.png\" height=30>"); } else
-                              { strcat(statusControl,"<img src=\"statusFailed.png\" height=30>"); }
+  if (processExists("rgbd"))  { strcat(statusControl,"<img src=\"statusOk.png\" height=15>"); } else
+                              { strcat(statusControl,"<img src=\"statusFailed.png\" height=15>"); }
 
 
   strcat(statusControl,"<br>Skeleton Detector : ");
-  if (processExists("skeleton"))  { strcat(statusControl,"<img src=\"statusOk.png\" height=30>"); } else
-                                  { strcat(statusControl,"<img src=\"statusFailed.png\" height=30>"); }
+  if (processExists("skeleton"))  { strcat(statusControl,"<img src=\"statusOk.png\" height=15>"); } else
+                                  { strcat(statusControl,"<img src=\"statusFailed.png\" height=15>"); }
 
 
   strcat(statusControl,"<br>");
@@ -260,7 +260,7 @@ powerSupplyPresent: False
                 Charging : %s<br>\
                 Mileage : %s<br>\
                 Svn Ver : %s<br>\
-                 %s<br><br>\
+                 %s<br><br><br><br>\
                </body>\
              </html>",
              tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900,   tm.tm_hour, tm.tm_min, tm.tm_sec,batteryState,chargingState,mileageState,svnVersion,statusControl);
