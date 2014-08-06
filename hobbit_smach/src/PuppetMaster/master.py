@@ -47,7 +47,8 @@ commands = [['emergency', 'G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP', 'G_HELP',
              'C_PICKUP', 'C_FOLLOW', 'C_LEARN', 'C_BRING', 'C_GOTOPOINT', 'G_POINTING'],
             ['patrol', 'E_PATROL'],
             ['surprise', 'C_SURPRISE'],
-            ['reward', 'C_REWARD', 'G_REWARD']
+            ['reward', 'C_REWARD', 'G_REWARD'],
+            ['master_reset', 'C_MASTER_RESET']
             ]
 
 
@@ -92,6 +93,10 @@ def command_cb(msg, ud):
         print(input_ce)
         if input_ce in item:
             # if index == 4:
+            if item[0] == 'master_reset':
+                    print('Master RESET activated')
+                    ud.parameters['active_task'] = 100
+                    return True
             if item[0] == 'call_hobbit':
                 ud.command = item[0]
                 ud.params = msg.params
@@ -338,7 +343,7 @@ def main():
             return 'succeeded'
         elif outcome_map['Command_Listener'] == 'succeeded':
             return 'succeeded'
-        else: 
+        else:
             return 'aborted'
 
     cc = Concurrence(
