@@ -45,7 +45,11 @@
 				<type>goTo</type>
                			<pose x="3.5" y="6" theta="0.0"/>
             		</place>
-
+			<place>
+				<name>default</name>
+				<type>user</type>
+               			<pose x="3.5" y="6" theta="0.0"/>
+            		</place>
 			<place>
 				<name>side_entrance</name>
 				<type>goTo</type>
@@ -75,6 +79,11 @@
 			<place>
 				<name>center</name>
 				<type>goTo</type>
+               			<pose x="-0.2" y="4.5" theta="0.0"/>
+            		</place>
+			<place>
+				<name>default</name>
+				<type>user</type>
                			<pose x="-0.2" y="4.5" theta="0.0"/>
             		</place>
 			<place>
