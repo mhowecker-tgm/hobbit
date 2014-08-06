@@ -1,6 +1,6 @@
 
 
-   var statusMonitorUpdateDelay = 3000;
+   var statusMonitorUpdateDelay = 5000;
    var centerX=51;
    var centerY=54;
    

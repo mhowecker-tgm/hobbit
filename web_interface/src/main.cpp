@@ -282,7 +282,7 @@ powerSupplyPresent: False
   //No range check but since everything here is static max_stats_size should be big enough not to segfault with the strcat calls!
   snprintf(rqst->content,rqst->MAXcontentSize,
             "<html>\
-              <head>\
+               <head><meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\"/></head>\
                <body>\
                 Time is <br> %02d-%02d-%02d %02d:%02d:%02d \n<br> \
                 Battery is : %s \n<br> \
