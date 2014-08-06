@@ -79,8 +79,8 @@ class AskForName(State):
     The returned String is stored in the userdata key object_name.
     """
 
-    # def __init__(self, text='T_LO_WHAT_IS_THE_NAME_OF_THIS_OBJECT'):
-    def __init__(self, text='WHAT IS THE NAME OF THIS OBJECT'):
+    def __init__(self, text='T_LO_WHAT_IS_THE_NAME_OF_THIS_OBJECT'):
+    #def __init__(self, text='WHAT IS THE NAME OF THIS OBJECT'):
         State.__init__(
             self,
             output_keys=['object_name'],
@@ -93,6 +93,8 @@ class AskForName(State):
             self.service_preempt()
             return 'preempted'
         mmui = MMUI.MMUIInterface()
+        print(type(self.text))
+        print(self.text)
         resp = mmui.askForName(text=self.text)
         print(resp)
         if not resp:

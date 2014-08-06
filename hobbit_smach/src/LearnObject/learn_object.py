@@ -397,7 +397,7 @@ def main():
             'HEAD_UP',
             head_move.MoveTo(pose='center_center'),
             transitions={'succeeded': 'SAY_WHAT_IS_THE_NAME',
-                         'failed': 'SET_FAILURE'}
+                         'aborted': 'SET_FAILURE'}
         )
         StateMachine.add(
             'SAY_WHAT_IS_THE_NAME',
