@@ -231,7 +231,7 @@ powerSupplyPresent: False
 
 
   char checkPID[MAX_COMMAND_SIZE]={0};
-  getBackCommandLine((char*) "/bin/bash -c \"ps -A | grep rgbd_acqu | cut -d ' ' -f2\" " , svnVersion , MAX_COMMAND_SIZE );
+  getBackCommandLine((char*) "/bin/bash -c \"ps -A | grep rgbd | cut -d ' ' -f1\" " , checkPID , MAX_COMMAND_SIZE );
 
 
   //No range check but since everything here is static max_stats_size should be big enough not to segfault with the strcat calls!
