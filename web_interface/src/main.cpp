@@ -114,6 +114,7 @@ struct AmmServer_RH_Context stats={0};
 struct AmmServer_RH_Context form={0};
 struct AmmServer_RH_Context base_image={0};
 struct AmmServer_RH_Context top_image={0};
+struct AmmServer_RH_Context tf_image={0};
 
 
 char FileExistsTest(char * filename)
@@ -236,17 +237,17 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
   float battery = atof(batteryState);
 
   if (battery<=10)  { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_10.png\" height=\"15\"> %0.2f ",battery); } else
-  if (battery<=25)  { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_25.png\" height=\"15\"> %0.2f ",battery); } else    
+  if (battery<=25)  { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_25.png\" height=\"15\"> %0.2f ",battery); } else
   if (battery<=50)  { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_50.png\" height=\"15\"> %0.2f ",battery); } else
   if (battery<=75)  { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_75.png\" height=\"15\"> %0.2f ",battery); } else
   if (battery<=100) { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_100.png\" height=\"15\"> %0.2f ",battery); } else
-                    { snprintf(batteryState,MAX_COMMAND_SIZE," %s ",batteryState); } 
+                    { snprintf(batteryState,MAX_COMMAND_SIZE," %s ",batteryState); }
 
   char chargingState[MAX_COMMAND_SIZE]={0};
   getBackCommandLine((char*) "timeout 0.5 rostopic echo /battery_state -n 1 | grep charging | cut -d ':' -f2", chargingState , MAX_COMMAND_SIZE );
   unsigned int charging=atoi(chargingState);
   if (charging)  { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"plugged.png\" height=\"15\"> %u ",charging); } else
-                 { snprintf(batteryState,MAX_COMMAND_SIZE," %u ",charging); } 
+                 { snprintf(batteryState,MAX_COMMAND_SIZE," %u ",charging); }
 
 
   //  char mileageState[MAX_COMMAND_SIZE]={0};
@@ -269,7 +270,7 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
    addServiceCheck(statusControl , "Joystick" , "joy" );
   strcat(statusControl,"</table></center>");
 
- 
+
   //No range check but since everything here is static max_stats_size should be big enough not to segfault with the strcat calls!
   snprintf(rqst->content,rqst->MAXcontentSize,
             "<html>\
@@ -340,6 +341,34 @@ void * prepare_top_image(struct AmmServer_DynamicRequest  * rqst)
   return 0;
 }
 
+
+
+void * prepare_tf_image(struct AmmServer_DynamicRequest  * rqst)
+{
+  unsigned int length=0;
+
+  int i=system("/bin/bash -c \"cd /opt/ros/hobbit_hydro/src/rgbd_acquisition/bin/frames/tf/ && rosrun tf view_frames && convert frames.pdf frames.png");
+
+  char * readContent = 0;
+  if (i==0) {  readContent = AmmServer_ReadFileToMemory((char*) "/opt/ros/hobbit_hydro/src/rgbd_acquisition/bin/frames/tf/frames.png",&length);    }
+
+  if(readContent==0)
+  {
+     snprintf(rqst->content,rqst->MAXcontentSize,"<html><body><h1>Bad Image</h1></body></html>");
+     rqst->contentSize=strlen(rqst->content);
+  } else
+  {
+     if (rqst->MAXcontentSize<length)
+     {
+        length = rqst->MAXcontentSize;
+        fprintf(stderr,"Error , not enough space to accomodate image \n");
+     }
+     memcpy(rqst->content,readContent,length);
+     rqst->contentSize=length;
+     free(readContent);
+  }
+  return 0;
+}
 
 void joystickExecute(float x , float y )
 {
@@ -807,7 +836,13 @@ int init_dynamic_content()
   if (! AmmServer_AddResourceHandler(default_server,&base_image,(char*)"/base_image.jpg",webserver_root,640*480*3,0,(void* ) &prepare_base_image,SAME_PAGE_FOR_ALL_CLIENTS) )
               { AmmServer_Error("Failed adding prepare base_image page\n"); }
 
-  //if (! AmmServer_AddResourceHandler(default_server,&top_image,(char*)"/top_image.jpg",webserver_root,640*480*3,0,(void* ) &prepare_top_image,SAME_PAGE_FOR_ALL_CLIENTS) ) { fprintf(stderr,"Failed adding prepare top_image page\n"); }
+  if (! AmmServer_AddResourceHandler(default_server,&top_image,(char*)"/top_image.jpg",webserver_root,640*480*3,0,(void* ) &prepare_top_image,SAME_PAGE_FOR_ALL_CLIENTS) )
+              { fprintf(stderr,"Failed adding prepare top_image page\n"); }
+
+  if (! AmmServer_AddResourceHandler(default_server,&tf_image,(char*)"/tf.png",webserver_root,640*480*3,0,(void* ) &prepare_tf_image,SAME_PAGE_FOR_ALL_CLIENTS) )
+              { fprintf(stderr,"Failed adding prepare tf_image page\n"); }
+
+
   return 1;
  }
 
