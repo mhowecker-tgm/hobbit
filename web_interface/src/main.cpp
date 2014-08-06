@@ -347,7 +347,7 @@ void * prepare_map_image(struct AmmServer_DynamicRequest  * rqst)
 {
   unsigned int length=0;
 
-  int i=system("/bin/bash -c \"cd ../../rgbd_acquisition/bin/frames/map/ && rosrun map_server map_saver -f map  && convert map.pgm map.jpg\" ");
+  int i=system("/bin/bash -c \"cd ../../rgbd_acquisition/bin/frames/map/ && timeout 2 rosrun map_server map_saver -f map  && convert map.pgm map.jpg\" ");
 
   char * readContent = 0;
   if (i==0) {  readContent = AmmServer_ReadFileToMemory((char*) "../../rgbd_acquisition/bin/frames/map/map.jpg",&length);    }
