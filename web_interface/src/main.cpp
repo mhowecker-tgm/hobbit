@@ -225,10 +225,29 @@ powerSupplyPresent: False
   char mileageState[MAX_COMMAND_SIZE]={0};
   getBackCommandLine((char*) "timeout 1 rostopic echo /mileage -n 1 | grep data | cut -d ':' -f2", mileageState , MAX_COMMAND_SIZE );
 
+
+  char svnVersion[MAX_COMMAND_SIZE]={0};
+  getBackCommandLine((char*) "/bin/bash -c \"cd /opt/ros/hobbit_hydro/src/ && svnversion \" " , svnVersion , MAX_COMMAND_SIZE );
+
+
+  char checkPID[MAX_COMMAND_SIZE]={0};
+  getBackCommandLine((char*) "/bin/bash -c \"ps -A | grep rgbd_acqu | cut -d ' ' -f2\" " , svnVersion , MAX_COMMAND_SIZE );
+
+
   //No range check but since everything here is static max_stats_size should be big enough not to segfault with the strcat calls!
   snprintf(rqst->content,rqst->MAXcontentSize,
-            "<html><head><body>Time is<br> %02d-%02d-%02d %02d:%02d:%02d\n <br>Battery is : %s<br>Charging : %s<br>Mileage : %s<br><br></body></html>",
-            tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900,   tm.tm_hour, tm.tm_min, tm.tm_sec,batteryState,chargingState,mileageState);
+            "<html>\
+              <head>\
+               <body>\
+                Time is <br> %02d-%02d-%02d %02d:%02d:%02d \n<br> \
+                Battery is : %s \n<br> \
+                Charging : %s<br>\
+                Mileage : %s<br>\
+                Svn Ver : %s<br>\
+                RGBDAcq : %s<br><br>\
+               </body>\
+             </html>",
+             tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900,   tm.tm_hour, tm.tm_min, tm.tm_sec,batteryState,chargingState,mileageState,svnVersion,checkPID);
 
   rqst->contentSize=strlen(rqst->content);
   return 0;
@@ -499,9 +518,9 @@ void execute(char * command,char * param)
    else
   if (strcmp(command,"robot")==0)
   {
-    if (strcmp(param,"systemRestart")==0)  { strncpy(cR,"/opt/ros/hobbit_hydro/src/web_interface/bin/restart.sh",cRLen); } else
-    if (strcmp(param,"systemShutdown")==0) { strncpy(cR,"/opt/ros/hobbit_hydro/src/web_interface/bin/shutdown.sh",cRLen); } else
-    if (strcmp(param,"systemUpdate")==0)   { strncpy(cR,"/bin/bash -c \"cd /opt/ros/hobbit_hydro/ && source devel/setup.bash && svn update src/ && catkin_make\"",cRLen); } else
+    if (strcmp(param,"systemRestart")==0)  { strncpy(cR,"../../hobbit_launch/launch/System/restart.sh",cRLen); }  else
+    if (strcmp(param,"systemShutdown")==0) { strncpy(cR,"../../hobbit_launch/launch/System/shutdown.sh",cRLen); } else
+    if (strcmp(param,"systemUpdate")==0)   { strncpy(cR,"../../hobbit_launch/launch/System/update.sh",cRLen); }   else
     //-------------------------------
     if (strcmp(param,"yes")==0)    { rostopic_pub(cR,cRLen,(char *) "/Event",(char *) "hobbit_msgs/Event",(char *) "\"event: 'G_YES'\"");           } else
     if (strcmp(param,"no")==0)     { rostopic_pub(cR,cRLen,(char *) "/Event",(char *) "hobbit_msgs/Event",(char *) "\"event: 'G_NO'\"");            } else
