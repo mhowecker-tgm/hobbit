@@ -196,13 +196,16 @@ int getBackCommandLine(char *  command , char * what2GetBack , unsigned int what
 int processExists(char * safeProcessName)
 {
   char what2Execute[MAX_COMMAND_SIZE];
-  char what2GetBack[MAX_COMMAND_SIZE];
+  char what2GetBack[MAX_COMMAND_SIZE]={0};
   unsigned int what2GetBackMaxSize=MAX_COMMAND_SIZE;
 
-  snprintf(what2Execute,MAX_COMMAND_SIZE,"/bin/bash -c \"ps -A | grep %s | cut -d ' ' -f1\" ",safeProcessName);
+  snprintf(what2Execute,MAX_COMMAND_SIZE,"ps -A | grep %s | cut -d ' ' -f1",safeProcessName);
+  //snprintf(what2Execute,MAX_COMMAND_SIZE,"/bin/bash -c \"ps -A | grep %s | cut -d ' ' -f1\" ",safeProcessName);
   if ( getBackCommandLine( what2Execute ,  what2GetBack , what2GetBackMaxSize) )
     {
-     if (atoi(what2GetBack)>0)
+      fprintf(stderr,"Run %s , got back %s which is %u\n",what2Execute,what2GetBack,atoi(what2GetBack));
+
+      if (atoi(what2GetBack)>0)
        {
         return 1;
        }
@@ -227,11 +230,11 @@ powerSupplyPresent: False
 */
 
   char batteryState[MAX_COMMAND_SIZE]={0};
-  getBackCommandLine((char*) "timeout 1 rostopic echo /battery_state -n 1 | grep lifePercent | cut -d ':' -f2", batteryState , MAX_COMMAND_SIZE );
+  getBackCommandLine((char*) "timeout 0.5 rostopic echo /battery_state -n 1 | grep lifePercent | cut -d ':' -f2", batteryState , MAX_COMMAND_SIZE );
   char chargingState[MAX_COMMAND_SIZE]={0};
-  getBackCommandLine((char*) "timeout 1 rostopic echo /battery_state -n 1 | grep charging | cut -d ':' -f2", chargingState , MAX_COMMAND_SIZE );
+  getBackCommandLine((char*) "timeout 0.5 rostopic echo /battery_state -n 1 | grep charging | cut -d ':' -f2", chargingState , MAX_COMMAND_SIZE );
   char mileageState[MAX_COMMAND_SIZE]={0};
-  getBackCommandLine((char*) "timeout 1 rostopic echo /mileage -n 1 | grep data | cut -d ':' -f2", mileageState , MAX_COMMAND_SIZE );
+  getBackCommandLine((char*) "timeout 0.5 rostopic echo /mileage -n 1 | grep data | cut -d ':' -f2", mileageState , MAX_COMMAND_SIZE );
 
 
   char svnVersion[MAX_COMMAND_SIZE]={0};
@@ -264,6 +267,11 @@ powerSupplyPresent: False
 
   strcat(statusControl,"<tr><td>Emergency Detection</td><td>");
   if (processExists("emergency"))  { strcat(statusControl,"<img src=\"statusOk.png\" height=15>"); } else
+                                  { strcat(statusControl,"<img src=\"statusFailed.png\" height=15>"); }
+  strcat(statusControl,"</td></tr>");
+
+  strcat(statusControl,"<tr><td>Fitness Function</td><td>");
+  if (processExists("fitness"))   { strcat(statusControl,"<img src=\"statusOk.png\" height=15>"); } else
                                   { strcat(statusControl,"<img src=\"statusFailed.png\" height=15>"); }
   strcat(statusControl,"</td></tr>");
 
