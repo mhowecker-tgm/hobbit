@@ -213,6 +213,18 @@ int processExists(char * safeProcessName)
   return 0;
 }
 
+int addServiceCheck(char * mem, char * label , char * processName )
+{
+  strcat(mem,"<tr><td>");
+  strcat(mem,label);
+  strcat(mem,"</td><td>");
+  if (processExists(processName))  { strcat(mem,"<img src=\"statusOk.png\" height=15>"); } else
+                                  { strcat(mem,"<img src=\"statusFailed.png\" height=15>"); }
+  strcat(mem,"</td></tr>");
+
+  return 0;
+}
+
 //This function prepares the content of  stats context , ( stats.content )
 void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
 {
@@ -241,41 +253,16 @@ powerSupplyPresent: False
   getBackCommandLine((char*) "/bin/bash -c \"cd /opt/ros/hobbit_hydro/src/ && svnversion \" " , svnVersion , MAX_COMMAND_SIZE );
 
 
-  char statusControl[MAX_COMMAND_SIZE*3]={0};
-  strcat(statusControl,"<table><tr><td>RGBDAcquisition</td><td>");
-  if (processExists("rgbd"))  { strcat(statusControl,"<img src=\"statusOk.png\" height=15>"); } else
-                              { strcat(statusControl,"<img src=\"statusFailed.png\" height=15>"); }
-  strcat(statusControl,"</td></tr>");
-
-
-  strcat(statusControl,"<tr><td>Skeleton Detector</td><td>");
-  if (processExists("skeleton"))  { strcat(statusControl,"<img src=\"statusOk.png\" height=15>"); } else
-                                  { strcat(statusControl,"<img src=\"statusFailed.png\" height=15>"); }
-  strcat(statusControl,"</td></tr>");
-
-
-  strcat(statusControl,"<tr><td>Hand Gestures</td><td>");
-  if (processExists("hand"))  { strcat(statusControl,"<img src=\"statusOk.png\" height=15>"); } else
-                                  { strcat(statusControl,"<img src=\"statusFailed.png\" height=15>"); }
-  strcat(statusControl,"</td></tr>");
-
-  strcat(statusControl,"<tr><td>Face Detection</td><td>");
-  if (processExists("face"))  { strcat(statusControl,"<img src=\"statusOk.png\" height=15>"); } else
-                                  { strcat(statusControl,"<img src=\"statusFailed.png\" height=15>"); }
-  strcat(statusControl,"</td></tr>");
-
-
-  strcat(statusControl,"<tr><td>Emergency Detection</td><td>");
-  if (processExists("emergency"))  { strcat(statusControl,"<img src=\"statusOk.png\" height=15>"); } else
-                                  { strcat(statusControl,"<img src=\"statusFailed.png\" height=15>"); }
-  strcat(statusControl,"</td></tr>");
-
-  strcat(statusControl,"<tr><td>Fitness Function</td><td>");
-  if (processExists("fitness"))   { strcat(statusControl,"<img src=\"statusOk.png\" height=15>"); } else
-                                  { strcat(statusControl,"<img src=\"statusFailed.png\" height=15>"); }
-  strcat(statusControl,"</td></tr>");
-
-
+  char statusControl[MAX_COMMAND_SIZE*4]={0};
+  strcat(statusControl,"<table>");
+   addServiceCheck(statusControl , "RGBDAcquisition" , "rgbd" );
+   addServiceCheck(statusControl , "Skeleton Detector" , "skeleton" );
+   addServiceCheck(statusControl , "Hand Gestures" , "hand" );
+   addServiceCheck(statusControl , "Face Detection" , "face" );
+   addServiceCheck(statusControl , "Emergency Detection" , "emergency" );
+   addServiceCheck(statusControl , "Fitness Function" , "fitness" );
+   addServiceCheck(statusControl , "Mira Center" , "mira" );
+   addServiceCheck(statusControl , "Joystick" , "joy" );
   strcat(statusControl,"</table>");
 
  
