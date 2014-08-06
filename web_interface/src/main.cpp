@@ -249,8 +249,8 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
                  { snprintf(batteryState,MAX_COMMAND_SIZE," %u ",charging); } 
 
 
-  char mileageState[MAX_COMMAND_SIZE]={0};
-  getBackCommandLine((char*) "timeout 0.5 rostopic echo /mileage -n 1 | grep data | cut -d ':' -f2", mileageState , MAX_COMMAND_SIZE );
+  //  char mileageState[MAX_COMMAND_SIZE]={0};
+  //  getBackCommandLine((char*) "timeout 0.5 rostopic echo /mileage -n 1 | grep data | cut -d ':' -f2", mileageState , MAX_COMMAND_SIZE );
 
 
   char svnVersion[MAX_COMMAND_SIZE]={0};
