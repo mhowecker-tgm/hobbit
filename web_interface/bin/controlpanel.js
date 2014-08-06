@@ -44,6 +44,13 @@
      } 
    }
  
+    function refreshMapFeed(name,imageName)
+    {
+      //command('camera=refreshMap');
+      document.getElementById(name).style.visibility='visible';
+      var randomnumber=Math.floor(Math.random()*100000);
+      document.getElementById("mapImage").src="map.jpg?t="+randomnumber;
+    }
 
     function refreshTFFeed(name,imageName)
     {
