@@ -182,6 +182,7 @@ def addObject(object_name, rooms):
 def getObjectLocations(req):
     """ Given the name of an object its positions (room and location) are returned.
     """
+    rospy.loginfo('/get_object_location: Request received')
     query = req.object_name.data
     places = []
     out_places = []
@@ -202,7 +203,7 @@ def getObjectLocations(req):
 def get_room_name(req):
     """ Given a x and y coordinate the room name is searched for and returned
     """
-    print(req)
+    rospy.loginfo('/get_room_name: Request received')
     global rooms
     vertices = []
     for room in rooms.rooms_vector:
@@ -219,8 +220,8 @@ def getCoordinates(req):
     """ Given the name of the room and of the location their Pose is retrieved
     and returned
     """
+    rospy.loginfo('/getCoordinates: Request received')
     global rooms
-    print('Inside: getCoordinates')
     # print(rooms)
     print req.room_name.data, req.location_name.data
     # print 'call' in req.location_name.data
@@ -245,7 +246,7 @@ def getAllRooms(req):
     Returns a RoomsVector with all available rooms inside.
     """
     global rooms
-    print('Request received')
+    rospy.loginfo('/getRooms: Request received')
     print(req)
     print(rooms)
     # As rooms is already the RoomsVector we are looking for we just return it
@@ -254,6 +255,7 @@ def getAllRooms(req):
     return rooms
 
 def get_robots_current_room(req_old):
+    rospy.loginfo('/get_robots_current_room : Request received')
     req = GetRoomNameRequest()
     x, y, yaw = util.get_current_robot_position(frame='/map')
     req.point.x = x

@@ -110,10 +110,8 @@ class SetFailure(State):
             output_keys=['result']
         )
         self.pub = rospy.Publisher('/DiscreteMotionCmd', String, queue_size=50)
-        self.pub_face = rospy.Publisher('/Hobbit/Emoticon', String, queue_size=50)
 
     def execute(self, ud):
-        self.pub_face.publish('EMO_SAD')
         self.pub.publish('Stop')
         if self.preempt_requested():
             ud.result = String('preempted')
@@ -136,8 +134,6 @@ class Dummy(State):
         )
 
     def execute(self, ud):
-        # ud.result = String('')
-        # rospy.sleep(2.0)
         return 'succeeded'
 
 
@@ -243,7 +239,7 @@ def main():
             )
             Sequence.add(
                 'WAIT_3',
-                SleepState(duration=2)
+                SleepState(duration=1)
             )
             Sequence.add(
                 'SAY_DONE',

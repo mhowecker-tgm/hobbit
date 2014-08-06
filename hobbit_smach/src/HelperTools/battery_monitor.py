@@ -6,7 +6,7 @@ from std_msgs.msg import Header
 from mira_msgs.msg import BatteryState
 
 LIMIT = 5
-NAME = 'BATTERY_CHECK'
+NAME = 'battery_check'
 VOLT_LIMIT = 26.0
 
 
@@ -16,7 +16,7 @@ def talker(level):
     data.header.stamp = rospy.Time.now()
     data.event = level
     pub = rospy.Publisher('/Event', Event, queue_size=10)
-    r = rospy.Rate(10)
+    r = rospy.Rate(0.1)
     i = 0
     while i < LIMIT:
         rospy.loginfo(str(data))

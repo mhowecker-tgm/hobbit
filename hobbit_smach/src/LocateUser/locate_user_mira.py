@@ -86,10 +86,10 @@ class UserCounter(smach.State):
             return 'preempted'
         print('Counter: %d' % self.counter)
         self.counter += 1
-        if self.counter < 12:
+        if self.counter < steps:
             return 'succeeded'
         else:
-            ud.counter = 0
+            self.counter = 0
             return 'aborted'
 
 class Init(smach.State):
@@ -251,7 +251,6 @@ class PlanPath(smach.State):
             print bcolors.FAIL+'Visited all positions'+bcolors.ENDC
             return 'failure'
         else:
-            ud.visited_places = []
             ud.visited_places.append(ud.robot_end_pose)
             print(ud.robot_end_pose)
             return 'success'
@@ -328,7 +327,8 @@ def userdetection_cb(msg, ud):
     print bcolors.ENDC
     if 0.39 < msg.confidence <= 0.61:
         print bcolors.OKGREEN + 'Face detected!' + bcolors.ENDC
-        return True
+	rospy.loginfo('The face detection is not good enough to rely on.')
+        return False
     elif msg.confidence > 0.61:
         print bcolors.OKGREEN + 'Skeleton detected!' + bcolors.ENDC
         return True
@@ -568,7 +568,7 @@ def main():
         smach.StateMachine.add(
             'USER_DETECTION',
             detectUser(),
-            transitions={'succeeded': 'succeeded',
+            transitions={'succeeded': 'SET_SUCCESS',
                          'preempted': 'preempted',
                          'failed': 'PLAN_PATH'}
         )

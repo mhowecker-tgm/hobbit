@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 PKG = 'hobbit_smach'
-NAME = 'HOBBIT_MASTER'
+NAME = 'hobbit_master'
 
 import roslib
 roslib.load_manifest(PKG)
