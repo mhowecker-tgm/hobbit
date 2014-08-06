@@ -2,7 +2,7 @@
     <!-- name of the "camera" -->
     <arg name="camera" value="headcam"/> 
     <!-- name of the root frame -->
-    <arg name="frame" value="headcam_rgb_optical_frame"/> 
+    <arg name="frame" value="frame"/> 
     <!--  This is the kinect camera address -->  
     <arg name="deviceID" value="1d27/0601@1/3" type="str"/> 
     <!-- deviceID can have the following formats:
@@ -88,6 +88,8 @@
         args="$(arg optical_rotate) $(arg camera)_depth_frame $(arg camera)_depth_optical_frame 100" />
   <node pkg="tf" type="static_transform_publisher" name="$(arg camera)_base_link3"
         args="$(arg optical_rotate) $(arg camera)_rgb_frame $(arg camera)_rgb_optical_frame 100" /> 
+  <node pkg="tf" type="static_transform_publisher" name="tmp_headcam_rgb_optical_frame_to_frame"
+        args="0.0 0.0 0.0 0 0 0 headcam_rgb_optical_frame frame 100" />
 
 
 
