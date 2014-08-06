@@ -193,13 +193,21 @@ int getBackCommandLine(char *  command , char * what2GetBack , unsigned int what
   return 1;
 }
 
-int process_exists(char * safeProcessName)
+int processExists(char * safeProcessName)
 {
   char what2Execute[MAX_COMMAND_SIZE];
   char what2GetBack[MAX_COMMAND_SIZE];
   unsigned int what2GetBackMaxSize=MAX_COMMAND_SIZE;
 
-  //getBackCommandLine( what2Execute ,  what2GetBack , what2GetBackMaxSize)
+  snprintf(what2Execute,MAX_COMMAND_SIZE,"/bin/bash -c \"ps -A | grep %s | cut -d ' ' -f1\" ",safeProcessName);
+  getBackCommandLine( what2Execute ,  what2GetBack , what2GetBackMaxSize)
+
+  if (atoi(checkPID)>0)
+  {
+    return 1;
+  }
+
+ return 0;
 }
 
 //This function prepares the content of  stats context , ( stats.content )
@@ -230,10 +238,18 @@ powerSupplyPresent: False
   getBackCommandLine((char*) "/bin/bash -c \"cd /opt/ros/hobbit_hydro/src/ && svnversion \" " , svnVersion , MAX_COMMAND_SIZE );
 
 
-  char checkPID[MAX_COMMAND_SIZE]={0};
-  getBackCommandLine((char*) "/bin/bash -c \"ps -A | grep rgbd | cut -d ' ' -f1\" " , checkPID , MAX_COMMAND_SIZE );
+  char statusControl[MAX_COMMAND_SIZE*3]={0};
+  strcat(statusControl,"<br>RGBDAcquisition : ");
+  if (processExists("rgbd"))  { strcat(statusControl,"<img src=\"statusOk.png\" height=30>"); } else
+                              { strcat(statusControl,"<img src=\"statusFailed.png\" height=30>"); }
 
 
+  strcat(statusControl,"<br>Skeleton Detector : ");
+  if (processExists("skeleton"))  { strcat(statusControl,"<img src=\"statusOk.png\" height=30>"); } else
+                                  { strcat(statusControl,"<img src=\"statusFailed.png\" height=30>"); }
+
+
+  strcat(statusControl,"<br>");
   //No range check but since everything here is static max_stats_size should be big enough not to segfault with the strcat calls!
   snprintf(rqst->content,rqst->MAXcontentSize,
             "<html>\
@@ -244,10 +260,10 @@ powerSupplyPresent: False
                 Charging : %s<br>\
                 Mileage : %s<br>\
                 Svn Ver : %s<br>\
-                RGBDAcq : %s<br><br>\
+                 %s<br><br>\
                </body>\
              </html>",
-             tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900,   tm.tm_hour, tm.tm_min, tm.tm_sec,batteryState,chargingState,mileageState,svnVersion,checkPID);
+             tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900,   tm.tm_hour, tm.tm_min, tm.tm_sec,batteryState,chargingState,mileageState,svnVersion,statusControl);
 
   rqst->contentSize=strlen(rqst->content);
   return 0;
