@@ -1,4 +1,6 @@
 
+
+   var statusMonitorUpdateDelay = 3000;
    var centerX=51;
    var centerY=54;
    
@@ -135,7 +137,7 @@ function updateStatusMonitor()
     iframe.reload(true);
 }
 
-setTimeout('updateStatusMonitor()', 10000);
+setTimeout('updateStatusMonitor()', statusMonitorUpdateDelay );
 
 function updateFormRandomNumber()
     {
