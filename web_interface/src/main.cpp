@@ -347,10 +347,10 @@ void * prepare_tf_image(struct AmmServer_DynamicRequest  * rqst)
 {
   unsigned int length=0;
 
-  int i=system("/bin/bash -c \"cd /opt/ros/hobbit_hydro/src/rgbd_acquisition/bin/frames/tf/ && rosrun tf view_frames && convert frames.pdf frames.png");
+  int i=system("/bin/bash -c \"cd ../../rgbd_acquisition/bin/frames/tf/ && rosrun tf view_frames && convert frames.pdf frames.png\" ");
 
   char * readContent = 0;
-  if (i==0) {  readContent = AmmServer_ReadFileToMemory((char*) "/opt/ros/hobbit_hydro/src/rgbd_acquisition/bin/frames/tf/frames.png",&length);    }
+  if (i==0) {  readContent = AmmServer_ReadFileToMemory((char*) "../../rgbd_acquisition/bin/frames/tf/frames.png",&length);    }
 
   if(readContent==0)
   {
@@ -516,6 +516,9 @@ void execute(char * command,char * param)
         { strncpy(cR,"/bin/bash -c \"cd /opt/ros/hobbit_hydro/src/rgbd_acquisition/bin/frames/top/ && timeout 1 rosrun image_view image_saver image:=/headcam/rgb/image_raw\" ",cRLen); }
     if (strcmp(param,"refreshBottom")==0)
         { strncpy(cR,"/bin/bash -c \"cd /opt/ros/hobbit_hydro/src/rgbd_acquisition/bin/frames/base/ && timeout 1 rosrun image_view image_saver image:=/basecam/rgb/image_raw\" ",cRLen); }
+    if (strcmp(param,"refreshTF")==0)
+      { strncpy(cR,"/bin/bash -c \"cd ../../rgbd_acquisition/bin/frames/tf/ && rosrun tf view_frames && convert frames.pdf frames.png\" ",cRLen); }
+
   } else
   if (strcmp(command,"head")==0)
   {

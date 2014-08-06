@@ -44,6 +44,16 @@
      } 
    }
  
+
+    function refreshTFFeed(name,imageName)
+    {
+      //command('camera=refreshTF');
+      document.getElementById(name).style.visibility='visible';
+      var randomnumber=Math.floor(Math.random()*100000);
+      document.getElementById("tfTreeImage").src="tf.png?t="+randomnumber;
+    }
+
+
     function refreshTopFeed(name,imageName)
     {
       command('camera=refreshTop');
