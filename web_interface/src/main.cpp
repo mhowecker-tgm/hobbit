@@ -285,12 +285,14 @@ powerSupplyPresent: False
             "<html>\
                <head><meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\"/></head>\
                <body>\
+                <center>\
                 Time is <br> %02d-%02d-%02d %02d:%02d:%02d \n<br> \
                 Battery is : %s \n<br> \
                 Charging : %s<br>\
                 Mileage : %s<br>\
                 Svn Ver : %s<br><br>\
                  %s <br>\
+                </center>\
                </body>\
              </html>",
              tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900,   tm.tm_hour, tm.tm_min, tm.tm_sec,batteryState,chargingState,mileageState,svnVersion,statusControl);
