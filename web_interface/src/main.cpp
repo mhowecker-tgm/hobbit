@@ -231,16 +231,6 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
   time_t t = time(NULL);
   struct tm tm = *localtime(&t);
 
-/*
-rostopic echo /battery_state
-voltage: 26.0810012817
-current: 3.8780002594
-lifePercent: 41
-lifeTime: -1
-charging: False
-powerSupplyPresent: False
-*/
-
   char batteryState[MAX_COMMAND_SIZE]={0};
   getBackCommandLine((char*) "timeout 0.5 rostopic echo /battery_state -n 1 | grep lifePercent | cut -d ':' -f2", batteryState , MAX_COMMAND_SIZE );
   float battery = atof(batteryState);
@@ -268,7 +258,7 @@ powerSupplyPresent: False
 
 
   char statusControl[MAX_COMMAND_SIZE*4]={0};
-  strcat(statusControl,"<table>");
+  strcat(statusControl,"<center><table>");
    addServiceCheck(statusControl , "RGBDAcquisition" , "rgbd" );
    addServiceCheck(statusControl , "Skeleton Detector" , "skeleton" );
    addServiceCheck(statusControl , "Hand Gestures" , "hand" );
@@ -277,7 +267,7 @@ powerSupplyPresent: False
    addServiceCheck(statusControl , "Fitness Function" , "fitness" );
    addServiceCheck(statusControl , "Mira Center" , "mira" );
    addServiceCheck(statusControl , "Joystick" , "joy" );
-  strcat(statusControl,"</table>");
+  strcat(statusControl,"</table></center>");
 
  
   //No range check but since everything here is static max_stats_size should be big enough not to segfault with the strcat calls!
@@ -286,16 +276,15 @@ powerSupplyPresent: False
                <head><meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\"/></head>\
                <body>\
                 <center>\
-                Time is <br> %02d-%02d-%02d %02d:%02d:%02d \n<br> \
+                  %02d-%02d-%02d %02d:%02d:%02d \n<br><br> \
+                </center>\
                 Battery is : %s \n<br> \
                 Charging : %s<br>\
-                Mileage : %s<br>\
                 Svn Ver : %s<br><br>\
                  %s <br>\
-                </center>\
                </body>\
              </html>",
-             tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900,   tm.tm_hour, tm.tm_min, tm.tm_sec,batteryState,chargingState,mileageState,svnVersion,statusControl);
+             tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900,   tm.tm_hour, tm.tm_min, tm.tm_sec,batteryState,chargingState,svnVersion,statusControl);
 
   rqst->contentSize=strlen(rqst->content);
   return 0;
