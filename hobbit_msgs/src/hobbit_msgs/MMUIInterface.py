@@ -163,7 +163,7 @@ class MMUIInterface:
     def askForName(
         self,
         text='What is the name of this object?',
-        timeout=30
+        timeout='30'
     ):
         parr = []
         p = Parameter('type', 'D_NAME')
