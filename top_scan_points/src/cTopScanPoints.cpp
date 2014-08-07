@@ -4,7 +4,7 @@
 #include "pcl_ros/transforms.h"
 #include <pcl_ros/point_cloud.h>
 
-//#include <pcl/visualization/cloud_viewer.h>
+#include <pcl/visualization/cloud_viewer.h>
 
 /* PARTIALLY based on SOURCE cloud_to_scanHoriz.cpp: 
 * Copyright (c) 2010, Willow Garage, Inc.
@@ -123,7 +123,7 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 		//Translation to the neck
   		headcam_trans.setOrigin(tf::Vector3(-0.12, -0.052, -0.086));
 		//Apply transform
-		pcl_ros::transformPointCloud(point_cloud, point_cloud_new_frame, headcam_trans_height);
+		pcl_ros::transformPointCloud(pcl_cloud, point_cloud_new_frame, headcam_trans);
 
 		// Define rotations tf transformation
 		tf::StampedTransform headcam_trans_rot;
@@ -134,7 +134,7 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 		//roll value is obtained as asin(cos(head_inclination_angle))
 		headcam_trans_rot.setRotation(tf::createQuaternionFromRPY(0.96, M_PI, M_PI/2));
 		//Apply transform to new reference frame
-		pcl_ros::transformPointCloud(point_cloud_new_frame, point_cloud_new_frame2, headcam_trans);
+		pcl_ros::transformPointCloud(point_cloud_new_frame, point_cloud_new_frame2, headcam_trans_rot);
 
 		// Define the tf transformation for the height
 		tf::StampedTransform headcam_trans_height;
@@ -151,11 +151,11 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 		return;
 	}
 
-	/*pcl::visualization::CloudViewer viewer ("Simple Cloud Viewer");
+	pcl::visualization::CloudViewer viewer ("Simple Cloud Viewer");
 
 	pcl::PointCloud<pcl::PointXYZ>::Ptr mycloudPtr (new pcl::PointCloud<pcl::PointXYZ> (point_cloud_new_frame)); 
         viewer.showCloud(mycloudPtr);
-	sleep (50);*/
+	sleep (50);
 
 	uint32_t ranges_size = std::ceil((output.angle_max - output.angle_min) / output.angle_increment);
 	output.ranges.assign(ranges_size, output.range_max);
@@ -190,7 +190,7 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 			continue;
 		}
 
-		//std::cout << "Point " << x << " " << y << " " << z << std::endl;
+		std::cout << "Point " << x << " " << y << " " << z << std::endl;
 		
 		if (z > max_height_ || z < min_height_)
 		{
