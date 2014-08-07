@@ -97,6 +97,18 @@ bool stopDump(std_srvs::Empty::Request& request, std_srvs::Empty::Response& resp
 {
     ROS_INFO("Disabling Dump to files");
     hobbitUpperBodyTracker_setDumpToFiles(0);
+    
+    int i=system("./packageRecord.sh");
+    if (i==0) 
+      {
+        fprintf(stderr,"Success packaging..!\n");
+      } else
+      {
+        fprintf(stderr,"Error packaging..!\n");
+      } 
+    
+
+
     return true;
 }
 
