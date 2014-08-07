@@ -27,6 +27,7 @@ void broadcastNewPerson()
   msg.x = actualX;
   msg.y = actualY;
   msg.z = actualZ;
+  msg.source = 3;
   msg.theta = actualTheta;
 
   msg.inFieldOfView = 1;
