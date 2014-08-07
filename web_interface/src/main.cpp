@@ -66,8 +66,9 @@ ros::NodeHandle * nhPtr=0;
 
 
 #define WEBROOT "./"
+#define TEMPLATEROOT "./templates"
 char webserver_root[MAX_FILE_PATH]=WEBROOT; // <- change this to the directory that contains your content if you dont want to use the default public_html dir..
-char templates_root[MAX_FILE_PATH]=WEBROOT;
+char templates_root[MAX_FILE_PATH]=TEMPLATEROOT;
 
 unsigned int stopWebInterface=0;
 char * page=0;
