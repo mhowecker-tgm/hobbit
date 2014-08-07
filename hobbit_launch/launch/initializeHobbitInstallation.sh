@@ -26,12 +26,12 @@ cd "$DIR"
 OURUSER=`whoami`
 
 mkdir System
-sh -c 'echo "#!/bin/bash \n sudo init 0\n exit 0\n" > System/shutdown.sh' 
+sh -c 'echo "#!/bin/bash \n #sudo init 0\n shutdown -H\n exit 0\n" > System/shutdown.sh' 
 sudo chown root:root System/shutdown.sh
 sudo chmod 777 System/shutdown.sh
 sudo chmod +s System/shutdown.sh
 
-sh -c 'echo "#!/bin/bash \n sudo init 6\n exit 0\n" > System/restart.sh' 
+sh -c 'echo "#!/bin/bash \n #sudo init 6\n shutdown -r\n exit 0\n" > System/restart.sh' 
 sudo chown root:root System/restart.sh
 sudo chmod 777 System/restart.sh
 sudo chmod +s System/restart.sh
