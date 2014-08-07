@@ -909,7 +909,7 @@ void close_dynamic_content()
 
 int main(int argc, char **argv)
 {
-   ROS_INFO("Starting Up!!");
+   ROS_INFO("Starting Up!!"); 
 
    try
    {
