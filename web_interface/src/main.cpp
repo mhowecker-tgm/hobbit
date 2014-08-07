@@ -523,6 +523,8 @@ void execute(char * command,char * param)
 
     if (strcmp(param,"forthSKPause")==0)     {  rosservice_call(cR,cRLen,(char *) "/skeleton_detector/pause");        } else
     if (strcmp(param,"forthSKResume")==0)    {  rosservice_call(cR,cRLen,(char *) "/skeleton_detector/resume");       } else
+    if (strcmp(param,"forthSKAdvanced")==0)  {  rosservice_call(cR,cRLen,(char *) "/skeleton_detector/advanced");     } else
+    if (strcmp(param,"forthSKSimple")==0)    {  rosservice_call(cR,cRLen,(char *) "/skeleton_detector/simple");       } else
 
     if (strcmp(param,"emergencyTrigger")==0) {  rosservice_call(cR,cRLen,(char *) "/emergency_detector/trigger");    } else
     if (strcmp(param,"emergencyPause")==0)   {  rosservice_call(cR,cRLen,(char *) "/emergency_detector/pause");      } else
