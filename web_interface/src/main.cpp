@@ -257,7 +257,7 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
 
 
   char svnVersion[MAX_COMMAND_SIZE]={0};
-  getBackCommandLine((char*) "/bin/bash -c \"cd /opt/ros/hobbit_hydro/src/ && svnversion \" " , svnVersion , MAX_COMMAND_SIZE );
+  getBackCommandLine((char*) "/bin/bash -c \" svnversion \" " , svnVersion , MAX_COMMAND_SIZE );
 
 
   char statusControl[MAX_COMMAND_SIZE*4]={0};
@@ -298,7 +298,7 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
 void * prepare_base_image(struct AmmServer_DynamicRequest  * rqst)
 {
   unsigned int length=0;
-  char * readContent = AmmServer_ReadFileToMemory((char*) "/opt/ros/hobbit_hydro/src/rgbd_acquisition/bin/frames/base/left0000.jpg",&length);
+  char * readContent = AmmServer_ReadFileToMemory((char*) "../../rgbd_acquisition/bin/frames/base/left0000.jpg",&length);
 
   if(readContent==0)
   {
@@ -323,7 +323,7 @@ void * prepare_base_image(struct AmmServer_DynamicRequest  * rqst)
 void * prepare_top_image(struct AmmServer_DynamicRequest  * rqst)
 {
   unsigned int length=0;
-  char * readContent = AmmServer_ReadFileToMemory((char*) "/opt/ros/hobbit_hydro/src/rgbd_acquisition/bin/frames/top/left0000.jpg",&length);
+  char * readContent = AmmServer_ReadFileToMemory((char*) "../../rgbd_acquisition/bin/frames/top/left0000.jpg",&length);
 
   if(readContent==0)
   {
@@ -909,7 +909,7 @@ void close_dynamic_content()
 
 int main(int argc, char **argv)
 {
-   ROS_INFO("Starting Up!!"); 
+   ROS_INFO("Starting Up!!");
 
    try
    {
