@@ -39,6 +39,9 @@
 int rate=11;
 int first=0;
 int key = 0;
+
+int recording=0;
+int recordedFrames=0;
 volatile int paused = 0;
 unsigned int frameTimestamp =0;
 unsigned int colorWidth = 640 , colorHeight =480 , depthWidth = 640 , depthHeight = 480;
@@ -90,25 +93,37 @@ bool startDump(std_srvs::Empty::Request& request, std_srvs::Empty::Response& res
 {
     ROS_INFO("Enabling Dump to files");
     hobbitUpperBodyTracker_setDumpToFiles(1);
+    recording=1;
+    recordedFrames=0;
+
+    return true;
+}
+
+int stopDumpInternal()
+{
+    ROS_INFO("Disabling Dump to files");
+    hobbitUpperBodyTracker_setDumpToFiles(0);
+    recording=0;
+
+    int i=system("./packageRecord.sh");
+    if (i==0) { fprintf(stderr,"Success packaging..!\n"); } else
+              { fprintf(stderr,"Error packaging..!\n"); }
+
+  return (i==0);
+}
+
+
+bool clearDump(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    int i=system("./clearRecords.sh");
+    if (i==0) { fprintf(stderr,"Success packaging..!\n"); } else
+              { fprintf(stderr,"Error packaging..!\n");   }
     return true;
 }
 
 bool stopDump(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    ROS_INFO("Disabling Dump to files");
-    hobbitUpperBodyTracker_setDumpToFiles(0);
-
-    int i=system("./packageRecord.sh");
-    if (i==0)
-      {
-        fprintf(stderr,"Success packaging..!\n");
-      } else
-      {
-        fprintf(stderr,"Error packaging..!\n");
-      }
-
-
-
+    stopDumpInternal();
     return true;
 }
 
@@ -264,7 +279,8 @@ int main(int argc, char **argv)
      ros::ServiceServer terminateService        = nh.advertiseService(name+"/terminate"    , terminate);
      ros::ServiceServer resumeService           = nh.advertiseService(name+"/pause"        , pause);
      ros::ServiceServer dumpService             = nh.advertiseService(name+"/startDump"         , startDump);
-     ros::ServiceServer stopDumpService             = nh.advertiseService(name+"/stopDump"         , stopDump);
+     ros::ServiceServer stopDumpService         = nh.advertiseService(name+"/stopDump"         , stopDump);
+     ros::ServiceServer clearDumpService        = nh.advertiseService(name+"/clearDump"         , clearDump);
      ros::ServiceServer pauseService            = nh.advertiseService(name+"/resume"       , resume);
      ros::ServiceServer simpleService           = nh.advertiseService(name+"/simple"        , simple);
      ros::ServiceServer advancedService         = nh.advertiseService(name+"/advanced"       , advanced);
@@ -297,6 +313,13 @@ int main(int argc, char **argv)
 		{
           ros::spinOnce();
           loop_rate.sleep();
+
+          if (recording) { ++recordedFrames; }
+          if (recordedFrames>1000)
+          {
+            fprintf(stderr,"Automatic Cut Off of recording activated..");
+            stopDumpInternal();
+          }
 		 }
 
 	   stopServices();
