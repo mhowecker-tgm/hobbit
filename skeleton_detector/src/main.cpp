@@ -35,6 +35,7 @@
 //This will make this node also register to color/depth calibrations and
 //pass them to the gesture node instead of the defaults
 #define USE_NONDEFAULT_CALIBRATIONS 1
+#define MAX_RECORDED_FRAMES 1000
 
 int rate=11;
 int first=0;
@@ -104,6 +105,7 @@ int stopDumpInternal()
     ROS_INFO("Disabling Dump to files");
     hobbitUpperBodyTracker_setDumpToFiles(0);
     recording=0;
+    recordedFrames=0;
 
     int i=system("./packageRecord.sh");
     if (i==0) { fprintf(stderr,"Success packaging..!\n"); } else
@@ -211,6 +213,15 @@ void rgbdCallback(const sensor_msgs::Image::ConstPtr rgb_img_msg,
  orig_depth_img = cv_bridge::toCvCopy(depth_img_msg, sensor_msgs::image_encodings::TYPE_16UC1);
  orig_depth_img->image.copyTo(depth);
 
+
+          if (recording) { ++recordedFrames; }
+          if (recordedFrames>MAX_RECORDED_FRAMES)
+          {
+            fprintf(stderr,"Automatic Cut Off of recording activated..");
+            stopDumpInternal();
+          }
+
+
   runServicesThatNeedColorAndDepth((unsigned char*) rgb.data, colorWidth , colorHeight ,
                                    (unsigned short*) depth.data ,  depthWidth , depthHeight ,
                                      &calib , frameTimestamp );
@@ -237,10 +248,18 @@ void rgbdCallbackNoCalibration(const sensor_msgs::Image::ConstPtr rgb_img_msg,
   orig_depth_img = cv_bridge::toCvCopy(depth_img_msg, sensor_msgs::image_encodings::TYPE_16UC1);
   orig_depth_img->image.copyTo(depth);
 
-  doDrawOut();
+
+          if (recording) { ++recordedFrames; }
+          if (recordedFrames>MAX_RECORDED_FRAMES)
+          {
+            fprintf(stderr,"Automatic Cut Off of recording activated..");
+            stopDumpInternal();
+          }
+
   runServicesThatNeedColorAndDepth((unsigned char*) rgb.data, colorWidth , colorHeight ,
                                    (unsigned short*) depth.data ,  depthWidth , depthHeight ,
                                      0 , frameTimestamp );
+  doDrawOut();
  //After running (at least) once it is not a first run any more!
  first = false;
 return;
@@ -314,12 +333,6 @@ int main(int argc, char **argv)
           ros::spinOnce();
           loop_rate.sleep();
 
-          if (recording) { ++recordedFrames; }
-          if (recordedFrames>1000)
-          {
-            fprintf(stderr,"Automatic Cut Off of recording activated..");
-            stopDumpInternal();
-          }
 		 }
 
 	   stopServices();
