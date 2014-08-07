@@ -33,6 +33,7 @@ void broadcastNewPerson()
   msg.x = actualX;
   msg.y = actualY;
   msg.z = actualZ;
+  msg.source = 1;
   msg.theta = actualTheta;
 
   msg.inFieldOfView = actualInFieldOfView;

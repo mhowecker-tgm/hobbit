@@ -15,8 +15,9 @@
          This can also be the serial number of the top Kinect - gathered via "lsusb -v"
          ______________________________________________________________________   
     -->
-    <arg name="deviceID" value="/home/ammar/Documents/Programming/FORTH/input_acquisition/grabbed_frames/test_ammar_2.oni"/> 
- 
+    <!-- arg name="deviceID" value="/home/ammar/Documents/Programming/FORTH/input_acquisition/grabbed_frames/test_ammar_2.oni"/ --> 
+    <arg name="deviceID" value="/home/ammar/Documents/Programming/FORTH/input_acquisition/grabbed_frames/CapturedMark4.oni"/> 
+  
  
    <!--  rosrun pcl_ros pointcloud_to_pcd input:=headcam/depth_registered/points/ -->
 
