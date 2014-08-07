@@ -86,7 +86,7 @@ bool terminate(std_srvs::Empty::Request& request, std_srvs::Empty::Response& res
 }
 
 
-bool dump(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+bool startDump(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
     ROS_INFO("Enabling Dump to files");
     hobbitUpperBodyTracker_setDumpToFiles(1);
@@ -97,16 +97,16 @@ bool stopDump(std_srvs::Empty::Request& request, std_srvs::Empty::Response& resp
 {
     ROS_INFO("Disabling Dump to files");
     hobbitUpperBodyTracker_setDumpToFiles(0);
-    
+
     int i=system("./packageRecord.sh");
-    if (i==0) 
+    if (i==0)
       {
         fprintf(stderr,"Success packaging..!\n");
       } else
       {
         fprintf(stderr,"Error packaging..!\n");
-      } 
-    
+      }
+
 
 
     return true;
@@ -236,10 +236,10 @@ int main(int argc, char **argv)
 {
    ROS_INFO("Starting Up !!");
    try
-    { 
+    {
      ros::init(argc, argv, "skeleton_detector");
      ros::start();
- 
+
      ros::NodeHandle nh;
      ros::NodeHandle private_node_handle_("~");
 
@@ -263,7 +263,7 @@ int main(int argc, char **argv)
      ros::ServiceServer visualizeOffService     = nh.advertiseService(name+"/visualize_off", visualizeOff);
      ros::ServiceServer terminateService        = nh.advertiseService(name+"/terminate"    , terminate);
      ros::ServiceServer resumeService           = nh.advertiseService(name+"/pause"        , pause);
-     ros::ServiceServer dumpService             = nh.advertiseService(name+"/dump"         , dump);
+     ros::ServiceServer dumpService             = nh.advertiseService(name+"/startDump"         , startDump);
      ros::ServiceServer stopDumpService             = nh.advertiseService(name+"/stopDump"         , stopDump);
      ros::ServiceServer pauseService            = nh.advertiseService(name+"/resume"       , resume);
      ros::ServiceServer simpleService           = nh.advertiseService(name+"/simple"        , simple);
