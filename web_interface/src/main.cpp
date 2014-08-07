@@ -256,6 +256,11 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
   //  getBackCommandLine((char*) "timeout 0.5 rostopic echo /mileage -n 1 | grep data | cut -d ':' -f2", mileageState , MAX_COMMAND_SIZE );
 
 
+  char cpuUsage[MAX_COMMAND_SIZE]={0};
+  getBackCommandLine((char*) "top -b -d1 -n1|grep -i \"Cpu(s)\"|head -c21|cut -d ' ' -f3|cut -d '%' -f1" , cpuUsage , MAX_COMMAND_SIZE );
+
+
+
   char svnVersion[MAX_COMMAND_SIZE]={0};
   getBackCommandLine((char*) "/bin/bash -c \" svnversion \" " , svnVersion , MAX_COMMAND_SIZE );
 
@@ -281,13 +286,14 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
                 <center>\
                   %02d-%02d-%02d %02d:%02d:%02d \n<br><br> \
                 </center>\
+                CPU usage : %s %% \n<br> \
                 Battery is : %s \n<br> \
                 Charging : %s<br>\
                 Svn Ver : %s<br><br>\
                  %s <br>\
                </body>\
              </html>",
-             tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900,   tm.tm_hour, tm.tm_min, tm.tm_sec,batteryState,chargingState,svnVersion,statusControl);
+             tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900,   tm.tm_hour, tm.tm_min, tm.tm_sec,cpuUsage,batteryState,chargingState,svnVersion,statusControl);
 
   rqst->contentSize=strlen(rqst->content);
   return 0;
