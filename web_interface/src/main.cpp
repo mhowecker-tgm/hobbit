@@ -257,7 +257,7 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
 
 
   char cpuUsage[MAX_COMMAND_SIZE]={0};
-  getBackCommandLine((char*) "top -b -d1 -n1|grep -i \"Cpu(s)\"|head -c21|cut -d ' ' -f3|cut -d '%' -f1" , cpuUsage , MAX_COMMAND_SIZE );
+  getBackCommandLine((char*) "grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage \"%\"}'" , cpuUsage , MAX_COMMAND_SIZE );
 
 
 
