@@ -530,8 +530,10 @@ void execute(char * command,char * param)
     if (strcmp(param,"emergencyPause")==0)   {  rosservice_call(cR,cRLen,(char *) "/emergency_detector/pause");      } else
     if (strcmp(param,"emergencyResume")==0)  {  rosservice_call(cR,cRLen,(char *) "/emergency_detector/resume");     } else
 
-    if (strcmp(param,"gesturePause")==0)     {  rosservice_call(cR,cRLen,(char *) "/hand_gestures/pause");          } else
-    if (strcmp(param,"gestureResume")==0)    {  rosservice_call(cR,cRLen,(char *) "/hand_gestures/resume");         } else
+    if (strcmp(param,"gesturePause")==0)              {  rosservice_call(cR,cRLen,(char *) "/hand_gestures/pause");          } else
+    if (strcmp(param,"gestureResume")==0)             {  rosservice_call(cR,cRLen,(char *) "/hand_gestures/resume");         } else
+    if (strcmp(param,"gestureStartVisualization")==0) {  rosservice_call(cR,cRLen,(char *) "/hand_gestures/visualize_on");   } else
+    if (strcmp(param,"gestureStopVisualization")==0)  {  rosservice_call(cR,cRLen,(char *) "/hand_gestures/visualize_off");  } else
 
     if (strcmp(param,"faceTrigger")==0)      {  rosservice_call(cR,cRLen,(char *) "/face_detection/trigger");  } else
     if (strcmp(param,"facePause")==0)        {  rosservice_call(cR,cRLen,(char *) "/face_detection/pause");    } else
