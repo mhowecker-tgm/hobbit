@@ -113,23 +113,35 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 	//fromROSMsg not working
 
 	pcl::PointCloud<pcl::PointXYZ> point_cloud_new_frame;
-
+	pcl::PointCloud<pcl::PointXYZ> point_cloud_new_frame2;
 
 	try
 	{
-		// Define the tf transformation
+
+		// Define first tf transformation
 		tf::StampedTransform headcam_trans;
-		//Vertical translation in order to check heights
-  		headcam_trans.setOrigin(tf::Vector3(0, 0, 1.108)); //FIXME, check height value
+		//Translation to the neck
+  		headcam_trans.setOrigin(tf::Vector3(-0.12, -0.052, -0.086));
+		//Apply transform
+		pcl_ros::transformPointCloud(point_cloud, point_cloud_new_frame, headcam_trans_height);
+
+		// Define rotations tf transformation
+		tf::StampedTransform headcam_trans_rot;
 		//RPY angles obtained from the matrix composition of the following transformations:
                 // 1.) 90 degrees rotation around fixed global y axis
 		// 2.) -90 degrees around fixed global x axis
 		// 3.)-35 degrees around new x axis (head_inclination_angle)
 		//roll value is obtained as asin(cos(head_inclination_angle))
-		headcam_trans.setRotation(tf::createQuaternionFromRPY(0.96, M_PI, M_PI/2));
+		headcam_trans_rot.setRotation(tf::createQuaternionFromRPY(0.96, M_PI, M_PI/2));
+		//Apply transform to new reference frame
+		pcl_ros::transformPointCloud(point_cloud_new_frame, point_cloud_new_frame2, headcam_trans);
 
+		// Define the tf transformation for the height
+		tf::StampedTransform headcam_trans_height;
+		//Vertical translation in order to check heights
+  		headcam_trans_height.setOrigin(tf::Vector3(0, 0, 1.108)); //FIXME, check height value
 		//Transform pointcloud to new reference frame
-		pcl_ros::transformPointCloud(pcl_cloud, point_cloud_new_frame, headcam_trans);
+		pcl_ros::transformPointCloud(point_cloud_new_frame2, point_cloud_new_frame, headcam_trans_height);
 
 	}
 	catch (tf::TransformException& e)
@@ -173,7 +185,7 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 		}
 
 		//points from robot base or tablet should be ignored
-		if ( fabs(x) < (robot_front - cam_disp_x) && y < (0.5*robot_width-cam_disp_y) && y > -cam_disp_y - 0.5*robot_width)
+		if ( fabs(x) < (robot_front - cam_disp_x) && y < (0.5*robot_width-cam_disp_y) && y > (-cam_disp_y - 0.5*robot_width))
 		{
 			continue;
 		}
