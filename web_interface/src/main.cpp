@@ -526,6 +526,10 @@ void execute(char * command,char * param)
     if (strcmp(param,"forthSKAdvanced")==0)  {  rosservice_call(cR,cRLen,(char *) "/skeleton_detector/advanced");     } else
     if (strcmp(param,"forthSKSimple")==0)    {  rosservice_call(cR,cRLen,(char *) "/skeleton_detector/simple");       } else
 
+    if (strcmp(param,"startRecording")==0)   {  rosservice_call(cR,cRLen,(char *) "/skeleton_detector/startDump");    } else
+    if (strcmp(param,"stopRecording")==0)    {  rosservice_call(cR,cRLen,(char *) "/skeleton_detector/stopDump");     } else
+    if (strcmp(param,"clearRecording")==0)   {  rosservice_call(cR,cRLen,(char *) "/skeleton_detector/clearDump");    } else
+
     if (strcmp(param,"emergencyTrigger")==0) {  rosservice_call(cR,cRLen,(char *) "/emergency_detector/trigger");    } else
     if (strcmp(param,"emergencyPause")==0)   {  rosservice_call(cR,cRLen,(char *) "/emergency_detector/pause");      } else
     if (strcmp(param,"emergencyResume")==0)  {  rosservice_call(cR,cRLen,(char *) "/emergency_detector/resume");     } else
@@ -621,9 +625,6 @@ void execute(char * command,char * param)
     if (strcmp(param,"systemRestart")==0)  { strncpy(cR,"../../hobbit_launch/launch/System/restart.sh",cRLen); }  else
     if (strcmp(param,"systemShutdown")==0) { strncpy(cR,"../../hobbit_launch/launch/System/shutdown.sh",cRLen); } else
     if (strcmp(param,"systemUpdate")==0)   { strncpy(cR,"../../hobbit_launch/launch/System/update.sh",cRLen); }   else
-
-    if (strcmp(param,"startRecording")==0) {  rosservice_call(cR,cRLen,(char *) "/skeleton_detector/startDump");    } else
-    if (strcmp(param,"stopRecording")==0)   {  rosservice_call(cR,cRLen,(char *) "/skeleton_detector/stopDump");      } else
 
     //-------------------------------
     if (strcmp(param,"yes")==0)    { rostopic_pub(cR,cRLen,(char *) "/Event",(char *) "hobbit_msgs/Event",(char *) "\"event: 'G_YES'\"");           } else
