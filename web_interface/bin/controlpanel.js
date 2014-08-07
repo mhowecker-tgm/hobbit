@@ -66,7 +66,7 @@
       command('camera=refreshTop');
       document.getElementById(name).style.visibility='visible';
       var randomnumber=Math.floor(Math.random()*100000);
-      document.getElementById("videoFeedTopImage").src="base_image.jpg?t="+randomnumber;
+      document.getElementById("videoFeedTopImage").src="top_image.jpg?t="+randomnumber;
     }
 
 
@@ -75,7 +75,7 @@
       command('camera=refreshBottom');
       document.getElementById(name).style.visibility='visible';
       var randomnumber=Math.floor(Math.random()*100000);
-      document.getElementById("videoFeedBottomImage").src="top_image.jpg?t="+randomnumber;
+      document.getElementById("videoFeedBottomImage").src="base_image.jpg?t="+randomnumber;
     }
 
 
