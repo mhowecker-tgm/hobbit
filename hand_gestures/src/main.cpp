@@ -204,7 +204,7 @@ return;
 
 int main(int argc, char **argv)
 {
-   ROS_INFO("Starting Up!!");
+   ROS_INFO("Starting Up!!"); 
    try
 	{ 
   	 ros::init(argc, argv, NODE_NAME);
