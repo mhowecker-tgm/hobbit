@@ -26,12 +26,12 @@ cd "$DIR"
 OURUSER=`whoami`
 
 mkdir System
-sh -c 'echo "#!/bin/bash \n #sudo init 0\n shutdown -H\n exit 0\n" > System/shutdown.sh' 
+sh -c 'echo "#!/bin/bash \n #sudo init 0\n sudo shutdown -H\n exit 0\n" > System/shutdown.sh' 
 sudo chown root:root System/shutdown.sh
 sudo chmod 777 System/shutdown.sh
 sudo chmod +s System/shutdown.sh
 
-sh -c 'echo "#!/bin/bash \n #sudo init 6\n shutdown -r\n exit 0\n" > System/restart.sh' 
+sh -c 'echo "#!/bin/bash \n #sudo init 6\n sudo shutdown -r\n exit 0\n" > System/restart.sh' 
 sudo chown root:root System/restart.sh
 sudo chmod 777 System/restart.sh
 sudo chmod +s System/restart.sh
@@ -55,7 +55,7 @@ sudo chmod +x System/update.sh
 
 
 sh -c 'echo "#!/bin/bash \n \
-              apt-get update && apt-get upgrade -y \n exit 0 \n" > System/updateGlobal.sh'
+             sudo apt-get update && sudo apt-get upgrade -y \n exit 0 \n" > System/updateGlobal.sh'
 
 sudo chown root:root System/updateGlobal.sh
 sudo chmod 777 System/updateGlobal.sh
