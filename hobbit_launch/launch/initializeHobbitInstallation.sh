@@ -48,13 +48,14 @@ sh -c 'echo "#!/bin/bash \n \
              exit 0 \n" > System/update.sh' 
 
 sudo chown "$OURUSER":"$OURUSER" System/update.sh
+sudo chmod +x System/update.sh
 #sudo chmod 777 System/update.sh
 #sudo chmod +s System/update.sh
 
 
 
 sh -c 'echo "#!/bin/bash \n \
-             sudo apt-get update && sudo apt-get upgrade -y \n exit 0 \n" > System/updateGlobal.sh'
+              apt-get update && apt-get upgrade -y \n exit 0 \n" > System/updateGlobal.sh'
 
 sudo chown root:root System/updateGlobal.sh
 sudo chmod 777 System/updateGlobal.sh
