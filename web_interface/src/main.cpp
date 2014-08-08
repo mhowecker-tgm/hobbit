@@ -629,10 +629,10 @@ void execute(char * command,char * param)
    else
   if (strcmp(command,"robot")==0)
   {
-    if (strcmp(param,"systemRestart")==0)  { strncpy(cR,"../../hobbit_launch/launch/System/restart.sh",cRLen); }  else
-    if (strcmp(param,"systemShutdown")==0) { strncpy(cR,"../../hobbit_launch/launch/System/shutdown.sh",cRLen); } else
-    if (strcmp(param,"systemUpdate")==0)   { strncpy(cR,"../../hobbit_launch/launch/System/update.sh",cRLen); }   else
-
+    if (strcmp(param,"systemRestart")==0)      { strncpy(cR,"../../hobbit_launch/launch/System/systemCommands restart",cRLen); }  else
+    if (strcmp(param,"systemShutdown")==0)     { strncpy(cR,"../../hobbit_launch/launch/System/systemCommands shutdown",cRLen); } else
+    if (strcmp(param,"systemUpdate")==0)       { strncpy(cR,"../../hobbit_launch/launch/System/update.sh",cRLen); }   else
+    if (strcmp(param,"systemUpdateGlobal")==0) { strncpy(cR,"../../hobbit_launch/launch/System/systemCommands updateGlobal",cRLen); }   else
     //-------------------------------
     if (strcmp(param,"yes")==0)    { rostopic_pub(cR,cRLen,(char *) "/Event",(char *) "hobbit_msgs/Event",(char *) "\"event: 'G_YES'\"");           } else
     if (strcmp(param,"no")==0)     { rostopic_pub(cR,cRLen,(char *) "/Event",(char *) "hobbit_msgs/Event",(char *) "\"event: 'G_NO'\"");            } else
