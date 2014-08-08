@@ -45,7 +45,7 @@ sudo chmod +x System/update.sh
 
 #Multi System Tool
 sudo rm System/systemCommands
-gcc System/systemCommands.c -o System/systemCommands
+gcc System/systemCommands.c -s -o System/systemCommands
 sudo chown root:root System/systemCommands
 sudo chmod +s System/systemCommands
 
