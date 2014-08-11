@@ -113,7 +113,8 @@ def init():
 	r = rospy.Rate(5) #5hz
 	while not rospy.is_shutdown():
 		angles = herkulex.getAngles()
-		br.sendTransform((0, 0, 0), (0.0, angles[1]/100, angles[0]/100, 1), rospy.Time.now(), base_tf,head_tf)
+		br.sendTransform( (0,0,0), tf.transformations.quaternion_from_euler(0, angles[1]/100.0, angles[0]/100.0), rospy.Time.now(), base_tf, head_tf)
+		#br.sendTransform((0, 0, 0), (0.0, angles[1]/100, angles[0]/100, 1), rospy.Time.now(), base_tf,head_tf)
 		r.sleep()
 
 def shutdown():
