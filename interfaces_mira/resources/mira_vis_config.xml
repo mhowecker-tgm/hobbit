@@ -1,0 +1,8 @@
+<root>
+	<communication>
+		<KnownFrameworks>
+			<item>127.0.0.1:1234</item>
+			<item>127.0.0.1:1235</item>
+		</KnownFrameworks>
+	</communication>
+</root>
