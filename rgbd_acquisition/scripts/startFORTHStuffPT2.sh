@@ -10,11 +10,12 @@ MAX_RETRIES=10
 if [ -d $HOBBITDIR ] 
 then
  echo "Hobbit Normal root dir"
-elif [ -d ~/Documents/Programming/FORTH/Hobbit/hobbit_hydro ] 
+elif [ -d /home/ammar/Documents/Programming/FORTH/Hobbit/hobbit_hydro ] 
 then
- HOBBITDIR="~/Documents/Programming/FORTH/Hobbit/hobbit_hydro/"
+ HOBBITDIR="/home/ammar/Documents/Programming/FORTH/Hobbit/hobbit_hydro/"
 fi
 
+echo "Will Use $HOBBITDIR for root"
 echo "NewLog" > ~/debug.txt 
 #Try to bring up our node for the first time!
 echo "Trying to bring RGBD Node up with a first try"
