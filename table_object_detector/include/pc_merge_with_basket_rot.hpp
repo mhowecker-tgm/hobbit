@@ -70,6 +70,7 @@
 #include "tf/transform_listener.h"
 
 #include <sstream>
+#include "table_object_detector/CheckFreeSpace.h"
 
 using namespace std;
 
@@ -87,6 +88,8 @@ public:
 	ros::Subscriber pc_cam1_sub;
 	ros::Subscriber pc_cam1_sub2;
 	ros::Subscriber pc_cam2_sub;
+	ros::ServiceServer service_check_free_space;
+	pcl::PointCloud<pcl::PointXYZ> pc_check_free_space_new_cs; //cs ...coordinate system
 	pcl::PointCloud<pcl::PointXYZ> pc_cam1;
 	pcl::PointCloud<pcl::PointXYZ> pc_cam2;
 	pcl::PointCloud<pcl::PointXYZ> pc_for_basketdet_out;
@@ -111,6 +114,8 @@ public:
 			       float y_min=-1.0, float y_max=0.25, float z_min=0.035, float z_max = 0.9);
 
 	void segment_pc(pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_cloud_merged );
+	//service function for check_free_space
+	bool check_free_space(table_object_detector::CheckFreeSpace::Request  &req, table_object_detector::CheckFreeSpace::Response &res);
 	// receives point clouds from camera #1
 	void pc_cam1_callback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& pcl_in);
 

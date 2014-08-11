@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp 
   rospy 
   std_msgs 
+  message_generation
   genmsg 
   hobbit_msgs 
   image_geometry 
@@ -29,12 +30,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 find_package(PCL REQUIRED)
 
-catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES tmpdf
-#  CATKIN_DEPENDS roscpp std_msgs
-#  DEPENDS system_lib
-)
+
 
 include_directories(
   ${PCL_INCLUDE_DIRS}
@@ -44,10 +40,21 @@ include_directories(
 
 ## Declare ROS messages and services
 #add_message_files(FILES Num.msg)
-#add_service_files(FILES AddTwoInts.srv)
+add_service_files(
+  FILES 
+  CheckFreeSpace.srv
+)
 
 ## Generate added messages and services
-#generate_messages(DEPENDENCIES std_msgs genmsg)
+generate_messages(DEPENDENCIES std_msgs sensor_msgs)
+
+
+catkin_package(
+#  INCLUDE_DIRS include
+#  LIBRARIES tmpdf
+  CATKIN_DEPENDS message_runtime
+#  DEPENDS system_lib
+)
 
 #add_boost_directories ()
 #add_definitions (-Wall -O3 -msse3 -mssse3 -funroll-loops)

@@ -32,6 +32,8 @@
 #include "tf/transform_datatypes.h"
 #include "tf/transform_listener.h"
 
+#include "table_object_detector/CheckFreeSpace.h"
+
 
 CPCMerge::CPCMerge(ros::NodeHandle nh_)
 {
@@ -40,8 +42,48 @@ CPCMerge::CPCMerge(ros::NodeHandle nh_)
   //define publishers
   pc_for_basketdet_pub = nh.advertise<pcl::PointCloud<pcl::PointXYZ> >("/SS/headcam/depth_registered/points_edited_in_rcs",1); //rcs:robot coordinate sys.
   position_highestpoint_pub = nh.advertise<std_msgs::String>("/SS/basket_position",1);
+  //define service check_free_space
+  service_check_free_space = nh.advertiseService("check_free_space", &CPCMerge::check_free_space, this);
+
   //define subscriber
   pc_cam1_sub = nh.subscribe("/SS/headcam/depth_registered/points",1, &CPCMerge::pc_cam1_callback, this);
+}
+
+
+bool CPCMerge::check_free_space(table_object_detector::CheckFreeSpace::Request  &req,
+         table_object_detector::CheckFreeSpace::Response &res)
+{
+  m.lock();
+  ROS_INFO("pc_merge.cpp: check_free_space: point cloud received");
+  //search for tf transform for pc for the 2 given input and output tf-frames
+  ros::Time now = ros::Time::now();
+  bool foundTransform = tf_listener.waitForTransform(req.frame_id_desired.data.c_str(), req.frame_id_original.data.c_str(), now, ros::Duration(13.0));
+  if (!foundTransform)
+  {
+	ROS_WARN("check_free_space: No transform for point cloud found");
+	m.unlock();
+	return false;
+  }
+
+  //ROS_INFO(tf_listener);
+  ROS_INFO("check_free_space: Transform for point cloud found");
+
+  pcl::PointCloud<pcl::PointXYZ> pcl_cloud_check_free_space_old_cs;
+pcl::fromROSMsg(req.cloud, pcl_cloud_check_free_space_old_cs); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  
+
+  pcl_ros::transformPointCloud(req.frame_id_desired.data.c_str(), pcl_cloud_check_free_space_old_cs, pc_check_free_space_new_cs, tf_listener);
+
+  pcl::PointCloud<pcl::PointXYZ> pcl_cloud_merged;  //needed zwischenstep?
+  pcl_cloud_merged = pc_check_free_space_new_cs;
+
+  filter_pc(pcl_cloud_merged, false, req.x1, req.x2, req.y1, req.y2, req.z1, req.z2); //second entry false <=> coordinates of highest points of scene are published instead of basket center point
+  ROS_INFO("%d",pcl_cloud_merged.points.size());
+
+  res.nr_points_in_area = pcl_cloud_merged.points.size();
+  ROS_INFO("sending back response: [%ld]", (long int)res.nr_points_in_area);
+  m.unlock();
+  return true;
 }
 
 void CPCMerge::pc_cam1_callback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& pcl_in)
