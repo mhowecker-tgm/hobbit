@@ -735,6 +735,7 @@ void * store_new_configuration_callback(struct AmmServer_DynamicRequest  * rqst)
          char * bufferCommand = (char *) malloc ( 256 * sizeof(char) );
          if (bufferCommand!=0)
           {
+            if ( _GET(default_server,rqst,(char*)"LuiBackgroundSelector",bufferCommand,256) )  { execute((char*)"LuiBackgroundSelector",bufferCommand);  }
             if ( _GET(default_server,rqst,(char*)"userName",bufferCommand,256) )  { execute((char*)"setUserName",bufferCommand);  }
             if ( _GET(default_server,rqst,(char*)"robotName",bufferCommand,256) )  { execute((char*)"setRobotName",bufferCommand);  }
             if ( _GET(default_server,rqst,(char*)"socialRole",bufferCommand,256) )  { execute((char*)"setSocialRole",bufferCommand);  }
