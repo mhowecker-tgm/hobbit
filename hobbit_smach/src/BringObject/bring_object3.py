@@ -32,7 +32,7 @@ def main():
         )
 
     asw = ActionServerWrapper(
-        'locate_user', GeneralHobbitAction, bo_sm,
+        'bring_object', GeneralHobbitAction, bo_sm,
         ['succeeded'], ['aborted'], ['preempted'],
         result_slots_map={'result': 'result'},
         goal_slots_map={'command': 'command'})

@@ -10,8 +10,8 @@ NAME = 'place_handler'
 PROJECT = 'Hobbit'
 
 # FILE='places.xml'
-#FILE='/home/bajo/work/development/catkin/src/navigation/places.xml'
-FILE='/opt/ros/hobbit_hydro/src/navigation/places.xml'
+FILE='/home/bajo/work/development/catkin/src/navigation/places.xml'
+#FILE='/opt/ros/hobbit_hydro/src/navigation/places.xml'
 
 import roslib; roslib.load_manifest(PKG)
 import rospy

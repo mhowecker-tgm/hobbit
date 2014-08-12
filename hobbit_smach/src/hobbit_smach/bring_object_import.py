@@ -684,12 +684,12 @@ def get_bring_scenario():
                 time=4,
                 text='T_BM_HERE_IS_THE_OBJECT_O_I_SHOULD_BRING_TO_YOU'
             ),
-            transitions={'succeeded': 'HELP_ACCEPTED?',
+            transitions={'succeeded': 'HELP_ACCEPTED',
                          'aborted': 'aborted',
                          'preempted': 'LOG_TASK_HAS_PREEMPTED'}
         )
         StateMachine.add(
-            'HELP_ACCEPTED?',
+            'HELP_ACCEPTED',
             social_role.CheckHelpAccepted(),
             transitions={'succeeded': 'SAY_THANKS',
                          'aborted': 'succeeded',
@@ -814,7 +814,7 @@ def get_bring_scenario():
                 time=4,
                 text='T_BM_I_WILL_LOOK_AT_PLACE_P_FOR_OBJECT_O'
             ),
-            transitions={'succeeded': 'SAY_SELECT_ROOM',
+            transitions={'succeeded': 'MOVE_TO_P',
                          'aborted': 'LOG_NOT_COMPLETE',
                          'preempted': 'LOG_TASK_HAS_PREEMPTED'}
         )
