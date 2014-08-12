@@ -49,21 +49,34 @@
                         <option value="3">3</option>
                         <option value="4">4</option> 
                       </select>   <br/>
-
  
                   currentEmotion : 
                       <select name="currentEmotion"  >
                         <option value="EMO_HAPPY">Happy</option> 
                       </select>   <br/>
-
-
+ 
                   User Away  : 
                       <select name="userAway"  >
                         <option value="false">false</option>  
                         <option value="true">true</option> 
                       </select>   <br/>
+ 
+                  Language  : 
+                      <select name="language" onchange="javascript:changeLanguage(this.value);" >
+                        <option value="english">English</option>  
+                        <option value="greek">Greek</option>  
+                        <option value="german">German</option>  
+                        <option value="swedish">Swedish</option>   
+                      </select>   <a href="javascript:command('say='+speakString);"><img src="volume.png" height=18></a>
+                      <br/>
 
-
+                  Gender : 
+                      <select name="gender" onchange="javascript:changeGender(this.value);" >
+                        <option value="FEMALE">Female</option> 
+                        <option value="MALE">Male</option> 
+                      </select>   <a href="javascript:command('say='+speakString);"><img src="volume.png" height=18></a>
+                      <br/>
+ 
                   Talking Speed : 
                       <select name="talkingSpeed" onchange="javascript:settingsCommand('talkingSpeed='+this.value);" >
                         <option value="3">Normal</option> 
@@ -72,18 +85,32 @@
                         <option value="2">Slow</option>
                         <option value="4">Fast</option>
                         <option value="5">Very Fast</option>  
-                      </select>    <a href="controlpanel.html?say=Test my voice"><img src="volume.png" height=18></a> 
+                      </select>    <a href="javascript:command('say='+speakString);"><img src="volume.png" height=18></a> 
                       <br/>
-
-                  Gender : 
-                      <select name="gender" onchange="javascript:settingsCommand('gender='+this.value);" >
-                        <option value="FEMALE">Female</option> 
-                        <option value="MALE">Male</option> 
-                      </select>   <a href="controlpanel.html?say=Test my voice"><img src="volume.png" height=18></a> 
-                      <br/>
- 
+                       
+                  Volume : 
+                      <select name="volume"  onchange="javascript:settingsCommand('volume='+this.value);" >
+                        <option value="10">100%</option> 
+                        <option value="0">0%</option>
+                        <option value="1">10%</option>
+                        <option value="2">20%</option>
+                        <option value="3">30%</option>
+                        <option value="4">40%</option> 
+                        <option value="5">50%</option> 
+                        <option value="6">60%</option> 
+                        <option value="7">70%</option> 
+                        <option value="8">80%</option> 
+                        <option value="9">90%</option> 
+                        <option value="10">100%</option> 
+                      </select>    <a href="javascript:command('say='+speakString);"><img src="volume.png" height=18></a>
+                  <br/> 
+                      
+                  <label><input id="voiceAdvancedSwitch" type="checkbox" onchange='handleVoiceAdvancedSwitch(this);' >Manual Voice Selection</label> 
+                   <br>
+                   
+                  <div id="voiceAdvanced" style="visibility:hidden;"> 
                   Female Voice : 
-                      <select name="voiceFemale" onchange="javascript:settingsCommand('voiceFemale='+this.value);" >
+                      <select id="voiceFemale" name="voiceFemale" onchange="javascript:settingsCommand('voiceFemale='+this.value);"  >
                         <optgroup label="English Language" >
                           <option value="Susan">Susan</option>  
                           <option value="Kate">Kate</option>  
@@ -101,10 +128,11 @@
                           <option value="Annika">Annika</option>  
                           <option value="Alva P">Alva P</option>     
                         </optgroup>                         
-                      </select>    <a href="controlpanel.html?say=Test my voice"><img src="volume.png" height=18></a> 
+                      </select>     <a href="javascript:command('say='+speakString);"><img src="volume.png" height=18></a>  
                       <br/>
-                  Male Voice :  
-                      <select name="voiceMale" onchange="javascript:settingsCommand('voiceMale='+this.value);" >
+                      
+                  Male Voice :   
+                      <select id="voiceMale"  name="voiceMale" onchange="javascript:settingsCommand('voiceMale='+this.value);" >
                         <optgroup label="English Language" >
                           <option value="Dave">Dave</option>  
                           <option value="Simon">Simon</option>  
@@ -122,26 +150,10 @@
                           <option value="Sven">Sven</option>  
                           <option value="Oskar P">Oskar P</option>     
                         </optgroup>                         
-                      </select>   <a href="controlpanel.html?say=Test my voice"><img src="volume.png" height=18></a>  
+                      </select>    <a href="javascript:command('say='+speakString);"><img src="volume.png" height=18></a>  
                       <br/>
-
-                  Volume : 
-                      <select name="volume"  onchange="javascript:settingsCommand('volume='+this.value);" >
-                        <option value="4">40%</option> 
-                        <option value="0">0%</option>
-                        <option value="1">10%</option>
-                        <option value="2">20%</option>
-                        <option value="3">30%</option>
-                        <option value="4">40%</option> 
-                        <option value="5">50%</option> 
-                        <option value="6">60%</option> 
-                        <option value="7">70%</option> 
-                        <option value="8">80%</option> 
-                        <option value="9">90%</option> 
-                        <option value="10">100%</option> 
-                      </select>    <a href="controlpanel.html?say=Test my voice"><img src="volume.png" height=18></a> 
-                  <br/>
-                  
+                     </div>  
+ 
                   City Of Operation :   
                   <input type="text" name="city"  style="width: 40%;" value="Herakleion,Greece"> <br/>
   
@@ -151,16 +163,11 @@
                        <img src="lui.png" width=300><br/>
                       </div>  
                     UI color : <input id="LuiBackgroundSelector" name="LuiBackgroundSelector" type="color" value="#66ff00" 
-                               onchange="document.getElementById('LuiBackground').style.backgroundColor=document.getElementById('LuiBackgroundSelector').value; 
-                                         alert('LuiBackgroundSelector='+this.value);
-                                         settingsCommand('LuiBackgroundSelector='+this.value);
-                                         " > <br/>  
+                               onchange="changeUIColor(this.value);" > <br/>  
                   </td>
             </tr>
           </table>
-
-
-
+ 
 
                   <hr /> 
                    <strong>Emergencies</strong><br/>

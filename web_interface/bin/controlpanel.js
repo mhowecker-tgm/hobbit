@@ -19,11 +19,82 @@
  
    var ledX = 5;
    var ledY = 5;
+   
+   var speakLanguage="english";
+   var speakString="Testing My Voice";
+   var speakGender="female";
+
+
+
+   function updateLanguageForms()
+   {
+    if (speakGender=="female")   
+        {  
+         if (speakLanguage=="greek")   {  document.getElementById('voiceFemale').value="Afroditi"; } else
+         if (speakLanguage=="english") {  document.getElementById('voiceFemale').value="Susan";    } else
+         if (speakLanguage=="swedish") {  document.getElementById('voiceFemale').value="Annika";   } else
+         if (speakLanguage=="german")  {  document.getElementById('voiceFemale').value="Katrin";   } else
+                                       {  alert('Unknown language : '+speakLanguage); } 
+        } else
+    if (speakGender=="male")   
+        {  
+         if (speakLanguage=="greek")   {  document.getElementById('voiceMale').value="Nikos";  }  else
+         if (speakLanguage=="english") {  document.getElementById('voiceMale').value="Dave";   }  else
+         if (speakLanguage=="swedish") {  document.getElementById('voiceMale').value="Sven";   }  else
+         if (speakLanguage=="german")  {  document.getElementById('voiceMale').value="Stefan"; }  else
+                                       {  alert('Unknown language : '+speakLanguage); }
+        } else
+        {
+         alert('Unknown gender : '+speakGender);
+        }
+
+   }
+
+
+   function changeUIColor(str)
+   {
+     var cleanStr = str;
+     cleanStr.replace('#',' '); 
+     document.getElementById('LuiBackground').style.backgroundColor=cleanStr; 
+     alert('The value to transmit is '+cleanStr);
+     settingsCommand('LuiBackgroundSelector='+cleanStr);
+   }
+
+
+   function changeLanguage(str)
+   {
+     if (str=="greek")   {  speakString="Δοκιμη της φωνης μου";  } else
+     if (str=="english") {  speakString="Testing my voice";      } else
+     if (str=="swedish") {  speakString="Test av min röst";      } else
+     if (str=="german")  {  speakString="Test meiner Stimme";    } 
+     speakLanguage=str;
+     updateLanguageForms();
+   }
+
+
+   function changeGender(str)
+   { 
+     if (str=="FEMALE")   { speakGender="female"; } else
+     if (str=="MALE")     { speakGender="male";   } else
+                          { alert('Unknown Gender : '+str); }
+     updateLanguageForms();
+     settingsCommand('gender='+str);
+   }
+
 
    function getCommandPartOfURL(str) 
    {
     return str.split('?')[1];
    }
+
+
+    function handleVoiceAdvancedSwitch(cb)
+    {
+       if (cb.checked) { document.getElementById("voiceAdvanced").style.visibility='visible'; } else
+                       { document.getElementById("voiceAdvanced").style.visibility='hidden'; }
+    }
+
+
 
    function makeUniqueURLs()
    {  
