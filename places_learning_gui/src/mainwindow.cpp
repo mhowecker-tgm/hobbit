@@ -304,32 +304,63 @@ void MainWindow::on_delete_place_clicked()
     bool ok;
     QString text_input = QInputDialog::getText(this,("Enter room name"),(""),QLineEdit::Normal,QString::null,&ok);
 
-    /*std::string room_to_be_deleted = text_input.toStdString();
+    std::string room_to_be_deleted = text_input.toStdString();
 
-    bool found = false;
+    bool room_found = false;
+    bool place_found = false;
 
     //look for the room name among the existing rooms
-    for(unsigned int i=0; i<ui->label->rooms.size();i++)
+    for(unsigned int i=0; i<(*ui->label->rooms).rooms_vector.size();i++)
     {
-        std::string room_name = ui->label->rooms[i].room_name;
+        std::string room_name = (*ui->label->rooms).rooms_vector[i].room_name;
         if (room_name.compare(room_to_be_deleted) == 0)
         {
-            found = true;
+            room_found = true;
+	    //cout << "room to be deleted found " << room_name << endl;
 
-            ui->label->rooms.erase(ui->label->rooms.begin()+i);
-            break;
-
+	    QString text_input_place = QInputDialog::getText(this,("Enter place name"),(""),QLineEdit::Normal,QString::null,&ok);
+	    std::string place_to_be_deleted = text_input_place.toStdString();
+            //if room is found look for the place name among the existing places
+	    for(unsigned int j=0; j<(*ui->label->rooms).rooms_vector[i].places_vector.size();j++)
+	    {
+            	std::string place_name = (*ui->label->rooms).rooms_vector[i].places_vector[j].place_name;
+        	if (place_name.compare(place_to_be_deleted) == 0)
+		{
+			(*ui->label->rooms).rooms_vector[i].places_vector.erase((*ui->label->rooms).rooms_vector[i].places_vector.begin()+j);
+			place_found = true;
+		  	//cout << "place to be deleted found " << place_name << endl;
+			break;
+		}
+	    }
+	    if (place_found)
+		break;
         }
 
     }
 
     //if the requested room is not found, give output message so that any spelling errors can be corrected
-    if(!found)
+    if(!room_found)
     {
         QMessageBox msgBox;
         msgBox.setText("That room does not exist");
         msgBox.exec();
-    }*/
+	return;
+    }
+
+    if(!place_found)
+    {
+        QMessageBox msgBox;
+        msgBox.setText("The place was not found within the given room");
+        msgBox.exec();
+	return;
+    }
+
+    {
+        QMessageBox msgBox;
+        msgBox.setText("The place was deleted");
+        msgBox.exec();
+	return;
+    }
 
 }
 
