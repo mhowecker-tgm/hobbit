@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 PKG = 'hobbit_smach'
-NAME = 'locate_user'
+NAME = 'bring_object'
 
 import roslib
 roslib.load_manifest(PKG)
@@ -11,36 +11,36 @@ from smach import StateMachine
 from smach_ros import IntrospectionServer, ActionServerWrapper
 
 from hobbit_msgs.msg import GeneralHobbitAction
-import hobbit_smach.locate_user_import as locate_user
+import hobbit_smach.bring_object as bring_object
 
 
 def main():
     rospy.init_node(NAME)
 
-    lu_sm = StateMachine(
+    bo_sm = StateMachine(
         outcomes=['succeeded', 'aborted', 'preempted'],
         input_keys=['command'],
         output_keys=['result'])
 
-    with lu_sm:
+    with bo_sm:
         StateMachine.add(
-            'LOCATE_USER',
-            locate_user.get_detect_user(),
+            'BRING_OBJECT',
+            bring_object.get_brring_object(),
             transitions={'succeeded': 'succeeded',
                          'aborted': 'aborted',
                          'preempted': 'preempted'}
         )
 
     asw = ActionServerWrapper(
-        'locate_user', GeneralHobbitAction, lu_sm,
+        'locate_user', GeneralHobbitAction, bo_sm,
         ['succeeded'], ['aborted'], ['preempted'],
         result_slots_map={'result': 'result'},
         goal_slots_map={'command': 'command'})
 
     sis = IntrospectionServer(
         'smach_server',
-        lu_sm,
-        '/HOBBIT/LU_SM_ROOT')
+        bo_sm,
+        '/HOBBIT/bo_sm_ROOT')
 
     sis.start()
     asw.run_server()
