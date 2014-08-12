@@ -57,7 +57,7 @@
    {
      var cleanStr = str.replace("#",""); 
      document.getElementById('LuiBackground').style.backgroundColor=str; 
-     alert('The value to transmit is '+cleanStr);
+     //alert('The value to transmit is '+cleanStr);
      settingsCommand('LuiBackgroundSelector='+cleanStr);
    }
 
