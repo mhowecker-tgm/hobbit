@@ -4,7 +4,7 @@
 PKG = 'hobbit_smach'
 NAME = 'recharge'
 
-DEBUG = True
+DEBUG = False
 
 import roslib
 roslib.load_manifest(PKG)

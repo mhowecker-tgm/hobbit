@@ -3,7 +3,7 @@
 
 PKG = 'hobbit_smach'
 NAME = 'pickup_import'
-DEBUG = True
+DEBUG = False
 
 import roslib
 roslib.load_manifest(PKG)
