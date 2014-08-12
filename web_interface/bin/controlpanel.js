@@ -35,6 +35,7 @@
          if (speakLanguage=="swedish") {  document.getElementById('voiceFemale').value="Annika";   } else
          if (speakLanguage=="german")  {  document.getElementById('voiceFemale').value="Katrin";   } else
                                        {  alert('Unknown language : '+speakLanguage); } 
+         settingsCommand('voiceFemale='+document.getElementById('voiceFemale').value);
         } else
     if (speakGender=="male")   
         {  
@@ -43,6 +44,7 @@
          if (speakLanguage=="swedish") {  document.getElementById('voiceMale').value="Sven";   }  else
          if (speakLanguage=="german")  {  document.getElementById('voiceMale').value="Stefan"; }  else
                                        {  alert('Unknown language : '+speakLanguage); }
+         settingsCommand('voiceMale='+document.getElementById('voiceMale').value);
         } else
         {
          alert('Unknown gender : '+speakGender);
