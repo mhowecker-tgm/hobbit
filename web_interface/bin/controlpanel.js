@@ -121,7 +121,7 @@
       //command('camera=refreshMap');
       document.getElementById(name).style.visibility='visible';
       var randomnumber=Math.floor(Math.random()*100000);
-      document.getElementById("mapImage").src="map.jpg?t="+randomnumber;
+      document.getElementById("mapImage").src="map.png?t="+randomnumber;
     }
 
     function refreshTFFeed(name,imageName)

@@ -353,11 +353,17 @@ void * prepare_top_image(struct AmmServer_DynamicRequest  * rqst)
 void * prepare_map_image(struct AmmServer_DynamicRequest  * rqst)
 {
   unsigned int length=0;
-
-  int i=system("/bin/bash -c \"cd ../../rgbd_acquisition/bin/frames/map/ && timeout 2 rosrun map_server map_saver -f map  && convert map.pgm map.jpg\" ");
-
   char * readContent = 0;
-  if (i==0) {  readContent = AmmServer_ReadFileToMemory((char*) "../../rgbd_acquisition/bin/frames/map/map.jpg",&length);    }
+
+ if ( FileExistsTest("../../interfaces_mira/maps/current_map/static.png") )
+ {
+     readContent = AmmServer_ReadFileToMemory((char*) "../../rgbd_acquisition/bin/frames/map/map.png",&length);
+ } else
+ {
+   int i=system("/bin/bash -c \"cd ../../rgbd_acquisition/bin/frames/map/ && timeout 2 rosrun map_server map_saver -f map  && convert map.pgm map.png\" ");
+
+   if (i==0) {  readContent = AmmServer_ReadFileToMemory((char*) "../../rgbd_acquisition/bin/frames/map/map.png",&length);    }
+ }
 
   if(readContent==0)
   {
@@ -891,7 +897,7 @@ int init_dynamic_content()
   if (! AmmServer_AddResourceHandler(default_server,&tf_image,(char*)"/tf.png",webserver_root,640*480*3,0,(void* ) &prepare_tf_image,SAME_PAGE_FOR_ALL_CLIENTS) )
               { fprintf(stderr,"Failed adding prepare tf_image page\n"); }
 
-  if (! AmmServer_AddResourceHandler(default_server,&map_image,(char*)"/map.jpg",webserver_root,640*480*3,0,(void* ) &prepare_map_image,SAME_PAGE_FOR_ALL_CLIENTS) )
+  if (! AmmServer_AddResourceHandler(default_server,&map_image,(char*)"/map.png",webserver_root,640*480*3,0,(void* ) &prepare_map_image,SAME_PAGE_FOR_ALL_CLIENTS) )
               { fprintf(stderr,"Failed adding prepare map_image page\n"); }
 
 
