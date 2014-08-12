@@ -50,6 +50,43 @@ SETUP HOBBIT WORKSPACE FOR PT2
   you can run src/hobbit_launch/launch/initializeHobbitInstallation.sh
 
 
+
+ENABLING PERMANENT PASSWORD/CERTIFICATE STORAGE FOR SVN
+
+Step 1 :
+
+sudo nano ~/.subversion/servers
+
+and change
+
+# Password / passphrase caching parameters:
+store-passwords = yes
+store-plaintext-passwords = yes
+
+Ctrl+X
+and Y to save
+
+
+Step 2 :
+
+sudo /bin/bash
+cd  ~/.subversion/auth/
+mv svn.ssl.server svn.ssl.serverOLD
+cd ..
+chown -R demo auth/
+
+
+Next time you svn update or commit , select p for permanant certificate storage and enter the codes once..
+This should make things work with only the user password ( as they should be :) ) 
+
+
+
+
+
+
+
+
+
 SUBMIT ROS PACKAGES TO HOBBIT PT2 REPOSITORY
 - all packages have to use catkin build system of ROS hydro
 - package name, description and maintainer has to be maintained in the package.xml file of the package
