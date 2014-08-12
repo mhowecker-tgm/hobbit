@@ -441,6 +441,8 @@ void MMUIExecute(char * command,char * param)
   if (commandToRun==0) { AmmServer_Error("Could not allocate enough space for MMUI command execution"); return ; }
 
   commandToRun[0]=0;
+  fprintf(stderr,"MMUIExecute(%s,%s)\n",command,param);
+
 
   //rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_VOICE],[Value, "Susan"]]}'
   if (strcmp(command,"LuiBackgroundSelector")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_SETBG],[Value, \\\"#%s\\\"]]}' \" ",param); }  else
