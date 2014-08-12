@@ -7,34 +7,16 @@ NAME = 'reminder'
 import roslib
 roslib.load_manifest(PKG)
 import rospy
-#import smach
 from uashh_smach.util import SleepState
 
 from std_msgs.msg import String
 from hobbit_msgs.msg import GeneralHobbitAction,\
-    LocateUserAction, LocateUserGoal, ApproachUserAction, ApproachUserGoal
-#from hobbit_msgs.srv import *
+    ApproachUserAction, ApproachUserGoal
 from smach_ros import ActionServerWrapper, \
     SimpleActionState, IntrospectionServer
 from smach import StateMachine, State
 from hobbit_user_interaction import HobbitMMUI
-
-
-class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-
-    def disable(self):
-        self.HEADER = ''
-        self.OKBLUE = ''
-        self.OKGREEN = ''
-        self.WARNING = ''
-        self.FAIL = ''
-        self.ENDC = ''
+import hobbit_smach.locate_user_import as locate_user
 
 
 class Init(State):
@@ -208,10 +190,7 @@ def main():
         )
         StateMachine.add(
             'LOCATE_USER',
-            SimpleActionState(
-                'locate_user',
-                LocateUserAction,
-                goal=LocateUserGoal(command=String('locateUser'))),
+            locate_user.get_detect_user(),
             {'succeeded': 'SKIP_APPROACH_USER',
              'aborted': 'CLEAN_UP',
              'preempted': 'CLEAN_UP'})

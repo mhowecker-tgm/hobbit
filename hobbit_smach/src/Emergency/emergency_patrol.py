@@ -23,6 +23,7 @@ from smach import StateMachine, State, cb_interface
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 import hobbit_smach.sos_call_import as sos_call
 import hobbit_smach.speech_output_import as speech_output
+import hobbit_smach.locate_user_import as locate_user
 from datetime import datetime, time
 
 
@@ -259,10 +260,7 @@ def main():
         else:
             StateMachine.add(
                 'LOCATE_USER',
-                SimpleActionState(
-                    'locate_user',
-                    LocateUserAction,
-                    goal=LocateUserGoal(command=String('locateUser'))),
+                locate_user.get_detect_user(),
                 transitions={'succeeded': '',
                              'aborted': 'CLEAN_UP',
                              'preempted': 'preempted'}
