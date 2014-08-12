@@ -62,7 +62,7 @@
 
    function changeLanguage(str)
    {
-     if (str=="greek")   {  speakString="Δοκιμη της φωνης μου";  } else
+     if (str=="greek")   {  speakString="Δοκιμή της φωνής μου";  } else
      if (str=="english") {  speakString="Testing my voice";      } else
      if (str=="swedish") {  speakString="Test av min röst";      } else
      if (str=="german")  {  speakString="Test meiner Stimme";    } 
