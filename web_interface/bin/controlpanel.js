@@ -53,9 +53,8 @@
 
    function changeUIColor(str)
    {
-     var cleanStr = str;
-     cleanStr.replace('#',' '); 
-     document.getElementById('LuiBackground').style.backgroundColor=cleanStr; 
+     var cleanStr = str.replace("#",""); 
+     document.getElementById('LuiBackground').style.backgroundColor=str; 
      alert('The value to transmit is '+cleanStr);
      settingsCommand('LuiBackgroundSelector='+cleanStr);
    }
