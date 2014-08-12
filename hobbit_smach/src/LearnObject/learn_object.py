@@ -243,7 +243,7 @@ def main():
             )
             Sequence.add(
                 'SAY_DONE',
-                speech_output.sayText(info='I_AM_DONE')
+                speech_output.sayText(info='T_LO_I_AM_DONE')
             )
             Sequence.add(
                 'SAY_THANKS',
@@ -364,7 +364,8 @@ def main():
         )
         StateMachine.add(
             'SAY_UNABLE_TO_SEE_OBJECT_2',
-            speech_output.sayText(info='T_LO_I_COULD:NOT_FIND_OBJECT_ON_TURNTABLE'),
+            speech_output.sayText(
+                info='T_LO_I_COULD:NOT_FIND_OBJECT_ON_TURNTABLE'),
             transitions={'succeeded': 'CONFIRM_TURN_OBJECT',
                          'failed': 'STOP_SEQ_2'}
         )

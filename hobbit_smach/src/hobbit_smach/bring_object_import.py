@@ -7,7 +7,7 @@ import uashh_smach.util as util
 import tf
 import math
 
-from smach import StateMachine, State
+from smach import StateMachine, State, Sequence
 from std_msgs.msg import String
 from hobbit_msgs.srv import GetObjectLocations, GetCoordinates,\
     GetCoordinatesRequest, GetName
@@ -18,8 +18,14 @@ from nav_msgs.srv import GetPlan, GetPlanRequest
 from geometry_msgs.msg import PoseStamped, Point, Quaternion,\
     PoseWithCovarianceStamped
 import hobbit_smach.head_move_import as head_move
+import hobbit_smach.arm_move_import as arm_move
 import hobbit_smach.hobbit_move_import as hobbit_move
+import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.bcolors as bcolors
+import hobbit_smach.locate_user_import as locate_user
+import hobbit_smach.social_role_import as social_role
+import hobbit_smach.logging_import as logging
+from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 
 
 class Init(State):
@@ -34,7 +40,10 @@ class Init(State):
                 'canceled'],
             input_keys=['object_name'],
             output_keys=['social_role'])
-        self.pub_obstacle = rospy.Publisher('/headcam/active', String)
+        self.pub_obstacle = rospy.Publisher(
+            '/headcam/active',
+            String,
+            queue_size=50)
 
     def execute(self, ud):
         self.pub_obstacle.publish('active')
@@ -86,6 +95,30 @@ class MoveCounter(State):
         return 'failure'
 
 
+class Counter(State):
+
+    def __init__(self):
+        State.__init__(
+            self,
+            outcomes=[
+                'succeeded',
+                'preempted',
+                'aborted'])
+        self.run_counter = 1
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        rospy.loginfo('counter: %s' % str(self.run_counter))
+        if self.run_counter < 2:
+            self.run_counter += 1
+            return 'succeeded'
+        else:
+            self.run_counter = 1
+        return 'failure'
+
+
 class SetSuccess(State):
 
     """
@@ -97,7 +130,10 @@ class SetSuccess(State):
         State.__init__(self, outcomes=['succeeded', 'preempted'],
                        input_keys=['result'],
                        output_keys=['result', 'visited_places'])
-        self.pub = rospy.Publisher('/DiscreteMotionCmd', String)
+        self.pub = rospy.Publisher(
+            '/DiscreteMotionCmd',
+            String,
+            queue_size=50)
 
     def execute(self, ud):
         ud.visited_places = []
@@ -197,7 +233,10 @@ class PlanPath(State):
                 'goal_position_y',
                 'goal_position_yaw'])
         self.positions = []
-        self.pub_obstacle = rospy.Publisher('/headcam/active', String)
+        self.pub_obstacle = rospy.Publisher(
+            '/headcam/active',
+            String,
+            queue_size=50)
         self.getPlan = rospy.ServiceProxy(
             '/make_plan',
             GetPlan,
@@ -307,7 +346,7 @@ class DummyGrasp(State):
                 'preempted'])
 
     def execute(self, ud):
-        rospy.loginfo('Start DUMMY object recognition')
+        rospy.loginfo('Start DUMMY object grasping')
         return 'succeeded'
 
 
@@ -394,7 +433,6 @@ def point_cloud_cb(msg, ud):
 
 
 def get_bring_object():
-
     bo_sm = StateMachine(
         outcomes=['succeeded', 'aborted', 'preempted'],
         input_keys=['object_name'],
@@ -461,7 +499,7 @@ def get_bring_object():
             transitions={
                 'succeeded': 'MOVE_BASE',
                 'preempted': 'CLEAN_UP',
-                'failed': 'MOVE_BASE'})
+                'aborted': 'MOVE_BASE'})
         StateMachine.add(
             'MOVE_BASE',
             hobbit_move.goToPose(),
@@ -480,7 +518,7 @@ def get_bring_object():
             transitions={
                 'succeeded': 'REC_COUNTER',
                 'preempted': 'CLEAN_UP',
-                'failed': 'PLAN_PATH'})
+                'aborted': 'PLAN_PATH'})
         StateMachine.add(
             'REC_COUNTER',
             MoveCounter(),
@@ -514,16 +552,16 @@ def get_bring_object():
             'OBJECT_DETECTED',
             ObjectDetected(),
             transitions={
-                'succeeded': 'GRASP_OBJECT',
+                'succeeded': 'SET_SUCCESS',
                 'failure': 'MOVE_HEAD',
                 'preempted': 'CLEAN_UP'})
-        StateMachine.add(
-            'GRASP_OBJECT',
-            DummyGrasp(),
-            transitions={
-                'succeeded': 'SET_SUCCESS',
-                'failure': 'CLEAN_UP',
-                'preempted': 'CLEAN_UP'})
+        # StateMachine.add(
+        #     'GRASP_OBJECT',
+        #     DummyGrasp(),
+        #     transitions={
+        #         'succeeded': 'SET_SUCCESS',
+        #         'failure': 'CLEAN_UP',
+        #         'preempted': 'CLEAN_UP'})
         StateMachine.add(
             'SET_SUCCESS',
             SetSuccess(),
@@ -535,6 +573,314 @@ def get_bring_object():
             CleanUp(),
             transitions={
                 'succeeded': 'preempted'})
+    return bo_sm
+
+
+def get_grasping():
+    seq = Sequence(
+        outcomes=['succeeded', 'aborted', 'preempted'],
+        connector_outcome='succeeded'
+    )
+    with seq:
+        Sequence.add(
+            'CALC_GRASP_POSE',
+            DummyGrasp()
+        )
+        Sequence.add(
+            'MOVE_TO_GRASP',
+            hobbit_move.goToPose()
+        )
+        Sequence.add(
+            'SAY_GRASP',
+            speech_output.sayText(
+                info='T_BM_I_WILL_GRASP_THE_OBJECT'
+            )
+        )
+        Sequence.add(
+            'GRASP',
+            DummyGrasp()
+        )
+        Sequence.add(
+            'HAPPY',
+            speech_output.emo_say_something(
+                emo='HAPPY',
+                time=4,
+                text='T_BM_I_FETCHED_THE_OBJECT_O_FOR_YOU'
+            )
+        )
+        Sequence.add(
+            'PUT_ON_TRAY',
+            arm_move.goToTrayPosition()
+        )
+    return seq
+
+
+def get_bring_scenario():
+    sm = StateMachine(
+        outcomes=['succeeded', 'aborted', 'preempted'],
+        input_keys=['object_name'],
+        output_keys=['result']
+    )
+
+    with sm:
+        StateMachine.add(
+            'START',
+            speech_output.emo_say_something(
+                emo='WONDERING',
+                time=4,
+                text='T_BM_ConfirmBringMeObject'
+            ),
+            transitions={'succeeded': 'HAPPY_SAY',
+                         'aborted': 'aborted',
+                         'preempted': 'LOG_TASK_HAS_PREEMPTED'}
+        )
+        StateMachine.add(
+            'HAPPY_SAY',
+            speech_output.emo_say_something(
+                emo='HAPPY',
+                time=4,
+                text='T_BM_WILL_FETCH_OBJECT_O_FOR_YOU'
+            ),
+            transitions={'succeeded': 'SEARCH_FOR_OBJECT',
+                         'aborted': 'aborted',
+                         'preempted': 'LOG_TASK_HAS_PREEMPTED'}
+        )
+        StateMachine.add(
+            'SEARCH_FOR_OBJECT',
+            get_bring_object(),
+            transitions={'succeeded': 'VHAPPY_SAY',
+                         'aborted': 'LOCATE_USER_2',
+                        'preempted': 'LOG_TASK_HAS_PREEMPTED'}
+        )
+        StateMachine.add(
+            'VHAPPY_SAY',
+            speech_output.emo_say_something(
+                emo='VERY_HAPPY',
+                time=4,
+                text='T_BM_ObjectFoundRepositioning'
+            ),
+            transitions={'succeeded': 'GRASP_OBJECT',
+                         'aborted': 'aborted',
+                         'preempted': 'LOG_TASK_HAS_PREEMPTED'}
+        )
+        StateMachine.add(
+            'GRASP_OBJECT',
+            DummyGrasp(),
+            transitions={
+                'succeeded': 'LOCATE_USER',
+                'failure': 'LOG_NOT_COMPLETE',
+                'preempted': 'LOG_TASK_HAS_PREEMPTED'})
+        StateMachine.add(
+            'LOCATE_USER',
+            locate_user.get_detect_user(),
+            transitions={'succeeded': 'HAPPY_SAY_2',
+                         'aborted': 'aborted',
+                         'preempted': 'LOG_TASK_HAS_PREEMPTED'}
+        )
+        StateMachine.add(
+            'HAPPY_SAY_2',
+            speech_output.emo_say_something(
+                emo='HAPPY',
+                time=4,
+                text='T_BM_HERE_IS_THE_OBJECT_O_I_SHOULD_BRING_TO_YOU'
+            ),
+            transitions={'succeeded': 'HELP_ACCEPTED?',
+                         'aborted': 'aborted',
+                         'preempted': 'LOG_TASK_HAS_PREEMPTED'}
+        )
+        StateMachine.add(
+            'HELP_ACCEPTED?',
+            social_role.CheckHelpAccepted(),
+            transitions={'succeeded': 'SAY_THANKS',
+                         'aborted': 'succeeded',
+                         'preempted': 'LOG_TASK_HAS_PREEMPTED'}
+        )
+        StateMachine.add(
+            'SAY_THANKS',
+            speech_output.sayText(
+                info='T_BM_THANK_YOU_FOR_HELPING_ME'),
+            transitions={'succeeded': 'SAY_ROF',
+                         'failed': 'succeeded',
+                         'preempted': 'LOG_TASK_HAS_PREEMPTED'}
+        )
+        StateMachine.add(
+            'SAY_ROF',
+            HobbitMMUI.AskYesNo(
+                question='T_BM_PLEASE_LET_ME_RETURN_THE_FAVOUR'),
+            transitions={'yes': 'VHAPPY_SAY_2',
+                         'no': 'SAY_MAYBE',
+                         'failed': 'SAY_MAYBE',
+                         '3times': 'LOG_NOT_COMPLETE',
+                         'timeout': 'SAY_MAYBE',
+                         'preempted': 'LOG_TASK_HAS_PREEMPTED'}
+        )
+        StateMachine.add(
+            'VHAPPY_SAY_2',
+            speech_output.emo_say_something(
+                emo='VERRY_HAPPY',
+                time=4,
+                text='T_BM_SAY_SOMETHING_NICE'
+            ),
+            transitions={'succeeded': 'MAIN_MENU',
+                         'aborted': 'succeeded',
+                         'preempted': 'LOG_TASK_HAS_PREEMPTED'}
+        )
+        StateMachine.add(
+            'SAY_MAYBE',
+            speech_output.sayText(
+                info='T_BM_Maybe_next_time'),
+            transitions={'succeeded': 'MAIN_MENU',
+                         'failed': 'succeeded',
+                         'preempted': 'LOG_TASK_HAS_PREEMPTED'}
+        )
+        StateMachine.add(
+            'MAIN_MENU',
+            HobbitMMUI.ShowMenu(
+                menu='MAIN'
+            ),
+            transitions={'succeeded': 'succeeded',
+                         'failed': 'succeeded',
+                         'preempted': 'LOG_TASK_HAS_PREEMPTED'}
+        )
+        StateMachine.add(
+            'LOCATE_USER_2',
+            locate_user.get_detect_user(),
+            transitions={'succeeded': 'SAD',
+                         'aborted': 'succeeded',
+                         'preempted': 'LOG_TASK_HAS_PREEMPTED'}
+        )
+        StateMachine.add(
+            'SAD',
+            speech_output.emo_say_something(
+                emo='SAD',
+                time=4,
+                text='T_BM_SORRY_NOT_ABLE_TO_FIND_OBJECT_O'
+            ),
+            transitions={'succeeded': 'COUNTER',
+                         'aborted': 'succeeded',
+                         'preempted': 'LOG_TASK_HAS_PREEMPTED'}
+        )
+        StateMachine.add(
+            'COUNTER',
+            Counter(),
+            transitions={'succeeded': 'CHECK_ROLE',
+                         'aborted': 'LOG_NOT_COMPLETE',
+                         'preempted': 'LOG_TASK_HAS_PREEMPTED'}
+
+        )
+        StateMachine.add(
+            'CHECK_ROLE',
+            social_role.GetSocialRole(),
+            transitions={'companion': 'NEUTRAL',
+                         'butler': 'LOG_NOT_COMPLETE',
+                         'tool': 'LOG_NOT_COMPLETE',
+                         'preempted': 'LOG_TASK_HAS_PREEMPTED'}
+        )
+        StateMachine.add(
+            'NEUTRAL',
+            speech_output.emo_yes_no_something(
+                emo='NEUTRAL',
+                time=0,
+                text='T_BM_WOULD_YOU_HELP_ME_FIND_OBJECT_O'
+            ),
+            transitions={'yes': 'VHAPPY_SAY_3',
+                         'no': 'LOG_NO_HELP',
+                         'preempted': 'LOG_TASK_HAS_PREEMPTED'}
+        )
+        StateMachine.add(
+            'VHAPPY_SAY_3',
+            speech_output.emo_say_something(
+                emo='VERY_HAPPY',
+                time=4,
+                text='T_BM_THANKS_WHERE_COULD_THE_OBJECT_BE'
+            ),
+            transitions={'succeeded': 'SAY_SELECT_ROOM',
+                         'aborted': 'succeeded',
+                         'preempted': 'LOG_TASK_HAS_PREEMPTED'}
+        )
+        StateMachine.add(
+            'SAY_SELECT_ROOM',
+            speech_output.sayText(
+                info='T_GT_SelectRoom'
+            ),
+            transitions={'succeeded': 'HAPPY_SAY_3',
+                         'failed': 'succeeded',
+                         'preempted': 'LOG_TASK_HAS_PREEMPTED'}
+        )
+        StateMachine.add(
+            'HAPPY_SAY_3',
+            speech_output.emo_say_something(
+                emo='HAPPY',
+                time=4,
+                text='T_BM_I_WILL_LOOK_AT_PLACE_P_FOR_OBJECT_O'
+            ),
+            transitions={'succeeded': 'SAY_SELECT_ROOM',
+                         'aborted': 'LOG_NOT_COMPLETE',
+                         'preempted': 'LOG_TASK_HAS_PREEMPTED'}
+        )
+        StateMachine.add(
+            'MOVE_TO_P',
+            hobbit_move.goToPosition(
+                frame='/map',
+                room='corridor',
+                place='search'
+            ),
+            transitions={'succeeded': 'SEARCH_FOR_OBJECT',
+                         'aborted': 'LOG_NOT_COMPLETE',
+                         'preempted': 'LOG_TASK_HAS_PREEMPTED'}
+        )
+        StateMachine.add(
+            'LOG_NO_HELP',
+            logging.DoLog(
+                scenario='bring object',
+                data='Help was not accepted'
+            ),
+            transitions={'succeeded': 'SAD_2',
+                         'aborted': 'SAD_2',
+                         'preempted': 'LOG_TASK_HAS_PREEMPTED'}
+        )
+        StateMachine.add(
+            'SAD_2',
+            HobbitEmotions.ShowEmotions(
+                emotion='SAD',
+                emo_time=4
+            ),
+            transitions={'succeeded': 'LOG_NOT_COMPLETE',
+                         'failed': 'LOG_NOT_COMPLETE',
+                         'preempted': 'LOG_TASK_HAS_PREEMPTED'}
+        )
+        StateMachine.add(
+            'LOG_NOT_COMPLETE',
+            logging.DoLog(
+                scenario='bring object',
+                data='Task is not accomplished.'
+            ),
+            transitions={'succeeded': 'LOG_TASK_HAS_ENDED',
+                         'aborted': 'LOG_TASK_HAS_ENDED',
+                         'preempted': 'LOG_TASK_HAS_PREEMPTED'}
+        )
+        StateMachine.add(
+            'LOG_TASK_HAS_ENDED',
+            logging.DoLog(
+                scenario='bring object',
+                data='Task has ended.'
+            ),
+            transitions={'succeeded': 'MAIN_MENU',
+                         'aborted': 'aborted',
+                         'preempted': 'LOG_TASK_HAS_PREEMPTED'}
+        )
+        StateMachine.add(
+            'LOG_TASK_HAS_PREEMPTED',
+            logging.DoLog(
+                scenario='bring object',
+                data='Task has preempted.'
+            ),
+            transitions={'succeeded': 'MAIN_MENU',
+                         'aborted': 'aborted',
+                         'preempted': 'preempted'}
+        )
+
+    return sm
 
 if __name__ == '__main__':
     print("Do not call this directly. Import it into your node.")

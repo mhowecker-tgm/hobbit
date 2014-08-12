@@ -8,8 +8,8 @@ DEBUG = True
 import roslib
 roslib.load_manifest(PKG)
 
-from smach import Sequence, State
-from hobbit_user_interaction import HobbitMMUI
+from smach import Sequence, State, Concurrence
+from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 from hobbit_msgs.msg import Event
 from hobbit_msgs import MMUIInterface as MMUI
 
@@ -80,7 +80,6 @@ class AskForName(State):
     """
 
     def __init__(self, text='T_LO_WHAT_IS_THE_NAME_OF_THIS_OBJECT'):
-    #def __init__(self, text='WHAT IS THE NAME OF THIS OBJECT'):
         State.__init__(
             self,
             output_keys=['object_name'],
@@ -119,7 +118,7 @@ class PlayAudio(State):
             outcomes=['succeeded', 'failed', 'preempted']
         )
         self.text = text
-        self.audio= audio
+        self.audio = audio
 
     def execute(self, ud):
         if self.preempt_requested():
@@ -149,7 +148,7 @@ def playMoveOut():
             'PLAY_SOUND',
             PlayAudio(text='Moving out',
                       audio='moveout.mp3'),
-	    transitions={'failed': 'aborted'}
+            transitions={'failed': 'aborted'}
         )
         Sequence.add(
             'WAIT_FOR_MMUI',
@@ -159,6 +158,75 @@ def playMoveOut():
         Sequence.add(
             'MAIN_MENU',
             HobbitMMUI.ShowMenu(menu='MAIN'),
-	    transitions={'failed': 'aborted'}
+            transitions={'failed': 'aborted'}
         )
         return seq
+
+
+def say_child_term_cb(outcome_map):
+    return False
+
+
+def say_outcome_cb(outcome_map):
+    if outcome_map['EMOTION'] == 'succeeded' and\
+            outcome_map['SAY_SOMETHING'] == 'succeeded':
+        return 'succeeded'
+    else:
+        return 'aborted'
+
+
+def emo_say_something(emo='NEUTRAL', time=1, text='textID missing'):
+    cc = Concurrence(
+        outcomes=['succeeded', 'preempted', 'aborted'],
+        default_outcome='succeeded',
+        child_termination_cb=say_child_term_cb,
+        outcome_cb=say_outcome_cb
+    )
+
+    with cc:
+        Concurrence.add(
+            'EMOTION',
+            HobbitEmotions.ShowEmotions(
+                emotion=emo,
+                emo_time=time)
+        )
+        Concurrence.add(
+            'SAY_SOMETHING',
+            sayText(info=text)
+        )
+    return cc
+
+
+def yes_no_child_term_cb(outcome_map):
+    return False
+
+
+def yes_no_outcome_cb(outcome_map):
+    if outcome_map['EMOTION'] == 'succeeded' and\
+            outcome_map['SAY_SOMETHING'] == 'yes':
+        return 'yes'
+    else:
+        return 'no'
+
+
+def emo_yes_no_something(emo='NEUTRAL', time=1, text='textID missing'):
+    cc = Concurrence(
+        outcomes=['yes', 'preempted', 'no'],
+        default_outcome='no',
+        child_termination_cb=say_child_term_cb,
+        outcome_cb=say_outcome_cb
+    )
+
+    with cc:
+        Concurrence.add(
+            'EMOTION',
+            HobbitEmotions.ShowEmotions(
+                emotion=emo,
+                emo_time=time)
+        )
+        Concurrence.add(
+            'SAY_SOMETHING',
+            HobbitMMUI.AskYesNo(
+                question=text)
+        )
+    return cc

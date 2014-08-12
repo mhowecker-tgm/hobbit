@@ -11,7 +11,7 @@ from smach import StateMachine
 from smach_ros import IntrospectionServer, ActionServerWrapper
 
 from hobbit_msgs.msg import GeneralHobbitAction
-import hobbit_smach.bring_object as bring_object
+import hobbit_smach.bring_object_import as bring_object
 
 
 def main():
@@ -25,7 +25,7 @@ def main():
     with bo_sm:
         StateMachine.add(
             'BRING_OBJECT',
-            bring_object.get_brring_object(),
+            bring_object.get_bring_scenario(),
             transitions={'succeeded': 'succeeded',
                          'aborted': 'aborted',
                          'preempted': 'preempted'}
