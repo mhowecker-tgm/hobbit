@@ -43,7 +43,7 @@ void QNode::learnPlace(const std::string place_name, const std::string place_typ
 
 	//cout << "current_x " << current_x << endl;
         //cout << "current_y " << current_y << endl;
-	cout << "current_th " << current_theta << endl;
+	cout << "current_th " << current_theta*180/M_PI << endl;
 
         std_msgs::String req_msg;
 	req_msg.data = "Request";
