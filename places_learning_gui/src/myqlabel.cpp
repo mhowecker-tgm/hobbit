@@ -7,9 +7,10 @@
 
 void MyQLabel ::drawArrow(QPoint p1, float th, QColor color)
 {
-    QPoint v_target(p1.x()+15*cos(th), p1.y()+15*sin(th));
-    QPoint v_init(v_target.x()+3*cos(th+0.75*M_PI),v_target.y()+3*sin(th+0.75*M_PI)); 
-    QPoint v_end(v_target.x()+3*cos(th-0.75*M_PI),v_target.y()+3*sin(th-0.75*M_PI));
+    QPoint v_target(p1.x()+15*cos(th), p1.y()-15*sin(th));
+
+    QPoint v_init(v_target.x()+3*cos(th+0.75*M_PI),v_target.y()-3*sin(th+0.75*M_PI)); 
+    QPoint v_end(v_target.x()+3*cos(th-0.75*M_PI),v_target.y()-3*sin(th-0.75*M_PI));
 
     QPoint* points = new QPoint[3];
     points[0] = v_target;
