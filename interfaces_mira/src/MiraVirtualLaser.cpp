@@ -36,6 +36,14 @@ void MiraVirtualLaser::virtual_laser_loc_callback(const sensor_msgs::LaserScan::
 	for (int i=0; i<msg->ranges.size();i++)
 	{
 		scan.range[i] = msg->ranges[i];
+		//std::cout << "laser loc point range " << scan.range[i] << std::endl;
+		if (!std::isfinite(scan.range[i]))
+		{
+			scan.range[i] = scan.maximumRange;
+			scan.valid[i] = mira::robot::RangeScan::Invalid;
+			std::cout << "laser loc point invalid " << std::endl;
+			continue;
+		}
                 if (scan.range[i] < scan.minimumRange)
 		{
 			scan.valid[i] = mira::robot::RangeScan::Invalid;
@@ -49,7 +57,7 @@ void MiraVirtualLaser::virtual_laser_loc_callback(const sensor_msgs::LaserScan::
 			else
 			{ 
 				scan.valid[i] = mira::robot::RangeScan::Valid;
-				//std::cout << "valid " << std::endl;
+				//std::cout << "loc valid " << std::endl;
 			}
 		}
 	}
@@ -71,12 +79,20 @@ void MiraVirtualLaser::virtual_laser_obs_callback(const sensor_msgs::LaserScan::
 
 	scan.minimumRange = msg->range_min;
 	//scan.maximumRange = msg->range_max; //ok for localization
-	scan.maximumRange = 0.99; //FIXME //value for temporary obstacle avoidance
+	//scan.maximumRange = 0.99; //FIXME //value for temporary obstacle avoidance
+	scan.maximumRange = 3;
 
 	for (int i=0; i<msg->ranges.size();i++)
 	{
 		scan.range[i] = msg->ranges[i];
-		//scan.valid[i] = mira::robot::RangeScan::Valid;
+		//std::cout << "laser obs point range " << scan.range[i] << std::endl;
+		if (!std::isfinite(scan.range[i]))
+		{
+			scan.range[i] = scan.maximumRange;
+			scan.valid[i] = mira::robot::RangeScan::Invalid;
+			std::cout << "laser obs point invalid " << std::endl;
+			continue;
+		}
 		if (scan.range[i] < scan.minimumRange)
 		{
 			scan.valid[i] = mira::robot::RangeScan::Invalid;
@@ -90,7 +106,7 @@ void MiraVirtualLaser::virtual_laser_obs_callback(const sensor_msgs::LaserScan::
 			else
 			{ 
 				scan.valid[i] = mira::robot::RangeScan::Valid;
-				//std::cout << "valid " << std::endl;
+				//std::cout << "obs valid " << std::endl;
 			}
 		}
 
