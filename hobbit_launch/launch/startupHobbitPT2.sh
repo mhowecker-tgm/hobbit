@@ -97,17 +97,18 @@ cd /opt/ros/hobbit_hydro/src/table_object_detector/launch
 roslaunch startup.launch&
 
 # Start interfaces_mira, which starts the platform driver and the ros-mira interface for virtual lasers
-#cd /opt/ros/hobbit_hydro/src/interfaces_mira/launch
-#roslaunch startup.launch&
+cd /opt/ros/hobbit_hydro/src/interfaces_mira/launch
+roslaunch startup.launch&
 
 sleep $DELAY_BETWEEN_STEPS
 
 # Start mira (start mira center with: e.g. 'miracenter mira_vis_config.xml')
-#cd /opt/ros/hobbit_hydro/src/interfaces_mira/resources
-#mira mira_config.xml -p1234&
+cd /opt/ros/hobbit_hydro/src/interfaces_mira/resources
+mira mira_config.xml -p1234&
 #miracenter mira_config.xml
+sleep $DELAY_BETWEEN_STEPS
 # start new mira visualization
-#miracenter mira_vis_config.xml
+miracenter mira_vis_config.xml
 
 #start get_current_room
 sleep $DELAY_BETWEEN_STEPS
