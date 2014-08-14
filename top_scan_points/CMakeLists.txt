@@ -4,7 +4,7 @@ project(top_scan_points)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp sensor_msgs stereo_msgs tf pcl_ros  pcl_conversions)
+find_package(catkin REQUIRED COMPONENTS roscpp sensor_msgs stereo_msgs tf pcl_ros  pcl_conversions tf_conversions)
 
 
 ###################################
@@ -19,8 +19,8 @@ find_package(catkin REQUIRED COMPONENTS roscpp sensor_msgs stereo_msgs tf pcl_ro
 catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES test
-  CATKIN_DEPENDS roscpp
-#  DEPENDS system_lib
+  CATKIN_DEPENDS roscpp tf_conversions
+  DEPENDS eigen
 )
 
 ###########

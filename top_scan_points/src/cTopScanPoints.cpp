@@ -4,7 +4,9 @@
 #include "pcl_ros/transforms.h"
 #include <pcl_ros/point_cloud.h>
 
-#include <pcl/visualization/cloud_viewer.h>
+//#include <pcl/visualization/cloud_viewer.h>
+
+#include <tf_conversions/tf_eigen.h>
 
 /* PARTIALLY based on SOURCE cloud_to_scanHoriz.cpp:
 * Copyright (c) 2010, Willow Garage, Inc.
@@ -115,23 +117,53 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 	pcl::PointCloud<pcl::PointXYZ> point_cloud_new_frame;
 	pcl::PointCloud<pcl::PointXYZ> point_cloud_new_frame2;
 
-	try
-	{
+	 Eigen::Vector3f trans_base_to_neck(-0.260, 0.000, 1.090);
+    	 Eigen::Matrix4f base_to_neck;
+    	 base_to_neck.setIdentity();
+         base_to_neck.block<3,1>(0,3) = trans_base_to_neck; //brings point in basis CS to
 
-		// Define first tf transformation
-		tf::StampedTransform headcam_trans;
-		//Translation to the neck
-  		headcam_trans.setOrigin(tf::Vector3(0, 0, 1.108));
+    	 Eigen::AngleAxisf rollAngle(0.0 *M_PI/180, Eigen::Vector3f::UnitZ());
+    	 Eigen::AngleAxisf yawAngle(34.0*M_PI/180, Eigen::Vector3f::UnitY());
 
-		//RPY angles obtained from the matrix composition of the following transformations:
-                // 1.) 90 degrees rotation around fixed global y axis
-		// 2.) -90 degrees around fixed global x axis
-		// 3.)-35 degrees around new x axis (head_inclination_angle)
-		//roll value is obtained as asin(cos(head_inclination_angle))
-		headcam_trans.setRotation(tf::createQuaternionFromRPY(0.96, M_PI, M_PI/2));
+    	 Eigen::Matrix4f rotation_learning;
+    	 rotation_learning.setIdentity();
+    	 rotation_learning.block<3,3>(0,0) = rollAngle.toRotationMatrix()*yawAngle.toRotationMatrix();
+
+
+	 Eigen::Vector3f trans_neck_to_cam(0.012, -0.045, 0.166);
+    	 Eigen::Quaternionf q_neck_to_cam (0.508, -0.486, 0.492, -0.514);
+
+    	 Eigen::Matrix4f neck_to_cam;
+    	 neck_to_cam.setIdentity();
+    	 neck_to_cam.block<3,3>(0,0) = q_neck_to_cam.toRotationMatrix();
+    	 neck_to_cam.block<3,1>(0,3) = trans_neck_to_cam;
+
+    	 Eigen::Matrix4f matrix = base_to_neck * rotation_learning * neck_to_cam;
+
+	 try
+	 {
+
+		//Apply transform
+		Eigen::Matrix4d matrix_d(matrix.cast<double>());
+		Eigen::Affine3d affine_trans(matrix_d);
+		tf::Transform trans;
+		tf::transformEigenToTF(affine_trans, trans);
+		//std::cout << "trans " << trans.getOrigin()[0] << " " << trans.getOrigin()[1] << " " << trans.getOrigin()[2] << std::endl;
+		float x = trans.getRotation().x();
+		float y = trans.getRotation().y();
+		float z = trans.getRotation().z();
+		float w = trans.getRotation().w();
+		//std::cout << "quaternion" << x << " " << y << " " << z << " " << w << std::endl;
+		pcl_ros::transformPointCloud(pcl_cloud, point_cloud_new_frame, trans);
+
+	/*	// Define tf transformation
+		tf::StampedTransform trans;
+  		trans.setOrigin(tf::Vector3(-0.152, -0.047, 1.215));
+		//trans.setRotation(tf::createQuaternionFromRPY(0.96, M_PI, M_PI/2));
+		trans.setRotation(tf::Quaternion(-0.620, 0.630, -0.334, 0.328));
 		//Apply transform to new reference frame
-		pcl_ros::transformPointCloud(pcl_cloud, point_cloud_new_frame, headcam_trans);
-
+		pcl_ros::transformPointCloud(pcl_cloud, point_cloud_new_frame, trans);*/
+	
 
 	}
 	catch (tf::TransformException& e)
@@ -141,11 +173,12 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 		return;
 	}
 
-	pcl::visualization::CloudViewer viewer ("Simple Cloud Viewer");
+
+	/*pcl::visualization::CloudViewer viewer ("Simple Cloud Viewer");
 
 	pcl::PointCloud<pcl::PointXYZ>::Ptr mycloudPtr (new pcl::PointCloud<pcl::PointXYZ> (point_cloud_new_frame));
         viewer.showCloud(mycloudPtr);
-	sleep (50);
+	sleep (50);*/
 
 	uint32_t ranges_size = std::ceil((output.angle_max - output.angle_min) / output.angle_increment);
 	output.ranges.assign(ranges_size, output.range_max);
@@ -167,7 +200,7 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 		float cam_disp_y = -0.208;
 
 		float min_height_ = 0.3;
-        	float max_height_ = 1;
+        	float max_height_ = 1.4; //FIXME
 
 		if ( std::isnan(x) || std::isnan(y) || std::isnan(z) )
 		{
@@ -175,12 +208,13 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 		}
 
 		//points from robot base or tablet should be ignored
-		if ( fabs(x) < (robot_front - cam_disp_x) && y < (0.5*robot_width-cam_disp_y) && y > (-cam_disp_y - 0.5*robot_width))
+		//if ( fabs(x) < (robot_front - cam_disp_x) && y < (0.5*robot_width-cam_disp_y) && y > (-cam_disp_y - 0.5*robot_width))
+		if ( fabs(x) < (robot_front) && y < (0.5*robot_width) && y > (- 0.5*robot_width))
 		{
 			continue;
 		}
 
-		std::cout << "Point " << x << " " << y << " " << z << std::endl;
+		//std::cout << "Point " << x << " " << y << " " << z << std::endl;
 
 		if (z > max_height_ || z < min_height_)
 		{
