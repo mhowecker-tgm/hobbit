@@ -67,13 +67,16 @@ class Trigger():
 	    input = CheckFreeSpace()
 	    input.cloud = self.pc_
 	    input.frame_id_original = String(self.pc_.header.frame_id)
-	    input.frame_id_desired = String(self.pc_.header.frame_id)
-	    input.x1 = 0
-	    input.x2 = 1
-	    input.y1 = -0.50
-	    input.y2 = 0.5
+	    #input.frame_id_desired = String(self.pc_.header.frame_id)
+	    print "input.frame_id_original: ",input.frame_id_original
+	    input.frame_id_desired = String("base_link")
+	    print "input.frame_id_desired: ",input.frame_id_desired
+	    input.x1 = -0.5
+	    input.x2 = 10
+	    input.y1 = -1
+	    input.y2 = 10
 	    input.z1 = 0
-	    input.z2 = 1
+	    input.z2 = 2
 	    #resp1 = check_free_space(input)
 	    resp1 = check_free_space(input.cloud,input.frame_id_original,input.frame_id_desired,input.x1,input.x2,input.y1,input.y2,input.z1,input.z2)
 	    print "number of points in area with boarders \nx1: ", input.x1, "\tx2: ",input.x2,"\ny1: ",input.y1,"\ty2: ",input.y2,"\nz1: ",input.z1,"\tz2: ",input.z2,"\nnr_points: ",resp1.nr_points_in_area

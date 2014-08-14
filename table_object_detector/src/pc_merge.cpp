@@ -41,6 +41,7 @@ CPCMerge::CPCMerge(ros::NodeHandle nh_)
   pc_cam1_filled = false;
   //define publishers
   pc_for_basketdet_pub = nh.advertise<pcl::PointCloud<pcl::PointXYZ> >("/SS/headcam/depth_registered/points_edited_in_rcs",1); //rcs:robot coordinate sys.
+  pc_from_check_free_space_pub = nh.advertise<pcl::PointCloud<pcl::PointXYZ> >("/SS/headcam/depth_registered/points_from_check_free_space",1); //frame_id not fixed
   position_highestpoint_pub = nh.advertise<std_msgs::String>("/SS/basket_position",1);
   //define service check_free_space
   service_check_free_space = nh.advertiseService("check_free_space", &CPCMerge::check_free_space, this);
@@ -69,7 +70,7 @@ bool CPCMerge::check_free_space(table_object_detector::CheckFreeSpace::Request  
   ROS_INFO("check_free_space: Transform for point cloud found");
 
   pcl::PointCloud<pcl::PointXYZ> pcl_cloud_check_free_space_old_cs;
-pcl::fromROSMsg(req.cloud, pcl_cloud_check_free_space_old_cs); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  pcl::fromROSMsg(req.cloud, pcl_cloud_check_free_space_old_cs); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!
   
 
   pcl_ros::transformPointCloud(req.frame_id_desired.data.c_str(), pcl_cloud_check_free_space_old_cs, pc_check_free_space_new_cs, tf_listener);
@@ -79,6 +80,12 @@ pcl::fromROSMsg(req.cloud, pcl_cloud_check_free_space_old_cs); // !!!!!!!!!!!!!!
 
   filter_pc(pcl_cloud_merged, false, req.x1, req.x2, req.y1, req.y2, req.z1, req.z2); //second entry false <=> coordinates of highest points of scene are published instead of basket center point
   ROS_INFO("%d",pcl_cloud_merged.points.size());
+
+  //publish point clouds of area where free space was checked
+  if (pcl_cloud_merged.points.size() > 0)
+  {
+  	pc_from_check_free_space_pub.publish(pcl_cloud_merged);
+  }
 
   res.nr_points_in_area = pcl_cloud_merged.points.size();
   ROS_INFO("sending back response: [%ld]", (long int)res.nr_points_in_area);
@@ -126,9 +133,9 @@ void CPCMerge::publish_merged_pc()
 	//Filter Data (with basket detection and basket point elimination)
 	filter_pc(pcl_cloud_merged, false); //last entry false <=> coordinates of highest points of scene are published instead of basket center point
 
-    //publish manipulated and merged point cloud data (in base_link (not world!) coordinate system)
-    pc_for_basketdet_out = pcl_cloud_merged;
-    pc_for_basketdet_out.header.frame_id = "/base_link";
+    	//publish manipulated and merged point cloud data (in base_link (not world!) coordinate system)
+    	pc_for_basketdet_out = pcl_cloud_merged;
+    	pc_for_basketdet_out.header.frame_id = "/base_link";
 	pc_for_basketdet_pub.publish(pc_for_basketdet_out);
 
 	ROS_INFO("point cloud of objects (rcs) and highest point position (of objects) were published");
@@ -144,8 +151,8 @@ void CPCMerge::filter_pc(pcl::PointCloud<pcl::PointXYZ>& pcl_cloud_merged, bool 
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered_z (new pcl::PointCloud<pcl::PointXYZ>);
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered_y (new pcl::PointCloud<pcl::PointXYZ>);
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered_x (new pcl::PointCloud<pcl::PointXYZ>);
-    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
-    *cloud = pcl_cloud_merged;
+   	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
+    	*cloud = pcl_cloud_merged;
 	pcl::PassThrough<pcl::PointXYZ> pass;
 
 	ROS_INFO("Filtering outliers and cutting region");

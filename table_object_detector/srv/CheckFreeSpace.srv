@@ -1,12 +1,12 @@
 sensor_msgs/PointCloud2 cloud
 std_msgs/String frame_id_original
 std_msgs/String frame_id_desired
-int64 x1
-int64 x2
-int64 y1
-int64 y2
-int64 z1
-int64 z2
+float32 x1
+float32 x2
+float32 y1
+float32 y2
+float32 z1
+float32 z2
 ---
 int64 nr_points_in_area
 
