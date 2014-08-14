@@ -127,6 +127,30 @@ class MMUIInterface:
         parr.append(p)
         return self.callMMUIService('0', 'create', parr)
 
+    def enable_asr(self):
+        parr=[]
+        p = Parameter('type', 'F_ASRON')
+        parr.append(p)
+        return self.callMMUIService('0', 'create', parr)
+
+    def disable_asr(self):
+        parr=[]
+        p = Parameter('type', 'F_ASROFF')
+        parr.append(p)
+        return self.callMMUIService('0', 'create', parr)
+
+    def enable_gesture(self):
+        parr=[]
+        p = Parameter('type', 'F_GestureON')
+        parr.append(p)
+        return self.callMMUIService('0', 'create', parr)
+
+    def disable_gesture(self):
+        parr=[]
+        p = Parameter('type', 'F_GestureOFF')
+        parr.append(p)
+        return self.callMMUIService('0', 'create', parr)
+
     def GoToMenu(self, menu='F_MAIN'):
         parr = []
         p = Parameter('type', 'F_GOTOMENU')
