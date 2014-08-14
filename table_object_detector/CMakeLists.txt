@@ -101,3 +101,5 @@ target_link_libraries(pc_merge ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 
 #rosbuild_add_executable (cvtest src/cvtest.cpp)
 # Online PointCloud2 Viewer
+add_dependencies(pc_merge ${PROJECT_NAME}_generate_messages_cpp)
+

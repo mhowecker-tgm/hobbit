@@ -38,7 +38,7 @@
  */
 
 //#include <pcl/io/vtk_io.h>
-#include "/opt/ros/hobbit_hydro/src/table_object_detector/include/iv_io.h"
+#include "iv_io.h"
 #include <fstream>
 #include <iostream>
 #include <pcl/io/io.h>
@@ -82,8 +82,8 @@ pcl::io::saveIVFile (const std::string &file_name,
         count = 1;          // we simply cannot tolerate 0 counts (coming from older converter code)
       int c = 0;
       if ((triangles.cloud.fields[d].datatype == sensor_msgs::PointField::FLOAT32) && (
-           triangles.cloud.fields[d].name == "x" || 
-           triangles.cloud.fields[d].name == "y" || 
+           triangles.cloud.fields[d].name == "x" ||
+           triangles.cloud.fields[d].name == "y" ||
            triangles.cloud.fields[d].name == "z"))
       {
         float value;

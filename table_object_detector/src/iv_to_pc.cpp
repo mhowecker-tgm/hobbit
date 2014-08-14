@@ -12,7 +12,7 @@
 #include "pcl/ros/conversions.h"
 #include <pcl/io/pcd_io.h>
 #include <pcl/io/vtk_io.h>
-#include "/opt/ros/hobbit_hydro/src/table_object_detector/include/iv_io.h"
+#include "iv_io.h"
 
 //#include <opencv2/highgui.h>
 
