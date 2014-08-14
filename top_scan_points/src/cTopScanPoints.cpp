@@ -6,9 +6,9 @@
 
 #include <pcl/visualization/cloud_viewer.h>
 
-/* PARTIALLY based on SOURCE cloud_to_scanHoriz.cpp: 
+/* PARTIALLY based on SOURCE cloud_to_scanHoriz.cpp:
 * Copyright (c) 2010, Willow Garage, Inc.
-* All rights reserved. 
+* All rights reserved.
 
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -44,7 +44,7 @@ cTopScanPoints::cTopScanPoints(int argc, char **argv) : init_argc(argc), init_ar
 // Set up the localisation virtual laser scan message.
     //Setup laserscan message
 	//output->header = cloud_in->header;
-        
+
 	output.header.frame_id = "/obstacle_link";
 	output.angle_min = -M_PI/2;
 	output.angle_max = M_PI/2;
@@ -64,7 +64,7 @@ cTopScanPoints::cTopScanPoints(int argc, char **argv) : init_argc(argc), init_ar
     	obstacle_trans.transform.rotation.y = 0.0;
     	obstacle_trans.transform.rotation.z = 0.0;
     	obstacle_trans.transform.rotation.w = 1.0;
-  
+
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Destructor. Shuts down ROS, ends the thread and released allocated
@@ -106,7 +106,7 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 			//pcl::PointXYZ point(0,0,1);
 			pcl_cloud.push_back(point);
 			i+=4;
-		
+
 		}
 	}
 
@@ -143,7 +143,7 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 
 	pcl::visualization::CloudViewer viewer ("Simple Cloud Viewer");
 
-	pcl::PointCloud<pcl::PointXYZ>::Ptr mycloudPtr (new pcl::PointCloud<pcl::PointXYZ> (point_cloud_new_frame)); 
+	pcl::PointCloud<pcl::PointXYZ>::Ptr mycloudPtr (new pcl::PointCloud<pcl::PointXYZ> (point_cloud_new_frame));
         viewer.showCloud(mycloudPtr);
 	sleep (50);
 
@@ -159,10 +159,10 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 		const float &x = it->x;
 		const float &y = it->y;
 		const float &z = it->z;
-		
+
 		float robot_front = 0.22;
 		float robot_width = 0.44;
-		
+
 		float cam_disp_x = -0.248;
 		float cam_disp_y = -0.208;
 
@@ -171,7 +171,7 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 
 		if ( std::isnan(x) || std::isnan(y) || std::isnan(z) )
 		{
-			continue;  
+			continue;
 		}
 
 		//points from robot base or tablet should be ignored
@@ -181,14 +181,14 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 		}
 
 		std::cout << "Point " << x << " " << y << " " << z << std::endl;
-		
+
 		if (z > max_height_ || z < min_height_)
 		{
 			continue;
 		}
-		
+
 		double angle = atan2(y, x);
-		
+
 		if (angle < output.angle_min || angle > output.angle_max)
 		{
 			continue;
@@ -232,7 +232,12 @@ void cTopScanPoints::Run(void)
          p_obstacle_broadcaster = &obstacle_broadcaster;
 
 	// ROS main loop.
-         ros::spin();
+    ros::Rate r(10);
+    while (ros::ok()){
+        ros::spinOnce();
+        r.sleep();
+    }
+    //ros::spin();
 
 }
 
