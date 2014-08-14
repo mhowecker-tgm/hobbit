@@ -103,17 +103,16 @@ roslaunch startup.launch&
 sleep $DELAY_BETWEEN_STEPS
 
 # Start mira (start mira center with: e.g. 'miracenter mira_vis_config.xml')
-cd /opt/ros/hobbit_hydro/src/interfaces_mira/resources
+#cd /opt/ros/hobbit_hydro/src/interfaces_mira/resources
 mira mira_config.xml -p1234&
-#miracenter mira_config.xml
 sleep $DELAY_BETWEEN_STEPS
 # start new mira visualization
-miracenter mira_vis_config.xml
+miracenter mira_vis_config.xml&
 
 #start get_current_room
-sleep $DELAY_BETWEEN_STEPS
-cd /opt/ros/hobbit_hydro/src/get_current_room/launch
-roslaunch startup.launch&
+#sleep $DELAY_BETWEEN_STEPS
+#cd /opt/ros/hobbit_hydro/src/get_current_room/launch
+#roslaunch startup.launch&
 
 #Startup Joystick node , ( it allows webinterface joystick emulation also )
 roslaunch joy2twist startup.launch& 
