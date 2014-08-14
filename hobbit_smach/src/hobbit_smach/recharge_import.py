@@ -47,6 +47,34 @@ class PreemptChecker(State):
         return 'aborted'
 
 
+def undock_if_needed():
+    """
+    Returns a SMACH StateMachine that check if it is needed to undock
+    before any movement is done.
+    """
+    sm = StateMachine(
+        outcomes=['succeeded', 'aborted', 'preempted'])
+    with sm:
+        StateMachine.add(
+            'CHARGE_CHECK',
+            WaitForMsgState(
+                '/battery_state',
+                BatteryState,
+                msg_cb=battery_cb
+                ),
+            transitions={'succeeded': 'UNDOCK',
+                         'aborted': 'aborted',
+                         'preempted': 'preempted'}
+        )
+        StateMachine.add(
+            'UNDOCK',
+            hobbit_move.Undock(),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'aborted',
+                         'preempted': 'preempted'}
+        )
+        return sm
+
 def getRecharge():
     """This function handles the autonomous charging sequence.
     It is without the user interaction and is mainly used during

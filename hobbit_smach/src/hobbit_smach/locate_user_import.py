@@ -19,6 +19,7 @@ from smach_ros import ServiceState
 from nav_msgs.srv import GetPlan, GetPlanRequest
 from geometry_msgs.msg import PoseStamped, Point, Quaternion
 import hobbit_smach.hobbit_move_import as hobbit_move
+import hobbit_smach.recharge_import as recharge
 from hobbit_smach import bcolors
 from rgbd_acquisition.msg import Person
 import hobbit_smach.head_move_import as head_move
@@ -466,6 +467,12 @@ def get_detect_user():
         smach.StateMachine.add(
             'INIT',
             Init(),
+            transitions={'succeeded': 'DOCK_CHECK',
+                         'canceled': 'CLEAN_UP'}
+        )
+        smach.StateMachine.add(
+            'DOCK_CHECK',
+            recharge.undock_if_needed(),
             transitions={'succeeded': 'GET_ALL_POSITIONS',
                          'canceled': 'CLEAN_UP'}
         )
