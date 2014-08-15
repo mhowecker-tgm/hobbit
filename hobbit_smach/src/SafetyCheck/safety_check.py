@@ -5,10 +5,11 @@ PKG = 'hobbit_smach'
 NAME = 'safety_check'
 DEBUG = True
 
-import roslib
-
-roslib.load_manifest(PKG)
 import rospy
+import roslib
+roslib.load_manifest(PKG)
+
+from hobbit_user_interaction import HobbitMMUI
 from smach_ros import IntrospectionServer, ActionServerWrapper
 from hobbit_msgs.msg import GeneralHobbitAction
 from smach import StateMachine
@@ -24,9 +25,14 @@ def main():
         output_keys=['result'])
 
     with sc_sm:
-        StateMachine.add(
+        StateMachine.add_auto(
             'SAFETY_CHECK',
             safety_check.get_safety_check(),
+            connector_outcomes=['succeeded', 'aborted', 'preempted']
+        )
+        StateMachine.add(
+            'MAIN_MENU',
+            HobbitMMUI.ShowMenu(menu='MAIN'),
             transitions={'succeeded': 'succeeded',
                          'aborted': 'aborted',
                          'preempted': 'preempted'}
