@@ -244,6 +244,46 @@ class ConfirmInfo(smach.State):
             return 'failed'
 
 
+class ConfirmOk(smach.State):
+    """
+    Class to interact with the MMUI
+    """
+    def __init__(self, text):
+        smach.State.__init__(
+            self,
+            outcomes=['succeeded', 'aborted', 'preempted', 'timeout', '3times']
+        )
+        self.text = text
+        self.timeout_count = 0
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        print(self.timeout_count)
+        if self.timeout_count > 2:
+            self.timeout_count = 0
+            return '3times'
+        mmui = MMUI.MMUIInterface()
+        resp = mmui.showMMUI_OK(text=self.text)
+        if resp:
+            for i, v in enumerate(resp.params):
+                print i, v
+                if v.name == 'result' and v.value == 'D_OK':
+                    return 'succeeded'
+                elif v.name == 'result' and v.value == 'D_CANCEL':
+                    return 'aborted'
+                elif v.name == 'result' and v.value == 'D_TIMEOUT':
+                    self.timeout_count += 1
+                    return 'timeout'
+                else:
+                    self.timeout_count += 1
+                    return 'timeout'
+        else:
+            self.timeout_count += 1
+            return 'timeout'
+
+
 class ShowInfo(smach.State):
 
     """
