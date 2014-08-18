@@ -1,8 +1,12 @@
 <launch>
 	
-	<node name="TOD" pkg="table_object_detector" type="thor" args= "" output="screen">        
-	    <remap from="~input" to="/SS/points2" />
-	    <remap from="~caminfo" to="/SS/rgb/camera_info" />
+	<node 	name="CloudSegmenthor" 
+		pkg="table_object_detector" 
+		type="thor" 
+		args= "" 
+		output="screen">        
+		<remap from="~input" to="/SS/points2" />
+	    	<remap from="~caminfo" to="/SS/rgb/camera_info" />
 	</node>
 
 	<node   name="Trigger" 
@@ -12,6 +16,13 @@
 		output="screen" 
 		respawn="true">        
 	</node>
+
+	<node 	name="point_cloud_edit" 
+		pkg="table_object_detector" 
+		type="pc_merge" 
+		output="screen" 
+		respawn="true">        
+    	</node>
 
 </launch>
 
