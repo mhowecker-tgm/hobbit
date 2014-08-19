@@ -530,6 +530,11 @@ void execute(char * command,char * param)
   //-------------------------------------------------
   if (strcmp(command,"node")==0)
   {
+
+    if (strcmp(param,"switchToMapping")==0)      { strncpy(cR,"../../hobbit_launch/launch/switchMira.sh mapping",cRLen);    }   else
+    if (strcmp(param,"switchToLearning")==0)     { strncpy(cR,"../../hobbit_launch/launch/switchMira.sh learning",cRLen);   }   else
+    if (strcmp(param,"switchToNavigation")==0)   { strncpy(cR,"../../hobbit_launch/launch/switchMira.sh navigation",cRLen); }   else
+
     if (strcmp(param,"niteTrigger")==0)      {  rosservice_call(cR,cRLen,(char *) "/rgbd_acquisition/trigger_peopletracker");   } else
     if (strcmp(param,"nitePause")==0)        {  rosservice_call(cR,cRLen,(char *) "/rgbd_acquisition/pause_peopletracker");     } else
     if (strcmp(param,"niteResume")==0)       {  rosservice_call(cR,cRLen,(char *) "/rgbd_acquisition/resume_peopletracker");    } else
