@@ -97,19 +97,32 @@ rosrun hobbit_smach sos_monitor.py&
 cd /opt/ros/hobbit_hydro/src/table_object_detector/launch
 roslaunch startup.launch&
 
-# Start interfaces_mira, which starts the platform driver and the ros-mira interface for virtual lasers
-cd /opt/ros/hobbit_hydro/src/interfaces_mira/launch
-roslaunch startup.launch&
 
-sleep $DELAY_BETWEEN_STEPS
+
+
+
+
+# Start interfaces_mira, which starts the platform driver and the ros-mira interface for virtual lasers
+#cd /opt/ros/hobbit_hydro/src/interfaces_mira/launch
+#roslaunch startup.launch&
+
+#sleep $DELAY_BETWEEN_STEPS
 
 # Start mira (start mira center with: e.g. 'miracenter mira_vis_config.xml')
-cd /opt/ros/hobbit_hydro/src/interfaces_mira/resources
-mira mira_config.xml -p1234&
-sleep $DELAY_BETWEEN_STEPS
+#cd /opt/ros/hobbit_hydro/src/interfaces_mira/resources
+#mira mira_config.xml -p1234&
+#sleep $DELAY_BETWEEN_STEPS
 # start new mira visualization
-cd /opt/ros/hobbit_hydro/src/interfaces_mira/resources
-miracenter mira_vis_config.xml&
+#cd /opt/ros/hobbit_hydro/src/interfaces_mira/resources
+#miracenter mira_vis_config.xml&
+
+
+#Switch Mira stuff to navigation mode ( default )
+./switchMira.sh navigation
+
+
+
+
 
 #start get_current_room
 #sleep $DELAY_BETWEEN_STEPS
