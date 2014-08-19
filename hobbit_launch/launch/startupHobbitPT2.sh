@@ -83,8 +83,9 @@ rosrun hobbit_smach recharge&
 rosrun hobbit_smach sos_monitor.py&
 
 # Start places_interpretation
-cd /opt/ros/hobbit_hydro/src/places_interpretation/launch
-roslaunch startup.launch&
+#cd /opt/ros/hobbit_hydro/src/places_interpretation/launch
+#roslaunch startup.launch&
+
 # Start get room stuff needed for mmui
 # bajo: same functionality is provided from places_objects and no other node 
 # seems to use it. 
