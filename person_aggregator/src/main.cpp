@@ -19,6 +19,9 @@
 
 #include <std_srvs/Empty.h>
 
+
+#include "person_aggregator/Person.h"
+
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
 #include <sensor_msgs/CameraInfo.h>
@@ -28,6 +31,8 @@
 #define MAX_CMD_STR 1024
 #define MAX_NUM_STR 128
 
+#define divisor 1000
+
 #define DEFAULT_FRAME_RATE 30
 
 int rate=DEFAULT_FRAME_RATE;
@@ -36,6 +41,77 @@ int key = 0;
 unsigned int frameTimestamp=0;
 ros::NodeHandle * nhPtr=0;
 unsigned int paused=0;
+
+ros::Publisher personBroadcaster;
+
+struct personMessageSt
+{
+    float actualX , actualY , actualZ , actualTheta , actualConfidence;
+    unsigned int actualTimestamp , actualInFieldOfView;
+};
+
+
+void broadcastNewPerson( struct personMessageSt * p)
+{
+  if (dontPublishPersons) { return ; }
+
+  person_aggregator::Person msg;
+  msg.x = p->actualX;
+  msg.y = p->actualY;
+  msg.z = p->actualZ;
+  msg.source = 10;
+  msg.theta = actualTheta;
+
+  msg.inFieldOfView = p->actualInFieldOfView;
+  msg.confidence = p->actualConfidence;
+  msg.timestamp=p->actualTimestamp;
+
+  fprintf(stderr,"Publishing a new Person\n");
+  personBroadcaster.publish(msg);
+  //ros::spinOnce();
+}
+
+
+
+void personMessageAggregator(const person_aggregator::Person & msg , unsigned int source)
+{
+    struct personMessageSt prsn;
+
+    prsn.actualX = msg.x;
+    prsn.actualY = msg.y;
+    prsn.actualZ = msg.z;
+
+    // = msg.source;
+    prsn.actualTheta = msg.theta;
+
+
+    prsn.actualInFieldOfView = msg.inFieldOfView;
+    prsn.actualInFieldOfView = msg.confidence;
+    prsn.actualInFieldOfView = msg.timestamp;
+
+
+}
+
+void personMessageRGBDAcquisition(const person_aggregator::Person & msg)
+{
+  personMessageAggregator(msg,1);
+}
+
+void personMessageSkeletonDetector(const person_aggregator::Person & msg)
+{
+  personMessageAggregator(msg,2);
+}
+
+void personMessageFaceDetector(const person_aggregator::Person & msg)
+{
+  personMessageAggregator(msg,3);
+}
+
+void personMessageGestures(const person_aggregator::Person & msg)
+{
+  personMessageAggregator(msg,4);
+}
+
 
 
 //----------------------------------------------------------
@@ -89,7 +165,13 @@ int main(int argc, char **argv)
      ros::ServiceServer resumeService   = nh.advertiseService(name+"/resume", resume);
      ros::ServiceServer stopService     = nh.advertiseService(name+"/terminate", terminate);
 
-     //  ros::Subscriber sub = nh.subscribe("fitness",1000,fitnessMessage);
+
+     personBroadcaster = nh.advertise <person_aggregator::Person> ("persons", divisor);
+
+     ros::Subscriber sub1 = nh.subscribe("/rgbd_acquisition/persons",divisor,personMessageRGBDAcquisition);
+     ros::Subscriber sub2 = nh.subscribe("/skeleton_detector/persons",divisor,personMessageSkeletonDetector);
+     ros::Subscriber sub3 = nh.subscribe("/face_detection/persons",divisor,personMessageFaceDetector);
+     ros::Subscriber sub4 = nh.subscribe("/hand_gestures/persons",divisor,personMessageGestures);
 
      //Create our context
      //---------------------------------------------------------------------------------------------------
