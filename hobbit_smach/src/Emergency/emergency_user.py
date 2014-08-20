@@ -262,8 +262,9 @@ def main():
             'EMERGENCY_CALL',
             sos_call.get_call_sos_simple(),
             transitions={'succeeded': 'SET_SUCCESS',
-                         'aborted': 'SET_FAILURE',
-                         'preempted': 'preempted'}
+                         'failure': 'SET_FAILURE',
+                         'preempted': 'preempted',
+                         'aborted': 'SET_SUCCESS'}
         )
         StateMachine.add(
             'EMO_NEUTRAL',
