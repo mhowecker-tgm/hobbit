@@ -13,7 +13,7 @@
 
 
 
-#define USE_PERSON_AGGREGATOR 0
+#define USE_PERSON_AGGREGATOR 1
 
 #if USE_PERSON_AGGREGATOR
  #define PERSON_TOPIC "/rgbd_acquisition/persons"
