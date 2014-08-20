@@ -69,14 +69,14 @@ def IsItNight(ud):
 
 def command_cb(msg, ud):
     try:
-        print msg.command
+        # print msg.command
         input_ce = msg.command
         rospy.loginfo('/Command data received:')
     except AttributeError, e:
         print(e)
         pass
     try:
-        print msg.event
+        # print msg.event
         input_ce = msg.event
         rospy.loginfo('/Event data received:')
     except AttributeError, e:
@@ -84,24 +84,20 @@ def command_cb(msg, ud):
         pass
 
     night = IsItNight(ud)
-    rospy.sleep(2.0)
-    print('active_task and night')
     active_task = ud.parameters['active_task']
-    print(active_task)
-    print(night)
     for index, item in enumerate(commands):
-        print(input_ce)
+        # print(input_ce)
         if input_ce in item:
             # if index == 4:
             if item[0] == 'master_reset':
+                    # print('Master RESET activated')
                     rospy.loginfo('Master RESET activated')
-                    print('Master RESET activated')
                     ud.parameters['active_task'] = 100
                     return True
             if item[0] == 'call_hobbit':
                 ud.command = item[0]
                 ud.params = msg.params
-                print(msg.params)
+                # print(msg.params)
                 ud.parameters['active_task'] = index
                 return True
             elif item[0] == 'emergency':
@@ -110,7 +106,8 @@ def command_cb(msg, ud):
                 return True
             # elif index == 1 and night and index + 1 <= active_task:
             elif item[0] == 'recharge' and not night and index  <= active_task:
-                print('RECHARGING')
+                rospy.loginfo('RECHARGING')
+                # print('RECHARGING')
                 ud.command = 'recharge'
                 ud.parameters['active_task'] = index
                 return True
@@ -129,14 +126,13 @@ def command_cb(msg, ud):
                 if item[0] == 'pickup':
                     i = item.index(input_ce)
                     ud.command = item[i - 5]
-                    print('COMMAND')
-                    print(item[i-5])
+                    # print('COMMAND')
+                    # print(item[i-5])
                     pass
                 else:
                     ud.command = item[0]
                 ud.params = msg.params
                 if item[0] == 'stop':
-                    print('Reset active_task value')
                     rospy.loginfo('Reset active_task value')
                     ud.parameters['active_task'] = 100
                 else:
@@ -191,9 +187,9 @@ class ResetActiveTask(State):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
-        print('ResetActiveTask')
+        rospy.loginfo('ResetActiveTask')
         rospy.set_param('active_task', 100)
-        ud.parameters['active_task']  = 100
+        ud.parameters['active_task'] = 100
         return 'succeeded'
 
 
@@ -219,7 +215,7 @@ class Init(State):
         ud.parameters['sleep_time'] = self.sleep_time
         ud.parameters['wakeup_time'] = self.wakeup_time
         ud.parameters['active_task'] = self.active_task
-        print('Init')
+        rospy.loginfo('Init')
         return 'succeeded'
 
 
@@ -255,8 +251,8 @@ class SelectTask(State):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
-        print('Task Selection')
-        print(ud.command)
+        rospy.loginfo('Task Selection')
+        # print(ud.command)
         if ud.command == 'IDLE':
             return 'none'
         return ud.command
@@ -278,8 +274,8 @@ class FakeForAllWithoutRunningActionSever(State):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
-        print('FakeForAllWithoutRunningActionSever')
-        print(self.name)
+        rospy.loginfo('FakeForAllWithoutRunningActionSever')
+        rospy.loginfo(self.name)
         return 'succeeded'
 
 
@@ -289,7 +285,6 @@ def away_cb(ud, goal):
     goal = GeneralHobbitGoal(command=String('away'),
                              previous_state=String('call_hobbit'),
                              parameters=par)
-    print goal
     return goal
 
 
@@ -301,7 +296,6 @@ def goto_cb(ud, goal):
     goal = GeneralHobbitGoal(command=String('goto'),
                              previous_state=String('previous_task'),
                                  parameters=par)
-    print goal
     return goal
 
 
