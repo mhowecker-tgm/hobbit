@@ -48,6 +48,7 @@ struct personMessageSt
 {
     float actualX , actualY , actualZ , actualTheta , actualConfidence;
     unsigned int actualTimestamp , actualInFieldOfView;
+    unsigned int source;
 };
 
 
@@ -57,7 +58,7 @@ void broadcastNewPerson( struct personMessageSt * p)
   msg.x = p->actualX;
   msg.y = p->actualY;
   msg.z = p->actualZ;
-  msg.source = 10;
+  msg.source = p->source;
   msg.theta = p->actualTheta;
 
   msg.inFieldOfView = p->actualInFieldOfView;
@@ -79,15 +80,12 @@ void personMessageAggregator(const person_aggregator::Person & msg , unsigned in
     prsn.actualY = msg.y;
     prsn.actualZ = msg.z;
 
-    // = msg.source;
+    prsn.source = msg.source;
     prsn.actualTheta = msg.theta;
-
 
     prsn.actualInFieldOfView = msg.inFieldOfView;
     prsn.actualInFieldOfView = msg.confidence;
     prsn.actualInFieldOfView = msg.timestamp;
-
-
 }
 
 void personMessageRGBDAcquisition(const person_aggregator::Person & msg)
