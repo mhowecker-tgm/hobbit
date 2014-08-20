@@ -1,0 +1,5 @@
+<launch>   
+    <node name="fitness_coordinator" pkg="fitness_coordinator" type="run_it.sh" required="true">
+      <param name="name" value="fitness_coordinator" /> 
+    </node>   
+</launch>
