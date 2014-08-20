@@ -53,14 +53,12 @@ struct personMessageSt
 
 void broadcastNewPerson( struct personMessageSt * p)
 {
-  if (dontPublishPersons) { return ; }
-
   person_aggregator::Person msg;
   msg.x = p->actualX;
   msg.y = p->actualY;
   msg.z = p->actualZ;
   msg.source = 10;
-  msg.theta = actualTheta;
+  msg.theta = p->actualTheta;
 
   msg.inFieldOfView = p->actualInFieldOfView;
   msg.confidence = p->actualConfidence;
