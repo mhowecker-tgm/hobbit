@@ -122,33 +122,24 @@ void MiraSendingGoals::stop_request_callback(const std_msgs::String::ConstPtr& m
 void MiraSendingGoals::executeCb(const interfaces_mira::MiraSendingGoalsGoalConstPtr& goal_pose)
 {
 
-    if(!isQuaternionValid(goal_pose->target_pose.pose.orientation))
+       if(!isQuaternionValid(goal_pose->target_pose.pose.orientation))
     {
-      as_->setAborted(interfaces_mira::MiraSendingGoalsResult(), "Goal rejected because it was sent with an invalid quaternion");
+      as2_->setAborted(move_base_msgs::MoveBaseResult(), "Aborting on goal because it was sent with an invalid quaternion");
       return;
     }
-
-    TaskPtr task(new Task());
-    //cancel the task
-    std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
-    robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
-
-    goal_status.data = "cancelled";
-    std::cout << "Previous goal cancelled " << std::endl;
-    goal_status_pub.publish(goal_status);
 
     geometry_msgs::PoseStamped goal = goal_pose->target_pose; //should be in global reference frame already!!
     goal_status.data = "idle";
     goal_status_pub.publish(goal_status);
 
-	//std::cout << "goal actionlib x:" << goal.pose.position.x << " y: " << goal.pose.position.y << " theta " << tf::getYaw(goal.pose.orientation)*180/M_PI << std::endl;
+    std::cout << "goal actionlib x:" << goal.pose.position.x << " y: " << goal.pose.position.y << " theta " << tf::getYaw(goal.pose.orientation)*180/M_PI << std::endl;
 
      TaskPtr goal_task(new Task());
      goal_task->addSubTask(SubTaskPtr(new PreferredDirectionTask(mira::navigation::PreferredDirectionTask::FORWARD, 1.0f)));
      goal_task->addSubTask(SubTaskPtr(new mira::navigation::PositionTask(mira::Point2f(goal.pose.position.x, goal.pose.position.y), 0.1f, 0.1f)));
-     goal_task->addSubTask(mira::navigation::SubTaskPtr(new mira::navigation::OrientationTask(tf::getYaw(goal.pose.orientation), mira::deg2rad(15.0f))));
+     goal_task->addSubTask(mira::navigation::SubTaskPtr(new mira::navigation::OrientationTask(tf::getYaw(goal.pose.orientation), mira::deg2rad(10.0f))));
 
-     //std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
+     std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
      robot_->getMiraAuthority().callService<void>(navService, "setTask", goal_task);
 
     ros::NodeHandle n = robot_->getRosNode();
@@ -156,31 +147,31 @@ void MiraSendingGoals::executeCb(const interfaces_mira::MiraSendingGoalsGoalCons
     {
 
       //std::cout << "actionlib server executeCb ok" << std::endl;
-      if(as_->isPreemptRequested())
+      if(as2_->isPreemptRequested())
       {
 	std::cout << "preempt requested" << std::endl;
-
-        //TaskPtr task(new Task());
+        
+	TaskPtr task(new Task());
         //cancel the task
-        //std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
+        std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
         robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
 
         goal_status.data = "cancelled";
         std::cout << "Previous goal cancelled " << std::endl;
         goal_status_pub.publish(goal_status);
 
-        if(as_->isNewGoalAvailable())
+        if(as2_->isNewGoalAvailable())
 	{
-	  //std::cout << "new goal available" << std::endl;
+	  std::cout << "new goal available" << std::endl;
           //if we're active and a new goal is available, we'll accept it, but we won't shut anything down
-          interfaces_mira::MiraSendingGoalsGoal new_goal = *as_->acceptNewGoal();
+          move_base_msgs::MoveBaseGoal new_goal = *as2_->acceptNewGoal();
 
           if(!isQuaternionValid(new_goal.target_pose.pose.orientation))
 	  {
-            as_->setAborted(interfaces_mira::MiraSendingGoalsResult(), "Aborting on goal because it was sent with an invalid quaternion");
+            as2_->setAborted(move_base_msgs::MoveBaseResult(), "Aborting on goal because it was sent with an invalid quaternion");
             return;
           }
-	  std::cout << "preempt requested because of a new goal" << std::endl;
+
           goal = new_goal.target_pose;
 	  //std::cout << "goal actionlib loop" << goal.pose.position.x << " y: " << goal.pose.position.y << " theta " << tf::getYaw(goal.pose.orientation)*180/M_PI<< std::endl;
 
@@ -189,7 +180,7 @@ void MiraSendingGoals::executeCb(const interfaces_mira::MiraSendingGoalsGoalCons
           TaskPtr new_goal_task(new Task());
 	  new_goal_task->addSubTask(SubTaskPtr(new PreferredDirectionTask(mira::navigation::PreferredDirectionTask::FORWARD, 1.0f)));
           new_goal_task->addSubTask(SubTaskPtr(new mira::navigation::PositionTask(mira::Point2f(goal.pose.position.x, goal.pose.position.y), 0.1f, 0.1f)));
-	  new_goal_task->addSubTask(mira::navigation::SubTaskPtr(new mira::navigation::OrientationTask(tf::getYaw(goal.pose.orientation), mira::deg2rad(15.0f))));
+	  new_goal_task->addSubTask(mira::navigation::SubTaskPtr(new mira::navigation::OrientationTask(tf::getYaw(goal.pose.orientation), mira::deg2rad(10.0f))));
 
 	  std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
 	  robot_->getMiraAuthority().callService<void>(navService, "setTask", new_goal_task);
@@ -201,7 +192,8 @@ void MiraSendingGoals::executeCb(const interfaces_mira::MiraSendingGoalsGoalCons
 
           //notify the ActionServer that we've successfully preempted
           ROS_DEBUG_NAMED("interfaces_mira","preempting the current goal");
-          as_->setPreempted();
+          as2_->setPreempted();
+          std::cout << "goal preempted, preemt received" << std::endl;
 
            //we'll actually return from execute after preempting
           return;
@@ -214,14 +206,27 @@ void MiraSendingGoals::executeCb(const interfaces_mira::MiraSendingGoalsGoalCons
      if(done)
      {
 	//std::cout << "done " << std::endl;
-	as_->setSucceeded(interfaces_mira::MiraSendingGoalsResult(), "Goal reached.");
+	as2_->setSucceeded(move_base_msgs::MoveBaseResult(), "Goal reached.");
         return;
+     }
+
+     if (goal_status.data == "preempted")
+     {
+	as2_->setPreempted();
+	std::cout << "goal preempted, path temporarily lost" << std::endl;
+	return;
+     }
+  
+     if (goal_status.data == "aborted")
+     {
+     	as2_->setAborted(move_base_msgs::MoveBaseResult(), "Aborting on goal, probably because the path is blocked");
+	return;
      }
 
    }
 
    //if the node is killed then we'll abort and return
-    as_->setAborted(interfaces_mira::MiraSendingGoalsResult(), "Aborting on the goal because the node has been killed");
+    as2_->setAborted(move_base_msgs::MoveBaseResult(), "Aborting on the goal because the node has been killed");
     return;
 
 
