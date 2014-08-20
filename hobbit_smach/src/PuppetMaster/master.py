@@ -94,6 +94,7 @@ def command_cb(msg, ud):
         if input_ce in item:
             # if index == 4:
             if item[0] == 'master_reset':
+                    rospy.loginfo('Master RESET activated')
                     print('Master RESET activated')
                     ud.parameters['active_task'] = 100
                     return True
@@ -136,6 +137,7 @@ def command_cb(msg, ud):
                 ud.params = msg.params
                 if item[0] == 'stop':
                     print('Reset active_task value')
+                    rospy.loginfo('Reset active_task value')
                     ud.parameters['active_task'] = 100
                 else:
                     ud.parameters['active_task'] = index

@@ -220,7 +220,7 @@ def getCoordinates(req):
     """ Given the name of the room and of the location their Pose is retrieved
     and returned
     """
-    rospy.loginfo('/getCoordinates: Request received')
+    rospy.loginfo('/get_coordinates: Request received')
     global rooms
     # print(rooms)
     print req.room_name.data, req.location_name.data
@@ -238,7 +238,9 @@ def getCoordinates(req):
             # print(k)
             pose = Pose2D(float(k.x), float(k.y), float(k.theta))
             print(pose)
+            rospy.loginfo('/get_coordinates: Returned coordinates')
             return pose
+    rospy.loginfo('/get_coordinates: Returned empty coordinates')
     return (Pose2D(float(0.0), float(0.0), float(0.0)))
 
 def getAllRooms(req):
