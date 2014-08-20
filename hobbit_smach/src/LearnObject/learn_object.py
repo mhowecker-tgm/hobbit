@@ -165,7 +165,8 @@ def main():
 
     cc2 = Concurrence(
         outcomes=['succeeded', 'preempted', 'failed'],
-        default_outcome='failed'
+        default_outcome='failed',
+        outcome_map={'succeeded': {'EMO_WONDERING': 'succeeded', 'SAY_LEARN_NEW_OBJECT': 'succeeded'}}
     )
 
     with cc1:

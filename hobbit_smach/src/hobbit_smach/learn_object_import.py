@@ -155,7 +155,7 @@ def unloadReturnTurntable():
         )
         Sequence.add(
             'SAY_I_WILL_PUT_THE_OBJECT_INTO_TRAY',
-            speech_output.sayText(info='T_LO_I_WILL_PUT_THE_OBJECT_INTO_TRAY')
+            speech_output.sayText(info='T_LO_I_WILL_PUT_OBJECT_INTO_TRAY')
         )
         # Sequence.add(
         #    'MOVE_ARM_TRAY_POSE',
