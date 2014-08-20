@@ -14,7 +14,7 @@
 #include "skeleton_detector/Person.h"
 
 
-#define USE_PERSON_AGGREGATOR 0
+#define USE_PERSON_AGGREGATOR 1
 
 #if USE_PERSON_AGGREGATOR
  #define PERSON_TOPIC "/skeleton_detector/persons"
@@ -275,7 +275,7 @@ int registerServices(ros::NodeHandle * nh,unsigned int width,unsigned int height
   hobbitUpperBodyTracker_RegisterSkeletonDetectedEvent((void *) &broadcastNewSkeleton);
 
   pointEventsBroadcaster = nh->advertise <skeleton_detector::PointEvents> ("pointEvents", 1000);
-  personBroadcaster = nh->advertise <skeleton_detector::Person> ("persons", divisor);
+  personBroadcaster = nh->advertise <skeleton_detector::Person> (PERSON_TOPIC, divisor);
 }
 
 int stopServices()
