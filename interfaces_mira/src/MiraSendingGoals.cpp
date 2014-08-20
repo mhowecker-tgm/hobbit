@@ -335,6 +335,7 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
           //notify the ActionServer that we've successfully preempted
           ROS_DEBUG_NAMED("interfaces_mira","preempting the current goal");
           as2_->setPreempted();
+          std::cout << "goal preempted, preemt received" << std::endl;
 
            //we'll actually return from execute after preempting
           return;
