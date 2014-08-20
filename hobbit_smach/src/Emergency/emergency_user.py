@@ -262,7 +262,7 @@ def main():
             'EMERGENCY_CALL',
             sos_call.get_call_sos_simple(),
             transitions={'succeeded': 'SET_SUCCESS',
-                         'failure': 'SET_FAILURE',
+                         'failed': 'SET_FAILURE',
                          'preempted': 'preempted',
                          'aborted': 'SET_SUCCESS'}
         )
