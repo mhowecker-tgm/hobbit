@@ -13,8 +13,6 @@ import hobbit_smach.hobbit_move_import as hobbit_move
 
 from std_msgs.msg import String
 from hobbit_msgs.msg import GeneralHobbitAction, Event
-from smach_ros import ActionServerWrapper, \
-    IntrospectionServer
 from smach import StateMachine, State, Sequence
 import hobbit_smach.speech_output_import as speech_output
 
@@ -347,6 +345,27 @@ def get_call_sos():
                          'failed': 'EMO_NEUTRAL'}
         )
     return sos_sm
+
+
+def get_call_sos_simple():
+    sos_sm = StateMachine(
+        outcomes=['succeeded', 'aborted', 'preempted', 'failed'],
+        input_keys=['command', 'parameters'],
+        output_keys=['result'])
+
+    sos_sm.userdata.result = String('started')
+
+    with sos_sm:
+        StateMachine.add(
+            'START_CALL',
+            HobbitMMUI.CallEmergency(),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'aborted',
+                         'failed': 'failed',
+                         'preempted': 'preempted'}
+        )
+        return sos_sm
+
 
 if __name__ == '__main__':
     print('You should import this file, not execute it.')
