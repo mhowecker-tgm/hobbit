@@ -8,6 +8,18 @@
 
 #include "face_detection/Person.h"
 
+
+
+#define USE_PERSON_AGGREGATOR 0
+
+#if USE_PERSON_AGGREGATOR
+ #define PERSON_TOPIC "/face_detection/persons"
+#else
+ #define PERSON_TOPIC "persons"
+#endif // USE_PERSON_AGGREGATOR
+
+
+
 ros::Publisher personBroadcaster;
 
 unsigned char dontPublishPersons=0;
@@ -81,7 +93,7 @@ int registerServices(ros::NodeHandle * nh,unsigned int width,unsigned int height
   depthFrameCopy = (unsigned short * ) malloc(width*height*1*sizeof(unsigned short));
   if (depthFrameCopy==0) { fprintf(stderr,"Cannot make an intermidiate copy of depth frame \n"); }
 
-  personBroadcaster = nh->advertise <face_detection::Person> ("persons", 1000);
+  personBroadcaster = nh->advertise <face_detection::Person> (PERSON_TOPIC, 1000);
 
   InitFaceDetection((char*) "haarcascade_frontalface_alt.xml");
   registerFaceDetectedEvent((void *) &broadcastDetectedFace);
