@@ -11,6 +11,18 @@
 #include "rgbd_acquisition/SkeletonBBox.h"
 #include "pose.h"
 
+
+
+#define USE_PERSON_AGGREGATOR 0
+
+#if USE_PERSON_AGGREGATOR
+ #define PERSON_TOPIC "/rgbd_acquisition/persons"
+#else
+ #define PERSON_TOPIC "persons"
+#endif // USE_PERSON_AGGREGATOR
+
+
+
 ros::Publisher joint2DBroadcaster;
 ros::Publisher jointBBoxBroadcaster;
 ros::Publisher personBroadcaster;
@@ -164,7 +176,7 @@ void broadcastSkeleton(unsigned int frameNumber ,struct skeletonHuman * skeleton
 
 int registerServices(ros::NodeHandle * nh)
 {
-    personBroadcaster = nh->advertise <rgbd_acquisition::Person> ("persons", 1000);
+    personBroadcaster = nh->advertise <rgbd_acquisition::Person> (PERSON_TOPIC, 1000);
     pointEventsBroadcaster = nh->advertise <rgbd_acquisition::PointEvents> ("pointEvents", 1000);
     joint2DBroadcaster = nh->advertise <rgbd_acquisition::Skeleton2D> ("joints2D", 1000);
     jointBBoxBroadcaster = nh->advertise <rgbd_acquisition::SkeletonBBox> ("jointsBBox", 1000);
