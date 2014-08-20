@@ -1,5 +1,5 @@
 <launch>   
-    <node name="web_interface" pkg="web_interface" type="run_it.sh" required="true">
-      <param name="name" value="web_interface" /> 
+    <node name="person_aggregator" pkg="person_aggregator" type="run_it.sh" required="true">
+      <param name="name" value="person_aggregator" /> 
     </node>   
 </launch>
