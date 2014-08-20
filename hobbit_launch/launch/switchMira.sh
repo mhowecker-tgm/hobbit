@@ -25,6 +25,7 @@ elif [ "$1" == "mapping" ]
 then
  echo "Mapping"
  killall -9 mira
+ rosnode kill get_current_room&
 
  cd /opt/ros/hobbit_hydro/src/interfaces_mira/launch
  roslaunch startup_ros_nav.launch&
