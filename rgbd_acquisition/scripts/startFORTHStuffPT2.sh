@@ -62,7 +62,8 @@ screen -d -m -S "skeleton_detector" /bin/bash -c "source ~/.bashrc && source $HO
 echo "Starting up Fitness Function Coordinator"
 screen -d -m -S "fitness_coordinator" /bin/bash -c "source ~/.bashrc && source $HOBBITDIR/devel/setup.bash && roslaunch fitness_coordinator fitness_coordinator.launch"
  
-
+echo "Starting up Fitness Function Coordinator"
+screen -d -m -S "person_aggregator" /bin/bash -c "source ~/.bashrc && source /opt/ros/hobbit_hydro/devel/setup.bash && roslaunch person_aggregator person_aggregator.launch"
 
 
 
