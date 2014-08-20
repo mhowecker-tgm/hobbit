@@ -41,6 +41,7 @@ int key = 0;
 unsigned int frameTimestamp=0;
 ros::NodeHandle * nhPtr=0;
 unsigned int paused=0;
+unsigned int raw=1;
 
 ros::Publisher personBroadcaster;
 
@@ -67,13 +68,20 @@ void broadcastNewPerson( struct personMessageSt * p)
 
   fprintf(stderr,"Publishing a new Person\n");
   personBroadcaster.publish(msg);
-  //ros::spinOnce();
 }
 
+
+void aggregatePersonMessage(struct personMessageSt * p )
+{
+
+  fprintf(stderr,"aggregatePersonMessage is not implemented yet\n");
+}
 
 
 void personMessageAggregator(const person_aggregator::Person & msg , unsigned int source)
 {
+    fprintf(stderr,"personMessageAggregator triggered %u \n",source);
+
     struct personMessageSt prsn;
 
     prsn.actualX = msg.x;
@@ -86,6 +94,15 @@ void personMessageAggregator(const person_aggregator::Person & msg , unsigned in
     prsn.actualInFieldOfView = msg.inFieldOfView;
     prsn.actualInFieldOfView = msg.confidence;
     prsn.actualInFieldOfView = msg.timestamp;
+
+    if (raw) {
+               fprintf(stderr,"Raw Mode : Blindly passing around received Person Message\n");
+               broadcastNewPerson(&prsn);
+              } else
+             {
+               fprintf(stderr,"Precise Mode : Collecting Person Message \n");
+               aggregatePersonMessage(&prsn);
+             }
 }
 
 void personMessageRGBDAcquisition(const person_aggregator::Person & msg)
@@ -118,6 +135,20 @@ bool terminate(std_srvs::Empty::Request& request, std_srvs::Empty::Response& res
     exit(0);
     return true;
 }
+
+
+bool precise(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    raw=0;
+    return true;
+}
+
+bool raw(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    raw=1;
+    return true;
+}
+
 
 bool pause(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
@@ -160,6 +191,8 @@ int main(int argc, char **argv)
      ros::ServiceServer pauseService    = nh.advertiseService(name+"/pause", pause);
      ros::ServiceServer resumeService   = nh.advertiseService(name+"/resume", resume);
      ros::ServiceServer stopService     = nh.advertiseService(name+"/terminate", terminate);
+     ros::ServiceServer stopService     = nh.advertiseService(name+"/precise", precise);
+     ros::ServiceServer stopService     = nh.advertiseService(name+"/raw", raw);
 
 
      personBroadcaster = nh.advertise <person_aggregator::Person> ("persons", divisor);
@@ -175,7 +208,7 @@ int main(int argc, char **argv)
 
 	  while ( ( key!='q' ) && (ros::ok()) )
 		{
-		          fprintf(stderr,".");
+		          //fprintf(stderr,".");
                   ros::spinOnce();//<- this keeps our ros node messages handled up until synergies take control of the main thread
 	    }
 
