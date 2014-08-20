@@ -61,20 +61,42 @@
                         <option value="true">true</option> 
                       </select>   <br/>
  
+                  
+                  <table> 
+                    <tr> 
+                      <td>
+                       <a href="javascript:command('say='+speakString);">
+                         <img src="volume.png" height=35 style="-moz-transform: scaleX(-1);
+                                                                -o-transform: scaleX(-1);
+                                                                -webkit-transform: scaleX(-1);
+                                                                transform: scaleX(-1);
+                                                                filter: FlipH;
+                                                                -ms-filter: "FlipH"; ">
+                       </a> 
+                      </td>
+                      <td><a href="javascript:command('say='+speakString);">Test Voice</a></td>
+                      <td>
+                       <a href="javascript:command('say='+speakString);"><img src="volume.png" height=35></a> 
+                      </td>
+                      
+                    </tr>
+                  </table>
+ 
+ 
                   Language  : 
                       <select name="language" onchange="javascript:changeLanguage(this.value);" >
                         <option value="english">English</option>  
                         <option value="greek">Greek</option>  
                         <option value="german">German</option>  
                         <option value="swedish">Swedish</option>   
-                      </select>   <a href="javascript:command('say='+speakString);"><img src="volume.png" height=18></a>
+                      </select>    
                       <br/>
 
                   Gender : 
                       <select name="gender" onchange="javascript:changeGender(this.value);" >
                         <option value="FEMALE">Female</option> 
                         <option value="MALE">Male</option> 
-                      </select>   <a href="javascript:command('say='+speakString);"><img src="volume.png" height=18></a>
+                      </select>  
                       <br/>
  
                   Talking Speed : 
@@ -85,7 +107,7 @@
                         <option value="2">Slow</option>
                         <option value="4">Fast</option>
                         <option value="5">Very Fast</option>  
-                      </select>    <a href="javascript:command('say='+speakString);"><img src="volume.png" height=18></a> 
+                      </select>   
                       <br/>
                        
                   Volume : 
@@ -102,7 +124,7 @@
                         <option value="8">80%</option> 
                         <option value="9">90%</option> 
                         <option value="10">100%</option> 
-                      </select>    <a href="javascript:command('say='+speakString);"><img src="volume.png" height=18></a>
+                      </select>  
                   <br/> 
                       
                   <label><input id="voiceAdvancedSwitch" type="checkbox" onchange='handleVoiceAdvancedSwitch(this);' >Manual Voice Selection</label> 
