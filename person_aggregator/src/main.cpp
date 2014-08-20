@@ -27,6 +27,8 @@
 #include <sensor_msgs/CameraInfo.h>
 #include <image_transport/image_transport.h>
 
+#include "timer.h"
+
 #define NODE_NAME "person_aggregator"
 #define MAX_CMD_STR 1024
 #define MAX_NUM_STR 128
@@ -34,6 +36,9 @@
 #define divisor 1000
 
 #define DEFAULT_FRAME_RATE 30
+
+unsigned int integrationTime = 100000;
+unsigned int maxSource=4;
 
 int rate=DEFAULT_FRAME_RATE;
 
@@ -73,14 +78,36 @@ void broadcastNewPerson( struct personMessageSt * p)
 
 void aggregatePersonMessage(struct personMessageSt * p )
 {
-
   fprintf(stderr,"aggregatePersonMessage is not implemented yet\n");
+  unsigned int i=0;
+  unsigned int currentTime = EndTimer(p->source);
+
+  unsigned int clues = 0;
+  for (i=0; i<maxSource; i++)
+  {
+    if (i!=p->source)
+      {
+
+       fprintf(stderr,"Diff %u with %u is %u \n",p->source,i,EndTimer(i)-currentTime);
+
+        if (EndTimer(i)-currentTime < integrationTime)
+        {
+           ++clues;
+        }
+      }
+  }
+
+   fprintf(stderr,"Gathered %u clues for a person \n",clues);
+   if (clues>=1)
+   {
+     broadcastNewPerson(p);
+   }
 }
 
 
 void personMessageAggregator(const person_aggregator::Person & msg , unsigned int source)
 {
-    fprintf(stderr,"personMessageAggregator triggered %u \n",source);
+    fprintf(stderr,"personMessageAggregator triggered %u , after %u time \n",source , EndTimer(0));
 
     struct personMessageSt prsn;
 
@@ -94,6 +121,11 @@ void personMessageAggregator(const person_aggregator::Person & msg , unsigned in
     prsn.actualInFieldOfView = msg.inFieldOfView;
     prsn.actualInFieldOfView = msg.confidence;
     prsn.actualInFieldOfView = msg.timestamp;
+
+    if (prsn.source<TOTAL_TIMERS)
+    {
+        StartTimer(prsn.source);
+    }
 
     if (raw) {
                fprintf(stderr,"Raw Mode : Blindly passing around received Person Message\n");
@@ -137,13 +169,13 @@ bool terminate(std_srvs::Empty::Request& request, std_srvs::Empty::Response& res
 }
 
 
-bool precise(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+bool switchToPrecise(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
     raw=0;
     return true;
 }
 
-bool raw(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+bool switchToRaw(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
     raw=1;
     return true;
@@ -191,8 +223,8 @@ int main(int argc, char **argv)
      ros::ServiceServer pauseService    = nh.advertiseService(name+"/pause", pause);
      ros::ServiceServer resumeService   = nh.advertiseService(name+"/resume", resume);
      ros::ServiceServer stopService     = nh.advertiseService(name+"/terminate", terminate);
-     ros::ServiceServer stopService     = nh.advertiseService(name+"/precise", precise);
-     ros::ServiceServer stopService     = nh.advertiseService(name+"/raw", raw);
+     ros::ServiceServer preciseService  = nh.advertiseService(name+"/precise", switchToPrecise);
+     ros::ServiceServer rawService      = nh.advertiseService(name+"/raw", switchToRaw);
 
 
      personBroadcaster = nh.advertise <person_aggregator::Person> ("persons", divisor);
@@ -205,10 +237,14 @@ int main(int argc, char **argv)
      //Create our context
      //---------------------------------------------------------------------------------------------------
 	 //////////////////////////////////////////////////////////////////////////
+	 unsigned int i=0;
+     for (i=0; i<maxSource; i++) { StartTimer(i); }
+
+
 
 	  while ( ( key!='q' ) && (ros::ok()) )
 		{
-		          //fprintf(stderr,".");
+
                   ros::spinOnce();//<- this keeps our ros node messages handled up until synergies take control of the main thread
 	    }
 

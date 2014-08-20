@@ -17,7 +17,7 @@ catkin_package()
 include_directories(${catkin_INCLUDEDIR} 
 		    ${OpenCV_INCLUDEDIR})
 
-add_executable(person_aggregator src/main.cpp )
+add_executable(person_aggregator src/main.cpp src/timer.cpp )
  
 target_link_libraries(person_aggregator ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 
