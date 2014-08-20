@@ -12,6 +12,18 @@
 #define MAXIMUM_DISTANCE_FOR_POINTING 400
 
 #include "skeleton_detector/Person.h"
+
+
+#define USE_PERSON_AGGREGATOR 0
+
+#if USE_PERSON_AGGREGATOR
+ #define PERSON_TOPIC "/skeleton_detector/persons"
+#else
+ #define PERSON_TOPIC "persons"
+#endif // USE_PERSON_AGGREGATOR
+
+
+
 #include "skeleton_detector/PointEvents.h"
 
 ros::Publisher personBroadcaster;
