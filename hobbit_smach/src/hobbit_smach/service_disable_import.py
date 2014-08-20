@@ -8,7 +8,8 @@ import roslib
 roslib.load_manifest(PKG)
 # import rospy
 
-from smach import Sequence, SimpleActionState
+from smach import Sequence
+from smach_ros import SimpleActionState
 from std_msgs.srv import Empty
 
 
