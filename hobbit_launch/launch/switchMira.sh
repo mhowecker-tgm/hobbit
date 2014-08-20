@@ -55,6 +55,9 @@ then
  rosnode kill places_interpretation&
  rosnode kill get_current_rooms&
 
+ killall -9 mira&
+ rosnode kill interfaces_node&
+
  cd /opt/ros/hobbit_hydro/src/interfaces_mira/launch
  roslaunch startup.launch&
 
