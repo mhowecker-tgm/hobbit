@@ -327,12 +327,10 @@ def main():
         with seq:
             Sequence.add(
                 'EMO_HAPPY',
-                #HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=4))
                 HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=1))
             Sequence.add(
                 'MMUI_SAY_GoingToPlace',
                 speech_output.sayText(info='T_GT_GoingToPlace'))
-                #speech_output.sayText(info='Going To Place'))
             if not DEBUGGOTO:
                 Sequence.add(
                     'SET_NAV_GOAL',
@@ -342,7 +340,6 @@ def main():
                 )
                 Sequence.add(
                     'MOVE_TO_GOAL',
-                    #hobbit_move.goToPosition(frame='/map', place=None),
                     hobbit_move.goToPose(),
                     transitions={'aborted': 'EMO_SAD',
                                  'succeeded': 'EMO_HAPPY_1'}
@@ -372,11 +369,7 @@ def main():
                 HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=1))
             Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
                      head_move.MoveTo(pose='center_center'),
-                     transitions={'aborted': 'MMUI_SAY_ReachedPlace'})
-            Sequence.add(
-                'MMUI_SAY_ReachedPlace',
-                speech_output.sayText(info='T_GT_ReachedMyDestination'))
-                # speech_output.sayText(info='Reached my destination'))
+                         transitions={'aborted': 'MMUI_MENU_MAIN_1'})
             Sequence.add(
                 'SHOW_MENU_MAIN_1',
                 HobbitMMUI.ShowMenu(menu='MAIN'))

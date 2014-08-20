@@ -1,9 +1,9 @@
 #!/bin/bash
 
-#This script is called from ~/.config/autostart/hobbit.desktop 
-#to make it autostart you can just 
+#This script is called from ~/.config/autostart/hobbit.desktop
+#to make it autostart you can just
 #mkdir ~/.config/autostart
-#ln -s /opt/ros/hobbit_hydro/src/hobbit_launch/launch/hobbitPT2.desktop ~/.config/autostart/hobbitPT2.desktop 
+#ln -s /opt/ros/hobbit_hydro/src/hobbit_launch/launch/hobbitPT2.desktop ~/.config/autostart/hobbitPT2.desktop
 #and ( for now ) brings up all the nodes / etc required for the hobbit robot to function
 
 DELAY_BETWEEN_STEPS="5"
@@ -12,11 +12,11 @@ STARTDIR=`pwd`
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
 #cd to the directory where the script lies at
- 
+
 THEDATETAG=`date +"%y-%m-%d_%H-%M-%S"`
 echo $THEDATETAG > ~/.startup.txt
-env >> ~/.startup.txt  
-  
+env >> ~/.startup.tx
+
 #Make sure we have our stuff sourced
 source ~/.bashrc
 source /opt/ros/hobbit_hydro/devel/setup.bash
@@ -29,7 +29,6 @@ sleep $DELAY_BETWEEN_STEPS
 
 
 /opt/ros/hobbit_hydro/src/rgbd_acquisition/scripts/workAroundUSB.sh
-
 
 #Trying to start basecam
 /opt/ros/hobbit_hydro/src/rgbd_acquisition/scripts/startBaseCameraPT2.sh
@@ -50,7 +49,7 @@ sleep $DELAY_BETWEEN_STEPS
 
 #Give some time for the first camera to come online
 sleep $DELAY_BETWEEN_STEPS
-  
+
 #Start Head ( and bring it to level )
 /opt/ros/hobbit_hydro/src/hobbit_launch/launch/startupBlueDanubeHead.sh&
 #roslaunch head startup.launch&
@@ -72,8 +71,6 @@ rosparam load /opt/ros/hobbit_hydro/src/hobbit_params.yaml&
 # Start SMACH handling of rooms, places, objects.
 rosrun hobbit_smach places_objects.py&
 roslaunch hobbit_smach SavePCD.launch&
-# Start SMACH handling for the demo on 14,15th July 2014
-# Start SMACH handling for the demo on 19th June 2014
 rosrun hobbit_smach learn_object.py&
 rosrun hobbit_smach away.py&
 rosrun hobbit_smach goto.py&
@@ -81,26 +78,12 @@ rosrun hobbit_smach emergency_user.py&
 rosrun hobbit_smach battery_monitor.py&
 rosrun hobbit_smach recharge&
 rosrun hobbit_smach sos_monitor.py&
+rosrun hobbit_smach master.py&
 
-# Start places_interpretation
-#cd /opt/ros/hobbit_hydro/src/places_interpretation/launch
-#roslaunch startup.launch&
-
-# Start get room stuff needed for mmui
-# bajo: same functionality is provided from places_objects and no other node 
-# seems to use it. 
-# Disabled unless another node needs it.
-# cd /opt/ros/hobbit_hydro/src/get_current_room/launch
-# roslaunch startup.launch&
 
 # Start table/floor object detector (for clustering) and trigger for publishing single shot point clouds from headcam
 cd /opt/ros/hobbit_hydro/src/table_object_detector/launch
 roslaunch startup.launch&
-
-
-
-
-
 
 # Start interfaces_mira, which starts the platform driver and the ros-mira interface for virtual lasers
 #cd /opt/ros/hobbit_hydro/src/interfaces_mira/launch
@@ -121,16 +104,8 @@ roslaunch startup.launch&
 ./switchMira.sh navigation
 
 
-
-
-
-#start get_current_room
-#sleep $DELAY_BETWEEN_STEPS
-#cd /opt/ros/hobbit_hydro/src/get_current_room/launch
-#roslaunch startup.launch&
-
 #Startup Joystick node , ( it allows webinterface joystick emulation also )
-roslaunch joy2twist startup.launch& 
+roslaunch joy2twist startup.launch&
 
 
 cd $STARTDIR
