@@ -176,22 +176,35 @@
                       <br/>
                      </div>  
  
-                  City Of Operation :   
-                  <input type="text" name="city"  style="width: 40%;" value="Herakleion,Greece"> <br/>
+                  <!--City Of Operation :   
+                  <input type="text" name="city"  style="width: 40%;" value="Herakleion,Greece"> <br/> -->
   
                   </td>
                   <td>
-                      <div id="LuiBackground" style="background-color:#66FF00;clear:both;text-align:center;" >
+                      <div id="LuiBackground" style="background-color:#FFE4E1;clear:both;text-align:center;" >
                        <img src="lui.png" width=300><br/>
                       </div>  
-                    UI color : <input id="LuiBackgroundSelector" name="LuiBackgroundSelector" type="color" value="#66ff00" 
-                               onchange="changeUIColor(this.value);" > <br/>  
+                      
+                   UI color :    
+                    <select id="LuiBackgroundSelector" name="LuiBackgroundSelector"  onchange="javascript:changeUIColor(this.value);" >
+                        <option value="#FFE4E1">Misty Rose</option> 
+                        <option value="#FFEFD5">Papaya Whip</option>
+                        <option value="#FFFFE0">Light Yellow</option>
+                        <option value="#F0FFF0">Honeydew</option>
+                        <option value="#F0F8FF">Alice Blue</option>
+                        <option value="#E6E6FA">Lavender</option> 
+                        <option value="#F5F5F5">White Smoke</option> 
+                        <option value="#32CD32">Lime Green</option>   
+                      </select>                        
+                      
+                    <!-- input id="LuiBackgroundSelector" name="LuiBackgroundSelector" type="color" value="#66ff00" 
+                               onchange="changeUIColor(this.value);" --> <br/>  
                   </td>
             </tr>
           </table>
  
 
-                  <hr /> 
+                  <hr /> <!--
                    <strong>Emergencies</strong><br/>
 
                     #1 :  Name : <input type="text" name="emergencyContactName1"  style="width: 20%;"> 
@@ -238,7 +251,7 @@
                   Twitter Username :  
                   <input type="text" name="twitterUser"  style="width: 20%;">   Password :  
                   <input type="text" name="twitterPass"  style="width: 20%;"> <br/>
-   
+                   -->
 
                       <input type="submit" value="Set" onclick="updateFormRandomNumber()" style="float: right">
                      </div> 
