@@ -1,5 +1,0 @@
-<launch>   
-    <node name="web_interface" pkg="web_interface" type="run_it.sh" required="true">
-      <param name="name" value="web_interface" /> 
-    </node>   
-</launch>
