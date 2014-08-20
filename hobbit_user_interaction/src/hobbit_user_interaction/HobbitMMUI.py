@@ -434,7 +434,7 @@ class CallEmergencySimple(smach.State):
                     return 'failed'
                 elif v.name == 'result' and v.value == 'B_STOPSOS':
                     return 'aborted'
-                elif v.name == 'result' and v.value == 'E_CALLENDED':
+                elif v.name == 'result' and v.value == 'S_OK':
                     return 'succeeded'
                 else:
                     pass
