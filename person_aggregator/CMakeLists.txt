@@ -3,6 +3,11 @@ project(person_aggregator)
 
 find_package(catkin REQUIRED COMPONENTS roscpp roslib sensor_msgs OpenCV cv_bridge roscpp std_msgs genmsg image_transport geometry_msgs tf)
 
+
+#Messages -----------------------------------
+add_message_files(DIRECTORY msg FILES Person.msg )
+
+
 ## Generate added messages and services
 generate_messages(DEPENDENCIES std_msgs)
 
