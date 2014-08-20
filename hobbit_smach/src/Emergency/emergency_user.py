@@ -8,41 +8,16 @@ DEBUG = False
 import roslib
 roslib.load_manifest(PKG)
 import rospy
-#import smach
-#import uashh_smach.util as util
-import uashh_smach.platform.move_base as move_base
 
 from std_msgs.msg import String
-from hobbit_msgs.msg import GeneralHobbitAction,\
-    Event
-#    Event, LocateUserAction, LocateUserGoal,\
-#    ApproachUserAction, ApproachUserGoal
-from hobbit_msgs.srv import GetCoordinates
-from smach_ros import ActionServerWrapper, \
-    IntrospectionServer, ServiceState, SimpleActionState
-from smach import StateMachine, State, cb_interface
+from hobbit_msgs.msg import GeneralHobbitAction
+from smach_ros import ActionServerWrapper, IntrospectionServer
+from smach import StateMachine, State
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 import hobbit_smach.sos_call_import as sos_call
 import hobbit_smach.speech_output_import as speech_output
 from datetime import datetime, time
 import hobbit_smach.aal_lights_import as aal_lights
-
-
-class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-
-    def disable(self):
-        self.HEADER = ''
-        self.OKBLUE = ''
-        self.OKGREEN = ''
-        self.WARNING = ''
-        self.FAIL = ''
-        self.ENDC = ''
 
 
 class Init(State):
@@ -191,10 +166,10 @@ class TimeCheck(State):
                 <= now.time()\
                 <= time(int(sleep[0]), int(sleep[1])):
             print('yes, within the interval')
-            #ud.night = False
+            # ud.night = False
             return 'day'
         else:
-            #ud.night = True
+            # ud.night = True
             return 'night'
 
 
@@ -215,13 +190,6 @@ class ActivateLights(State):
             return 'preempted'
         # TODO: Call tcp client to communicate with the light switch
         return 'succeeded'
-
-
-@cb_interface(input_keys=['room_name'])
-def set_nav_goal_cb(userdata, request):
-    nav_request = GetCoordinates().Request
-    nav_request.room_name = String(userdata.room_name)
-    return nav_request
 
 
 def main():
@@ -247,12 +215,12 @@ def main():
             transitions={'day': 'EMO_CONCERNED',
                          'night': 'ACTIVATE_LIGHTS',
                          'canceled': 'CLEAN_UP',
-                         #'preempted': 'preempted'
+                         # 'preempted': 'preempted'
                          }
         )
         StateMachine.add(
             'ACTIVATE_LIGHTS',
-            aal_lights.SetLights(active = True),
+            aal_lights.SetLights(active=True),
             transitions={'succeeded': 'MMUI_CONFIRM_DoYouNeedHelp',
                          'failed': 'MMUI_CONFIRM_DoYouNeedHelp',
                          'preempted': 'preempted'}
@@ -264,29 +232,6 @@ def main():
                          'preempted': 'preempted',
                          'failed': 'SET_FAILURE'}
         )
-        # Why should Hobbit look for the user if the command was given on
-        # the touchscreen, by voice or by gesture.
-        # This means the user is at least in front or very close to hoobit
-        #StateMachine.add(
-        #    'LOCATE_USER',
-        #    SimpleActionState(
-        #        'locate_user',
-        #        LocateUserAction,
-        #        goal=LocateUserGoal(command=String('locateUser'))),
-        #    {'succeeded': 'APPROACH_USER',
-        #     'aborted': 'CLEAN_UP',
-        #     'preempted': 'CLEAN_UP'}
-        #)
-        #StateMachine.add(
-        #    'APPROACH_USER',
-        #    SimpleActionState(
-        #        'approach_user',
-        #        ApproachUserAction,
-        #        goal=ApproachUserGoal(command=String('approachUser'))),
-        #    {'succeeded': 'MMUI_CONFIRM',
-        #     'aborted': 'CLEAN_UP',
-        #     'preempted': 'CLEAN_UP'}
-        #)
         StateMachine.add(
             'MMUI_CONFIRM_DoYouNeedHelp',
             HobbitMMUI.AskYesNo(question='T_HM_DoYouNeedHelp'),
@@ -307,7 +252,7 @@ def main():
         )
         StateMachine.add(
             'MMUI_SAY_YouCanGetHelpAnytime',
-            #HobbitMMUI.ShowInfo(info='T_HM_YouCanGetHelpAnytime'),
+            # HobbitMMUI.ShowInfo(info='T_HM_YouCanGetHelpAnytime'),
             speech_output.sayText(info='T_HM_YouCanGetHelpAnytime'),
             transitions={'succeeded': 'EMO_NEUTRAL',
                          'preempted': 'preempted',
@@ -315,7 +260,7 @@ def main():
         )
         StateMachine.add(
             'EMERGENCY_CALL',
-            sos_call.get_call_sos(),
+            sos_call.get_call_sos_simple(),
             transitions={'succeeded': 'SET_SUCCESS',
                          'aborted': 'SET_FAILURE',
                          'preempted': 'preempted'}

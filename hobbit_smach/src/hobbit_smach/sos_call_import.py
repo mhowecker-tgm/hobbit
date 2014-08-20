@@ -16,8 +16,6 @@ from hobbit_msgs.msg import GeneralHobbitAction, Event
 from smach import StateMachine, State, Sequence
 import hobbit_smach.speech_output_import as speech_output
 
-param_server_lock = threading.RLock()
-
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -48,11 +46,10 @@ class Init(State):
             output_keys=['social_role'])
 
     def execute(self, ud):
-        with param_server_lock:
-            if rospy.has_param('/hobbit/social_role'):
-                ud.social_role = rospy.get_param('/hobbit/social_role')
-            else:
-                pass
+        if rospy.has_param('/hobbit/social_role'):
+            ud.social_role = rospy.get_param('/hobbit/social_role')
+        else:
+            pass
         return 'succeeded'
 
 
@@ -357,8 +354,8 @@ def get_call_sos_simple():
 
     with sos_sm:
         StateMachine.add(
-            'START_CALL',
-            HobbitMMUI.CallEmergency(),
+            'START_SOS_CALL',
+            HobbitMMUI.CallEmergencySimple(),
             transitions={'succeeded': 'succeeded',
                          'aborted': 'aborted',
                          'failed': 'failed',

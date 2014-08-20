@@ -57,7 +57,7 @@ class CallDecision(smach.State):
         smach.State.__init__(
             self,
             input_keys=['call_state'],
-            outcomes=['succeeded', 'failed', 'preempted', \
+            outcomes=['succeeded', 'failed', 'preempted',
                       'stop', 'ended', 'established', 'confirmed']
         )
 
@@ -141,7 +141,8 @@ class WaitforConfirmedCall(util.WaitForMsgState):
             elif msg.event == 'B_STOPSOS':
                 ud.call_state = 'stop'
                 return 'succeeded'
-            elif msg.event == 'E_CALLENDED' or msg.event == 'B_CALLENDED' or msg.event == 'B_ENDSOS':
+            elif msg.event == 'E_CALLENDED' or msg.event == 'B_CALLENDED' or\
+                msg.event == 'B_ENDSOS':
                 ud.call_state = 'ended'
                 return 'succeeded'
             else:
@@ -215,7 +216,8 @@ class AskYesNo(smach.State):
                     self.timeout_count += 1
                     return 'timeout'
                 else:
-                    return 'failed'
+                    pass
+            return 'failed'
         else:
             return 'failed'
 
@@ -347,7 +349,7 @@ class ShowCalendar(smach.State):
         smach.State.__init__(
             self,
             outcomes=['failed', 'succeeded', 'preempted']
-            #input_keys=['timeframe', 'categories']
+            # input_keys=['timeframe', 'categories']
         )
         self._categories = categories
         self._timeframe = timeframe
@@ -405,6 +407,40 @@ class CallEmergency(smach.State):
         print('response from StartSOSCall was: ')
         print(resp)
         return 'succeeded'
+
+
+class CallEmergencySimple(smach.State):
+    """
+    Class to start the Voip-call to emergency personal
+    """
+    def __init__(self):
+        smach.State.__init__(
+            self,
+            outcomes=['succeeded', 'preempted', 'failed', 'aborted']
+        )
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        mmui = MMUI.MMUIInterface()
+        resp = mmui.StartSOSCall()
+        print('response from StartSOSCall was: ')
+        print(resp)
+        if resp:
+            for i, v in enumerate(resp.params):
+                print i, v
+                if v.name == 'result' and v.value == 'B_ENDSOS':
+                    return 'failed'
+                elif v.name == 'result' and v.value == 'B_STOPSOS':
+                    return 'aborted'
+                elif v.name == 'result' and v.value == 'E_CALLENDED':
+                    return 'succeeded'
+                else:
+                    pass
+            return 'failed'
+        else:
+            return 'failed'
 
 
 class CallEnded(smach.State):
