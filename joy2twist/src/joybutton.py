@@ -39,7 +39,7 @@ srvSkeletonPause = rospy.ServiceProxy('/skeleton_detector/pause', Empty)
 srvSkeletonResume = rospy.ServiceProxy('/skeleton_detector/resume', Empty)
 srvResetMotors = rospy.ServiceProxy('/reset_motorstop', ResetMotorStop)
  
-oneclick = True
+blockEvent = False
 
 mmui = MMUI.MMUIInterface()
 
@@ -59,63 +59,56 @@ mmui = MMUI.MMUIInterface()
 
 
 def joyCallback(msg):
-    global oneclick,mmui,srvFacePause,srvFaceResume,srvEmergencyPause,srvEmergencyResume,srvGesturesPause,srvGesturesResume,srvSkeletonPause,srvSkeletonResume,srvResetMotors
+    global blockEvent,mmui,srvFacePause,srvFaceResume,srvEmergencyPause,srvEmergencyResume,srvGesturesPause,srvGesturesResume,srvSkeletonPause,srvSkeletonResume,srvResetMotors
    
     if numpy.sum(numpy.asarray(msg.buttons)) < 1.0:
-        # rospy.loginfo('oneclick: True')
-        oneclick = True
-        
-    # do nothing if more than 1 button is simultaneously pressed
-    if oneclick == False:
-        rospy.loginfo('returning')
-        oneclick = False
+        # BUTTON UP EVENT and no more button is pressed -> unblock event
+#        rospy.loginfo('Button up, no more button pressed')
+        blockEvent = False
         return
-    
+    else:
+        if blockEvent == True:
+	    # button still pressed, keep blocking event
+#            rospy.loginfo('Other button still pressed, block new button click')
+            return
+   	else:
+	    # first button has been pressed. block next event
+            blockEvent = True
+ 
     if msg.buttons[0] == 1:    # X, not used right now
         rospy.loginfo("JOYSTICK: Blue X button pressed. Do nothing.")                
-        oneclick = False
-        return
 
     if msg.buttons[1] == 1:    # A
         rospy.loginfo("JOYSTICK: Green A button pressed. Unblock motors.") 
-        oneclick = False
         
         try:
             resp = srvResetMotors()
         except rospy.ServiceException, e:
             rospy.loginfo("Service call failed: %s" % str(e))                     
-        return
 
     if msg.buttons[2] == 1:    # B
+        rospy.loginfo("JOYSTICK: Red B button pressed. STOP (C_STOP).")       
         e = Command()
         e.header = Header()
         e.command = "C_STOP"
         e.sessionID = '0'
         pubC.publish(e)
-        rospy.loginfo("JOYSTICK: Red B button pressed. STOP (C_STOP).")       
-        oneclick = False
-        return
 
     if msg.buttons[3] == 1:    # Y
+        rospy.loginfo("JOYSTICK: Yellow Y button pressed. EMERGENCY (E_SOSBUTTON).")
         e = Event()
         e.header = Header()
         e.event = "E_SOSBUTTON"
         e.sessionID = '0'
         e.confidence = 1
         pubE.publish(e)
-        rospy.loginfo("JOYSTICK: Yellow Y button pressed. EMERGENCY (E_SOSBUTTON).")
-        oneclick = False
-        return
         
     if msg.buttons[4] == 1:    # L TOP (labeled LB for Left Button)                
+        rospy.loginfo("JOYSTICK: Left top button pressed. Enable ASR.")
         mmui.enable_asr()
-        rospy.loginfo("JOYSTICK: Left top button pressed. ASR enabled.")
-        oneclick = False
-        return
 
     if msg.buttons[5] == 1:    # R TOP (labeled RB for Right Button)
         rospy.loginfo("JOYSTICK: Right top button pressed. Enable gestures, face and emergency detector and skeleton tracker.")
-        oneclick = False
     
         try:
             resp = srvFaceResume()
@@ -136,17 +129,13 @@ def joyCallback(msg):
             resp = srvSkeletonResume()
         except rospy.ServiceException, e:
             rospy.loginfo("Service call failed: %s" % str(e))
-        return
 
     if msg.buttons[6] == 1:    # L BOTTOM (labeled LT for Left Trigger)
+        rospy.loginfo("JOYSTICK: Left bottom button pressed. Disable ASR.")
         mmui.disable_asr()
-        rospy.loginfo("JOYSTICK: Left bottom button pressed. ASR disabled.")
-        oneclick = False
-        return
 
     if msg.buttons[7] == 1:    # R BOTTOM (labeled RT for Right Trigger)
         rospy.loginfo("JOYSTICK: Right bottom button pressed. Disable gestures, face and emergency detector and skeleton tracker.")
-        oneclick = False
         
         try:
             resp = srvFacePause()
@@ -167,33 +156,23 @@ def joyCallback(msg):
             resp = srvSkeletonPause()
         except rospy.ServiceException, e:
             rospy.loginfo("Service call failed: %s" % str(e))
-        return
 
     if msg.buttons[8] == 1:    # Back
+        rospy.loginfo("JOYSTICK: Back button pressed. Master Reset (C_MASTER_RESET)")
         e = Command()
         e.header = Header()
         e.command = "C_MASTER_RESET"
         e.sessionID = '0'
         pubC.publish(e)
-        rospy.loginfo("JOYSTICK: Back button pressed. Master Reset (C_MASTER_RESET)")
-        oneclick = False
-        return
 
     if msg.buttons[9] == 1:    # Start
         rospy.loginfo("JOYSTICK: Start button pressed. Do nothing.")
-        oneclick = False
-        return
 
     if msg.buttons[10] == 1:   # Left joystick
         rospy.loginfo("JOYSTICK: Left joystick pressed. Do nothing.")
-        oneclick = False
-        return
 
     if msg.buttons[11] == 1:   # Right joystick
         rospy.loginfo("JOYSTICK: Right joystick pressed. Do nothing.")
-        oneclick = False
-        return
-
 
 def main(args):
     rospy.init_node('Joybutton', anonymous=False)
