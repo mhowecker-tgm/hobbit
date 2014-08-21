@@ -26,7 +26,7 @@ def get_safety_check():
         )
         StateMachine.add_auto(
             'T_SC_CHECK_INITIATED',
-            HobbitMMUI.ConfirmOk(text='T_SC_CHECK_INITIATED'),
+            HobbitMMUI.ConfirmOk(text='T_SC_CHECKINITIATED'),
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'timeout': 'T_SC_CHECK_INITIATED',
                          '3times': 'USER_NOT_RESPONDING',
@@ -34,7 +34,7 @@ def get_safety_check():
         )
         StateMachine.add_auto(
             'T_SC_CHECK_CLOTHING',
-            HobbitMMUI.ConfirmOk(text='T_SC_CHECK_CLOTHING'),
+            HobbitMMUI.ConfirmOk(text='T_SC_CHECKCLOTHING'),
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'timeout': 'T_SC_CHECK_CLOTHING',
                          '3times': 'USER_NOT_RESPONDING',
@@ -42,7 +42,7 @@ def get_safety_check():
         )
         StateMachine.add_auto(
             'T_SC_CHECK_CLOTHING2',
-            HobbitMMUI.ConfirmOk(text='T_SC_CHECK_CLOTHING2'),
+            HobbitMMUI.ConfirmOk(text='T_SC_CHECKCLOTHING2'),
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'timeout': 'T_SC_CHECK_CLOTHING2',
                          '3times': 'USER_NOT_RESPONDING',
@@ -50,7 +50,7 @@ def get_safety_check():
         )
         StateMachine.add_auto(
             'T_SC_CHECK_CLOTHING3',
-            HobbitMMUI.ConfirmOk(text='T_SC_CHECK_CLOTHING3'),
+            HobbitMMUI.ConfirmOk(text='T_SC_CHECKCLOTHING3'),
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'timeout': 'T_SC_CHECK_CLOTHING3',
                          '3times': 'USER_NOT_RESPONDING',
@@ -66,7 +66,7 @@ def get_safety_check():
         )
         StateMachine.add_auto(
             'T_SC_CHECK_FLOORS2',
-            HobbitMMUI.ConfirmOk(text='T_SC_CHECK_FLOORS2'),
+            HobbitMMUI.ConfirmOk(text='T_SC_FLOORS2'),
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'timeout': 'T_SC_CHECK_FLOORS2',
                          '3times': 'USER_NOT_RESPONDING',
