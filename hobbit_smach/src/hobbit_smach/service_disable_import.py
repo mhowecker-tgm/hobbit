@@ -9,7 +9,7 @@ roslib.load_manifest(PKG)
 # import rospy
 
 from smach import Sequence
-from smach_ros import SimpleActionState
+from smach_ros import ServiceState
 from std_srvs.srv import Empty
 
 
@@ -30,21 +30,21 @@ def enable_gestures():
     with seq:
         Sequence.add(
             'ENABLE_FACE_DETECTION',
-            SimpleActionState(
+            ServiceState(
                 '/face_detection/resume',
                 Empty
             )
         )
         Sequence.add(
             'ENABLE_GESTURES',
-            SimpleActionState(
+            ServiceState(
                 '/hand_gestures/resume',
                 Empty
             )
         )
         Sequence.add(
             'ENABLE_SKELETON_DETECTION',
-            SimpleActionState(
+            ServiceState(
                 '/skeleton_detector/resume',
                 Empty
             )
@@ -69,21 +69,21 @@ def disable_gestures():
     with seq:
         Sequence.add(
             'ENABLE_FACE_DETECTION',
-            SimpleActionState(
+            ServiceState(
                 '/face_detection/pause',
                 Empty
             )
         )
         Sequence.add(
             'ENABLE_GESTURES',
-            SimpleActionState(
+            ServiceState(
                 '/hand_gestures/pause',
                 Empty
             )
         )
         Sequence.add(
             'ENABLE_SKELETON_DETECTION',
-            SimpleActionState(
+            ServiceState(
                 '/skeleton_detector/pause',
                 Empty
             )
