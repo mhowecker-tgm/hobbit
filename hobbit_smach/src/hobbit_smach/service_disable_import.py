@@ -23,7 +23,7 @@ def enable_gestures():
     """
 
     seq = Sequence(
-        ['succeeded', 'aborted', 'preempted']
+        outcomes=['succeeded', 'aborted', 'preempted']
     )
     with seq:
         Sequence.add(
@@ -60,7 +60,7 @@ def disable_gestures():
     """
 
     seq = Sequence(
-        ['succeeded', 'aborted', 'preempted']
+        outcomes=['succeeded', 'aborted', 'preempted']
     )
     with seq:
         Sequence.add(

@@ -90,7 +90,6 @@ def command_cb(msg, ud):
         if input_ce in item:
             # if index == 4:
             if item[0] == 'master_reset':
-                    # print('Master RESET activated')
                     rospy.loginfo('Master RESET activated')
                     ud.parameters['active_task'] = 100
                     return True
@@ -107,15 +106,14 @@ def command_cb(msg, ud):
             # elif index == 1 and night and index + 1 <= active_task:
             elif item[0] == 'recharge' and not night and index  <= active_task:
                 rospy.loginfo('RECHARGING')
-                # print('RECHARGING')
                 ud.command = 'recharge'
                 ud.parameters['active_task'] = index
                 return True
             elif index + 1 >= active_task and not night:
                 rospy.loginfo('New task has lower priority. Do nothing')
-                print(bcolors.OKGREEN +
-                      'New task has lower priority. Do nothing' +
-                      bcolors.ENDC)
+                rospy.loginfo(bcolors.OKGREEN +
+                              'New task has lower priority. Do nothing' +
+                              bcolors.ENDC)
                 return False
             else:
                 rospy.loginfo('New task has higher priority. Start it.')
@@ -143,13 +141,12 @@ def command_cb(msg, ud):
 
 
 def child_cb(outcome_map):
-    print('child_cb')
+    rospy.loginfo('Event Command cc child termination callback')
     return True
 
 
 def child_cb1(outcome_map):
-    print('child_cb1')
-    print(outcome_map)
+    rospy.loginfo('cc1 child termination callback')
     if outcome_map['Commands'] == 'succeeded':
         return True
     else:
@@ -545,8 +542,9 @@ def main():
         )
         StateMachine.add(
             'REWARD',
-            HobbitEmotions.ShowEmotions(emotion='HAPPY',
-                                                 emo_time=4),
+            HobbitEmotions.ShowEmotions(
+                emotion='HAPPY',
+                emo_time=4),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'failed': 'RESET_ACTIVE_TASK'}
         )
@@ -559,23 +557,20 @@ def main():
         )
         StateMachine.add(
             'RECHARGE',
-            # FakeForAllWithoutRunningActionSever(name='RECHARGE'),
             recharge.getRecharge(),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
-                         #'failed': 'failed',
+                         # 'failed': 'failed',
                          'aborted': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
             'SILENT_RECHARGE',
-            # FakeForAllWithoutRunningActionSever(name='SILENT_RECHARGE'),
             recharge.getRecharge(),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'AWAY',
-            # FakeForAllWithoutRunningActionSever(name='GOTO'),
             SimpleActionState('away',
                               GeneralHobbitAction,
                               goal_cb=away_cb,
