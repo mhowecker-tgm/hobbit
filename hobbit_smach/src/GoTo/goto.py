@@ -369,7 +369,7 @@ def main():
                 HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=1))
             Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
                      head_move.MoveTo(pose='center_center'),
-                         transitions={'aborted': 'MMUI_MENU_MAIN_1'})
+                         transitions={'aborted': 'SHOW_MENU_MAIN_1'})
             Sequence.add(
                 'SHOW_MENU_MAIN_1',
                 HobbitMMUI.ShowMenu(menu='MAIN'))
