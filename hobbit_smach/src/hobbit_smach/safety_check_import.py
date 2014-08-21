@@ -58,7 +58,7 @@ def get_safety_check():
         )
         StateMachine.add_auto(
             'T_SC_CHECK_FLOORS',
-            HobbitMMUI.ConfirmOk(text='T_SC_CHECK_FLOORS'),
+            HobbitMMUI.ConfirmOk(text='T_SC_CHECKFLOORS'),
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'timeout': 'T_SC_CHECK_FLOORS',
                          '3times': 'USER_NOT_RESPONDING',
@@ -243,14 +243,6 @@ def get_safety_check():
             transitions={'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
         )
         StateMachine.add(
-            'USER_NOT_RESPONDING',
-            sos_call.get_call_sos_simple(),
-            transitions={'succeeded': 'aborted',
-                         'failed': 'LOG_SAFETY_CHECK_END',
-                         'aborted': 'LOG_SAFETY_CHECK_END',
-                         'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
-        )
-        StateMachine.add(
             'LOG_SAFETY_CHECK_END',
             logging.DoLog(
                 scenario='safety check',
@@ -269,6 +261,14 @@ def get_safety_check():
             transitions={'succeeded': 'preempted',
                          'preempted': 'preempted',
                          'aborted': 'preempted'}
+        )
+        StateMachine.add(
+            'USER_NOT_RESPONDING',
+            sos_call.get_call_sos_simple(),
+            transitions={'succeeded': 'aborted',
+                         'failed': 'LOG_SAFETY_CHECK_END',
+                         'aborted': 'LOG_SAFETY_CHECK_END',
+                         'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
         )
 
     return sm

@@ -29,7 +29,7 @@ class DoLog(State):
         data = ud.data if self.data is None else self.data
         rospy.loginfo('LOG: scenario: %s: %s' % (scenario, data))
         message = Event()
-        Event.event = 'E_LOG'
+        message.event = 'E_LOG'
         params = []
         par = Parameter(name='scenario',
                         value=scenario)
@@ -37,6 +37,6 @@ class DoLog(State):
         par = Parameter(name='DATA',
                         value=data)
         params.append(par)
-        Event.params = params
+        message.params = params
         self.pubEvent.publish(message)
         return 'succeeded'

@@ -9,10 +9,11 @@ import rospy
 import roslib
 roslib.load_manifest(PKG)
 
+from std_msgs.msg import String
 from hobbit_user_interaction import HobbitMMUI
 from smach_ros import IntrospectionServer, ActionServerWrapper
 from hobbit_msgs.msg import GeneralHobbitAction
-from smach import StateMachine
+from smach import StateMachine, State
 import hobbit_smach.safety_check_import as safety_check
 
 
@@ -23,12 +24,20 @@ def main():
         outcomes=['succeeded', 'aborted', 'preempted'],
         input_keys=['command'],
         output_keys=['result'])
+    sc_sm.userdata.result = 'failed'
 
     with sc_sm:
         StateMachine.add_auto(
             'SAFETY_CHECK',
             safety_check.get_safety_check(),
-            connector_outcomes=['succeeded', 'aborted', 'preempted']
+            connector_outcomes=['succeeded'],
+            transitions={'aborted': 'MAIN_MENU',
+                         'preempted': 'MAIN_MENU'}
+        )
+        StateMachine.add_auto(
+            'SET_SUCCESS',
+            SetSuccess(),
+            connector_outcomes=['succeeded', 'preempted']
         )
         StateMachine.add(
             'MAIN_MENU',
@@ -54,6 +63,28 @@ def main():
     asw.run_server()
     rospy.spin()
     sis.stop()
+
+
+class SetSuccess(State):
+    """
+    Class for setting the success message in the actionlib result \
+        and clean up of persistent variables
+    """
+    def __init__(self):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'preempted'],
+            output_keys=['result']
+        )
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            ud.result = String('preempted')
+            self.service_preempt()
+            return 'preempted'
+        ud.result = String('succeeded')
+        return 'succeeded'
+
 
 if __name__ == '__main__':
     main()

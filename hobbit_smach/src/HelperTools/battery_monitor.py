@@ -16,7 +16,7 @@ def talker(level):
     data.header.stamp = rospy.Time.now()
     data.event = level
     pub = rospy.Publisher('/Event', Event, queue_size=10)
-    r = rospy.Rate(0.1)
+    r = rospy.Rate(0.01)
     i = 0
     while i < LIMIT:
         rospy.loginfo(str(data))
