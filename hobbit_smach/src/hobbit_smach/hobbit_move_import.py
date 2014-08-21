@@ -265,8 +265,8 @@ def goToPosition(frame='/map', room='None', place='dock'):
 
     print(room, place)
     with seq:
-        Sequence.add('DISABLE_GESTURES',
-                     service_disable.disable_gestures())
+        # Sequence.add('DISABLE_GESTURES',
+        #              service_disable.disable_gestures())
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
                      head_move.MoveTo(pose='down_center'))
         Sequence.add('WAIT', SleepState(duration=1))
@@ -279,8 +279,8 @@ def goToPosition(frame='/map', room='None', place='dock'):
             'HEAD_UP_AFTER_MOVEMENT',
             head_move.MoveTo(pose='center_center')
         )
-        Sequence.add('ENABLE_GESTURES',
-                     service_disable.enable_gestures())
+        # Sequence.add('ENABLE_GESTURES',
+        #              service_disable.enable_gestures())
         Sequence.add(
             'MMUI_SAY_ReachedPlace',
             speech_output.sayText(info='T_GT_ReachedMyDestination'),
@@ -305,8 +305,8 @@ def prepareMovement():
         connector_outcome='succeeded')
 
     with seq:
-        Sequence.add('DISABLE_GESTURES',
-                     service_disable.disable_gestures())
+        # Sequence.add('DISABLE_GESTURES',
+        #              service_disable.disable_gestures())
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
                      head_move.MoveTo(pose='down_center'))
         Sequence.add('WAIT', SleepState(duration=1))
@@ -342,8 +342,8 @@ def goToPose():
             'HEAD_UP_AFTER_MOVEMENT',
             head_move.MoveTo(pose='center_center')
         )
-        Sequence.add('ENABLE_GESTURES',
-                     service_disable.enable_gestures())
+        # Sequence.add('ENABLE_GESTURES',
+        #              service_disable.enable_gestures())
         Sequence.add(
             'MMUI_SAY_ReachedPlace',
             speech_output.sayText(info='T_GT_ReachedMyDestination'),
