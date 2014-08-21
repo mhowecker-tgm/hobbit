@@ -5,6 +5,7 @@ from smach import StateMachine
 from hobbit_user_interaction import HobbitMMUI
 import hobbit_smach.logging_import as logging
 import hobbit_smach.speech_output_import as speech_output
+import hobbit_smach.sos_call_import as sos_call
 
 
 def get_safety_check():
@@ -20,7 +21,7 @@ def get_safety_check():
                 scenario='safety check',
                 data='Started'
             ),
-            transitions={'succeeded': 'SAY_CHECK_INITIATED',
+            transitions={'succeeded': 'T_SC_CHECK_INITIATED',
                          'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
         )
         StateMachine.add_auto(
@@ -240,6 +241,14 @@ def get_safety_check():
             ),
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
+        )
+        StateMachine.add(
+            'USER_NOT_RESPONDING',
+            sos_call.get_call_sos_simple(),
+            transitions={'succeeded': 'aborted',
+                         'failed': 'LOG_SAFETY_CHECK_END',
+                         'aborted': 'LOG_SAFETY_CHECK_END',
+                         'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
         )
         StateMachine.add(
             'LOG_SAFETY_CHECK_END',

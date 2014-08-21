@@ -34,7 +34,7 @@ def main():
             'MAIN_MENU',
             HobbitMMUI.ShowMenu(menu='MAIN'),
             transitions={'succeeded': 'succeeded',
-                         'aborted': 'aborted',
+                         'failed': 'aborted',
                          'preempted': 'preempted'}
         )
 
