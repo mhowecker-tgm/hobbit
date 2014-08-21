@@ -6,6 +6,7 @@ NAME = 'hobbit_mmui'
 
 import roslib
 roslib.load_manifest(PKG)
+import rospy
 import smach
 
 from std_msgs.msg import String
@@ -269,6 +270,7 @@ class ConfirmOk(smach.State):
         mmui = MMUI.MMUIInterface()
         resp = mmui.showMMUI_OK(text=self.text)
         if resp:
+            rospy.loginfo(str(resp))
             for i, v in enumerate(resp.params):
                 print i, v
                 if v.name == 'result' and v.value == 'D_OK':
