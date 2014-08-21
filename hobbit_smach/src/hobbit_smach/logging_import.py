@@ -38,5 +38,5 @@ class DoLog(State):
                         value=data)
         params.append(par)
         Event.params = params
-        self.pubEvent(message)
+        self.pubEvent.publish(message)
         return 'succeeded'
