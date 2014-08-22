@@ -139,13 +139,13 @@ def getEndRecharge():
         Sequence.add(
             'MOVE_AWAY_FROM_DOCK',
             hobbit_move.goToPose())
-        Sequence.add(
-            'SET_NAV_GOAL_RANDOM',
-            hobbit_move.SetNavGoal(room='maincorridor', place='default')
-        )
-        Sequence.add(
-            'MOVE_AWAY',
-            hobbit_move.goToPose())
+        # Sequence.add(
+        #     'SET_NAV_GOAL_RANDOM',
+        #     hobbit_move.SetNavGoal(room='maincorridor', place='default')
+        # )
+        # Sequence.add(
+        #     'MOVE_AWAY',
+        #     hobbit_move.goToPose())
     return seq
 
 
