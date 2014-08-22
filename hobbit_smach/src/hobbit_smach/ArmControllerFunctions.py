@@ -25,6 +25,7 @@ AxisStateNames.append('ArmAtPreGraspFromFloorPos')
 AxisStateNames.append('ArmAtPreGraspFromTablePos')
 AxisStateNames.append('ArmAtCCWPos')
 AxisStateNames.append('ArmAtCWPos')
+AxisStateNames.append('ArmAtCandlePos')
 AxisStateNames.append('GripperIsClosed')
 #AxisStateNames.append('InterpolationPosReceived')
 AxisStateNames.append('EmergencyPressed')
@@ -32,7 +33,7 @@ AxisStateNames.append('EmergencyPressed')
    
 def PublishToROS(data):
     #Here the function for publishing Axis and Gripper State to ROS is implemented:
-    print 'Publishing to ROS is not implemented yet!'
+    print('Publishing to ROS is not implemented yet!')
 
 
 def CutString(RecieveString):
@@ -92,9 +93,9 @@ def STRINGLIST_TO_BOOLLIST(StringList):
     
 
 def PrintAxisState(StateDict):
-    print '____________ARM STATE____________'
+    print ('____________ARM STATE____________')
     pprint(StateDict)
-    print '_________________________________\n'
+    print ('_________________________________\n')
     #    print '\n'
 
 

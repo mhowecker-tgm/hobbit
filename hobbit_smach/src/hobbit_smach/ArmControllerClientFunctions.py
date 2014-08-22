@@ -12,7 +12,7 @@ import time
 
 class ArmClientFunctions():
     def __init__(self,Host):
-        #self.Host = '169.254.141.97'
+        #self.Host = '169.254.141.97'        
         self.Host = Host
         self.Port = 5010
         
@@ -25,8 +25,8 @@ class ArmClientFunctions():
         try:
             csocket.connect((self.Host, self.Port))
             
-        except socket.error, e:
-            print 'XPC Client, Open Socket: ', e
+        except socket.error as e:
+            print ('XPC Client, Open Socket: ', e)
             #ArmControllerFunctions.PublishToROS(e)
             csocket.close()
             exit()
@@ -35,8 +35,8 @@ class ArmClientFunctions():
     def SendData(self,csocket,datastring):
         try:
             csocket.send(datastring)
-        except socket.error, e:
-            print 'XPC Client, Send Data: ', e
+        except socket.error as e:
+            print ('XPC Client, Send Data: ', e)
             #ArmControllerFunctions.PublishToROS(e)
             csocket.close()
             exit()
@@ -44,8 +44,8 @@ class ArmClientFunctions():
     def ReceiveData(self,csocket):
         try:
             res = csocket.recv(1024)
-        except socket.error, e:
-            print 'XPC Client, Receive Data: ', e
+        except socket.error as e:
+            print ('XPC Client, Receive Data: ', e)
             #ArmControllerFunctions.PublishToROS(e)
             csocket.close()
             exit()
@@ -80,7 +80,7 @@ class ArmClientFunctions():
             recv = self.ReceiveData(self.csocket)    #Get the received Data
             ReceiveDataList = ArmControllerFunctions.CutString(recv)
             if ReceiveDataList[1] == 'POSITION_BUFFER_FULL':
-                print ReceiveDataList
+                print (ReceiveDataList)
                 return ReceiveDataList
                 break
         if i==49:
@@ -89,7 +89,7 @@ class ArmClientFunctions():
             recv = self.ReceiveData(self.csocket)    #Get the received Data
             ReceiveDataList = ArmControllerFunctions.CutString(recv)
         #csocket.close()             #Close Socket  
-        print ReceiveDataList      
+        print (ReceiveDataList)
         return ReceiveDataList
                 
     
@@ -141,6 +141,9 @@ class ArmClientFunctions():
             if ReceiveDataList[1]=='COMMAND_OK':
                 State = ArmControllerFunctions.CHAR_TO_BOOL(ReceiveDataList[2])
         elif ReceiveDataList[0] == 'ArmAtCWPos':
+            if ReceiveDataList[1]=='COMMAND_OK':
+                State = ArmControllerFunctions.CHAR_TO_BOOL(ReceiveDataList[2])
+        elif ReceiveDataList[0] == 'ArmAtCandlePos':
             if ReceiveDataList[1]=='COMMAND_OK':
                 State = ArmControllerFunctions.CHAR_TO_BOOL(ReceiveDataList[2])
         elif ReceiveDataList[0] == 'ArmAtPreGraspFromFloorPos':
@@ -228,7 +231,13 @@ class ArmClientFunctions():
         buf = 'SET;StoreTurntable;'
         ReceiveDataList = self.SendTCP(buf)
         #ArmControllerFunctions.PublishToROS(ReceiveDataList)
-        return ReceiveDataList     
+        return ReceiveDataList
+    
+    def SetMoveToCandlePos(self):
+        buf = 'SET;SetMoveToCandlePos;'
+        ReceiveDataList = self.SendTCP(buf)
+        #ArmControllerFunctions.PublishToROS(ReceiveDataList)
+        return ReceiveDataList
     
     def SetTurnTurntableCW(self):
         buf = 'SET;TurnTurntableCW;'
@@ -411,7 +420,13 @@ class ArmClientFunctions():
         Status = self.CheckReceive(ReceiveDataList)
         #ArmControllerFunctions.PublishToROS(ReceiveDataList)
         return Status
-    
+        
+    def GetArmAtCandlePos(self):
+        buf = 'GET;ArmAtCandlePos;'
+        ReceiveDataList = self.SendTCP(buf)
+        Status = self.CheckReceive(ReceiveDataList)
+        #ArmControllerFunctions.PublishToROS(ReceiveDataList)
+        return Status
     '''       
     def GetArmAtGraspFromFloorPos(self):
         buf = 'GET;ArmAtGraspFromFloorPos;'
