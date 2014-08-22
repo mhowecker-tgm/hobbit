@@ -8,6 +8,7 @@ import roslib
 roslib.load_manifest(PKG)
 import rospy
 import smach
+import threading
 
 from std_msgs.msg import String
 from hobbit_msgs import MMUIInterface as MMUI
@@ -418,7 +419,7 @@ class CallEmergencySimple(smach.State):
     def __init__(self):
         smach.State.__init__(
             self,
-            outcomes=['succeeded', 'preempted', 'failed', 'aborted']
+            outcomes=['succeeded', 'preempted', 'aborted']
         )
 
     def execute(self, ud):
@@ -432,17 +433,13 @@ class CallEmergencySimple(smach.State):
         if resp:
             for i, v in enumerate(resp.params):
                 print i, v
-                if v.name == 'result' and v.value == 'B_ENDSOS':
-                    return 'failed'
-                elif v.name == 'result' and v.value == 'B_STOPSOS':
-                    return 'aborted'
-                elif v.name == 'result' and v.value == 'S_OK':
+                if v.name == 'result' and v.value == 'S_OK':
                     return 'succeeded'
                 else:
                     pass
-            return 'failed'
+            return 'aborted'
         else:
-            return 'failed'
+            return 'aborted'
 
 
 class CallEnded(smach.State):
@@ -465,6 +462,56 @@ class CallEnded(smach.State):
         print('response from StartSOSCall was: ')
         print(resp)
         return 'succeeded'
+
+
+class CheckSOSCall(util.WaitForMsgState):
+    """
+    Inherit from util.WaitForMsgState to wait
+    for the end of an emergency call.
+    """
+    def __init__(self, topic, msg_type, msg_cb=None, output_keys=None, latch=False, timeout=None):
+        if output_keys is None:
+            output_keys = []
+        smach.State.__init__(
+            self,
+            outcomes=['succeeded', 'aborted', 'preempted', 'failed'],
+            output_keys=output_keys)
+        self.latch = latch
+        self.timeout = timeout
+        self.mutex = threading.Lock()
+        self.msg = None
+        self.msg_cb = msg_cb
+        self.subscriber = rospy.Subscriber(topic, msg_type, self._callback, queue_size=1)
+
+    def execute(self, ud):
+        """
+            Override execute() to check for some Events
+        """
+        msg = self.waitForMsg()
+        if msg is not None:
+            print(msg)
+            if msg == 'preempted':
+                return 'preempted'
+            # call callback if there is one
+            if self.msg_cb is not None:
+                cb_result = self.msg_cb(msg, ud)
+                # check if callback wants to dictate output
+                if cb_result is not None:
+                    print('self.msg_cb is not None')
+                    if cb_result:
+                        return 'succeeded'
+                    else:
+                        return 'failed'
+            if msg.event == 'B_ENDSOS':
+                return 'failed'
+            elif msg.event == 'B_STOPSOS':
+                return 'succeeded'
+            elif msg.event == 'E_CALLENDED':
+                return 'succeeded'
+            else:
+                return 'aborted'
+        else:
+            return 'aborted'
 
 
 if __name__ == '__main__':

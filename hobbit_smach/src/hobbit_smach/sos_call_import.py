@@ -353,11 +353,21 @@ def get_call_sos_simple():
     sos_sm.userdata.result = String('started')
 
     with sos_sm:
-        StateMachine.add(
+        StateMachine.add_auto(
             'START_SOS_CALL_SIMPLE',
             HobbitMMUI.CallEmergencySimple(),
+            connector_outcomes=['succeeded',
+                                'aborted',
+                                'preempted']
+        )
+        StateMachine.add(
+            'CHECK_SOS_CALL',
+            HobbitMMUI.CheckSOSCall(
+                '/Event',
+                Event
+            ),
             transitions={'succeeded': 'succeeded',
-                         'aborted': 'aborted',
+                         'aborted': 'CHECK_SOS_CALL',
                          'failed': 'failed',
                          'preempted': 'preempted'}
         )
