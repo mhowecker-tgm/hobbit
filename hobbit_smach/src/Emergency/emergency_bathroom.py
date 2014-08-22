@@ -3,7 +3,7 @@
 
 PKG = 'hobbit_smach'
 NAME = 'reminder'
-DEBUG = False
+DEBUG = True
 
 import roslib
 roslib.load_manifest(PKG)
@@ -258,7 +258,7 @@ def main():
                 # FIXME: For testing we use maincorridor here
                 # hobbit_move.goToPosition(frame='/map', room='bathroom', place='door'),
                 hobbit_move.goToPosition(frame='/map', room='maincorridor', place='default'),
-                transitions={'failed': 'SET_FAILURE',
+                transitions={'aborted': 'SET_FAILURE',
                              'succeeded': 'MMUI_CONFIRM_DoYouNeedHelp'}
             )
         else:
@@ -292,9 +292,10 @@ def main():
         StateMachine.add(
             'EMERGENCY_CALL',
             sos_call.get_call_sos_simple(),
-            transitions={'succeeded': 'SET_SUCCESS',
-                         'aborted': 'SET_FAILURE',
-                         'preempted': 'preempted'}
+            transitions={'succeeded': 'MMUI_MAIN_MENU_1',
+                         'failed': 'SET_FAILURE',
+                         'preempted': 'preempted',
+                         'aborted': 'SET_SUCCESS'}
         )
         StateMachine.add(
             'EMO_NEUTRAL',
@@ -318,23 +319,30 @@ def main():
                 text='T_HM_YouCanGetHelpAnytime'
             ),
             transitions={'succeeded': 'SET_SUCCESS',
+                         'aborted': 'SET_FAILURE',
+                         'preempted': 'preempted'}
+        )
+        StateMachine.add(
+            'MMUI_SAY_YouCanGetHelpAnytime',
+            speech_output.sayText(info='T_HM_YouCanGetHelpAnytime'),
+            transitions={'succeeded': 'MMUI_MAIN_MENU_1',
+                         'preempted': 'preempted',
+                         'failed': 'SET_FAILURE'}
+        )
+        StateMachine.add(
+            'MMUI_MAIN_MENU_1',
+            HobbitMMUI.ShowMenu(menu='MAIN'),
+            transitions={'succeeded': 'SET_SUCCESS',
+                         'preempted': 'preempted',
+                         'failed': 'SET_FAILURE'}
+        )
+        StateMachine.add(
+            'EMO_NEUTRAL1',
+            HobbitEmotions.ShowEmotions(emotion='NEUTRAL', emo_time=0),
+            transitions={'succeeded': 'succeeded',
                          'failed': 'SET_FAILURE',
                          'preempted': 'preempted'}
         )
-        # StateMachine.add(
-        #     'MMUI_SAY_YouCanGetHelpAnytime',
-        #     speech_output.sayText(info='T_HM_YouCanGetHelpAnytime'),
-        #     transitions={'succeeded': 'SET_SUCCESS',
-        #                  'preempted': 'preempted',
-        #                  'failed': 'SET_FAILURE'}
-        # )
-        # StateMachine.add(
-        #     'EMO_NEUTRAL1',
-        #     HobbitEmotions.ShowEmotions(emotion='NEUTRAL', emo_time=0),
-        #     transitions={'succeeded': 'succeeded',
-        #                  'failed': 'SET_FAILURE',
-        #                  'preempted': 'preempted'}
-        # )
         StateMachine.add(
             'SET_SUCCESS',
             SetSuccess(),

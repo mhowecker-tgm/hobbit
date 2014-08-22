@@ -354,7 +354,7 @@ def get_call_sos_simple():
 
     with sos_sm:
         StateMachine.add(
-            'START_SOS_CALL',
+            'START_SOS_CALL_SIMPLE',
             HobbitMMUI.CallEmergencySimple(),
             transitions={'succeeded': 'succeeded',
                          'aborted': 'aborted',
