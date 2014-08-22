@@ -53,7 +53,7 @@ then
  # bajo: regular startup does not need the following nodes
  # this is why they should be killed with rosnode kill
  rosnode kill places_interpretation&
- rosnode kill get_current_rooms&
+ rosnode kill get_current_room&
 
  killall -9 mira&
  rosnode kill interfaces_node&
