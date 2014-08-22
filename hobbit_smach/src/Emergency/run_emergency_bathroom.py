@@ -17,7 +17,7 @@ def start_action():
     client.wait_for_server()
     print "connected to server"
     par = []
-    par.append(String('user_initiated'))
+    par.append(String('bathroom sos button'))
     goal = GeneralHobbitGoal(
         command=String('Emergency'),
         parameters=par)

@@ -311,19 +311,30 @@ def main():
                          'failed': 'SET_FAILURE'}
         )
         StateMachine.add(
-            'MMUI_SAY_YouCanGetHelpAnytime',
-            speech_output.sayText(info='T_HM_YouCanGetHelpAnytime'),
+            'SAY_NEUTRAL',
+            speech_output.emo_say_something(
+                emo='NEUTRAL',
+                time=0,
+                text='T_HM_YouCanGetHelpAnytime'
+            ),
             transitions={'succeeded': 'SET_SUCCESS',
-                         'preempted': 'preempted',
-                         'failed': 'SET_FAILURE'}
-        )
-        StateMachine.add(
-            'EMO_NEUTRAL1',
-            HobbitEmotions.ShowEmotions(emotion='NEUTRAL', emo_time=0),
-            transitions={'succeeded': 'succeeded',
                          'failed': 'SET_FAILURE',
                          'preempted': 'preempted'}
         )
+        # StateMachine.add(
+        #     'MMUI_SAY_YouCanGetHelpAnytime',
+        #     speech_output.sayText(info='T_HM_YouCanGetHelpAnytime'),
+        #     transitions={'succeeded': 'SET_SUCCESS',
+        #                  'preempted': 'preempted',
+        #                  'failed': 'SET_FAILURE'}
+        # )
+        # StateMachine.add(
+        #     'EMO_NEUTRAL1',
+        #     HobbitEmotions.ShowEmotions(emotion='NEUTRAL', emo_time=0),
+        #     transitions={'succeeded': 'succeeded',
+        #                  'failed': 'SET_FAILURE',
+        #                  'preempted': 'preempted'}
+        # )
         StateMachine.add(
             'SET_SUCCESS',
             SetSuccess(),
