@@ -142,7 +142,7 @@ def get_end_recharge():
 
 def call_hobbit():
     """
-    First check if Hobbit s charging and in the docking station,
+    First check if Hobbit is charging and in the docking station,
     if so move out. Then go to the user.
     """
 
@@ -173,8 +173,8 @@ def call_hobbit():
             connector_outcomes=['succeeded']
         )
         StateMachine.add_auto(
-	    'SET_NAV_GOAL',
-	    hobbit_move.SetNavigationGoal(),
+        'SET_NAV_GOAL',
+        hobbit_move.SetNavigationGoal(),
             connector_outcomes=['succeeded']
         )
         StateMachine.add(

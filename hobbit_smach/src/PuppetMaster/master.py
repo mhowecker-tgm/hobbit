@@ -34,7 +34,8 @@ def disable(self):
         self.FAIL = ''
         self.ENDC = ''
 
-commands = [['emergency', 'G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP', 'G_HELP', 'A_HELP','C_HELP', 'F_CALLSOS', 'G_EMERGENCY'],
+commands = [['emergency', 'G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP',
+             'G_HELP', 'A_HELP', 'C_HELP', 'F_CALLSOS', 'G_EMERGENCY'],
             ['recharge', 'E_RECHARGE', 'C_RECHARGE'],
             ['reminder', 'E_REMINDER'],
             ['stop', 'C_STOP', 'G_STOP', 'E_STOP'],
@@ -95,8 +96,12 @@ def command_cb(msg, ud):
                     return True
             if item[0] == 'call_hobbit':
                 ud.command = item[0]
+                for i, v in enumerate(ud.params):
+                    if v.name == 'bathroom' and v.value == 'true':
+                        ud.parameters['active_task'] = 'emergency_bathroom'
+                        ud.params = msg.params
+                        return True
                 ud.params = msg.params
-                # print(msg.params)
                 ud.parameters['active_task'] = index
                 return True
             elif item[0] == 'emergency':
@@ -104,7 +109,7 @@ def command_cb(msg, ud):
                 ud.command = item[0]
                 return True
             # elif index == 1 and night and index + 1 <= active_task:
-            elif item[0] == 'recharge' and not night and index  <= active_task:
+            elif item[0] == 'recharge' and not night and index <= active_task:
                 rospy.loginfo('RECHARGING')
                 ud.command = 'recharge'
                 ud.parameters['active_task'] = index
@@ -427,6 +432,7 @@ def main():
                          'reminder': 'REMINDER',
                          'stop': 'STOP',
                          'call_hobbit': 'CALL_HOBBIT',
+                         'emergency_bathroom': 'EMERGENCY_BATHROOM',
                          'call': 'CALL',
                          'clear_floor': 'CLEAR_FLOOR',
                          'away': 'AWAY',
@@ -445,7 +451,6 @@ def main():
         )
         StateMachine.add(
             'LEARN_OBJECT',
-            # FakeForAllWithoutRunningActionSever(name='LEARN_OBJECT'),
             SimpleActionState(
                 'learn_object',
                 GeneralHobbitAction,
@@ -458,7 +463,6 @@ def main():
         )
         StateMachine.add(
             'REMINDER',
-            # FakeForAllWithoutRunningActionSever(name='REMINDER'),
             SimpleActionState(
                 'reminder',
                 GeneralHobbitAction,
@@ -471,7 +475,6 @@ def main():
         )
         StateMachine.add(
             'EMERGENCY',
-            # FakeForAllWithoutRunningActionSever(name='EMERGENCY'),
             SimpleActionState('emergency_user',
                               GeneralHobbitAction,
                               goal_cb=sos_cb,
@@ -493,7 +496,6 @@ def main():
         )
         StateMachine.add(
             'GOTO',
-            # FakeForAllWithoutRunningActionSever(name='GOTO'),
             SimpleActionState('goto',
                               GeneralHobbitAction,
                               goal_cb=goto_cb,
@@ -504,7 +506,6 @@ def main():
         StateMachine.add(
             'STOP',
             helper.get_hobbit_full_stop(),
-            # FakeForAllWithoutRunningActionSever(name='STOP'),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          # 'aborted': 'failed',
                          'failed': 'RESET_ACTIVE_TASK'}
@@ -512,7 +513,15 @@ def main():
         StateMachine.add(
             'CALL_HOBBIT',
             call_hobbit.call_hobbit(),
-            # FakeForAllWithoutRunningActionSever(name='CALL_HOBBIT'),
+            transitions={'succeeded': 'RESET_ACTIVE_TASK',
+                         'aborted': 'RESET_ACTIVE_TASK'}
+        )
+        StateMachine.add(
+            'EMERGENCY_BATHROOM',
+            SimpleActionState('emergency_bathroom',
+                              GeneralHobbitAction,
+                              goal_cb=away_cb,
+                              input_keys=['parameters', 'params']),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
