@@ -3,14 +3,12 @@
 
 PKG = 'hobbit_smach'
 NAME = 'learn_object'
-DEBUG =  False
-MMUI_IS_DOING_IT = True
+DEBUG = False
 
 import roslib
 roslib.load_manifest(PKG)
 import rospy
 from uashh_smach.util import SleepState
-import hobbit_smach.hobbit_move_import as hobbit_move
 
 from std_msgs.msg import String
 from hobbit_msgs.msg import GeneralHobbitAction
@@ -21,6 +19,7 @@ import hobbit_smach.learn_object_import as learn_object
 import hobbit_smach.head_move_import as head_move
 import hobbit_smach.arm_move_import as arm_move
 import hobbit_smach.speech_output_import as speech_output
+# import hobbit_smach.hobbit_move_import as hobbit_move
 
 
 class Init(State):
@@ -160,26 +159,12 @@ def main():
 
     cc1 = Concurrence(
         outcomes=['succeeded', 'preempted', 'failed'],
-        default_outcome='failed'
-    )
-
-    cc2 = Concurrence(
-        outcomes=['succeeded', 'preempted', 'failed'],
         default_outcome='failed',
-        outcome_map={'succeeded': {'EMO_WONDERING': 'succeeded', 'SAY_LEARN_NEW_OBJECT': 'succeeded'}}
+        outcome_map={'succeeded': {'EMO_WONDERING': 'succeeded',
+                                   'SAY_LEARN_NEW_OBJECT': 'succeeded'}}
     )
 
     with cc1:
-        Concurrence.add(
-            'EMO_HAPPY',
-            HobbitEmotions.ShowEmotions(emotion='HAPPY', emo_time=4)
-        )
-        Concurrence.add(
-            'SAY_ATTENTION',
-            speech_output.sayText(info='T_LO_ATTENTION_I_AM_MOVING_MY_ARM_OUT')
-        )
-
-    with cc2:
         Concurrence.add(
             'EMO_WONDERING',
             HobbitEmotions.ShowEmotions(emotion='WONDERING', emo_time=4)
@@ -191,19 +176,23 @@ def main():
         )
 
     with seq1:
-        #Sequence.add(
-        #    'SAY_HAPPY',
-        #    cc1
-        #)
+        Sequence.add(
+            'SAY_HAPPY',
+            speech_output.emo_say_something(
+                emo='HAPPY',
+                time=4,
+                text='T_LO_ATTENTION_I_AM_MOVING_MY_ARM_OUT'
+            )
+        )
         Sequence.add(
             'HEAD_MOVE',
             head_move.MoveTo(pose='center_center'),
             transitions={'aborted': 'failed'}
         )
-        #if not DEBUG:
-        #    Sequence.add(
-        #        'MOVE_BACK',
-        #        hobbit_move.Move(goal='back', distance=0.25))
+        # if not DEBUG:
+        #     Sequence.add(
+        #         'MOVE_BACK',
+        #         hobbit_move.Move(goal='back', distance=0.25))
         Sequence.add(
             'HEAD_MOVE_2',
             head_move.MoveTo(pose='down_center'),
@@ -224,10 +213,10 @@ def main():
             'MOVE_TT_LEARN_POSITION',
             arm_move.goToLearnPosition()
         )
-        #if not DEBUG:
-        #    Sequence.add(
-        #        'MOVE_FRONT',
-        #        hobbit_move.Move(goal='front', distance=0.25))
+        # if not DEBUG:
+        #     Sequence.add(
+        #         'MOVE_FRONT',
+        #         hobbit_move.Move(goal='front', distance=0.25))
         Sequence.add(
             'HEAD_MOVE_3',
             head_move.MoveTo(pose='to_turntable'),
@@ -236,7 +225,7 @@ def main():
         with seq2:
             Sequence.add(
                 'SAY_LEARN_NEW_OBJECT',
-                cc2
+                cc1
             )
             Sequence.add(
                 'WAIT_3',
@@ -298,7 +287,8 @@ def main():
         )
         StateMachine.add(
             'CONFIRM_PUT_OBJECT_ON_TRAY',
-            HobbitMMUI.ConfirmInfo(info='T_LO_PLEASE_PUT_OBJECT_ONTO_TURNTABLE'),
+            HobbitMMUI.ConfirmInfo(
+                info='T_LO_PLEASE_PUT_OBJECT_ONTO_TURNTABLE'),
             transitions={'succeeded': 'CHECK_FOR_OBJECT_1',
                          'failed': 'FAIL_COUNT_CONFIRM_1'}
         )
@@ -328,7 +318,8 @@ def main():
         )
         StateMachine.add(
             'SAY_UNABLE_TO_SEE_OBJECT',
-            speech_output.sayText(info='T_LO_I_COULD_NOT_FIND_OBJECT_ON_TURNTABLE'),
+            speech_output.sayText(
+                info='T_LO_I_COULD_NOT_FIND_OBJECT_ON_TURNTABLE'),
             transitions={'succeeded': 'CONFIRM_PUT_OBJECT_ON_TRAY',
                          'failed': 'SET_FAILURE'}
         )
