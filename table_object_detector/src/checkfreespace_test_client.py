@@ -87,13 +87,10 @@ class Trigger():
 	#check normal distance from object to camera
 	print "check normal distance from object to camera:"
  	rospy.wait_for_service('check_camera_distance_center')
-	print "df2"
+	print "checkfreespace_test_client.py: service  check_camera_distance_center found"
 	check_camera_distance_center = rospy.ServiceProxy('check_camera_distance_center', CheckCameraDistanceCenter)
-	print "df2.5"
 	input_cdist = CheckCameraDistanceCenter()
-	print "df3"
    	input_cdist.cloud = self.pc_
-	print "df4"
 	resp_cdist = check_camera_distance_center(input_cdist.cloud)
 	print "resp_cdist",resp_cdist
    

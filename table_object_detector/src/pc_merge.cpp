@@ -80,12 +80,6 @@ bool CPCMerge::check_free_space(table_object_detector::CheckFreeSpace::Request  
   pcl::PointCloud<pcl::PointXYZ> pcl_cloud_merged;  //needed zwischenstep?
   pcl_cloud_merged = pc_check_free_space_new_cs;
 
-  float temp;
-  temp=0.0;
-   for (int i=1; i< 302000; i++){
-	temp = (float) pcl_cloud_merged.points[i].z;  //!!!!!!! probably very buggy for getting real center value
-  	ROS_INFO("sending distance for first 2000 points: [%f]", temp);
-  }
 
   filter_pc(pcl_cloud_merged, false, req.x1, req.x2, req.y1, req.y2, req.z1, req.z2); //second entry false <=> coordinates of highest points of scene are published instead of basket center point
   ROS_INFO("%d",(int)pcl_cloud_merged.points.size());
@@ -122,11 +116,22 @@ bool CPCMerge::check_camera_distance_center(table_object_detector::CheckCameraDi
   pcl::fromROSMsg(req.cloud, pcl_cloud_input_as_pcl); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!
   
   int middle_point = pcl_cloud_input_as_pcl.points.size()/2;
+  float acc_distance;
+  acc_distance = 0.0;
+  int cnt;
+  cnt = 0;
   for (int i=150000; i< 152000; i++){
 	res.camera_center_object_distance_in_m = pcl_cloud_input_as_pcl.points[i].z;  //!!!!!!! probably very buggy for getting real center value
-  	//ROS_INFO("numer of points in point cloud: [%f]", (float)res.camera_center_object_distance_in_m);
-  	ROS_INFO("sending back response res.camera_center_object_distance_in_m: [x: \t %f \t y: %f \t z: %f]", pcl_cloud_input_as_pcl.points[i].x,pcl_cloud_input_as_pcl.points[i].y,(float)res.camera_center_object_distance_in_m);
+	if (res.camera_center_object_distance_in_m > -1.0 and res.camera_center_object_distance_in_m < 1000.0){  //if it's a real value
+		acc_distance += res.camera_center_object_distance_in_m;
+		cnt++;
+	}
+	//ROS_INFO("numer of points in point cloud: [%f]", (float)res.camera_center_object_distance_in_m);
+  	//ROS_INFO("sending back response res.camera_center_object_distance_in_m: [x: \t %f \t y: %f \t z: %f]", pcl_cloud_input_as_pcl.points[i].x,pcl_cloud_input_as_pcl.points[i].y,(float)res.camera_center_object_distance_in_m);
   }
+  ROS_INFO("\n check_camera_distance_center: counter of valid distance values: \t %f]", (float)(cnt));
+  ROS_INFO("check_camera_distance_center: distance in camera z-axis: [z-center-mean: \t %f]", (float)(acc_distance/cnt));
+  res.camera_center_object_distance_in_m = (float)(acc_distance/cnt);
   //pcl_cloud_merged.points.size();
   //ROS_INFO("sending back response res.camera_center_object_distance_in_m: [%f]", res.camera_center_object_distance_in_m);
   m.unlock();

@@ -21,7 +21,7 @@
 		pkg="table_object_detector" 
 		type="pc_merge" 
 		output="screen" 
-		respawn="true">        
+		respawn="false">        
     	</node>
 
 </launch>
