@@ -289,7 +289,8 @@ def sleep_cb(ud, goal):
 
 def bring_cb(ud, goal):
     par = []
-    par.append(String(ud.params[0].value))
+    par.append({'object_name': ud.params[0].value})
+    # par.append(String(ud.params[0].value))
     rospy.loginfo('bring_cb: %s' % ud.params[0].value)
     goal = GeneralHobbitGoal(command=String('bring_object'),
                              previous_state=String('call_hobbit'),
