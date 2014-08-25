@@ -202,7 +202,7 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 		float min_height_ = 0.3;
         	float max_height_ = 1.4; //FIXME
 
-		if ( std::isnan(x) || std::isnan(y) || std::isnan(z) )
+		if (!std::isfinite(x) || !std::isfinite(y) || !std::isfinite(z) )
 		{
 			continue;
 		}
