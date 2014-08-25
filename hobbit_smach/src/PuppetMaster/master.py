@@ -15,24 +15,10 @@ from hobbit_msgs.msg import Command, Event, GeneralHobbitAction,\
 import hobbit_smach.helper_import as helper
 import hobbit_smach.recharge_import as recharge
 import hobbit_smach.call_hobbit_import as call_hobbit
+import hobbit_smach.bcolors as bcolors
 import uashh_smach.util as util
 from hobbit_user_interaction import HobbitEmotions
 
-
-class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-def disable(self):
-        self.HEADER = ''
-        self.OKBLUE = ''
-        self.OKGREEN = ''
-        self.WARNING = ''
-        self.FAIL = ''
-        self.ENDC = ''
 
 commands = [['emergency', 'G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP',
              'G_HELP', 'A_HELP', 'C_HELP', 'F_CALLSOS', 'G_EMERGENCY'],
@@ -42,7 +28,7 @@ commands = [['emergency', 'G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP',
             ['call_hobbit', 'C_CALLHOBBIT', 'E_CALLHOBBIT'],
             ['call', 'E_CALLRING', 'E_CALLESTABLISHED', 'E_CALLENDED', 'C_MAKECALL'],
             ['away', 'C_AWAY1', 'C_AWAY2', 'C_AWAY3', 'C_AWAY4', 'C_AWAY5', 'C_AWAY6',
-            'C_SLEEP1','C_SLEEP2','C_SLEEP3','C_SLEEP4','C_SLEEP5','C_SLEEP6',],
+            'C_SLEEP1', 'C_SLEEP2', 'C_SLEEP3', 'C_SLEEP4', 'C_SLEEP5', 'C_SLEEP6'],
             ['clear_floor', 'E_CLEARFLOOR'],
             ['pickup', 'follow', 'learn_object', 'bring_object', 'goto', 'pickup'
              'C_PICKUP', 'C_FOLLOW', 'C_LEARN', 'C_BRING', 'C_GOTOPOINT', 'G_POINTING'],
@@ -107,6 +93,17 @@ def command_cb(msg, ud):
             elif item[0] == 'emergency':
                 ud.parameters['active_task'] = index
                 ud.command = item[0]
+                return True
+            elif item[0] == 'away' or item[0] == 'sleep':
+                times = [1, 2, 4, 6, 12, 24]
+                print(input_ce)
+                index = int(input_ce[-1:]) - 1
+                print(times[index])
+                if input_ce[:-1] == 'SLEEP':
+                    ud.command = 'sleep'
+                else:
+                    ud.command = 'away'
+                ud.parameters['sleep_time'] = times[index]
                 return True
             # elif index == 1 and night and index + 1 <= active_task:
             elif item[0] == 'recharge' and not night and index <= active_task:
@@ -281,11 +278,48 @@ class FakeForAllWithoutRunningActionSever(State):
         return 'succeeded'
 
 
+def sleep_cb(ud, goal):
+    par = []
+    par.append(String(ud.parameters['sleep_time']))
+    goal = GeneralHobbitGoal(command=String('sleep'),
+                             previous_state=String('call_hobbit'),
+                             parameters=par)
+    return goal
+
+
+def bring_cb(ud, goal):
+    par = []
+    par.append(String(ud.params[0].value))
+    rospy.loginfo('bring_cb: %s' % ud.params[0].value)
+    goal = GeneralHobbitGoal(command=String('bring_object'),
+                             previous_state=String('call_hobbit'),
+                             parameters=par)
+    return goal
+
+
 def away_cb(ud, goal):
     par = []
-    par.append(String('2'))
+    par.append(String(ud.parameters['sleep_time']))
     goal = GeneralHobbitGoal(command=String('away'),
                              previous_state=String('call_hobbit'),
+                             parameters=par)
+    return goal
+
+
+def patrol_cb(ud, goal):
+    goal = GeneralHobbitGoal(command=String('locateUser'),
+                             previous_state=String('call_hobbit'),
+                             parameters=[])
+    return goal
+
+
+def follow_cb(ud, goal):
+    room, place = ud.params[0].value.lower().split(' ')
+    par = []
+    par.append(String(room))
+    par.append(String(place))
+    goal = GeneralHobbitGoal(command=String('follow'),
+                             previous_state=String('previous_task'),
                              parameters=par)
     return goal
 
@@ -297,7 +331,7 @@ def goto_cb(ud, goal):
     par.append(String(place))
     goal = GeneralHobbitGoal(command=String('goto'),
                              previous_state=String('previous_task'),
-                                 parameters=par)
+                             parameters=par)
     return goal
 
 
@@ -436,6 +470,7 @@ def main():
                          'call': 'CALL',
                          'clear_floor': 'CLEAR_FLOOR',
                          'away': 'AWAY',
+                         'sleep': 'SLEEP',
                          'pickup': 'PICKUP',
                          'follow': 'FOLLOW',
                          'learn_object': 'LEARN_OBJECT',
@@ -490,7 +525,10 @@ def main():
         )
         StateMachine.add(
             'PATROL',
-            FakeForAllWithoutRunningActionSever(name='PATROL'),
+            SimpleActionState('locate_user',
+                              GeneralHobbitAction,
+                              goal_cb=patrol_cb,
+                              input_keys=['parameters', 'params']),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
@@ -545,7 +583,10 @@ def main():
         )
         StateMachine.add(
             'FOLLOW',
-            FakeForAllWithoutRunningActionSever(name='FOLLOW'),
+            SimpleActionState('follow',
+                              GeneralHobbitAction,
+                              goal_cb=follow_cb,
+                              input_keys=['parameters', 'params']),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
@@ -560,6 +601,11 @@ def main():
         StateMachine.add(
             'BRING_OBJECT',
             FakeForAllWithoutRunningActionSever(name='BRING_OBJECT'),
+            #SimpleActionState('bring_object',
+            #                  GeneralHobbitAction,
+            #                  goal_cb=bring_cb,
+            #                  input_keys=['parameters', 'params']
+            #                  ),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK',
                          'failed': 'RESET_ACTIVE_TASK'}
@@ -583,6 +629,15 @@ def main():
             SimpleActionState('away',
                               GeneralHobbitAction,
                               goal_cb=away_cb,
+                              input_keys=['parameters', 'params']),
+            transitions={'succeeded': 'RESET_ACTIVE_TASK',
+                         'aborted': 'RESET_ACTIVE_TASK'}
+        )
+        StateMachine.add(
+            'SLEEP',
+            SimpleActionState('sleep',
+                              GeneralHobbitAction,
+                              goal_cb=sleep_cb,
                               input_keys=['parameters', 'params']),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
