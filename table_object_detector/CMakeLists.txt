@@ -43,6 +43,7 @@ include_directories(
 add_service_files(
   FILES 
   CheckFreeSpace.srv
+  CheckCameraDistanceCenter.srv
 )
 
 ## Generate added messages and services

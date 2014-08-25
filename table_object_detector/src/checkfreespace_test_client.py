@@ -61,7 +61,7 @@ class Trigger():
             return
         self.pc_.header.stamp = self.t
         #self.pc_pub.publish(self.pc_)
-	rospy.wait_for_service('check_free_space')
+	'''rospy.wait_for_service('check_free_space')
     	try:
             check_free_space = rospy.ServiceProxy('check_free_space', CheckFreeSpace)
 	    input = CheckFreeSpace()
@@ -80,11 +80,22 @@ class Trigger():
 	    #resp1 = check_free_space(input)
 	    resp1 = check_free_space(input.cloud,input.frame_id_original,input.frame_id_desired,input.x1,input.x2,input.y1,input.y2,input.z1,input.z2)
 	    print "number of points in area with boarders \nx1: ", input.x1, "\tx2: ",input.x2,"\ny1: ",input.y1,"\ty2: ",input.y2,"\nz1: ",input.z1,"\tz2: ",input.z2,"\nnr_points: ",resp1.nr_points_in_area
-            return resp1.nr_points_in_area
+            #return resp1.nr_points_in_area
     	except rospy.ServiceException, e:
             print "Service call failed: %s"%e
- 	
-   
+	'''
+	#check normal distance from object to camera
+	print "check normal distance from object to camera:"
+ 	rospy.wait_for_service('check_camera_distance_center')
+	print "df2"
+	check_camera_distance_center = rospy.ServiceProxy('check_camera_distance_center', CheckCameraDistanceCenter)
+	print "df2.5"
+	input_cdist = CheckCameraDistanceCenter()
+	print "df3"
+   	input_cdist.cloud = self.pc_
+	print "df4"
+	resp_cdist = check_camera_distance_center(input_cdist.cloud)
+	print "resp_cdist",resp_cdist
    
 
 def main(args):       

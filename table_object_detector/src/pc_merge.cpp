@@ -33,6 +33,7 @@
 #include "tf/transform_listener.h"
 
 #include "table_object_detector/CheckFreeSpace.h"
+#include "table_object_detector/CheckCameraDistanceCenter.h"
 
 
 CPCMerge::CPCMerge(ros::NodeHandle nh_)
@@ -45,6 +46,7 @@ CPCMerge::CPCMerge(ros::NodeHandle nh_)
   position_highestpoint_pub = nh.advertise<std_msgs::String>("/SS/basket_position",1);
   //define service check_free_space
   service_check_free_space = nh.advertiseService("check_free_space", &CPCMerge::check_free_space, this);
+  service_check_camera_distance_center = nh.advertiseService("check_camera_distance_center", &CPCMerge::check_camera_distance_center, this);
 
   //define subscriber
   pc_cam1_sub = nh.subscribe("/SS/headcam/depth_registered/points",1, &CPCMerge::pc_cam1_callback, this);
@@ -78,8 +80,15 @@ bool CPCMerge::check_free_space(table_object_detector::CheckFreeSpace::Request  
   pcl::PointCloud<pcl::PointXYZ> pcl_cloud_merged;  //needed zwischenstep?
   pcl_cloud_merged = pc_check_free_space_new_cs;
 
+  float temp;
+  temp=0.0;
+   for (int i=1; i< 302000; i++){
+	temp = (float) pcl_cloud_merged.points[i].z;  //!!!!!!! probably very buggy for getting real center value
+  	ROS_INFO("sending distance for first 2000 points: [%f]", temp);
+  }
+
   filter_pc(pcl_cloud_merged, false, req.x1, req.x2, req.y1, req.y2, req.z1, req.z2); //second entry false <=> coordinates of highest points of scene are published instead of basket center point
-  ROS_INFO("%d",pcl_cloud_merged.points.size());
+  ROS_INFO("%d",(int)pcl_cloud_merged.points.size());
 
   //publish point clouds of area where free space was checked
   if (pcl_cloud_merged.points.size() > 0)
@@ -88,10 +97,48 @@ bool CPCMerge::check_free_space(table_object_detector::CheckFreeSpace::Request  
   }
 
   res.nr_points_in_area = pcl_cloud_merged.points.size();
-  ROS_INFO("sending back response: [%ld]", (long int)res.nr_points_in_area);
+  ROS_INFO("sending back response res.nr_points_in_area: [%ld]", (long int)res.nr_points_in_area);
   m.unlock();
   return true;
 }
+
+
+
+
+
+// check how far away the center of the depth cloud is away from the camera (in m)
+bool CPCMerge::check_camera_distance_center(table_object_detector::CheckCameraDistanceCenter::Request  &req,
+         table_object_detector::CheckCameraDistanceCenter::Response &res)
+{
+  m.lock();
+  ROS_INFO("pc_merge.cpp: check_camera_distance_center: point cloud received");
+
+
+  //pcl::PointCloud<pcl::PointXYZ> pcl_cloud_check_free_space_old_cs;
+  //pcl::fromROSMsg(req.cloud, pcl_cloud_check_free_space_old_cs); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  
+  //ROS_INFO("=======================> %d",req.cloud.points.size());
+  pcl::PointCloud<pcl::PointXYZ> pcl_cloud_input_as_pcl;
+  pcl::fromROSMsg(req.cloud, pcl_cloud_input_as_pcl); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  
+  int middle_point = pcl_cloud_input_as_pcl.points.size()/2;
+  for (int i=150000; i< 152000; i++){
+	res.camera_center_object_distance_in_m = pcl_cloud_input_as_pcl.points[i].z;  //!!!!!!! probably very buggy for getting real center value
+  	//ROS_INFO("numer of points in point cloud: [%f]", (float)res.camera_center_object_distance_in_m);
+  	ROS_INFO("sending back response res.camera_center_object_distance_in_m: [x: \t %f \t y: %f \t z: %f]", pcl_cloud_input_as_pcl.points[i].x,pcl_cloud_input_as_pcl.points[i].y,(float)res.camera_center_object_distance_in_m);
+  }
+  //pcl_cloud_merged.points.size();
+  //ROS_INFO("sending back response res.camera_center_object_distance_in_m: [%f]", res.camera_center_object_distance_in_m);
+  m.unlock();
+  return true;
+}
+
+
+
+
+
+
+
 
 void CPCMerge::pc_cam1_callback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& pcl_in)
 {
@@ -156,26 +203,26 @@ void CPCMerge::filter_pc(pcl::PointCloud<pcl::PointXYZ>& pcl_cloud_merged, bool 
 	pcl::PassThrough<pcl::PointXYZ> pass;
 
 	ROS_INFO("Filtering outliers and cutting region");
-	ROS_INFO("points before filtering: %d", pcl_cloud_merged.points.size());
+	ROS_INFO("points before filtering: %d", (int)pcl_cloud_merged.points.size());
 	//Filter w.r.t. axis z
 	pass.setInputCloud (cloud);
 	pass.setFilterFieldName ("z");
 	pass.setFilterLimits (z_min, z_max);
 	//pass.setFilterLimitsNegative (true);
 	pass.filter (*cloud_filtered_z);
-	ROS_INFO("points after z filtering: %d", cloud_filtered_z->points.size());
+	ROS_INFO("points after z filtering: %d", (int)cloud_filtered_z->points.size());
 	//Filter w.r.t. axis y
 	pass.setInputCloud(cloud_filtered_z);
 	pass.setFilterFieldName ("y");
 	pass.setFilterLimits (y_min, y_max);
 	pass.filter (*cloud_filtered_y);
-	ROS_INFO("points after y filtering: %d", cloud_filtered_y->points.size());
+	ROS_INFO("points after y filtering: %d", (int)cloud_filtered_y->points.size());
 	//Filter w.r.t. axis x
 	pass.setInputCloud(cloud_filtered_y);
 	pass.setFilterFieldName ("x");
 	pass.setFilterLimits (x_min, x_max);
 	pass.filter (*cloud_filtered_x);
-	ROS_INFO("points after x filtering: %d", cloud_filtered_x->points.size());
+	ROS_INFO("points after x filtering: %d", (int)cloud_filtered_x->points.size());
 	//Create the filtering object
 	pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
 	sor.setInputCloud(cloud_filtered_x);
@@ -184,7 +231,7 @@ void CPCMerge::filter_pc(pcl::PointCloud<pcl::PointXYZ>& pcl_cloud_merged, bool 
 	sor.filter(pcl_cloud_merged);
 
 	if (pub_basket_position == false){ // than the position of the highest point is published!
-	    ROS_INFO("%d",pcl_cloud_merged.points.size());
+	    ROS_INFO("%d",(int)pcl_cloud_merged.points.size());
 		float z_max = -1000;			//max heigt val for z
 		float x_for_z_max = -1000;		//coordinates for x,y at position of maximal z
 		float y_for_z_max = -1000;

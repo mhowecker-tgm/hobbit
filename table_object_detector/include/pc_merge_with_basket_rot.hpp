@@ -71,6 +71,7 @@
 
 #include <sstream>
 #include "table_object_detector/CheckFreeSpace.h"
+#include "table_object_detector/CheckCameraDistanceCenter.h"
 
 using namespace std;
 
@@ -90,6 +91,7 @@ public:
 	ros::Subscriber pc_cam1_sub2;
 	ros::Subscriber pc_cam2_sub;
 	ros::ServiceServer service_check_free_space;
+	ros::ServiceServer service_check_camera_distance_center;
 	pcl::PointCloud<pcl::PointXYZ> pc_check_free_space_new_cs; //cs ...coordinate system
 	pcl::PointCloud<pcl::PointXYZ> pc_cam1;
 	pcl::PointCloud<pcl::PointXYZ> pc_cam2;
@@ -117,6 +119,10 @@ public:
 	void segment_pc(pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_cloud_merged );
 	//service function for check_free_space
 	bool check_free_space(table_object_detector::CheckFreeSpace::Request  &req, table_object_detector::CheckFreeSpace::Response &res);
+	//service function for check_camera_distance_center
+	bool check_camera_distance_center(table_object_detector::CheckCameraDistanceCenter::Request  &req, table_object_detector::CheckCameraDistanceCenter::Response &res);
+
+
 	// receives point clouds from camera #1
 	void pc_cam1_callback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& pcl_in);
 
@@ -148,7 +154,7 @@ void CPCMerge::basket_detection(pcl::PointCloud<PointT>& pcl_cloud_merged,
 
 	//step_1
 	//filter by height
-    ROS_INFO("%d",pcl_cloud_merged.points.size());
+    ROS_INFO("%d",(int)pcl_cloud_merged.points.size());
 	for (unsigned int i = 0; i < pcl_cloud_merged.points.size(); ++i)
 	{
 	  if (pcl_cloud_merged.points[i].z < 0.1)
@@ -157,7 +163,7 @@ void CPCMerge::basket_detection(pcl::PointCloud<PointT>& pcl_cloud_merged,
 		pc_for_basketdet.push_back(pnt_tmp);
 	  }
 	}
-	ROS_INFO("%d",pc_for_basketdet.points.size());
+	ROS_INFO("%d",(int)pc_for_basketdet.points.size());
 	//step_2
 	//find max/min for x/y
 	double x_mi = 1000;
@@ -362,7 +368,7 @@ void CPCMerge::basket_detection(pcl::PointCloud<PointT>& pcl_cloud_merged,
 	   	length_edge = box_width;
 	   	length_other_edge = box_height;
 	  }
-	  ROS_INFO("variable: long_edge_selected: %f",long_edge_selected);
+	  //ROS_INFO("variable: long_edge_selected: %f",long_edge_selected);
 	  //make 90 degree rotation of direction vector from segment_line model (swap x,y-coordinates and make x negativ)
 	  double n_vec_line_x = - model_coefficients[4];
 	  double n_vec_line_y =   model_coefficients[3];

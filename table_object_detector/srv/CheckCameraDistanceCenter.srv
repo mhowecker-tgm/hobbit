@@ -1,0 +1,4 @@
+sensor_msgs/PointCloud2 cloud
+---
+float32 camera_center_object_distance_in_m
+
