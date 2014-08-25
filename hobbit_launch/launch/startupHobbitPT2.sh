@@ -99,11 +99,16 @@ roslaunch startup.launch&
 #cd /opt/ros/hobbit_hydro/src/interfaces_mira/resources
 #miracenter mira_vis_config.xml&
 
+sleep $DELAY_BETWEEN_STEPS
+# Start the virtual laser from the headcam for obstacle avoidance
+cd /opt/ros/hobbit_hydro/src/top_scan_points/launch
+roslaunch startup.launch&
 
+sleep $DELAY_BETWEEN_STEPS
 #Switch Mira stuff to navigation mode ( default )
 ./switchMira.sh navigation
 
-
+sleep $DELAY_BETWEEN_STEPS
 #Startup Joystick node , ( it allows webinterface joystick emulation also )
 roslaunch joy2twist startup.launch&
 
