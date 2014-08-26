@@ -106,6 +106,7 @@ roslaunch startup.launch&
 
 sleep $DELAY_BETWEEN_STEPS
 #Switch Mira stuff to navigation mode ( default )
+cd /opt/ros/hobbit_hydro/src/hobbit_launch/launch
 ./switchMira.sh navigation
 
 sleep $DELAY_BETWEEN_STEPS
