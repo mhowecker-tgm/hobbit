@@ -120,9 +120,10 @@ bool CPCMerge::check_camera_distance_center(table_object_detector::CheckCameraDi
   acc_distance = 0.0;
   int cnt;
   cnt = 0;
-  for (int i=150000; i< 152000; i++){
+  for (int i=148000; i< 154000; i++){
 	res.camera_center_object_distance_in_m = pcl_cloud_input_as_pcl.points[i].z;  //!!!!!!! probably very buggy for getting real center value
-	if (res.camera_center_object_distance_in_m > -1.0 and res.camera_center_object_distance_in_m < 1000.0){  //if it's a real value
+	if (res.camera_center_object_distance_in_m > -1.0 and res.camera_center_object_distance_in_m < 1000.0 and pcl_cloud_input_as_pcl.points[i].x < 0.2 and 
+            pcl_cloud_input_as_pcl.points[i].x > -0.2 and pcl_cloud_input_as_pcl.points[i].y < 0.1 and pcl_cloud_input_as_pcl.points[i].y > -0.1){  //if it's a real value
 		acc_distance += res.camera_center_object_distance_in_m;
 		cnt++;
 	}
