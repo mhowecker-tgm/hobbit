@@ -228,6 +228,7 @@ class SelectTask(State):
             outcomes=['emergency',
                       'recharge',
                       'reminder',
+                      'emergency_bathroom',
                       'stop',
                       'call_hobbit',
                       'call',
@@ -244,6 +245,7 @@ class SelectTask(State):
                       'silent_recharge',
                       'social_role',
                       'preempted',
+                      'sleep',
                       'none'])
 
     def execute(self, ud):
