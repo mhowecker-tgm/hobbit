@@ -513,6 +513,7 @@ void execute(char * command,char * param)
   if (strcmp(command,"setUserName")==0)           { rosparam_set(cR,cRLen,(char *) "/Hobbit/robot_name",param);      }  else
   if (strcmp(command,"setRobotName")==0)          { rosparam_set(cR,cRLen,(char *) "/Hobbit/user_name",param);       }  else
   if (strcmp(command,"setSocialRole")==0)         { rosparam_set(cR,cRLen,(char *) "/Hobbit/social_role",param);     }  else
+  if (strcmp(command,"askForSocialRole")==0)      { rostopic_pub(cR,cRLen,(char*) "/Command", (char *) "hobbit_msgs/Command", (char *) "\"{command: 'C_SOCIALROLE' , params: [ {name: 'facilitator' , value: true} ] }\"" );       }  else
   if (strcmp(command,"setUserAway")==0)           { rosparam_set(cR,cRLen,(char *) "/Hobbit/user_away",param);       }  else
   if (strcmp(command,"setCurrentEmotion")==0)     { rosparam_set(cR,cRLen,(char *) "/Hobbit/current_emotion",param); }  else
   if (strcmp(command,"setLatestWakingUpTime")==0) { rosparam_set(cR,cRLen,(char *) "/Hobbit/wakeup_time",param);     }  else
@@ -750,6 +751,8 @@ void * store_new_configuration_callback(struct AmmServer_DynamicRequest  * rqst)
             if ( _GET(default_server,rqst,(char*)"userName",bufferCommand,256) )  { execute((char*)"setUserName",bufferCommand);  }
             if ( _GET(default_server,rqst,(char*)"robotName",bufferCommand,256) )  { execute((char*)"setRobotName",bufferCommand);  }
             if ( _GET(default_server,rqst,(char*)"socialRole",bufferCommand,256) )  { execute((char*)"setSocialRole",bufferCommand);  }
+            if ( _GET(default_server,rqst,(char*)"askForSocialRole",bufferCommand,256) )  { execute((char*)"askForSocialRole",bufferCommand);  }
+
             if ( _GET(default_server,rqst,(char*)"userAway",bufferCommand,256) )  { execute((char*)"setUserAway",bufferCommand);  }
             if ( _GET(default_server,rqst,(char*)"currentEmotion",bufferCommand,256) )  { execute((char*)"setCurrentEmotion",bufferCommand);  }
             if ( _GET(default_server,rqst,(char*)"latestWakingUpTime",bufferCommand,256) )  { execute((char*)"setLatestWakingUpTime",bufferCommand);  }
