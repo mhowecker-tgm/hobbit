@@ -24,6 +24,8 @@ public:
     ~MainWindow();
     
     QNode qnode;
+    
+    int num; //id for call buttons
 
 private Q_SLOTS:
     
