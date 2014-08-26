@@ -47,7 +47,7 @@ int key = 0;
 unsigned int frameTimestamp=0;
 ros::NodeHandle * nhPtr=0;
 unsigned int paused=0;
-unsigned int raw=1;
+unsigned int raw=0;
 unsigned int localityUsed=1;
 
 ros::Publisher personBroadcaster;
