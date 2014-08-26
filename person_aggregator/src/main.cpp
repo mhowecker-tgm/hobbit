@@ -37,8 +37,9 @@
 
 #define DEFAULT_FRAME_RATE 30
 
+float maximumDistanceForIntegration = 300;
 unsigned int integrationTime = 100000;
-unsigned int maxSource=4;
+#define maxSource 4
 
 int rate=DEFAULT_FRAME_RATE;
 
@@ -47,8 +48,14 @@ unsigned int frameTimestamp=0;
 ros::NodeHandle * nhPtr=0;
 unsigned int paused=0;
 unsigned int raw=1;
+unsigned int localityUsed=1;
 
 ros::Publisher personBroadcaster;
+
+struct position3D
+{
+  float x,y,z;
+};
 
 struct personMessageSt
 {
@@ -56,6 +63,10 @@ struct personMessageSt
     unsigned int actualTimestamp , actualInFieldOfView;
     unsigned int source;
 };
+
+struct position3D lastKnownPosition[maxSource]={0};
+
+
 
 
 void broadcastNewPerson( struct personMessageSt * p)
@@ -87,12 +98,24 @@ void aggregatePersonMessage(struct personMessageSt * p )
   {
     if (i!=p->source)
       {
-
-       fprintf(stderr,"Diff %u with %u is %u \n",p->source,i,EndTimer(i)-currentTime);
-
-        if (EndTimer(i)-currentTime < integrationTime)
+       fprintf(stderr,"Temporal Diff %u with %u is %u \n",p->source,i,EndTimer(i)-currentTime);
+       if (EndTimer(i)-currentTime < integrationTime)
         {
-           ++clues;
+          if (localityUsed)
+          {
+            double distance = sqrt( ((p->actualX-lastKnownPosition[i].x)*(p->actualX-lastKnownPosition[i].x)) +
+                                    ((p->actualY-lastKnownPosition[i].y)*(p->actualY-lastKnownPosition[i].y)) +
+                                    ((p->actualZ-lastKnownPosition[i].z)*(p->actualZ-lastKnownPosition[i].z))   );
+            fprintf(stderr,"Spatial Diff %u with %u is %0.2f \n",p->source,i,distance);
+            if (distance<maximumDistanceForIntegration)
+            {
+              ++clues;
+            }
+          } else
+          {
+            //If we don't use locality having two messages at the same period is good enough
+            ++clues;
+          }
         }
       }
   }
@@ -125,6 +148,13 @@ void personMessageAggregator(const person_aggregator::Person & msg , unsigned in
     if (prsn.source<TOTAL_TIMERS)
     {
         StartTimer(prsn.source);
+    }
+
+    if (prsn.source<maxSource)
+    {
+      lastKnownPosition[prsn.source].x = msg.x;
+      lastKnownPosition[prsn.source].y = msg.y;
+      lastKnownPosition[prsn.source].z = msg.z;
     }
 
     if (raw) {
