@@ -37,7 +37,7 @@
 
 #define DEFAULT_FRAME_RATE 30
 
-float maximumDistanceForIntegration = 300;
+float maximumDistanceForIntegration = 220;
 unsigned int integrationTime = 100000;
 #define maxSource 4
 
@@ -104,8 +104,9 @@ void aggregatePersonMessage(struct personMessageSt * p )
           if (localityUsed)
           {
             double distance = sqrt( ((p->actualX-lastKnownPosition[i].x)*(p->actualX-lastKnownPosition[i].x)) +
-                                    ((p->actualY-lastKnownPosition[i].y)*(p->actualY-lastKnownPosition[i].y)) +
-                                    ((p->actualZ-lastKnownPosition[i].z)*(p->actualZ-lastKnownPosition[i].z))   );
+                                     ((p->actualY-lastKnownPosition[i].y)*(p->actualY-lastKnownPosition[i].y)) +
+                                     ((p->actualZ-lastKnownPosition[i].z)*(p->actualZ-lastKnownPosition[i].z))   );
+
             fprintf(stderr,"Spatial Diff %u with %u is %0.2f \n",p->source,i,distance);
             if (distance<maximumDistanceForIntegration)
             {
