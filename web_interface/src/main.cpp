@@ -202,7 +202,7 @@ int processExists(char * safeProcessName)
   char what2GetBack[MAX_COMMAND_SIZE]={0};
   unsigned int what2GetBackMaxSize=MAX_COMMAND_SIZE;
 
-  snprintf(what2Execute,MAX_COMMAND_SIZE,"ps -A | grep %s | cut -d ' ' -f1",safeProcessName);
+  snprintf(what2Execute,MAX_COMMAND_SIZE,"ps -A | grep %s | cut -d ' ' -f2",safeProcessName);
   //snprintf(what2Execute,MAX_COMMAND_SIZE,"/bin/bash -c \"ps -A | grep %s | cut -d ' ' -f1\" ",safeProcessName);
   if ( getBackCommandLine( what2Execute ,  what2GetBack , what2GetBackMaxSize) )
     {
