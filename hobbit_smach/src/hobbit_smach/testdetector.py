@@ -167,6 +167,7 @@ class TD:
     def findObjectsOnFloor(self, pointcloud, groundplane):
 	print "david3"
         rospy.wait_for_service('/CloudSegmenthor/findObjectsOnFloor')
+	print "david3.5"
         servicecall = rospy.ServiceProxy('/CloudSegmenthor/findObjectsOnFloor', ClustersOnPlane)
 	print "david4"
         try:

@@ -11,13 +11,13 @@ import rospy
 import numpy
 from smach import Concurrence, Sequence, State
 from hobbit_user_interaction import HobbitEmotions, HobbitMMUI
-from sensor_msgs.msg import PointCloud2
+from sensor_msgs.msg import PointCloud, PointCloud2
 from geometry_msgs.msg import Point, PointStamped
 import uashh_smach.util as util
 import hobbit_smach.speech_output_import as speech_output
-# import hobbit_smach.head_move_import as head_move
+import hobbit_smach.head_move_import as head_move
 import hobbit_smach.hobbit_move_import as hobbit_move
-#import hobbit_smach.arm_move_import as arm_move                   df 31.7.2014 temporary!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+import hobbit_smach.arm_move_import as arm_move
 import math, struct
 from testdetector import TD
 import tf
@@ -112,16 +112,16 @@ class DavidLookForObject(State):
             posRobot = [robot_x, robot_y] #Bajo, please fill in
 	    print "actual robot position: ", posRobot
 	    print "graspable center of cluster: ", self.graspable_center_of_cluster_wcs  #center of graspable point cluster
-            robotApproachDir = [self.graspable_center_of_cluster_wcs[0] - posRobot[0], self.graspable_center_of_cluster_wcs[1] - posRobot[1]]
+            robotApproachDir = [self.graspable_center_of_cluster_wcs.point.x - posRobot[0], self.graspable_center_of_cluster_wcs.point.y - posRobot[1]]
             robotApproachDir = [robotApproachDir[0]/numpy.linalg.norm(robotApproachDir), robotApproachDir[1]/numpy.linalg.norm(robotApproachDir)]       #normalized
 	    print "normalized robot approach direction: ", robotApproachDir
 
 
-            ud.goal_position_x = self.graspable_center_of_cluster_wcs[0] - robotDistFromGraspPntForGrasping * robotApproachDir[0]
-            ud.goal_position_y = self.graspable_center_of_cluster_wcs[1] - robotDistFromGraspPntForGrasping * robotApproachDir[1]
-            ud.goal_position_yaw = math.atan2(robotApproachDir[1],robotApproachDir[0]) + robotOffsetRotationForGrasping #can be negative!  180/math.pi*math.atan2(y,x) = angle in degree of vector (x,y)
-	    print "robotDistFromGraspPntForGrasping: ", robotDistFromGraspPntForGrasping
-	    print "robotOffsetRotationForGrasping: ", robotOffsetRotationForGrasping
+            ud.goal_position_x = self.graspable_center_of_cluster_wcs.point.x - self.robotDistFromGraspPntForGrasping * robotApproachDir[0]
+            ud.goal_position_y = self.graspable_center_of_cluster_wcs.point.y - self.robotDistFromGraspPntForGrasping * robotApproachDir[1]
+            ud.goal_position_yaw = math.atan2(robotApproachDir[1],robotApproachDir[0]) + self.robotOffsetRotationForGrasping #can be negative!  180/math.pi*math.atan2(y,x) = angle in degree of vector (x,y)
+	    print "robotDistFromGraspPntForGrasping: ", self.robotDistFromGraspPntForGrasping
+	    print "robotOffsetRotationForGrasping: ", self.robotOffsetRotationForGrasping
 	    print "robot goal position:"
 	    print "ud.goal_position_x:   ", ud.goal_position_x
 	    print "ud.goal_position_y:   ", ud.goal_position_y
@@ -171,6 +171,8 @@ class DavidLookForObject(State):
         self.graspable_center_of_cluster_wcs = pnt_wcs
         return isgraspable
 
+
+
     def transformPointCloud(self, target_frame, point_cloud):
         """
         :param target_frame: the tf target frame, a string
@@ -180,6 +182,53 @@ class DavidLookForObject(State):
 
         Transforms a geometry_msgs PoseStamped message to frame target_frame, returns a new PoseStamped message.
         """
+	print "===> pickup_import.py: DavidLookForObject.transformPointCloud()"
+        r = PointCloud()
+        r.header.stamp = rospy.Time.now() #point_cloud.header.stamp
+        r.header.frame_id = target_frame
+        #r.channels = point_cloud.channels
+
+        #get points from pc2
+        fmt = self._get_struct_fmt(point_cloud)
+        narr = list()
+        offset = 0
+        for i in xrange(point_cloud.width * point_cloud.height):
+            p = struct.unpack_from(fmt, point_cloud.data, offset)
+            offset += point_cloud.point_step
+            narr.append(p[0:3])
+
+        while True:
+            try:
+                t = rospy.Time(0)
+                point_cloud.header.stamp = t
+                (trans,rot) = self.listener.lookupTransform('/headcam_rgb_optical_frame', target_frame, rospy.Time(0))
+                print trans,rot
+                break
+            except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+                print "isGraspableObject(): tf transform /headcam_rgb_optical_frame to ", target_frame," not found"
+                rospy.sleep(1)
+                continue
+        mat44 = self.listener.asMatrix(target_frame, point_cloud.header)
+        #print mat44
+
+        def xf(p):
+            #xyz = tuple(numpy.dot(mat44, numpy.array([p.x, p.y, p.z, 1.0])))[:3]
+            xyz = tuple(numpy.dot(mat44, numpy.array([p[0], p[1], p[2], 1.0])))[:3]
+            return Point(*xyz)
+        #r.points = [xf(p) for p in point_cloud.points]
+        r.points = [xf(p) for p in narr]
+        return r
+
+
+    """def transformPointCloud(self, target_frame, point_cloud):
+        " ""
+        :param target_frame: the tf target frame, a string
+        :param ps: the sensor_msgs.msg.PointCloud2 message
+        :return: new sensor_msgs.msg.PointCloud2 message, in frame target_frame
+        :raises: any of the exceptions that :meth:`~tf.Transformer.lookupTransform` can raise
+
+        Transforms a geometry_msgs PoseStamped message to frame target_frame, returns a new PoseStamped message.
+        "" "
 	print "===> pickup_import.py: DavidLookForObject.transformPointCloud()"
         r = PointCloud()
         r.header.stamp = rospy.Time.now() #point_cloud.header.stamp
@@ -219,7 +268,7 @@ class DavidLookForObject(State):
             return Point(*xyz)
         #r.points = [xf(p) for p in point_cloud.points]
         r.points = [xf(p) for p in narr]
-        return r
+        return r"""
 
 
     def ispossibleobject(self, pnt):    #pnt is in rcs
@@ -230,7 +279,7 @@ class DavidLookForObject(State):
         y_min = -1.0
         y_max = 0.5
         z_min = 0.0
-        z_max = 0.15
+        z_max = 0.25	#only that high because of buggy camera
 
         if (self.restrictfind): #only search for objects where grasped object was lying
             x_min = 0.15
@@ -238,7 +287,7 @@ class DavidLookForObject(State):
             y_min = -0.45
             y_max = -0.17
             z_min = 0.01
-            z_max = 0.15
+            z_max = 0.25	#only that high because of buggy camera
 
         #print "pnt.point.x: ", pnt.point.x
         #print "pnt.point.x *2: ", 2*pnt.point.x
@@ -330,50 +379,7 @@ class DavidLookForObject(State):
                 offset += field.count * datatype_length
         return fmt
 
-    def transformPointCloud(self, target_frame, point_cloud):
-        """
-        :param target_frame: the tf target frame, a string
-        :param ps: the sensor_msgs.msg.PointCloud2 message
-        :return: new sensor_msgs.msg.PointCloud2 message, in frame target_frame
-        :raises: any of the exceptions that :meth:`~tf.Transformer.lookupTransform` can raise
 
-        Transforms a geometry_msgs PoseStamped message to frame target_frame, returns a new PoseStamped message.
-        """
-        r = PointCloud()
-        r.header.stamp = rospy.Time.now() #point_cloud.header.stamp
-        r.header.frame_id = target_frame
-        #r.channels = point_cloud.channels
-
-        #get points from pc2
-        fmt = self._get_struct_fmt(point_cloud)
-        narr = list()
-        offset = 0
-        for i in xrange(point_cloud.width * point_cloud.height):
-            p = struct.unpack_from(fmt, point_cloud.data, offset)
-            offset += point_cloud.point_step
-            narr.append(p[0:3])
-
-        while True:
-            try:
-                t = rospy.Time(0)
-                point_cloud.header.stamp = t
-                (trans,rot) = self.listener.lookupTransform('/headcam_rgb_optical_frame', target_frame, rospy.Time(0))
-                print trans,rot
-                break
-            except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
-                print "isGraspableObject(): tf transform /headcam_rgb_optical_frame to ", target_frame," not found"
-                rospy.sleep(1)
-                continue
-        mat44 = self.listener.asMatrix(target_frame, point_cloud.header)
-        #print mat44
-
-        def xf(p):
-            #xyz = tuple(numpy.dot(mat44, numpy.array([p.x, p.y, p.z, 1.0])))[:3]
-            xyz = tuple(numpy.dot(mat44, numpy.array([p[0], p[1], p[2], 1.0])))[:3]
-            return Point(*xyz)
-        #r.points = [xf(p) for p in point_cloud.points]
-        r.points = [xf(p) for p in narr]
-        return r
 
 
 class DavidLookingPose(State):
@@ -443,13 +449,13 @@ class DavidLookingPose(State):
 		rot = quaternion_matrix(rot)[0:3,0:3]
 		#print "trans: ", trans
 		#rot[0:3,3]=trans
-		print "rot quat plus trans", rot
+		#print "rot quat plus trans", rot
                 pvec = (self.pointingDirCCS[3],self.pointingDirCCS[4],self.pointingDirCCS[5])
 		pvec = (pvec[0]/numpy.linalg.norm(pvec),pvec[1]/numpy.linalg.norm(pvec),pvec[2]/numpy.linalg.norm(pvec))  #normalize
 		pvecWCS = numpy.dot(pvec,rot)                
 		print "======================================================="
 		print "pvec (CCS, normalized): ", pvec # (CCS)
-		print "roation matrix: ", rot  
+		#print "roation matrix: ", rot  
 		print "Pointing Vector in WCS: ", pvecWCS
 
 
@@ -886,7 +892,8 @@ def getEndPickupSeq():
             )
             Sequence.add(
                 'LOCATE_USER',
-                Dummy()
+		sayRemoveObjectTakeObject() # df 18.8.2014: delete this line again, only inserted to get code running!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                #Dummy()
             )
         Sequence.add(
             'EMO_SAY_REMOVE_OBJECT',

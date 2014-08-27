@@ -10,7 +10,7 @@ ArmClient = ArmClientFunctions('192.168.25.50')
 
 
 ''' GET Functions '''
-#print ArmClient.GetActualPosition()                    #
+print ArmClient.GetActualPosition()                    #
 #print ArmClient.GetArmAtHomePos()                      #
 #print ArmClient.GetArmAtLearningPos()                  #
 #print ArmClient.GetArmAtTrayPos()                      #
