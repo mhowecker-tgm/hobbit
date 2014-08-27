@@ -56,11 +56,6 @@
                			<pose x="3.5" y="3" theta="-1.57"/>
             		</place>
 			<place>
-				<name>dock</name>
-				<type>docking_base_point</type>
-               			<pose x="3.5393" y="-0.34563" theta="-3.0929"/>
-            		</place>
-			<place>
 				<name>call4</name>
 				<type>call_button_4</type>
                			<pose x="3.5393" y="-0.34563" theta="-3.0929"/>
@@ -68,7 +63,7 @@
 		</places>
 	</room>
 	<room>
-		<name>ShortCorridor</name>
+		<name>shortcorridor</name>
 		<vertices>
 			<vertex x="-1.732000" y="5.816000" />
 			<vertex x="-1.732000" y="3.448002" />
@@ -90,6 +85,11 @@
 				<name>printer_desk</name>
 				<type>searchable</type>
                			<pose x="-0.198" y="5.098" theta="1.5782"/>
+            		</place>
+			<place>
+				<name>dock</name>
+				<type>docking_base_point</type>
+               			<pose x="-0.3731" y="4.2595" theta="1.649"/>
             		</place>
 		</places>
 	</room>
