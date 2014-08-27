@@ -16,6 +16,11 @@ add_executable(fitness_coordinator src/main.cpp src/process.cpp )
  
 target_link_libraries(fitness_coordinator ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 
+
+## Add cmake target dependencies of the executable/library
+## as an example, message headers may need to be generated before nodes
+add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencpp)
+
 #install(TARGETS fitness_coordinator RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 #install(FILES fitness_coordinator.xml DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
