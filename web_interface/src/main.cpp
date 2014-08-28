@@ -291,7 +291,8 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
                 <center>\
                   %02d-%02d-%02d %02d:%02d:%02d \n<br><br> \
                 </center>\
-                CPU usage : %s  , temp : %s \n<br> \
+                CPU usage : %s \n<br> \
+                CPU temp : %s \n<br> \
                 Battery is : %s \n<br> \
                 Charging : %s<br>\
                 Svn Ver : %s<br><br>\
