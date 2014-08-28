@@ -234,6 +234,10 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
   time_t t = time(NULL);
   struct tm tm = *localtime(&t);
 
+
+  char temperatureState[MAX_COMMAND_SIZE]={0};
+  getBackCommandLine((char*) "timeout 1 sensors | grep Physical | cut -d ' ' -f5", temperatureState , MAX_COMMAND_SIZE );
+
   char batteryState[MAX_COMMAND_SIZE]={0};
   getBackCommandLine((char*) "timeout 1 rostopic echo /battery_state -n 1 | grep lifePercent | cut -d ':' -f2", batteryState , MAX_COMMAND_SIZE );
   float battery = atof(batteryState);
@@ -271,6 +275,7 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
    addServiceCheck(statusControl , "Skeleton Detector" , "skeleton" );
    addServiceCheck(statusControl , "Hand Gestures" , "hand" );
    addServiceCheck(statusControl , "Face Detection" , "face" );
+   addServiceCheck(statusControl , "Person Aggregator" , "person_aggre" );
    addServiceCheck(statusControl , "Emergency Detection" , "emergency" );
    addServiceCheck(statusControl , "Fitness Function" , "fitness" );
    addServiceCheck(statusControl , "Mira Center" , "mira" );
@@ -286,14 +291,14 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
                 <center>\
                   %02d-%02d-%02d %02d:%02d:%02d \n<br><br> \
                 </center>\
-                CPU usage : %s  \n<br> \
+                CPU usage : %s  , temp : %s \n<br> \
                 Battery is : %s \n<br> \
                 Charging : %s<br>\
                 Svn Ver : %s<br><br>\
                  %s <br>\
                </body>\
              </html>",
-             tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900,   tm.tm_hour, tm.tm_min, tm.tm_sec,cpuUsage,batteryState,chargingState,svnVersion,statusControl);
+             tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900,   tm.tm_hour, tm.tm_min, tm.tm_sec,cpuUsage,temperatureState,batteryState,chargingState,svnVersion,statusControl);
 
   rqst->contentSize=strlen(rqst->content);
   return 0;
