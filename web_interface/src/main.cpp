@@ -242,6 +242,7 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
   getBackCommandLine((char*) "timeout 1 rostopic echo /battery_state -n 1 | grep lifePercent | cut -d ':' -f2", batteryState , MAX_COMMAND_SIZE );
   float battery = atof(batteryState);
 
+  if (battery==0)   { snprintf(batteryState,MAX_COMMAND_SIZE," %s ",batteryState); fprintf(stderr,"Battery state is weird %0.2f , or %s \n",battery,batteryState); } else
   if (battery<=10)  { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_10.png\" height=\"15\"> %0.2f ",battery); } else
   if (battery<=25)  { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_25.png\" height=\"15\"> %0.2f ",battery); } else
   if (battery<=50)  { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_50.png\" height=\"15\"> %0.2f ",battery); } else
