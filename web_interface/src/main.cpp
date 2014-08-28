@@ -243,11 +243,11 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
   float battery = atof(batteryState);
 
   if (battery<=1)   { fprintf(stderr,"Battery state is weird %0.2f , or %s \n",battery,batteryState); } else
-  if (battery<=10)  { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_10.png\" height=\"15\"> %0.2f ",battery); } else
-  if (battery<=25)  { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_25.png\" height=\"15\"> %0.2f ",battery); } else
-  if (battery<=50)  { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_50.png\" height=\"15\"> %0.2f ",battery); } else
-  if (battery<=75)  { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_75.png\" height=\"15\"> %0.2f ",battery); } else
-  if (battery<=100) { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_100.png\" height=\"15\"> %0.2f ",battery); }
+  if (battery<=10)  { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_10.png\" height=\"15\"> %0.2f %% ",battery); } else
+  if (battery<=25)  { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_25.png\" height=\"15\"> %0.2f %%",battery); } else
+  if (battery<=50)  { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_50.png\" height=\"15\"> %0.2f %%",battery); } else
+  if (battery<=75)  { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_75.png\" height=\"15\"> %0.2f %%",battery); } else
+  if (battery<=100) { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_100.png\" height=\"15\"> %0.2f %%",battery); }
 
   char chargingState[MAX_COMMAND_SIZE]={0};
   getBackCommandLine((char*) "timeout 1 rostopic echo /battery_state -n 1 | grep charging | cut -d ':' -f2", chargingState , MAX_COMMAND_SIZE );
