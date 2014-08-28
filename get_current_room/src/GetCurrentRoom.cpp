@@ -32,11 +32,13 @@ int main(int argc, char **argv)
 
   ROS_INFO("Init loop");
     //Loop
+  ros::Rate r(10);
   while(ros::ok())
   {
       //Read ros messages
       ros::spinOnce();
       myGetCurrentRoom.Run();
+      r.sleep();
   }
 
   return 0;
