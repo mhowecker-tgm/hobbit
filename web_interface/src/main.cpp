@@ -236,7 +236,7 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
 
 
   char temperatureState[MAX_COMMAND_SIZE]={0};
-  getBackCommandLine((char*) "timeout 1 sensors | grep Physical | cut -d ' ' -f5", temperatureState , MAX_COMMAND_SIZE );
+  getBackCommandLine((char*) "timeout 1 sensors | grep temp3 | cut -d ' ' -f9", temperatureState , MAX_COMMAND_SIZE );
 
   char batteryState[MAX_COMMAND_SIZE]={0};
   getBackCommandLine((char*) "timeout 1 rostopic echo /battery_state -n 1 | grep lifePercent | cut -d ':' -f2", batteryState , MAX_COMMAND_SIZE );
