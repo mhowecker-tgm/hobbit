@@ -75,11 +75,13 @@ rosrun hobbit_smach learn_object.py&
 rosrun hobbit_smach away.py&
 rosrun hobbit_smach goto.py&
 rosrun hobbit_smach emergency_user.py&
+rosrun hobbit_smach emergency_bathroom.py&
 rosrun hobbit_smach battery_monitor.py&
 rosrun hobbit_smach recharge&
 rosrun hobbit_smach sos_monitor.py&
-rosrun hobbit_smach master.py&
 
+sleep $DELAY_BETWEEN_STEPS 
+rosrun hobbit_smach master.py&
 
 # Start table/floor object detector (for clustering) and trigger for publishing single shot point clouds from headcam
 cd /opt/ros/hobbit_hydro/src/table_object_detector/launch
@@ -105,14 +107,13 @@ cd /opt/ros/hobbit_hydro/src/top_scan_points/launch
 roslaunch startup.launch&
 
 sleep $DELAY_BETWEEN_STEPS
-#Switch Mira stuff to navigation mode ( default )
-cd /opt/ros/hobbit_hydro/src/hobbit_launch/launch
-./switchMira.sh navigation
-
-sleep $DELAY_BETWEEN_STEPS
 #Startup Joystick node , ( it allows webinterface joystick emulation also )
 roslaunch joy2twist startup.launch&
 
+sleep $DELAY_BETWEEN_STEPS
+#Switch Mira stuff to navigation mode ( default )
+cd /opt/ros/hobbit_hydro/src/hobbit_launch/launch
+./switchMira.sh navigation
 
 cd $STARTDIR
 
