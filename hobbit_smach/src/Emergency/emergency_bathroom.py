@@ -255,9 +255,7 @@ def main():
         if not DEBUG:
             StateMachine.add(
                 'MOVE_TO_BATHROOM',
-                # FIXME: For testing we use maincorridor here
-                # hobbit_move.goToPosition(frame='/map', room='bathroom', place='door'),
-                hobbit_move.goToPosition(frame='/map', room='maincorridor', place='default'),
+                hobbit_move.goToPosition(frame='/map', room='None', place='bathroom'),
                 transitions={'aborted': 'SET_FAILURE',
                              'succeeded': 'MMUI_CONFIRM_DoYouNeedHelp'}
             )

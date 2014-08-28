@@ -113,15 +113,11 @@ def command_cb(msg, ud):
                 return True
             elif index + 1 >= active_task and not night:
                 rospy.loginfo('New task has lower priority. Do nothing')
-                rospy.loginfo(bcolors.OKGREEN +
-                              'New task has lower priority. Do nothing' +
-                              bcolors.ENDC)
+                print('New task has lower priority. Do nothing' )
                 return False
             else:
                 rospy.loginfo('New task has higher priority. Start it.')
-                print(bcolors.OKGREEN +
-                      'New task has higher priority. Start it.' +
-                      bcolors.ENDC)
+                print('New task has higher priority. Start it.')
                 # if index == 7:
                 if item[0] == 'pickup':
                     i = item.index(input_ce)
