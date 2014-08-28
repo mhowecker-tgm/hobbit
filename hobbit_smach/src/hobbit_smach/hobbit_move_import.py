@@ -174,9 +174,9 @@ class SetNavigationGoal(ServiceState):
         print('Inside SetNavigationGoal')
         print(ud.room_name, ud.location_name)
         print(self.room, self.place)
-        if ud.room_name:
+        if not ud.room_name == 'None':
             self.room = ud.room_name
-            if ud.location_name:
+            if not ud.location_name == 'None':
                 self.place = ud.location_name
             else:
                 self.place = String('default')
@@ -263,7 +263,7 @@ def goToPosition(frame='/map', room='None', place='dock'):
     seq.userdata.room_name = room
     seq.userdata.location_name = place
 
-    print(room, place)
+    rospy.loginfo(room + place)
     with seq:
         # Sequence.add('DISABLE_GESTURES',
         #              service_disable.disable_gestures())

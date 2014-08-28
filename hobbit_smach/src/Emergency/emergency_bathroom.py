@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 PKG = 'hobbit_smach'
-NAME = 'reminder'
-DEBUG = True
+NAME = 'emergency_bathroom'
+DEBUG = False
 
 import roslib
 roslib.load_manifest(PKG)
@@ -255,7 +255,7 @@ def main():
         if not DEBUG:
             StateMachine.add(
                 'MOVE_TO_BATHROOM',
-                hobbit_move.goToPosition(frame='/map', room='None', place='bathroom'),
+                hobbit_move.goToPosition(frame='/map', room='corridor', place='bathroom'),
                 transitions={'aborted': 'SET_FAILURE',
                              'succeeded': 'MMUI_CONFIRM_DoYouNeedHelp'}
             )

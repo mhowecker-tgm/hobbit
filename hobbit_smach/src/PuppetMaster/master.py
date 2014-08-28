@@ -15,9 +15,9 @@ from hobbit_msgs.msg import Command, Event, GeneralHobbitAction,\
 import hobbit_smach.helper_import as helper
 import hobbit_smach.recharge_import as recharge
 import hobbit_smach.call_hobbit_import as call_hobbit
-import hobbit_smach.bcolors as bcolors
 import uashh_smach.util as util
 from hobbit_user_interaction import HobbitEmotions
+from hobbit_smach.bcolors import bcolors
 
 
 commands = [['emergency', 'G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP',
@@ -82,8 +82,11 @@ def command_cb(msg, ud):
                     return True
             if item[0] == 'call_hobbit':
                 ud.command = item[0]
-                for i, v in enumerate(ud.params):
+                for i, v in enumerate(msg.params):
+                    print(v.name)
+                    print(v.value)
                     if v.name == 'bathroom' and v.value == 'true':
+                        ud.command = 'emergency_bathroom'
                         ud.parameters['active_task'] = 'emergency_bathroom'
                         ud.params = msg.params
                         return True
@@ -113,11 +116,15 @@ def command_cb(msg, ud):
                 return True
             elif index + 1 >= active_task and not night:
                 rospy.loginfo('New task has lower priority. Do nothing')
-                print('New task has lower priority. Do nothing' )
+                print(bcolors.FAIL + \
+                    'New task has lower priority. Do nothing' \
+                    + bcolors.ENDC)
                 return False
             else:
                 rospy.loginfo('New task has higher priority. Start it.')
-                print('New task has higher priority. Start it.')
+                print(bcolors.OKGREEN +\
+                    'New task has higher priority. Start it.'\
+                    + bcolors.ENDC)
                 # if index == 7:
                 if item[0] == 'pickup':
                     i = item.index(input_ce)

@@ -28,7 +28,7 @@ def talker(level):
 def battery_cb(msg):
     # print('received msg on topic /battery_state')
     # print(msg)
-    if msg.voltage < VOLT_LIMIT:
+    if msg.voltage < VOLT_LIMIT and not msg.charging:
         rospy.loginfo('Battery level is low')
         talker('E_RECHARGE')
     else:
