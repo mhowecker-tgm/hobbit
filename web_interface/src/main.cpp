@@ -251,9 +251,11 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
 
   char chargingState[MAX_COMMAND_SIZE]={0};
   getBackCommandLine((char*) "timeout 1 rostopic echo /battery_state -n 1 | grep charging | cut -d ':' -f2", chargingState , MAX_COMMAND_SIZE );
+  /*
   unsigned int charging=atoi(chargingState);
+   "charging: True "it does not return an integer
   if (charging)  { snprintf(chargingState,MAX_COMMAND_SIZE,"<img src=\"plugged.png\" height=\"15\"> %u ",charging); } else
-                 { snprintf(chargingState,MAX_COMMAND_SIZE," %u ",charging); }
+                 { snprintf(chargingState,MAX_COMMAND_SIZE," %u ",charging); }*/
 
 
   //  char mileageState[MAX_COMMAND_SIZE]={0};
