@@ -274,7 +274,7 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
    addServiceCheck(statusControl , "RGBDAcquisition" , "rgbd" );
    addServiceCheck(statusControl , "Skeleton Detector" , "skeleton" );
    addServiceCheck(statusControl , "Hand Gestures" , "hand" );
-   addServiceCheck(statusControl , "Face Detection" , "face" );
+   addServiceCheck(statusControl , "Face Detection" , "face_det" );
    addServiceCheck(statusControl , "Person Aggregator" , "person_aggre" );
    addServiceCheck(statusControl , "Emergency Detection" , "emergency" );
    addServiceCheck(statusControl , "Fitness Function" , "fitness" );
