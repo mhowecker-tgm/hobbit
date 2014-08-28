@@ -15,6 +15,8 @@ fi
 
 sudo echo "Asked for super user"
 
+sudo apt-get install lm-sensors
+
 #Change to Script directory
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
