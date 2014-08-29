@@ -18,13 +18,73 @@ from hobbit_msgs.srv import GetCoordinates, GetCoordinatesRequest
 from std_msgs.msg import String
 from mira_msgs.msg import BatteryState
 from hobbit_user_interaction import HobbitMMUI
-from uashh_smach.util import SleepState, WaitForMsgState, \
-    TransformListenerSingleton
+from uashh_smach.util import SleepState, WaitForMsgState
 import uashh_smach.platform.move_base as move_base
 import head_move_import as head_move
 import speech_output_import as speech_output
 import service_disable_import as service_disable
 from math import pi
+
+
+def battery_cb(msg, ud):
+    print('Received battery_state message')
+    print(msg.charging)
+    rospy.sleep(2.0)
+    if msg.charging:
+        print('I am charging')
+        return True
+    else:
+        print('I am NOT charging')
+        return False
+
+
+def undock_if_needed():
+    """
+    Returns a SMACH StateMachine that check if it is needed to undock
+    before any movement is done.
+    """
+    sm = StateMachine(
+        outcomes=['succeeded', 'aborted', 'preempted'])
+    with sm:
+        StateMachine.add(
+            'CHARGE_CHECK',
+            WaitForMsgState(
+                '/battery_state',
+                BatteryState,
+                msg_cb=battery_cb
+                ),
+            transitions={'succeeded': 'UNDOCK',
+                         'aborted': 'aborted',
+                         'preempted': 'preempted'}
+        )
+        StateMachine.add(
+            'UNDOCK',
+            get_undock(),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'aborted',
+                         'preempted': 'preempted'}
+        )
+        return sm
+
+
+def get_undock():
+    """
+    Returns a SMACH StateMachine that check if it is needed to undock
+    before any movement is done.
+    """
+    seq = Sequence(
+        outcomes=['succeeded', 'preempted', 'aborted'],
+        connector_outcome='succeeded')
+    with seq:
+        Sequence.add(
+            'UNDOCK',
+            Undock()
+        )
+        Sequence.add(
+            'WAIT_BEFORE_MOVEMENT',
+            SleepState(duration=5)
+        )
+    return seq
 
 
 class SetObstacles(State):
@@ -265,6 +325,10 @@ def goToPosition(frame='/map', room='None', place='dock'):
 
     rospy.loginfo(room + place)
     with seq:
+        Sequence.add(
+            'UNDOCK_IF_NEEDED',
+            undock_if_needed()
+        )
         # Sequence.add('DISABLE_GESTURES',
         #              service_disable.disable_gestures())
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
@@ -328,6 +392,10 @@ def goToPose():
                    input_keys=['x', 'y', 'yaw'])
 
     with seq:
+        Sequence.add(
+            'UNDOCK_IF_NEEDED',
+            undock_if_needed()
+        )
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
                      head_move.MoveTo(pose='down_center'))
         Sequence.add('WAIT', SleepState(duration=1))
@@ -388,74 +456,29 @@ def rotateRobot(angle=0, frame='/map'):
         Sequence.add('GET_ROBOT_POSE', move_base.ReadRobotPositionState())
         Sequence.add('SET_ROT_GOAL', SetRotationGoal(angle=angle))
         Sequence.add('ROTATE_ROBOT', move_base.MoveBaseState(frame))
-        # Sequence.add('SET_ROT_GOAL_2', SetRotationGoal(angle=angle/4))
-        # Sequence.add('ROTATE_ROBOT_2', move_base.MoveBaseState(frame))
-        # Sequence.add('SET_ROT_GOAL_3', SetRotationGoal(angle=angle/4))
-        # Sequence.add('ROTATE_ROBOT_3', move_base.MoveBaseState(frame))
-        # Sequence.add('SET_ROT_GOAL_4', SetRotationGoal(angle=angle/4))
-        # Sequence.add('ROTATE_ROBOT_4', move_base.MoveBaseState(frame))
         return seq
-
-    # steps = 12
-    # print('angle:')
-    # print(angle)
-    # sm = StateMachine(
-    #     outcomes=['succeeded', 'preempted', 'aborted']
-    # )
-    # sm.userdata.degree = angle
-    # with sm:
-    #     rot_it = Iterator(
-    #         outcomes=['succeeded', 'preempted', 'aborted'],
-    #         input_keys=['degree'],
-    #         it=lambda: range(0, steps),
-    #         it_label='index',
-    #         exhausted_outcome='aborted'
-    #     )
-
-    #     with rot_it:
-    #         rot_sm = StateMachine(
-    #             outcomes=['succeeded', 'preempted', 'aborted']
-    #         )
-
-    #         with rot_sm:
-    #             StateMachine.add(
-    #                 'GET_ROBOT_POSE',
-    #                 move_base.ReadRobotPositionState())
-    #             StateMachine.add(
-    #                 'SET_ROT_GOAL',
-    #                 SetRotationGoal(angle=angle/12))
-    #             StateMachine.add(
-    #                 'ROTATE_ROBOT',
-    #                 move_base.MoveBaseState(frame))
-
-    #         Iterator.set_contained_state(
-    #             'CONTAINER_STATE',
-    #             rot_sm,
-    #             loop_outcomes='continue')
-    #     StateMachine.add(
-    #         'ITERATOR',
-    #         rot_it,
-    #         transitions={'succeeded': 'succeeded',
-    #                      'aborted': 'aborted',
-    #                      'preempted': 'preempted'}
-    #     )
-    # return sm
 
 
 class HasMovedFromPreDock(State):
-    """Return whether the robot moved beyond a given minimum distance in a given frame
-    from the pre-dock pose.
+    """
+    Return whether the robot moved beyond a given minimum distance
+    in a given frame from the pre-dock pose.
 
     minimum_distance: distance threshold to control outcomes
     frame: frame in which to retrieve the robot's pose, defaults to /map
     """
+
     def __init__(self, minimum_distance, frame='/map'):
-        smach.State.__init__(self, outcomes=['movement_exceeds_distance', 'movement_within_distance', 'counter'])
+        smach.State.__init__(
+            self,
+            outcomes=['movement_exceeds_distance',
+                      'movement_within_distance',
+                      'counter'])
         util.TransformListenerSingleton.init()
         self.minimum_distance = minimum_distance
         self.frame = frame
         self.lastX, self.lastY = self._getXYDock()
-	self.counter = 0
+        self.counter = 0
 
     def _getXY(self):
         x, y, _yaw = util.get_current_robot_position(self.frame)
@@ -472,7 +495,6 @@ class HasMovedFromPreDock(State):
         print(resp)
         return (resp.pose.x, resp.pose.y)
 
-
     def execute(self, userdata):
         rospy.sleep(1.5)
         currentX, currentY = self._getXY()
@@ -480,13 +502,16 @@ class HasMovedFromPreDock(State):
             math.pow(currentX - self.lastX, 2) +
             math.pow(currentY - self.lastY, 2)
         )
-        rospy.loginfo("current XY: %f,%f last XY: %f,%f current distance: %f minimum distance: %f",
-                       currentX, currentY, self.lastX, self.lastY, current_distance, self.minimum_distance)
+        rospy.loginfo(
+            "current XY: %f,%f last XY: %f,%f\
+            current distance: %f minimum distance: %f",
+            currentX, currentY, self.lastX, self.lastY,
+            current_distance, self.minimum_distance)
         if current_distance >= self.minimum_distance:
             return 'movement_exceeds_distance'
         else:
             if self.counter > 10:
-		self.counter = 0
+                self.counter = 0
                 return 'counter'
             else:
                 self.counter += 1

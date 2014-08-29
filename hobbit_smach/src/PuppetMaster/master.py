@@ -57,14 +57,14 @@ def IsItNight(ud):
 def command_cb(msg, ud):
     try:
         # print msg.command
-        input_ce = msg.command
+        input_ce = msg.command.upper()
         rospy.loginfo('/Command data received:')
     except AttributeError, e:
         print(e)
         pass
     try:
         # print msg.event
-        input_ce = msg.event
+        input_ce = msg.event.upper()
         rospy.loginfo('/Event data received:')
     except AttributeError, e:
         print(e)

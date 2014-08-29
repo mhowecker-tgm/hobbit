@@ -68,7 +68,7 @@ def undock_if_needed():
         )
         StateMachine.add(
             'UNDOCK',
-            hobbit_move.Undock(),
+            hobbit_move.get_undock(),
             transitions={'succeeded': 'succeeded',
                          'aborted': 'aborted',
                          'preempted': 'preempted'}
@@ -122,7 +122,7 @@ def getEndRecharge():
     with seq:
         Sequence.add(
             'UNDOCK',
-            hobbit_move.Undock()
+            hobbit_move.get_undock()
         )
         #  Sequence.add(
         #      'SOUND',
@@ -196,18 +196,18 @@ def startDockProcedure():
 
     with cc:
         Concurrence.add(
-            'WAIT', SleepState(duration=25))
+            'WAIT', SleepState(duration=10))
         Concurrence.add(
             'CHARGE_CHECK',
             seq)
 
     with seq1:
         Sequence.add('START_DOCK', hobbit_move.Dock())
-        Sequence.add('WAIT', SleepState(duration=30))
+        Sequence.add('WAIT', SleepState(duration=10))
         Sequence.add('CHECK', cc,
                          transitions={'succeeded': 'aborted',
                                       'failed': 'RETRY'})
-        Sequence.add('RETRY', hobbit_move.Undock())
+        Sequence.add('RETRY', hobbit_move.get_undock())
         Sequence.add('WAIT1', SleepState(duration=10))
         Sequence.add('CHECK_1', cc,
                          transitions={'succeeded': 'aborted',

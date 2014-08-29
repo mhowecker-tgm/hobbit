@@ -105,41 +105,41 @@ def getRecharge():
     return seq
 
 
-def get_end_recharge():
-    """This function handles the autonomous charging sequence.
-    It is without the user interaction and is mainly used during
-    the night or as part of the recharging scenario.
-    """
-
-    seq = Sequence(
-        outcomes=['succeeded', 'aborted', 'preempted'],
-        input_keys=['room_name', 'location_name'],
-        connector_outcome='succeeded'
-    )
-
-    with seq:
-        Sequence.add(
-            'UNDOCK',
-            hobbit_move.Undock()
-        )
-        #  Sequence.add(
-        #      'SOUND',
-        #      speech_output.playMoveOut()
-        #  )
-        Sequence.add(
-            'WAIT_FOR_MIRA',
-            SleepState(duration=5)
-        )
-        Sequence.add(
-            'SET_NAV_GOAL_DOCK',
-            hobbit_move.SetNavGoal(room='dock', place='dock')
-        )
-        Sequence.add(
-            'MOVE_AWAY_FROM_DOCK',
-            hobbit_move.goToPose())
-    return seq
-
-
+# def get_end_recharge():
+#     """This function handles the autonomous charging sequence.
+#     It is without the user interaction and is mainly used during
+#     the night or as part of the recharging scenario.
+#     """
+#
+#     seq = Sequence(
+#         outcomes=['succeeded', 'aborted', 'preempted'],
+#         input_keys=['room_name', 'location_name'],
+#         connector_outcome='succeeded'
+#     )
+#
+#     with seq:
+#         Sequence.add(
+#             'UNDOCK',
+#             hobbit_move.Undock()
+#         )
+#         #  Sequence.add(
+#         #      'SOUND',
+#         #      speech_output.playMoveOut()
+#         #  )
+#         Sequence.add(
+#             'WAIT_FOR_MIRA',
+#             SleepState(duration=5)
+#         )
+#         Sequence.add(
+#             'SET_NAV_GOAL_DOCK',
+#             hobbit_move.SetNavGoal(room='dock', place='dock')
+#         )
+#         Sequence.add(
+#             'MOVE_AWAY_FROM_DOCK',
+#             hobbit_move.goToPose())
+#     return seq
+#
+#
 def call_hobbit():
     """
     First check if Hobbit is charging and in the docking station,
@@ -153,20 +153,20 @@ def call_hobbit():
     )
 
     with sm:
-        StateMachine.add(
-            'CHARGE_CHECK',
-            WaitForMsgState('/battery_state', BatteryState, msg_cb=battery_cb, input_keys=['params']),
-            transitions={'succeeded': 'UNDOCK',
-                         'aborted': 'EXTRACT_GOAL',
-                         'preempted': 'preempted'}
-        )
-        StateMachine.add(
-            'UNDOCK',
-            get_end_recharge(),
-            transitions={'succeeded': 'EXTRACT_GOAL',
-                         'aborted': 'aborted',
-                         'preempted': 'preempted'}
-        )
+        #StateMachine.add(
+        #    'CHARGE_CHECK',
+        #    WaitForMsgState('/battery_state', BatteryState, msg_cb=battery_cb, input_keys=['params']),
+        #    transitions={'succeeded': 'UNDOCK',
+        #                 'aborted': 'EXTRACT_GOAL',
+        #                 'preempted': 'preempted'}
+        #)
+        #StateMachine.add(
+        #    'UNDOCK',
+        #    hobbit_move.get_undock(),
+        #    transitions={'succeeded': 'EXTRACT_GOAL',
+        #                 'aborted': 'aborted',
+        #                 'preempted': 'preempted'}
+        #)
         StateMachine.add_auto(
             'EXTRACT_GOAL',
             ExtractGoal(),
