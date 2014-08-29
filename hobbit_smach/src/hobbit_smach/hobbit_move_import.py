@@ -15,7 +15,7 @@ import math
 from smach import State, Sequence, StateMachine
 from smach_ros import ServiceState
 from hobbit_msgs.srv import GetCoordinates, GetCoordinatesRequest
-from hobbit_msgs.msg import GeneralHobbitAction
+from move_base_msgs.msg import MoveBaseAction
 from std_msgs.msg import String
 from mira_msgs.msg import BatteryState
 from hobbit_user_interaction import HobbitMMUI
@@ -178,8 +178,8 @@ class Stop(State):
             self.service_preempt()
             return 'preempted'
         client = SimpleActionClient(
-            'safety_check',
-            GeneralHobbitAction)
+            'move_base',
+            MoveBaseAction)
         client.wait_for_server()
         client.cancel_all_goals()
         self.stop_pub.publish('stop')
