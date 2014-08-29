@@ -277,6 +277,7 @@ int main(int argc, char **argv)
 		{
 
                   ros::spinOnce();//<- this keeps our ros node messages handled up until synergies take control of the main thread
+                  loop_rate.sleep();
 	    }
 
 	}
