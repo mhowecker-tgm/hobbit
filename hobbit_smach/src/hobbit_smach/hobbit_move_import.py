@@ -15,10 +15,12 @@ import math
 from smach import State, Sequence, StateMachine
 from smach_ros import ServiceState
 from hobbit_msgs.srv import GetCoordinates, GetCoordinatesRequest
+from hobbit_msgs.msg import GeneralHobbitAction
 from std_msgs.msg import String
 from mira_msgs.msg import BatteryState
 from hobbit_user_interaction import HobbitMMUI
 from uashh_smach.util import SleepState, WaitForMsgState
+from actionlib import SimpleActionClient
 import uashh_smach.platform.move_base as move_base
 import head_move_import as head_move
 import speech_output_import as speech_output
@@ -175,8 +177,33 @@ class Stop(State):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
+        client = SimpleActionClient(
+            'safety_check',
+            GeneralHobbitAction)
+        client.wait_for_server()
+        client.cancel_all_goals()
         self.stop_pub.publish('stop')
         return 'succeeded'
+
+
+def get_full_stop():
+    """
+    Return a SMACH Sequence that cancels all goals on the movebase
+    action server.
+    """
+
+    seq = Sequence(
+        outcomes=['succeeded', 'preempted', 'aborted'],
+        connector_outcome='succeeded',
+    )
+
+    rospy.loginfo('CANCEL all Movement')
+
+    with seq:
+        Sequence.add(
+        )
+
+
 
 
 class SetRotationGoal(State):

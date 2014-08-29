@@ -73,7 +73,7 @@ def get_hobbit_full_stop():
     with seq:
         Sequence.add(
             'STOP_MOVEMENT',
-            hobbit_move.Stop()
+            hobbit_move.get_stop()
         )
         Sequence.add(
             'MAIN_MENU',
