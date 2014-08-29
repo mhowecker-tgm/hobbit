@@ -1,7 +1,9 @@
 #!/bin/bash
 
-sudo /etc/init.d/chrony stop
-sudo ntpdate 192.168.2.122
-sudo /etc/init.d/chrony start
+#we need to perform some super-user commands from a non root user , so we use oure systemCommandsPi suid binary to do those things 
+
+./systemCommandsPi chronyStart
+./systemCommandsPi ntpdate
+./systemCommandsPi chronyStop
 
 exit 0
