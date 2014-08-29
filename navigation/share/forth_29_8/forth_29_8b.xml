@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<rooms>
+	<room>
+		<name>room1</name>
+		<vertices>
+			<vertex x="-3.299999" y="-7.100000" />
+			<vertex x="-3.299999" y="-1.628000" />
+			<vertex x="0.956001" y="-1.628000" />
+			<vertex x="0.880001" y="-7.403999" />
+		</vertices>
+	</room>
+	<room>
+		<name>room2</name>
+		<vertices>
+			<vertex x="-3.604000" y="-5.276000" />
+			<vertex x="-3.299999" y="-10.520000" />
+			<vertex x="-5.883999" y="-10.747999" />
+			<vertex x="-6.188000" y="-10.823999" />
+			<vertex x="-6.188000" y="-8.468000" />
+			<vertex x="-7.175999" y="-7.784000" />
+			<vertex x="-10.367999" y="-7.859999" />
+			<vertex x="-10.139999" y="-5.504000" />
+		</vertices>
+	</room>
+</rooms>
