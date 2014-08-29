@@ -74,6 +74,7 @@ roslaunch hobbit_smach SavePCD.launch&
 rosrun hobbit_smach learn_object.py&
 rosrun hobbit_smach away.py&
 rosrun hobbit_smach goto.py&
+rosrun hobbit_smach follow_me&
 rosrun hobbit_smach emergency_user.py&
 rosrun hobbit_smach emergency_bathroom.py&
 rosrun hobbit_smach battery_monitor.py&

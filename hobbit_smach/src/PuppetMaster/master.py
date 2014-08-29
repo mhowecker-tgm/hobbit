@@ -321,6 +321,9 @@ def patrol_cb(ud, goal):
 
 def follow_cb(ud, goal):
     room, place = ud.params[0].value.lower().split(' ')
+    if not room or not place:
+        room = 'corridor'
+        place = 'default'
     par = []
     par.append(String(room))
     par.append(String(place))
