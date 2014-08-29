@@ -28,7 +28,8 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)  :
 
     ui->label->rooms = &qnode.rooms;
 
-    ui->label->map_size_relation = 1;
+    ui->label->map_width_relation = 1;
+    ui->label->map_height_relation = 1;
     ui->label->map_resolution = 1;
     ui->label->map_origin_x = 0;
     ui->label->map_origin_y = 0;
@@ -79,11 +80,13 @@ void MainWindow::LoadMap()
             //show the image on the label
             ui->label->setPixmap(QPixmap::fromImage(resized_image));
 
-            //obtain the map_size_relation, needed for the coordinates convertion from pixels to map coordinates
-            map_size_relation = image.width()/width;
+            //obtain the map_size_relations, needed for the coordinates convertion from pixels to map coordinates
+            map_width_relation = image.width()/width;
+            map_height_relation = image.height()/height;
             input_map_height = image.height();
 
-	    cout << "map_size_relation " << map_size_relation << endl;
+	    cout << "map_width_relation " << map_width_relation << endl;
+	    cout << "map_height_relation " << map_height_relation << endl;
 	    cout << "input_map_height " << input_map_height << endl;
 
             //open .yaml file to obtain other parameters required for the coordinates convertion from pixels to map coordinates
@@ -155,7 +158,8 @@ void MainWindow::LoadMap()
 
             }
 
-    	    ui->label->map_size_relation = map_size_relation;
+    	    ui->label->map_width_relation = map_width_relation;
+	    ui->label->map_height_relation = map_height_relation;
             ui->label->map_resolution = map_resolution;
 	    ui->label->input_map_height = input_map_height;
             ui->label->map_origin_x = map_origin_x;
@@ -225,14 +229,14 @@ bool MainWindow::LoadFile(std::string placesFileName)
 float MainWindow::transform_x(float x)
 {
 
-    float map_x = map_origin_x + x*map_size_relation*map_resolution;
+    float map_x = map_origin_x + x*map_width_relation*map_resolution;
     return map_x;
 
 }
 
 float MainWindow::transform_y(float y)
 {
-    float map_y = map_origin_y + input_map_height*map_resolution - y*map_size_relation*map_resolution;
+    float map_y = map_origin_y + input_map_height*map_resolution - y*map_height_relation*map_resolution;
     return map_y;
 
 

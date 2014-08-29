@@ -48,7 +48,8 @@ private:
     QString map_file_name;
 
     float input_map_height;
-    float map_size_relation;
+    float map_width_relation;
+    float map_height_relation;
     float map_resolution;
 
     float map_origin_x;

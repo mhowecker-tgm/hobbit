@@ -27,7 +27,8 @@ public:
     void drawArrow(QPoint p1, float th, QColor color);
 
     float map_resolution;
-    float map_size_relation;
+    float map_width_relation;
+    float map_height_relation;
     float input_map_height;
     float map_origin_x;
     float map_origin_y;

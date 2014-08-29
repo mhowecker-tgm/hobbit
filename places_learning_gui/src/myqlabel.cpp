@@ -44,8 +44,8 @@ void MyQLabel :: paintEvent(QPaintEvent * e)
 	    
 	QPoint p1;
 
-	float x_converted = ((*current_x) - map_origin_x)/(map_size_relation*map_resolution);
-        float y_converted = (map_origin_y + input_map_height*map_resolution - (*current_y))/(map_size_relation*map_resolution);
+	float x_converted = ((*current_x) - map_origin_x)/(map_width_relation*map_resolution);
+        float y_converted = (map_origin_y + input_map_height*map_resolution - (*current_y))/(map_height_relation*map_resolution);
 
 	p1.setX(x_converted);
 	p1.setY(y_converted);
@@ -67,8 +67,8 @@ void MyQLabel :: paintEvent(QPaintEvent * e)
                    hobbit_msgs::Point2D corner = rooms->rooms_vector[i].vertices_vector[j];
 
                    QPoint vertex;
-		   float vertex_x_converted = (corner.x - map_origin_x)/(map_size_relation*map_resolution);
-		   float vertex_y_converted = (map_origin_y + input_map_height*map_resolution - corner.y)/(map_size_relation*map_resolution);
+		   float vertex_x_converted = (corner.x - map_origin_x)/(map_width_relation*map_resolution);
+		   float vertex_y_converted = (map_origin_y + input_map_height*map_resolution - corner.y)/(map_height_relation*map_resolution);
 
                    vertex.setX(vertex_x_converted);
                    vertex.setY(vertex_y_converted);
@@ -107,8 +107,8 @@ void MyQLabel :: paintEvent(QPaintEvent * e)
 
                    QPoint place_point;
 
-		   float place_x_converted = (place.x - map_origin_x)/(map_size_relation*map_resolution);
- 		   float place_y_converted = (map_origin_y + input_map_height*map_resolution - place.y)/(map_size_relation*map_resolution);
+		   float place_x_converted = (place.x - map_origin_x)/(map_width_relation*map_resolution);
+ 		   float place_y_converted = (map_origin_y + input_map_height*map_resolution - place.y)/(map_height_relation*map_resolution);
 
                    place_point.setX(place_x_converted);
                    place_point.setY(place_y_converted);
