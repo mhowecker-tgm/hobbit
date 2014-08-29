@@ -46,10 +46,13 @@ void PS3Joystick2Twist::SetFastSpeed(void)
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void PS3Joystick2Twist::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 {
-  geometry_msgs::Twist twist;
-  twist.linear.x = linear_ * joy->axes[linear_axis_];
-  twist.angular.z = angular_ * joy->axes[angular_axis_];
-  vel_pub_.publish(twist);
+  if(joy->buttons[4] > 0)
+  {
+      geometry_msgs::Twist twist;
+      twist.linear.x = linear_ * joy->axes[linear_axis_];
+      twist.angular.z = angular_ * joy->axes[angular_axis_];
+      vel_pub_.publish(twist);
+  }
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 int main(int argc, char * argv[])

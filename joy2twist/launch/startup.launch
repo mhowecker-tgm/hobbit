@@ -4,15 +4,16 @@
             type="joy_node"
             respawn="true"
             output="screen">
+            <param name="autorepeat_rate" value="5" /> 
     </node>
     <node   pkg="joy2twist"
             type="joy2twist"
             name="joy2twist"
             output="screen">
     </node>
-    <node   pkg="joy2twist"
+    <!--<node   pkg="joy2twist"
             type="joybutton.py" 
             name="joybutton" 
             output="screen">
-    </node>
+    </node>-->
 </launch>

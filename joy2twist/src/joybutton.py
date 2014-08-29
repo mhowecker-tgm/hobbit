@@ -76,7 +76,8 @@ def joyCallback(msg):
             blockEvent = True
  
     if msg.buttons[0] == 1:    # X, not used right now
-        rospy.loginfo("JOYSTICK: Blue X button pressed. Do nothing.")                
+        rospy.loginfo("JOYSTICK: Blue X button pressed. Enable ASR.")     
+        mmui.enable_asr()           
 
     if msg.buttons[1] == 1:    # A
         rospy.loginfo("JOYSTICK: Green A button pressed. Unblock motors.") 
@@ -95,17 +96,11 @@ def joyCallback(msg):
         pubC.publish(e)
 
     if msg.buttons[3] == 1:    # Y
-        rospy.loginfo("JOYSTICK: Yellow Y button pressed. EMERGENCY (E_SOSBUTTON).")
-        e = Event()
-        e.header = Header()
-        e.event = "E_SOSBUTTON"
-        e.sessionID = '0'
-        e.confidence = 1
-        pubE.publish(e)
+        rospy.loginfo("JOYSTICK: Yellow Y button pressed. Disable ASR.")
+        mmui.disable_asr()
         
     if msg.buttons[4] == 1:    # L TOP (labeled LB for Left Button)                
-        rospy.loginfo("JOYSTICK: Left top button pressed. Enable ASR.")
-        mmui.enable_asr()
+        rospy.loginfo("JOYSTICK: Left top button pressed. Manual driving.")
 
     if msg.buttons[5] == 1:    # R TOP (labeled RB for Right Button)
         rospy.loginfo("JOYSTICK: Right top button pressed. Enable gestures, face and emergency detector and skeleton tracker.")
@@ -130,9 +125,10 @@ def joyCallback(msg):
         except rospy.ServiceException, e:
             rospy.loginfo("Service call failed: %s" % str(e))
 
+        rospy.loginfo("Done.")
+
     if msg.buttons[6] == 1:    # L BOTTOM (labeled LT for Left Trigger)
-        rospy.loginfo("JOYSTICK: Left bottom button pressed. Disable ASR.")
-        mmui.disable_asr()
+        rospy.loginfo("JOYSTICK: Left bottom button pressed. Do nothing.")
 
     if msg.buttons[7] == 1:    # R BOTTOM (labeled RT for Right Trigger)
         rospy.loginfo("JOYSTICK: Right bottom button pressed. Disable gestures, face and emergency detector and skeleton tracker.")
@@ -157,6 +153,8 @@ def joyCallback(msg):
         except rospy.ServiceException, e:
             rospy.loginfo("Service call failed: %s" % str(e))
 
+        rospy.loginfo("Done.")
+
     if msg.buttons[8] == 1:    # Back
         rospy.loginfo("JOYSTICK: Back button pressed. Master Reset (C_MASTER_RESET)")
         e = Command()
@@ -166,7 +164,13 @@ def joyCallback(msg):
         pubC.publish(e)
 
     if msg.buttons[9] == 1:    # Start
-        rospy.loginfo("JOYSTICK: Start button pressed. Do nothing.")
+        rospy.loginfo("JOYSTICK: Start button pressed. EMERGENCY (E_SOSBUTTON).")
+        e = Event()
+        e.header = Header()
+        e.event = "E_SOSBUTTON"
+        e.sessionID = '0'
+        e.confidence = 1
+        pubE.publish(e)
 
     if msg.buttons[10] == 1:   # Left joystick
         rospy.loginfo("JOYSTICK: Left joystick pressed. Do nothing.")
