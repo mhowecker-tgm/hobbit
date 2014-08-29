@@ -1,5 +1,13 @@
 #!/bin/bash
 
+
+echo "Making sudo-enabled ntpdate commands"
+gcc systemCommandsPi.c -s -o systemCommandsPi
+sudo chmod 777 systemCommandsPi
+sudo chown root:root systemCommandsPi
+sudo chmod +s systemCommandsPi
+
+
 echo "Adding netcat to the system"
 sudo apt-get install netcat6
 
@@ -14,11 +22,6 @@ sudo chown root:root blue_temperature
 sudo chmod +s blue_temperature
 
 
-echo "Making sudo-enabled ntpdate commands"
-gcc systemCommandsPi.c -s -o systemCommandsPi
-sudo chmod 777 systemCommandsPi
-sudo chown root:root systemCommandsPi
-sudo chmod +s systemCommandsPi
 
 
 if cat /etc/xdg/lxsession/LXDE/autostart  | grep -q "headKickStarter"
