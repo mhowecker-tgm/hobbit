@@ -554,8 +554,7 @@ def main():
             'STOP',
             helper.get_hobbit_full_stop(),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
-                         # 'aborted': 'failed',
-                         'failed': 'RESET_ACTIVE_TASK'}
+                         'aborted': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'CALL_HOBBIT',

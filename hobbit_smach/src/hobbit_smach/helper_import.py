@@ -66,17 +66,18 @@ def get_hobbit_full_stop():
     returns to the main menu of the MMUI.
     """
     seq = Sequence(
-        outcomes=['succeeded', 'failed', 'preempted'],
+        outcomes=['succeeded', 'aborted', 'preempted'],
         connector_outcome='succeeded'
     )
 
     with seq:
         Sequence.add(
             'STOP_MOVEMENT',
-            hobbit_move.get_stop()
+            hobbit_move.get_full_stop()
         )
         Sequence.add(
             'MAIN_MENU',
-            HobbitMMUI.ShowMenu(menu='MAIN')
+            HobbitMMUI.ShowMenu(menu='MAIN'),
+            transitions={'failed': 'aborted'}
         )
     return seq

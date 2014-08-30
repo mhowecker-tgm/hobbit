@@ -168,7 +168,7 @@ class Stop(State):
     def __init__(self):
         State.__init__(
             self,
-            outcomes=['succeeded', 'preempted']
+            outcomes=['succeeded', 'preempted', 'aborted']
         )
         self.stop_pub = rospy.Publisher('/stop_request', String,
                                         latch=False, queue_size=50)
@@ -201,7 +201,10 @@ def get_full_stop():
 
     with seq:
         Sequence.add(
+            'STOP_ALL_MOVEMENT',
+            Stop()
         )
+    return seq
 
 
 
