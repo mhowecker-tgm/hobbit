@@ -22,7 +22,7 @@ o- - - -  0 - - - -  |       |  - - - -  0 - - - - o
 */
 
 
-enum humanSkeletonJoints
+enum humanHandPose
 {
    POSE_HAND_UP = 0,
    POSE_HAND_UP_MIDDLE ,

@@ -10,7 +10,7 @@ int broadcastExcerciseGeneric(char * tag , char * name , char * value)
     int i=system(what2execute);
     if (i!=0) { fprintf(stderr,"Command %s failed\n",what2execute); } else
               { fprintf(stderr,"Command %s success\n",what2execute); }
-   
+
 }
 
 int broadcastExcerciseRepetition(unsigned int exerciseNumber,unsigned int repetitionNumber)
@@ -21,17 +21,17 @@ int broadcastExcerciseRepetition(unsigned int exerciseNumber,unsigned int repeti
   char repetitionStr[MAX_NUM_STR]={0};
   snprintf(repetitionStr,MAX_NUM_STR,"%u",repetitionNumber);
 
-  return broadcastExcerciseGeneric("C_EXERCISE_REP",exerciseStr,repetitionStr);
+  return broadcastExcerciseGeneric((char*) "C_EXERCISE_REP",exerciseStr,repetitionStr);
 }
 
 int broadcastExcerciseStarted(char * name , char * value)
 {
-  return broadcastExcerciseGeneric("C_EXERCISE_STARTED",name,value);
+  return broadcastExcerciseGeneric((char*) "C_EXERCISE_STARTED",name,value);
 }
 
 int broadcastExcerciseFinished(char * name , char * value)
 {
-  return broadcastExcerciseGeneric("C_EXERCISE_FINISHED",name,value);
+  return broadcastExcerciseGeneric((char*) "C_EXERCISE_FINISHED",name,value);
 }
 
 /* ============================= ============================= ============================= =============================  */

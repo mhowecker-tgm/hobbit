@@ -140,8 +140,6 @@ void fitnessMessage(const hobbit_msgs::Fitness & msg)
   {
     fprintf(stderr,"Unknown command arrived %s \n",msg.command.c_str());
   }
-
-
 }
 
 
