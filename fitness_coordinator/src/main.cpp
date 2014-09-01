@@ -154,7 +154,7 @@ int main(int argc, char **argv)
    try
 	{
 	 ROS_INFO("Initializing ROS");
- 
+
   	 ros::init(argc, argv, NODE_NAME);
      ros::start();
 
@@ -188,7 +188,7 @@ int main(int argc, char **argv)
 		{
 		          fprintf(stderr,".");
                   ros::spinOnce();//<- this keeps our ros node messages handled up until synergies take control of the main thread
-                  //usleep(1000);
+                  loop_rate.sleep();
 
                   collectSkeletonFromTF(&sk);
                   checkSkeletonForRepetition(&state,&sk);
