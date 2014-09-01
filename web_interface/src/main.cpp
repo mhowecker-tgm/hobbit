@@ -942,6 +942,9 @@ int main(int argc, char **argv)
 {
    ROS_INFO("Starting Up!!");
 
+   int i=system("./videos/getVideos.sh");
+   if (i!=0 ) { ROS_INFO("Could not check for video datasets"); }
+
    try
    {
      ROS_INFO("Initializing ROS");
