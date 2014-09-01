@@ -27,6 +27,7 @@
 #include <sensor_msgs/CameraInfo.h>
 #include <image_transport/image_transport.h>
 
+#include "recognize_pose.h"
 #include "process.h"
 #include "hobbit_msgs/Fitness.h"
 
