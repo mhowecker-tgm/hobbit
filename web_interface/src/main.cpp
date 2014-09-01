@@ -365,7 +365,7 @@ void * prepare_map_image(struct AmmServer_DynamicRequest  * rqst)
 
  if ( FileExistsTest("../../interfaces_mira/maps/current_map/static.png") )
  {
-     readContent = AmmServer_ReadFileToMemory((char*) "../../rgbd_acquisition/bin/frames/map/map.png",&length);
+     readContent = AmmServer_ReadFileToMemory((char*) "../../interfaces_mira/maps/current_map/static.png",&length);
  } else
  {
    int i=system("/bin/bash -c \"cd ../../rgbd_acquisition/bin/frames/map/ && timeout 2 rosrun map_server map_saver -f map  && convert map.pgm map.png\" ");
