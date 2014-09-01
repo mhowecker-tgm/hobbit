@@ -272,17 +272,17 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
 
 
   char statusControl[MAX_COMMAND_SIZE*4]={0};
-  strcat(statusControl,"<center><table>");
-   addServiceCheck(statusControl , "RGBDAcquisition" , "rgbd" );
-   addServiceCheck(statusControl , "Skeleton Detector" , "skeleton" );
-   addServiceCheck(statusControl , "Hand Gestures" , "hand" );
-   addServiceCheck(statusControl , "Face Detection" , "face_det" );
-   addServiceCheck(statusControl , "Person Aggregator" , "person_aggre" );
-   addServiceCheck(statusControl , "Emergency Detection" , "emergency" );
-   addServiceCheck(statusControl , "Fitness Function" , "fitness" );
-   addServiceCheck(statusControl , "Mira Center" , "mira" );
-   addServiceCheck(statusControl , "Joystick" , "joy" );
-  strcat(statusControl,"</table></center>");
+  strcat(statusControl, (char*) "<center><table>");
+   addServiceCheck(statusControl , (char*) "RGBDAcquisition"      , (char*)  "rgbd" );
+   addServiceCheck(statusControl , (char*)  "Skeleton Detector"   , (char*)  "skeleton" );
+   addServiceCheck(statusControl , (char*)  "Hand Gestures"       , (char*)  "hand" );
+   addServiceCheck(statusControl , (char*)  "Face Detection"      , (char*)  "face_det" );
+   addServiceCheck(statusControl , (char*)  "Person Aggregator"   , (char*)  "person_aggre" );
+   addServiceCheck(statusControl , (char*)  "Emergency Detection" , (char*)  "emergency" );
+   addServiceCheck(statusControl , (char*)  "Fitness Function"    , (char*)  "fitness" );
+   addServiceCheck(statusControl , (char*)  "Mira Center"         , (char*)  "mira" );
+   addServiceCheck(statusControl , (char*)  "Joystick"            , (char*)  "joy" );
+  strcat(statusControl, (char*) "</table></center>");
 
 
   //No range check but since everything here is static max_stats_size should be big enough not to segfault with the strcat calls!
@@ -363,7 +363,7 @@ void * prepare_map_image(struct AmmServer_DynamicRequest  * rqst)
   unsigned int length=0;
   char * readContent = 0;
 
- if ( FileExistsTest("../../interfaces_mira/maps/current_map/static.png") )
+ if ( FileExistsTest((char*) "../../interfaces_mira/maps/current_map/static.png") )
  {
      readContent = AmmServer_ReadFileToMemory((char*) "../../interfaces_mira/maps/current_map/static.png",&length);
  } else
@@ -687,7 +687,7 @@ void execute(char * command,char * param)
       //rostopic pub /ActionSequence HobbitMsgs/Command "{command: 'C_SPEAK' , params: [ name: 'INFO' , value: 'lobbit' ] }" -1
       snprintf(cR,cRLen,"rostopic pub /ActionSequence hobbit_msgs/Command \"{command: 'C_SPEAK' , params: [ {name: 'INFO' , value: '%s'} ] }\" -1\n",internalString);
      #else
-      MMUIExecute("say",internalString);
+      MMUIExecute((char*) "say",internalString);
       return ;
      #endif // USE_OLD_SAY_COMMAND
   }
