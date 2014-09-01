@@ -282,7 +282,7 @@ def get_current_robot_position(frame='/map'):
         trans, rot = TransformListenerSingleton.get().lookupTransform(frame, '/base_link', rospy.Time(0))
         (_roll, _pitch, yaw) = tf.transformations.euler_from_quaternion(rot)
         return trans[0], trans[1], yaw
-    except (tf.LookupException, tf.ConnectivityException) as e:
+    except (tf.LookupException, tf.ConnectivityException, Exception) as e:
         print e
         return 0, 0, 0
     # TODO: i.e. forward exception

@@ -56,7 +56,7 @@ def undock_if_needed():
                 msg_cb=battery_cb
                 ),
             transitions={'succeeded': 'UNDOCK',
-                         'aborted': 'aborted',
+                         'aborted': 'succeeded',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
@@ -134,8 +134,6 @@ class Undock(State):
             self.service_preempt()
             return 'preempted'
         self.stop_pub.publish('docking_off')
-        # self.motion_pub.publish('Move -0.5')
-        # rospy.sleep(3.0)
         return 'succeeded'
 
 
@@ -205,8 +203,6 @@ def get_full_stop():
             Stop()
         )
     return seq
-
-
 
 
 class SetRotationGoal(State):

@@ -13,7 +13,7 @@ from nav_msgs.srv import GetPlan, GetPlanRequest
 from geometry_msgs.msg import PoseStamped, Point, Quaternion
 from hobbit_smach import bcolors
 from rgbd_acquisition.msg import Person
-from hobbit_msgs.msg import GetRooms
+from hobbit_msgs.srv import GetRooms
 import hobbit_smach.hobbit_move_import as hobbit_move
 # import hobbit_smach.recharge_import as recharge
 import uashh_smach.platform.move_base as move_base
@@ -233,7 +233,7 @@ class PlanPath(smach.State):
                 resp = self.getPlan(req)
             except rospy.ServiceException:
                 self.getPlan.close()
-                return 'failure'
+                return 'aborted'
 
             if resp.plan.poses:
                 distance = calc_path_length(end_pose, resp.plan.poses)
