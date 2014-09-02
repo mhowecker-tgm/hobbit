@@ -226,7 +226,6 @@ class PlanPath(smach.State):
 
         robot_pose = get_pose_from_xytheta(ud.x, ud.y, ud.yaw)
         rospy.loginfo('PlanPath: number of possible locations:' + str(len(self.positions)))
-        rospy.loginfo()
         for index, position in enumerate(self.positions):
             end_pose = get_pose_from_xytheta(
                 position['x'], position['y'], position['theta'])
