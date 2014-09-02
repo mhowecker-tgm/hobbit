@@ -250,7 +250,7 @@ class PlanPath(smach.State):
         except Exception as e:
             print(e)
             rospy.loginfo('All rooms visited')
-            self.reset()
+            self.reset(ud)
             return 'aborted'
         rospy.loginfo('Moving to next position')
         self.reset(ud)
