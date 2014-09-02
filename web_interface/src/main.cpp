@@ -459,7 +459,7 @@ void MMUIExecute(char * command,char * param)
 
 
   //rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_VOICE],[Value, "Susan"]]}'
-  if (strcmp(command,"LuiBackgroundSelector")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_SETBG],[Value, \\\"#%s\\\"]]}' \" ",param); }  else
+  if (strcmp(command,"LuiBackgroundSelector")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_SETBG],[Value, \\\"%s\\\"]]}' \" ",param); }  else
   if (strcmp(command,"talkingSpeed")==0) { unsigned int speedInt = 10*atoi(param);
                                            snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_SPEED],[Value, \\\"%u\\\"]]}' \" ",speedInt); }  else
   if (strcmp(command,"voiceFemale")==0)  { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_VOICE],[Value, \\\"%s\\\"]]}' \" ",param); }  else
@@ -527,7 +527,14 @@ void execute(char * command,char * param)
   if (strcmp(command,"setLatestWakingUpTime")==0) { rosparam_set(cR,cRLen,(char *) "/Hobbit/wakeup_time",param);     }  else
   if (strcmp(command,"setLatestSleepingTime")==0) { rosparam_set(cR,cRLen,(char *) "/Hobbit/sleep_time",param);      }  else
   //---------------
-  if (strcmp(command,"LuiBackgroundSelector")==0) { MMUIExecute(command,param); rosparam_set(cR,cRLen,(char *) "USER/BGCOLOUR",param);           }  else
+  if (strcmp(command,"LuiBackgroundSelector")==0) {
+                                                    char hexValue[32]={0};
+                                                    if (param[0]=='#') { strncpy(hexValue,param,32);        } else
+                                                                       { snprintf(hexValue,32,"#%s",param); }
+                                                    fprintf(stderr,"Background Color was %s , it now is %s which should have a #XXXXXX format \n");
+                                                    MMUIExecute(command,hexValue);
+                                                    rosparam_set(cR,cRLen,(char *) "USER/BGCOLOUR",hexValue);
+                                                  }  else
   if (strcmp(command,"talkingSpeed")==0)          { MMUIExecute(command,param); rosparam_set(cR,cRLen,(char *) "USER/Voice/Speed",param);   }  else
   if (strcmp(command,"gender")==0)                { MMUIExecute(command,param); rosparam_set(cR,cRLen,(char *) "USER/Voice/Default",param); }  else
   if (strcmp(command,"voiceFemale")==0)           { MMUIExecute(command,param); rosparam_set(cR,cRLen,(char *) "USER/Voice/FEMALE",param);  }  else
