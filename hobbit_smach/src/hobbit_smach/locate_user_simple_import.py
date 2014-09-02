@@ -245,12 +245,13 @@ class PlanPath(smach.State):
                     ud.goal_position_x = position['x']
                     ud.goal_position_y = position['y']
                     ud.goal_position_yaw = position['theta']
+                    rospy.loginfo('Set a goal to go to.')
                 else:
                     pass
         try:
             rospy.loginfo('Trying to remove the position')
             rospy.loginfo(str(type(self.positions)))
-            self.positions.pop(self.index)
+            del self.positions[self.index]
             rospy.loginfo('Successfully removed the position')
         except Exception as e:
             print(e)
