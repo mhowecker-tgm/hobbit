@@ -297,12 +297,12 @@ int main(int argc, char **argv)
      ros::ServiceServer visualizeOffService     = nh.advertiseService(name+"/visualize_off", visualizeOff);
      ros::ServiceServer terminateService        = nh.advertiseService(name+"/terminate"    , terminate);
      ros::ServiceServer resumeService           = nh.advertiseService(name+"/pause"        , pause);
-     ros::ServiceServer dumpService             = nh.advertiseService(name+"/startDump"         , startDump);
-     ros::ServiceServer stopDumpService         = nh.advertiseService(name+"/stopDump"         , stopDump);
-     ros::ServiceServer clearDumpService        = nh.advertiseService(name+"/clearDump"         , clearDump);
+     ros::ServiceServer dumpService             = nh.advertiseService(name+"/startDump"    , startDump);
+     ros::ServiceServer stopDumpService         = nh.advertiseService(name+"/stopDump"     , stopDump);
+     ros::ServiceServer clearDumpService        = nh.advertiseService(name+"/clearDump"    , clearDump);
      ros::ServiceServer pauseService            = nh.advertiseService(name+"/resume"       , resume);
-     ros::ServiceServer simpleService           = nh.advertiseService(name+"/simple"        , simple);
-     ros::ServiceServer advancedService         = nh.advertiseService(name+"/advanced"       , advanced);
+     ros::ServiceServer simpleService           = nh.advertiseService(name+"/simple"       , simple);
+     ros::ServiceServer advancedService         = nh.advertiseService(name+"/advanced"     , advanced);
      ros::ServiceServer setQualityService       = nh.advertiseService(name+"/set_quality"  , setQuality);
 
      //Make our rostopic cmaera grabber
