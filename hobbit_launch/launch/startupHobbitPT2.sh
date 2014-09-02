@@ -27,6 +27,10 @@ roscore&
 sleep $DELAY_BETWEEN_STEPS
 sleep $DELAY_BETWEEN_STEPS
 
+#Bring up web interface first , so that we can see what is happening ( port 8080 )
+/opt/ros/hobbit_hydro/src/web_interface/scripts/startWebInterface.sh&
+
+
 
 /opt/ros/hobbit_hydro/src/rgbd_acquisition/scripts/workAroundUSB.sh
 
@@ -43,9 +47,6 @@ sleep $DELAY_BETWEEN_STEPS
 #roslaunch openni2_launch openni2.launch camera:=headcam depth_registration:=true device_id:="#1"&
 sleep $DELAY_BETWEEN_STEPS
 
-#rosrun mobile_platform mobile_platform&
-#Bring up web interface ( port 8080 )
-/opt/ros/hobbit_hydro/src/web_interface/scripts/startWebInterface.sh&
 
 #Give some time for the first camera to come online
 sleep $DELAY_BETWEEN_STEPS
