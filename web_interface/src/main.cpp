@@ -531,7 +531,7 @@ void execute(char * command,char * param)
                                                     char hexValue[32]={0};
                                                     if (param[0]=='#') { strncpy(hexValue,param,32);        } else
                                                                        { snprintf(hexValue,32,"#%s",param); }
-                                                    fprintf(stderr,"Background Color was %s , it now is %s which should have a #XXXXXX format \n");
+                                                    fprintf(stderr,"Background Color was %s , it now is %s which should have a #XXXXXX format \n",param,hexValue);
                                                     MMUIExecute(command,hexValue);
                                                     rosparam_set(cR,cRLen,(char *) "USER/BGCOLOUR",hexValue);
                                                   }  else
