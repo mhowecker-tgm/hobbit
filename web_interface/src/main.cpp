@@ -539,7 +539,6 @@ void execute(char * command,char * param)
   //-------------------------------------------------
   if (strcmp(command,"node")==0)
   {
-
     if (strcmp(param,"switchToMapping")==0)      { strncpy(cR,"../../hobbit_launch/launch/switchMira.sh mapping",cRLen);    }   else
     if (strcmp(param,"switchToLearning")==0)     { strncpy(cR,"../../hobbit_launch/launch/switchMira.sh learning",cRLen);   }   else
     if (strcmp(param,"switchToNavigation")==0)   { strncpy(cR,"../../hobbit_launch/launch/switchMira.sh navigation",cRLen); }   else
@@ -568,10 +567,21 @@ void execute(char * command,char * param)
     if (strcmp(param,"gestureStartVisualization")==0) {  rosservice_call(cR,cRLen,(char *) "/hand_gestures/visualize_on");   } else
     if (strcmp(param,"gestureStopVisualization")==0)  {  rosservice_call(cR,cRLen,(char *) "/hand_gestures/visualize_off");  } else
 
+    if (strcmp(param,"aggregatorPrecise")==0)         {  rosservice_call(cR,cRLen,(char *) "/person_aggregator/precise");          } else
+    if (strcmp(param,"aggregatorRaw")==0)             {  rosservice_call(cR,cRLen,(char *) "/person_aggregator/raw");         } else
+    if (strcmp(param,"aggregatorPause")==0)           {  rosservice_call(cR,cRLen,(char *) "/person_aggregator/pause");   } else
+    if (strcmp(param,"aggregatorResume")==0)          {  rosservice_call(cR,cRLen,(char *) "/person_aggregator/resume");  } else
+
     if (strcmp(param,"faceTrigger")==0)      {  rosservice_call(cR,cRLen,(char *) "/face_detection/trigger");  } else
     if (strcmp(param,"facePause")==0)        {  rosservice_call(cR,cRLen,(char *) "/face_detection/pause");    } else
     if (strcmp(param,"faceResume")==0)       {  rosservice_call(cR,cRLen,(char *) "/face_detection/resume");   } else
-                                             {  fprintf(stderr,"Unknown node command ( param %s ) \n", param); }
+
+    if (strcmp(param,"fitnessTrigger")==0)      {  rosservice_call(cR,cRLen,(char *) "/fitness_coordinator/trigger");  } else
+    if (strcmp(param,"fitnessPause")==0)        {  rosservice_call(cR,cRLen,(char *) "/fitness_coordinator/pause");    } else
+    if (strcmp(param,"fitnessResume")==0)       {  rosservice_call(cR,cRLen,(char *) "/fitness_coordinator/resume");   }
+    // Else there is an unknown node command
+      else
+    {  fprintf(stderr,"Unknown node command ( param %s ) \n", param); }
 
   } else
   if (strcmp(command,"camera")==0)

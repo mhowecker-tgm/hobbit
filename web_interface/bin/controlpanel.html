@@ -284,6 +284,7 @@
            <select id="NodeControls" onchange="javascript:command('node='+this.value);" > 
                <option value="nothing0">Click to control nodes</option>  
                
+                              
                  <optgroup label="Nite Skeleton Tracker" >
                     <option value="niteTrigger">Trigger Nite Person Message</option> 
                     <option value="nitePause">Pause Nite Tracking</option> 
@@ -316,12 +317,24 @@
                     <option value="gestureResume">Resume Gesture Detector</option>
                  </optgroup>
                       
+                 <optgroup label="Person Aggregator" >
+                    <option value="aggregatorPrecise">Set Person Messages to Precise Mode</option> 
+                    <option value="aggregatorRaw">Set Person Messages to Raw Mode</option> 
+                    <option value="aggregatorPause">Pause Person Aggregator</option> 
+                    <option value="aggregatorResume">Resume Person Aggregator</option>
+                 </optgroup>   
+                 
                  <optgroup label="Face Detector" >
                     <option value="faceTrigger">Trigger Face Detector</option> 
                     <option value="facePause">Pause Face Detector</option> 
                     <option value="faceResume">Resume Face Detector</option>
                  </optgroup>   
                  
+                 <optgroup label="Fitness Function" >
+                    <option value="fitnessTrigger">Trigger Fitness Function</option> 
+                    <option value="fitnessPause">Pause Fitness Function</option> 
+                    <option value="fitnessResume">Resume Fitness Function</option> 
+                 </optgroup>
                  
                  <optgroup label="MIRA Control" >
                     <option value="switchToNavigation">Switch to Navigation</option> 
