@@ -250,7 +250,7 @@ class PlanPath(smach.State):
         try:
             rospy.loginfo('Trying to remove the position')
             rospy.loginfo(str(type(self.positions)))
-            self.positions.pop()[self.index]
+            self.positions.pop(self.index)
             rospy.loginfo('Successfully removed the position')
         except Exception as e:
             print(e)
