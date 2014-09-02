@@ -37,9 +37,9 @@
 //This will make this node also register to color/depth calibrations and
 //pass them to the gesture node instead of the defaults
 #define USE_NONDEFAULT_CALIBRATIONS 1
-#define DEFAULT_FRAME_RATE 5
+#define DEFAULT_FRAME_RATE 6
 
-int rate=DEFAULT_FRAME_RATE; 
+int rate=DEFAULT_FRAME_RATE;
 int first=0;
 int key = 0;
 volatile int paused = 0;
@@ -204,9 +204,9 @@ return;
 
 int main(int argc, char **argv)
 {
-   ROS_INFO("Starting Up!!"); 
+   ROS_INFO("Starting Up!!");
    try
-	{ 
+	{
   	 ros::init(argc, argv, NODE_NAME);
          ros::start();
 
@@ -236,7 +236,7 @@ int main(int argc, char **argv)
      std::cerr<<"Depth : "<<fromDepthTopic<<std::endl;
      std::cerr<<"Rate : "<<rate<<std::endl;
      std::cerr<<"--------------------------------------------------"<<std::endl;
-     
+
 
 
      //We advertise the services we want accessible using "rosservice call *w/e*"
