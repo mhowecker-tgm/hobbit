@@ -25,7 +25,7 @@ roscore&
 
 #ros core takes ages to start
 sleep $DELAY_BETWEEN_STEPS
-sleep $DELAY_BETWEEN_STEPS
+#sleep $DELAY_BETWEEN_STEPS
 
 #Bring up web interface first , so that we can see what is happening ( port 8080 )
 /opt/ros/hobbit_hydro/src/web_interface/scripts/startWebInterface.sh&
