@@ -1,5 +1,10 @@
 #!/bin/bash
 
+
+echo "We won't do a usb workaround from now on , it should work?"
+exit 0
+
+
 #Quick Settings
 HOBBITDIR="/opt/ros/hobbit_hydro/"  
 DEVICE_TOP="1d27/0601@1/3"
