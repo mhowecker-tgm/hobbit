@@ -23,7 +23,8 @@ extern "C" {
 *        Of course not all of them are supported/used internally but they are listed in the same order to maintain spec compatibility
 * @bug   A potential bug might arise if the specs of the header file are changed and someone is linking with an older version libAmmServer.a thats why this value exists
 */
-#define AMMAR_SERVER_HTTP_HEADER_SPEC 125
+#define AMMAR_SERVER_HTTP_HEADER_SPEC 126
+//+a cacheEtag field on instance
 
 
 /**
@@ -226,6 +227,7 @@ struct AmmServer_Instance
     int stop_server;
 
     //Cache Items..
+    unsigned int cacheVersionETag; //This should be set to a number ( typically 0 ) and gets prepended to the e-tag , in order to make clients refresh on different launches of AmmarServer
     unsigned long loaded_cache_items_Kbytes;
     unsigned int loaded_cache_items;
     void * cache; /*Actually struct cache_item * but declared as a void pointer here */
@@ -577,6 +579,19 @@ struct AmmServer_Instance *  AmmServer_StartAdminInstance(char * ip,unsigned int
 */
 int AmmServer_SelfCheck(struct AmmServer_Instance * instance);
 
+
+
+/**
+* @brief Execute a command and copy its output line to the provided buffer
+* @ingroup tools
+* @param Command to execute
+* @param Allocated memory to store the result
+* @param Size of Allocated memory
+* @param Number of line we want to get back
+* @retval 1=Ok,0=Failed
+* @bug Executing commands can be dangerous , always check and sanitize input before executing , Also be sure about the max size of output so that you don't lose a part of it , also make something like escapeshellcmd
+*/
+int AmmServer_ExecuteCommandLineNum(char *  command , char * what2GetBack , unsigned int what2GetBackMaxSize,unsigned int lineNumber);
 
 /**
 * @brief Execute a command and copy its output to the provided buffer
