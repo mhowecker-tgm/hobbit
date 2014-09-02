@@ -177,7 +177,7 @@ class CleanPositions(smach.State):
                          'room': room.room_name,
                          'place_name': position.place_name})
         ud.plan = None
-        rospy.loginfo('CleanPositions'+str(len(ud.positions)))
+        rospy.loginfo('CleanPositions: ' + str(len(ud.positions)))
         return 'succeeded'
 
 
@@ -225,8 +225,8 @@ class PlanPath(smach.State):
             self.first = False
 
         robot_pose = get_pose_from_xytheta(ud.x, ud.y, ud.yaw)
-        rospy.loginfo('PlanPath: number of possible locations')
-        rospy.loginfo(str(len(self.positions)))
+        rospy.loginfo('PlanPath: number of possible locations:' + str(len(self.positions)))
+        rospy.loginfo()
         for index, position in enumerate(self.positions):
             end_pose = get_pose_from_xytheta(
                 position['x'], position['y'], position['theta'])
@@ -249,7 +249,10 @@ class PlanPath(smach.State):
                 else:
                     pass
         try:
-            self.positions.pop[index]
+            rospy.loginfo('Trying to remove the position')
+            rospy.loginfo(str(type(self.positions)))
+            self.positions.pop()[self.index]
+            rospy.loginfo('Successfully removed the position')
         except Exception as e:
             print(e)
             rospy.loginfo('All rooms visited')
