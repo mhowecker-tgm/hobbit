@@ -1,9 +1,8 @@
 #!/bin/bash
 
 
-echo "We won't do a usb workaround from now on , it should work?"
-exit 0
-
+#exit 0
+echo "We will do a USB work around" 
 
 #Quick Settings
 HOBBITDIR="/opt/ros/hobbit_hydro/"  
