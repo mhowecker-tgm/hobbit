@@ -23,6 +23,7 @@ from testdetector import TD
 import tf
 from tf.transformations import euler_from_quaternion, quaternion_matrix
 from sensor_msgs.msg import PointField
+from visualization_msgs.msg import Marker
 
 _DATATYPES = {}
 _DATATYPES[PointField.INT8]    = ('b', 1)
@@ -414,6 +415,7 @@ class DavidLookingPose(State):
             output_keys=['goal_position_x', 'goal_position_y', 'goal_position_yaw']
         )
 	self.listener = tf.TransformListener()
+	pointing_gesture_pub = rospy.Publisher("pointing_gesture_pub", Marker)
 
     def execute(self, ud):
         if self.preempt_requested():
@@ -471,6 +473,34 @@ class DavidLookingPose(State):
         gpOnFloor = self.calcIntersectionPointingDirWithFloor(pspWCS, pvecWCS)
         if gpOnFloor == None:
 		return 'preempted'
+
+
+
+	#publish marker for visualizing the pointing point on floor
+	print "========================> no the point on floor is published as marker "
+	ellipse = Marker()
+    	ellipse.header.frame_id = "map"
+    	ellipse.header.stamp = rospy.Time.now()  #rospy.Time(0)
+    	ellipse.type = Marker.CYLINDER
+    	ellipse.pose.position.x = gpOnFloor[0]
+    	ellipse.pose.position.y = gpOnFloor[1]
+    	ellipse.pose.position.z = gpOnFloor[2]
+    	ellipse.pose.orientation = (0,0,0,1)
+    	ellipse.scale.x = 2*count
+    	ellipse.scale.y = 2*count
+    	ellipse.scale.z = 1
+    	ellipse.color.a = 1.0
+    	ellipse.color.r = 1.0
+    	ellipse.color.g = 1.0
+    	ellipse.color.b = 1.0
+    	# Publish the MarkerArray
+    	publisher.publish(ellipse)
+
+
+
+
+
+
 	print "grasp point on floor: X:  ", gpOnFloor[0], "   Y:  ", gpOnFloor[1], "   Z:  ", gpOnFloor[2]
         robotApproachDir = [gpOnFloor[0] - posRobot[0], gpOnFloor[1] - posRobot[1]]
         robotApproachDir = [robotApproachDir[0]/numpy.linalg.norm(robotApproachDir), robotApproachDir[1]/numpy.linalg.norm(robotApproachDir)]       #normalized
@@ -482,6 +512,8 @@ class DavidLookingPose(State):
         ud.goal_position_y = gpOnFloor[1] - robotDistFromGraspPnt * robotApproachDir[1]
         ud.goal_position_yaw = math.atan2(robotApproachDir[1],robotApproachDir[0]) + robotOffsetRotationForLooking #can be negative!  180/math.pi*math.atan2(y,x) = angle in degree of vector (x,y)
         return 'succeeded'
+
+
 
     def calcIntersectionPointingDirWithFloor(self, pspWCS, pvecWCS):
         #calculates intersection of pointing vector (pvecWCS)
