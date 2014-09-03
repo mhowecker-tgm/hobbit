@@ -11,7 +11,7 @@ from std_msgs.msg import String
 from smach_ros import ServiceState
 from nav_msgs.srv import GetPlan, GetPlanRequest
 from geometry_msgs.msg import PoseStamped, Point, Quaternion
-import hobbit_smach.bcolors as bcolors
+from hobbit_smach.bcolors import bcolors
 from rgbd_acquisition.msg import Person
 from hobbit_msgs.srv import GetRooms
 import hobbit_smach.hobbit_move_import as hobbit_move
