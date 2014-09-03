@@ -516,7 +516,7 @@ void execute(char * command,char * param)
   if (strcmp(command,"setUserName")==0)           { rosparam_set(cR,cRLen,(char *) "/Hobbit/robot_name",param);      }  else
   if (strcmp(command,"setRobotName")==0)          { rosparam_set(cR,cRLen,(char *) "/Hobbit/user_name",param);       }  else
   if (strcmp(command,"setSocialRole")==0)         { rosparam_set(cR,cRLen,(char *) "/Hobbit/social_role",param);     }  else
-  if (strcmp(command,"askForSocialRole")==0)      { rostopic_pub(cR,cRLen,(char*) "/Command", (char *) "hobbit_msgs/Command", (char *) "\"{command: 'C_SOCIALROLE' , params: [ {name: 'facilitator' , value: true} ] }\"" );       }  else
+  if (strcmp(command,"askForSocialRole")==0)      { rostopic_pub(cR,cRLen,(char*) "/Command", (char *) "hobbit_msgs/Command", (char *) "\"{command: 'C_SOCIALROLE' , params: [ {name: 'facilitator' , value: true} ] }\"" );   }  else
   if (strcmp(command,"setUserAway")==0)           { rosparam_set(cR,cRLen,(char *) "/Hobbit/user_away",param);       }  else
   if (strcmp(command,"setCurrentEmotion")==0)     { rosparam_set(cR,cRLen,(char *) "/Hobbit/current_emotion",param); }  else
   if (strcmp(command,"setLatestWakingUpTime")==0) { rosparam_set(cR,cRLen,(char *) "/Hobbit/wakeup_time",param);     }  else
@@ -748,8 +748,9 @@ void * store_new_configuration_callback(struct AmmServer_DynamicRequest  * rqst)
        {
          if ( AmmServer_SaveDynamicRequest((char*) "hobbit_raw.ini",default_server,rqst) )
            {
-             int i=system("tr \"\\&\" \"\\n\" < hobbit_raw.ini > hobbit.ini");
-             if (i==0) {  successfullStore = 1; }
+
+               int i=system("tr \"\\&\" \"\\n\" < hobbit_raw.ini > hobbit.ini");
+               if (i==0) {  successfullStore = 1; }
            }
        }
     }
@@ -820,6 +821,16 @@ void * store_new_configuration_callback(struct AmmServer_DynamicRequest  * rqst)
           }
         }
      }
+
+
+//Save rosparameters set
+int i=system("rosparam save /opt/ros/hobbit_hydro/src/hobbit_params.yaml");
+if (i==0)
+  {
+   successfullStore=1;
+  }
+
+
 
 if (successfullStore)
      {
