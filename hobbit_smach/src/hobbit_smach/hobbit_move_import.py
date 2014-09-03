@@ -353,7 +353,8 @@ def goToPosition(frame='/map', room='None', place='dock'):
     with seq:
         Sequence.add(
             'MMUI_SAY_YesIAmComing',
-            speech_output.sayText(info='T_HM_YesIAmComing')
+            speech_output.sayText(info='T_HM_YesIAmComing'),
+            transitions={'failed': 'aborted'}
         )
         Sequence.add(
             'UNDOCK_IF_NEEDED',
@@ -431,7 +432,8 @@ def goToPose():
     with seq:
         Sequence.add(
             'MMUI_SAY_YesIAmComing',
-            speech_output.sayText(info='T_HM_YesIAmComing')
+            speech_output.sayText(info='T_HM_YesIAmComing'),
+            transitions={'failed': 'aborted'}
         )
         Sequence.add(
             'UNDOCK_IF_NEEDED',
