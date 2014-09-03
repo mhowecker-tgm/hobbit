@@ -16,7 +16,7 @@ class DoLog(State):
     def __init__(self, scenario=None, data=None):
         State.__init__(
             self,
-            outcomes=['succeeded', 'aborted', 'preempted'],
+            outcomes=['succeeded'],
             input_keys=['scenario', 'data'] if
             (scenario is None and data is None) else []
         )
@@ -31,7 +31,7 @@ class DoLog(State):
         message = Event()
         message.event = 'E_LOG'
         params = []
-        par = Parameter(name='scenario',
+        par = Parameter(name='SCENARIO',
                         value=scenario)
         params.append(par)
         par = Parameter(name='DATA',
@@ -40,3 +40,54 @@ class DoLog(State):
         message.params = params
         self.pubEvent.publish(message)
         return 'succeeded'
+
+
+class DoLogPreempt(DoLog):
+    """
+    Inherit from DoLog but specialize in logging of preemption
+    """
+
+    def __init__(self, scenario=None):
+        State.__init__(
+            self,
+            outcomes=['succeeded'],
+            input_keys=['scenario', 'data'] if
+            (scenario is None) else []
+        )
+        self.scenario = scenario
+        self.data = 'Task has preempted.'
+        self.pubEvent = rospy.Publisher('Event', Event, queue_size=50)
+
+
+class DoLogSuccess(DoLog):
+    """
+    Inherit from DoLog but specialize in logging of preemption
+    """
+
+    def __init__(self, scenario=None):
+        State.__init__(
+            self,
+            outcomes=['succeeded'],
+            input_keys=['scenario', 'data'] if
+            (scenario is None) else []
+        )
+        self.scenario = scenario
+        self.data = 'Task has succeeded.'
+        self.pubEvent = rospy.Publisher('Event', Event, queue_size=50)
+
+
+class DoLogAborted(DoLog):
+    """
+    Inherit from DoLog but specialize in logging of aborted
+    """
+
+    def __init__(self, scenario=None):
+        State.__init__(
+            self,
+            outcomes=['succeeded'],
+            input_keys=['scenario', 'data'] if
+            (scenario is None) else []
+        )
+        self.scenario = scenario
+        self.data = 'Task has aborted.'
+        self.pubEvent = rospy.Publisher('Event', Event, queue_size=50)

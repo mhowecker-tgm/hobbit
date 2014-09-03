@@ -16,6 +16,7 @@ from mira_msgs.msg import BatteryState
 import hobbit_smach.hobbit_move_import as hobbit_move
 from hobbit_user_interaction import HobbitMMUI
 import hobbit_smach.speech_output_import as speech_output
+import hobbit_smach.logging_import as log
 
 
 def battery_cb(msg, ud):
@@ -173,15 +174,31 @@ def call_hobbit():
             connector_outcomes=['succeeded']
         )
         StateMachine.add_auto(
-        'SET_NAV_GOAL',
-        hobbit_move.SetNavigationGoal(),
+            'SET_NAV_GOAL',
+            hobbit_move.SetNavigationGoal(),
             connector_outcomes=['succeeded']
         )
         StateMachine.add(
             'MOVE_TO_GOAL',
             hobbit_move.goToPose(),
-            transitions={'succeeded': 'succeeded',
-                         'aborted': 'aborted',
-                         'preempted': 'preempted'}
+            transitions={'succeeded': 'LOG_SUCCESS',
+                         'aborted': 'LOG_ABORT',
+                         'preempted': 'LOG_PREEMPT'}
         )
+        StateMachine.add(
+            'LOG_PREEMPT',
+            log.DoLogPreempt(scenario='Call Hobbit'),
+            transitions={'succeeded': 'preempted'}
+        )
+        StateMachine.add(
+            'LOG_ABORT',
+            log.DoLogPreempt(scenario='Call Hobbit'),
+            transitions={'succeeded': 'failure'}
+        )
+        StateMachine.add(
+            'LOG_SUCCESS',
+            log.DoLogPreempt(scenario='Call Hobbit'),
+            transitions={'succeeded': 'succeeded'}
+        )
+
         return sm

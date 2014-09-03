@@ -15,6 +15,7 @@ from smach_ros import IntrospectionServer, ActionServerWrapper
 from hobbit_msgs.msg import GeneralHobbitAction
 from smach import StateMachine, State
 import hobbit_smach.safety_check_import as safety_check
+import hobbit_smach.logging_import as log
 
 
 def main():
@@ -31,13 +32,28 @@ def main():
             'SAFETY_CHECK',
             safety_check.get_safety_check(),
             connector_outcomes=['succeeded'],
-            transitions={'aborted': 'MAIN_MENU',
-                         'preempted': 'MAIN_MENU'}
+            transitions={'aborted': 'LOG_ABORT',
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add_auto(
             'SET_SUCCESS',
             SetSuccess(),
             connector_outcomes=['succeeded', 'preempted']
+        )
+        StateMachine.add(
+            'LOG_SUCCESS',
+            log.DoLogPreempt(scenario='Safety Check'),
+            transitions={'succeeded': 'succeeded'}
+        )
+        StateMachine.add(
+            'LOG_PREEMPT',
+            log.DoLogPreempt(scenario='Safety Check'),
+            transitions={'succeeded': 'preempted'}
+        )
+        StateMachine.add(
+            'LOG_ABORT',
+            log.DoLogPreempt(scenario='Safety Check'),
+            transitions={'succeeded': 'failure'}
         )
         StateMachine.add(
             'MAIN_MENU',

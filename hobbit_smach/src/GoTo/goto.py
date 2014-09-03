@@ -20,6 +20,7 @@ from smach_ros import ActionServerWrapper, IntrospectionServer
 from smach import StateMachine, State, Sequence
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 import hobbit_smach.head_move_import as head_move
+import hobbit_smach.logging_import as log
 
 
 class Init(State):
@@ -247,13 +248,13 @@ def main():
             CallCheck(),
             transitions={'touch': 'EMO_HAPPY',
                          'voice': 'EMO_WONDERING',
-                         'preempted': 'preempted'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'EMO_WONDERING',
             #HobbitEmotions.ShowEmotions(emotion='EMO_WONDERING', emo_time=4),
             HobbitEmotions.ShowEmotions(emotion='EMO_WONDERING', emo_time=1),
-            transitions={'preempted': 'preempted',
+            transitions={'preempted': 'LOG_PREEMPT',
                          'succeeded': 'MMUI_ConfirmPlace',
                          'failed': 'SET_FAILURE'}
         )
@@ -263,7 +264,7 @@ def main():
             transitions={'yes': 'EMO_HAPPY',
                          'no': 'MMUI_REPEAT_CMD',
                          'failed': 'SET_FAILURE',
-                         'preempted': 'preempted',
+                         'preempted': 'LOG_PREEMPT',
                          'timeout': 'MMUI_ConfirmPlace',
                          '3times': 'SET_FAILURE'}
         )
@@ -271,7 +272,7 @@ def main():
             'MMUI_REPEAT_CMD',
             #HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=4),
             HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=1),
-            transitions={'preempted': 'preempted',
+            transitions={'preempted': 'LOG_PREEMPT',
                          'succeeded': 'failure',
                          'failed': 'SET_FAILURE'}
         )
@@ -279,7 +280,7 @@ def main():
             'EMO_HAPPY',
             #HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=4),
             HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=1),
-            transitions={'preempted': 'preempted',
+            transitions={'preempted': 'LOG_PREEMPT',
                          'succeeded': 'VIEW_BLOCKED',
                          'failed': 'SET_FAILURE'}
         )
@@ -293,7 +294,7 @@ def main():
             'EMO_SAD',
             #HobbitEmotions.ShowEmotions(emotion='EMO_SAD', emo_time=4),
             HobbitEmotions.ShowEmotions(emotion='EMO_SAD', emo_time=1),
-            transitions={'preempted': 'preempted',
+            transitions={'preempted': 'LOG_PREEMPT',
                          'succeeded': 'COUNT_CHECK',
                          'failed': 'SET_FAILURE'}
         )
@@ -307,14 +308,14 @@ def main():
             'MMUI_SAY_CAM_BLOCKED',
             speech_output.sayText(info='T_GT_EyesBlockedMoveObject'),
             transitions={'succeeded': 'VIEW_BLOCKED',
-                         'preempted': 'preempted',
+                         'preempted': 'LOG_PREEMPT',
                          'failed': 'SET_FAILURE'}
         )
         StateMachine.add(
             'MMUI_SAY_CAM_STILL_BLOCKED',
             speech_output.sayText(info='T_GT_EyesBlockedRemoveObject'),
             transitions={'succeeded': 'SET_FAILURE',
-                         'preempted': 'preempted',
+                         'preempted': 'LOG_PREEMPT',
                          'failed': 'SET_FAILURE'}
         )
         StateMachine.add(
@@ -322,7 +323,7 @@ def main():
             seq,
             transitions={'succeeded': 'SET_SUCCESS',
                          'failed': 'SET_FAILURE',
-                         'preempted': 'preempted'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         with seq:
             Sequence.add(
@@ -335,7 +336,6 @@ def main():
                 Sequence.add(
                     'SET_NAV_GOAL',
 	                hobbit_move.get_set_nav_goal_state(),
-                    #hobbit_move.SetNavigationGoal(frame='/map'),
                     transitions={'aborted': 'failed'}
                 )
                 Sequence.add(
@@ -353,7 +353,6 @@ def main():
                                  'succeeded': 'EMO_HAPPY_1'})
             Sequence.add(
                 'EMO_SAD',
-                #HobbitEmotions.ShowEmotions(emotion='EMO_SAD', emo_time=4))
                 HobbitEmotions.ShowEmotions(emotion='EMO_SAD', emo_time=1))
             Sequence.add(
                 'MMUI_SAY_WayBlocked',
@@ -365,7 +364,6 @@ def main():
                 transitions={'succeeded': 'failed'})
             Sequence.add(
                 'EMO_HAPPY_1',
-                #HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=4))
                 HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=1))
             Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
                      head_move.MoveTo(pose='center_center'),
@@ -376,19 +374,34 @@ def main():
         StateMachine.add(
             'SET_SUCCESS',
             SetSuccess(),
-            transitions={'succeeded': 'succeeded',
+            transitions={'succeeded': 'LOG_SUCCESS',
                          'preempted': 'CLEAN_UP'}
         )
         StateMachine.add(
             'SET_FAILURE',
             SetFailure(),
-            transitions={'succeeded': 'failure',
-                         'preempted': 'preempted'}
+            transitions={'succeeded': 'LOG_ABORTED',
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'CLEAN_UP',
             CleanUp(),
-            transitions={'succeeded': 'preempted'})
+            transitions={'succeeded': 'LOG_PREEMPT'})
+        StateMachine.add(
+            'LOG_PREEMPT',
+            log.DoLogPreempt(scenario='GoTo'),
+            transitions={'succeeded': 'preempted'}
+        )
+        StateMachine.add(
+            'LOG_ABORT',
+            log.DoLogPreempt(scenario='GoTo'),
+            transitions={'succeeded': 'failure'}
+        )
+        StateMachine.add(
+            'LOG_SUCCESS',
+            log.DoLogPreempt(scenario='GoTo'),
+            transitions={'succeeded': 'succeeded'}
+        )
 
     asw = ActionServerWrapper(
         'goto',

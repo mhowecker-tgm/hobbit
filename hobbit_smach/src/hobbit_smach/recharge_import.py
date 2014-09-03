@@ -104,7 +104,22 @@ def getRecharge():
             pass
         Sequence.add('MMUI_MAIN_MENU', HobbitMMUI.ShowMenu(menu='MAIN'),
                      transitions={'failed': 'aborted'})
-    return seq
+        Sequence.add(
+            'LOG_PREEMPT',
+            log.DoLogPreempt(scenario='Call Hobbit'),
+            transitions={'succeeded': 'preempted'}
+        )
+        Sequence.add(
+            'LOG_ABORT',
+            log.DoLogPreempt(scenario='Call Hobbit'),
+            transitions={'succeeded': 'failure'}
+        )
+        Sequence.add(
+            'LOG_SUCCESS',
+            log.DoLogPreempt(scenario='Call Hobbit'),
+            transitions={'succeeded': 'succeeded'}
+        )
+return seq
 
 
 def getEndRecharge():

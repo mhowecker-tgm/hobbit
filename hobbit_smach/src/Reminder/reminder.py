@@ -17,6 +17,7 @@ from smach_ros import ActionServerWrapper, \
 from smach import StateMachine, State
 from hobbit_user_interaction import HobbitMMUI
 import hobbit_smach.locate_user_import as locate_user
+import hobbit_smach.logging_import as log
 
 
 class Init(State):
@@ -212,19 +213,34 @@ def main():
         StateMachine.add(
             'SET_SUCCESS',
             SetSuccess(),
-            transitions={'succeeded': 'succeeded',
+            transitions={'succeeded': 'LOG_SUCCESS',
                          'preempted': 'CLEAN_UP'}
         )
         StateMachine.add(
             'SET_FAILURE',
             SetFailure(),
-            transitions={'succeeded': 'failure',
-                         'preempted': 'preempted'}
+            transitions={'succeeded': 'LOG_ABORT',
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'CLEAN_UP',
             CleanUp(),
-            transitions={'succeeded': 'preempted'})
+            transitions={'succeeded': 'LOG_PREEMPT'})
+        StateMachine.add(
+            'LOG_SUCCESS',
+            log.DoLogPreempt(scenario='Reminder'),
+            transitions={'succeeded': 'succeeded'}
+        )
+        StateMachine.add(
+            'LOG_PREEMPT',
+            log.DoLogPreempt(scenario='Reminder'),
+            transitions={'succeeded': 'preempted'}
+        )
+        StateMachine.add(
+            'LOG_ABORT',
+            log.DoLogPreempt(scenario='Reminder'),
+            transitions={'succeeded': 'failure'}
+        )
 
     asw = ActionServerWrapper(
         'reminder',
