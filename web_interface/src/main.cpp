@@ -462,7 +462,8 @@ void MMUIExecute(char * command,char * param)
   if (strcmp(command,"volume")==0)       { unsigned int volumeInt = 10*atoi(param);
                                            snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_ABSVOLUME],[Value, \\\"%u\\\"]]}' \" ",volumeInt); }
   if (strcmp(command,"say")==0)          { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, D_OK],[Text, \\\"%s\\\"],[Speak, \\\"%s\\\"],[\\\"wait\\\", \\\"1\\\"]]}'\"",param,param); } else
-  if (strcmp(command,"ask")==0)          { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, D_YESNO],[Text, \\\"%s\\\"],[Speak, \\\"%s\\\"],[\\\"wait\\\", \\\"1\\\"]]}'\"",param,param); }
+  if (strcmp(command,"ask")==0)              { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, D_YESNO],[Text, \\\"%s\\\"],[Speak, \\\"%s\\\"],[\\\"wait\\\", \\\"1\\\"]]}'\"",param,param); }
+  if (strcmp(command,"signalNameUpdate")==0) { snprintf(commandToRun,MAX_COMMAND_SIZE,"/bin/bash -c \"rosservice call MMUI '{header: auto, sessionID: abc, requestText: create, params: [[Type, F_NAMESUPDATE],[Value, \\\"%s\\\"]]}' \"",param); }
 
   if ( strlen(commandToRun)!=0 )
    {
@@ -513,6 +514,7 @@ void execute(char * command,char * param)
   //-------------------------------------------------
   #warning "This code is injection prone , there needs to be sanitization for param , that unfortunately I haven't done yet"
 
+  if (strcmp(command,"signalNameUpdate")==0)      { MMUIExecute(command,param); }  else
   if (strcmp(command,"setUserName")==0)           { rosparam_set(cR,cRLen,(char *) "/ROBOT/robot_name",param);      }  else
   if (strcmp(command,"setRobotName")==0)          { rosparam_set(cR,cRLen,(char *) "/ROBOT/user_name",param);       }  else
   if (strcmp(command,"setSocialRole")==0)         { rosparam_set(cR,cRLen,(char *) "/ROBOT/social_role",param);     }  else
@@ -739,6 +741,7 @@ void execute(char * command,char * param)
 //This function prepares the content of  form context , ( content )
 void * store_new_configuration_callback(struct AmmServer_DynamicRequest  * rqst)
 {
+  unsigned int signalNamesChanged=0;
   unsigned int successfullStore = 0;
   rqst->content[pageLength]=0; //Clear content
 
@@ -769,8 +772,8 @@ void * store_new_configuration_callback(struct AmmServer_DynamicRequest  * rqst)
          if (bufferCommand!=0)
           {
             if ( _GET(default_server,rqst,(char*)"LuiBackgroundSelector",bufferCommand,256) )  { execute((char*)"LuiBackgroundSelector",bufferCommand);  }
-            if ( _GET(default_server,rqst,(char*)"userName",bufferCommand,256) )  { execute((char*)"setUserName",bufferCommand);  }
-            if ( _GET(default_server,rqst,(char*)"robotName",bufferCommand,256) )  { execute((char*)"setRobotName",bufferCommand);  }
+            if ( _GET(default_server,rqst,(char*)"userName",bufferCommand,256) )  { execute((char*)"setUserName",bufferCommand); signalNamesChanged=1; }
+            if ( _GET(default_server,rqst,(char*)"robotName",bufferCommand,256) )  { execute((char*)"setRobotName",bufferCommand); signalNamesChanged=1; }
             if ( _GET(default_server,rqst,(char*)"socialRole",bufferCommand,256) )  { execute((char*)"setSocialRole",bufferCommand);  }
             if ( _GET(default_server,rqst,(char*)"askForSocialRole",bufferCommand,256) )  { execute((char*)"askForSocialRole",bufferCommand);  }
 
@@ -830,6 +833,10 @@ if (i==0)
    successfullStore=1;
   }
 
+if (signalNamesChanged)
+{
+  execute("signalNameUpdate","no_parameter");
+}
 
 
 if (successfullStore)
