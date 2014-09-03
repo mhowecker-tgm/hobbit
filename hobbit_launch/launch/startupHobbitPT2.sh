@@ -34,6 +34,7 @@ sleep $DELAY_BETWEEN_STEPS
 
 /opt/ros/hobbit_hydro/src/rgbd_acquisition/scripts/workAroundUSB.sh
 
+sleep $DELAY_BETWEEN_STEPS
 #Trying to start basecam
 /opt/ros/hobbit_hydro/src/rgbd_acquisition/scripts/startBaseCameraPT2.sh
 #If someone would like to start it on his own he could use the following
