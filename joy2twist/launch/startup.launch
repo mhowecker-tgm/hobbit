@@ -11,9 +11,9 @@
             name="joy2twist"
             output="screen">
     </node>
-    <!--<node   pkg="joy2twist"
+    <node   pkg="joy2twist"
             type="joybutton.py" 
             name="joybutton" 
             output="screen">
-    </node>-->
+    </node>
 </launch>
