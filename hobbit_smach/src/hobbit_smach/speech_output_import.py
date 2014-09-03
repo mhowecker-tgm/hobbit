@@ -57,13 +57,19 @@ def sayText(info='Text is missing'):
 
     seq = Sequence(
         outcomes=['succeeded', 'preempted', 'failed'],
-        connector_outcome='succeeded'
+        connector_outcome='succeeded',
+        input_keys=['robots_room_name']
     )
 
     with seq:
             Sequence.add(
                 'TALK',
-                HobbitMMUI.ShowInfo(info=info)
+                HobbitMMUI.ShowInfo(
+                    info=info,
+                    #FIXME: Do it with the userdata
+                    #room_name=seq.userdata.robots_room_name
+                    #room_name='room'
+                )
             )
             Sequence.add(
                 'WAIT_FOR_MMUI',

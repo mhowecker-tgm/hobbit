@@ -189,7 +189,7 @@ class PlanPath(smach.State):
     def __init__(self):
         smach.State.__init__(
             self,
-            outcomes=['success', 'preempted', 'aborted'],
+            outcomes=['succeeded', 'preempted', 'aborted'],
             input_keys=['positions', 'x', 'y', 'yaw'],
             output_keys=['goal_position_x', 'goal_position_y',
                          'goal_position_yaw'])
@@ -239,6 +239,7 @@ class PlanPath(smach.State):
 
             if resp.plan.poses:
                 distance = calc_path_length(end_pose, resp.plan.poses)
+                rospy.loginfo('Path length: ' + str(distance))
                 if (distance < self.shortest_path):
                     self.index = index
                     self.shortest_path = distance
@@ -361,7 +362,7 @@ def get_detect_user():
         smach.StateMachine.add(
             'PLAN_PATH',
             PlanPath(),
-            transitions={'success': 'MOVE_BASE',
+            transitions={'succeeded': 'MOVE_BASE',
                          'preempted': 'CLEAN_UP',
                          'aborted': 'CLEAN_UP'}
         )

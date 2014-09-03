@@ -14,7 +14,7 @@ import math
 
 from smach import State, Sequence, StateMachine
 from smach_ros import ServiceState
-from hobbit_msgs.srv import GetCoordinates, GetCoordinatesRequest
+from hobbit_msgs.srv import GetCoordinates, GetCoordinatesRequest, GetName
 from move_base_msgs.msg import MoveBaseAction
 from std_msgs.msg import String
 from mira_msgs.msg import BatteryState
@@ -352,6 +352,10 @@ def goToPosition(frame='/map', room='None', place='dock'):
     rospy.loginfo(room + place)
     with seq:
         Sequence.add(
+            'MMUI_SAY_YesIAmComing',
+            speech_output.sayText(info='T_HM_YesIAmComing')
+        )
+        Sequence.add(
             'UNDOCK_IF_NEEDED',
             undock_if_needed()
         )
@@ -371,6 +375,13 @@ def goToPosition(frame='/map', room='None', place='dock'):
         )
         # Sequence.add('ENABLE_GESTURES',
         #              service_disable.enable_gestures())
+        Sequence.add(
+            'GET_ROBOTS_CURRENT_ROOM',
+            ServiceState(
+                'get_robots_current_room',
+                GetName,
+                response_key='robots_room_name')
+        )
         Sequence.add(
             'MMUI_SAY_ReachedPlace',
             speech_output.sayText(info='T_GT_ReachedMyDestination'),
@@ -419,6 +430,10 @@ def goToPose():
 
     with seq:
         Sequence.add(
+            'MMUI_SAY_YesIAmComing',
+            speech_output.sayText(info='T_HM_YesIAmComing')
+        )
+        Sequence.add(
             'UNDOCK_IF_NEEDED',
             undock_if_needed()
         )
@@ -438,6 +453,13 @@ def goToPose():
         )
         # Sequence.add('ENABLE_GESTURES',
         #              service_disable.enable_gestures())
+        Sequence.add(
+            'GET_ROBOTS_CURRENT_ROOM',
+            ServiceState(
+                'get_robots_current_room',
+                GetName,
+                response_key='robots_room_name')
+        )
         Sequence.add(
             'MMUI_SAY_ReachedPlace',
             speech_output.sayText(info='T_GT_ReachedMyDestination'),
