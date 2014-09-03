@@ -63,6 +63,7 @@ ros::NodeHandle * nhPtr=0;
 
 #define DEFAULT_BINDING_PORT 8080  // <--- Change this to 80 if you want to bind to the default http port..!
 #define MAX_COMMAND_SIZE 2048
+#define SMALL_CMD_BUF 256
 
 
 #define WEBROOT "./"
@@ -83,29 +84,7 @@ bool terminate(std_srvs::Empty::Request& request, std_srvs::Empty::Response& res
     return true;
 }
 
-
-/*! Dynamic content code ..! START!*/
-/* A few words about dynamic content here..
-   This is actually one of the key features on AmmarServer and maybe the reason that I started the whole project
-   What I am trying to do here is serve content by directly linking the webserver to binary ( NOT Interpreted ) code
-   in order to serve pages with the maximum possible efficiency and skipping all intermidiate layers..
-
-   PHP , Ruby , Python and all other "web-languages" are very nice and handy and to be honest I can do most of my work fine using PHP , MySQL and Apache
-   However setting up , configuring and maintaining large projects with different database systems , seperate configuration files for each of the sub parts
-   and re deploying everything is a very tiresome affair.. Not to mention that despite the great work done by the apache  , php etc teams performance is wasted
-   due to the interpreters of the various scripting languages used..
-
-   Things can't get any faster than AmmarServer and the whole programming interface exposed to the programmer is ( imho ) very friendly and familiar to even inexperienced
-   C developer..
-
-   What follows is the decleration of some "Dynamic Content Resources" their Constructors/Destructors and their callback routines that fill them with the content to be served
-   each time a client requests one of the pages..
-
-   One can test them by opening http://127.0.0.1:8081/stats.html for a dynamic time page and http://127.0.0.1:8081/formtest.html for form testing..
-
-*/
-
-//The decleration of some dynamic content resources..
+//The deceleration of some dynamic content resources..
 struct AmmServer_Instance  * default_server=0;
 struct AmmServer_Instance  * admin_server=0;
 
@@ -119,31 +98,10 @@ struct AmmServer_RH_Context tf_image={0};
 struct AmmServer_RH_Context map_image={0};
 
 
-char FileExistsTest(char * filename)
-{
- FILE *fp = fopen(filename,"r");
- if( fp ) { /* exists */ fclose(fp); return 1; }
- fprintf(stderr,"FileExists(%s) returns 0\n",filename);
- return 0;
-}
-
-char EraseFile(char * filename)
-{
- FILE *fp = fopen(filename,"w");
- if( fp ) { /* exists */ fclose(fp); return 1; }
- return 0;
-}
-
-
-unsigned int StringIsHTMLSafe(char * str)
-{
-  unsigned int i=0;
-  while(i<strlen(str)) { if ( ( str[i]<'!' ) || ( str[i]=='<' ) || ( str[i]=='>' ) ) { return 0;} ++i; }
-  return 1;
-}
 
 void replaceChar(char * input , char findChar , char replaceWith)
 {
+  #warning "TODO : Replace replaceChar with AmmServer_ReplaceCharInString"
   char * cur = input;
   char * inputEnd = input+strlen(input);
   while ( cur < inputEnd )
@@ -223,7 +181,7 @@ int addServiceCheck(char * mem, char * label , char * processName )
   strcat(mem,label);
   strcat(mem,"</td><td>");
   if (processExists(processName))  { strcat(mem,"<img src=\"statusOk.png\" height=15>"); } else
-                                  { strcat(mem,"<img src=\"statusFailed.png\" height=15>"); }
+                                   { strcat(mem,"<img src=\"statusFailed.png\" height=15>"); }
   strcat(mem,"</td></tr>");
 
   return 0;
@@ -358,7 +316,7 @@ void * prepare_map_image(struct AmmServer_DynamicRequest  * rqst)
   unsigned int length=0;
   char * readContent = 0;
 
- if ( FileExistsTest((char*) "../../interfaces_mira/maps/current_map/static.png") )
+ if ( AmmServer_FileExists((char*) "../../interfaces_mira/maps/current_map/static.png") )
  {
      readContent = AmmServer_ReadFileToMemory((char*) "../../interfaces_mira/maps/current_map/static.png",&length);
  } else
@@ -444,6 +402,23 @@ void joystickExecute(float x , float y )
       ===========================================================================================================================
 */
 
+void rosservice_call(char * commandToRun,unsigned int maxCommandSize,char * serviceName)
+{
+  snprintf(commandToRun,maxCommandSize,"/bin/bash -c \"rosservice call %s\"",serviceName);
+}
+
+
+void rosparam_set(char * commandToRun,unsigned int maxCommandSize,char * paramName,char * paramValue)
+{
+  snprintf(commandToRun,maxCommandSize,"/bin/bash -c \"rosparam set %s \"%s\" \"",paramName,paramValue);
+}
+
+
+void rostopic_pub(char * commandToRun,unsigned int maxCommandSize,char * topicName,char * topicType,char * topicValue)
+{
+  snprintf(commandToRun,maxCommandSize,"/bin/bash -c \"rostopic pub %s %s %s -1\"",topicName,topicType,topicValue);
+}
+
 void MMUIExecute(char * command,char * param)
 {
   char * commandToRun = (char*) malloc((MAX_COMMAND_SIZE+1) * sizeof(char));
@@ -481,28 +456,9 @@ void MMUIExecute(char * command,char * param)
 
 
 
-void rosservice_call(char * commandToRun,unsigned int maxCommandSize,char * serviceName)
-{
-  snprintf(commandToRun,maxCommandSize,"/bin/bash -c \"rosservice call %s\"",serviceName);
-}
-
-
-void rosparam_set(char * commandToRun,unsigned int maxCommandSize,char * paramName,char * paramValue)
-{
-  snprintf(commandToRun,maxCommandSize,"/bin/bash -c \"rosparam set %s \"%s\" \"",paramName,paramValue);
-}
-
-
-void rostopic_pub(char * commandToRun,unsigned int maxCommandSize,char * topicName,char * topicType,char * topicValue)
-{
-  snprintf(commandToRun,maxCommandSize,"/bin/bash -c \"rostopic pub %s %s %s -1\"",topicName,topicType,topicValue);
-}
-
-
 void execute(char * command,char * param)
 {
   fprintf(stderr,"Execute(%s,%s) \n",command,param);
-  int i=0;
   unsigned int cRLen=MAX_COMMAND_SIZE;
   char * cR = (char*) malloc((MAX_COMMAND_SIZE+1) * sizeof(char));
 
@@ -708,13 +664,14 @@ void execute(char * command,char * param)
       snprintf(cR,cRLen,"rostopic pub /ActionSequence hobbit_msgs/Command \"{command: 'C_SPEAK' , params: [ {name: 'INFO' , value: '%s'} ] }\" -1\n",internalString);
      #else
       MMUIExecute((char*) "say",internalString);
-      return ;
+        cR[0]=0;
+      //Dont return because it leaks memory -> return ;
      #endif // USE_OLD_SAY_COMMAND
   }
 
   if ( strlen(cR)!=0 )
    {
-     i=system(cR);
+     int i=system(cR);
      if (i!=0) { AmmServer_Error("Command %s failed\n",cR); } else
                { AmmServer_Success("Command %s success\n",cR); }
    } else
@@ -774,51 +731,51 @@ void * store_new_configuration_callback(struct AmmServer_DynamicRequest  * rqst)
 
 
          AmmServer_Warning("Setting variables at once is unsafe since it doesnt check for injection");
-         char * bufferCommand = (char *) malloc ( 256 * sizeof(char) );
+         char * bufferCommand = (char *) malloc ( SMALL_CMD_BUF * sizeof(char) );
          if (bufferCommand!=0)
           {
-            if ( _GET(default_server,rqst,(char*)"LuiBackgroundSelector",bufferCommand,256) )  { execute((char*)"LuiBackgroundSelector",bufferCommand);  }
-            if ( _GET(default_server,rqst,(char*)"userName",bufferCommand,256) )  { execute((char*)"setUserName",bufferCommand); signalNamesChanged=1; }
-            if ( _GET(default_server,rqst,(char*)"robotName",bufferCommand,256) )  { execute((char*)"setRobotName",bufferCommand); signalNamesChanged=1; }
-            if ( _GET(default_server,rqst,(char*)"socialRole",bufferCommand,256) )  { execute((char*)"setSocialRole",bufferCommand);  }
-            if ( _GET(default_server,rqst,(char*)"askForSocialRole",bufferCommand,256) )  { execute((char*)"askForSocialRole",bufferCommand);  }
+            if ( _GET(default_server,rqst,(char*)"LuiBackgroundSelector",bufferCommand,SMALL_CMD_BUF) )  { execute((char*)"LuiBackgroundSelector",bufferCommand);  }
+            if ( _GET(default_server,rqst,(char*)"userName",bufferCommand,SMALL_CMD_BUF) )  { execute((char*)"setUserName",bufferCommand); signalNamesChanged=1; }
+            if ( _GET(default_server,rqst,(char*)"robotName",bufferCommand,SMALL_CMD_BUF) )  { execute((char*)"setRobotName",bufferCommand); signalNamesChanged=1; }
+            if ( _GET(default_server,rqst,(char*)"socialRole",bufferCommand,SMALL_CMD_BUF) )  { execute((char*)"setSocialRole",bufferCommand);  }
+            if ( _GET(default_server,rqst,(char*)"askForSocialRole",bufferCommand,SMALL_CMD_BUF) )  { execute((char*)"askForSocialRole",bufferCommand);  }
 
-            if ( _GET(default_server,rqst,(char*)"userAway",bufferCommand,256) )  { execute((char*)"setUserAway",bufferCommand);  }
-            if ( _GET(default_server,rqst,(char*)"currentEmotion",bufferCommand,256) )  { execute((char*)"setCurrentEmotion",bufferCommand);  }
-            if ( _GET(default_server,rqst,(char*)"latestWakingUpTime",bufferCommand,256) )  { execute((char*)"setLatestWakingUpTime",bufferCommand);  }
-            if ( _GET(default_server,rqst,(char*)"latestSleepingTime",bufferCommand,256) )  { execute((char*)"setLatestSleepingTime",bufferCommand);  }
+            if ( _GET(default_server,rqst,(char*)"userAway",bufferCommand,SMALL_CMD_BUF) )  { execute((char*)"setUserAway",bufferCommand);  }
+            if ( _GET(default_server,rqst,(char*)"currentEmotion",bufferCommand,SMALL_CMD_BUF) )  { execute((char*)"setCurrentEmotion",bufferCommand);  }
+            if ( _GET(default_server,rqst,(char*)"latestWakingUpTime",bufferCommand,SMALL_CMD_BUF) )  { execute((char*)"setLatestWakingUpTime",bufferCommand);  }
+            if ( _GET(default_server,rqst,(char*)"latestSleepingTime",bufferCommand,SMALL_CMD_BUF) )  { execute((char*)"setLatestSleepingTime",bufferCommand);  }
 
 
-            if ( _GET(default_server,rqst,(char*)"talkingSpeed",bufferCommand,256) )  { execute((char*)"talkingSpeed",bufferCommand);  }
-            if ( _GET(default_server,rqst,(char*)"gender",bufferCommand,256) )  { execute((char*)"gender",bufferCommand);  }
-            if ( _GET(default_server,rqst,(char*)"voiceFemale",bufferCommand,256) )  { execute((char*)"voiceFemale",bufferCommand);  }
-            if ( _GET(default_server,rqst,(char*)"voiceMale",bufferCommand,256) )  { execute((char*)"voiceMale",bufferCommand);  }
-            if ( _GET(default_server,rqst,(char*)"volume",bufferCommand,256) )  { execute((char*)"volume",bufferCommand);  }
+            if ( _GET(default_server,rqst,(char*)"talkingSpeed",bufferCommand,SMALL_CMD_BUF) )  { execute((char*)"talkingSpeed",bufferCommand);  }
+            if ( _GET(default_server,rqst,(char*)"gender",bufferCommand,SMALL_CMD_BUF) )  { execute((char*)"gender",bufferCommand);  }
+            if ( _GET(default_server,rqst,(char*)"voiceFemale",bufferCommand,SMALL_CMD_BUF) )  { execute((char*)"voiceFemale",bufferCommand);  }
+            if ( _GET(default_server,rqst,(char*)"voiceMale",bufferCommand,SMALL_CMD_BUF) )  { execute((char*)"voiceMale",bufferCommand);  }
+            if ( _GET(default_server,rqst,(char*)"volume",bufferCommand,SMALL_CMD_BUF) )  { execute((char*)"volume",bufferCommand);  }
 
             char * commandToRun = (char*) malloc((MAX_COMMAND_SIZE+1) * sizeof(char));
             if (commandToRun!=0)
             {
-              if ( _GET(default_server,rqst,(char*)"LuiBackgroundSelector",bufferCommand,256) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXCOLORXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
-              if ( _GET(default_server,rqst,(char*)"city",bufferCommand,256) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXCITYXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
-              if ( _GET(default_server,rqst,(char*)"voice",bufferCommand,256) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXVOICEXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
-              if ( _GET(default_server,rqst,(char*)"emergencyContactTel1",bufferCommand,256) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXEMERGENCYTELXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
-              if ( _GET(default_server,rqst,(char*)"contactTel1",bufferCommand,256) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXTELEPHONE1NUMXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
-              if ( _GET(default_server,rqst,(char*)"contactName1",bufferCommand,256) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXTELEPHONE1NAMEXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"LuiBackgroundSelector",bufferCommand,SMALL_CMD_BUF) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXCOLORXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"city",bufferCommand,SMALL_CMD_BUF) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXCITYXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"voice",bufferCommand,SMALL_CMD_BUF) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXVOICEXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"emergencyContactTel1",bufferCommand,SMALL_CMD_BUF) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXEMERGENCYTELXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"contactTel1",bufferCommand,SMALL_CMD_BUF) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXTELEPHONE1NUMXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"contactName1",bufferCommand,SMALL_CMD_BUF) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXTELEPHONE1NAMEXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
 
-              if ( _GET(default_server,rqst,(char*)"contactTel2",bufferCommand,256) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXTELEPHONE2NUMXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
-              if ( _GET(default_server,rqst,(char*)"contactName2",bufferCommand,256) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXTELEPHONE2NAMEXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"contactTel2",bufferCommand,SMALL_CMD_BUF) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXTELEPHONE2NUMXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"contactName2",bufferCommand,SMALL_CMD_BUF) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXTELEPHONE2NAMEXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
 
-              if ( _GET(default_server,rqst,(char*)"contactTel3",bufferCommand,256) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXTELEPHONE3NUMXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
-              if ( _GET(default_server,rqst,(char*)"contactName3",bufferCommand,256) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXTELEPHONE3NAMEXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"contactTel3",bufferCommand,SMALL_CMD_BUF) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXTELEPHONE3NUMXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"contactName3",bufferCommand,SMALL_CMD_BUF) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXTELEPHONE3NAMEXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
 
-              if ( _GET(default_server,rqst,(char*)"contactTel4",bufferCommand,256) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXTELEPHONE4NUMXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
-              if ( _GET(default_server,rqst,(char*)"contactName4",bufferCommand,256) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXTELEPHONE4NAMEXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"contactTel4",bufferCommand,SMALL_CMD_BUF) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXTELEPHONE4NUMXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"contactName4",bufferCommand,SMALL_CMD_BUF) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXTELEPHONE4NAMEXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
 
-              if ( _GET(default_server,rqst,(char*)"contactTel5",bufferCommand,256) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXTELEPHONE5NUMXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
-              if ( _GET(default_server,rqst,(char*)"contactName5",bufferCommand,256) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXTELEPHONE5NAMEXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"contactTel5",bufferCommand,SMALL_CMD_BUF) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXTELEPHONE5NUMXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"contactName5",bufferCommand,SMALL_CMD_BUF) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXTELEPHONE5NAMEXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
 
-              if ( _GET(default_server,rqst,(char*)"contactTel6",bufferCommand,256) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXTELEPHONE6NUMXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
-              if ( _GET(default_server,rqst,(char*)"contactName6",bufferCommand,256) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXTELEPHONE6NAMEXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"contactTel6",bufferCommand,SMALL_CMD_BUF) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXTELEPHONE6NUMXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
+              if ( _GET(default_server,rqst,(char*)"contactName6",bufferCommand,SMALL_CMD_BUF) )  {  snprintf(commandToRun,MAX_COMMAND_SIZE,"sed -i 's/XXXXXTELEPHONE6NAMEXXXXX/%s/' startup.dcfg",bufferCommand); i=system(commandToRun);  }
 
               free(commandToRun);
             }
@@ -969,7 +926,6 @@ void close_dynamic_content()
     AmmServer_RemoveResourceHandler(default_server,&stats,1);
     AmmServer_RemoveResourceHandler(default_server,&form,1);
 }
-/*! Dynamic content code ..! END ------------------------*/
 
 
 
@@ -1017,7 +973,6 @@ int main(int argc, char **argv)
 
     if (!default_server) { AmmServer_Error((char*) "Could not start server , shutting down everything.."); exit(1); }
 
-    ros::spinOnce();
     ros::spinOnce();
 
     //Create dynamic content allocations and associate context to the correct files
