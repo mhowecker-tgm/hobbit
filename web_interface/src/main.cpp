@@ -515,8 +515,14 @@ void execute(char * command,char * param)
   #warning "This code is injection prone , there needs to be sanitization for param , that unfortunately I haven't done yet"
 
   if (strcmp(command,"signalNameUpdate")==0)      { MMUIExecute(command,param); }  else
-  if (strcmp(command,"setUserName")==0)           { rosparam_set(cR,cRLen,(char *) "/Hobbit/robot_name",param);      }  else
-  if (strcmp(command,"setRobotName")==0)          { rosparam_set(cR,cRLen,(char *) "/Hobbit/user_name",param);       }  else
+  if (strcmp(command,"setUserName")==0)           {
+                                                    rosparam_set(cR,cRLen,(char *) "/Hobbit/robot_name",param);
+                                                    rosparam_set(cR,cRLen,(char *) "/ROBOT/robot_name",param);
+                                                  }  else
+  if (strcmp(command,"setRobotName")==0)          {
+                                                    rosparam_set(cR,cRLen,(char *) "/Hobbit/user_name",param);
+                                                    rosparam_set(cR,cRLen,(char *) "/ROBOT/user_name",param);
+                                                  }  else
   if (strcmp(command,"setSocialRole")==0)         { rosparam_set(cR,cRLen,(char *) "/Hobbit/social_role",param);     }  else
   if (strcmp(command,"askForSocialRole")==0)      { rostopic_pub(cR,cRLen,(char *) "/Command", (char *) "hobbit_msgs/Command", (char *) "\"{command: 'C_SOCIALROLE' , params: [ {name: 'facilitator' , value: true} ] }\"" );   }  else
   if (strcmp(command,"setUserAway")==0)           { rosparam_set(cR,cRLen,(char *) "/Hobbit/user_away",param);       }  else
