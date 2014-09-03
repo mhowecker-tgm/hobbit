@@ -513,14 +513,14 @@ void execute(char * command,char * param)
   //-------------------------------------------------
   #warning "This code is injection prone , there needs to be sanitization for param , that unfortunately I haven't done yet"
 
-  if (strcmp(command,"setUserName")==0)           { rosparam_set(cR,cRLen,(char *) "/Hobbit/robot_name",param);      }  else
-  if (strcmp(command,"setRobotName")==0)          { rosparam_set(cR,cRLen,(char *) "/Hobbit/user_name",param);       }  else
-  if (strcmp(command,"setSocialRole")==0)         { rosparam_set(cR,cRLen,(char *) "/Hobbit/social_role",param);     }  else
+  if (strcmp(command,"setUserName")==0)           { rosparam_set(cR,cRLen,(char *) "/ROBOT/robot_name",param);      }  else
+  if (strcmp(command,"setRobotName")==0)          { rosparam_set(cR,cRLen,(char *) "/ROBOT/user_name",param);       }  else
+  if (strcmp(command,"setSocialRole")==0)         { rosparam_set(cR,cRLen,(char *) "/ROBOT/social_role",param);     }  else
   if (strcmp(command,"askForSocialRole")==0)      { rostopic_pub(cR,cRLen,(char*) "/Command", (char *) "hobbit_msgs/Command", (char *) "\"{command: 'C_SOCIALROLE' , params: [ {name: 'facilitator' , value: true} ] }\"" );   }  else
-  if (strcmp(command,"setUserAway")==0)           { rosparam_set(cR,cRLen,(char *) "/Hobbit/user_away",param);       }  else
-  if (strcmp(command,"setCurrentEmotion")==0)     { rosparam_set(cR,cRLen,(char *) "/Hobbit/current_emotion",param); }  else
-  if (strcmp(command,"setLatestWakingUpTime")==0) { rosparam_set(cR,cRLen,(char *) "/Hobbit/wakeup_time",param);     }  else
-  if (strcmp(command,"setLatestSleepingTime")==0) { rosparam_set(cR,cRLen,(char *) "/Hobbit/sleep_time",param);      }  else
+  if (strcmp(command,"setUserAway")==0)           { rosparam_set(cR,cRLen,(char *) "/ROBOT/user_away",param);       }  else
+  if (strcmp(command,"setCurrentEmotion")==0)     { rosparam_set(cR,cRLen,(char *) "/ROBOT/current_emotion",param); }  else
+  if (strcmp(command,"setLatestWakingUpTime")==0) { rosparam_set(cR,cRLen,(char *) "/ROBOT/wakeup_time",param);     }  else
+  if (strcmp(command,"setLatestSleepingTime")==0) { rosparam_set(cR,cRLen,(char *) "/ROBOT/sleep_time",param);      }  else
   //---------------
   if (strcmp(command,"LuiBackgroundSelector")==0) {
                                                     char hexValue[32]={0};
