@@ -64,7 +64,7 @@ ros::NodeHandle * nhPtr=0;
 #define DEFAULT_BINDING_PORT 8080  // <--- Change this to 80 if you want to bind to the default http port..!
 #define MAX_COMMAND_SIZE 2048
 
-
+ 
 #define WEBROOT "./"
 #define TEMPLATEROOT "./templates/"
 char webserver_root[MAX_FILE_PATH]=WEBROOT; // <- change this to the directory that contains your content if you dont want to use the default public_html dir..
