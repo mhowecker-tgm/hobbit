@@ -27,9 +27,9 @@ def start_action():
 
 if __name__ == '__main__':
         try:
+	    print('node %s started' % NAME)
             rospy.init_node(NAME)
             result = start_action()
-            print('node %s started' % NAME)
             print ('Result:', result)
         except rospy.ROSInterruptException:
             print('program interrupted before completion')
