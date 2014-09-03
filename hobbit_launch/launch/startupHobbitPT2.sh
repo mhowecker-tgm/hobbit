@@ -25,11 +25,10 @@ roscore&
 
 #ros core takes ages to start
 sleep $DELAY_BETWEEN_STEPS
-#sleep $DELAY_BETWEEN_STEPS
+sleep $DELAY_BETWEEN_STEPS
 
 #Bring up web interface first , so that we can see what is happening ( port 8080 )
 /opt/ros/hobbit_hydro/src/web_interface/scripts/startWebInterface.sh&
-
 
 
 /opt/ros/hobbit_hydro/src/rgbd_acquisition/scripts/workAroundUSB.sh
@@ -49,13 +48,9 @@ sleep $DELAY_BETWEEN_STEPS
 sleep $DELAY_BETWEEN_STEPS
 
 
-#Give some time for the first camera to come online
-sleep $DELAY_BETWEEN_STEPS
-
 #Start Head ( and bring it to level )
 /opt/ros/hobbit_hydro/src/hobbit_launch/launch/startupBlueDanubeHead.sh&
-#roslaunch head startup.launch&
-#Start Base
+
 
 # Start the virtual laser
 cd /opt/ros/hobbit_hydro/src/virtual_laser/launch
@@ -67,7 +62,7 @@ sleep $DELAY_BETWEEN_STEPS
 roslaunch aal_service startup.launch&
 
 # Load Hobbit PT2 parameters
-#cd /opt/ros/hobbit_hydro/src/
+cd /opt/ros/hobbit_hydro/src/ #, web interface will save to this file also when somene clicks Set
 rosparam load /opt/ros/hobbit_hydro/src/hobbit_params.yaml&
 
 # Start SMACH handling of rooms, places, objects.
@@ -83,7 +78,7 @@ rosrun hobbit_smach battery_monitor.py&
 rosrun hobbit_smach recharge&
 rosrun hobbit_smach sos_monitor.py&
 
-sleep $DELAY_BETWEEN_STEPS 
+#sleep $DELAY_BETWEEN_STEPS
 rosrun hobbit_smach master.py&
 
 # Start table/floor object detector (for clustering) and trigger for publishing single shot point clouds from headcam
@@ -104,7 +99,7 @@ roslaunch startup.launch&
 #cd /opt/ros/hobbit_hydro/src/interfaces_mira/resources
 #miracenter mira_vis_config.xml&
 
-sleep $DELAY_BETWEEN_STEPS
+
 # Start the virtual laser from the headcam for obstacle avoidance
 cd /opt/ros/hobbit_hydro/src/top_scan_points/launch
 roslaunch startup.launch&
