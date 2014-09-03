@@ -119,7 +119,7 @@ def getRecharge():
             log.DoLogPreempt(scenario='Call Hobbit'),
             transitions={'succeeded': 'succeeded'}
         )
-return seq
+    return seq
 
 
 def getEndRecharge():
