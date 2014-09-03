@@ -64,7 +64,7 @@ ros::NodeHandle * nhPtr=0;
 #define DEFAULT_BINDING_PORT 8080  // <--- Change this to 80 if you want to bind to the default http port..!
 #define MAX_COMMAND_SIZE 2048
 
- 
+
 #define WEBROOT "./"
 #define TEMPLATEROOT "./templates/"
 char webserver_root[MAX_FILE_PATH]=WEBROOT; // <- change this to the directory that contains your content if you dont want to use the default public_html dir..
@@ -235,7 +235,6 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
   time_t t = time(NULL);
   struct tm tm = *localtime(&t);
 
-
   char temperatureState[MAX_COMMAND_SIZE]={0};
   getBackCommandLine((char*) "timeout 1 sensors | grep temp3 | cut -d ' ' -f9", temperatureState , MAX_COMMAND_SIZE );
 
@@ -258,11 +257,6 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
   if (charging)  { snprintf(chargingState,MAX_COMMAND_SIZE,"<img src=\"plugged.png\" height=\"15\"> %u ",charging); } else
                  { snprintf(chargingState,MAX_COMMAND_SIZE," %u ",charging); }*/
 
-
-  //  char mileageState[MAX_COMMAND_SIZE]={0};
-  //  getBackCommandLine((char*) "timeout 0.5 rostopic echo /mileage -n 1 | grep data | cut -d ':' -f2", mileageState , MAX_COMMAND_SIZE );
-
-
   char cpuUsage[MAX_COMMAND_SIZE]={0};
   getBackCommandLine((char*) "grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage \"%\"}'" , cpuUsage , MAX_COMMAND_SIZE );
 
@@ -272,7 +266,7 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
   getBackCommandLine((char*) "/bin/bash -c \" svnversion \" " , svnVersion , MAX_COMMAND_SIZE );
 
 
-  char statusControl[MAX_COMMAND_SIZE*4]={0};
+  char statusControl[MAX_COMMAND_SIZE*8]={0};
   strcat(statusControl, (char*) "<center><table>");
    addServiceCheck(statusControl , (char*) "RGBDAcquisition"      , (char*)  "rgbd" );
    addServiceCheck(statusControl , (char*)  "Skeleton Detector"   , (char*)  "skeleton" );
@@ -916,7 +910,7 @@ int init_dynamic_content()
 
   if (! AmmServer_AddResourceHandler(default_server,&indexPage,(char*)"/index.html",webserver_root,4096,0,(void*) &prepare_index_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) )
               { AmmServer_Error("Failed adding index page\n"); }
-  if (! AmmServer_AddResourceHandler(default_server,&stats,(char*) "/stats.html",webserver_root,4096,0,(void*) &prepare_stats_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) )
+  if (! AmmServer_AddResourceHandler(default_server,&stats,(char*) "/stats.html",webserver_root,8000,0,(void*) &prepare_stats_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) )
               { AmmServer_Error("Failed adding stats page\n"); }
 
   if (! AmmServer_AddResourceHandler(default_server,&settings,(char*)"/settings.html",webserver_root,4096,0,(void* ) &store_new_configuration_callback,SAME_PAGE_FOR_ALL_CLIENTS) )
