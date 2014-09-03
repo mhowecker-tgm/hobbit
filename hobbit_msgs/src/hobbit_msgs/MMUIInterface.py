@@ -121,6 +121,14 @@ class MMUIInterface:
         parr.append(p)
         return self.callMMUIService('0', 'create', parr)
 
+    def DefineSOSFile(self, filename='default'):
+        parr = []
+        p = Parameter('type', 'F_SOSFILE')
+        parr.append(p)
+        p = Parameter('Audio', filename)
+        parr.append(p)
+        return self.callMMUIService('0', 'create', parr)
+
     def StartSOSCall(self):
         parr=[]
         p = Parameter('type', 'F_CALLSOS')
