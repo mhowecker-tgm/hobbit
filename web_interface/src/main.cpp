@@ -264,7 +264,7 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
 
   char statusControl[MAX_COMMAND_SIZE*8]={0};
   strcat(statusControl, (char*) "<center><table>");
-   addHeadRPICheck(statusControl , (char*) "Head "      )
+   addHeadRPICheck(statusControl , (char*) "Head ");
    addServiceCheck(statusControl , (char*) "RGBDAcquisition"      , (char*)  "rgbd" );
    addServiceCheck(statusControl , (char*)  "Skeleton Detector"   , (char*)  "skeleton" );
    addServiceCheck(statusControl , (char*)  "Hand Gestures"       , (char*)  "hand" );
