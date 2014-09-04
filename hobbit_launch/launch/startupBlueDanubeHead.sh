@@ -1,7 +1,7 @@
 #!/bin/bash 
 
 HOBBITDIR="/opt/ros/hobbit_hydro/"
-screen -d -m -S "head" /bin/bash -c "source ~/.bashrc && source $HOBBITDIR/devel/setup.bash && netcat 192.168.2.199 8080"
+screen -d -m -S "head" /bin/bash -c "source ~/.bashrc && source $HOBBITDIR/devel/setup.bash && nc6 192.168.2.199 8080"
  
 #Useful Commands :
  
