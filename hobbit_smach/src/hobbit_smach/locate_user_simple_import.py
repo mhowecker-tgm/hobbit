@@ -11,11 +11,10 @@ from std_msgs.msg import String
 from smach_ros import ServiceState
 from nav_msgs.srv import GetPlan, GetPlanRequest
 from geometry_msgs.msg import PoseStamped, Point, Quaternion
-from hobbit_smach.bcolors import bcolors
+# from hobbit_smach.bcolors import bcolors
 from rgbd_acquisition.msg import Person
 from hobbit_msgs.srv import GetRooms
 import hobbit_smach.hobbit_move_import as hobbit_move
-# import hobbit_smach.recharge_import as recharge
 import uashh_smach.platform.move_base as move_base
 import hobbit_smach.head_move_import as head_move
 
@@ -305,17 +304,20 @@ def calc_path_length(end_pose, poses):
 
 
 def userdetection_cb(msg, ud):
-    print bcolors.OKGREEN + 'received message: '
-    print msg
-    print bcolors.ENDC
+    # print bcolors.OKGREEN + 'received message: '
+    # print msg
+    # print bcolors.ENDC
     if 0.39 < msg.confidence <= 0.61:
-        print bcolors.OKGREEN + 'Face detected!' + bcolors.ENDC
+        # print bcolors.OKGREEN + 'Face detected!' + bcolors.ENDC
+        rospy.loginfo('Face detected!')
         return True
     elif msg.confidence > 0.61:
-        print bcolors.OKGREEN + 'Skeleton detected!' + bcolors.ENDC
+        # print bcolors.OKGREEN + 'Skeleton detected!' + bcolors.ENDC
+        rospy.loginfo('Skeleton detected!')
         return True
     else:
-        print bcolors.FAIL + 'NO USER' + bcolors.ENDC
+        rospy.loginfo('NO USER')
+        # print bcolors.FAIL + 'NO USER' + bcolors.ENDC
         return False
 
 

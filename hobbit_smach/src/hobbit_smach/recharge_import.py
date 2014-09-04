@@ -16,6 +16,7 @@ from mira_msgs.msg import BatteryState
 import hobbit_smach.hobbit_move_import as hobbit_move
 from hobbit_user_interaction import HobbitMMUI
 import hobbit_smach.speech_output_import as speech_output
+import hobbit_smach.logging_import as log
 
 
 def battery_cb(msg, ud):
