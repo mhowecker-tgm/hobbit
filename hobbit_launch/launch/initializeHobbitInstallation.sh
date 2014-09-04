@@ -15,7 +15,7 @@ fi
 
 sudo echo "Asked for super user to install needed , but potentially missing packages"
 
-sudo apt-get install lm-sensors netcat chrony
+sudo apt-get install lm-sensors netcat6 chrony
 
 #Change to Script directory
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
