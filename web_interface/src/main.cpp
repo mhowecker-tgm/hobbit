@@ -71,6 +71,7 @@ ros::NodeHandle * nhPtr=0;
 char webserver_root[MAX_FILE_PATH]=WEBROOT; // <- change this to the directory that contains your content if you dont want to use the default public_html dir..
 char templates_root[MAX_FILE_PATH]=TEMPLATEROOT;
 
+unsigned int enableBatteryPrompt=0;
 unsigned int stopWebInterface=0;
 char * page=0;
 unsigned int pageLength=0;
@@ -197,18 +198,26 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
   getBackCommandLine((char*) "timeout 1 sensors | grep temp3 | cut -d ' ' -f9", temperatureState , MAX_COMMAND_SIZE );
 
   char batteryState[MAX_COMMAND_SIZE]={0};
-  getBackCommandLine((char*) "timeout 1 rostopic echo /battery_state -n 1 | grep lifePercent | cut -d ':' -f2", batteryState , MAX_COMMAND_SIZE );
-  float battery = atof(batteryState);
-
-  if (battery<=1)   { fprintf(stderr,"Battery state is weird %0.2f , or %s \n",battery,batteryState); } else
-  if (battery<=10)  { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_10.png\" height=\"15\"> %0.2f %% ",battery); } else
-  if (battery<=25)  { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_25.png\" height=\"15\"> %0.2f %%",battery); } else
-  if (battery<=50)  { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_50.png\" height=\"15\"> %0.2f %%",battery); } else
-  if (battery<=75)  { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_75.png\" height=\"15\"> %0.2f %%",battery); } else
-  if (battery<=100) { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_100.png\" height=\"15\"> %0.2f %%",battery); }
-
   char chargingState[MAX_COMMAND_SIZE]={0};
-  getBackCommandLine((char*) "timeout 1 rostopic echo /battery_state -n 1 | grep charging | cut -d ':' -f2", chargingState , MAX_COMMAND_SIZE );
+
+  if (enableBatteryPrompt)
+  {
+    getBackCommandLine((char*) "timeout 1 rostopic echo /battery_state -n 1 | grep lifePercent | cut -d ':' -f2", batteryState , MAX_COMMAND_SIZE );
+    float battery = atof(batteryState);
+
+    if (battery<=1)   { fprintf(stderr,"Battery state is weird %0.2f , or %s \n",battery,batteryState); } else
+    if (battery<=10)  { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_10.png\" height=\"15\"> %0.2f %% ",battery); } else
+    if (battery<=25)  { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_25.png\" height=\"15\"> %0.2f %%",battery); } else
+    if (battery<=50)  { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_50.png\" height=\"15\"> %0.2f %%",battery); } else
+    if (battery<=75)  { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_75.png\" height=\"15\"> %0.2f %%",battery); } else
+    if (battery<=100) { snprintf(batteryState,MAX_COMMAND_SIZE,"<img src=\"battery_100.png\" height=\"15\"> %0.2f %%",battery); }
+
+    getBackCommandLine((char*) "timeout 1 rostopic echo /battery_state -n 1 | grep charging | cut -d ':' -f2", chargingState , MAX_COMMAND_SIZE );
+  } else
+  {
+    strncpy(batteryState,"- N/A -",MAX_COMMAND_SIZE);
+    strncpy(chargingState,"- N/A -",MAX_COMMAND_SIZE);
+  }
   /*
   unsigned int charging=atoi(chargingState);
    "charging: True "it does not return an integer
@@ -505,6 +514,10 @@ void execute(char * command,char * param)
   //-------------------------------------------------
   if (strcmp(command,"node")==0)
   {
+
+    if (strcmp(param,"webintfEnableBattery")==0)       { enableBatteryPrompt=1;    }   else
+    if (strcmp(param,"webintfDisableBattery")==0)      { enableBatteryPrompt=0;    }   else
+
     if (strcmp(param,"switchToMapping")==0)      { strncpy(cR,"../../hobbit_launch/launch/switchMira.sh mapping",cRLen);    }   else
     if (strcmp(param,"switchToLearning")==0)     { strncpy(cR,"../../hobbit_launch/launch/switchMira.sh learning",cRLen);   }   else
     if (strcmp(param,"switchToNavigation")==0)   { strncpy(cR,"../../hobbit_launch/launch/switchMira.sh navigation",cRLen); }   else
@@ -798,7 +811,7 @@ if (i==0)
 
 if (signalNamesChanged)
 {
-  execute("signalNameUpdate","no_parameter");
+  execute((char*) "signalNameUpdate",(char*) "no_parameter");
 }
 
 
