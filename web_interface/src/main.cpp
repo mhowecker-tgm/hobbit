@@ -188,6 +188,35 @@ int addServiceCheck(char * mem, char * label , char * processName )
   return 0;
 }
 
+
+int addHeadRPICheck(char * mem, char * label)
+{
+  strcat(mem,"<tr><td>");
+  strcat(mem,label);
+  strcat(mem,"</td><td>");
+
+  char what2GetBack[MAX_COMMAND_SIZE]={0};
+  unsigned int what2GetBackMaxSize=MAX_COMMAND_SIZE;
+
+  unsigned int rpiOK=0;
+  if ( getBackCommandLine( (char*) "/opt/ros/hobbit_hydro/src/hobbit_launch/launch/System/systemCommands checkPi" ,  what2GetBack , what2GetBackMaxSize) )
+    {
+        if (strstr(what2GetBack,"alive")!=0)
+          {
+           rpiOK=1;
+          }
+    }
+
+
+
+  if (rpiOK)  { strcat(mem,"<img src=\"statusOk.png\" height=15>"); } else
+              { strcat(mem,"<img src=\"statusFailed.png\" height=15>"); }
+  strcat(mem,"</td></tr>");
+
+  return 0;
+}
+
+
 //This function prepares the content of  stats context , ( stats.content )
 void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
 {
@@ -235,6 +264,7 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
 
   char statusControl[MAX_COMMAND_SIZE*8]={0};
   strcat(statusControl, (char*) "<center><table>");
+   addHeadRPICheck(statusControl , (char*) "Head "      )
    addServiceCheck(statusControl , (char*) "RGBDAcquisition"      , (char*)  "rgbd" );
    addServiceCheck(statusControl , (char*)  "Skeleton Detector"   , (char*)  "skeleton" );
    addServiceCheck(statusControl , (char*)  "Hand Gestures"       , (char*)  "hand" );
