@@ -514,7 +514,6 @@ void execute(char * command,char * param)
   //-------------------------------------------------
   if (strcmp(command,"node")==0)
   {
-
     if (strcmp(param,"webintfEnableBattery")==0)       { enableBatteryPrompt=1;    }   else
     if (strcmp(param,"webintfDisableBattery")==0)      { enableBatteryPrompt=0;    }   else
 
@@ -644,6 +643,8 @@ void execute(char * command,char * param)
     if (strcmp(param,"systemShutdown")==0)     { strncpy(cR,"../../hobbit_launch/launch/System/systemCommands shutdown",cRLen); } else
     if (strcmp(param,"systemUpdate")==0)       { strncpy(cR,"../../hobbit_launch/launch/System/update.sh",cRLen); }   else
     if (strcmp(param,"systemUpdateGlobal")==0) { strncpy(cR,"../../hobbit_launch/launch/System/systemCommands updateGlobal",cRLen); }   else
+    if (strcmp(param,"systemCleanROS")==0)     { strncpy(cR,"rm -rf /localhome/demo/.ros/log",cRLen); }   else
+
     //-------------------------------
     if (strcmp(param,"yes")==0)    { rostopic_pub(cR,cRLen,(char *) "/Event",(char *) "hobbit_msgs/Event",(char *) "\"event: 'G_YES'\"");           } else
     if (strcmp(param,"no")==0)     { rostopic_pub(cR,cRLen,(char *) "/Event",(char *) "hobbit_msgs/Event",(char *) "\"event: 'G_NO'\"");            } else
