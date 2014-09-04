@@ -176,6 +176,27 @@ int processExists(char * safeProcessName)
   return 0;
 }
 
+
+int screenExists(char * safeProcessName)
+{
+  unsigned int screenExistsResult = 0;
+  char what2Execute[MAX_COMMAND_SIZE];
+  char what2GetBack[MAX_COMMAND_SIZE]={0};
+  unsigned int what2GetBackMaxSize=MAX_COMMAND_SIZE;
+
+  snprintf(what2Execute,MAX_COMMAND_SIZE,"screen -ls | grep %s",safeProcessName);
+  if ( getBackCommandLine( what2Execute ,  what2GetBack , what2GetBackMaxSize) )
+    {
+      if (strstr(what2GetBack,safeProcessName)!=0)
+          {
+           screenExistsResult=1;
+          }
+      fprintf(stderr,"Run %s , got back %s which is %u\n",what2Execute,what2GetBack,screenExistsResult );
+
+    }
+  return screenExistsResult;
+}
+
 int addServiceCheck(char * mem, char * label , char * processName )
 {
   strcat(mem,"<tr><td>");
@@ -188,6 +209,19 @@ int addServiceCheck(char * mem, char * label , char * processName )
   return 0;
 }
 
+
+
+int addScreenCheck(char * mem, char * label , char * processName )
+{
+  strcat(mem,"<tr><td>");
+  strcat(mem,label);
+  strcat(mem,"</td><td>");
+  if (screenExists(processName))  { strcat(mem,"<img src=\"statusOk.png\" height=15>"); } else
+                                   { strcat(mem,"<img src=\"statusFailed.png\" height=15>"); }
+  strcat(mem,"</td></tr>");
+
+  return 0;
+}
 
 int addHeadRPICheck(char * mem, char * label)
 {
@@ -266,6 +300,7 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
   strcat(statusControl, (char*) "<center><table>");
    addHeadRPICheck(statusControl , (char*) "Head ");
    addServiceCheck(statusControl , (char*) "RGBDAcquisition"      , (char*)  "rgbd" );
+   addScreenCheck (statusControl , (char*) "Base Camera"          , (char*)  "basecam" );
    addServiceCheck(statusControl , (char*)  "Skeleton Detector"   , (char*)  "skeleton" );
    addServiceCheck(statusControl , (char*)  "Hand Gestures"       , (char*)  "hand" );
    addServiceCheck(statusControl , (char*)  "Face Detection"      , (char*)  "face_det" );
