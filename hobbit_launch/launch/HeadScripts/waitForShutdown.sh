@@ -3,7 +3,7 @@
 source /home/pi/.bashrc
 
 while true; do
- nc6 -l -p 8082 -e "echo \"Shutting down\" && systemCommandsPi shutdown"
+ nc6 -l -p 8082 -e "echo \"Shutting down\" && runSystemCommandPi.sh shutdown && echo \"kthxbye..\""
  sleep 1
 done
 

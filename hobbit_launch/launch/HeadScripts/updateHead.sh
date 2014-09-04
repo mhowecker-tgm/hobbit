@@ -4,7 +4,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
 
 cd /opt/ros/hobbit_hydro/src/hobbit_launch/launch/HeadScripts/
-scp headStart.sh headKickStarter.sh waitForShutdown.sh systemCommandsPi.c activateHeadAutoStart.sh headSyncTime.sh pi@192.168.2.199:/home/pi
+scp headStart.sh headKickStarter.sh runSystemCommandPi.sh waitForShutdown.sh systemCommandsPi.c activateHeadAutoStart.sh headSyncTime.sh pi@192.168.2.199:/home/pi
 #scp owlpose.py herkulex.py pi@192.168.2.199:/home/pi/workspace/blue_owlpose/scripts
 
 

@@ -6,6 +6,8 @@ gcc systemCommandsPi.c -s -o systemCommandsPi
 sudo chmod 777 systemCommandsPi
 sudo chown root:root systemCommandsPi
 sudo chmod +s systemCommandsPi
+#we also have a low privilege wrapper for the suid binary
+chmod +x /home/pi/runSystemCommandPi.sh
 
 
 echo "Adding netcat to the system"
