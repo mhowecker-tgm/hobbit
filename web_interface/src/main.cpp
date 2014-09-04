@@ -463,7 +463,22 @@ void MMUIExecute(char * command,char * param)
   free(commandToRun);
 }
 
-
+int shutdownRaspberryPi()
+{
+     int i=system("../../hobbit_launch/launch/System/systemCommands shutdownPi");
+     if (i!=0)
+        {
+          AmmServer_Error("Shutting down the raspberry pi appears to have failed\n");
+        }
+         else
+        {
+          AmmServer_Success("Shutting down the raspberry pi appears to have succeeded , waiting a little for it to shutdown before returning \n");
+          //Sleep for 1.0 sec , could also ping raspberry here to see if it still alive ( or not )
+          usleep(1500*1000);
+          return 1;
+        }
+  return 0;
+}
 
 void execute(char * command,char * param)
 {
@@ -640,7 +655,13 @@ void execute(char * command,char * param)
   if (strcmp(command,"robot")==0)
   {
     if (strcmp(param,"systemRestart")==0)      { strncpy(cR,"../../hobbit_launch/launch/System/systemCommands restart",cRLen); }  else
-    if (strcmp(param,"systemShutdown")==0)     { strncpy(cR,"../../hobbit_launch/launch/System/systemCommands shutdown",cRLen); } else
+    if (strcmp(param,"systemShutdown")==0)
+         {
+           //When we shut down we also need to shutdown the raspberry pi's and this requires us to add another command
+           shutdownRaspberryPi();
+           //Assuming that the raspberry pi is off we can then shutdown XPC
+           strncpy(cR,"../../hobbit_launch/launch/System/systemCommands shutdown",cRLen);
+         } else
     if (strcmp(param,"systemUpdate")==0)       { strncpy(cR,"../../hobbit_launch/launch/System/update.sh",cRLen); }   else
     if (strcmp(param,"systemUpdateGlobal")==0) { strncpy(cR,"../../hobbit_launch/launch/System/systemCommands updateGlobal",cRLen); }   else
     if (strcmp(param,"systemCleanROS")==0)     { strncpy(cR,"rm -rf /localhome/demo/.ros/log",cRLen); }   else
