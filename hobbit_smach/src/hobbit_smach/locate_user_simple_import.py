@@ -222,13 +222,14 @@ class PlanPath(smach.State):
             self.first = False
 
         robot_pose = get_pose_from_xytheta(ud.x, ud.y, ud.yaw)
-        if not len(self.positions) > 0:
+        if len(self.positions) == 0:
             self.reset(ud)
             self.first = True
-            rospy.loginfo('All rooms visited')
+            rospy.loginfo('Abort because the list of self.positions is empty.')
             return 'aborted'
         rospy.loginfo('PlanPath: number of possible locations:' + str(len(self.positions)))
         for index, position in enumerate(self.positions):
+            rospy.loginfo('index of positions: '+str(index))
             end_pose = get_pose_from_xytheta(
                 position['x'], position['y'], position['theta'])
             req = GetPlanRequest(robot_pose, end_pose, 0.01)
@@ -248,12 +249,17 @@ class PlanPath(smach.State):
                     ud.goal_position_x = position['x']
                     ud.goal_position_y = position['y']
                     ud.goal_position_yaw = position['theta']
-                    rospy.loginfo('Set a goal to go to.')
+                    rospy.loginfo('Found shorter path')
                 else:
-                    rospy.loginfo('We have another path which is shorter')
+                    rospy.loginfo('Another path is shorter')
                     pass
             else:
                 rospy.loginfo('We did not receive a plan.')
+                self.index = index
+                ud.goal_position_x = position['x']
+                ud.goal_position_y = position['y']
+                ud.goal_position_yaw = position['theta']
+                rospy.loginfo('Select random goal')
         try:
             rospy.loginfo('Trying to remove the position#: ' + str(self.index))
             del self.positions[self.index]
