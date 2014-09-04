@@ -5,6 +5,11 @@ cd "$DIR"
 
 cd /opt/ros/hobbit_hydro/src/hobbit_launch/launch/HeadScripts/
 scp headStart.sh headKickStarter.sh runSystemCommandPi.sh waitForShutdown.sh waitForRefresh.sh systemCommandsPi.c checkStatus.sh activateHeadAutoStart.sh headSyncTime.sh pi@192.168.2.199:/home/pi
+
+echo "Trying to force refresh"
+nc6 192.168.2.199 8084
+echo "Done.."
+
 #scp owlpose.py herkulex.py pi@192.168.2.199:/home/pi/workspace/blue_owlpose/scripts
 
 

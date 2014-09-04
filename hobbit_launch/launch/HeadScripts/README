@@ -7,5 +7,10 @@ Ok , so in order to make the heads work one must change the current bashrc madne
 
 I literally cannot make it easier than this :)
 
+nc6 192.168.2.199 8080 # Startup Head
+nc6 192.168.2.199 8082
+nc6 192.168.2.199 8084 # Refresh Head Startup Scripts
+nc6 192.168.2.199 8086 # Shutdown Head
+nc6 192.168.2.199 8090 # Check if head is alive
 
 Ammar
