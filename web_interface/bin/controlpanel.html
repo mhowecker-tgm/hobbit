@@ -283,7 +283,11 @@
         <strong>NODE CONTROL</strong><br/>
            <select id="NodeControls" onchange="javascript:command('node='+this.value);" > 
                <option value="nothing0">Click to control nodes</option>  
-               
+                
+                 <optgroup label="Web Interface" >
+                    <option value="webintfEnableBattery">Enable Battery Information</option> 
+                    <option value="webintfDisableBattery">Disable Battery Information</option>  
+                 </optgroup> 
                               
                  <optgroup label="Nite Skeleton Tracker" >
                     <option value="niteTrigger">Trigger Nite Person Message</option> 
