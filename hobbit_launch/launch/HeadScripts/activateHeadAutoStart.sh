@@ -11,7 +11,7 @@ chmod +x /home/pi/runSystemCommandPi.sh
 
 
 echo "Adding netcat to the system"
-sudo apt-get install netcat6
+sudo apt-get install -y netcat6
 
 echo "Making Scripts Executable"
 chmod +x /home/pi/headStart.sh
