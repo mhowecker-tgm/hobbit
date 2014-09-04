@@ -201,13 +201,13 @@ class PlanPath(smach.State):
             GetPlan,
             persistent=True)
         self.shortest_path = 99999.99
-        self.index = 99
+        self.index = 0
         self.first = True
 
     def reset(self, ud):
         self.shortest_path = 99999.99
-        self.positions = ud.positions
-        self.index = 99
+        # self.positions = ud.positions
+        self.index = 0
         self.first = True
 
     def execute(self, ud):
@@ -224,6 +224,8 @@ class PlanPath(smach.State):
             self.first = False
 
         robot_pose = get_pose_from_xytheta(ud.x, ud.y, ud.yaw)
+        if not len(self.positions) > 0:
+            self.positions = ud.positions
         rospy.loginfo('PlanPath: number of possible locations:' + str(len(self.positions)))
         for index, position in enumerate(self.positions):
             end_pose = get_pose_from_xytheta(
@@ -248,10 +250,16 @@ class PlanPath(smach.State):
                     rospy.loginfo('Set a goal to go to.')
                 else:
                     pass
+            else:
+                rospy.loginfo('We did not receive a plan.')
         try:
-            rospy.loginfo('Trying to remove the position')
-            rospy.loginfo(str(type(self.positions)))
-            del self.positions[self.index]
+            rospy.loginfo('Trying to remove the position#: ' + str(self.index))
+            if len(self.positions) == 0:
+                rospy.loginfo('All rooms visited')
+                self.reset(ud)
+                return 'aborted'
+            else:
+                del self.positions[self.index]
             rospy.loginfo('Successfully removed the position')
         except Exception as e:
             print(e)
@@ -259,7 +267,6 @@ class PlanPath(smach.State):
             self.reset(ud)
             return 'aborted'
         rospy.loginfo('Moving to next position')
-        self.reset(ud)
         return 'succeeded'
 
 
