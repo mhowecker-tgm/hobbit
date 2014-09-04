@@ -199,7 +199,7 @@ int addHeadRPICheck(char * mem, char * label)
   unsigned int what2GetBackMaxSize=MAX_COMMAND_SIZE;
 
   unsigned int rpiOK=0;
-  if ( getBackCommandLine( (char*) "/opt/ros/hobbit_hydro/src/hobbit_launch/launch/System/systemCommands checkPi" ,  what2GetBack , what2GetBackMaxSize) )
+  if ( getBackCommandLine( (char*) "timeout 1 /opt/ros/hobbit_hydro/src/hobbit_launch/launch/System/systemCommands checkPi" ,  what2GetBack , what2GetBackMaxSize) )
     {
         if (strstr(what2GetBack,"alive")!=0)
           {
