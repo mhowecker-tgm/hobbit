@@ -57,8 +57,8 @@ def sayText(info='Text is missing'):
 
     seq = Sequence(
         outcomes=['succeeded', 'preempted', 'failed'],
-        connector_outcome='succeeded',
-        input_keys=['robots_room_name']
+        connector_outcome='succeeded'
+        # input_keys=['robots_room_name']
     )
 
     with seq:
