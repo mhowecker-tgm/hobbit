@@ -291,9 +291,9 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
   getBackCommandLine((char*) "grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage \"%\"}'" , cpuUsage , MAX_COMMAND_SIZE );
 
 
-
-  char svnVersion[MAX_COMMAND_SIZE]={0};
-  getBackCommandLine((char*) "/bin/bash -c \" svnversion \" " , svnVersion , MAX_COMMAND_SIZE );
+ //SVN version is kind of irrelevant
+ // char svnVersion[MAX_COMMAND_SIZE]={0};
+ // getBackCommandLine((char*) "/bin/bash -c \" svnversion \" " , svnVersion , MAX_COMMAND_SIZE );
 
 
   char statusControl[MAX_COMMAND_SIZE*8]={0};
@@ -324,11 +324,11 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
                 CPU temp : %s \n<br> \
                 Battery is : %s \n<br> \
                 Charging : %s<br>\
-                Svn Ver : %s<br><br>\
+                <br>\
                  %s <br>\
                </body>\
              </html>",
-             tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900,   tm.tm_hour, tm.tm_min, tm.tm_sec,cpuUsage,temperatureState,batteryState,chargingState,svnVersion,statusControl);
+             tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900,   tm.tm_hour, tm.tm_min, tm.tm_sec,cpuUsage,temperatureState,batteryState,chargingState,statusControl);
 
   rqst->contentSize=strlen(rqst->content);
   return 0;
