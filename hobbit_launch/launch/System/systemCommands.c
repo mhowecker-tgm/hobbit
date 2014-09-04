@@ -10,9 +10,10 @@ int main(int argc, char *argv[])
    int i=0;
    for (i=0; i<argc; i++)
    {
-     if (strcmp(argv[i],"updateGlobal")==0) { system("apt-get update && apt-get upgrade -y"); } else
-     if (strcmp(argv[i],"shutdown")==0) { system("init 0"); } else
-     if (strcmp(argv[i],"restart")==0) { system("init 6"); } 
+     if (strcmp(argv[i],"updateGlobal")==0) { return system("apt-get update && apt-get upgrade -y"); } else
+     if (strcmp(argv[i],"shutdownPI")==0)   { return system("netcat 192.168.2.199 8082"); } else 
+     if (strcmp(argv[i],"shutdown")==0)     { return system("init 0"); } else
+     if (strcmp(argv[i],"restart")==0)      { return system("init 6"); } 
    }
 
    return 0;
