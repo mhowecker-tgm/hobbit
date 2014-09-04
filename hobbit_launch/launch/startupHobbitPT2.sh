@@ -28,6 +28,8 @@ sleep $DELAY_BETWEEN_STEPS
 sleep $DELAY_BETWEEN_STEPS
 
 #Bring up web interface first , so that we can see what is happening ( port 8080 )
+#Wtf , it might not be executable ?
+chmod +x /opt/ros/hobbit_hydro/src/web_interface/scripts/startWebInterface.sh
 /opt/ros/hobbit_hydro/src/web_interface/scripts/startWebInterface.sh&
 
 
