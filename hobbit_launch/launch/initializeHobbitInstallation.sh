@@ -13,9 +13,9 @@ else
  echo "Working.."
 fi
 
-sudo echo "Asked for super user"
+sudo echo "Asked for super user to install needed , but potentially missing packages"
 
-sudo apt-get install lm-sensors
+sudo apt-get install lm-sensors netcat chrony
 
 #Change to Script directory
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
