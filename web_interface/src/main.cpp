@@ -598,9 +598,9 @@ void execute(char * command,char * param)
                                                     fprintf(stderr,"Background Color was %s , it now is %s which should have a #XXXXXX format \n",param,hexValue);
                                                     MMUIExecute(command,hexValue);
                                                     if (param[0]=='#') { strncpy(hexValue,param,32);        } else
-                                                                       { snprintf(hexValue,32,"\\#%s",param); }
-                                                    fprintf(stderr,"Background Color was %s , it now is %s which should have a \#XXXXXX format \n",param,hexValue);
-                                                    rosparam_set(cR,cRLen,(char *) "USER/BGCOLOUR",hexValue);
+                                                                       { snprintf(hexValue,32,"%s",param); }
+                                                    fprintf(stderr,"Background Color was %s , it now is %s which should have a XXXXXX format \n",param,hexValue);
+                                                    rosparam_set(cR,cRLen,(char *) "USER/BGCOLOUR",hexValue); // rosparam set doesn't like #
                                                   }  else
   if (strcmp(command,"talkingSpeed")==0)          { MMUIExecute(command,param); rosparam_set(cR,cRLen,(char *) "USER/Voice/Speed",param);   }  else
   if (strcmp(command,"gender")==0)                { MMUIExecute(command,param); rosparam_set(cR,cRLen,(char *) "USER/Voice/Default",param); }  else
