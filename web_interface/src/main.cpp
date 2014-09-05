@@ -545,6 +545,20 @@ int shutdownRaspberryPi()
   return 0;
 }
 
+
+
+
+
+int executeSystem(char * what2Execute)
+{
+ int i=system(cR);
+ if (i!=0) { AmmServer_Error("executeSystem command %s failed\n",cR); } else
+           { AmmServer_Success("executeSystem command %s success\n",cR); }
+ return (i==0);
+}
+
+
+
 void execute(char * command,char * param)
 {
   fprintf(stderr,"Execute(%s,%s) \n",command,param);
@@ -562,10 +576,12 @@ void execute(char * command,char * param)
   if (strcmp(command,"signalNameUpdate")==0)      { MMUIExecute(command,param); }  else
   if (strcmp(command,"setUserName")==0)           {
                                                     rosparam_set(cR,cRLen,(char *) "/Hobbit/robot_name",param);
+                                                    executeSystem(cR);
                                                     rosparam_set(cR,cRLen,(char *) "/ROBOT/robot_name",param);
                                                   }  else
   if (strcmp(command,"setRobotName")==0)          {
                                                     rosparam_set(cR,cRLen,(char *) "/Hobbit/user_name",param);
+                                                    executeSystem(cR);
                                                     rosparam_set(cR,cRLen,(char *) "/ROBOT/user_name",param);
                                                   }  else
   if (strcmp(command,"setSocialRole")==0)         { rosparam_set(cR,cRLen,(char *) "/Hobbit/social_role",param);     }  else
