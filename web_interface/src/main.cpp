@@ -551,9 +551,9 @@ int shutdownRaspberryPi()
 
 int executeSystem(char * what2Execute)
 {
- int i=system(cR);
- if (i!=0) { AmmServer_Error("executeSystem command %s failed\n",cR); } else
-           { AmmServer_Success("executeSystem command %s success\n",cR); }
+ int i=system(what2Execute);
+ if (i!=0) { AmmServer_Error("executeSystem command %s failed\n",what2Execute); } else
+           { AmmServer_Success("executeSystem command %s success\n",what2Execute); }
  return (i==0);
 }
 
