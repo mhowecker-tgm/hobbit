@@ -1,7 +1,7 @@
 #!/bin/bash
  
 HOBBITDIR="/opt/ros/hobbit_hydro/"
-SLEEP_TIME_IN_SECONDS_BETWEEN_RETRIES=4
+SLEEP_TIME_IN_SECONDS_BETWEEN_RETRIES=10
 MAX_RETRIES=10
 
 #Script to start a screen session of web_interface
