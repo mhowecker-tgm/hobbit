@@ -145,12 +145,12 @@ def main():
         output_keys=['result'])
 
     seq1 = Sequence(
-        outcomes=['succeeded', 'failed', 'preempted'],
+        outcomes=['succeeded', 'failed', 'preempted', 'aborted'],
         connector_outcome='succeeded'
     )
 
     seq2 = Sequence(
-        outcomes=['succeeded', 'failed', 'preempted'],
+        outcomes=['succeeded', 'failed', 'preempted', 'aborted'],
         connector_outcome='succeeded'
     )
     learn_object_sm.userdata.result = String('started')
@@ -158,7 +158,7 @@ def main():
     learn_object_sm.userdata.emo_time = 4
 
     cc1 = Concurrence(
-        outcomes=['succeeded', 'preempted', 'failed'],
+        outcomes=['succeeded', 'preempted', 'failed', 'aborted'],
         default_outcome='failed',
         outcome_map={'succeeded': {'EMO_WONDERING': 'succeeded',
                                    'SAY_LEARN_NEW_OBJECT': 'succeeded'}}
@@ -252,6 +252,7 @@ def main():
             seq1,
             transitions={'succeeded': 'CONFIRM_PUT_OBJECT_ON_TRAY',
                          'failed': 'SET_FAILURE',
+                         'aborted': 'SET_FAILURE',
                          'preempted': 'SET_FAILURE'}
         )
         # StateMachine.add(
@@ -418,7 +419,8 @@ def main():
             'END_SEQ',
             seq2,
             transitions={'succeeded': 'STOP_SEQ_2',
-                         'failed': 'STOP_SEQ'}
+                         'failed': 'STOP_SEQ',
+                         'aborted': 'STOP_SEQ'}
         )
         StateMachine.add(
             'SET_FAILURE',
