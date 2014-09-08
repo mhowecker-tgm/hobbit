@@ -287,7 +287,10 @@ int main(int argc, char **argv)
 	  while ( ( key!='q' ) && (ros::ok()) )
 		{
                   ros::spinOnce();//<- this keeps our ros node messages handled up until synergies take control of the main thread
-                  usleep(1000);
+                  loop_rate.sleep();
+
+                  if(emergencyDetected)
+                      { broadcastEmergency(frameTimestamp); }
 		 }
 
 
