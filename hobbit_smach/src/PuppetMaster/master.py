@@ -247,7 +247,7 @@ class SelectTask(State):
                       'reward',
                       'silent_recharge',
                       'social_role',
-                      'master_reset'
+                      'master_reset',
                       'preempted',
                       'sleep',
                       'none'])
@@ -554,6 +554,7 @@ def main():
         )
         StateMachine.add(
             'STOP',
+            # FakeForAllWithoutRunningActionSever(name='STOP'),
             helper.get_hobbit_full_stop(),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
@@ -622,6 +623,7 @@ def main():
         )
         StateMachine.add(
             'RECHARGE',
+            # FakeForAllWithoutRunningActionSever(name='RECHARGE'),
             recharge.getRecharge(),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          # 'failed': 'failed',
@@ -630,6 +632,7 @@ def main():
         )
         StateMachine.add(
             'SILENT_RECHARGE',
+            # FakeForAllWithoutRunningActionSever(name='SILENT_RECHARGE'),
             recharge.getRecharge(),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}

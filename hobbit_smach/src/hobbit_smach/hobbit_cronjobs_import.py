@@ -33,7 +33,7 @@ class SetCronJob(State):
     """
     Set a cronjob as the user demo.
     """
-    def __init__(self, ):
+    def __init__(self):
         State.__init__(
             self,
             outcomes=['succeeded', 'preempted']

@@ -380,7 +380,7 @@ def main():
         StateMachine.add(
             'SET_FAILURE',
             SetFailure(),
-            transitions={'succeeded': 'LOG_ABORTED',
+            transitions={'succeeded': 'LOG_ABORT',
                          'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
