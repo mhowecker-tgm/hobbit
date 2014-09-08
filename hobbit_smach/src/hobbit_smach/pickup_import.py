@@ -24,6 +24,9 @@ import tf
 from tf.transformations import euler_from_quaternion, quaternion_matrix
 from sensor_msgs.msg import PointField
 from visualization_msgs.msg import Marker
+from visualization_msgs.msg import MarkerArray
+from std_msgs.msg import String
+from geometry_msgs.msg import Pose
 
 _DATATYPES = {}
 _DATATYPES[PointField.INT8]    = ('b', 1)
@@ -415,7 +418,9 @@ class DavidLookingPose(State):
             output_keys=['goal_position_x', 'goal_position_y', 'goal_position_yaw']
         )
 	self.listener = tf.TransformListener()
-	pointing_gesture_pub = rospy.Publisher("pointing_gesture_pub", Marker)
+	self.pointing_gesture_pub = rospy.Publisher("pointing_gesture_pub", Marker)
+	self.obj_marker = rospy.Publisher('obj_marker_array', MarkerArray)
+	self.test_pub = rospy.Publisher('test_pub', String)
 
     def execute(self, ud):
         if self.preempt_requested():
@@ -436,6 +441,7 @@ class DavidLookingPose(State):
         p.point.x = self.pointingDirCCS[0]
         p.point.y = self.pointingDirCCS[1]
         p.point.z = self.pointingDirCCS[2]
+	print "===================================================> p.point.x:", p.point.x
         pspWCS = self.listener.transformPoint('/map', p) #pspWCS: PointingStartPoint of the pointing gesture, i.e. the position of the shoulder in WCS (world coordinate system)
         print "shoulder coordinates in world coordinate system: ", pspWCS
         #calculate pointing vector in world coordinate system
@@ -477,28 +483,57 @@ class DavidLookingPose(State):
 
 
 	#publish marker for visualizing the pointing point on floor
-	print "========================> no the point on floor is published as marker "
+	print "========================> now the point on floor is published as marker "
+	obj_markerArray = MarkerArray()
+	
+	pose = Pose()
+        pose.position.x = gpOnFloor[0]
+        pose.position.y = gpOnFloor[1]
+        pose.position.z = gpOnFloor[2]
+        pose.orientation.w = 1
+        pose.orientation.x = 0
+        pose.orientation.y = 0
+        pose.orientation.z = 0
+
 	ellipse = Marker()
-    	ellipse.header.frame_id = "map"
-    	ellipse.header.stamp = rospy.Time.now()  #rospy.Time(0)
-    	ellipse.type = Marker.CYLINDER
-    	ellipse.pose.position.x = gpOnFloor[0]
-    	ellipse.pose.position.y = gpOnFloor[1]
-    	ellipse.pose.position.z = gpOnFloor[2]
-    	ellipse.pose.orientation = (0,0,0,1)
-    	ellipse.scale.x = 2*count
-    	ellipse.scale.y = 2*count
-    	ellipse.scale.z = 1
+	ellipse.id = 1
+    	ellipse.header.frame_id = "/map"
+    	ellipse.header.stamp = rospy.Time()
+	ellipse.type = ellipse.CYLINDER
+	ellipse.action = ellipse.ADD
+    	ellipse.pose = pose
+    	ellipse.scale.x = 0.1
+    	ellipse.scale.y = 0.2
+    	ellipse.scale.z = 0.1
     	ellipse.color.a = 1.0
     	ellipse.color.r = 1.0
-    	ellipse.color.g = 1.0
+    	ellipse.color.g = 0.5
     	ellipse.color.b = 1.0
-    	# Publish the MarkerArray
-    	publisher.publish(ellipse)
 
+        #marker1 = Marker()
+        #marker1.id = 1 
+        #marker1.header.frame_id = "/map"
+        #marker1.type = marker1.SPHERE
+        #marker1.action = marker1.ADD
+        #marker1.scale.x = 0.05
+        #marker1.scale.y = 0.05
+        #marker1.scale.z = 0.05
+        #marker1.color.a = 1.0
+        #marker1.color.r = 1.0
+        #marker1.color.g = 1.0
+        #marker1.color.b = 0.0
 
+        #marker1.pose.orientation = pose.orientation
+        #marker1.pose.position = pose.position
+        
+        #obj_markerArray.markers.append(marker1)
+	obj_markerArray.markers.append(ellipse)
 
+    	# Publish the Marker
+    	#self.pointing_gesture_pub.publish(ellipse)
 
+	#obj_markerArray.markers.append(ellipse)
+	self.obj_marker.publish(obj_markerArray)
 
 
 	print "grasp point on floor: X:  ", gpOnFloor[0], "   Y:  ", gpOnFloor[1], "   Z:  ", gpOnFloor[2]
@@ -511,7 +546,7 @@ class DavidLookingPose(State):
         ud.goal_position_x = gpOnFloor[0] - robotDistFromGraspPnt * robotApproachDir[0]
         ud.goal_position_y = gpOnFloor[1] - robotDistFromGraspPnt * robotApproachDir[1]
         ud.goal_position_yaw = math.atan2(robotApproachDir[1],robotApproachDir[0]) + robotOffsetRotationForLooking #can be negative!  180/math.pi*math.atan2(y,x) = angle in degree of vector (x,y)
-        return 'succeeded'
+        return 'succasökhfdsaölkjfdsaljfsaljfsadljafsljölkjfdsaöljafdsöljöljöljfadjeeded'
 
 
 

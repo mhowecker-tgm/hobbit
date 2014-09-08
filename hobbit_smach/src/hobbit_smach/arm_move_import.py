@@ -12,6 +12,7 @@ import rospy
 from smach import Sequence, State
 from uashh_smach.util import SleepState
 from ArmControllerClientFunctions import ArmClientFunctions
+from ArmClientFunctionsPublisher import ArmClientFunctionsPublisher
 
 class ArmClientSingleton(object):
     """To avoid running multiple arm clients, this singleton class
@@ -24,7 +25,10 @@ class ArmClientSingleton(object):
     def init(cls):
         """Ignore multiple calls."""
         if cls._arm is None:
+            print('Open connection to arm')
             cls._arm = ArmClientFunctions('192.168.2.190')
+        else:
+            print('connection already established')
 
     @classmethod
     def get(cls):
@@ -33,8 +37,9 @@ class ArmClientSingleton(object):
         return cls._arm
 
 if not DEBUG:
-    arm = ArmClientSingleton.get()
-    #arm = ArmClientFunctions('192.168.2.190')
+    pass
+    # arm = ArmClientSingleton.get()
+    arm = ArmClientFunctions('192.168.2.190')
     #arm.SetEnableArm()
 else:
     arm = True
