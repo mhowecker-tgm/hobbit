@@ -58,6 +58,7 @@ add_action_files(
   DIRECTORY action
   FILES
   ApproachUser.action
+  ArmServer.action
   BringObject.action
   CallUser.action
   LocateUser.action
