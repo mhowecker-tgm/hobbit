@@ -193,7 +193,7 @@ def call_hobbit():
         StateMachine.add(
             'LOG_ABORT',
             log.DoLogPreempt(scenario='Call Hobbit'),
-            transitions={'succeeded': 'failure'}
+            transitions={'succeeded': 'aborted'}
         )
         StateMachine.add(
             'LOG_SUCCESS',

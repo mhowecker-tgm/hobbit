@@ -53,7 +53,7 @@ def main():
         StateMachine.add(
             'LOG_ABORT',
             log.DoLogPreempt(scenario='Safety Check'),
-            transitions={'succeeded': 'failure'}
+            transitions={'succeeded': 'aborted'}
         )
         StateMachine.add(
             'MAIN_MENU',
