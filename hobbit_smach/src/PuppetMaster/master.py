@@ -217,6 +217,7 @@ class Init(State):
         ud.parameters['sleep_time'] = self.sleep_time
         ud.parameters['wakeup_time'] = self.wakeup_time
         ud.parameters['active_task'] = self.active_task
+        ud.params = []
         rospy.loginfo('Init')
         return 'succeeded'
 
@@ -364,14 +365,14 @@ def main():
     )
 
     sm1 = StateMachine(
-        input_keys=['command', 'params', 'parameters', 'active_task'],
+        # input_keys=['command', 'params', 'parameters', 'active_task'],
         outcomes=['succeeded',
                   'preempted',
                   'failed']
     )
     sm1.userdata.command = 'IDLE'
     sm1.userdata.active_task = 'CALL'
-    # sm1.userdata.params = []
+    sm1.userdata.params = []
 
     sm2 = StateMachine(
         outcomes=['succeeded',
