@@ -247,6 +247,7 @@ class SelectTask(State):
                       'reward',
                       'silent_recharge',
                       'social_role',
+                      'master_reset'
                       'preempted',
                       'sleep',
                       'none'])
@@ -490,6 +491,7 @@ def main():
                          'reward': 'REWARD',
                          'silent_recharge': 'SILENT_RECHARGE',
                          'social_role': 'SOCIAL_ROLE',
+                         'master_reset': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted',
                          'none': 'succeeded'}
         )
