@@ -184,11 +184,18 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 	output.ranges.assign(ranges_size, output.range_max);
 
         bool process = false;
+	int count = 0;
+	int num_points_proc = 5; //FIXME
+
 	//"Thin" laser height from pointcloud
 	for (pcl::PointCloud<pcl::PointXYZ>::const_iterator it = point_cloud_new_frame.begin(); it != point_cloud_new_frame.end(); ++it)
 	{
-		process = !process;
-		if (!process) continue;
+		//process = !process;
+		//if (!process) continue;
+		count++;
+		if (count < num_points_proc) continue; //use only one point from every n points
+		count = 0;
+
 		const float &x = it->x;
 		const float &y = it->y;
 		const float &z = it->z;
