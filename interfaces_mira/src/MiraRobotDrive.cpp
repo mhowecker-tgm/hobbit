@@ -278,8 +278,10 @@ bool MiraRobotDrive::enable_motors(mira_msgs::EnableMotors::Request &req, mira_m
 
 void MiraRobotDrive::QueueThread() 
 {
+     ros::Rate r(5);
      while ((&robot_->getRosNode())->ok()) 
      {
        (robot_->getMyQueue()).callAvailable(ros::WallDuration());
+        r.sleep();
      }
 }
