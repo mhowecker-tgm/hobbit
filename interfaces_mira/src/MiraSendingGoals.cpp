@@ -1,3 +1,5 @@
+
+
 #include <interfaces_mira/MiraSendingGoals.h>
 
 #include <navigation/Task.h>
@@ -82,7 +84,7 @@ void MiraSendingGoals::goal_status_channel_callback(mira::ChannelRead<std::strin
 	if(data->value() == "NoData")
 	{
 		goal_status.data = "aborted";
-		std::cout << "Goal aborted, no data " << std::endl;
+		std::cout << "Goal aborted " << std::endl;
 		goal_status_pub.publish(goal_status);
 
 	}
@@ -378,7 +380,3 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
 
 
 }
-
-
-
-
