@@ -35,6 +35,6 @@ else
 fi
 
 
-echo "Head is configured for autostart , please remove all rosrun commands from ~/.bashrc"
+echo "Head is configured for autostart.."
 
 exit 0
