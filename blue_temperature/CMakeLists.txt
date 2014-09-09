@@ -79,7 +79,7 @@ generate_messages(DEPENDENCIES)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES blue_temperature
-#  CATKIN_DEPENDS roscpp rospy message_runtime
+CATKIN_DEPENDS roscpp rospy message_runtime
 #  DEPENDS system_lib
 )
 
