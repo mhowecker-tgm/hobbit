@@ -53,7 +53,7 @@ generate_messages(DEPENDENCIES std_msgs sensor_msgs)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES tmpdf
-  CATKIN_DEPENDS message_runtime
+  CATKIN_DEPENDS message_runtime sensor_msgs std_msgs hobbit_msgs pcl_msgs geometry_msgs
 #  DEPENDS system_lib
 )
 
