@@ -1065,18 +1065,26 @@ int main(int argc, char **argv)
      ros::NodeHandle nh;
      nhPtr = &nh;
 
+
      //We advertise the services we want accessible using "rosservice call *w/e*"
      ros::ServiceServer stopWebService     = nh.advertiseService("web_interface/terminate", terminate);
 
+     ros::Rate loop_rate(1); //  1hz should be our target spin time
+     ros::spinOnce();
+     ros::spinOnce();
+     ros::spinOnce();
+
 
      printf("\nAmmar Server %s starting up..\n",AmmServer_Version());
-     AmmServer_RegisterTerminationSignal((void*) &close_dynamic_content);
+     //Do not registering termination signal , AmmServer_RegisterTerminationSignal((void*) &close_dynamic_content);
 
 
      char bindIP[MAX_IP_STRING_SIZE];
      strcpy(bindIP,"0.0.0.0");
 
      unsigned int port=DEFAULT_BINDING_PORT;
+
+
 
 
     default_server = AmmServer_StartWithArgs(
@@ -1092,7 +1100,6 @@ int main(int argc, char **argv)
 
     if (!default_server) { AmmServer_Error((char*) "Could not start server , shutting down everything.."); exit(1); }
 
-    ros::spinOnce();
 
     //Create dynamic content allocations and associate context to the correct files
     if ( init_dynamic_content() )
@@ -1103,7 +1110,8 @@ int main(int argc, char **argv)
 	   //////////////////////////////////////////////////////////////////////////
 	   while ( (AmmServer_Running(default_server))  && (ros::ok()) && (!stopWebInterface) )
 		{
-                  ros::spinOnce();//<- this keeps our ros node messages handled up until synergies take control of the main thread
+             ros::spinOnce();//<- this keeps our ros node messages handled up until synergies take control of the main thread
+             loop_rate.sleep();
 
              //Main thread should just sleep and let the background threads do the hard work..!
              //In other applications the programmer could use the main thread to do anything he likes..
