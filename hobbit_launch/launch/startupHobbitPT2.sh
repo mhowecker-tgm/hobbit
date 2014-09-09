@@ -27,11 +27,6 @@ roscore&
 sleep $DELAY_BETWEEN_STEPS
 sleep $DELAY_BETWEEN_STEPS
 
-#Bring up web interface first , so that we can see what is happening ( port 8080 )
-#Wtf , it might not be executable ?
-chmod +x /opt/ros/hobbit_hydro/src/web_interface/scripts/startWebInterface.sh
-/opt/ros/hobbit_hydro/src/web_interface/scripts/startWebInterface.sh&
-
 
 /opt/ros/hobbit_hydro/src/rgbd_acquisition/scripts/workAroundUSB.sh
 sleep $DELAY_BETWEEN_STEPS
@@ -43,11 +38,20 @@ sleep $DELAY_BETWEEN_STEPS
 sleep $DELAY_BETWEEN_STEPS
 
 
+
+#Bring up web interface after we got some things on , so that we can see what is happening ( port 8080 )
+#Wtf , it might not be executable ?
+chmod +x /opt/ros/hobbit_hydro/src/web_interface/scripts/startWebInterface.sh
+/opt/ros/hobbit_hydro/src/web_interface/scripts/startWebInterface.sh&
+
+
+
 #Start up vision acquisition etc
 /opt/ros/hobbit_hydro/src/rgbd_acquisition/scripts/startFORTHStuffPT2.sh
 #In case someone would like to startup the top camera without our integrated node he could do it like following
 #roslaunch openni2_launch openni2.launch camera:=headcam depth_registration:=true device_id:="#1"&
 sleep $DELAY_BETWEEN_STEPS
+
 
 
 #Start Head ( and bring it to level )
