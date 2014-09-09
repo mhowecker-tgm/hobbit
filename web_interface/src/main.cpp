@@ -1065,7 +1065,6 @@ int main(int argc, char **argv)
      ros::NodeHandle nh;
      nhPtr = &nh;
 
-
      //We advertise the services we want accessible using "rosservice call *w/e*"
      ros::ServiceServer stopWebService     = nh.advertiseService("web_interface/terminate", terminate);
 
@@ -1111,14 +1110,16 @@ int main(int argc, char **argv)
 	   while ( (AmmServer_Running(default_server))  && (ros::ok()) && (!stopWebInterface) )
 		{
              ros::spinOnce();//<- this keeps our ros node messages handled up until synergies take control of the main thread
-             loop_rate.sleep();
 
              //Main thread should just sleep and let the background threads do the hard work..!
              //In other applications the programmer could use the main thread to do anything he likes..
              //The only caveat is that he would takeup more CPU time from the server and that he would have to poll
              //the AmmServer_Running() call once in a while to make sure everything is in order
              //usleep(60000);
-             sleep(1);
+             //sleep(1);
+
+             //We now sleep using ROS mechanism for sleep..
+             loop_rate.sleep();
 		 }
       AmmServer_Warning("Web Interface is now Shutting down.. ");
 
