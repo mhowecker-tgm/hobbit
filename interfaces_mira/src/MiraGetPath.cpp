@@ -66,7 +66,7 @@ bool MiraGetPath::get_path(nav_msgs::GetPlan::Request &req, nav_msgs::GetPlan::R
 
   //if (t>=max_t) return false;
 
-  sleep (3);
+  sleep (2);
 
   //std::cout << "after waiting" << std::endl;
 
