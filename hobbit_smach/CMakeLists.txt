@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   tf
+  visualization_msgs
 #  semantic_segmentation
 )
 
