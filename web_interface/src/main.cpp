@@ -1069,9 +1069,21 @@ int main(int argc, char **argv)
      ros::ServiceServer stopWebService     = nh.advertiseService("web_interface/terminate", terminate);
 
      ros::Rate loop_rate(1); //  1hz should be our target spin time
-     ros::spinOnce();
-     ros::spinOnce();
-     ros::spinOnce();
+
+
+     //Is there some race condition with rosmaster ?
+     unsigned int countdown=5;
+     fprintf(stderr,"Giving some time to ROS before the multithreaded stuff kicks in\n");
+     while (countdown>0)
+     {
+        ros::spinOnce();
+        fprintf(stderr," %u \n",countdown);
+        --countdown;
+        loop_rate.sleep();
+     }
+     //---------------------------------------------
+
+
 
 
      printf("\nAmmar Server %s starting up..\n",AmmServer_Version());
