@@ -54,10 +54,19 @@ message_filters::Subscriber<sensor_msgs::CameraInfo> *depth_cam_info_sub;
 
 typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image> RgbdSyncPolicy;
 
+enum HEAD_LOOK_DIRECTION_ENUM
+{
+   HEAD_UNKNOWN_DIRECTION = 0,
+   HEAD_LOOKING_DOWN     ,
+   HEAD_LOOKING_CENTER  ,
+   HEAD_LOOKING_UP
+};
+
 
 
 bool first=false;
 int key = 0;
+unsigned int headLookingDirection=HEAD_UNKNOWN_DIRECTION;
 unsigned int frameTimestamp=0;
 ros::NodeHandle * nhPtr=0;
 unsigned int paused=0;
@@ -156,6 +165,28 @@ bool visualizeOff(std_srvs::Empty::Request& request, std_srvs::Empty::Response& 
     return true;
 }
 
+bool lookingUp(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    headLookingDirection=HEAD_LOOKING_UP;
+    return true;
+}
+
+
+bool lookingDown(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    headLookingDirection=HEAD_LOOKING_DOWN;
+    return true;
+}
+
+
+bool lookingCenter(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    headLookingDirection=HEAD_LOOKING_CENTER;
+    return true;
+}
+
+
+
 void bboxReceived(const emergency_detector::SkeletonBBox & msg)
 {
    processBoundingBox(msg.width , msg.height ,msg.depth );
@@ -224,10 +255,6 @@ int main(int argc, char **argv)
    try
 	{
 	 ROS_INFO("Initializing ROS");
-
-	 //char regName[128]={0};
-	 //sprintf(regName,"EmergencyDetector%u",getpid());
-	 //fprintf(stderr,"Node named %s \n",regName);
   	 ros::init(argc, argv, "emergency_detector");
      ros::start();
 
@@ -260,8 +287,11 @@ int main(int argc, char **argv)
      ros::ServiceServer stopGestureRecognitionService     = nh.advertiseService(name+"/terminate", terminate);
      ros::ServiceServer triggerGestureRecognitionService     = nh.advertiseService(name+"/trigger", trigger);
 
+     ros::ServiceServer lookUpService          = nh.advertiseService(name+"/looking_up" , lookingUp);
+     ros::ServiceServer lookCenterService      = nh.advertiseService(name+"/looking_center" , lookingCenter);
+     ros::ServiceServer lookDownService        = nh.advertiseService(name+"/looking_down" , lookingDown);
 
-     //Make our rostopic cmaera grabber
+     //Make our rostopic camera grabber
      message_filters::Synchronizer<RgbdSyncPolicy> *sync;
 
 	 depth_img_sub = new message_filters::Subscriber<sensor_msgs::Image>(nh,fromDepthTopic,1);
@@ -292,6 +322,8 @@ int main(int argc, char **argv)
 
                   if(emergencyDetected)
                       { broadcastEmergency(frameTimestamp); }
+
+                  if (frameTimestamp%10) { fprintf(stderr,"."); }
 		 }
 
 
