@@ -7,6 +7,8 @@ DEBUG = False
 
 import rospy
 from smach import Sequence, State, Concurrence
+from smach_ros import ServiceState
+from hobbit_msgs.srv import GetName
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 from hobbit_msgs.msg import Event
 from hobbit_msgs import MMUIInterface as MMUI
@@ -73,14 +75,21 @@ def sayText(info='Text is missing'):
     seq = Sequence(
         outcomes=['succeeded', 'preempted', 'failed'],
         connector_outcome='succeeded'
-        ,input_keys=['robots_room_name']
     )
 
     with seq:
-        Sequence.add(
-            'TEST_DATA_SPEECH',
-            TestData()
-        )
+        if info == 'T_GT_ReachedMyDestination':
+            Sequence.add(
+                'GET_ROBOTS_CURRENT_ROOM',
+                ServiceState(
+                    'get_robots_current_room',
+                    GetName,
+                    response_key='robots_room_name')
+            )
+            Sequence.add(
+                'TEST_DATA_SPEECH',
+                TestData()
+            )
         Sequence.add(
             'TALK',
             HobbitMMUI.ShowInfo(
