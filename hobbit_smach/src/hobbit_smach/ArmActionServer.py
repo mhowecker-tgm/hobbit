@@ -17,7 +17,7 @@ import rospy
 from ArmControllerClientFunctions import ArmClientFunctions
 from std_msgs.msg import String
 import actionlib
-from hobbit_msgs.msg import ArmServerAction
+from hobbit_msgs.msg import *
 
 
 
@@ -29,7 +29,7 @@ class ArmActionServerROS(object):
     _result   = hobbit_msgs.msg.ArmServerResult()
 
 
-    def __init__(self, name): 
+    def __init__(self): 
 
 	#arm client instance (can only exist once)
         self.ArmClient = ArmClientFunctions('192.168.2.190')
@@ -37,9 +37,10 @@ class ArmActionServerROS(object):
 	self.armCommands_sub = rospy.Subscriber("/arm/commands", String, self.arm_execute)
 
 	#action server stuff
-	self._action_name = name
+	self._action_name = "armactionlibtopic"
 	self._as = actionlib.SimpleActionServer(self._action_name, hobbit_msgs.msg.ArmServerAction, execute_cb=self.execute_cb, auto_start = False)
 	self._as.start()
+	print "ArmServer was started"
 
     #arm commands triggered by ActionServer
     def execute_cb(self, goal):
@@ -52,7 +53,9 @@ class ArmActionServerROS(object):
 
 	''' GET Functions '''
 	if cmd == 'GetArmState':
-            print self.ArmClient.GetArmState()
+            self._feedback.feedback = self.ArmClient.GetArmState()
+	    print "ArmActionServer: feedback: ",self._feedback.feedback
+	    self._result.result = True
 	elif cmd == 'GetActualPosition':
 	    print self.ArmClient.GetActualPosition()
 	elif cmd == 'GetArmAtHomePos':
@@ -139,6 +142,9 @@ class ArmActionServerROS(object):
 	elif cmd == 'help':
 	    self.help()
 
+	#publish feedback
+	self._as.publish_feedback(self._feedback)
+	self._as.set_succeeded(self._result)
 
         # helper variables
         #r = rospy.Rate(1)
@@ -294,6 +300,7 @@ if __name__ == '__main__':
     # Node name
     rospy.init_node('arm_action_server_ros')
     print "ROS node arm_action_server started"
+    #armservertopic = "armactionlibtopic"
     armclient = ArmActionServerROS()
 
     rospy.spin()

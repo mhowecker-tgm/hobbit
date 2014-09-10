@@ -980,10 +980,6 @@ def getPickupSeq():
     )
 
     with seq:
-        Sequence.add(
-            'EMO_SAY_PICKED_UP',
-            sayPickedUpObject()
-        )
         if not DEBUG:
             Sequence.add(
                 'MOVE_ARM_TO_PRE_GRASP_POSITION',
