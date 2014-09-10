@@ -100,10 +100,18 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
 
       if (doCVOutput)
       {
+        cv::Mat bgrMat,rgbMat(colorHeight,colorWidth,CV_8UC3,segmentedRGB,3*colorWidth);
+	    cv::cvtColor(rgbMat,bgrMat, CV_RGB2BGR);// opencv expects the image in BGR format
+
         cv::Mat segDepth(depthHeight,depthWidth,CV_16UC1 ,segmentedDepth,depthWidth);
 	    cv::Mat segDepthNorm;
 	    cv::normalize(segDepth,segDepthNorm,0,65536,CV_MINMAX,CV_16UC1);
+
+
+	    cv::imshow("emergency_detector segmented rgb",bgrMat);
 	    cv::imshow("emergency_detector segmented depth",segDepthNorm);
+
+        fprintf(stderr,"Proc Depth cv mat has type %u ",segDepth.type() );
       }
 
       if (

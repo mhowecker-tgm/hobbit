@@ -176,9 +176,10 @@ int doDrawOut()
      cv::Mat depthNorm;
 	 cv::normalize(depth,depthNorm,0,255,CV_MINMAX,CV_8UC1);
 
+     fprintf(stderr,"Depth cv mat has type %u ",depth.type() );
      //After we have our bgr Frame ready and we added the FPS text , lets show it!
-	 cv::imshow("emergency_detector rgb",depthNorm);
-	 cv::imshow("emergency_detector depth",bgrMat);
+	 cv::imshow("emergency_detector depth",depthNorm);
+	 cv::imshow("emergency_detector rgb",bgrMat);
 
 	 cv::waitKey(1);
 
