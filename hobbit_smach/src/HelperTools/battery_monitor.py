@@ -5,7 +5,7 @@ from hobbit_msgs.msg import Event
 from std_msgs.msg import Header
 from mira_msgs.msg import BatteryState
 
-LIMIT = 5
+LIMIT = 1
 NAME = 'battery_check'
 VOLT_LIMIT = 26.0
 
@@ -16,10 +16,10 @@ def talker(level):
     data.header.stamp = rospy.Time.now()
     data.event = level
     pub = rospy.Publisher('/Event', Event, queue_size=10)
-    r = rospy.Rate(0.01)
+    r = rospy.Rate(10)
     i = 0
     while i < LIMIT:
-        rospy.loginfo(str(data))
+        # rospy.loginfo(str(data))
         pub.publish(data)
         r.sleep()
         i += 1
