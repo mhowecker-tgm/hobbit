@@ -137,6 +137,23 @@ class Undock(State):
         return 'succeeded'
 
 
+class TestData(State):
+    """
+    """
+    def __init__(self):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'preempted']
+        )
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        rospy.loginfo('TEST_DATA: ' + str(ud.robots_room_name))
+        return 'succeeded'
+
+
 class Dock(State):
     """
     Publish the docking message to mira
@@ -382,6 +399,10 @@ def goToPosition(frame='/map', room='None', place='dock'):
                 'get_robots_current_room',
                 GetName,
                 response_key='robots_room_name')
+        )
+        Sequence.add(
+            'TEST_DATA',
+            TestData()
         )
         Sequence.add(
             'MMUI_SAY_ReachedPlace',

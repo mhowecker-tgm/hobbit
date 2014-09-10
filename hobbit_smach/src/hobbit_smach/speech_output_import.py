@@ -5,9 +5,7 @@ PKG = 'hobbit_smach'
 NAME = 'SpeechOutput'
 DEBUG = False
 
-import roslib
-roslib.load_manifest(PKG)
-
+import rospy
 from smach import Sequence, State, Concurrence
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 from hobbit_msgs.msg import Event
@@ -44,6 +42,23 @@ def askYesNo(question='Text is missing'):
     return seq
 
 
+class TestData(State):
+    """
+    """
+    def __init__(self):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'preempted']
+        )
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        rospy.loginfo('TEST_DATA_SPEECH: ' + str(ud.robots_room_name))
+        return 'succeeded'
+
+
 def sayText(info='Text is missing'):
     """
     Return a SMACH Sequence for speech output on the MMUI.
@@ -58,24 +73,28 @@ def sayText(info='Text is missing'):
     seq = Sequence(
         outcomes=['succeeded', 'preempted', 'failed'],
         connector_outcome='succeeded'
-        # input_keys=['robots_room_name']
+        ,input_keys=['robots_room_name']
     )
 
     with seq:
-            Sequence.add(
-                'TALK',
-                HobbitMMUI.ShowInfo(
-                    info=info,
-                    #FIXME: Do it with the userdata
-                    #room_name=seq.userdata.robots_room_name
-                    #room_name='room'
-                )
+        Sequence.add(
+            'TEST_DATA_SPEECH',
+            TestData()
+        )
+        Sequence.add(
+            'TALK',
+            HobbitMMUI.ShowInfo(
+                info=info,
+                #FIXME: Do it with the userdata
+                #room_name=seq.userdata.robots_room_name
+                #room_name='room'
             )
-            Sequence.add(
-                'WAIT_FOR_MMUI',
-                HobbitMMUI.WaitforSoundEnd('/Event', Event),
-                transitions={'aborted': 'WAIT_FOR_MMUI',
-                             'succeeded': 'succeeded'})
+        )
+        Sequence.add(
+            'WAIT_FOR_MMUI',
+            HobbitMMUI.WaitforSoundEnd('/Event', Event),
+            transitions={'aborted': 'WAIT_FOR_MMUI',
+                            'succeeded': 'succeeded'})
     return seq
 
 
