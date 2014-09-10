@@ -15,11 +15,13 @@ import roslib
 roslib.load_manifest(PKG)
 import rospy
 from ArmControllerClientFunctions import ArmClientFunctions
-from std_msgs.msg import String
+from std_msgs.msg import String, Bool
 import actionlib
-from hobbit_msgs.msg import *
+import hobbit_msgs.msg
 
 
+def str2bool(v):
+  return v.lower() in ("yes", "true", "t", "1")
 
 
 class ArmActionServerROS(object):
@@ -29,7 +31,12 @@ class ArmActionServerROS(object):
     _result   = hobbit_msgs.msg.ArmServerResult()
 
 
-    def __init__(self): 
+    def __init__(self, name): 
+
+	self._action_name = name
+	self._as = actionlib.SimpleActionServer(self._action_name, hobbit_msgs.msg.ArmServerAction, execute_cb=self.execute_cb, auto_start = False)
+	self._as.start()
+	print "ArmServer was started"
 
 	#arm client instance (can only exist once)
         self.ArmClient = ArmClientFunctions('192.168.2.190')
@@ -37,59 +44,96 @@ class ArmActionServerROS(object):
 	self.armCommands_sub = rospy.Subscriber("/arm/commands", String, self.arm_execute)
 
 	#action server stuff
-	self._action_name = "armactionlibtopic"
-	self._as = actionlib.SimpleActionServer(self._action_name, hobbit_msgs.msg.ArmServerAction, execute_cb=self.execute_cb, auto_start = False)
-	self._as.start()
-	print "ArmServer was started"
-
+	
     #arm commands triggered by ActionServer
     def execute_cb(self, goal):
 
 	#get command from goal
-        strdata = str(goal.command)
-        print "\nGRASP COMMAND received by the ArmActionServer:\n", strdata
+        strdata = str(goal.command.data)
+        print "\nGRASP COMMAND received by the ArmActionServer: >> ", strdata
 	input = strdata.split()        
      	cmd = input[0]
-
 	''' GET Functions '''
+	#return False/True if appropriate, otherwise True if command was executed
 	if cmd == 'GetArmState':
-            self._feedback.feedback = self.ArmClient.GetArmState()
-	    print "ArmActionServer: feedback: ",self._feedback.feedback
-	    self._result.result = True
+            self._feedback.feedback.data = str(self.ArmClient.GetArmState())
+	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
+	    self._result.result = Bool(True)
 	elif cmd == 'GetActualPosition':
-	    print self.ArmClient.GetActualPosition()
+	    self._feedback.feedback.data = str(self.ArmClient.GetActualPosition())
+	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
+	    self._result.result = Bool(True)
+
+
 	elif cmd == 'GetArmAtHomePos':
-	    print self.ArmClient.GetArmAtHomePos()
+	    self._feedback.feedback.data = str(self.ArmClient.GetArmAtHomePos())
+	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
+	    self._result.result.data = str2bool(self._feedback.feedback.data)
 	elif cmd == 'GetArmAtLearningPos':
-	    print self.ArmClient.GetArmAtLearningPos() 
+	    self._feedback.feedback.data = str(self.ArmClient.GetArmAtLearningPos())
+	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
+	    self._result.result.data = str2bool(self._feedback.feedback.data)
 	elif cmd == 'GetArmAtTrayPos':
-	    print self.ArmClient.GetArmAtTrayPos() 
+	    self._feedback.feedback.data = str(self.ArmClient.GetArmAtTrayPos())
+	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
+	    self._result.result.data = str2bool(self._feedback.feedback.data)
 	elif cmd == 'GetArmAtTurntablePos':
-	    print self.ArmClient.GetArmAtTurntablePos() 
+	    self._feedback.feedback.data = str(self.ArmClient.GetArmAtTurntablePos())
+	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
+	    self._result.result.data = str2bool(self._feedback.feedback.data)
 	elif cmd == 'GetTurntableAtCCWPos':
-	    print self.ArmClient.GetTurntableAtCCWPos()
+	    self._feedback.feedback.data = str(self.ArmClient.GetTurntableAtCCWPos())
+	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
+	    self._result.result.data = str2bool(self._feedback.feedback.data)
 	elif cmd == 'GetTurntableAtCWPos':
-	    print self.ArmClient.GetTurntableAtCWPos()
+	    self._feedback.feedback.data = str(self.ArmClient.GetTurntableAtCWPos())
+	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
+	    self._result.result.data = str2bool(self._feedback.feedback.data)
 	elif cmd == 'GetArmHasError':
-	    print self.ArmClient.GetArmHasError()                        
+	    self._feedback.feedback.data = str(self.ArmClient.GetArmHasError())
+	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
+	    self._result.result.data = str2bool(self._feedback.feedback.data)                       
 	elif cmd == 'GetArmHasStopped':
-	    print self.ArmClient.GetArmHasStopped()
+	    self._feedback.feedback.data = str(self.ArmClient.GetArmHasStopped())
+	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
+	    self._result.result.data = str2bool(self._feedback.feedback.data)
 	elif cmd == 'GetArmInPositionArea':
-	    print self.ArmClient.GetArmInPositionArea()
+	    self._feedback.feedback.data = str(self.ArmClient.GetArmInPositionArea())
+	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
+	    self._result.result.data = str2bool(self._feedback.feedback.data)
 	elif cmd == 'GetArmInTargetPos':
-	    print self.ArmClient.GetArmInTargetPos()
+	    self._feedback.feedback.data = str(self.ArmClient.GetArmInTargetPos())
+	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
+	    self._result.result.data = str2bool(self._feedback.feedback.data)
 	elif cmd == 'GetArmIsEnabled':
-	    print self.ArmClient.GetArmIsEnabled() 
+	    self._feedback.feedback.data = str(self.ArmClient.GetArmIsEnabled())
+	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
+	    self._result.result.data = str2bool(self._feedback.feedback.data)
 	elif cmd == 'GetArmIsHomed':
-	    print self.ArmClient.GetArmIsHomed()
+	    self._feedback.feedback.data = str(self.ArmClient.GetArmIsHomed())
+	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
+	    self._result.result.data = str2bool(self._feedback.feedback.data)
 	elif cmd == 'GetArmIsMoving':
-	    print self.ArmClient.GetArmIsMoving()
+	    self._feedback.feedback.data = str(self.ArmClient.GetArmIsMoving())
+	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
+	    self._result.result.data = str2bool(self._feedback.feedback.data)
 	elif cmd == 'GetArmSoftLimitMax':
-	    print self.ArmClient.GetArmSoftLimitMax()
+	    self._feedback.feedback.data = str(self.ArmClient.GetArmSoftLimitMax())
+	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
+	    self._result.result.data = str2bool(self._feedback.feedback.data)
 	elif cmd == 'GetArmSoftLimitMin':
-	    print self.ArmClient.GetArmSoftLimitMin()
+	    self._feedback.feedback.data = str(self.ArmClient.GetArmSoftLimitMin())
+	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
+	    self._result.result.data = str2bool(self._feedback.feedback.data)
 	elif cmd == 'GetGripperIsClosed':
-            print self.ArmClient.GetGripperIsClosed()         
+	    self._feedback.feedback.data = str(self.ArmClient.GetGripperIsClosed())
+	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
+	    self._result.result.data = str2bool(self._feedback.feedback.data)     
+	elif cmd == 'GetArmAtCandlePos':
+	    self._feedback.feedback.data = str(self.ArmClient.GetArmAtCandlePos())
+	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
+	    self._result.result.data = str2bool(self._feedback.feedback.data)     
+
 	# SET Functions
 	elif cmd == 'SetMoveToHomePos':
 	    print self.ArmClient.SetMoveToHomePos()
@@ -298,9 +342,9 @@ class ArmActionServerROS(object):
 if __name__ == '__main__':
    
     # Node name
-    rospy.init_node('arm_action_server_ros')
+    rospy.init_node('arm_action_server')
     print "ROS node arm_action_server started"
     #armservertopic = "armactionlibtopic"
-    armclient = ArmActionServerROS()
+    armclient = ArmActionServerROS(rospy.get_name())
 
     rospy.spin()

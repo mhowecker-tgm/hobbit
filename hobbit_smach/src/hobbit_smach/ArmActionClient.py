@@ -11,16 +11,15 @@ import roslib
 roslib.load_manifest(PKG)
 import rospy
 import ArmControllerFunctions
-from std_msgs.msg import String
+from std_msgs.msg import String, Bool
 import actionlib
-from hobbit_msgs.msg import *
+import hobbit_msgs.msg
 
 
 class ArmActionClient():
     def __init__(self):
         #self.arm_client_pub = rospy.Publisher("/arm/commands", String)
-	arm_actionlib_topic = "armactionlibtopic"
-        self.client = actionlib.SimpleActionClient("arm_action_server_ros", hobbit_msgs.msg.ArmServerAction)
+        self.client = actionlib.SimpleActionClient("arm_action_server", hobbit_msgs.msg.ArmServerAction)   #"arm_action_server" has to be nodename of ArmActionServer(.py)
  
     def arm_action_client(self, cmd):
 
@@ -38,11 +37,15 @@ class ArmActionClient():
 	# Sends the goal to the action server.
 	self.client.send_goal(goal)
 
+	print "wait for result"
 	# Waits for the server to finish performing the action.
 	self.client.wait_for_result()
+	
 
 	# Prints out the result of executing the action
-	return self.client.get_result()  # 
+	returnval = self.client.get_result()  # 
+	print returnval.result.data
+	return returnval
         
     '''#_____________________SET Commands_____________________#
     
@@ -268,8 +271,65 @@ if __name__ == '__main__':
     print "node arm_action_client test started"
     arm_client = ArmActionClient()
     cmd = String ("GetArmState")
-    arm_client.arm_action_client(cmd)
-    raw_input("press key to finish ... get GetArmState")
+    res = arm_client.arm_action_client(cmd)
+    print "Result: ", res
+	
+    raw_input("press key to get GetActualPosition (armactionserver)")
+    cmd = String ("GetActualPosition")
+    res = arm_client.arm_action_client(cmd)
+    print "Result: ", res
+
+    raw_input("press key to get GetArmIsHomed (armactionserver)")
+    cmd = String ("GetArmIsHomed")
+    res = arm_client.arm_action_client(cmd)
+    print "Result: ", res
+
+    raw_input("press key to get GetArmAtLearningPos (armactionserver)")
+    cmd = String ("GetArmAtLearningPos")
+    res = arm_client.arm_action_client(cmd)
+    print "Result: ", res
+    exit
+    raw_input("press key to get GetArmInTargetPos (armactionserver)")
+    cmd = String ("GetArmInTargetPos")
+    res = arm_client.arm_action_client(cmd)
+    print "Result: ", res
+
+    raw_input("press key to get GetArmIsEnabled (armactionserver)")
+    cmd = String ("GetArmIsEnabled")
+    res = arm_client.arm_action_client(cmd)
+    print "Result: ", res
+
+    raw_input("press key to get GetArmAtTrayPos (armactionserver)")
+    cmd = String ("GetArmAtTrayPos")
+    res = arm_client.arm_action_client(cmd)
+    print "Result: ", res
+
+    raw_input("press key to get GetArmSoftLimitMax (armactionserver)")
+    cmd = String ("GetArmSoftLimitMax")
+    res = arm_client.arm_action_client(cmd)
+    print "Result: ", res
+
+    raw_input("press key to get GetArmAtCandlePos (armactionserver)")
+    cmd = String ("GetArmAtCandlePos")
+    res = arm_client.arm_action_client(cmd)
+    print "Result: ", res
+
+    raw_input("press key to get GetArmHasStopped (armactionserver)")
+    cmd = String ("GetArmHasStopped")
+    res = arm_client.arm_action_client(cmd)
+    print "Result: ", res
+
+    raw_input("press key to get GetArmSoftLimitMin (armactionserver)")
+    cmd = String ("GetArmSoftLimitMin")
+    res = arm_client.arm_action_client(cmd)
+    print "Result: ", res
+
+    raw_input("press key to get GetGripperIsClosed (armactionserver)")
+    cmd = String ("GetGripperIsClosed")
+    res = arm_client.arm_action_client(cmd)
+    print "Result: ", res
+
+    #raw_input("press key to finish ... get GetArmState")
     #arm_pub.GetArmState()
 
     #raw_input("press key to get GetActualPosition")
