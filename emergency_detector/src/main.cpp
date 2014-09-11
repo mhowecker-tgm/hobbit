@@ -197,7 +197,8 @@ void bboxReceived(const emergency_detector::SkeletonBBox & msg)
 int doDrawOut()
 {
      if (!doCVOutput) { return 0; }
-     /*Don't add this on output ( reduce cluttering )*/
+
+     /*
      cv::Mat rgbTmp = rgb.clone();
      //Take care of drawing stuff as visual output
 
@@ -211,7 +212,7 @@ int doDrawOut()
      //After we have our bgr Frame ready and we added the FPS text , lets show it!
 	 cv::imshow("emergency_detector depth",depthNorm);
 	 cv::imshow("emergency_detector rgb",bgrMat);
-
+*/
 	 cv::waitKey(1);
 
  return 1;

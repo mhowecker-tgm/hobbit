@@ -23,6 +23,9 @@
 #define CYAN "\033[36m" /* Cyan */
 #define WHITE "\033[37m" /* White */
 
+using namespace std;
+using namespace cv;
+
 struct SegmentationFeaturesRGB segConfRGB={0};
 struct SegmentationFeaturesDepth segConfDepth={0};
 unsigned int combinationMode=0;
@@ -77,7 +80,7 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
                                         void * calib ,
                                           unsigned int frameTimestamp )
 {
-  if ( (35<temperatureObjectDetected) && (temperatureObjectDetected<37)  )
+  if ( (33<temperatureObjectDetected) && (temperatureObjectDetected<37)  )
     {
         fprintf(stderr,"runServicesThatNeedColorAndDepth called \n");
         unsigned char * segmentedRGB = copyRGB(colorFrame ,colorWidth , colorHeight);
@@ -98,21 +101,6 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
       unsigned int depthAvg = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , 147 , 169 , 300 , 200 , 1000 );
       fprintf(stderr,"RECT Score is %u \n",depthAvg);
 
-      if (doCVOutput)
-      {
-        cv::Mat bgrMat,rgbMat(colorHeight,colorWidth,CV_8UC3,segmentedRGB,3*colorWidth);
-	    cv::cvtColor(rgbMat,bgrMat, CV_RGB2BGR);// opencv expects the image in BGR format
-
-        cv::Mat segDepth(depthHeight,depthWidth,CV_16UC1 ,segmentedDepth,depthWidth);
-	    cv::Mat segDepthNorm;
-	    cv::normalize(segDepth,segDepthNorm,0,65536,CV_MINMAX,CV_16UC1);
-
-
-	    cv::imshow("emergency_detector segmented rgb",bgrMat);
-	    cv::imshow("emergency_detector segmented depth",segDepthNorm);
-
-        fprintf(stderr,"Proc Depth cv mat has type %u ",segDepth.type() );
-      }
 
       if (
            ( depthAvg > 1000) &&
@@ -125,11 +113,49 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
 
 
 
+
+
+      if (doCVOutput)
+      {
+        cv::Mat bgrMat,rgbMat(colorHeight,colorWidth,CV_8UC3,segmentedRGB,3*colorWidth);
+	    cv::cvtColor(rgbMat,bgrMat, CV_RGB2BGR);// opencv expects the image in BGR format
+
+        cv::Mat segDepth(depthHeight,depthWidth,CV_16UC1 ,segmentedDepth,depthWidth);
+	    cv::Mat segDepthNorm;
+	    cv::normalize(segDepth,segDepthNorm,0,65536,CV_MINMAX,CV_16UC1);
+
+        RNG rng(12345);
+        Point pt1; pt1.x=147; pt1.y=169;
+        Point pt2; pt2.x=147+300; pt2.y=169+200;
+        Scalar color = Scalar ( rng.uniform(0,255) , rng.uniform(0,255) , rng.uniform(0,255)  );
+        rectangle(bgrMat ,  pt1 , pt2 , color , 2, 8 , 0);
+
+        char rectVal[123]={0};
+
+        Point txtPosition;  txtPosition.x = pt1.x+15; txtPosition.y = pt1.y+20;
+        putText(bgrMat , "Scanning for emergency .." , txtPosition , FONT_HERSHEY_SCRIPT_SIMPLEX , 0.7 , color , 2 , 8 );
+        txtPosition.y += 24; snprintf(rectVal,123,"Score : %u",depthAvg);
+        putText(bgrMat , rectVal, txtPosition , FONT_HERSHEY_SCRIPT_SIMPLEX , 0.7 , color , 2 , 8 );
+        txtPosition.y += 24; snprintf(rectVal,123,"Temperature : %0.2f C",temperatureObjectDetected);
+        putText(bgrMat , rectVal, txtPosition , FONT_HERSHEY_SCRIPT_SIMPLEX , 0.7 , color , 2 , 8 );
+
+	    cv::imshow("emergency_detector segmented rgb",bgrMat);
+	    cv::imshow("emergency_detector segmented depth",segDepthNorm);
+
+        fprintf(stderr,"Proc Depth cv mat has type %u ",segDepth.type() );
+      }
+
+
        fprintf(stderr,"Freeing\n");
        free (segmentedRGB);
        free (segmentedDepth);
        fprintf(stderr,"Done\n");
     }
+
+
+
+
+
  return emergencyDetected;
 }
 
