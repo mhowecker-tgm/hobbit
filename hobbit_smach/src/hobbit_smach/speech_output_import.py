@@ -78,7 +78,8 @@ def sayText(info='Text is missing'):
     )
 
     with seq:
-        if info == 'T_GT_ReachedMyDestination':
+        if info in ['T_GT_ReachedMyDestination', 'T_GT_WayBlocked']:
+        # if info == 'T_GT_ReachedMyDestination':
             Sequence.add(
                 'GET_ROBOTS_CURRENT_ROOM',
                 ServiceState(
