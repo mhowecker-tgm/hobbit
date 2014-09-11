@@ -16,7 +16,7 @@
          ______________________________________________________________________   
     -->
     <!-- arg name="deviceID" value="/home/ammar/Documents/Programming/FORTH/input_acquisition/grabbed_frames/test_ammar_2.oni"/ --> 
-    <arg name="deviceID" value="/home/ammar/Documents/Programming/FORTH/input_acquisition/grabbed_frames/CapturedMark4.oni"/> 
+    <arg name="deviceID"/> 
   
  
    <!--  rosrun pcl_ros pointcloud_to_pcd input:=headcam/depth_registered/points/ -->
