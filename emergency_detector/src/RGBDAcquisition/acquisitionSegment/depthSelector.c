@@ -204,6 +204,7 @@ if (segConf->enableBBox)
                  segConf->bboxZ2
          );
 
+
  double * m = allocate4x4MatrixForPointTransformationBasedOnCalibration(calib);
  if (m==0) {fprintf(stderr,"Could not allocate a 4x4 matrix , cannot perform bounding box selection\n"); } else
  {
@@ -267,6 +268,14 @@ if (segConf->enableBBox)
 
 if ( segConf->enablePlaneSegmentation )
  {
+
+ fprintf(stderr,"Plane Calib fx %0.2f fy %0.2f cx %0.2f cy %0.2f \n",
+                 calib->intrinsic[CALIB_INTR_FX],
+                 calib->intrinsic[CALIB_INTR_FY],
+                 calib->intrinsic[CALIB_INTR_CX],
+                 calib->intrinsic[CALIB_INTR_CY]
+         );
+
   double * m = allocate4x4MatrixForPointTransformationBasedOnCalibration(calib);
   if (m==0) {fprintf(stderr,"Could not allocate a 4x4 matrix , cannot perform plane segmentation\n"); } else
   {

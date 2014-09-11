@@ -28,11 +28,18 @@ using namespace cv;
 
 struct SegmentationFeaturesRGB segConfRGB={0};
 struct SegmentationFeaturesDepth segConfDepth={0};
-unsigned int combinationMode=0;
+unsigned int combinationMode=COMBINE_AND;
 
+
+unsigned int tempZoneWidth = 300;
+unsigned int tempZoneHeight = 200;
+
+unsigned int minScoreTrigger = 600;
+unsigned int maxScoreTrigger = 1000;
 
 unsigned int doCVOutput=0;
 unsigned int emergencyDetected=0;
+
 float temperatureAmbientDetected=36.0; //<- YODO : default value should be 0
 float temperatureObjectDetected=36.0; //<- YODO : default value should be 0
 
@@ -98,17 +105,20 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
                                    combinationMode
                                 );
 
-      unsigned int depthAvg = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , 147 , 169 , 300 , 200 , 1000 );
+      unsigned int tempZoneStartX = (unsigned int ) ((colorWidth-tempZoneWidth) / 2);
+      unsigned int tempZoneStartY = (unsigned int ) ((colorHeight-tempZoneHeight) / 2);
+
+      unsigned int depthAvg = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , tempZoneStartX , tempZoneStartY , tempZoneWidth , tempZoneHeight , 1000 );
       fprintf(stderr,"RECT Score is %u \n",depthAvg);
 
 
       if (
-           ( depthAvg > 1000) &&
-           ( depthAvg < 2000)
+           ( depthAvg > minScoreTrigger) &&
+           ( depthAvg < maxScoreTrigger)
          )
                        {
                         fprintf(stderr,MAGENTA "\n\n ? EMERGENCY ?  \n\n" NORMAL);
-                         // emergencyDetected=1;
+                        emergencyDetected=1;
                        }
 
 
@@ -120,29 +130,52 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
         cv::Mat bgrMat,rgbMat(colorHeight,colorWidth,CV_8UC3,segmentedRGB,3*colorWidth);
 	    cv::cvtColor(rgbMat,bgrMat, CV_RGB2BGR);// opencv expects the image in BGR format
 
-        cv::Mat segDepth(depthHeight,depthWidth,CV_16UC1 ,segmentedDepth,depthWidth);
-	    cv::Mat segDepthNorm;
-	    cv::normalize(segDepth,segDepthNorm,0,65536,CV_MINMAX,CV_16UC1);
-
         RNG rng(12345);
-        Point pt1; pt1.x=147; pt1.y=169;
-        Point pt2; pt2.x=147+300; pt2.y=169+200;
+        Point pt1; pt1.x=tempZoneStartX;               pt1.y=tempZoneStartY;
+        Point pt2; pt2.x=tempZoneStartX+tempZoneWidth; pt2.y=tempZoneStartY+tempZoneHeight;
         Scalar color = Scalar ( rng.uniform(0,255) , rng.uniform(0,255) , rng.uniform(0,255)  );
+        Scalar colorEmergency = Scalar ( 0 , 0 , 255  );
         rectangle(bgrMat ,  pt1 , pt2 , color , 2, 8 , 0);
 
-        char rectVal[123]={0};
+       char rectVal[123]={0};
 
+       int fontUsed=FONT_HERSHEY_SIMPLEX; //FONT_HERSHEY_SCRIPT_SIMPLEX;
         Point txtPosition;  txtPosition.x = pt1.x+15; txtPosition.y = pt1.y+20;
-        putText(bgrMat , "Scanning for emergency .." , txtPosition , FONT_HERSHEY_SCRIPT_SIMPLEX , 0.7 , color , 2 , 8 );
+        if ( emergencyDetected )
+        {
+          putText(bgrMat , "Emergency Detected ..! " , txtPosition , fontUsed , 0.7 , color , 2 , 8 );
+          Point ptIn1; ptIn1.x=tempZoneStartX;               ptIn1.y=tempZoneStartY;
+          Point ptIn2; ptIn2.x=tempZoneStartX+tempZoneWidth; ptIn2.y=tempZoneStartY+tempZoneHeight;
+
+          unsigned int i=0;
+          for (i=0; i<3; i++)
+          {
+            ptIn1.x-=10; ptIn1.y-=10;
+            ptIn2.x+=10; ptIn2.y+=10;
+            rectangle(bgrMat ,  ptIn1 , ptIn2 , colorEmergency , 2, 8 , 0);
+          }
+
+          Point ul; ul.x=0;          ul.y=0;
+          Point ur; ur.x=colorWidth; ur.y=0;
+          Point dl; dl.x=0;          dl.y=colorHeight;
+          Point dr; dr.x=colorWidth; dr.y=colorHeight;
+          line(bgrMat,ul,ptIn1 , colorEmergency , 2 , 8 , 0);
+          line(bgrMat,dr,ptIn2 , colorEmergency , 2 , 8 , 0);
+
+          ptIn1.x+=tempZoneWidth+60;
+          ptIn2.x-=tempZoneWidth+60;
+          line(bgrMat,ur,ptIn1 , colorEmergency , 2 , 8 , 0);
+          line(bgrMat,dl,ptIn2 , colorEmergency , 2 , 8 , 0);
+        } else
+        {
+          putText(bgrMat , "Scanning for emergency .." , txtPosition , fontUsed , 0.7 , color , 2 , 8 );
+        }
         txtPosition.y += 24; snprintf(rectVal,123,"Score : %u",depthAvg);
-        putText(bgrMat , rectVal, txtPosition , FONT_HERSHEY_SCRIPT_SIMPLEX , 0.7 , color , 2 , 8 );
+        putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , color , 2 , 8 );
         txtPosition.y += 24; snprintf(rectVal,123,"Temperature : %0.2f C",temperatureObjectDetected);
-        putText(bgrMat , rectVal, txtPosition , FONT_HERSHEY_SCRIPT_SIMPLEX , 0.7 , color , 2 , 8 );
+        putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , color , 2 , 8 );
 
 	    cv::imshow("emergency_detector segmented rgb",bgrMat);
-	    cv::imshow("emergency_detector segmented depth",segDepthNorm);
-
-        fprintf(stderr,"Proc Depth cv mat has type %u ",segDepth.type() );
       }
 
 
@@ -166,18 +199,29 @@ void initializeProcess()
  initializeDepthSegmentationConfiguration(&segConfDepth,640,480);
 
 
- segConfDepth.maxDepth=1800;
+ segConfDepth.maxDepth=2800;
  //Hobbit orientation according to camera
 
- segConfDepth.doNotGenerateNormalFrom3Points=1;
+ segConfDepth.doNotGenerateNormalFrom3Points=0;
+ segConfDepth.p1[0]=492.23; segConfDepth.p1[1]=615.87; segConfDepth.p1[2]=1757.00;
+ segConfDepth.p2[0]=51.46;  segConfDepth.p2[1]=622.97; segConfDepth.p2[2]=1722.00;
+ segConfDepth.p3[0]=250.41; segConfDepth.p3[1]=403.77; segConfDepth.p3[2]=2198.00;
 
- segConfDepth.normal[0]=-0.02;
- segConfDepth.normal[1]=-0.78;
- segConfDepth.normal[2]=-0.62;
+ segConfDepth.normal[0]=0.02; segConfDepth.normal[1]=-0.91; segConfDepth.normal[2]=-0.42;
+ segConfDepth.center[0]=51.46; segConfDepth.normal[1]=622.97; segConfDepth.normal[2]=1722.0;
 
- segConfDepth.center[0]=114.95;
- segConfDepth.center[1]=501.61;
- segConfDepth.center[2]=1338.0;
+// segConfDepth.doNotGenerateNormalFrom3Points=1;
+
+// segConfDepth.normal[0]=-0.02;
+// segConfDepth.normal[1]=-0.78;
+// segConfDepth.normal[2]=-0.62;
+
+// segConfDepth.center[0]=114.95;
+// segConfDepth.center[1]=501.61;
+// segConfDepth.center[2]=1338.0;
 
  segConfDepth.planeNormalOffset=40.0;
+
+ segConfDepth.enablePlaneSegmentation =1;
+
 }

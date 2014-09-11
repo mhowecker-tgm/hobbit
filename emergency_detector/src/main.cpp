@@ -40,7 +40,7 @@ ros::Publisher gestureEventBroadcaster;
 #endif
 
 
-#define DEFAULT_FRAME_RATE 1
+#define DEFAULT_FRAME_RATE 15
 
 int rate=DEFAULT_FRAME_RATE;
 
