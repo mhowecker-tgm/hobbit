@@ -279,15 +279,23 @@ if __name__ == '__main__':
     res = arm_client.arm_action_client(cmd)
     print "Result: ", res
 
-    raw_input("press key to get GetArmIsHomed (armactionserver)")
-    cmd = String ("GetArmIsHomed")
+
+    raw_input("press key to set SetMoveToHomePos (armactionserver)")
+    cmd = String ("SetMoveToHomePos")
     res = arm_client.arm_action_client(cmd)
     print "Result: ", res
 
-    raw_input("press key to get GetArmAtLearningPos (armactionserver)")
-    cmd = String ("GetArmAtLearningPos")
-    res = arm_client.arm_action_client(cmd)
-    print "Result: ", res
+
+    #raw_input("press key to get GetArmIsHomed (armactionserver)")
+    #cmd = String ("GetArmIsHomed")
+    #res = arm_client.arm_action_client(cmd)
+    #print "Result: ", res
+
+    #raw_input("press key to get GetArmAtLearningPos (armactionserver)")
+    #cmd = String ("GetArmAtLearningPos")
+    #res = arm_client.arm_action_client(cmd)
+    #print "Result: ", res
+    
     exit
     raw_input("press key to get GetArmInTargetPos (armactionserver)")
     cmd = String ("GetArmInTargetPos")

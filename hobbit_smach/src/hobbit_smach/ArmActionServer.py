@@ -18,6 +18,7 @@ from ArmControllerClientFunctions import ArmClientFunctions
 from std_msgs.msg import String, Bool
 import actionlib
 import hobbit_msgs.msg
+import time
 
 
 def str2bool(v):
@@ -48,7 +49,9 @@ class ArmActionServerROS(object):
     #arm commands triggered by ActionServer
     def execute_cb(self, goal):
 
+	self._result.result = Bool(False) #default value for result
 	#get command from goal
+	isSetFunction = False
         strdata = str(goal.command.data)
         print "\nGRASP COMMAND received by the ArmActionServer: >> ", strdata
 	input = strdata.split()        
@@ -134,23 +137,97 @@ class ArmActionServerROS(object):
 	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
 	    self._result.result.data = str2bool(self._feedback.feedback.data)     
 
+
 	# SET Functions
 	elif cmd == 'SetMoveToHomePos':
-	    print self.ArmClient.SetMoveToHomePos()
+	    self._feedback.feedback.data = str(self.ArmClient.SetMoveToHomePos())
+	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
+	    for i in range(0,20):
+		time.sleep(0.5)
+		print "loop round: ", i+1
+		armInTargetPos = self.ArmClient.GetArmAtHomePos()
+		print "armInTargetPos: ",armInTargetPos
+		if armInTargetPos:
+		    self._result.result = Bool(True)
+		    break	 
 	elif cmd == 'SetMoveToLearningPos':
-	    print self.ArmClient.SetMoveToLearningPos()
+	    self._feedback.feedback.data = str(self.ArmClient.SetMoveToLearningPos())
+	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
+	    for i in range(0,30):
+		time.sleep(0.5)
+		print "loop round: ", i+1
+		armInTargetPos = self.ArmClient.GetArmAtLearningPos()
+		print "armInTargetPos: ",armInTargetPos
+		if armInTargetPos:
+		    self._result.result = Bool(True)
+		    break
 	elif cmd == 'SetMoveToTrayPos':
-	    print self.ArmClient.SetMoveToTrayPos()
+	    self._feedback.feedback.data = str(self.ArmClient.SetMoveToTrayPos())
+	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
+	    for i in range(0,30):
+		time.sleep(0.5)
+		print "loop round: ", i+1
+		armInTargetPos = self.ArmClient.GetArmAtTrayPos()
+		print "armInTargetPos: ",armInTargetPos
+		if armInTargetPos:
+		    self._result.result = Bool(True)
+		    break
 	elif cmd == 'SetMoveToPreGraspFromFloorPos':
-	    print self.ArmClient.SetMoveToPreGraspFromFloorPos()
+	    self._feedback.feedback.data = str(self.ArmClient.SetMoveToPreGraspFromFloorPos())
+	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
+	    for i in range(0,30):
+		time.sleep(0.5)
+		print "loop round: ", i+1
+		armInTargetPos = self.ArmClient.GetArmInTargetPos()
+		print "armInTargetPos: ",armInTargetPos
+		if armInTargetPos:
+		    self._result.result = Bool(True)
+		    break
 	elif cmd == 'SetStoreTurntable':
-	    print self.ArmClient.SetStoreTurntable()
+	    self._feedback.feedback.data = str(self.ArmClient.SetStoreTurntable())
+	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
+	    for i in range(0,30):
+		time.sleep(0.5)
+		print "loop round: ", i+1
+		armInTargetPos = self.ArmClient.GetArmAtHomePos()
+		print "armInTargetPos: ",armInTargetPos
+		if armInTargetPos:
+		    self._result.result = Bool(True)
+		    break
 	elif cmd == 'SetTurnTurntableCW':
-	    print self.ArmClient.SetTurnTurntableCW()
+	    self._feedback.feedback.data = str(self.ArmClient.SetTurnTurntableCW())
+	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
+	    for i in range(0,30):
+		time.sleep(0.5)
+		print "loop round: ", i+1
+		armInTargetPos = self.ArmClient.GetTurntableAtCWPos()
+		print "armInTargetPos: ",armInTargetPos
+		if armInTargetPos:
+		    self._result.result = Bool(True)
+		    break
 	elif cmd == 'SetTurnTurntableCCW':
-	    print self.ArmClient.SetTurnTurntableCCW()
+	    self._feedback.feedback.data = str(self.ArmClient.SetTurnTurntableCCW())
+	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
+	    for i in range(0,30):
+		time.sleep(0.5)
+		print "loop round: ", i+1
+		armInTargetPos = self.ArmClient.GetTurntableAtCCWPos()
+		print "armInTargetPos: ",armInTargetPos
+		if armInTargetPos:
+		    self._result.result = Bool(True)
+		    break
 	elif cmd == 'SetStartArmReference':
-	    print self.ArmClient.SetStartArmReference()
+	    self._feedback.feedback.data = str(self.ArmClient.SetStartArmReference())
+	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
+	    for i in range(0,30):
+		time.sleep(0.5)
+		print "loop round: ", i+1
+		armInTargetPos = self.ArmClient.GetArmAtHomePos()
+		print "armInTargetPos: ",armInTargetPos
+		if armInTargetPos:
+		    self._result.result = Bool(True)
+		    break
+
 	elif cmd == 'SetDisableArm':
 	    print self.ArmClient.SetDisableArm()
 	elif cmd == 'SetEnableArm':
@@ -167,11 +244,21 @@ class ArmActionServerROS(object):
 	    print self.ArmClient.SetAbsolutePos(float(input[1]),float(input[2]),float(input[3]),float(input[4]),float(input[5]),float(input[6])) #(90, 0, 50, 0, 110, 0)
 	elif cmd == 'SetStartMove':
 	    print self.ArmClient.SetStartMove(float(input[1]))   #(10) #10 Grad/Sec
+
+
+
 	# For Interpolation Mode    #no check of logic!!
 	elif cmd == 'SetClearPosBuffer':
-	    self.ArmClient.SetClearPosBuffer()
+	    self._feedback.feedback.data = str(self.ArmClient.SetClearPosBuffer())
+	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
+	    #@Andreas: how to check success?
+	    self._result.result = Bool(True)
 	elif cmd == 'SetPositionsForInterpolation':
-	    self.ArmClient.SetPositionsForInterpolation(float(input[1]),float(input[2]),float(input[3]),float(input[4]),float(input[5]),float(input[6]))    #(90, 86, 70, 0, 110, 0)
+	    #(90, 86, 70, 0, 110, 0)
+	    self._feedback.feedback.data =str(self.ArmClient.SetPositionsForInterpolation(float(input[1]),float(input[2]),float(input[3]),float(input[4]),float(input[5]),float(input[6]))) 
+	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
+	    #@Andreas: how to check success?
+	    self._result.result = Bool(True)
 	    #self.ArmClient.SetPositionsForInterpolation(90, 70, 65, 0, 110, 0)
 	    #self.ArmClient.SetPositionsForInterpolation(90, 60, 60, 0, 110, 0)
 	    #self.ArmClient.SetPositionsForInterpolation(90, 50, 60, 0, 110, 0)
@@ -180,11 +267,22 @@ class ArmActionServerROS(object):
 	    #self.ArmClient.SetPositionsForInterpolation(90, 20, 50, 0, 110, 0)
 	    #self.ArmClient.SetPositionsForInterpolation(90, 0, 50, 0, 110, 0)
 	elif cmd == 'SetPositionsForInterpolationReady':
-	    self.ArmClient.SetPositionsForInterpolationReady()
+	    self._feedback.feedback.data = str(self.ArmClient.SetPositionsForInterpolationReady())
+	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
+	    #@Andreas: how to check success?
+	    self._result.result = Bool(True)
 	elif cmd == 'SetStartInterpolation':
+	    self._feedback.feedback.data = str(self.ArmClient.SetStartInterpolation())
+	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
+	    #@Andreas: how to check success?
+	    self._result.result = Bool(True)
 	    self.ArmClient.SetStartInterpolation()
 	elif cmd == 'help':
 	    self.help()
+
+
+
+
 
 	#publish feedback
 	self._as.publish_feedback(self._feedback)
