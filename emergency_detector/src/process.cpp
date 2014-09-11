@@ -82,16 +82,38 @@ unsigned short * copyDepth(unsigned short * source , unsigned int width , unsign
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int colorWidth , unsigned int colorHeight ,
                                        unsigned short * depthFrame  , unsigned int depthWidth , unsigned int depthHeight ,
                                         void * calib ,
                                           unsigned int frameTimestamp )
 {
+  unsigned char * segmentedRGB = 0;
+  unsigned short * segmentedDepth = 0;
+  unsigned int tempZoneStartX = (unsigned int ) ((colorWidth-tempZoneWidth) / 2);
+  unsigned int tempZoneStartY = (unsigned int ) ((colorHeight-tempZoneHeight) / 2);
+  unsigned int depthAvg = 0;
+
   if ( (33<temperatureObjectDetected) && (temperatureObjectDetected<37)  )
     {
         fprintf(stderr,"runServicesThatNeedColorAndDepth called \n");
-        unsigned char * segmentedRGB = copyRGB(colorFrame ,colorWidth , colorHeight);
-        unsigned short * segmentedDepth = copyDepth(depthFrame ,depthWidth , depthHeight);
+         segmentedRGB = copyRGB(colorFrame ,colorWidth , colorHeight);
+         segmentedDepth = copyDepth(depthFrame ,depthWidth , depthHeight);
         fprintf(stderr,"Copied rgb/depth\n");
 
         fprintf(stderr,"Segmenting 2 frames sized  %ux%u and %ux%u \n",colorWidth , colorHeight,depthWidth , depthHeight);
@@ -105,10 +127,8 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
                                    combinationMode
                                 );
 
-      unsigned int tempZoneStartX = (unsigned int ) ((colorWidth-tempZoneWidth) / 2);
-      unsigned int tempZoneStartY = (unsigned int ) ((colorHeight-tempZoneHeight) / 2);
 
-      unsigned int depthAvg = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , tempZoneStartX , tempZoneStartY , tempZoneWidth , tempZoneHeight , 1000 );
+      depthAvg = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , tempZoneStartX , tempZoneStartY , tempZoneWidth , tempZoneHeight , 1000 );
       fprintf(stderr,"RECT Score is %u \n",depthAvg);
 
 
@@ -117,30 +137,53 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
            ( depthAvg < maxScoreTrigger)
          )
                        {
-                        fprintf(stderr,MAGENTA "\n\n ? EMERGENCY ?  \n\n" NORMAL);
+                        fprintf(stderr,MAGENTA "\n\n  EMERGENCY triggered  \n\n" NORMAL);
                         emergencyDetected=1;
                        }
 
+    }
 
 
 
 
       if (doCVOutput)
       {
-        cv::Mat bgrMat,rgbMat(colorHeight,colorWidth,CV_8UC3,segmentedRGB,3*colorWidth);
+        cv::Mat bgrMat,rgbMat;
+        if (segmentedRGB!=0)  { rgbMat = cv::Mat(colorHeight,colorWidth,CV_8UC3,segmentedRGB,3*colorWidth); } else
+                              { rgbMat = cv::Mat(colorHeight,colorWidth,CV_8UC3,colorFrame,3*colorWidth); }
+
 	    cv::cvtColor(rgbMat,bgrMat, CV_RGB2BGR);// opencv expects the image in BGR format
 
         RNG rng(12345);
-        Point pt1; pt1.x=tempZoneStartX;               pt1.y=tempZoneStartY;
-        Point pt2; pt2.x=tempZoneStartX+tempZoneWidth; pt2.y=tempZoneStartY+tempZoneHeight;
+        Point centerPt; centerPt.x=colorWidth/2;       centerPt.y=colorHeight/2;
+        Point pt1;      pt1.x=tempZoneStartX;               pt1.y=tempZoneStartY;
+        Point pt2;      pt2.x=tempZoneStartX+tempZoneWidth; pt2.y=tempZoneStartY+tempZoneHeight;
         Scalar color = Scalar ( rng.uniform(0,255) , rng.uniform(0,255) , rng.uniform(0,255)  );
         Scalar colorEmergency = Scalar ( 0 , 0 , 255  );
         rectangle(bgrMat ,  pt1 , pt2 , color , 2, 8 , 0);
 
-       char rectVal[123]={0};
 
-       int fontUsed=FONT_HERSHEY_SIMPLEX; //FONT_HERSHEY_SCRIPT_SIMPLEX;
+        unsigned int tempColorR=255 , tempColorG=0 , tempColorB=0;
+        if (temperatureObjectDetected<30) { tempColorR=0 , tempColorG=0 , tempColorB=255; } else
+        if (temperatureObjectDetected>40) { tempColorR=255 , tempColorG=0 , tempColorB=0; } else
+                                          { tempColorR=(unsigned int) 125+( 40-temperatureObjectDetected/10 ) * 125 , tempColorG=0 , tempColorB=0; }
+
+        //temperatureObjectDetected+=0.5;
+        //if (temperatureObjectDetected>40) { temperatureObjectDetected=28;}
+
+        Scalar tempColor = Scalar ( tempColorB , tempColorG , tempColorR );
+        circle(bgrMat,  centerPt , 15 , tempColor , 4, 8 , 0);
+
+        char rectVal[123]={0};
+
+
+
+        int fontUsed=FONT_HERSHEY_SIMPLEX; //FONT_HERSHEY_SCRIPT_SIMPLEX;
         Point txtPosition;  txtPosition.x = pt1.x+15; txtPosition.y = pt1.y+20;
+        if (segmentedRGB==0)
+        {
+          putText(bgrMat , "Low Temperature .." , txtPosition , fontUsed , 0.7 , color , 2 , 8 );
+        } else
         if ( emergencyDetected )
         {
           putText(bgrMat , "Emergency Detected ..! " , txtPosition , fontUsed , 0.7 , color , 2 , 8 );
@@ -179,15 +222,9 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
       }
 
 
-       fprintf(stderr,"Freeing\n");
-       free (segmentedRGB);
-       free (segmentedDepth);
-       fprintf(stderr,"Done\n");
-    }
 
-
-
-
+   if (segmentedRGB!=0)      { free (segmentedRGB);   }
+   if (segmentedDepth!=0)    { free (segmentedDepth); }
 
  return emergencyDetected;
 }
