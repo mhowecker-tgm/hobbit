@@ -295,20 +295,23 @@ class ShowInfo(smach.State):
     Class to interact with the MMUI
     """
 
-    def __init__(self, info, place='roomname'):
+    def __init__(self, info, place='roomname', object_name='object_name'):
         smach.State.__init__(self,
                              outcomes=['succeeded', 'failed', 'preempted']
                              )
         self.info = info
         self.place = place
+        self.object_name = object_name
 
     def execute(self, ud):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
         mmui = MMUI.MMUIInterface()
-        if not self.place == 'username':
+        if not self.place == 'roomname':
             resp = mmui.showMMUI_Info(text=self.info, prm=self.place)
+        if not self.object_name == 'object_name':
+            resp = mmui.showMMUI_Info(text=self.info, prm=self.object_name)
         # TODO: needs check for resp content
         if resp:
             return 'succeeded'

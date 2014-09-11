@@ -61,7 +61,7 @@ class TestData(State):
         return 'succeeded'
 
 
-def sayText(info='Text is missing'):
+def sayTextObject(info='Text is missing', object_name='object'):
     """
     Return a SMACH Sequence for speech output on the MMUI.
     The second State is needed to wait until the spoken text
@@ -78,6 +78,39 @@ def sayText(info='Text is missing'):
     )
 
     with seq:
+        Sequence.add(
+            'TALK',
+            HobbitMMUI.ShowInfo(
+                info=info,
+                object_name=object_name
+            )
+        )
+        Sequence.add(
+            'WAIT_FOR_MMUI',
+            HobbitMMUI.WaitforSoundEnd('/Event', Event),
+            transitions={'aborted': 'WAIT_FOR_MMUI',
+                            'succeeded': 'succeeded'})
+    return seq
+
+
+def sayText(info='Text is missing'):
+    """
+    Return a SMACH Sequence for speech output on the MMUI.
+    The second State is needed to wait until the spoken text
+    is completely done. Otherwise the next State can disturb
+    the speech output.
+
+    info: defaults to 'Text is missing' which indicates that
+    no textID was specified.
+    """
+
+    seq = Sequence(
+        outcomes=['succeeded', 'preempted', 'failed'],
+        connector_outcome='succeeded'
+    )
+    seq.userdata.robots_room_name = 'roomname'
+
+    with seq:
         if info in ['T_GT_ReachedMyDestination', 'T_GT_WayBlocked']:
         # if info == 'T_GT_ReachedMyDestination':
             Sequence.add(
@@ -92,13 +125,19 @@ def sayText(info='Text is missing'):
                 'TEST_DATA_SPEECH',
                 TestData()
             )
-        Sequence.add(
-            'TALK',
-            HobbitMMUI.ShowInfo(
-                info=info,
-                #FIXME: Do it with the userdata
-                room_name=seq.userdata.robots_room_name
+            Sequence.add(
+                'TALK',
+                HobbitMMUI.ShowInfo(
+                    info=info,
+                    place=seq.userdata.robots_room_name
+                )
             )
+        else:
+            Sequence.add(
+                'TALK',
+                HobbitMMUI.ShowInfo(
+                    info=info
+                )
         )
         Sequence.add(
             'WAIT_FOR_MMUI',
