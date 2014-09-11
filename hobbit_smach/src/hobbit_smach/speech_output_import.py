@@ -84,7 +84,8 @@ def sayText(info='Text is missing'):
                 ServiceState(
                     'get_robots_current_room',
                     GetName,
-                    response_key='robots_room_name')
+                    response_key='robots_room_name'),
+                transitions={'aborted': 'failed'}
             )
             Sequence.add(
                 'TEST_DATA_SPEECH',
@@ -95,8 +96,7 @@ def sayText(info='Text is missing'):
             HobbitMMUI.ShowInfo(
                 info=info,
                 #FIXME: Do it with the userdata
-                #room_name=seq.userdata.robots_room_name
-                #room_name='room'
+                room_name=seq.userdata.robots_room_name
             )
         )
         Sequence.add(
