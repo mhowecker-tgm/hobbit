@@ -9,7 +9,7 @@ add_message_files(DIRECTORY msg FILES Person.msg )
 
 
 ## Generate added messages and services
-generate_messages(DEPENDENCIES std_msgs)
+generate_messages(DEPENDENCIES std_msgs person_aggregator)
 
 #This needs to be after generate messages
 catkin_package()
