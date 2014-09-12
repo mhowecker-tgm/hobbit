@@ -40,7 +40,7 @@ ros::Publisher gestureEventBroadcaster;
 #endif
 
 
-#define DEFAULT_FRAME_RATE 15
+#define DEFAULT_FRAME_RATE 4
 
 int rate=DEFAULT_FRAME_RATE;
 
@@ -278,6 +278,7 @@ int main(int argc, char **argv)
      private_node_handle_.param("name", name, std::string("emergency_detector"));
      private_node_handle_.param("rate", rate , int(DEFAULT_FRAME_RATE)); //11 should me optimal  less for a little less CPU Usage
      ros::Rate loop_rate(rate); //  hz should be our target performance
+     ros::Rate vis_loop_rate(15); //  hz should be our target performance
 
 
      //We advertise the services we want accessible using "rosservice call *w/e*"
@@ -319,7 +320,9 @@ int main(int argc, char **argv)
 	  while ( ( key!='q' ) && (ros::ok()) )
 		{
                   ros::spinOnce();//<- this keeps our ros node messages handled up until synergies take control of the main thread
-                  loop_rate.sleep();
+
+                  if (doCVOutput) { vis_loop_rate.sleep(); } else
+                                  { loop_rate.sleep();     }
 
                   if(emergencyDetected)
                       { broadcastEmergency(frameTimestamp); }
