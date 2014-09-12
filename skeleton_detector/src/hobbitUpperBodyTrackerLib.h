@@ -175,6 +175,15 @@ enum humanMirroredSkeletonJoints
    HUMAN_SKELETON_MIRRORED_PARTS
 };
 
+
+
+enum processingModeENUM
+{
+   PROCESSING_MODE_UPPER_GESTURE_BODY_TRACKER = 0,
+   PROCESSING_MODE_SIMPLE_PERSON_DETECTOR ,
+   PROCESSING_MODE_TREE_GRID_BODY_TRACKER
+};
+
 extern const char * jointNames[];
 
 struct point2D
@@ -214,6 +223,7 @@ struct skeletonPointing
 
 
 
+int hobbitUpperBodyTracker_setVisualization(int doVis);
 int hobbitUpperBodyTracker_setDumpToFiles(int doDump);
 
 int hobbitUpperBodyTracker_Initialize(unsigned int targetWidth,unsigned int targetHeight);
@@ -225,8 +235,10 @@ int hobbitUpperBodyTracker_RegisterSkeletonDetectedEvent(void * callback);
 int hobbitUpperBodyTracker_NewFrame(unsigned char * colorFrame , unsigned int colorWidth , unsigned int colorHeight ,
                                     unsigned short * depthFrame  , unsigned int depthWidth , unsigned int depthHeight ,
                                     struct calibrationHUBT * frameCalibration ,
-                                    unsigned int simplePersonDetector ,
+                                    unsigned int processingMode ,
                                     unsigned int frameTimestamp );
+
+void hobbitUpperBodyTracker_Clear();
 
 #ifdef __cplusplus
 }

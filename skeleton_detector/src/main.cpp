@@ -129,17 +129,26 @@ bool stopDump(std_srvs::Empty::Request& request, std_srvs::Empty::Response& resp
     return true;
 }
 
+
+
 bool simple(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    ROS_INFO("Simple Mode on");
-    simplePersonDetector=1;
+    ROS_INFO("Skeleton Detector : Simple Mode on");
+    processingMode=PROCESSING_MODE_SIMPLE_PERSON_DETECTOR;
     return true;
 }
 
 bool advanced(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    ROS_INFO("Advanced Mode on");
-    simplePersonDetector=0;
+    ROS_INFO("Skeleton Detector : Advanced Mode on");
+    processingMode=PROCESSING_MODE_TREE_GRID_BODY_TRACKER;
+    return true;
+}
+
+bool super(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    ROS_INFO("Skeleton Detector : Super New Mode on");
+    processingMode=PROCESSING_MODE_UPPER_GESTURE_BODY_TRACKER;
     return true;
 }
 
@@ -291,6 +300,9 @@ int main(int argc, char **argv)
      private_node_handle_.param("name", name, std::string("skeleton_detector"));
      private_node_handle_.param("rate", rate, int(5));
      ros::Rate loop_rate(rate); //  hz should be our target performance
+     unsigned int fastRate = rate*2;
+     if (fastRate > 30) { fastRate=30; } //Cap fast speed at 30Hz ( i.e. frame rate of Depth camera )
+     ros::Rate loop_rate_fast(fastRate); //  hz should be our target performance
 
      //We advertise the services we want accessible using "rosservice call *w/e*"
      ros::ServiceServer visualizeOnService      = nh.advertiseService(name+"/visualize_on" , visualizeOn);
@@ -303,6 +315,7 @@ int main(int argc, char **argv)
      ros::ServiceServer pauseService            = nh.advertiseService(name+"/resume"       , resume);
      ros::ServiceServer simpleService           = nh.advertiseService(name+"/simple"       , simple);
      ros::ServiceServer advancedService         = nh.advertiseService(name+"/advanced"     , advanced);
+     ros::ServiceServer superService            = nh.advertiseService(name+"/super"        , super);
      ros::ServiceServer setQualityService       = nh.advertiseService(name+"/set_quality"  , setQuality);
 
      //Make our rostopic cmaera grabber
@@ -331,7 +344,9 @@ int main(int argc, char **argv)
 	  while ( ( key!='q' ) && (ros::ok()) )
 		{
           ros::spinOnce();
-          loop_rate.sleep();
+
+            if (processingMode==PROCESSING_MODE_UPPER_GESTURE_BODY_TRACKER)  {  loop_rate_fast.sleep(); } else
+                                                                             {  loop_rate.sleep();      }
 
 		 }
 

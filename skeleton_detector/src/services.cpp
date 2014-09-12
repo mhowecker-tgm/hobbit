@@ -35,7 +35,8 @@ ros::Publisher pointEventsBroadcaster;
 unsigned char dontPublishSkeletons=0;
 unsigned char dontPublishPointEvents=0;
 unsigned char dontPublishPersons=0;
-unsigned int simplePersonDetector = 1;
+
+unsigned int processingMode = PROCESSING_MODE_SIMPLE_PERSON_DETECTOR;
 
 unsigned int actualTimestamp=0;
 unsigned int actualInFieldOfView=0;
@@ -255,7 +256,7 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
   int retres = hobbitUpperBodyTracker_NewFrame(colorFrameCopy , colorWidth , colorHeight ,
                                                depthFrameCopy  , depthWidth , depthHeight ,
                                                calib ,
-                                               simplePersonDetector ,
+                                               processingMode ,
                                                frameTimestamp );
 
 

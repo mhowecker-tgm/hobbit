@@ -7,8 +7,8 @@
 #include <ros/ros.h>
 
 extern unsigned char dontPublishSkeletons;
-extern unsigned int simplePersonDetector;
 extern unsigned char dontPublishPointEvents;
+extern unsigned int processingMode;
 
 
 
