@@ -226,7 +226,7 @@ void rgbdCallbackNoCalibration(const sensor_msgs::Image::ConstPtr rgb_img_msg,
  ++frameTimestamp;
 return;
 }
-
+ 
 int main(int argc, char **argv)
 {
    ROS_INFO("Starting Up!!");
