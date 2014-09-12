@@ -40,8 +40,8 @@ unsigned int maxScoreTrigger = 1000;
 unsigned int doCVOutput=0;
 unsigned int emergencyDetected=0;
 
-float temperatureAmbientDetected=36.0; //<- YODO : default value should be 0
-float temperatureObjectDetected=36.0; //<- YODO : default value should be 0
+float temperatureAmbientDetected=0.0; //<- YODO : default value should be 0
+float temperatureObjectDetected=0.0; //<- YODO : default value should be 0
 
 
 int processBoundingBox(float sizeX,float sizeY,float sizeZ)
