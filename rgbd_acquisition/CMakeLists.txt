@@ -56,7 +56,7 @@ add_service_files(DIRECTORY srv FILES SetQuality.srv)
 
 
 ## Generate added messages and services
-generate_messages(DEPENDENCIES std_msgs)
+generate_messages(DEPENDENCIES std_msgs rgbd_acquisition)
 
 #This needs to be after generate messages
 catkin_package()
