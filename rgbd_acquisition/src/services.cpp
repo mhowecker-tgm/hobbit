@@ -96,9 +96,20 @@ void broadcast2DBBox(struct skeletonHuman * skeletonFound)
 
   rgbd_acquisition::SkeletonBBox msg;
 
-  msg.width=skeletonFound->bboxDimensions.x;
-  msg.height=skeletonFound->bboxDimensions.y;
-  msg.depth=skeletonFound->bboxDimensions.z;
+  msg.width3D=skeletonFound->bboxDimensions.x;
+  msg.height3D=skeletonFound->bboxDimensions.y;
+  msg.depth3D=skeletonFound->bboxDimensions.z;
+
+  msg.centerX3D = skeletonFound->centerOfMass.x;
+  msg.centerY3D = skeletonFound->centerOfMass.y;
+  msg.centerZ3D = skeletonFound->centerOfMass.z;
+
+  msg.width2D=skeletonFound->bboxDimensions.x;
+  msg.height2D=skeletonFound->bboxDimensions.y;
+
+  msg.centerX2D = skeletonFound->centerOfMass.x;
+  msg.centerY2D = skeletonFound->centerOfMass.y;
+
   msg.timestamp=actualTimestamp;
 
   fprintf(stderr,"Publishing a new Joint BBox configuration\n");

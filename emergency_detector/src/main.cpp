@@ -193,33 +193,7 @@ bool lookingCenter(std_srvs::Empty::Request& request, std_srvs::Empty::Response&
 
 void bboxReceived(const emergency_detector::SkeletonBBox & msg)
 {
-   processBoundingBox(msg.width , msg.height ,msg.depth );
-}
-
-
-
-int doDrawOut()
-{
-     if (!doCVOutput) { return 0; }
-
-     /*
-     cv::Mat rgbTmp = rgb.clone();
-     //Take care of drawing stuff as visual output
-
-     cv::Size s = rgb.size();
-	 cv::Mat bgrMat,rgbMat(s.height,s.width,CV_8UC3,rgbTmp.data,3*s.width);
-	 cv::cvtColor(rgbMat,bgrMat, CV_RGB2BGR);// opencv expects the image in BGR format
-     cv::Mat depthNorm;
-	 cv::normalize(depth,depthNorm,0,255,CV_MINMAX,CV_8UC1);
-
-     fprintf(stderr,"Depth cv mat has type %u ",depth.type() );
-     //After we have our bgr Frame ready and we added the FPS text , lets show it!
-	 cv::imshow("emergency_detector depth",depthNorm);
-	 cv::imshow("emergency_detector rgb",bgrMat);
-*/
-	 cv::waitKey(1);
-
- return 1;
+   processBoundingBox(msg.width3D , msg.height3D ,msg.depth3D );
 }
 
 
@@ -239,7 +213,7 @@ void rgbdCallbackNoCalibration(const sensor_msgs::Image::ConstPtr rgb_img_msg,
   orig_depth_img = cv_bridge::toCvCopy(depth_img_msg, sensor_msgs::image_encodings::TYPE_16UC1);
   orig_depth_img->image.copyTo(depth);
 
-  doDrawOut();
+  //doDrawOut();
 
   if (frameTimestamp%3==0)
   { //Preserve resources
@@ -331,7 +305,7 @@ int main(int argc, char **argv)
                   if(emergencyDetected)
                       { broadcastEmergency(frameTimestamp); }
 
-                  if (frameTimestamp%10) { fprintf(stderr,"."); }
+                  if (frameTimestamp%20) { fprintf(stderr,"."); }
 		 }
 
 

@@ -12,6 +12,8 @@
 #define MAXIMUM_DISTANCE_FOR_POINTING 400
 
 #include "skeleton_detector/Person.h"
+#include "skeleton_detector/Skeleton2D.h"
+#include "skeleton_detector/SkeletonBBox.h"
 
 
 #define USE_PERSON_AGGREGATOR 1
@@ -26,6 +28,8 @@
 
 #include "skeleton_detector/PointEvents.h"
 
+ros::Publisher joint2DBroadcaster;
+ros::Publisher jointBBoxBroadcaster;
 ros::Publisher personBroadcaster;
 ros::Publisher pointEventsBroadcaster;
 
@@ -79,6 +83,68 @@ void broadcastNewPerson()
   //ros::spinOnce();
 }
 
+
+void broadcast2DJoints(struct skeletonHuman * skeletonFound)
+{
+  if (dontPublishPersons) { return ; }
+
+
+  for (unsigned int z=0; z<HUMAN_SKELETON_PARTS; z++)
+  {
+    if ( (skeletonFound->joint2D[z].x==0) && (skeletonFound->joint2D[z].y==0) )
+    {
+        fprintf(stderr,"Will not send a joint configuration because tablet doesnt like zeros\n");
+        return;
+    }
+  }
+
+
+  skeleton_detector::Skeleton2D msg;
+  msg.joints2D.resize(HUMAN_SKELETON_PARTS * 2, 0.0);
+
+  for (unsigned int i=0; i<HUMAN_SKELETON_PARTS; i++)
+  {
+    msg.joints2D[2*i+0]=skeletonFound->joint2D[i].x;
+    msg.joints2D[2*i+1]=skeletonFound->joint2D[i].y;
+  }
+  msg.numberOfJoints=HUMAN_SKELETON_PARTS;
+  msg.timestamp=actualTimestamp;
+
+  fprintf(stderr,"Publishing a new Joint 2D configuration\n");
+  joint2DBroadcaster.publish(msg);
+  //ros::spinOnce();
+  fprintf(stderr," done \n ");
+
+}
+
+
+void broadcast2DBBox(struct skeletonHuman * skeletonFound)
+{
+  if (dontPublishPersons) { return ; }
+
+  skeleton_detector::SkeletonBBox msg;
+
+  msg.width3D=skeletonFound->bboxDimensions.x;
+  msg.height3D=skeletonFound->bboxDimensions.y;
+  msg.depth3D=skeletonFound->bboxDimensions.z;
+
+  msg.centerX3D = skeletonFound->centerOfMass.x;
+  msg.centerY3D = skeletonFound->centerOfMass.y;
+  msg.centerZ3D = skeletonFound->centerOfMass.z;
+
+  msg.width2D=skeletonFound->bboxDimensions.x;
+  msg.height2D=skeletonFound->bboxDimensions.y;
+
+  msg.centerX2D = skeletonFound->centerOfMass.x;
+  msg.centerY2D = skeletonFound->centerOfMass.y;
+
+  msg.timestamp=actualTimestamp;
+
+  fprintf(stderr,"Publishing a new Joint BBox configuration ");
+  jointBBoxBroadcaster.publish(msg);
+  //ros::spinOnce();
+  fprintf(stderr," done \n ");
+}
 
 
 
@@ -204,8 +270,8 @@ void broadcastNewSkeleton(unsigned int frameNumber,unsigned int skeletonID , str
    fprintf(stderr,"2DPOSE(");
    for (i=0; i<HUMAN_SKELETON_PARTS; i++)
     {
-      if (i<HUMAN_SKELETON_PARTS-1) {  fprintf(stderr,"%f, %f,",humanSkeletonJointNames[i],skeletonFound->joint2D[i].x,skeletonFound->joint2D[i].y); } else
-                                    {  fprintf(stderr,"%f, %f)\n",humanSkeletonJointNames[i],skeletonFound->joint2D[i].x,skeletonFound->joint2D[i].y); }
+      if (i<HUMAN_SKELETON_PARTS-1) {  fprintf(stderr,"%s,%f,%f,",humanSkeletonJointNames[i],skeletonFound->joint2D[i].x,skeletonFound->joint2D[i].y); } else
+                                    {  fprintf(stderr,"%s,%f,%f)\n",humanSkeletonJointNames[i],skeletonFound->joint2D[i].x,skeletonFound->joint2D[i].y); }
     }
    fprintf(stderr,"\n\n");
 
@@ -239,6 +305,10 @@ void broadcastNewSkeleton(unsigned int frameNumber,unsigned int skeletonID , str
       broadcastNewPerson();
 
       considerSkeletonPointing(frameNumber,skeletonFound);
+
+      if (processingMode != PROCESSING_MODE_SIMPLE_PERSON_DETECTOR)
+                                    { broadcast2DJoints(skeletonFound); } // We only produce 2d Joints when we have hands ( i.e. when not using simple person detector )
+      broadcast2DBBox(skeletonFound);
 
     return ;
 }
@@ -277,6 +347,9 @@ int registerServices(ros::NodeHandle * nh,unsigned int width,unsigned int height
 
   pointEventsBroadcaster = nh->advertise <skeleton_detector::PointEvents> ("pointEvents", 1000);
   personBroadcaster = nh->advertise <skeleton_detector::Person> (PERSON_TOPIC, divisor);
+  joint2DBroadcaster = nh->advertise <skeleton_detector::Skeleton2D> ("joints2D", 1000);
+  jointBBoxBroadcaster = nh->advertise <skeleton_detector::SkeletonBBox> ("jointsBBox", 1000);
+
 }
 
 int stopServices()

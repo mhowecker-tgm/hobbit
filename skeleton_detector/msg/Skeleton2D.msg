@@ -1,6 +1,4 @@
-
-float32 todo
-  
-#Timestamps are actually the number of the frame
+int32 numberOfJoints
+float32[] joints2D
 int32 timestamp
- 
+

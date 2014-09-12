@@ -219,6 +219,7 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
         putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , color , 2 , 8 );
 
 	    cv::imshow("emergency_detector segmented rgb",bgrMat);
+	    cv::waitKey(1);
       }
 
 
