@@ -427,14 +427,14 @@ class ArmClientFunctions():
         Status = self.CheckReceive(ReceiveDataList)
         #ArmControllerFunctions.PublishToROS(ReceiveDataList)
         return Status
-    '''       
-    def GetArmAtGraspFromFloorPos(self):
-        buf = 'GET;ArmAtGraspFromFloorPos;'
+           
+    def GetArmAtPreGraspFromTablePos(self):
+        buf = 'GET;ArmAtPreGraspFromTablePos;'
         ReceiveDataList = self.SendTCP(buf)
         Status = self.CheckReceive(ReceiveDataList)
         #ArmControllerFunctions.PublishToROS(ReceiveDataList)
         return Status
-    '''
+    
         
     def GetArmSoftLimitMax(self):
         buf = 'GET;ArmSoftLimitMax;'

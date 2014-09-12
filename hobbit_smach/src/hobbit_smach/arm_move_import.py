@@ -13,66 +13,78 @@ from smach import Sequence, State
 from uashh_smach.util import SleepState
 from ArmControllerClientFunctions import ArmClientFunctions
 from ArmClientFunctionsPublisher import ArmClientFunctionsPublisher
+from ArmActionClient import ArmActionClient
 
-class ArmClientSingleton(object):
-    """To avoid running multiple arm clients, this singleton class
-    provides one ArmClientFunctions that is initialised and retrieved
-    via class methods init() and get()
-    """
-    _arm = None
+import actionlib
+import hobbit_msgs.msg
 
-    @classmethod
-    def init(cls):
-        """Ignore multiple calls."""
-        if cls._arm is None:
-            print('Open connection to arm')
-            cls._arm = ArmClientFunctions('192.168.2.190')
-        else:
-            print('connection already established')
 
-    @classmethod
-    def get(cls):
-        """Does initialise if needed, too."""
-        cls.init()
-        return cls._arm
+
+
+#class ArmClientSingleton(object):
+#    """To avoid running multiple arm clients, this singleton class
+#    provides one ArmClientFunctions that is initialised and retrieved
+#    via class methods init() and get()
+#    """
+#    _arm = None
+#
+#    @classmethod
+#    def init(cls):
+#        """Ignore multiple calls."""
+#        if cls._arm is None:
+#            print('Open connection to arm')
+#            cls._arm = ArmClientFunctions('192.168.2.190')
+#        else:
+#            print('connection already established')
+#
+#    @classmethod
+#    def get(cls):
+#        """Does initialise if needed, too."""
+#        cls.init()
+#        return cls._arm
 
 if not DEBUG:
     pass
-    # arm = ArmClientSingleton.get()
+    #new: 
+    arm_client = ArmActionClient()
+    #cmd = String ("GetArmState")
+    #res = arm_client.arm_action_client(cmd)
+    #changes done for new ArmActionServer based communication: arm.command() => arm_client.arm_action_client(String(command))  
+    #old:
     arm = ArmClientFunctions('192.168.2.190')
-    #arm.SetEnableArm()
 else:
     arm = True
 
 def getArmAtPosition(position='home'):
-    status = arm.GetArmState()
+    #status = ast.literal_eval(arm.GetArmState())
     if position == 'home':
-        if status.get('ArmAtHomePos'):
+        if arm_client.GetArmAtHomePos():
             return True
     elif position == 'cwpos':
-        if status.get('ArmAtCWPos'):
+        if arm_client.GetTurntableAtCWPos():
             return True
     elif position == 'ccwpos':
-        if status.get('ArmAtCCWPos'):
+        if arm_client.GetTurntableAtCCWPos():
             return True
     elif position == 'learn':
-        if status.get('ArmAtLearningPos'):
+        if arm_client.GetArmAtLearningPos():
             return True
     elif position == 'pregrasp':
-        if status.get('ArmAtPreGraspFromFloor'):
+        if arm_client.GetArmAtPreGraspFromFloorPos():
             return True
     elif position == 'store':
-        if status.get('ArmAtHomePos'):
+        if arm_client.GetArmAtHomePos():
             return True
     elif position == 'tray':
-        if status.get('ArmAtTrayPos'):
+        if arm_client.GetArmAtTrayPos():
             return True
     elif position == 'empty_into_tray':
-        if status.get('ArmAtTrayPos'):
+        if arm_client.GetArmAtTrayPos():
             return True
     else:
         # Unless the data is correct we just wait 3 seconds and assume the arm reached the goal
-        rospy.sleep(3.0)
+	print "getArmAtPosition result was False at time of execution for position: [=> wait 3 sec and assume arm is in correct position!]",position         
+	rospy.sleep(3.0)
         return True
         # return False
 
@@ -91,10 +103,9 @@ class SetMoveToLearning(State):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
-        if not arm.GetArmIsEnabled():
+        if not arm_client.GetArmIsEnabled():
             return 'failed'
-        status = arm.SetMoveToLearningPos()
-        if status[0] == 'MoveToLearningPos' and status[1] == 'COMMAND_OK':
+        if arm_client.SetMoveToLearningPos():
             return 'succeeded'
         else:
             return 'failed'
@@ -113,10 +124,9 @@ class StoreTurntable(State):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
-        if not arm.GetArmIsEnabled():
+        if not arm_client.GetArmIsEnabled():
             return 'failed'
-        status = arm.SetStoreTurntable()
-        if status[0] == 'StoreTurntable' and status[1] == 'COMMAND_OK':
+        if arm_client.SetStoreTurntable():
             return 'succeeded'
         else:
             return 'failed'
@@ -138,7 +148,7 @@ class CheckArmReachedKnownPosition(State):
             self.service_preempt()
             return 'preempted'
         rospy.sleep(2)
-        if not arm.GetArmIsEnabled():
+        if not arm_client.GetArmIsEnabled():
             return 'failed'
         if getArmAtPosition(self.position):
             return 'succeeded'
@@ -160,9 +170,9 @@ class CheckArmIsNotMoving(State):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
-        if not arm.GetArmIsEnabled():
+        if not arm_client.GetArmIsEnabled():
             return 'failed'
-        if arm.GetArmIsMoving():
+        if arm_client.GetArmIsMoving():
             return 'failed'
         else:
             return 'succeeded'
@@ -184,31 +194,32 @@ class SetArmPosition(State):
             self.service_preempt()
             return 'preempted'
         if self.position == 'home':
-            status = arm.SetMoveToHomePos()
+            status = arm_client.SetMoveToHomePos()
             return 'succeeded'
         elif self.position == 'learn':
-            status = arm.SetMoveToLearningPos()
+            status = arm_client.SetMoveToLearningPos()
             return 'succeeded'
         elif self.position == 'tray':
-            status = self.arm.SetMoveToTrayPos()
+            status = self.arm_client.SetMoveToTrayPos()
         elif self.position == 'pregrasp':
-            status = arm.SetMoveToPreGraspFromFloorPos()
+            status = arm_client.SetMoveToPreGraspFromFloorPos()
             return 'succeeded'
         elif self.position == 'ccwpos':
-            status = arm.SetTurnTurntableCCW()
+            status = arm_client.SetTurnTurntableCCW()
             return 'succeeded'
         elif self.position == 'cwpos':
-            status = arm.SetTurnTurntableCW()
+            status = arm_client.SetTurnTurntableCW()
             return 'succeeded'
         elif self.position == 'store':
-            status = arm.SetStoreTurntable()
+            status = arm_client.SetStoreTurntable()
             return 'succeeded'
         else:
             return 'failed'
-        if status[1] == 'COMMAND_OK':
-            return 'succeeded'
-        else:
-            return 'failed'
+	#df: next lines would have been unreachable anyway
+        #if status[1] == 'COMMAND_OK':
+        #    return 'succeeded'
+        #else:
+        #    return 'failed'
 
 
 def goToPreGraspPosition():
@@ -324,7 +335,7 @@ def goToLearnPosition():
 
 def goToHomePosition():
     """
-    Return a SMACH Sequence that will move the arm to the learning pose.
+    Return a SMACH Sequence that will move the arm to the home pose.
     """
 
     seq = Sequence(
@@ -336,7 +347,7 @@ def goToHomePosition():
         Sequence.add('MOVE_ARM_TO_HOME',
                      SetArmPosition(position='home'))
         Sequence.add('ARM_POSE_REACHED',
-                     CheckArmReachedKnownPosition(position='learn'),
+                     CheckArmReachedKnownPosition(position='home'),
                      transitions={'failed': 'ARM_POSE_REACHED'})
         Sequence.add('CHECK_ARM_IS_NOT_MOVING', CheckArmIsNotMoving(),
                      transitions={'failed': 'CHECK_ARM_IS_NOT_MOVING'})
@@ -358,7 +369,7 @@ def rotateToCW():
         Sequence.add('ROTATE_TT_CW',
                      SetArmPosition(position='cwpos'))
         Sequence.add('TT_ROTATED',
-                     CheckArmReachedKnownPosition(position='cwposw'),
+                     CheckArmReachedKnownPosition(position='cwpos'),
                      transitions={'failed': 'TT_ROTATED'})
         Sequence.add('CHECK_TT_IS_NOT_MOVING', CheckArmIsNotMoving(),
                      transitions={'failed': 'CHECK_TT_IS_NOT_MOVING'})
@@ -379,7 +390,7 @@ def rotateToCCW():
         Sequence.add('ROTATE_TT_CW',
                      SetArmPosition(position='ccwpos'))
         Sequence.add('TT_ROTATED',
-                     CheckArmReachedKnownPosition(position='ccwposw'),
+                     CheckArmReachedKnownPosition(position='ccwpos'),
                      transitions={'failed': 'TT_ROTATED'})
         Sequence.add('CHECK_TT_IS_NOT_MOVING', CheckArmIsNotMoving(),
                      transitions={'failed': 'CHECK_TT_IS_NOT_MOVING'})
