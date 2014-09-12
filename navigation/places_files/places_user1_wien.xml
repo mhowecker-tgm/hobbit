@@ -9,6 +9,23 @@
 			<vertex x="1.704000" y="-1.564001" />
 			<vertex x="1.476000" y="2.084000" />
 		</vertices>
+		<places>
+			<place>
+				<name>bathroom</name>
+				<type>call_button_2</type>
+				<pose x="-0.880000" y="0.944000" theta="3.14" />
+			</place>
+			<place>
+				<name>center</name>
+				<type>goTo</type>
+				<pose x="-0.880000" y="0.511999" theta="-1.57" />
+			</place>
+			<place>
+				<name>dock</name>
+				<type>docking_base_point</type>
+				<pose x="-0.6" y="-0.0" theta="0.02" />
+			</place>
+		</places>
 	</room>
 	<room>
 		<name>kitchen</name>
@@ -18,6 +35,18 @@
 			<vertex x="3.072001" y="2.463999" />
 			<vertex x="3.148001" y="5.200000" />
 		</vertices>
+		<places>
+			<place>
+				<name>call1</name>
+				<type>call_button_1</type>
+				<pose x="-0.652000" y="3.452000" theta="0.001" />
+			</place>
+			<place>
+				<name>cupboard</name>
+				<type>goTo</type>
+				<pose x="2.388000" y="3.528000" theta="0.005" />
+			</place>
+		</places>
 	</room>
 	<room>
 		<name>livingroom</name>
@@ -27,6 +56,28 @@
 			<vertex x="3.224000" y="5.580000" />
 			<vertex x="3.300000" y="10.900000" />
 		</vertices>
+		<places>
+			<place>
+				<name>call3</name>
+				<type>call_button_3</type>
+				<pose x="-1.032001" y="6.644000" theta="3.14" />
+			</place>
+			<place>
+				<name>table</name>
+				<type>goTo</type>
+				<pose x="-0.424000" y="5.580000" theta="0.52" />
+			</place>
+			<place>
+				<name>call5</name>
+				<type>call_button_5</type>
+				<pose x="0.716000" y="7.860000" theta="0.52" />
+			</place>
+			<place>
+				<name>armchair</name>
+				<type>goTo</type>
+				<pose x="-0.272000" y="8.012000" theta="1.57" />
+			</place>
+		</places>
 	</room>
 	<room>
 		<name>corridor</name>
