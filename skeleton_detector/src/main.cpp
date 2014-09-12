@@ -25,7 +25,6 @@
 #include <sensor_msgs/CameraInfo.h>
 #include <image_transport/image_transport.h>
 
-#include "hand_gestures/SetQuality.h"
 #include "services.h"
 
 

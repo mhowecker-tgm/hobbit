@@ -11,9 +11,9 @@
 #define BROADCAST_HOBBIT 1
 #define MAXIMUM_DISTANCE_FOR_POINTING 400
 
-#include "skeleton_detector/Person.h"
-#include "skeleton_detector/Skeleton2D.h"
-#include "skeleton_detector/SkeletonBBox.h"
+#include <skeleton_detector/Person.h>
+#include <skeleton_detector/Skeleton2D.h>
+#include <skeleton_detector/SkeletonBBox.h>
 
 
 #define USE_PERSON_AGGREGATOR 1

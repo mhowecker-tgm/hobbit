@@ -1,21 +1,19 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(emergency_detector)
 
-find_package(catkin REQUIRED COMPONENTS sensor_msgs OpenCV cv_bridge roscpp std_msgs genmsg image_transport geometry_msgs roslib tf)
+find_package(catkin REQUIRED COMPONENTS sensor_msgs OpenCV cv_bridge roscpp std_msgs genmsg image_transport geometry_msgs roslib tf message_generation)
  
    
 #Messages -----------------------------------
 add_message_files(DIRECTORY msg FILES EmergencyMessage.msg SkeletonBBox.msg)
-
-#Services -----------------------------------
-add_service_files(DIRECTORY srv FILES TriggerEmergency.srv)
+ 
 
 
 ## Generate added messages and services
 generate_messages(DEPENDENCIES std_msgs emergency_detector)
 
 #This needs to be after generate messages
-catkin_package()
+catkin_package(CATKIN_DEPENDS message_runtime)
 
 include_directories(${catkin_INCLUDEDIR} 
 		    ${OpenCV_INCLUDEDIR})

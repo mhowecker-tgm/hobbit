@@ -7,7 +7,7 @@ if(NOT OpenCV_DIR)
 endif(NOT OpenCV_DIR)
 
 
-find_package(catkin REQUIRED COMPONENTS sensor_msgs OpenCV cv_bridge roscpp std_msgs genmsg image_transport geometry_msgs roslib tf)
+find_package(catkin REQUIRED COMPONENTS sensor_msgs OpenCV cv_bridge roscpp std_msgs genmsg image_transport geometry_msgs roslib tf message_generation)
  
    
 #Messages -----------------------------------
@@ -21,7 +21,7 @@ add_service_files(DIRECTORY srv FILES SetQuality.srv)
 generate_messages(DEPENDENCIES std_msgs skeleton_detector)
 
 #This needs to be after generate messages
-catkin_package()
+catkin_package(CATKIN_DEPENDS message_runtime)
 
 find_package(Boost COMPONENTS system filesystem thread serialization program_options) 
 #LINK_DIRECTORIES(${BOOST_LIBRARY_DIRS})
