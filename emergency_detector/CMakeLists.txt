@@ -12,7 +12,7 @@ add_service_files(DIRECTORY srv FILES TriggerEmergency.srv)
 
 
 ## Generate added messages and services
-generate_messages(DEPENDENCIES std_msgs)
+generate_messages(DEPENDENCIES std_msgs emergency_detector)
 
 #This needs to be after generate messages
 catkin_package()
@@ -50,6 +50,10 @@ add_executable(emergency_detector
               )
 
 target_link_libraries(emergency_detector ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+
+## Add cmake target dependencies of the executable/library
+## as an example, message headers may need to be generated before nodes
+add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencpp)
 
 install(TARGETS emergency_detector RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 install(FILES emergency_detector.xml DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})

@@ -193,7 +193,8 @@ bool lookingCenter(std_srvs::Empty::Request& request, std_srvs::Empty::Response&
 
 void bboxReceived(const emergency_detector::SkeletonBBox & msg)
 {
-   processBoundingBox(msg.width3D , msg.height3D ,msg.depth3D );
+   processBoundingBox(msg.centerX2D , msg.centerY2D , msg.centerZ2D  ,
+                      msg.width2D , msg.height2D ,msg.depth2D );
 }
 
 
@@ -226,7 +227,7 @@ void rgbdCallbackNoCalibration(const sensor_msgs::Image::ConstPtr rgb_img_msg,
  ++frameTimestamp;
 return;
 }
- 
+
 int main(int argc, char **argv)
 {
    ROS_INFO("Starting Up!!");

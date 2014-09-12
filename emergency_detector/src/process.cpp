@@ -43,11 +43,16 @@ unsigned int emergencyDetected=0;
 float temperatureAmbientDetected=0.0; //<- YODO : default value should be 0
 float temperatureObjectDetected=0.0; //<- YODO : default value should be 0
 
+float bboxCX,bboxCY,bboxCZ,bboxWidth,bboxHeight,bboxDepth;
 
-int processBoundingBox(float sizeX,float sizeY,float sizeZ)
+
+int processBoundingBox(
+                        float ctX,float ctY,float ctZ,
+                        float sizeX,float sizeY,float sizeZ)
 {
   if (sizeZ!=0)
   {
+   bboxCX=ctX,bboxCY=ctY,bboxCZ=ctZ,bboxWidth=sizeX,bboxHeight=sizeY,bboxDepth=sizeZ;
    fprintf(stderr,"Received BBOX %f , %f , %f \n", sizeX , sizeY , sizeZ );
   }
 }

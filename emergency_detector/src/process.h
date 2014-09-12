@@ -10,13 +10,14 @@ extern "C"
 extern unsigned int doCVOutput;
 extern unsigned int emergencyDetected;
 
-extern float temperatureAmbientDetected; 
+extern float temperatureAmbientDetected;
 extern float temperatureObjectDetected;
 
 
 int processNewTemperatureReading(float temperature);
 
-int processBoundingBox(float sizeX,float sizeY,float sizeZ);
+int processBoundingBox( float ctX,float ctY,float ctZ,
+                        float sizeX,float sizeY,float sizeZ);
 
 
 int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int colorWidth , unsigned int colorHeight ,
