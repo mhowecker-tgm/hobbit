@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<rooms>
+	<room>
+		<name>chargingroom</name>
+		<vertices>
+			<vertex x="-1.260000" y="2.160000" />
+			<vertex x="-2.780000" y="1.400000" />
+			<vertex x="-2.704000" y="-1.564001" />
+			<vertex x="1.704000" y="-1.564001" />
+			<vertex x="1.476000" y="2.084000" />
+		</vertices>
+	</room>
+	<room>
+		<name>kitchen</name>
+		<vertices>
+			<vertex x="-1.412100" y="4.896000" />
+			<vertex x="-1.412000" y="2.615999" />
+			<vertex x="3.072001" y="2.463999" />
+			<vertex x="3.148001" y="5.200000" />
+		</vertices>
+	</room>
+	<room>
+		<name>livingroom</name>
+		<vertices>
+			<vertex x="-1.564000" y="10.443999" />
+			<vertex x="-1.868000" y="4.896000" />
+			<vertex x="3.224000" y="5.580000" />
+			<vertex x="3.300000" y="10.900000" />
+		</vertices>
+	</room>
+	<room>
+		<name>corridor</name>
+		<vertices>
+			<vertex x="-5.136000" y="7.099999" />
+			<vertex x="-2.020000" y="7.1" />
+			<vertex x="-2.021" y="5.427999" />
+			<vertex x="-5.212000" y="5.047999" />
+		</vertices>
+	</room>
+</rooms>

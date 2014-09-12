@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<rooms>
+	<room>
+		<name>wohnzimmer</name>
+		<vertices>
+			<vertex x="0.500000" y="0.750000" />
+			<vertex x="-5.350000" y="0.800000" />
+			<vertex x="-5.400000" y="-3.500000" />
+			<vertex x="0.500000" y="-3.250000" />
+		</vertices>
+		<places>
+			<place>
+				<name>eingang</name>
+				<type>default</type>
+				<pose x="-2.210593" y="0.453307" theta="3.062406" />
+			</place>
+			<place>
+				<name>mitte</name>
+				<type>goTo</type>
+				<pose x="-1.942778" y="-1.652491" theta="-1.652386" />
+			</place>
+			<place>
+				<name>sofa</name>
+				<type>goTo</type>
+				<pose x="-1.118268" y="-1.811160" theta="-0.199482" />
+			</place>
+			<place>
+				<name>call2</name>
+				<type>call_button_2</type>
+				<pose x="-1.118268" y="-1.811160" theta="-0.199482" />
+			</place>
+			<place>
+				<name>dock</name>
+				<type>docking_base_point</type>
+				<pose x="-0.77" y="0.036" theta="-0.476" />
+			</place>
+		</places>
+	</room>
+	<room>
+		<name>esszimmer</name>
+		<vertices>
+			<vertex x="-5.400000" y="1.450000" />
+			<vertex x="-5.400000" y="0.950000" />
+			<vertex x="0.400001" y="1.000000" />
+			<vertex x="0.550000" y="4.500000" />
+			<vertex x="-3.600000" y="4.550000" />
+			<vertex x="-3.650000" y="1.800000" />
+		</vertices>
+		<places>
+			<place>
+				<name>mitte1</name>
+				<type>default</type>
+				<pose x="-2.726371" y="3.709086" theta="3.054089" />
+			</place>
+			<place>
+				<name>mitte</name>
+				<type>goTo</type>
+				<pose x="-2.726371" y="3.709086" theta="3.054089" />
+			</place>
+			<place>
+				<name>tisch</name>
+				<type>goTo</type>
+				<pose x="-0.386524" y="1.092805" theta="-2.656805" />
+			</place>
+			<place>
+				<name>call1</name>
+				<type>call_button_1</type>
+				<pose x="-0.386524" y="1.092805" theta="2.656805" />
+			</place>
+		</places>
+	</room>
+	<room>
+		<name>waschraum</name>
+		<vertices>
+			<vertex x="-6.450000" y="8.800000" />
+			<vertex x="-6.350000" y="4.700000" />
+			<vertex x="-2.850000" y="4.700000" />
+			<vertex x="-3.200000" y="8.800000" />
+		</vertices>
+		<places>
+			<place>
+				<name>mitte</name>
+				<type>goTo</type>
+				<pose x="-4.36" y="7.39" theta="1.57" />
+			</place>           		
+		</places>
+	</room>
+	<room>
+		<name>kueche</name>
+		<vertices>
+			<vertex x="-6.300000" y="4.650000" />
+			<vertex x="-6.250000" y="1.700000" />
+			<vertex x="-3.850000" y="1.900000" />
+			<vertex x="-3.950000" y="4.700000" />
+		</vertices>
+		<places>
+			<place>
+				<name>mitte</name>
+				<type>goTo</type>
+				<pose x="-4.571702" y="4.358846" theta="-2.184834" />
+			</place>
+           		<place>
+				<name>call3</name>
+				<type>call_button_3</type>
+				<pose x="-4.571702" y="4.358846" theta="-2.184834" />
+			</place>
+		</places>
+	</room>
+</rooms>
