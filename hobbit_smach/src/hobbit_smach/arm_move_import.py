@@ -190,7 +190,7 @@ class SetArmPosition(State):
             status = arm.SetMoveToLearningPos()
             return 'succeeded'
         elif self.position == 'tray':
-            statu = self.arm.SetMoveToTrayPos()
+            status = self.arm.SetMoveToTrayPos()
         elif self.position == 'pregrasp':
             status = arm.SetMoveToPreGraspFromFloorPos()
             return 'succeeded'
