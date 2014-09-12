@@ -168,34 +168,6 @@ bool resume(std_srvs::Empty::Request& request, std_srvs::Empty::Response& respon
 
 
 
-bool setQuality( hand_gestures::SetQuality::Request  &request,
-                  hand_gestures::SetQuality::Response &response )
-{
-   //request.quality <- the quality setting requested
-   return false;
-}
-
-int doDrawOut()
-{
-   // if (doCVOutput)
-    {
-     /*Don't add this on output ( reduce cluttering )
-     cv::Mat rgbTmp = rgb.clone();
-     //Take care of drawing stuff as visual output
-	 cv::Mat bgrMat,rgbMat(colorHeight,colorWidth,CV_8UC3,rgbTmp.data,3*colorWidth);
-	 cv::cvtColor(rgbMat,bgrMat, CV_RGB2BGR);// opencv expects the image in BGR format
-     cv::Mat depthNorm;
-	 cv::normalize(depth,depthNorm,0,255,CV_MINMAX,CV_8UC1);
-
-     //After we have our bgr Frame ready and we added the FPS text , lets show it!
-	 cv::imshow("hand_gestures  RAW Depth",depthNorm);
-	 cv::imshow("hand_gestures RAW RGB",bgrMat);
-	 cv::waitKey(1);*/
-    }
- return 1;
-}
-
-
 #if USE_NONDEFAULT_CALIBRATIONS
 //RGBd Callback is called every time we get a new pair of frames , it is synchronized to the main thread
 void rgbdCallback(const sensor_msgs::Image::ConstPtr rgb_img_msg,
@@ -234,7 +206,6 @@ void rgbdCallback(const sensor_msgs::Image::ConstPtr rgb_img_msg,
                                    (unsigned short*) depth.data ,  depthWidth , depthHeight ,
                                      &calib , frameTimestamp );
 
- doDrawOut();
  //After running (at least) once it is not a first run any more!
  first = false;
  return;
@@ -315,7 +286,6 @@ int main(int argc, char **argv)
      ros::ServiceServer simpleService           = nh.advertiseService(name+"/simple"       , simple);
      ros::ServiceServer advancedService         = nh.advertiseService(name+"/advanced"     , advanced);
      ros::ServiceServer superService            = nh.advertiseService(name+"/super"        , super);
-     ros::ServiceServer setQualityService       = nh.advertiseService(name+"/set_quality"  , setQuality);
 
      //Make our rostopic cmaera grabber
      message_filters::Synchronizer<RgbdSyncPolicy> *sync;
