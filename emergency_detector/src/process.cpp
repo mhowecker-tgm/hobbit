@@ -31,6 +31,8 @@ struct SegmentationFeaturesDepth segConfDepth={0};
 unsigned int combinationMode=COMBINE_AND;
 
 
+unsigned int maximumFrameDifferenceForTemperatureToBeRelevant=10;
+
 unsigned int tempZoneWidth = 300;
 unsigned int tempZoneHeight = 200;
 
@@ -42,19 +44,23 @@ unsigned int emergencyDetected=0;
 
 float temperatureAmbientDetected=0.0; //<- YODO : default value should be 0
 float temperatureObjectDetected=0.0; //<- YODO : default value should be 0
+unsigned int tempTimestamp=0;
 
 float bboxCX,bboxCY,bboxCZ,bboxWidth,bboxHeight,bboxDepth;
+unsigned int bboxTimeStamp=0;
 
+
+
+#define ABSDIFF(num1,num2) ( (num1-num2) >=0 ? (num1-num2) : (num2 - num1) )
 
 int processBoundingBox(
                         float ctX,float ctY,float ctZ,
-                        float sizeX,float sizeY,float sizeZ)
+                        float sizeX,float sizeY,float sizeZ,
+                        unsigned int matchingTimestamp)
 {
-  if (sizeZ!=0)
-  {
    bboxCX=ctX,bboxCY=ctY,bboxCZ=ctZ,bboxWidth=sizeX,bboxHeight=sizeY,bboxDepth=sizeZ;
-   fprintf(stderr,"Received BBOX %f , %f , %f \n", sizeX , sizeY , sizeZ );
-  }
+   bboxTimeStamp=matchingTimestamp;
+   fprintf(stderr,"Received BBOX %f , %f , %f ( ts %u )\n", sizeX , sizeY , sizeZ , bboxTimeStamp);
 }
 
 unsigned char * copyRGB(unsigned char * source , unsigned int width , unsigned int height)
@@ -114,7 +120,11 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
   unsigned int tempZoneStartY = (unsigned int ) ((colorHeight-tempZoneHeight) / 2);
   unsigned int depthAvg = 0;
 
-  if ( (33<temperatureObjectDetected) && (temperatureObjectDetected<37)  )
+  unsigned int temperatureFrameOffset = ABSDIFF(frameTimestamp,tempTimestamp);
+
+
+
+  if ( (33<temperatureObjectDetected) && (temperatureObjectDetected<37) && (temperatureFrameOffset < maximumFrameDifferenceForTemperatureToBeRelevant )  )
     {
         fprintf(stderr,"runServicesThatNeedColorAndDepth called \n");
          segmentedRGB = copyRGB(colorFrame ,colorWidth , colorHeight);
@@ -187,7 +197,7 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
         Point txtPosition;  txtPosition.x = pt1.x+15; txtPosition.y = pt1.y+20;
         if (segmentedRGB==0)
         {
-          putText(bgrMat , "Low Temperature .." , txtPosition , fontUsed , 0.7 , color , 2 , 8 );
+          putText(bgrMat , "Low Temp / Power Save" , txtPosition , fontUsed , 0.7 , color , 2 , 8 );
         } else
         if ( emergencyDetected )
         {

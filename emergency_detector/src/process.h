@@ -12,12 +12,14 @@ extern unsigned int emergencyDetected;
 
 extern float temperatureAmbientDetected;
 extern float temperatureObjectDetected;
+extern unsigned int tempTimestamp;
 
 
 int processNewTemperatureReading(float temperature);
 
 int processBoundingBox( float ctX,float ctY,float ctZ,
-                        float sizeX,float sizeY,float sizeZ);
+                        float sizeX,float sizeY,float sizeZ,
+                        unsigned int matchingTimestamp);
 
 
 int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int colorWidth , unsigned int colorHeight ,

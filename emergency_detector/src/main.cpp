@@ -70,6 +70,7 @@ unsigned int headLookingDirection=HEAD_UNKNOWN_DIRECTION;
 unsigned int frameTimestamp=0;
 ros::NodeHandle * nhPtr=0;
 unsigned int paused=0;
+unsigned int fakeTemperatureActivated=0;
 
 
 
@@ -121,6 +122,7 @@ void getAmbientTemperature(const std_msgs::Float32::ConstPtr& request)
 void getObjectTemperature(const std_msgs::Float32::ConstPtr& request)
 {
     temperatureObjectDetected=request->data;
+    tempTimestamp=frameTimestamp;
     return;
 }
 
@@ -169,6 +171,14 @@ bool visualizeOff(std_srvs::Empty::Request& request, std_srvs::Empty::Response& 
     return true;
 }
 
+bool fakeTemperature(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    if (fakeTemperatureActivated) { fakeTemperatureActivated=0; } else
+                                  { fakeTemperatureActivated=1; }
+    return true;
+}
+
+
 bool lookingUp(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
     headLookingDirection=HEAD_LOOKING_UP;
@@ -194,7 +204,7 @@ bool lookingCenter(std_srvs::Empty::Request& request, std_srvs::Empty::Response&
 void bboxReceived(const emergency_detector::SkeletonBBox & msg)
 {
    processBoundingBox(msg.centerX2D , msg.centerY2D , msg.centerZ2D  ,
-                      msg.width2D , msg.height2D ,msg.depth2D );
+                      msg.width2D , msg.height2D ,msg.depth2D , frameTimestamp );
 }
 
 
@@ -216,11 +226,20 @@ void rgbdCallbackNoCalibration(const sensor_msgs::Image::ConstPtr rgb_img_msg,
 
   //doDrawOut();
 
-  if (frameTimestamp%3==0)
+  if (frameTimestamp%2==0)
   { //Preserve resources
+
+   //Emulate Human Temperature , since we don't always have the temperature sensor available
+   if (fakeTemperatureActivated)
+   {
+      temperatureObjectDetected=36;
+      tempTimestamp=frameTimestamp;
+   }
    runServicesThatNeedColorAndDepth((unsigned char*) rgb.data, colorWidth , colorHeight ,
                                    (unsigned short*) depth.data ,  depthWidth , depthHeight ,
                                      0 , frameTimestamp );
+
+
   }
  //After running (at least) once it is not a first run any more!
  first = false;
@@ -267,6 +286,7 @@ int main(int argc, char **argv)
      ros::ServiceServer resumeGestureRecognitionService   = nh.advertiseService(name+"/resume", resume);
      ros::ServiceServer stopGestureRecognitionService     = nh.advertiseService(name+"/terminate", terminate);
      ros::ServiceServer triggerGestureRecognitionService     = nh.advertiseService(name+"/trigger", trigger);
+     ros::ServiceServer fakeTemperatureGestureRecognitionService     = nh.advertiseService(name+"/fakeTemperature", fakeTemperature);
 
      ros::ServiceServer lookUpService          = nh.advertiseService(name+"/looking_up" , lookingUp);
      ros::ServiceServer lookCenterService      = nh.advertiseService(name+"/looking_center" , lookingCenter);
