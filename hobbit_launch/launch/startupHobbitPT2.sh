@@ -81,8 +81,9 @@ rosrun hobbit_smach follow_me&
 rosrun hobbit_smach emergency_user.py&
 rosrun hobbit_smach emergency_bathroom.py&
 rosrun hobbit_smach battery_monitor.py&
-rosrun hobbit_smach recharge&
+rosrun hobbit_smach recharge.py&
 rosrun hobbit_smach sos_monitor.py&
+rosrun hobbit_smach ArmActionServer.py&
 
 #sleep $DELAY_BETWEEN_STEPS
 rosrun hobbit_smach master.py&
