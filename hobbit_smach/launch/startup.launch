@@ -1,14 +1,19 @@
 <launch>
-<node name="place_handler" pkg="hobbit_smach" type="places_objects.py" />
-<node name="learn_object" pkg="hobbit_smach" type="learn_object.py" />
-<node name="away_break" pkg="hobbit_smach" type="away.py" />
-<node name="goto" pkg="hobbit_smach" type="goto.py" />
-<node name="" pkg="hobbit_smach" type="folow_me.py" />
-<node name="emergency_user" pkg="hobbit_smach" type="emergency_user.py" />
-<node name="emergency_bathroom" pkg="hobbit_smach" type="emergency_bathroom.py" />
-<node name="battery_monitor" pkg="hobbit_smach" type="battery_monitor.py" />
-<node name="recharge" pkg="hobbit_smach" type="recharge.py" />
-<node name="sos_monitor" pkg="hobbit_smach" type="sos_monitor.py" />
-<node name="ArmActionServer" pkg="hobbit_smach" type="ArmActionServer.py" />
-<rosparam file="/opt/ros/hobbit_hydro/src/hobbit_params.yaml">
+<node name="place_handler" pkg="hobbit_smach" type="places_objects.py" output="log" />
+<node name="learn_object" pkg="hobbit_smach" type="learn_object.py" output="log" />
+<node name="goto" pkg="hobbit_smach" type="goto.py" output="log" />
+<node name="emergency_user" pkg="hobbit_smach" type="emergency_user.py" output="log" />
+<node name="emergency_bathroom" pkg="hobbit_smach" type="emergency_bathroom.py" output="log" />
+<node name="battery_monitor" pkg="hobbit_smach" type="battery_monitor.py" output="log" />
+<node name="recharge" pkg="hobbit_smach" type="recharge.py" output="log" />
+<node name="sos_monitor" pkg="hobbit_smach" type="sos_monitor.py" output="log" />
+<node name="hobbit_master" pkg="hobbit_smach" type="master.py" output="log" />
+<!--
+<node name="ArmActionServer" pkg="hobbit_smach" type="ArmActionServer.py" output="log" />
+<node name="follow_me" pkg="hobbit_smach" type="follow_me.py" output="log" />
+<node name="away_break" pkg="hobbit_smach" type="away.py" output="log" />
+<rosparam file="/opt/ros/hobbit_hydro/src/hobbit_params.yaml" command="load"/>
+-->
+
+<include file="$(find hobbit_smach)/launch/SavePCD.launch" />
 </launch>
