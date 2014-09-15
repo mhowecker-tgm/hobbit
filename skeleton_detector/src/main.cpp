@@ -270,7 +270,7 @@ int main(int argc, char **argv)
 
      private_node_handle_.param("fromDepthTopic", fromDepthTopic, std::string("/headcam/depth_registered/image_rect"));
      private_node_handle_.param("fromDepthTopicInfo", fromDepthTopicInfo, std::string("/headcam/depth_registered/camera_info"));
-     private_node_handle_.param("fromRGBTopic", fromRGBTopic, std::string("headcam/rgb/image_rect_color"));
+     private_node_handle_.param("fromRGBTopic", fromRGBTopic, std::string("/headcam/rgb/image_rect_color"));
      private_node_handle_.param("fromRGBTopicInfo", fromRGBTopicInfo, std::string("/headcam/rgb/camera_info"));
      private_node_handle_.param("name", name, std::string("skeleton_detector"));
      private_node_handle_.param("rate", rate, int(5));
