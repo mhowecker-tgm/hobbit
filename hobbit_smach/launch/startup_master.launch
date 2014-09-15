@@ -1,0 +1,3 @@
+<launch>
+<node name="hobbit_master" pkg="hobbit_smach" type="master.py" output="log" respawn="true"/>
+</launch>
