@@ -13,6 +13,7 @@ import smach
 import hobbit_smach.hobbit_move_import as hobbit_move
 import hobbit_smach.speech_output_import as speech_output
 
+from smach import Concurrence
 from std_msgs.msg import String
 from hobbit_msgs.msg import GeneralHobbitAction
 from hobbit_msgs.srv import GetCoordinates
@@ -276,7 +277,7 @@ def main():
         )
         StateMachine.add(
             'MMUI_ConfirmPlace',
-            HobbitMMUI.AskYesNo(question='T_GT_Confirmfollow_mePlace'),
+            HobbitMMUI.AskYesNo(question='T_GT_ConfirmGoToPlace'),
             transitions={'yes': 'EMO_HAPPY',
                          'no': 'MMUI_REPEAT_CMD',
                          'failed': 'SET_FAILURE',
@@ -367,8 +368,8 @@ def main():
                 )
                 Sequence.add(
                     'MOVE_TO_GOAL',
-                    # hobbit_move.follow_mePosition(frame='/map', place=None),
-                    hobbit_move.follow_mePose(),
+                    # hobbit_move.goToPosition(frame='/map', place=None),
+                    hobbit_move.goToPose(),
                     transitions={'aborted': 'EMO_SAD',
                                  'succeeded': 'EMO_HAPPY_1'}
                 )
