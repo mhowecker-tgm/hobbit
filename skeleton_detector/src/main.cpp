@@ -52,8 +52,6 @@ unsigned int colorWidth = 640 , colorHeight =480 , depthWidth = 640 , depthHeigh
 
 struct calibrationHUBT calib={0};
 
-//sensor_msgs::CameraInfo camInfo;
-
 #if USE_NONDEFAULT_CALIBRATIONS
  typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image, sensor_msgs::CameraInfo> RgbdSyncPolicy;
 #else
@@ -73,8 +71,6 @@ bool visualizeOn(std_srvs::Empty::Request& request, std_srvs::Empty::Response& r
 {
     hobbitUpperBodyTracker_setVisualization(1);
     runFullSpeed=1;
-     //doCVOutput=1;
-     //doCalibrationOutput=1;
     return true;
 }
 
@@ -83,8 +79,6 @@ bool visualizeOff(std_srvs::Empty::Request& request, std_srvs::Empty::Response& 
     hobbitUpperBodyTracker_setVisualization(0);
     runFullSpeed=0;
 
-    //doCVOutput=0;
-    //doCalibrationOutput=0;
     cv::destroyAllWindows();
     cv::waitKey(1);
     return true;
@@ -333,7 +327,10 @@ int main(int argc, char **argv)
             unsigned int lastDetectedFrame = ABSDIFF(frameTimestamp,actualTimestamp);
 
 
-            if (runFullSpeed) { loop_rate_fullSpeed.sleep(); }
+            if (runFullSpeed)
+                {
+                  loop_rate_fullSpeed.sleep();
+                } else
             if (
                  (processingMode==PROCESSING_MODE_UPPER_GESTURE_BODY_TRACKER) &&
                  ( lastDetectedFrame < 20 )
