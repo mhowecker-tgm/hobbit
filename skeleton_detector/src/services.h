@@ -10,7 +10,7 @@ extern unsigned char dontPublishSkeletons;
 extern unsigned char dontPublishPointEvents;
 extern unsigned int processingMode;
 
-
+extern unsigned int actualTimestamp;
 
 int registerServices(ros::NodeHandle * nh,unsigned int width,unsigned int height);
 int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int colorWidth , unsigned int colorHeight ,

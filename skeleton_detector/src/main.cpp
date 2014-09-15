@@ -36,6 +36,9 @@
 #define USE_NONDEFAULT_CALIBRATIONS 1
 #define MAX_RECORDED_FRAMES 1000
 
+
+#define ABSDIFF(num1,num2) ( (num1-num2) >=0 ? (num1-num2) : (num2 - num1) )
+
 int rate=11;
 int first=0;
 int key = 0;
@@ -142,8 +145,9 @@ bool simple(std_srvs::Empty::Request& request, std_srvs::Empty::Response& respon
 
 bool advanced(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    ROS_INFO("Skeleton Detector : Advanced Mode on");
-    processingMode=PROCESSING_MODE_TREE_GRID_BODY_TRACKER;
+    ROS_INFO("Skeleton Detector : Advanced Mode , we go to Super Mode instead ");
+    //processingMode=PROCESSING_MODE_TREE_GRID_BODY_TRACKER;
+    processingMode=PROCESSING_MODE_UPPER_GESTURE_BODY_TRACKER;
     return true;
 }
 
@@ -208,7 +212,7 @@ void rgbdCallback(const sensor_msgs::Image::ConstPtr rgb_img_msg,
   runServicesThatNeedColorAndDepth((unsigned char*) rgb.data, colorWidth , colorHeight ,
                                    (unsigned short*) depth.data ,  depthWidth , depthHeight ,
                                      &calib , frameTimestamp );
-
+ ++frameTimestamp;
  //After running (at least) once it is not a first run any more!
  first = false;
  return;
@@ -241,7 +245,8 @@ void rgbdCallbackNoCalibration(const sensor_msgs::Image::ConstPtr rgb_img_msg,
   runServicesThatNeedColorAndDepth((unsigned char*) rgb.data, colorWidth , colorHeight ,
                                    (unsigned short*) depth.data ,  depthWidth , depthHeight ,
                                      0 , frameTimestamp );
-  doDrawOut();
+
+ ++frameTimestamp;
  //After running (at least) once it is not a first run any more!
  first = false;
 return;
@@ -317,8 +322,14 @@ int main(int argc, char **argv)
 		{
           ros::spinOnce();
 
-            if (processingMode==PROCESSING_MODE_UPPER_GESTURE_BODY_TRACKER)  {  loop_rate_fast.sleep(); } else
-                                                                             {  loop_rate.sleep();      }
+            unsigned int lastDetectedFrame = ABSDIFF(frameTimestamp,actualTimestamp);
+
+            if (
+                 (processingMode==PROCESSING_MODE_UPPER_GESTURE_BODY_TRACKER) &&
+                 ( lastDetectedFrame < 20 )
+               )
+                  {  loop_rate_fast.sleep(); /*fprintf(stderr,"(fast)");*/ } else
+                  {  loop_rate.sleep();      /*fprintf(stderr,"(slow)");*/ }
 
 		 }
 
