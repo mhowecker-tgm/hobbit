@@ -67,6 +67,7 @@ cv::Mat rgb,depth;
 
 bool visualizeOn(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
+    hobbitUpperBodyTracker_setVisualization(1);
      //doCVOutput=1;
      //doCalibrationOutput=1;
     return true;
@@ -74,6 +75,8 @@ bool visualizeOn(std_srvs::Empty::Request& request, std_srvs::Empty::Response& r
 
 bool visualizeOff(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
+    hobbitUpperBodyTracker_setVisualization(0);
+
     //doCVOutput=0;
     //doCalibrationOutput=0;
     cv::destroyAllWindows();
