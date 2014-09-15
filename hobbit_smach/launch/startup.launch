@@ -8,12 +8,9 @@
 <node name="recharge" pkg="hobbit_smach" type="recharge.py" output="log" />
 <node name="sos_monitor" pkg="hobbit_smach" type="sos_monitor.py" output="log" />
 <node name="hobbit_master" pkg="hobbit_smach" type="master.py" output="log" />
-<!--
-<node name="ArmActionServer" pkg="hobbit_smach" type="ArmActionServer.py" output="log" />
 <node name="follow_me" pkg="hobbit_smach" type="follow_me.py" output="log" />
-<node name="away_break" pkg="hobbit_smach" type="away.py" output="log" />
+<node name="ArmActionServer" pkg="hobbit_smach" type="ArmActionServer.py" output="log" />
 <rosparam file="/opt/ros/hobbit_hydro/src/hobbit_params.yaml" command="load"/>
--->
-
+<node name="away_break" pkg="hobbit_smach" type="away.py" output="log" />
 <include file="$(find hobbit_smach)/launch/SavePCD.launch" />
 </launch>

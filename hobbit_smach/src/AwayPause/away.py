@@ -346,10 +346,10 @@ def main():
             )
             Sequence.add(
                 'MOVE_TO_DOCK',
-                hobbit_move.goToPose())
+                hobbit_move.goToPose(),
+                transitions={'aborted': 'failed'})
             # Sequence.add('MOVE_TO_DOCK',
             #              hobbit_move.goToPosition(room=None, place='dock'),
-            #              transitions={'aborted': 'failed'})
 
             seq2.userdata.text = 'Tell me when you are back/awake again.'
             # TODO: menu='MAIN' has to be changed to the 'User is back menu'
