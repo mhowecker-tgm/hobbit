@@ -47,6 +47,7 @@ int recording=0;
 int recordedFrames=0;
 volatile int paused = 0;
 unsigned int frameTimestamp =0;
+unsigned int runFullSpeed=0;
 unsigned int colorWidth = 640 , colorHeight =480 , depthWidth = 640 , depthHeight = 480;
 
 struct calibrationHUBT calib={0};
@@ -71,6 +72,7 @@ cv::Mat rgb,depth;
 bool visualizeOn(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
     hobbitUpperBodyTracker_setVisualization(1);
+    runFullSpeed=1;
      //doCVOutput=1;
      //doCalibrationOutput=1;
     return true;
@@ -79,6 +81,7 @@ bool visualizeOn(std_srvs::Empty::Request& request, std_srvs::Empty::Response& r
 bool visualizeOff(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
     hobbitUpperBodyTracker_setVisualization(0);
+    runFullSpeed=0;
 
     //doCVOutput=0;
     //doCalibrationOutput=0;
@@ -281,6 +284,7 @@ int main(int argc, char **argv)
      unsigned int fastRate = rate*2;
      if (fastRate > 30) { fastRate=30; } //Cap fast speed at 30Hz ( i.e. frame rate of Depth camera )
      ros::Rate loop_rate_fast(fastRate); //  hz should be our target performance
+     ros::Rate loop_rate_fullSpeed(30); //  hz should be our target performance
 
      //We advertise the services we want accessible using "rosservice call *w/e*"
      ros::ServiceServer visualizeOnService      = nh.advertiseService(name+"/visualize_on" , visualizeOn);
@@ -298,15 +302,19 @@ int main(int argc, char **argv)
      //Make our rostopic cmaera grabber
      message_filters::Synchronizer<RgbdSyncPolicy> *sync;
 
+     std::cerr<<"\n\n\nskeleton detector , RGB feed "<<fromRGBTopic<<" \n";
+     std::cerr<<"skeleton detector , RGB Info "<<fromRGBTopicInfo<<" \n";
+     std::cerr<<"skeleton detector , Depth feed "<<fromDepthTopic<<" \n";
+     std::cerr<<"skeleton detector , Depth Info "<<fromDepthTopicInfo<<" \n";
+
 	 depth_img_sub = new message_filters::Subscriber<sensor_msgs::Image>(nh,fromDepthTopic,1);
 	 depth_cam_info_sub = new message_filters::Subscriber<sensor_msgs::CameraInfo>(nh,fromDepthTopicInfo,1);
 
 	 rgb_img_sub = new  message_filters::Subscriber<sensor_msgs::Image>(nh,fromRGBTopic, 1);
 	 rgb_cam_info_sub = new message_filters::Subscriber<sensor_msgs::CameraInfo>(nh,fromRGBTopicInfo,1);
 
+     std::cerr<<"Done\n";
 
-     std::cout<<"Skeleton Detector , subscribed to RGB feed "<<fromRGBTopic<<" \n";
-     std::cout<<"Skeleton Detector , subscribed to Depth feed "<<fromDepthTopic<<" \n";
 
      #if USE_NONDEFAULT_CALIBRATIONS
 	   sync = new message_filters::Synchronizer<RgbdSyncPolicy>(RgbdSyncPolicy(rate), *rgb_img_sub, *depth_img_sub,*depth_cam_info_sub); //*rgb_cam_info_sub,
@@ -324,6 +332,8 @@ int main(int argc, char **argv)
 
             unsigned int lastDetectedFrame = ABSDIFF(frameTimestamp,actualTimestamp);
 
+
+            if (runFullSpeed) { loop_rate_fullSpeed.sleep(); }
             if (
                  (processingMode==PROCESSING_MODE_UPPER_GESTURE_BODY_TRACKER) &&
                  ( lastDetectedFrame < 20 )
