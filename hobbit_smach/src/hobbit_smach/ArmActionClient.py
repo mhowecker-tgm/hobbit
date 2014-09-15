@@ -258,12 +258,12 @@ class ArmActionClient():
        
     #as
     def GetTurntableAtCCWPos(self):
-        result = self.arm_action_client(String('GetArmAtCCWPos'))
+        result = self.arm_action_client(String('GetTurntableAtCCWPos'))
 	return result.result.data
        
     #as
     def GetTurntableAtCWPos(self):
-        result = self.arm_action_client(String('GetArmAtCWPos'))
+        result = self.arm_action_client(String('GetTurntableAtCWPos'))
 	return result.result.data
 
     #as
@@ -291,15 +291,24 @@ if __name__ == '__main__':
     print "node arm_action_client test started"
     arm_client = ArmActionClient()
     cmd = String ("GetArmState")
-    #res = arm_client.arm_action_client(cmd)
-    #print "Result: ", res
-    print "david last_feedback: ", arm_client.last_feedback
+    res = arm_client.arm_action_client(cmd)
+    print "Result: ", res
+    #print "david last_feedback: ", arm_client.last_feedback
 
-    print "==============================="
-    res = arm_client.SetMoveToPreGraspFromFloorPos()
-    res = arm_client.SetMoveToTrayPos()
+    print "SetResetArm: ", arm_client.SetResetArm()
+    print "===============GetTurntableAtCWPos================"
+    print "get arm act pos: ", arm_client.GetActualPosition()
+    #print "set arm SetMoveToLearningPos: ", arm_client.SetMoveToLearningPos()
+    print "move to candle: ", arm_client.SetMoveToCandlePos()
+    #res = arm_client.SetTurnTurntableCW()
+    #print "get arm act pos: ", arm_client.GetActualPosition()
+    #print "get arm at GetTurntableAtCWPos: ", arm_client.GetTurntableAtCWPos()
+    #print "get arm at learning pos: ", arm_client.GetArmAtLearningPos()
+    #print "storeturntable: ", arm_client.SetStoreTurntable()
+    #print "get arm at act pos: ", arm_client.GetActualPosition()
+    #res = arm_client.SetMoveToTrayPos()
 
-    print "resssvssst: ", res
+    #print "result: ", res
 
 
 
@@ -314,10 +323,10 @@ if __name__ == '__main__':
     res = arm_client.arm_action_client(cmd)
     print "Result: ", res
 
-    raw_input("press key to get GetArmIsHomed (armactionserver)")
-    cmd = String ("GetArmIsHomed")
-    res = arm_client.arm_action_client(cmd)
-    print "Result: ", res
+    #raw_input("press key to get GetArmIsHomed (armactionserver)")
+    #cmd = String ("GetArmIsHomed")
+    #res = arm_client.arm_action_client(cmd)
+    #print "Result: ", res
 
     if not res.result.data:
         raw_input("press key to start homing (armactionserver)")
@@ -335,6 +344,11 @@ if __name__ == '__main__':
     #res = arm_client.arm_action_client(cmd)
     #print "Result: ", res
     
+    raw_input("press key to get GetTurntableAtCWPos (armactionserver)")
+    cmd = String ("GetTurntableAtCWPos")
+    res = arm_client.arm_action_client(cmd)
+    print "Result: ", res
+
     #exit
     #raw_input("press key to get GetArmInTargetPos (armactionserver)")
     #cmd = String ("GetArmInTargetPos")

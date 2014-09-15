@@ -51,7 +51,7 @@ if not DEBUG:
     #res = arm_client.arm_action_client(cmd)
     #changes done for new ArmActionServer based communication: arm.command() => arm_client.arm_action_client(String(command))  
     #old:
-    arm = ArmClientFunctions('192.168.2.190')
+    #arm = ArmClientFunctions('192.168.2.190')
 else:
     arm = True
 

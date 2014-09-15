@@ -30,6 +30,7 @@ class ArmActionServerROS(object):
     # create messages that are used to publish feedback/result
     _feedback = hobbit_msgs.msg.ArmServerFeedback()
     _result   = hobbit_msgs.msg.ArmServerResult()
+    _stop_arm = False
 
 
     def __init__(self, name): 
@@ -51,6 +52,9 @@ class ArmActionServerROS(object):
     def CheckTargetPos(self, feedback, checkpos, timeout):	
 	if feedback[1]=='COMMAND_OK':
 	    for i in range(0,timeout):
+		if self._stop_arm:
+		    print "ArmActionServer: CheckTargetPos: stop function due to stop arm command on topic /arm/commands"
+		    break #are was actively stopped by command StopArm over topic /arm/commands
 		time.sleep(0.5)
 		print "loop round: ", i+1
 		armInTargetPos = checkpos()
@@ -79,7 +83,7 @@ class ArmActionServerROS(object):
 
     #arm commands triggered by ActionServer
     def execute_cb(self, goal):
-
+	_stop_arm = False #default value if arm schould be stopped
 	self._result.result = Bool(False) #default value for result
 	#get command from goal
 	isSetFunction = False
@@ -300,7 +304,18 @@ class ArmActionServerROS(object):
 	    #@David PLC returns COMMAND_OK if successful or NO_POSITIONS, ARM_HAS_ERROR, ... if not
 	elif cmd == 'help':
 	    self.help()
+	else:
+	    print "=====================> ArmActionServer.py: COMMAND was not found!!!!!"
 
+
+	#if arm was stopped
+	if self._stop_arm:
+	    print "david: arm was stopped manually, new command send to plc"
+	    feedback = self.ArmClient.SetStopArmMove()
+	    self._feedback.feedback.data = str(feedback)
+	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
+	    self._result.result = Bool(feedback[1]=='COMMAND_OK')
+	    self._stop_arm = False
 
 	#publish feedback
 	self._as.publish_feedback(self._feedback)
@@ -405,6 +420,10 @@ class ArmActionServerROS(object):
 	    self.ArmClient.SetPositionsForInterpolationReady()
 	elif cmd == 'SetStartInterpolation':
 	    self.ArmClient.SetStartInterpolation()
+	#arm stop function
+	elif cmd == 'StopArm':
+	    self._stop_arm = True
+	    print "StopArm command received via topic /arm/commands"
 	elif cmd == 'help':
 	    self.help()
 
