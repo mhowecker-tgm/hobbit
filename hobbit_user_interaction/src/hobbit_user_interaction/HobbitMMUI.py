@@ -309,19 +309,15 @@ class ShowInfo(smach.State):
             return 'preempted'
         mmui = MMUI.MMUIInterface()
         if not self.place == 'roomname':
-            resp = mmui.showMMUI_Info(
+            mmui.showMMUI_Info(
                 text=self.info, prm=self.place)
-            if resp:
-                return 'succeeded'
-            else:
-                return 'failed'
-        if not self.object_name == 'object_name':
-            resp = mmui.showMMUI_Info(
+        elif not self.object_name == 'object_name':
+            mmui.showMMUI_Info(
                 text=self.info, prm=self.object_name)
-            if resp:
-                return 'succeeded'
-            else:
-                return 'failed'
+        else:
+            mmui.showMMUI_Info(
+                text=self.info)
+            return 'succeeded'
 
 
 class CancelState(smach.State):
