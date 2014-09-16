@@ -94,9 +94,9 @@ void filter2DJoints(struct skeletonHuman * skeletonFound)
            skeletonFound->joint2D[i].x=0;
            skeletonFound->joint2D[i].y=0;
          }
-      printf("%0.2f %0.2f ", skeletonFound->joint2D[i].x , skeletonFound->joint2D[i].y );      //printf("JOINT2D(%s,%0.2f,%0.2f)\n" , humanSkeletonJointNames[i] , skeletonFound->joint2D[i].x , skeletonFound->joint2D[i].y );
+     // printf("%0.2f %0.2f ", skeletonFound->joint2D[i].x , skeletonFound->joint2D[i].y );      //printf("JOINT2D(%s,%0.2f,%0.2f)\n" , humanSkeletonJointNames[i] , skeletonFound->joint2D[i].x , skeletonFound->joint2D[i].y );
     }
-   printf("\n\n");
+   //printf("\n\n");
 }
 
 
@@ -108,10 +108,10 @@ void newSkeletonDetected(int devID,unsigned int frameNumber ,struct skeletonHuma
     skeletonFound->bboxDimensions.x = (float) skeletonFound->bbox[4].x-skeletonFound->bbox[2].x;
     skeletonFound->bboxDimensions.y = (float) skeletonFound->bbox[4].y-skeletonFound->bbox[2].y;
     skeletonFound->bboxDimensions.z = (float) skeletonFound->bbox[4].z-skeletonFound->bbox[2].z;
-    fprintf(stderr,"BBoxSize(%0.2f,%0.2f,%0.2f)\n", skeletonFound->bboxDimensions.x  , skeletonFound->bboxDimensions.y , skeletonFound->bboxDimensions.z );
+//    fprintf(stderr,"BBoxSize(%0.2f,%0.2f,%0.2f)\n", skeletonFound->bboxDimensions.x  , skeletonFound->bboxDimensions.y , skeletonFound->bboxDimensions.z );
 
 
-
+/*
     fprintf(stderr,"BBox(");
     unsigned int i=0;
     for (i=0; i<8; i++)
@@ -122,6 +122,8 @@ void newSkeletonDetected(int devID,unsigned int frameNumber ,struct skeletonHuma
     fprintf(stderr,"\n");
     fprintf(stderr,"Center of Mass %0.2f %0.2f %0.2f \n",skeletonFound->centerOfMass.x,skeletonFound->centerOfMass.y,skeletonFound->centerOfMass.z);
     fprintf(stderr,"Head %0.2f %0.2f %0.2f \n",skeletonFound->joint[HUMAN_SKELETON_HEAD].x,skeletonFound->joint[HUMAN_SKELETON_HEAD].y,skeletonFound->joint[HUMAN_SKELETON_HEAD].z);
+
+    */
     fprintf(stderr,  " \n" NORMAL );
 
     #if DO_2D_JOIN_FILTERING
@@ -495,11 +497,11 @@ void prepareSkeletonState(int devID,unsigned int frameNumber , nite::UserTracker
 
    //This is an event that gets fed with our newly encapsulated data
    //it should also fire up any additional events registered by clients
- 
-  
-   if ( (notAll_Z_AreZero) && 
+
+
+   if ( (notAll_Z_AreZero) &&
         (
-         (BROADCAST_EVEN_BAD_SKELETONS) || 
+         (BROADCAST_EVEN_BAD_SKELETONS) ||
          (  (humanSkeleton.isVisible) && ( (humanSkeleton.statusCalibrating) || (humanSkeleton.statusTracking) ) )
         )
       )
