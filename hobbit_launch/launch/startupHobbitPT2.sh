@@ -68,25 +68,27 @@ sleep $DELAY_BETWEEN_STEPS
 roslaunch aal_service startup.launch&
 
 # Load Hobbit PT2 parameters
-cd /opt/ros/hobbit_hydro/src/ #, web interface will save to this file also when somene clicks Set
-rosparam load /opt/ros/hobbit_hydro/src/hobbit_params.yaml&
-
-# Start SMACH handling of rooms, places, objects.
-rosrun hobbit_smach places_objects.py&
-roslaunch hobbit_smach SavePCD.launch&
-rosrun hobbit_smach learn_object.py&
-rosrun hobbit_smach away.py&
-rosrun hobbit_smach goto.py&
-rosrun hobbit_smach follow_me&
-rosrun hobbit_smach emergency_user.py&
-rosrun hobbit_smach emergency_bathroom.py&
-rosrun hobbit_smach battery_monitor.py&
-rosrun hobbit_smach recharge.py&
-rosrun hobbit_smach sos_monitor.py&
-rosrun hobbit_smach ArmActionServer.py&
-
-#sleep $DELAY_BETWEEN_STEPS
-rosrun hobbit_smach master.py&
+# cd /opt/ros/hobbit_hydro/src/ #, web interface will save to this file also when somene clicks Set
+# rosparam load /opt/ros/hobbit_hydro/src/hobbit_params.yaml&
+# 
+# # Start SMACH handling of rooms, places, objects.
+# rosrun hobbit_smach places_objects.py&
+# roslaunch hobbit_smach SavePCD.launch&
+# rosrun hobbit_smach learn_object.py&
+# rosrun hobbit_smach away.py&
+# rosrun hobbit_smach goto.py&
+# rosrun hobbit_smach follow_me&
+# rosrun hobbit_smach emergency_user.py&
+# rosrun hobbit_smach emergency_bathroom.py&
+# rosrun hobbit_smach battery_monitor.py&
+# rosrun hobbit_smach recharge.py&
+# rosrun hobbit_smach sos_monitor.py&
+# rosrun hobbit_smach ArmActionServer.py&
+# 
+roslaunch hobbit_smach startup.launch&
+sleep $DELAY_BETWEEN_STEPS
+roslaunch hobbit_smach startup_master.launch&
+# rosrun hobbit_smach master.py&
 
 # Start table/floor object detector (for clustering) and trigger for publishing single shot point clouds from headcam
 cd /opt/ros/hobbit_hydro/src/table_object_detector/launch
