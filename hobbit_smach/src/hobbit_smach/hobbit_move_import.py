@@ -317,16 +317,20 @@ class SetNavGoal(State):
         self.goalX, self.goalY, self.goalYAW = self._getGoal(room, place)
 
     def _getGoal(self, room, place):
+        rospy.wait_for_service('get_coordinates')
         serv = rospy.ServiceProxy(
             'get_coordinates',
             GetCoordinates,
             persistent=False
         )
         req = GetCoordinatesRequest(String(room), String(place))
-        resp = serv(req)
-        print('SetNavGoal:')
-        print(resp.pose.x, resp.pose.y, resp.pose.theta)
-        return (resp.pose.x, resp.pose.y, resp.pose.theta)
+        try:
+            resp = serv(req)
+        # print(resp.pose.x, resp.pose.y, resp.pose.theta)
+            return (resp.pose.x, resp.pose.y, resp.pose.theta)
+        except rospy.ServiceException as exc:
+            print("Service did not process request: " + str(exc))
+            return (0.0, 0.0, 0.0)
 
     def execute(self, ud):
         if self.preempt_requested():
@@ -337,14 +341,19 @@ class SetNavGoal(State):
 
 
 def getPosition(room='none', place='dock'):
+    rospy.wait_for_service('get_coordinates')
     serv = rospy.ServiceProxy(
         'get_coordinates',
         GetCoordinates,
         persistent=False
     )
     req = GetCoordinatesRequest(String(room), String(place))
-    resp = serv(req)
-    return (resp.pose.x, resp.pose.y, resp.pose.theta)
+    try:
+        resp = serv(req)
+        return (resp.pose.x, resp.pose.y, resp.pose.theta)
+    except rospy.ServiceException as exc:
+        print("Service did not process request: " + str(exc))
+        return (0.0, 0.0, 0.0)
 
 
 def goToPosition(frame='/map', room='None', place='dock'):
@@ -556,14 +565,19 @@ class HasMovedFromPreDock(State):
         return x, y
 
     def _getXYDock(self):
+        rospy.wait_for_service('get_coordinates')
         serv = rospy.ServiceProxy(
             'get_coordinates',
             GetCoordinates,
             persistent=False
         )
         req = GetCoordinatesRequest(String('dock'), String('dock'))
-        resp = serv(req)
-        print(resp)
+        try:
+            resp = serv(req)
+            return (resp.pose.x, resp.pose.y)
+        except rospy.ServiceException as exc:
+            print("Service did not process request: " + str(exc))
+            return (0.0, 0.0)
         return (resp.pose.x, resp.pose.y)
 
     def execute(self, userdata):
