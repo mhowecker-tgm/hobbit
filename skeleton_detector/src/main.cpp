@@ -274,6 +274,7 @@ int main(int argc, char **argv)
      private_node_handle_.param("fromRGBTopicInfo", fromRGBTopicInfo, std::string("/headcam/rgb/camera_info"));
      private_node_handle_.param("name", name, std::string("skeleton_detector"));
      private_node_handle_.param("rate", rate, int(5));
+     ros::Rate loop_rate_ultra_low(2); //  hz should be our target performance
      ros::Rate loop_rate(rate); //  hz should be our target performance
      unsigned int fastRate = rate*2;
      if (fastRate > 30) { fastRate=30; } //Cap fast speed at 30Hz ( i.e. frame rate of Depth camera )
@@ -331,12 +332,13 @@ int main(int argc, char **argv)
                 {
                   loop_rate_fullSpeed.sleep();
                 } else
-            if (
-                 (processingMode==PROCESSING_MODE_UPPER_GESTURE_BODY_TRACKER) &&
-                 ( lastDetectedFrame < 20 )
-               )
-                  {  loop_rate_fast.sleep(); /*fprintf(stderr,"(fast)");*/ } else
-                  {  loop_rate.sleep();      /*fprintf(stderr,"(slow)");*/ }
+            if (processingMode==PROCESSING_MODE_UPPER_GESTURE_BODY_TRACKER)
+            {
+              if ( lastDetectedFrame < 20 )
+                         {  loop_rate_fast.sleep();       /*Face Detector Not using a lot of CPU , so let's go fast*/ } else
+                         {  loop_rate_ultra_low.sleep();  /*Face Detector using a lot of CPU , so let's go slow */    }
+            } else
+            {  loop_rate.sleep(); }
 
 		 }
 
