@@ -274,7 +274,7 @@ int main(int argc, char **argv)
      private_node_handle_.param("fromRGBTopicInfo", fromRGBTopicInfo, std::string("/headcam/rgb/camera_info"));
      private_node_handle_.param("name", name, std::string("skeleton_detector"));
      private_node_handle_.param("rate", rate, int(5));
-     ros::Rate loop_rate_ultra_low(2); //  hz should be our target performance
+     ros::Rate loop_rate_ultra_low(1); //  hz should be our target performance
      ros::Rate loop_rate(rate); //  hz should be our target performance
      unsigned int fastRate = rate*2;
      if (fastRate > 30) { fastRate=30; } //Cap fast speed at 30Hz ( i.e. frame rate of Depth camera )
