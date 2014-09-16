@@ -124,7 +124,7 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
 
 
 
-  if ( (33<temperatureObjectDetected) && (temperatureObjectDetected<37) && (temperatureFrameOffset < maximumFrameDifferenceForTemperatureToBeRelevant )  )
+  if ( (32<temperatureObjectDetected) && (temperatureObjectDetected<37) && (temperatureFrameOffset < maximumFrameDifferenceForTemperatureToBeRelevant )  )
     {
         fprintf(stderr,"runServicesThatNeedColorAndDepth called \n");
          segmentedRGB = copyRGB(colorFrame ,colorWidth , colorHeight);
