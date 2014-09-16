@@ -263,10 +263,11 @@ void broadcastNewSkeleton(unsigned int frameNumber,unsigned int skeletonID , str
     {
       //DO flips here ?
       skeletonFound->joint[i].z = -1 * skeletonFound->joint[i].z;
-      fprintf(stderr,"%s(%f,%f,%f)\n",humanSkeletonJointNames[i],skeletonFound->joint[i].x,skeletonFound->joint[i].y,skeletonFound->joint[i].z);
+     // fprintf(stderr,"%s(%f,%f,%f)\n",humanSkeletonJointNames[i],skeletonFound->joint[i].x,skeletonFound->joint[i].y,skeletonFound->joint[i].z);
     }
-   fprintf(stderr,"\n\n");
 
+   /*
+   fprintf(stderr,"\n\n");
    fprintf(stderr,"2DPOSE(");
    for (i=0; i<HUMAN_SKELETON_PARTS; i++)
     {
@@ -274,7 +275,7 @@ void broadcastNewSkeleton(unsigned int frameNumber,unsigned int skeletonID , str
                                     {  fprintf(stderr,"%s,%f,%f)\n",humanSkeletonJointNames[i],skeletonFound->joint2D[i].x,skeletonFound->joint2D[i].y); }
     }
    fprintf(stderr,"\n\n");
-
+   */
 
 
      //Do TF Broadcast here
