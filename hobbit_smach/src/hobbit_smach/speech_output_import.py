@@ -111,7 +111,10 @@ def sayText(info='Text is missing'):
     seq.userdata.robots_room_name = 'roomname'
 
     with seq:
-        if info in ['T_GT_ReachedMyDestination', 'T_GT_WayBlocked']:
+        if info in ['T_GT_ReachedMyDestination',
+                    'T_GT_WayBlocked',
+                    'T_GT_GoingToPlace',
+                    'T_GT_ConfirmGoToPlace']:
         # if info == 'T_GT_ReachedMyDestination':
             Sequence.add(
                 'GET_ROBOTS_CURRENT_ROOM',
@@ -132,6 +135,7 @@ def sayText(info='Text is missing'):
                     place=seq.userdata.robots_room_name
                 )
             )
+            rospy.loginfo('SPEECH OUTPUT: Sending room name to MMUI.')
         else:
             Sequence.add(
                 'TALK',
