@@ -846,16 +846,17 @@ void * store_new_configuration_callback(struct AmmServer_DynamicRequest  * rqst)
     {
       if ( strlen(rqst->GET_request)>0 )
        {
-
-         int i=system("cp startupClean.dcfg startup.dcfg");
-         if (i==0) {  successfullStore = 1; }
-
-
          AmmServer_Warning("Setting variables at once is unsafe since it doesnt check for injection");
          char * bufferCommand = (char *) malloc ( SMALL_CMD_BUF * sizeof(char) );
          if (bufferCommand!=0)
           {
-            if ( _GET(default_server,rqst,(char*)"fullSetOperation",bufferCommand,SMALL_CMD_BUF) )  { fullSetOperation=1; }
+            if ( _GET(default_server,rqst,(char*)"fullSetOperation",bufferCommand,SMALL_CMD_BUF) )
+                  {
+                    AmmServer_Warning("Full Set Operation..!");
+                    fullSetOperation=1;
+                    int i=system("cp startupClean.dcfg startup.dcfg");
+                    if (i==0) {  successfullStore = 1; }
+                  }
             if ( _GET(default_server,rqst,(char*)"LuiBackgroundSelector",bufferCommand,SMALL_CMD_BUF) )  { execute((char*)"LuiBackgroundSelector",bufferCommand);  }
             if ( _GET(default_server,rqst,(char*)"userName",bufferCommand,SMALL_CMD_BUF) )  { execute((char*)"setUserName",bufferCommand); signalNamesChanged=1; }
             if ( _GET(default_server,rqst,(char*)"robotName",bufferCommand,SMALL_CMD_BUF) )  { execute((char*)"setRobotName",bufferCommand); signalNamesChanged=1; }
