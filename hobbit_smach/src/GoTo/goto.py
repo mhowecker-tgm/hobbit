@@ -30,15 +30,15 @@ class Init(State):
             self,
             outcomes=['succeeded', 'failure'],
             input_keys=['command', 'parameters'],
-            output_keys=['social_role', 'block_counter', 'room_name', 'location_name'])
+            output_keys=['social_role', 'block_counter', 'room_name', 'location_name', 'parameters'])
 
-    def execute(self, ud):
+    def execute(self, userdata):
         if rospy.has_param('/hobbit/social_role'):
-            ud.social_role = rospy.get_param('/hobbit/social_role')
-        ud.block_counter = 0
-        print(ud.parameters)
-        ud.room_name = ud.parameters[0].data
-        ud.location_name = ud.parameters[1].data
+            userdata.social_role = rospy.get_param('/hobbit/social_role')
+        userdata.block_counter = 0
+        print(userdata.parameters)
+        userdata.room_name = userdata.parameters[0].data
+        userdata.location_name = userdata.parameters[1].data
         return 'succeeded'
 
 
@@ -52,22 +52,22 @@ class CallCheck(State):
         State.__init__(self,
                        outcomes=['voice', 'touch', 'preempted', 'failure'],
                        input_keys=['command', 'parameters'],
-                       output_keys=['question', 'timeframe']
+                       output_keys=['question', 'timeframe', 'parameters']
                        )
 
-    def execute(self, ud):
+    def execute(self, userdata):
         if self.preempt_requested():
-            ud.result = String('preempted')
+            userdata.result = String('preempted')
             return 'preempted'
-        print(ud.parameters)
-        print(ud.command)
+        print(userdata.parameters)
+        print(userdata.command)
         return 'touch'
-        if ud.parameters[0].data.lower() == 'command':
+        if userdata.parameters[0].data.lower() == 'command':
             # TODO: Change hardcoded question to one from the translation pack
             pass
         else:
             rospy.loginfo(
-                'Unknown type in GeneralHobbitAction: %s' % ud.command.data)
+                'Unknown type in GeneralHobbitAction: %s' % userdata.command.data)
             return 'failure'
 
 
@@ -84,9 +84,9 @@ class CleanUp(State):
         )
         self.pub_face = rospy.Publisher('/Hobbit/Emoticon', String)
 
-    def execute(self, ud):
+    def execute(self, userdata):
         self.pub_face.publish('EMO_SAD')
-        ud.result = String('Unable to go to location')
+        userdata.result = String('Unable to go to location')
         return 'succeeded'
 
 
@@ -104,14 +104,14 @@ class SetSuccess(State):
         self.pub = rospy.Publisher('/DiscreteMotionCmd', String)
         self.pub_face = rospy.Publisher('/Hobbit/Emoticon', String)
 
-    def execute(self, ud):
+    def execute(self, userdata):
         self.pub_face.publish('EMO_HAPPY')
         self.pub.publish('Stop')
         if self.preempt_requested():
-            ud.result = String('preempted')
+            userdata.result = String('preempted')
             self.service_preempt()
             return 'preempted'
-        ud.result = String('Location reached')
+        userdata.result = String('Location reached')
         return 'succeeded'
 
 
@@ -129,14 +129,14 @@ class SetFailure(State):
         self.pub = rospy.Publisher('/DiscreteMotionCmd', String)
         self.pub_face = rospy.Publisher('/Hobbit/Emoticon', String)
 
-    def execute(self, ud):
+    def execute(self, userdata):
         self.pub_face.publish('EMO_SAD')
         self.pub.publish('Stop')
         if self.preempt_requested():
-            ud.result = String('preempted')
+            userdata.result = String('preempted')
             self.service_preempt()
             return 'preempted'
-        ud.result = String('failure')
+        userdata.result = String('failure')
         return 'succeeded'
 
 
@@ -148,11 +148,13 @@ class DummyNo(State):
         State.__init__(
             self,
             outcomes=['no', 'yes'],
-            input_keys=['command'],
-            output_keys=['result', 'command']
+            input_keys=['command', 'parameters'],
+            output_keys=['result', 'command', 'room_name', 'location_name', 'parameters']
         )
 
-    def execute(self, ud):
+    def execute(self, userdata):
+        rospy.loginfo('CHECK_VIEW: room_name: %s' % userdata.parameters[0].data)
+        rospy.loginfo('CHECK_VIEW: place_name: %s' % userdata.parameters[1].data)
         return 'no'
 
 
@@ -168,9 +170,9 @@ class BlockedFirst(State):
             output_keys=['block_counter']
         )
 
-    def execute(self, ud):
-        if ud.block_counter < 2:
-            ud.block_counter += 1
+    def execute(self, userdata):
+        if userdata.block_counter < 2:
+            userdata.block_counter += 1
             return 'first'
         else:
             return 'second'
@@ -188,7 +190,7 @@ class DummyYes(State):
             output_keys=['result', 'command']
         )
 
-    def execute(self, ud):
+    def execute(self, userdata):
         return 'yes'
 
 
@@ -204,8 +206,8 @@ class Dummy(State):
             output_keys=['result', 'command']
         )
 
-    def execute(self, ud):
-        #ud.result = String('')
+    def execute(self, userdata):
+        #userdata.result = String('')
         #rospy.sleep(2.0)
         return 'succeeded'
 
@@ -223,7 +225,7 @@ def main():
     goto_sm = StateMachine(
         outcomes=['succeeded', 'failure', 'preempted'],
         input_keys=['command', 'previous_state', 'parameters'],
-        output_keys=['result'])
+        output_keys=['result', 'room_name', 'location_name'])
 
     seq = Sequence(
         outcomes=['succeeded', 'failed', 'preempted'],
@@ -234,14 +236,14 @@ def main():
     goto_sm.userdata.result = String('started')
     goto_sm.userdata.emotion = 'WONDERING'
     goto_sm.userdata.emo_time = 1
+    goto_sm.userdata.room = 'room_name_dummy'
 
     with goto_sm:
         StateMachine.add(
             'INIT',
             Init(),
-            transitions={'succeeded': 'CALL_CHECK'}
-            # TODO: Do we get touch info from MMUI?
-            # If yes, do EMO_WONDERING + T_GT_SelectPlace
+            transitions={'succeeded': 'CALL_CHECK'},
+            remapping={'room_name': 'room'}
         )
         StateMachine.add(
             'CALL_CHECK',
@@ -288,7 +290,7 @@ def main():
             'VIEW_BLOCKED',
             DummyNo(),
             transitions={'yes': 'EMO_SAD',
-                         'no': 'SEQ'}
+                         'no': 'MMUI_SAY_GoingToPlace'}
         )
         StateMachine.add(
             'EMO_SAD',
@@ -319,6 +321,12 @@ def main():
                          'failed': 'SET_FAILURE'}
         )
         StateMachine.add(
+            'MMUI_SAY_GoingToPlace',
+            speech_output.sayTextRoom(info='T_GT_GoingToPlace',
+                                      room=goto_sm.userdata.room),
+            transitions={'succeeded': 'SEQ',
+                         'failed': 'SET_FAILURE'})
+        StateMachine.add(
             'SEQ',
             seq,
             transitions={'succeeded': 'SET_SUCCESS',
@@ -329,9 +337,6 @@ def main():
             Sequence.add(
                 'EMO_HAPPY',
                 HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=1))
-            Sequence.add(
-                'MMUI_SAY_GoingToPlace',
-                speech_output.sayText(info='T_GT_GoingToPlace'))
             if not DEBUGGOTO:
                 Sequence.add(
                     'SET_NAV_GOAL',
