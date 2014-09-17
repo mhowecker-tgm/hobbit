@@ -929,7 +929,7 @@ void * store_new_configuration_callback(struct AmmServer_DynamicRequest  * rqst)
 
 
 //Save rosparameters set
-int i=system("rosparam save /opt/ros/hobbit_hydro/src/hobbit_params.yaml");
+i=system("rosparam save /opt/ros/hobbit_hydro/src/hobbit_params.yaml");
 if (i==0)
   {
    successfullStore=1;
