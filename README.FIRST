@@ -80,9 +80,10 @@ Next time you svn update or commit , select p for permanant certificate storage 
 This should make things work with only the user password ( as they should be :) ) 
 
 
-
-
-
+ACTIVATE LEARNING/TRAINING OBJECTS OVER NIGHT AS CRONJOB
+Activate cronjob for learning objects (done during the night):
+For building the 3d-models of learned objects a small bash script should be executed every morning at 2 AM. Therefore the following line has to be added at the end of the file that is opened with the command:  crontab -e 
+        0 2 * * * /opt/ros/hobbit_hydro/src/hobbit_smach/src/LearnObject/model_cronjob.sh
 
 
 
