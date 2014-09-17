@@ -88,7 +88,7 @@ void broadcast2DJoints(struct skeletonHuman * skeletonFound)
 {
   if (dontPublishPersons) { return ; }
 
-
+  /*
   for (unsigned int z=0; z<HUMAN_SKELETON_PARTS; z++)
   {
     if ( (skeletonFound->joint2D[z].x==0) && (skeletonFound->joint2D[z].y==0) )
@@ -96,7 +96,7 @@ void broadcast2DJoints(struct skeletonHuman * skeletonFound)
         fprintf(stderr,"Will not send a joint configuration because tablet doesnt like zeros\n");
         return;
     }
-  }
+  }*/
 
 
   skeleton_detector::Skeleton2D msg;
