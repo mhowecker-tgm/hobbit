@@ -880,13 +880,13 @@ void * store_new_configuration_callback(struct AmmServer_DynamicRequest  * rqst)
             if ( _GET(default_server,rqst,(char*)"voiceFemale",bufferCommand,SMALL_CMD_BUF) )
                    {
                      if (!fullSetOperation)  { execute((char*)"voiceFemale",bufferCommand);     } else
-                     if (genderIsMale)       { fprintf(stderr,"Hiding Female voice command\n"); } else
+                     if (genderIsMale)       { AmmServer_Warning("Hiding Female voice command\n"); } else
                                              { execute((char*)"voiceFemale",bufferCommand);     }
                    }
             if ( _GET(default_server,rqst,(char*)"voiceMale",bufferCommand,SMALL_CMD_BUF) )
                    {
                      if (!fullSetOperation)  { execute((char*)"voiceMale",bufferCommand);     } else
-                     if (!genderIsMale)      { fprintf(stderr,"Hiding Male voice command\n"); } else
+                     if (!genderIsMale)      { AmmServer_Warning("Hiding Male voice command\n"); } else
                                              { execute((char*)"voiceMale",bufferCommand);     }
                    }
             if ( _GET(default_server,rqst,(char*)"volume",bufferCommand,SMALL_CMD_BUF) )  { execute((char*)"volume",bufferCommand);  }
