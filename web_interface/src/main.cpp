@@ -827,6 +827,7 @@ void * store_new_configuration_callback(struct AmmServer_DynamicRequest  * rqst)
   unsigned int successfullStore = 0;
   unsigned int fullSetOperation = 0;
   unsigned int genderIsMale=0;
+  int i=0;
   rqst->content[pageLength]=0; //Clear content
 
   if  ( rqst->GET_request != 0 )
@@ -854,7 +855,7 @@ void * store_new_configuration_callback(struct AmmServer_DynamicRequest  * rqst)
                   {
                     AmmServer_Warning("Full Set Operation..!");
                     fullSetOperation=1;
-                    int i=system("cp startupClean.dcfg startup.dcfg");
+                    i=system("cp startupClean.dcfg startup.dcfg");
                     if (i==0) {  successfullStore = 1; }
                   }
             if ( _GET(default_server,rqst,(char*)"LuiBackgroundSelector",bufferCommand,SMALL_CMD_BUF) )  { execute((char*)"LuiBackgroundSelector",bufferCommand);  }
