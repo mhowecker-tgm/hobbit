@@ -343,6 +343,8 @@ def goto_cb(ud, goal):
     goal = GeneralHobbitGoal(command=String('goto'),
                              previous_state=String('previous_task'),
                              parameters=par)
+    ud.goal_room = room
+    rospy.loginfo('Going to room: '+str(room))
     return goal
 
 
@@ -549,7 +551,8 @@ def main():
             SimpleActionState('goto',
                               GeneralHobbitAction,
                               goal_cb=goto_cb,
-                              input_keys=['parameters', 'params']),
+                              input_keys=['parameters', 'params'],
+                              output_keys=['goal_room']),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
