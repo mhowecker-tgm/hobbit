@@ -825,6 +825,8 @@ void * store_new_configuration_callback(struct AmmServer_DynamicRequest  * rqst)
 {
   unsigned int signalNamesChanged=0;
   unsigned int successfullStore = 0;
+  unsigned int fullSetOperation = 0;
+  unsigned int genderIsMale=0;
   rqst->content[pageLength]=0; //Clear content
 
   if  ( rqst->GET_request != 0 )
@@ -853,6 +855,7 @@ void * store_new_configuration_callback(struct AmmServer_DynamicRequest  * rqst)
          char * bufferCommand = (char *) malloc ( SMALL_CMD_BUF * sizeof(char) );
          if (bufferCommand!=0)
           {
+            if ( _GET(default_server,rqst,(char*)"fullSetOperation",bufferCommand,SMALL_CMD_BUF) )  { fullSetOperation=1; }
             if ( _GET(default_server,rqst,(char*)"LuiBackgroundSelector",bufferCommand,SMALL_CMD_BUF) )  { execute((char*)"LuiBackgroundSelector",bufferCommand);  }
             if ( _GET(default_server,rqst,(char*)"userName",bufferCommand,SMALL_CMD_BUF) )  { execute((char*)"setUserName",bufferCommand); signalNamesChanged=1; }
             if ( _GET(default_server,rqst,(char*)"robotName",bufferCommand,SMALL_CMD_BUF) )  { execute((char*)"setRobotName",bufferCommand); signalNamesChanged=1; }
@@ -866,9 +869,24 @@ void * store_new_configuration_callback(struct AmmServer_DynamicRequest  * rqst)
 
 
             if ( _GET(default_server,rqst,(char*)"talkingSpeed",bufferCommand,SMALL_CMD_BUF) )  { execute((char*)"talkingSpeed",bufferCommand);  }
-            if ( _GET(default_server,rqst,(char*)"gender",bufferCommand,SMALL_CMD_BUF) )  { execute((char*)"gender",bufferCommand);  }
-            if ( _GET(default_server,rqst,(char*)"voiceFemale",bufferCommand,SMALL_CMD_BUF) )  { execute((char*)"voiceFemale",bufferCommand);  }
-            if ( _GET(default_server,rqst,(char*)"voiceMale",bufferCommand,SMALL_CMD_BUF) )  { execute((char*)"voiceMale",bufferCommand);  }
+            if ( _GET(default_server,rqst,(char*)"gender",bufferCommand,SMALL_CMD_BUF) )
+                   {
+                     if (strcasecmp("MALE",bufferCommand)==0)   { genderIsMale=1; } else
+                     if (strcasecmp("FEMALE",bufferCommand)==0) { genderIsMale=0; }
+                     execute((char*)"gender",bufferCommand);
+                    }
+            if ( _GET(default_server,rqst,(char*)"voiceFemale",bufferCommand,SMALL_CMD_BUF) )
+                   {
+                     if (!fullSetOperation)  { execute((char*)"voiceFemale",bufferCommand);     } else
+                     if (genderIsMale)       { fprintf(stderr,"Hiding Female voice command\n"); } else
+                                             { execute((char*)"voiceFemale",bufferCommand);     }
+                   }
+            if ( _GET(default_server,rqst,(char*)"voiceMale",bufferCommand,SMALL_CMD_BUF) )
+                   {
+                     if (!fullSetOperation)  { execute((char*)"voiceMale",bufferCommand);     } else
+                     if (!genderIsMale)      { fprintf(stderr,"Hiding Male voice command\n"); } else
+                                             { execute((char*)"voiceMale",bufferCommand);     }
+                   }
             if ( _GET(default_server,rqst,(char*)"volume",bufferCommand,SMALL_CMD_BUF) )  { execute((char*)"volume",bufferCommand);  }
 
             char * commandToRun = (char*) malloc((MAX_COMMAND_SIZE+1) * sizeof(char));
