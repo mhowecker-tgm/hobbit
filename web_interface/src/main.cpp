@@ -626,6 +626,8 @@ void execute(char * command,char * param)
     if (strcmp(param,"nitePausePoint")==0)   {  rosservice_call(cR,cRLen,(char *) "/rgbd_acquisition/pause_pointing_gesture_messages");    } else
     if (strcmp(param,"niteResumePoint")==0)  {  rosservice_call(cR,cRLen,(char *) "/rgbd_acquisition/resume_pointing_gesture_messages");   } else
 
+    if (strcmp(param,"forthSKStartVisualization")==0)     {  rosservice_call(cR,cRLen,(char *) "/skeleton_detector/visualize_on");        } else
+    if (strcmp(param,"forthSKStopVisualization")==0)      {  rosservice_call(cR,cRLen,(char *) "/skeleton_detector/visualize_off");       } else
     if (strcmp(param,"forthSKPause")==0)     {  rosservice_call(cR,cRLen,(char *) "/skeleton_detector/pause");        } else
     if (strcmp(param,"forthSKResume")==0)    {  rosservice_call(cR,cRLen,(char *) "/skeleton_detector/resume");       } else
     if (strcmp(param,"forthSKAdvanced")==0)  {  rosservice_call(cR,cRLen,(char *) "/skeleton_detector/advanced");     } else
@@ -635,6 +637,8 @@ void execute(char * command,char * param)
     if (strcmp(param,"stopRecording")==0)    {  rosservice_call(cR,cRLen,(char *) "/skeleton_detector/stopDump");     } else
     if (strcmp(param,"clearRecording")==0)   {  rosservice_call(cR,cRLen,(char *) "/skeleton_detector/clearDump");    } else
 
+    if (strcmp(param,"emergencyStartVisualization")==0)     {  rosservice_call(cR,cRLen,(char *) "/emergency_detector/visualize_on");        } else
+    if (strcmp(param,"emergencyStopVisualization")==0)      {  rosservice_call(cR,cRLen,(char *) "/emergency_detector/visualize_off");       } else
     if (strcmp(param,"emergencyTrigger")==0) {  rosservice_call(cR,cRLen,(char *) "/emergency_detector/trigger");    } else
     if (strcmp(param,"emergencyPause")==0)   {  rosservice_call(cR,cRLen,(char *) "/emergency_detector/pause");      } else
     if (strcmp(param,"emergencyResume")==0)  {  rosservice_call(cR,cRLen,(char *) "/emergency_detector/resume");     } else
