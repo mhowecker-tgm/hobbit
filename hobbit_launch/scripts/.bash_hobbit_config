@@ -20,9 +20,11 @@ alias call2="rostopic pub -1 /Event hobbit_msgs/Event '{header: auto, event: E_C
 alias call3="rostopic pub -1 /Event hobbit_msgs/Event '{header: auto, event: E_CALLHOBBIT, confidence: 0.8, params: [{name: 'place', value: 'CALL3'}, {name: sensor, value: 'CALL3'}]}'"
 alias call4="rostopic pub -1 /Event hobbit_msgs/Event '{header: auto, event: E_CALLHOBBIT, confidence: 0.8, params: [{name: 'place', value: 'CALL4'}, {name: sensor, value: 'CALL4'}]}'"
 alias callb="rostopic pub -1 /Event hobbit_msgs/Event '{header: auto, event: E_CALLHOBBIT, confidence: 0.8, params: [{name: 'place', value: 'CALLb'}, {name: sensor, value: 'CALLb'}]}'"
+#short cut to stop arm
+alias arms="rosrun hobbit_smach ArmStop.py"
 
 # trigger pointing gesture
-alias pntges="rostopic pub /pointEvents rgbd_acquisition/PointEvents '{x: 0, y: 0, z: 2, vectorX: 0, vectorY: 1, vectorZ: 0, leftHand: 1, rightHand: 0,  timestamp: 0}' -1"
+alias pntges="rostopic pub /pointEvents rgbd_acquisition/PointEvents '{x: 0, y: 0, z: 2000, vectorX: 0, vectorY: 1, vectorZ: 0, leftHand: 1, rightHand: 0,  timestamp: 0}' -1"
 
 # create and show visualization of tf-frames
 alias tfc="rosrun tf2_tools view_frames.py"
