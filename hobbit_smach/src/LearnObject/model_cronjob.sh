@@ -6,6 +6,8 @@
 # This shell script will create the model and the recognizer structure
 # needed for the obejct recognition service
 
+rm /localhome/demo/.ros/sift_flann.idx
+
 cd /localhome/demo/data
 mkdir -p /localhome/demo/finished_data/
 for i in *; do
