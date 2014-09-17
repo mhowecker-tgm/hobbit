@@ -597,8 +597,8 @@ void execute(char * command,char * param)
                                                                        { snprintf(hexValue,32,"#%s",param); }
                                                     fprintf(stderr,"Background Color was `%s` , it now is `%s` which should have a #XXXXXX format \n",param,hexValue);
                                                     MMUIExecute(command,hexValue);
-                                                    if (param[0]=='#') { strncpy(hexValue,param,32);        } else
-                                                                       { snprintf(hexValue,32,"%s",param+1); }
+                                                    if (param[0]=='#') { strncpy(hexValue,param+1,31);        } else
+                                                                       { strncpy(hexValue,param,32); }
                                                     fprintf(stderr,"Background Color was `%s` , it now is `%s` which should have a XXXXXX format \n",param,hexValue);
                                                     rosparam_set(cR,cRLen,(char *) "USER/BGCOLOUR",hexValue); // rosparam set doesn't like #
                                                   }  else
