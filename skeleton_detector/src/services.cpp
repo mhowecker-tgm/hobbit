@@ -87,6 +87,7 @@ void broadcastNewPerson()
 void broadcast2DJoints(struct skeletonHuman * skeletonFound)
 {
   if (dontPublishPersons) { return ; }
+  if (processingMode == PROCESSING_MODE_SIMPLE_PERSON_DETECTOR) { fprintf(stderr,"Simple Person Detector should not emmit joints\n"); return ; }
 
   /*
   for (unsigned int z=0; z<HUMAN_SKELETON_PARTS; z++)
@@ -110,7 +111,7 @@ void broadcast2DJoints(struct skeletonHuman * skeletonFound)
   msg.numberOfJoints=HUMAN_SKELETON_PARTS;
   msg.timestamp=actualTimestamp;
 
-  fprintf(stderr,"Publishing a new Joint 2D configuration\n");
+  fprintf(stderr,"Publishing a new Joint 2D configuration .. ");
   joint2DBroadcaster.publish(msg);
   //ros::spinOnce();
   fprintf(stderr," done \n ");
@@ -140,7 +141,7 @@ void broadcast2DBBox(struct skeletonHuman * skeletonFound)
 
   msg.timestamp=actualTimestamp;
 
-  fprintf(stderr,"Publishing a new Joint BBox configuration ");
+  fprintf(stderr,"Publishing a new Joint BBox configuration .. ");
   jointBBoxBroadcaster.publish(msg);
   //ros::spinOnce();
   fprintf(stderr," done \n ");
@@ -161,9 +162,6 @@ void broadcastPointing(unsigned int frameNumber ,struct skeletonPointing * skele
     fprintf(stderr,"Will not broadcast a null pointing event \n");
     return ;
   }
-
-
-  fprintf(stderr,"Broadcasting a pointing event \n");
 
   //David Wants to Flip Y
   signed int YFlipper = -1;
@@ -257,7 +255,7 @@ void broadcastNewSkeleton(unsigned int frameNumber,unsigned int skeletonID , str
 {
     if ( (dontPublishSkeletons) || (skeletonFound==0) ) { return ; }
 
-    fprintf(stderr,"Broadcasting a skeleton at TF\n");
+  fprintf(stderr,"Broadcasting a skeleton at TF\n");
   unsigned int i=0;
   for (i=0; i<HUMAN_SKELETON_PARTS; i++)
     {
