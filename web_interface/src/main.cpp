@@ -585,7 +585,7 @@ void execute(char * command,char * param)
                                                     rosparam_set(cR,cRLen,(char *) "/ROBOT/user_name",param);
                                                   }  else
   if (strcmp(command,"setSocialRole")==0)         { rosparam_set(cR,cRLen,(char *) "/Hobbit/social_role",param);     }  else
-  if (strcmp(command,"askForSocialRole")==0)      { rostopic_pub(cR,cRLen,(char *) "/Command", (char *) "hobbit_msgs/Command", (char *) "\"{command: 'C_SOCIALROLE' , params: [ {name: 'facilitator' , value: true} ] }\"" );   }  else
+  if (strcmp(command,"askForSocialRole")==0)      { rostopic_pub(cR,cRLen,(char *) "/Command", (char *) "hobbit_msgs/Command", (char *) "\"{command: 'C_SOCIALROLE' , params: [ {name: 'facilitator' , value: 'true'} ] }\"" );   }  else
   if (strcmp(command,"setUserAway")==0)           { rosparam_set(cR,cRLen,(char *) "/Hobbit/user_away",param);       }  else
   if (strcmp(command,"setCurrentEmotion")==0)     { rosparam_set(cR,cRLen,(char *) "/Hobbit/current_emotion",param); }  else
   if (strcmp(command,"setLatestWakingUpTime")==0) { rosparam_set(cR,cRLen,(char *) "/Hobbit/wakeup_time",param);     }  else
