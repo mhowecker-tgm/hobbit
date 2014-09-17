@@ -624,7 +624,6 @@ def main():
         )
         StateMachine.add(
             'RECHARGE',
-            # FakeForAllWithoutRunningActionSever(name='RECHARGE'),
             recharge.getRecharge(),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          # 'failed': 'failed',
@@ -633,7 +632,6 @@ def main():
         )
         StateMachine.add(
             'SILENT_RECHARGE',
-            # FakeForAllWithoutRunningActionSever(name='SILENT_RECHARGE'),
             recharge.getRecharge(),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}

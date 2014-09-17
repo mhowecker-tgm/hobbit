@@ -81,7 +81,7 @@ def readXml(inFile):
         srv_room = Room()
         name = room.findall('name')
         srv_room.room_name = name[0].text
-        #print name[0].text
+        print name[0].text
         for vertices in room.findall('vertices'):
             for vertex in vertices.findall('vertex'):
                 srv_vertex = Point2D(float(vertex.attrib.get('x')), float(vertex.attrib.get('y')))
@@ -96,6 +96,7 @@ def readXml(inFile):
                 srv_place.x = float(pose.attrib.get('x'))
                 srv_place.y = float(pose.attrib.get('y'))
                 srv_place.theta = float(pose.attrib.get('theta'))
+                print srv_place
                 # this is not yet in the hobbit_msgs/Place definition
                 srv_place.place_type = types.text
                 for objects in place.findall('objects'):
@@ -105,6 +106,7 @@ def readXml(inFile):
                         #print obj.tag, obj.attrib
                 srv_room.places_vector.append(srv_place)
             rooms.rooms_vector.append(srv_room)
+    print rooms
     return rooms
 
 def writeXml(inFile, rooms):

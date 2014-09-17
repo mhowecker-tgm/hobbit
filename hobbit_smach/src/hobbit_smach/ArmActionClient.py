@@ -299,12 +299,12 @@ if __name__ == '__main__':
     print "===============GetTurntableAtCWPos================"
     print "get arm act pos: ", arm_client.GetActualPosition()
     #print "set arm SetMoveToLearningPos: ", arm_client.SetMoveToLearningPos()
-    print "move to candle: ", arm_client.SetMoveToCandlePos()
+    #print "move to candle: ", arm_client.SetMoveToCandlePos()
     #res = arm_client.SetTurnTurntableCW()
     #print "get arm act pos: ", arm_client.GetActualPosition()
     #print "get arm at GetTurntableAtCWPos: ", arm_client.GetTurntableAtCWPos()
     #print "get arm at learning pos: ", arm_client.GetArmAtLearningPos()
-    #print "storeturntable: ", arm_client.SetStoreTurntable()
+    print "storeturntable: ", arm_client.SetStoreTurntable()
     #print "get arm at act pos: ", arm_client.GetActualPosition()
     #res = arm_client.SetMoveToTrayPos()
 
