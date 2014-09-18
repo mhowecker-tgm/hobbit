@@ -175,7 +175,7 @@ class MMUIInterface:
 
     def callMMUIService(self, sessionid, txt, params):
         try:
-            rospy.wait_for_service('/MMUI', 5)
+            rospy.wait_for_service('/MMUI', 30)
             servicecall = rospy.ServiceProxy('/MMUI', Request)
         except rospy.ROSException, e:
             print('timeout exceeded while waiting for service %s' % e)

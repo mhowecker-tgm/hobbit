@@ -240,7 +240,8 @@ def main():
             )
             Sequence.add(
                 'SAY_THANKS',
-                speech_output.sayTextObject(info='T_LO_ThankYouTeachingNewObject_O')
+                speech_output.sayTextObject(info='T_LO_ThankYouTeachingNewObject_O',
+                                            learn=True)
             )
             Sequence.add('MMUI_MAIN_MENU', HobbitMMUI.ShowMenu(menu='MAIN'))
 
