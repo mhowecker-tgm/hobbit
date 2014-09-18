@@ -65,7 +65,8 @@ class SetName(State):
         random.seed()
 
     def execute(self, ud):
-        print(ud.object_name)
+        rospy.set_param('/hobbit/object_to_learn', ud.object_name)
+        rospy.loginfo(ud.object_name)
         if rospy.has_param('/hobbit/pcd_path'):
             directory = rospy.get_param('/hobbit/pcd_path') + '/'
         else:

@@ -42,18 +42,21 @@ def disable(self):
 class Init(smach.State):
     """Class to initialize certain parameters"""
     def __init__(self):
-        smach.State.__init__(self, outcomes=['succeeded', 'canceled'], input_keys=['object_name'], output_keys=['social_role'])
-        self.pub_head = rospy.Publisher('HeadMove', String)
+        smach.State.__init__(
+            self,
+            outcomes=['succeeded', 'canceled'],
+            input_keys=['object_name'],
+            output_keys=['social_role'])
         self.pub_obstacle = rospy.Publisher('/headcam/active', String)
 
     def execute(self,ud):
-        self.pub_head.publish('down')
         self.pub_obstacle.publish('active')
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
         if rospy.has_param('/hobbit/social_role'):
             ud.social_role = rospy.get_param('/hobbit/social_role')
+        rospy.set_param('/hobbit/object_to_bring', ud.object_name.data)
         return 'succeeded'
 
 class CleanUp(smach.State):

@@ -7,8 +7,6 @@ DEBUG = False
 
 import rospy
 from smach import Sequence, State, Concurrence
-from smach_ros import ServiceState
-from hobbit_msgs.srv import GetName
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 from hobbit_msgs.msg import Event
 from hobbit_msgs import MMUIInterface as MMUI
@@ -44,24 +42,48 @@ def askYesNo(question='Text is missing'):
     return seq
 
 
-class TestData(State):
+def sayTextObject(info='Text is missing', learn=False):
     """
+    Return a SMACH Sequence for speech output on the MMUI.
+    The second State is needed to wait until the spoken text
+    is completely done. Otherwise the next State can disturb
+    the speech output.
+
+    info: defaults to 'Text is missing' which indicates that
+    no textID was specified.
     """
-    def __init__(self):
-        State.__init__(
-            self,
-            outcomes=['succeeded', 'preempted']
+
+    seq = Sequence(
+        outcomes=['succeeded', 'preempted', 'failed'],
+        connector_outcome='succeeded'
+    )
+    if rospy.has_param('/hobbit/object_to_bring'):
+        if learn:
+            seq.userdata.object_name = rospy.get_param(
+                '/hobbit/object_to_learn')
+        else:
+            seq.userdata.object_name = rospy.get_param(
+                '/hobbit/object_to_bring')
+    else:
+        seq.userdata.object_name = 'mug'
+
+    with seq:
+        Sequence.add(
+            'TALK',
+            HobbitMMUI.ShowInfo(
+                info=info,
+                object_name=seq.userdata.object_name
+            )
         )
+        Sequence.add(
+            'WAIT_FOR_MMUI',
+            HobbitMMUI.WaitforSoundEnd('/Event', Event),
+            transitions={'aborted': 'WAIT_FOR_MMUI',
+                         'succeeded': 'succeeded'})
+    return seq
 
-    def execute(self, ud):
-        if self.preempt_requested():
-            self.service_preempt()
-            return 'preempted'
-        rospy.loginfo('TEST_DATA_SPEECH: ' + str(ud.robots_room_name))
-        return 'succeeded'
 
-
-def sayTextObject(info='Text is missing', object_name='object'):
+def sayTextRoom(info='Text is missing', room='room'):
     """
     Return a SMACH Sequence for speech output on the MMUI.
     The second State is needed to wait until the spoken text
@@ -82,7 +104,7 @@ def sayTextObject(info='Text is missing', object_name='object'):
             'TALK',
             HobbitMMUI.ShowInfo(
                 info=info,
-                object_name=object_name
+                place=room
             )
         )
         Sequence.add(
@@ -108,45 +130,19 @@ def sayText(info='Text is missing'):
         outcomes=['succeeded', 'preempted', 'failed'],
         connector_outcome='succeeded'
     )
-    seq.userdata.robots_room_name = 'roomname'
 
     with seq:
-        if info in ['T_GT_ReachedMyDestination',
-                    'T_GT_WayBlocked',
-                    'T_GT_GoingToPlace',
-                    'T_GT_ConfirmGoToPlace']:
-            rospy.loginfo('SPEECH OUTPUT: Sending room name to MMUI.')
-            Sequence.add(
-                'GET_ROBOTS_CURRENT_ROOM',
-                ServiceState(
-                    'get_robots_current_room',
-                    GetName,
-                    response_key='robots_room_name'),
-                transitions={'aborted': 'failed'}
+        Sequence.add(
+            'TALK',
+            HobbitMMUI.ShowInfo(
+                info=info
             )
-            Sequence.add(
-                'TEST_DATA_SPEECH',
-                TestData()
-            )
-            Sequence.add(
-                'TALK',
-                HobbitMMUI.ShowInfo(
-                    info=info,
-                    place=seq.userdata.robots_room_name
-                )
-            )
-        else:
-            Sequence.add(
-                'TALK',
-                HobbitMMUI.ShowInfo(
-                    info=info
-                )
         )
         Sequence.add(
             'WAIT_FOR_MMUI',
             HobbitMMUI.WaitforSoundEnd('/Event', Event),
             transitions={'aborted': 'WAIT_FOR_MMUI',
-                            'succeeded': 'succeeded'})
+                         'succeeded': 'succeeded'})
     return seq
 
 

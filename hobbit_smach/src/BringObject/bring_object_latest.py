@@ -58,6 +58,7 @@ class Init(smach.State):
         ud.object_name = ud.parameters[0]
         if rospy.has_param('/hobbit/social_role'):
             ud.social_role = rospy.get_param('/hobbit/social_role')
+        rospy.set_param('/hobbit/object_to_bring', ud.parameters[0].data)
         return 'succeeded'
 
 

@@ -233,11 +233,14 @@ def main():
             )
             Sequence.add(
                 'SAY_DONE',
-                speech_output.sayText(info='T_LO_I_AM_DONE')
+                speech_output.sayTextObject(
+                    info='T_LO_I_AM_DONE',
+                    learn=True
+                )
             )
             Sequence.add(
                 'SAY_THANKS',
-                speech_output.sayText(info='T_LO_ThankYouTeachingNewObject')
+                speech_output.sayTextObject(info='T_LO_ThankYouTeachingNewObject_O')
             )
             Sequence.add('MMUI_MAIN_MENU', HobbitMMUI.ShowMenu(menu='MAIN'))
 
@@ -458,8 +461,10 @@ def main():
                         'parameters': 'parameters'}
     )
 
-    sis = IntrospectionServer('smach_server',
-                              learn_object_sm, '/HOBBIT/LEARN_OBJECT_SM_ROOT')
+    sis = IntrospectionServer(
+        'smach_server',
+        learn_object_sm,
+        '/HOBBIT/LEARN_OBJECT_SM_ROOT')
     sis.start()
     asw.run_server()
     rospy.spin()
