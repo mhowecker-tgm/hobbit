@@ -89,7 +89,7 @@ def sayTextObject(info='Text is missing', object_name='object'):
             'WAIT_FOR_MMUI',
             HobbitMMUI.WaitforSoundEnd('/Event', Event),
             transitions={'aborted': 'WAIT_FOR_MMUI',
-                            'succeeded': 'succeeded'})
+                         'succeeded': 'succeeded'})
     return seq
 
 
@@ -115,7 +115,7 @@ def sayText(info='Text is missing'):
                     'T_GT_WayBlocked',
                     'T_GT_GoingToPlace',
                     'T_GT_ConfirmGoToPlace']:
-        # if info == 'T_GT_ReachedMyDestination':
+            rospy.loginfo('SPEECH OUTPUT: Sending room name to MMUI.')
             Sequence.add(
                 'GET_ROBOTS_CURRENT_ROOM',
                 ServiceState(
@@ -135,7 +135,6 @@ def sayText(info='Text is missing'):
                     place=seq.userdata.robots_room_name
                 )
             )
-            rospy.loginfo('SPEECH OUTPUT: Sending room name to MMUI.')
         else:
             Sequence.add(
                 'TALK',
