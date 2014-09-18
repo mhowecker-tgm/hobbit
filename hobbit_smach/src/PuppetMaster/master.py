@@ -56,16 +56,16 @@ def IsItNight(ud):
 
 def command_cb(msg, ud):
     try:
-        # print msg.command
-        input_ce = msg.command.upper()
         rospy.loginfo('/Command data received:')
+        rospy.loginfo(str(msg.command))
+        input_ce = msg.command.upper()
     except AttributeError, e:
         print(e)
         pass
     try:
-        # print msg.event
-        input_ce = msg.event.upper()
         rospy.loginfo('/Event data received:')
+        rospy.loginfo(str(msg.event))
+        input_ce = msg.event.upper()
     except AttributeError, e:
         print(e)
         pass
@@ -115,13 +115,13 @@ def command_cb(msg, ud):
                 ud.parameters['active_task'] = index
                 return True
             elif index + 1 >= active_task and not night:
-                rospy.loginfo('New task has lower priority. Do nothing')
+                rospy.loginfo('New task has lower priority. DO NOTHING')
                 print(bcolors.FAIL + \
                     'New task has lower priority. Do nothing' \
                     + bcolors.ENDC)
                 return False
             else:
-                rospy.loginfo('New task has higher priority. Start it.')
+                rospy.loginfo('New task has higher priority. START IT.')
                 print(bcolors.OKGREEN +\
                     'New task has higher priority. Start it.'\
                     + bcolors.ENDC)
