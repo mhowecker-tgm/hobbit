@@ -6,7 +6,7 @@ NAME = 'SocialRole'
 
 import rospy
 import roslib
-roslib.load_manifest(PKG)
+import random
 
 from smach import State, StateMachine
 from hobbit_msgs import MMUIInterface as MMUI
@@ -126,6 +126,33 @@ class CheckHelpAccepted(State):
             self.service_preempt()
             return 'preempted'
         if ud.help_accepted:
+            return 'succeeded'
+        else:
+            return 'aborted'
+
+
+class RandomStuff(State):
+    """
+    Switch to a randomly chosen menu on the MMUI.
+    Wrapped in a SMACH state.
+    """
+
+    def __init__(self):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'aborted', 'preempted']
+        )
+        # TODO: Check the names of the actual menues
+        self.menues = ['M_GAMES', 'M_MUSIC, M_BOOKS']
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        menu = random.choice(self.menues)
+        mmui = MMUI.MMUIInterface()
+        resp = mmui.GoToMenu(menu)
+        if resp:
             return 'succeeded'
         else:
             return 'aborted'

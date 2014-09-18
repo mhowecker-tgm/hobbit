@@ -15,6 +15,7 @@ from hobbit_msgs.msg import Command, Event, GeneralHobbitAction,\
 import hobbit_smach.helper_import as helper
 import hobbit_smach.recharge_import as recharge
 import hobbit_smach.call_hobbit_import as call_hobbit
+import hobbit_smach.speech_output_import as speech_output
 import uashh_smach.util as util
 from hobbit_user_interaction import HobbitEmotions
 from hobbit_smach.bcolors import bcolors
@@ -607,11 +608,16 @@ def main():
         )
         StateMachine.add(
             'REWARD',
-            HobbitEmotions.ShowEmotions(
-                emotion='HAPPY',
-                emo_time=4),
+            speech_output.emo_say_something(
+                emo='HAPPY',
+                time=4,
+                text='T_SR_Thankyou'
+            ),
+            # HobbitEmotions.ShowEmotions(
+            #     emotion='HAPPY',
+            #     emo_time=4),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
-                         'failed': 'RESET_ACTIVE_TASK'}
+                         'aborted': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'BRING_OBJECT',
