@@ -183,7 +183,8 @@ class ResetActiveTask(State):
     def __init__(self):
         State.__init__(
             self,
-            input_keys=['parameters'],
+            input_keys=['parameters', 'command'],
+            output_keys=['parameters', 'command'],
             outcomes=['succeeded', 'preempted', 'aborted'])
 
     def execute(self, ud):
@@ -193,6 +194,7 @@ class ResetActiveTask(State):
         rospy.loginfo('ResetActiveTask')
         rospy.set_param('active_task', 100)
         ud.parameters['active_task'] = 100
+        ud.command = ''
         return 'succeeded'
 
 
