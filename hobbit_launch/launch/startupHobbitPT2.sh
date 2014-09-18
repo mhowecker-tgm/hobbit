@@ -69,8 +69,9 @@ roslaunch aal_service startup.launch&
 # 
 # # Start SMACH handling of rooms, places, objects.
 roslaunch hobbit_smach startup.launch&
+roslaunch recognition_service startup.launch&
 sleep $DELAY_BETWEEN_STEPS
-roslaunch hobbit_smach startup_master.launch&
+# roslaunch hobbit_smach startup_master.launch&
 
 # Start table/floor object detector (for clustering) and trigger for publishing single shot point clouds from headcam
 cd /opt/ros/hobbit_hydro/src/table_object_detector/launch
