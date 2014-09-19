@@ -4,10 +4,11 @@
 struct fallState fallDetectionContext={0};
 
 
-int isSkeletonStanding(struct failState * fs)
+int isSkeletonStanding(struct fallState * fs)
 {
   //If we are standing we have a large bbox on the Y axis ..!
-  if (bboxCurrent.y>200)
+
+  if (fs->bboxCurrent.y>200)
   {
     return 1;
   }
