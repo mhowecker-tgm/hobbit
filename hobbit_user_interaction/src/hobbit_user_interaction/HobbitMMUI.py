@@ -289,6 +289,29 @@ class ConfirmOk(smach.State):
             return 'timeout'
 
 
+class ShowInfoRoom(smach.State):
+
+    """
+    Class to interact with the MMUI
+    """
+
+    def __init__(self, info, room='roomname'):
+        smach.State.__init__(self,
+                             outcomes=['succeeded', 'failed', 'preempted']
+                             )
+        self.info = info
+        self.room = room
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        mmui = MMUI.MMUIInterface()
+        mmui.showMMUI_Info(
+            text=self.info, prm=self.room)
+        return 'succeeded'
+
+
 class ShowInfo(smach.State):
 
     """
@@ -310,7 +333,7 @@ class ShowInfo(smach.State):
         mmui = MMUI.MMUIInterface()
         mmui.showMMUI_Info(
             text=self.info,
-            prm=self.place
+            prm=self.place,
             prm2=self.object_name
         )
         return 'succeeded'
@@ -437,7 +460,7 @@ class CallEmergencySimple(smach.State):
             return 'preempted'
         mmui = MMUI.MMUIInterface()
         resp = mmui.StartSOSCall()
-        print('response from StartSOSCall was: ')
+        print('response from StartSOSCallSimple was: ')
         print(resp)
         if resp:
             for i, v in enumerate(resp.params):
