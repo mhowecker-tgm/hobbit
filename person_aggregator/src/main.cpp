@@ -35,11 +35,11 @@
 
 #define divisor 1000
 
-#define DEFAULT_FRAME_RATE 30
+#define DEFAULT_FRAME_RATE 15
 
 float maximumDistanceForIntegration = 220;
 unsigned int integrationTime = 100000;
-#define maxSource 4
+#define maxSource 5
 
 int rate=DEFAULT_FRAME_RATE;
 
@@ -89,7 +89,6 @@ void broadcastNewPerson( struct personMessageSt * p)
 
 void aggregatePersonMessage(struct personMessageSt * p )
 {
-  fprintf(stderr,"aggregatePersonMessage is not implemented yet\n");
   unsigned int i=0;
   unsigned int currentTime = EndTimer(p->source);
 
@@ -188,6 +187,10 @@ void personMessageGestures(const person_aggregator::Person & msg)
   personMessageAggregator(msg,4);
 }
 
+void personMessageEmergency(const person_aggregator::Person & msg)
+{
+  personMessageAggregator(msg,5);
+}
 
 
 //----------------------------------------------------------
@@ -264,6 +267,7 @@ int main(int argc, char **argv)
      ros::Subscriber sub2 = nh.subscribe("/skeleton_detector/persons",divisor,personMessageSkeletonDetector);
      ros::Subscriber sub3 = nh.subscribe("/face_detection/persons",divisor,personMessageFaceDetector);
      ros::Subscriber sub4 = nh.subscribe("/hand_gestures/persons",divisor,personMessageGestures);
+     ros::Subscriber sub5 = nh.subscribe("/emergency_detector/persons",divisor,personMessageEmergency);
 
      //Create our context
      //---------------------------------------------------------------------------------------------------

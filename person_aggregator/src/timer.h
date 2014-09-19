@@ -27,6 +27,8 @@ enum VisCortTimerList
    UNUSED_TIMER_3 ,
    UNUSED_TIMER_4 ,
    UNUSED_TIMER_5 ,
+   UNUSED_TIMER_6 ,
+   UNUSED_TIMER_7 ,
    //<- 0-5 reserved for use by clients :P
    FRAME_SNAP_DELAY  ,
    FRAME_PASS_TO_TARGET_DELAY ,
