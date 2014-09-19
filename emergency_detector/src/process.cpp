@@ -149,10 +149,15 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
                                    combinationMode
                                 );
 
-
-      depthAvg = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , tempZoneStartX , tempZoneStartY , tempZoneWidth , tempZoneHeight , maxScoreTrigger , 1 );
+      unsigned int holesEncountered = 0;
+      depthAvg = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , tempZoneStartX , tempZoneStartY , tempZoneWidth , tempZoneHeight , maxScoreTrigger , 1 , &holesEncountered );
       fprintf(stderr,"RECT Score is %u \n",depthAvg);
 
+
+      if (holesEncountered> ( (unsigned int) tempZoneWidth*tempZoneHeight*70/100 ) )
+         {
+           fprintf(stderr,RED "\n\n  Too many holes , this cannot be an emergency \n\n" NORMAL );
+         }    else
       if (
            ( depthAvg > minScoreTrigger) &&
            ( depthAvg < maxScoreTrigger)

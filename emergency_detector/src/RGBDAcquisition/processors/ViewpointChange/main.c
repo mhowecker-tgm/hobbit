@@ -68,7 +68,7 @@ unsigned char * viewPointChange_ReadPPM(char * filename,unsigned int * width , u
             fclose(pf);
             if ( rd < pic_image_size )
             {
-                fprintf(stderr,"Incorrect read @ file %s , wanted to read %u bytes we got %u ",filename,pic_image_size,rd);
+                fprintf(stderr,"Incorrect read @ file %s , wanted to read %u bytes we got %lu ",filename,pic_image_size,rd);
                return pic_pixels;
             }
             return pic_pixels;
@@ -159,11 +159,12 @@ int viewPointChange_newFramesCompare(unsigned char *  prototype , unsigned char 
 
 unsigned int viewPointChange_countDepths(unsigned short *  depth, unsigned int imageWidth , unsigned int imageHeight  ,
                                          unsigned int x , unsigned int y , unsigned int width , unsigned int height ,
-                                         unsigned int depthRange , unsigned int ignoreHoles)
+                                         unsigned int depthRange , unsigned int ignoreHoles , unsigned int * numberOfHolesIgnored)
 {
   unsigned int depthSamples = 0;
   unsigned int totalDepth = 0;
   unsigned int holesIgnored = 0;
+  *numberOfHolesIgnored=0;
 
   unsigned short * depthPTR;
   unsigned short * depthStart=depth+ (y * imageWidth) +x;
@@ -186,6 +187,9 @@ unsigned int viewPointChange_countDepths(unsigned short *  depth, unsigned int i
    depthStart+=imageWidth;
    depthLimit+=imageWidth;
   }
+
+
+  *numberOfHolesIgnored = holesIgnored;
 
   if (depthSamples==0) { depthSamples=1; }
   return totalDepth/depthSamples;
