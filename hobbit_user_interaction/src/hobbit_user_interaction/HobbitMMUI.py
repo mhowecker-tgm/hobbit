@@ -308,6 +308,12 @@ class ShowInfo(smach.State):
             self.service_preempt()
             return 'preempted'
         mmui = MMUI.MMUIInterface()
+        mmui.showMMUI_Info(
+            text=self.info,
+            prm=self.place
+            prm2=self.object_name
+        )
+        return 'succeeded'
         if not self.place == 'roomname':
             mmui.showMMUI_Info(
                 text=self.info, prm=self.place)
