@@ -41,6 +41,7 @@ class MMUIInterface:
 
 
     def showMMUI_Info(self, text, wait="1", prm="", prm2="", prm3="", audio=""):
+        print(prm)
         parr = []
         p = Parameter('type', 'D_PLAIN')
         parr.append(p)
@@ -55,7 +56,7 @@ class MMUIInterface:
         p = Parameter('wait', wait)
         parr.append(p)
         if prm != "":
-            p = Parameter('parameter', prm)
+            p = Parameter('Parameter', prm)
             parr.append(p)
         if prm2 != "":
             p = Parameter('parameter', prm2)
@@ -66,6 +67,7 @@ class MMUIInterface:
         if audio != "":
             p = Parameter('play', audio)
             parr.append(p)
+        print(parr) 
         return self.callMMUIService('0', 'create', parr)
 
     def showMMUI_OK(self, text, prm=""):
@@ -175,7 +177,7 @@ class MMUIInterface:
 
     def callMMUIService(self, sessionid, txt, params):
         try:
-            rospy.wait_for_service('/MMUI', 30)
+            rospy.wait_for_service('/MMUI', 5)
             servicecall = rospy.ServiceProxy('/MMUI', Request)
         except rospy.ROSException, e:
             print('timeout exceeded while waiting for service %s' % e)

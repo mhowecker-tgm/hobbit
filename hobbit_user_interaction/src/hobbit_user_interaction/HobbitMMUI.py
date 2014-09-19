@@ -306,6 +306,7 @@ class ShowInfoRoom(smach.State):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
+        print(self.room)
         mmui = MMUI.MMUIInterface()
         mmui.showMMUI_Info(
             text=self.info, prm=self.room)
@@ -323,30 +324,14 @@ class ShowInfo(smach.State):
                              outcomes=['succeeded', 'failed', 'preempted']
                              )
         self.info = info
-        self.place = place
-        self.object_name = object_name
 
     def execute(self, ud):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
         mmui = MMUI.MMUIInterface()
-        mmui.showMMUI_Info(
-            text=self.info,
-            prm=self.place,
-            prm2=self.object_name
-        )
+        mmui.showMMUI_Info(text=self.info)
         return 'succeeded'
-        if not self.place == 'roomname':
-            mmui.showMMUI_Info(
-                text=self.info, prm=self.place)
-        elif not self.object_name == 'object_name':
-            mmui.showMMUI_Info(
-                text=self.info, prm=self.object_name)
-        else:
-            mmui.showMMUI_Info(
-                text=self.info)
-            return 'succeeded'
 
 
 class CancelState(smach.State):
