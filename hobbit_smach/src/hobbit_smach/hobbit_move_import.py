@@ -259,14 +259,14 @@ class SetNavigationGoal(ServiceState):
     and stored in the userdata.
     """
     def __init__(self, frame='/map', room=String('None'), place='dock'):
-        print('Inside SetNavigationGoal __init__')
+        #print('Inside SetNavigationGoal __init__')
         ServiceState.__init__(
             self,
             'get_coordinates',
             GetCoordinates,
             request_cb=self.__request_cb,
             response_cb=self.__response_cb,
-            input_keys=['room_name', 'location_name'],
+            input_keys=['room_name', 'location_name', 'room'],
             output_keys=['x', 'y', 'yaw', 'room_name', 'location_name']
         )
         self.frame = frame
@@ -275,7 +275,7 @@ class SetNavigationGoal(ServiceState):
 
     def __request_cb(self, ud, request):
         print('Inside SetNavigationGoal')
-        print(ud.room_name, ud.location_name)
+        print('userdata: ', ud.room_name, ud.location_name)
         print(self.room, self.place)
         if not ud.room_name == 'None':
             self.room = ud.room_name
@@ -300,8 +300,8 @@ class SetNavigationGoal(ServiceState):
         ud.x = response.pose.x
         ud.y = response.pose.y
         ud.yaw = response.pose.theta
-        ud.room_name = 'None'
-        ud.location_name = 'None'
+        #ud.room_name = 'None'
+        #ud.location_name = 'None'
         return 'succeeded'
 
 
@@ -457,7 +457,7 @@ def goToPose():
     frame = '/map'
     seq = Sequence(outcomes=['succeeded', 'aborted', 'preempted'],
                    connector_outcome='succeeded',
-                   input_keys=['x', 'y', 'yaw'])
+                   input_keys=['x', 'y', 'yaw', 'room_name', 'location_name'])
 
     with seq:
         Sequence.add(

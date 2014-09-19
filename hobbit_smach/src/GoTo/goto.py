@@ -22,6 +22,26 @@ from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 import hobbit_smach.head_move_import as head_move
 
 
+class TestData(State):
+    """
+    """
+
+    def __init__(self, ):
+        State.__init__(
+            self,
+            input_keys=['room_name', 'location_name'],
+            outcomes=['succeeded', 'failed', 'preempted']
+        )
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        print('TestData')
+        print(ud.room_name, ud.location_name)
+        return 'succeeded'
+
+
 class Init(State):
     """Class to initialize certain parameters"""
     def __init__(self):
@@ -222,7 +242,7 @@ def main():
     goto_sm = StateMachine(
         outcomes=['succeeded', 'failure', 'preempted'],
         input_keys=['command', 'previous_state', 'parameters'],
-        output_keys=['result'])
+        output_keys=['result', 'room_name', 'location_name'])
 
     seq = Sequence(
         outcomes=['succeeded', 'failed', 'preempted'],
@@ -330,27 +350,26 @@ def main():
                 HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=1))
             Sequence.add(
                 'MMUI_SAY_GoingToPlace',
-                speech_output.sayText(info='T_GT_GoingToPlace'))
-            if not DEBUGGOTO:
-                Sequence.add(
-                    'SET_NAV_GOAL',
-	                hobbit_move.get_set_nav_goal_state(),
-                    #hobbit_move.SetNavigationGoal(frame='/map'),
-                    transitions={'aborted': 'failed'}
-                )
-                Sequence.add(
-                    'MOVE_TO_GOAL',
-                    hobbit_move.goToPose(),
-                    transitions={'aborted': 'EMO_SAD',
-                                 'succeeded': 'EMO_HAPPY_1'}
-                )
-            else:
-                Sequence.add('SET_NAV_GOAL', Dummy())
-                Sequence.add(
-                    'MOVE_BASE_GO',
-                    Dummy(),
-                    transitions={'failed': 'EMO_SAD',
-                                 'succeeded': 'EMO_HAPPY_1'})
+                speech_output.sayTextRoom(info='T_GT_GoingToPlace'))
+	    Sequence.add(
+	        'TESTDATA',
+	        TestData(),
+	    )
+            Sequence.add(
+                'SET_NAV_GOAL',
+	        hobbit_move.get_set_nav_goal_state(),
+                transitions={'aborted': 'failed'}
+            )
+	    Sequence.add(
+	        'TESTDATA1',
+	        TestData(),
+	    )
+            Sequence.add(
+                'MOVE_TO_GOAL',
+                hobbit_move.goToPose(),
+                transitions={'aborted': 'EMO_SAD',
+                             'succeeded': 'EMO_HAPPY_1'}
+            )
             Sequence.add(
                 'EMO_SAD',
                 #HobbitEmotions.ShowEmotions(emotion='EMO_SAD', emo_time=4))

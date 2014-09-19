@@ -12,6 +12,27 @@ from hobbit_msgs.msg import Event
 from hobbit_msgs import MMUIInterface as MMUI
 
 
+class TestData(State):
+    """
+    """
+
+    def __init__(self, ):
+        State.__init__(
+            self,
+            input_keys=['room_name', 'location_name'],
+            outcomes=['succeeded', 'failed', 'preempted']
+        )
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        print('TestData')
+        print(ud.room_name, ud.location_name)
+        return 'succeeded'
+
+
+
 def askYesNo(question='Text is missing'):
     """
     Return a SMACH Sequence for speech output on the MMUI.
@@ -83,7 +104,32 @@ def sayTextObject(info='Text is missing', learn=False):
     return seq
 
 
-def sayTextRoom(info='Text is missing', room='room'):
+class ShowInfoRoom(State):
+
+    """
+    Class to interact with the MMUI
+    """
+
+    def __init__(self, info):
+        State.__init__(self,
+                       input_keys=['room_name', 'location_name'],
+                       outcomes=['succeeded', 'failed', 'preempted']
+                       )
+        self.info = info
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        print('ShowInfoRoom')
+        print(ud.room_name)
+        mmui = MMUI.MMUIInterface()
+        mmui.showMMUI_Info(
+            text=self.info, prm=ud.room_name)
+        return 'succeeded'
+
+
+def sayTextRoom(info='Text is missing'):
     """
     Return a SMACH Sequence for speech output on the MMUI.
     The second State is needed to wait until the spoken text
@@ -96,16 +142,14 @@ def sayTextRoom(info='Text is missing', room='room'):
 
     seq = Sequence(
         outcomes=['succeeded', 'preempted', 'failed'],
-        connector_outcome='succeeded'
+        connector_outcome='succeeded',
+        input_keys=['room_name', 'location_name']
     )
 
     with seq:
         Sequence.add(
             'TALK',
-            HobbitMMUI.ShowInfo(
-                info=info,
-                place=room
-            )
+            ShowInfoRoom(info=info)
         )
         Sequence.add(
             'WAIT_FOR_MMUI',
@@ -128,10 +172,15 @@ def sayText(info='Text is missing'):
 
     seq = Sequence(
         outcomes=['succeeded', 'preempted', 'failed'],
-        connector_outcome='succeeded'
+        connector_outcome='succeeded',
+        input_keys=['room_name', 'location_name']
     )
 
     with seq:
+        Sequence.add(
+            'Test',
+            TestData()
+        )
         Sequence.add(
             'TALK',
             HobbitMMUI.ShowInfo(
