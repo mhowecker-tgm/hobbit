@@ -137,6 +137,8 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
   //unsigned int temperatureFrameOffset = ABSDIFF(frameTimestamp,tempTimestamp);
 
 
+
+  //If we are looking Center then we might detect a person..!
   if (fallDetectionContext.headLookingDirection==HEAD_LOOKING_CENTER)
   {
      //Contemplate about emitting a Person message ( not an emergency )
