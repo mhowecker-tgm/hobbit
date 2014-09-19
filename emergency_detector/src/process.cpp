@@ -145,7 +145,12 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
        unsigned int x2d = (unsigned int) depthWidth/2;
        unsigned int y2d = (unsigned int) depthHeight/2;
        unsigned short * depthValue = depthFrame + (y2d * depthWidth + x2d );
-       if (transform2DProjectedPointTo3DPoint( (struct calibration*) calib ,
+
+       struct calibration calibSpontaneous;
+       NullCalibration(depthWidth,depthHeight,&calibSpontaneous);
+       struct calibration * calibSelected = (struct calibration * ) calib;
+       if (calibSelected==0) { calibSelected=&calibSpontaneous; }
+       if (transform2DProjectedPointTo3DPoint( calibSelected,
                                                x2d,
                                                y2d,
                                                 *depthValue ,
@@ -170,10 +175,10 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
   if ( temperatureSensorSensesHuman( temperatureObjectDetected ,  tempTimestamp , frameTimestamp) )
   //if ( (minHumanTemperature<temperatureObjectDetected) && (temperatureObjectDetected<maxHumanTemperature) && (temperatureFrameOffset < maximumFrameDifferenceForTemperatureToBeRelevant )  )
     {
-        fprintf(stderr,"runServicesThatNeedColorAndDepth called \n");
+        //fprintf(stderr,"runServicesThatNeedColorAndDepth called \n");
          segmentedRGB = copyRGB(colorFrame ,colorWidth , colorHeight);
          segmentedDepth = copyDepth(depthFrame ,depthWidth , depthHeight);
-        fprintf(stderr,"Copied rgb/depth\n");
+        //fprintf(stderr,"Copied rgb/depth\n");
 
         fprintf(stderr,"Segmenting 2 frames sized  %ux%u and %ux%u \n",colorWidth , colorHeight,depthWidth , depthHeight);
         segmentRGBAndDepthFrame (
@@ -182,7 +187,7 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
                                    colorWidth , colorHeight,
                                    &segConfRGB ,
                                    &segConfDepth ,
-                                   0 ,
+                                   (struct calibration*) calib ,
                                    combinationMode
                                 );
 

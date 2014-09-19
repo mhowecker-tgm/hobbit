@@ -94,7 +94,7 @@ void broadcastNewPerson()
   msg.confidence = 0.5;
   msg.timestamp=frameTimestamp;
 
-  fprintf(stderr,"Publishing a new Person\n");
+  fprintf(stderr,"Publishing a new Person @ %0.2f %0.2f %0.2f\n",temperatureX,temperatureY,temperatureZ);
   personBroadcaster.publish(msg);
   ros::spinOnce();
 }
