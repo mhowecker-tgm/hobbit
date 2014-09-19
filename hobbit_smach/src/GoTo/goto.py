@@ -20,7 +20,6 @@ from smach_ros import ActionServerWrapper, IntrospectionServer
 from smach import StateMachine, State, Sequence
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 import hobbit_smach.head_move_import as head_move
-import hobbit_smach.logging_import as log
 
 
 class Init(State):
@@ -30,15 +29,15 @@ class Init(State):
             self,
             outcomes=['succeeded', 'failure'],
             input_keys=['command', 'parameters'],
-            output_keys=['social_role', 'block_counter', 'room_name', 'location_name', 'parameters'])
+            output_keys=['social_role', 'block_counter', 'room_name', 'location_name'])
 
-    def execute(self, userdata):
+    def execute(self, ud):
         if rospy.has_param('/hobbit/social_role'):
-            userdata.social_role = rospy.get_param('/hobbit/social_role')
-        userdata.block_counter = 0
-        print(userdata.parameters)
-        userdata.room_name = userdata.parameters[0].data
-        userdata.location_name = userdata.parameters[1].data
+            ud.social_role = rospy.get_param('/hobbit/social_role')
+        ud.block_counter = 0
+        print(ud.parameters)
+        ud.room_name = ud.parameters[0].data
+        ud.location_name = ud.parameters[1].data
         return 'succeeded'
 
 
@@ -52,22 +51,22 @@ class CallCheck(State):
         State.__init__(self,
                        outcomes=['voice', 'touch', 'preempted', 'failure'],
                        input_keys=['command', 'parameters'],
-                       output_keys=['question', 'timeframe', 'parameters']
+                       output_keys=['question', 'timeframe']
                        )
 
-    def execute(self, userdata):
+    def execute(self, ud):
         if self.preempt_requested():
-            userdata.result = String('preempted')
+            ud.result = String('preempted')
             return 'preempted'
-        print(userdata.parameters)
-        print(userdata.command)
+        print(ud.parameters)
+        print(ud.command)
         return 'touch'
-        if userdata.parameters[0].data.lower() == 'command':
+        if ud.parameters[0].data.lower() == 'command':
             # TODO: Change hardcoded question to one from the translation pack
             pass
         else:
             rospy.loginfo(
-                'Unknown type in GeneralHobbitAction: %s' % userdata.command.data)
+                'Unknown type in GeneralHobbitAction: %s' % ud.command.data)
             return 'failure'
 
 
@@ -84,9 +83,9 @@ class CleanUp(State):
         )
         self.pub_face = rospy.Publisher('/Hobbit/Emoticon', String)
 
-    def execute(self, userdata):
+    def execute(self, ud):
         self.pub_face.publish('EMO_SAD')
-        userdata.result = String('Unable to go to location')
+        ud.result = String('Unable to go to location')
         return 'succeeded'
 
 
@@ -104,14 +103,14 @@ class SetSuccess(State):
         self.pub = rospy.Publisher('/DiscreteMotionCmd', String)
         self.pub_face = rospy.Publisher('/Hobbit/Emoticon', String)
 
-    def execute(self, userdata):
+    def execute(self, ud):
         self.pub_face.publish('EMO_HAPPY')
         self.pub.publish('Stop')
         if self.preempt_requested():
-            userdata.result = String('preempted')
+            ud.result = String('preempted')
             self.service_preempt()
             return 'preempted'
-        userdata.result = String('Location reached')
+        ud.result = String('Location reached')
         return 'succeeded'
 
 
@@ -129,14 +128,14 @@ class SetFailure(State):
         self.pub = rospy.Publisher('/DiscreteMotionCmd', String)
         self.pub_face = rospy.Publisher('/Hobbit/Emoticon', String)
 
-    def execute(self, userdata):
+    def execute(self, ud):
         self.pub_face.publish('EMO_SAD')
         self.pub.publish('Stop')
         if self.preempt_requested():
-            userdata.result = String('preempted')
+            ud.result = String('preempted')
             self.service_preempt()
             return 'preempted'
-        userdata.result = String('failure')
+        ud.result = String('failure')
         return 'succeeded'
 
 
@@ -148,13 +147,11 @@ class DummyNo(State):
         State.__init__(
             self,
             outcomes=['no', 'yes'],
-            input_keys=['command', 'parameters'],
-            output_keys=['result', 'command', 'room_name', 'location_name', 'parameters']
+            input_keys=['command'],
+            output_keys=['result', 'command']
         )
 
-    def execute(self, userdata):
-        rospy.loginfo('CHECK_VIEW: room_name: %s' % userdata.parameters[0].data)
-        rospy.loginfo('CHECK_VIEW: place_name: %s' % userdata.parameters[1].data)
+    def execute(self, ud):
         return 'no'
 
 
@@ -170,9 +167,9 @@ class BlockedFirst(State):
             output_keys=['block_counter']
         )
 
-    def execute(self, userdata):
-        if userdata.block_counter < 2:
-            userdata.block_counter += 1
+    def execute(self, ud):
+        if ud.block_counter < 2:
+            ud.block_counter += 1
             return 'first'
         else:
             return 'second'
@@ -190,7 +187,7 @@ class DummyYes(State):
             output_keys=['result', 'command']
         )
 
-    def execute(self, userdata):
+    def execute(self, ud):
         return 'yes'
 
 
@@ -206,8 +203,8 @@ class Dummy(State):
             output_keys=['result', 'command']
         )
 
-    def execute(self, userdata):
-        #userdata.result = String('')
+    def execute(self, ud):
+        #ud.result = String('')
         #rospy.sleep(2.0)
         return 'succeeded'
 
@@ -225,7 +222,7 @@ def main():
     goto_sm = StateMachine(
         outcomes=['succeeded', 'failure', 'preempted'],
         input_keys=['command', 'previous_state', 'parameters'],
-        output_keys=['result', 'room_name', 'location_name'])
+        output_keys=['result'])
 
     seq = Sequence(
         outcomes=['succeeded', 'failed', 'preempted'],
@@ -236,27 +233,27 @@ def main():
     goto_sm.userdata.result = String('started')
     goto_sm.userdata.emotion = 'WONDERING'
     goto_sm.userdata.emo_time = 1
-    goto_sm.userdata.room = 'room_name_dummy'
 
     with goto_sm:
         StateMachine.add(
             'INIT',
             Init(),
-            transitions={'succeeded': 'CALL_CHECK'},
-            remapping={'room_name': 'room'}
+            transitions={'succeeded': 'CALL_CHECK'}
+            # TODO: Do we get touch info from MMUI?
+            # If yes, do EMO_WONDERING + T_GT_SelectPlace
         )
         StateMachine.add(
             'CALL_CHECK',
             CallCheck(),
             transitions={'touch': 'EMO_HAPPY',
                          'voice': 'EMO_WONDERING',
-                         'preempted': 'LOG_PREEMPT'}
+                         'preempted': 'preempted'}
         )
         StateMachine.add(
             'EMO_WONDERING',
             #HobbitEmotions.ShowEmotions(emotion='EMO_WONDERING', emo_time=4),
             HobbitEmotions.ShowEmotions(emotion='EMO_WONDERING', emo_time=1),
-            transitions={'preempted': 'LOG_PREEMPT',
+            transitions={'preempted': 'preempted',
                          'succeeded': 'MMUI_ConfirmPlace',
                          'failed': 'SET_FAILURE'}
         )
@@ -266,7 +263,7 @@ def main():
             transitions={'yes': 'EMO_HAPPY',
                          'no': 'MMUI_REPEAT_CMD',
                          'failed': 'SET_FAILURE',
-                         'preempted': 'LOG_PREEMPT',
+                         'preempted': 'preempted',
                          'timeout': 'MMUI_ConfirmPlace',
                          '3times': 'SET_FAILURE'}
         )
@@ -274,7 +271,7 @@ def main():
             'MMUI_REPEAT_CMD',
             #HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=4),
             HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=1),
-            transitions={'preempted': 'LOG_PREEMPT',
+            transitions={'preempted': 'preempted',
                          'succeeded': 'failure',
                          'failed': 'SET_FAILURE'}
         )
@@ -282,7 +279,7 @@ def main():
             'EMO_HAPPY',
             #HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=4),
             HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=1),
-            transitions={'preempted': 'LOG_PREEMPT',
+            transitions={'preempted': 'preempted',
                          'succeeded': 'VIEW_BLOCKED',
                          'failed': 'SET_FAILURE'}
         )
@@ -290,13 +287,13 @@ def main():
             'VIEW_BLOCKED',
             DummyNo(),
             transitions={'yes': 'EMO_SAD',
-                         'no': 'MMUI_SAY_GoingToPlace'}
+                         'no': 'SEQ'}
         )
         StateMachine.add(
             'EMO_SAD',
             #HobbitEmotions.ShowEmotions(emotion='EMO_SAD', emo_time=4),
             HobbitEmotions.ShowEmotions(emotion='EMO_SAD', emo_time=1),
-            transitions={'preempted': 'LOG_PREEMPT',
+            transitions={'preempted': 'preempted',
                          'succeeded': 'COUNT_CHECK',
                          'failed': 'SET_FAILURE'}
         )
@@ -310,37 +307,35 @@ def main():
             'MMUI_SAY_CAM_BLOCKED',
             speech_output.sayText(info='T_GT_EyesBlockedMoveObject'),
             transitions={'succeeded': 'VIEW_BLOCKED',
-                         'preempted': 'LOG_PREEMPT',
+                         'preempted': 'preempted',
                          'failed': 'SET_FAILURE'}
         )
         StateMachine.add(
             'MMUI_SAY_CAM_STILL_BLOCKED',
             speech_output.sayText(info='T_GT_EyesBlockedRemoveObject'),
             transitions={'succeeded': 'SET_FAILURE',
-                         'preempted': 'LOG_PREEMPT',
+                         'preempted': 'preempted',
                          'failed': 'SET_FAILURE'}
         )
-        StateMachine.add(
-            'MMUI_SAY_GoingToPlace',
-            speech_output.sayTextRoom(info='T_GT_GoingToPlace',
-                                      room=goto_sm.userdata.room),
-            transitions={'succeeded': 'SEQ',
-                         'failed': 'SET_FAILURE'})
         StateMachine.add(
             'SEQ',
             seq,
             transitions={'succeeded': 'SET_SUCCESS',
                          'failed': 'SET_FAILURE',
-                         'preempted': 'LOG_PREEMPT'}
+                         'preempted': 'preempted'}
         )
         with seq:
             Sequence.add(
                 'EMO_HAPPY',
                 HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=1))
+            Sequence.add(
+                'MMUI_SAY_GoingToPlace',
+                speech_output.sayText(info='T_GT_GoingToPlace'))
             if not DEBUGGOTO:
                 Sequence.add(
                     'SET_NAV_GOAL',
 	                hobbit_move.get_set_nav_goal_state(),
+                    #hobbit_move.SetNavigationGoal(frame='/map'),
                     transitions={'aborted': 'failed'}
                 )
                 Sequence.add(
@@ -358,6 +353,7 @@ def main():
                                  'succeeded': 'EMO_HAPPY_1'})
             Sequence.add(
                 'EMO_SAD',
+                #HobbitEmotions.ShowEmotions(emotion='EMO_SAD', emo_time=4))
                 HobbitEmotions.ShowEmotions(emotion='EMO_SAD', emo_time=1))
             Sequence.add(
                 'MMUI_SAY_WayBlocked',
@@ -369,6 +365,7 @@ def main():
                 transitions={'succeeded': 'failed'})
             Sequence.add(
                 'EMO_HAPPY_1',
+                #HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=4))
                 HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=1))
             Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
                      head_move.MoveTo(pose='center_center'),
@@ -379,34 +376,19 @@ def main():
         StateMachine.add(
             'SET_SUCCESS',
             SetSuccess(),
-            transitions={'succeeded': 'LOG_SUCCESS',
+            transitions={'succeeded': 'succeeded',
                          'preempted': 'CLEAN_UP'}
         )
         StateMachine.add(
             'SET_FAILURE',
             SetFailure(),
-            transitions={'succeeded': 'LOG_ABORT',
-                         'preempted': 'LOG_PREEMPT'}
+            transitions={'succeeded': 'failure',
+                         'preempted': 'preempted'}
         )
         StateMachine.add(
             'CLEAN_UP',
             CleanUp(),
-            transitions={'succeeded': 'LOG_PREEMPT'})
-        StateMachine.add(
-            'LOG_PREEMPT',
-            log.DoLogPreempt(scenario='GoTo'),
-            transitions={'succeeded': 'preempted'}
-        )
-        StateMachine.add(
-            'LOG_ABORT',
-            log.DoLogPreempt(scenario='GoTo'),
-            transitions={'succeeded': 'failure'}
-        )
-        StateMachine.add(
-            'LOG_SUCCESS',
-            log.DoLogPreempt(scenario='GoTo'),
-            transitions={'succeeded': 'succeeded'}
-        )
+            transitions={'succeeded': 'preempted'})
 
     asw = ActionServerWrapper(
         'goto',
