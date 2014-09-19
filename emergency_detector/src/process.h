@@ -9,7 +9,10 @@ extern "C"
 
 extern unsigned int doCVOutput;
 extern unsigned int emergencyDetected;
+extern unsigned int personDetected;
 
+
+extern float temperatureX,temperatureY,temperatureZ;
 extern float temperatureAmbientDetected;
 extern float temperatureObjectDetected;
 extern unsigned int tempTimestamp;

@@ -30,6 +30,7 @@
 
 #include "emergency_detector/SkeletonBBox.h"
 #include "emergency_detector/Skeleton2D.h"
+#include "emergency_detector/Person.h"
 
 #include <std_msgs/Float32.h>
 
@@ -39,7 +40,18 @@
 #include "hobbit_msgs/Event.h"
 #include <std_msgs/String.h>
 ros::Publisher gestureEventBroadcaster;
+ros::Publisher personBroadcaster;
 #endif
+
+
+
+#define USE_PERSON_AGGREGATOR 1
+
+#if USE_PERSON_AGGREGATOR
+ #define PERSON_TOPIC "/emergency_detector/persons"
+#else
+ #define PERSON_TOPIC "persons"
+#endif // USE_PERSON_AGGREGATOR
 
 
 #define DEFAULT_FRAME_RATE 4
@@ -56,23 +68,36 @@ message_filters::Subscriber<sensor_msgs::CameraInfo> *depth_cam_info_sub;
 
 typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image> RgbdSyncPolicy;
 
-enum HEAD_LOOK_DIRECTION_ENUM
-{
-   HEAD_UNKNOWN_DIRECTION = 0,
-   HEAD_LOOKING_DOWN     ,
-   HEAD_LOOKING_CENTER  ,
-   HEAD_LOOKING_UP
-};
-
-
 
 bool first=false;
 int key = 0;
-unsigned int headLookingDirection=HEAD_UNKNOWN_DIRECTION;
 unsigned int frameTimestamp=0;
 ros::NodeHandle * nhPtr=0;
 unsigned int paused=0;
+unsigned int dontPublishPersons=0;
 unsigned int fakeTemperatureActivated=0;
+
+
+void broadcastNewPerson()
+{
+  if (dontPublishPersons) { return ; }
+  personDetected=0;
+
+  emergency_detector::Person msg;
+  msg.x = temperatureX;
+  msg.y = temperatureY;
+  msg.z = temperatureZ;;
+  msg.source = 5; //5 = temperature / emergency
+  msg.theta = 0;
+
+  msg.inFieldOfView = 1;
+  msg.confidence = 0.5;
+  msg.timestamp=frameTimestamp;
+
+  fprintf(stderr,"Publishing a new Person\n");
+  personBroadcaster.publish(msg);
+  ros::spinOnce();
+}
 
 
 
@@ -183,21 +208,21 @@ bool fakeTemperature(std_srvs::Empty::Request& request, std_srvs::Empty::Respons
 
 bool lookingUp(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    headLookingDirection=HEAD_LOOKING_UP;
+    fallDetectionContext.headLookingDirection=HEAD_LOOKING_UP;
     return true;
 }
 
 
 bool lookingDown(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    headLookingDirection=HEAD_LOOKING_DOWN;
+    fallDetectionContext.headLookingDirection=HEAD_LOOKING_DOWN;
     return true;
 }
 
 
 bool lookingCenter(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    headLookingDirection=HEAD_LOOKING_CENTER;
+    fallDetectionContext.headLookingDirection=HEAD_LOOKING_CENTER;
     return true;
 }
 
@@ -222,9 +247,7 @@ void jointsReceived(const emergency_detector::Skeleton2D & msg)
         fallDetectionContext.lastJoint2D[i].x = (float) msg.joints2D[i*2];
         fallDetectionContext.lastJoint2D[i].y = (float) msg.joints2D[1+(i*2)];
     }
-
   }
-
 }
 
 
@@ -330,8 +353,11 @@ int main(int argc, char **argv)
      ros::Subscriber subTempObject = nh.subscribe("/head/tempObject",1000,getObjectTemperature);
      #if BROADCAST_HOBBIT
       gestureEventBroadcaster = nh.advertise <hobbit_msgs::Event> ("Event", 1000);
+      personBroadcaster = nh.advertise <emergency_detector::Person> (PERSON_TOPIC, 1000);
      #endif
 
+
+     fallDetectionContext.headLookingDirection=HEAD_UNKNOWN_DIRECTION;
      initializeProcess();
 
       //Create our context
@@ -345,6 +371,7 @@ int main(int argc, char **argv)
                                   { loop_rate.sleep();     }
 
                   if(emergencyDetected) { broadcastEmergency(frameTimestamp); }
+                  if (personDetected)   { broadcastNewPerson(); }
 
                   if (frameTimestamp%20) { fprintf(stderr,"."); }
 		 }

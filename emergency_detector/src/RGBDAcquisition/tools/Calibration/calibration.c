@@ -422,6 +422,11 @@ int transform3DPointUsingCalibration(struct calibration * calib , float * x , fl
 
 int transform2DProjectedPointTo3DPoint(struct calibration * calib , unsigned int x2d , unsigned int y2d  , unsigned short depthValue , float * x , float * y , float * z)
 {
+    if (calib==0)
+    {
+      fprintf(stderr,"Cannot transform2DProjectedPointTo3DPoint without a calibration \n ");
+      return 0;
+    }
     if ( (calib->intrinsic[CALIB_INTR_FX]==0) || (calib->intrinsic[CALIB_INTR_FY]==0) )
     {
       fprintf(stderr,"Focal Length is 0.0 , cannot transform2DProjectedPointTo3DPoint \n ");

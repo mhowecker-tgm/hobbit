@@ -8,6 +8,15 @@ extern "C"
 #endif
 
 
+enum HEAD_LOOK_DIRECTION_ENUM
+{
+   HEAD_UNKNOWN_DIRECTION = 0,
+   HEAD_LOOKING_DOWN     ,
+   HEAD_LOOKING_CENTER  ,
+   HEAD_LOOKING_UP
+};
+
+
 #define ABSDIFF(num1,num2) ( (num1-num2) >=0 ? (num1-num2) : (num2 - num1) )
 
 #define MAX_NUMBER_OF_2D_JOINTS 30
@@ -30,6 +39,8 @@ struct floatTriplet
 
 struct fallState
 {
+   unsigned int headLookingDirection;
+
    unsigned int state;
    struct floatTriplet bboxLast,bboxDelta,bboxCurrent,bboxAverage;
    struct floatTriplet posLast,posDelta,posCurrent,posAverage;
