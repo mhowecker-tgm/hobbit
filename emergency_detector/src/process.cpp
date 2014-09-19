@@ -1,4 +1,5 @@
 #include "process.h"
+#include "fall_detection.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -60,7 +61,14 @@ int processBoundingBox(
 {
    bboxCX=ctX,bboxCY=ctY,bboxCZ=ctZ,bboxWidth=sizeX,bboxHeight=sizeY,bboxDepth=sizeZ;
    bboxTimeStamp=matchingTimestamp;
-   fprintf(stderr,"Received BBOX %f , %f , %f ( ts %u )\n", sizeX , sizeY , sizeZ , bboxTimeStamp);
+   fprintf(stderr,"Received BBOX center(%0.2f,%0.2f,%0.2f) size(%0.2f,%0.2f,%0.2f) ts(%u)\n", ctX,ctY,ctZ, sizeX , sizeY , sizeZ , bboxTimeStamp);
+
+   if (userHasFallen(&fallDetectionContext))
+        {
+          fprintf(stderr,MAGENTA "\n\n  Falling User Detected , EMERGENCY \n\n" NORMAL);
+          emergencyDetected=1;
+        }
+
 }
 
 unsigned char * copyRGB(unsigned char * source , unsigned int width , unsigned int height)
@@ -152,7 +160,7 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
            ( depthAvg < maxScoreTrigger)
          )
                        {
-                        fprintf(stderr,MAGENTA "\n\n  EMERGENCY triggered  \n\n" NORMAL);
+                        fprintf(stderr,MAGENTA "\n\n  Already Fallen User Detected , EMERGENCY \n\n" NORMAL);
                         emergencyDetected=1;
                        }
 

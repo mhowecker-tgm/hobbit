@@ -323,8 +323,8 @@ int main(int argc, char **argv)
                   if (doCVOutput) { vis_loop_rate.sleep(); } else
                                   { loop_rate.sleep();     }
 
-                  if(emergencyDetected)
-                      { broadcastEmergency(frameTimestamp); }
+                  // Disabled for now :
+                  //if(emergencyDetected) { broadcastEmergency(frameTimestamp); }
 
                   if (frameTimestamp%20) { fprintf(stderr,"."); }
 		 }

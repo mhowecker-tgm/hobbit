@@ -21,6 +21,7 @@ include_directories(${catkin_INCLUDEDIR}
 add_executable(emergency_detector 
                src/main.cpp
                src/process.cpp
+               src/fall_detection.cpp
                src/RGBDAcquisition/acquisitionSegment/AcquisitionSegment.c
                src/RGBDAcquisition/acquisitionSegment/automaticPlaneSegmentation.c
                src/RGBDAcquisition/acquisitionSegment/colorSelector.c
