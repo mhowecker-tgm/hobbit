@@ -9,6 +9,7 @@
 #include <image_transport/image_transport.h>
 
 #include "process.h"
+#include "fall_detection.h"
 
 #include <message_filters/subscriber.h>
 #include <message_filters/sync_policies/approximate_time.h>
@@ -28,6 +29,7 @@
 #include <image_transport/image_transport.h>
 
 #include "emergency_detector/SkeletonBBox.h"
+#include "emergency_detector/Skeleton2D.h"
 
 #include <std_msgs/Float32.h>
 
@@ -208,6 +210,29 @@ void bboxReceived(const emergency_detector::SkeletonBBox & msg)
 }
 
 
+void jointsReceived(const emergency_detector::Skeleton2D & msg)
+{
+  if (msg.numberOfJoints/2 < MAX_NUMBER_OF_2D_JOINTS)
+  {
+    unsigned int i=0;
+    fallDetectionContext.numberOfJoints = (unsigned int) msg.numberOfJoints/2;
+    for (i=0; i<fallDetectionContext.numberOfJoints; i++)
+    {
+        fallDetectionContext.lastJoint2D[i].x = (float) msg.joints2D[i*2];
+        fallDetectionContext.lastJoint2D[i].y = (float) msg.joints2D[1+(i*2)];
+    }
+
+    /*
+    for (i=0; i<fallDetectionContext.numberOfJoints; i++)
+    {
+       fprintf(stderr,"%u=%0.2f,%0.2f\n",i,fallDetectionContext.lastJoint2D[i].x,fallDetectionContext.lastJoint2D[i].y);
+    }
+    */
+  }
+
+}
+
+
 //RGBd Callback is called every time we get a new pair of frames , it is synchronized to the main thread
 void rgbdCallbackNoCalibration(const sensor_msgs::Image::ConstPtr rgb_img_msg,
                                  const sensor_msgs::Image::ConstPtr depth_img_msg  )
@@ -304,6 +329,7 @@ int main(int argc, char **argv)
      sync = new message_filters::Synchronizer<RgbdSyncPolicy>(RgbdSyncPolicy(rate), *rgb_img_sub, *depth_img_sub); //*rgb_cam_info_sub,
 	 sync->registerCallback(rgbdCallbackNoCalibration);
 
+     ros::Subscriber sub2D = nh.subscribe("joints2D",1000,jointsReceived);
      ros::Subscriber sub = nh.subscribe("jointsBBox",1000,bboxReceived);
      ros::Subscriber subTempAmbient = nh.subscribe("/head/tempAmbient",1000,getAmbientTemperature);
      ros::Subscriber subTempObject = nh.subscribe("/head/tempObject",1000,getObjectTemperature);

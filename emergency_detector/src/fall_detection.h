@@ -7,6 +7,7 @@ extern "C"
 {
 #endif
 
+#define MAX_NUMBER_OF_2D_JOINTS 30
 
 enum FALL_DETECTION_STATE_ENUM
 {
@@ -29,6 +30,11 @@ struct fallState
    unsigned int state;
    struct floatTriplet bboxLast,bboxDelta,bboxCurrent,bboxAverage;
    struct floatTriplet posLast,posDelta,posCurrent,posAverage;
+
+
+   unsigned int numberOfJoints;
+   struct floatTriplet lastJoint2D[MAX_NUMBER_OF_2D_JOINTS];
+
 };
 
 

@@ -195,7 +195,7 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
         //if (temperatureObjectDetected>40) { temperatureObjectDetected=28;}
 
         Scalar tempColor = Scalar ( tempColorB , tempColorG , tempColorR );
-        circle(bgrMat,  centerPt , 15 , tempColor , 4, 8 , 0);
+        circle(bgrMat,  centerPt , 20 , tempColor , 4, 8 , 0);
 
         char rectVal[123]={0};
 
@@ -240,6 +240,19 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
         putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , color , 2 , 8 );
         txtPosition.y += 24; snprintf(rectVal,123,"Temperature : %0.2f C",temperatureObjectDetected);
         putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , color , 2 , 8 );
+
+
+        unsigned int i=0;
+        for (i=0; i<fallDetectionContext.numberOfJoints; i++)
+         {
+           Scalar jointColor = Scalar ( 0 , 255 , 0 );
+           if ( ( fallDetectionContext.lastJoint2D[i].x!=0.0 ) || ( fallDetectionContext.lastJoint2D[i].y!=0.0) )
+           {
+               centerPt.x=fallDetectionContext.lastJoint2D[i].x;       centerPt.y=fallDetectionContext.lastJoint2D[i].y;
+               circle(bgrMat,  centerPt , 10 , jointColor , -4, 8 , 0);
+           }
+         }
+
 
 	    cv::imshow("emergency_detector segmented rgb",bgrMat);
 	    cv::waitKey(1);
