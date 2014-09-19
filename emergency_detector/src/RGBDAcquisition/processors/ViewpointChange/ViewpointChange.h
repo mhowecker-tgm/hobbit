@@ -17,7 +17,7 @@ int viewPointChange_newFramesCompare(unsigned char *  prototype , unsigned char 
 
 unsigned int viewPointChange_countDepths(unsigned short *  depth, unsigned int imageWidth , unsigned int imageHeight  ,
                                 unsigned int x , unsigned int y , unsigned int width , unsigned int height ,
-                                unsigned int depthRange );
+                                unsigned int depthRange , unsigned int ignoreHoles );
 
 
 #ifdef __cplusplus

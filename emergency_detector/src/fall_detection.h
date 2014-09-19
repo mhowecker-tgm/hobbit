@@ -7,6 +7,9 @@ extern "C"
 {
 #endif
 
+
+#define ABSDIFF(num1,num2) ( (num1-num2) >=0 ? (num1-num2) : (num2 - num1) )
+
 #define MAX_NUMBER_OF_2D_JOINTS 30
 
 enum FALL_DETECTION_STATE_ENUM
@@ -32,6 +35,7 @@ struct fallState
    struct floatTriplet posLast,posDelta,posCurrent,posAverage;
 
 
+   unsigned int jointsTimestamp;
    unsigned int numberOfJoints;
    struct floatTriplet lastJoint2D[MAX_NUMBER_OF_2D_JOINTS];
 
@@ -40,8 +44,9 @@ struct fallState
 
 extern struct fallState fallDetectionContext;
 
-
-int userHasFallen(struct fallState * fs);
+int userIsRecent(struct fallState * fs,unsigned int timeStamp);
+int userIsStanding(struct fallState * fs,unsigned int timeStamp);
+int userHasFallen(struct fallState * fs,unsigned int timeStamp);
 
 #ifdef __cplusplus
 }

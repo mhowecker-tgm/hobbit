@@ -215,6 +215,7 @@ void jointsReceived(const emergency_detector::Skeleton2D & msg)
   if (msg.numberOfJoints/2 < MAX_NUMBER_OF_2D_JOINTS)
   {
     unsigned int i=0;
+    fallDetectionContext.jointsTimestamp = frameTimestamp;
     fallDetectionContext.numberOfJoints = (unsigned int) msg.numberOfJoints/2;
     for (i=0; i<fallDetectionContext.numberOfJoints; i++)
     {
@@ -222,12 +223,6 @@ void jointsReceived(const emergency_detector::Skeleton2D & msg)
         fallDetectionContext.lastJoint2D[i].y = (float) msg.joints2D[1+(i*2)];
     }
 
-    /*
-    for (i=0; i<fallDetectionContext.numberOfJoints; i++)
-    {
-       fprintf(stderr,"%u=%0.2f,%0.2f\n",i,fallDetectionContext.lastJoint2D[i].x,fallDetectionContext.lastJoint2D[i].y);
-    }
-    */
   }
 
 }

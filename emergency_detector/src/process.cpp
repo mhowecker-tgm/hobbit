@@ -37,8 +37,8 @@ unsigned int maximumFrameDifferenceForTemperatureToBeRelevant=10;
 unsigned int tempZoneWidth = 300;
 unsigned int tempZoneHeight = 200;
 
-unsigned int minScoreTrigger = 600;
-unsigned int maxScoreTrigger = 1000;
+unsigned int minScoreTrigger = 1500;
+unsigned int maxScoreTrigger = 2000;
 
 unsigned int doCVOutput=0;
 unsigned int emergencyDetected=0;
@@ -52,7 +52,6 @@ unsigned int bboxTimeStamp=0;
 
 
 
-#define ABSDIFF(num1,num2) ( (num1-num2) >=0 ? (num1-num2) : (num2 - num1) )
 
 int processBoundingBox(
                         float ctX,float ctY,float ctZ,
@@ -63,9 +62,9 @@ int processBoundingBox(
    bboxTimeStamp=matchingTimestamp;
    fprintf(stderr,"Received BBOX center(%0.2f,%0.2f,%0.2f) size(%0.2f,%0.2f,%0.2f) ts(%u)\n", ctX,ctY,ctZ, sizeX , sizeY , sizeZ , bboxTimeStamp);
 
-   if (userHasFallen(&fallDetectionContext))
+   if (userHasFallen(&fallDetectionContext,matchingTimestamp))
         {
-          fprintf(stderr,MAGENTA "\n\n  Falling User Detected , EMERGENCY \n\n" NORMAL);
+          fprintf(stderr,MAGENTA "\n\n  Live Falling User Detected , EMERGENCY \n\n" NORMAL);
           emergencyDetected=1;
         }
 
@@ -151,19 +150,23 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
                                 );
 
 
-      depthAvg = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , tempZoneStartX , tempZoneStartY , tempZoneWidth , tempZoneHeight , 1000 );
+      depthAvg = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , tempZoneStartX , tempZoneStartY , tempZoneWidth , tempZoneHeight , maxScoreTrigger , 1 );
       fprintf(stderr,"RECT Score is %u \n",depthAvg);
-
 
       if (
            ( depthAvg > minScoreTrigger) &&
            ( depthAvg < maxScoreTrigger)
          )
-                       {
-                        fprintf(stderr,MAGENTA "\n\n  Already Fallen User Detected , EMERGENCY \n\n" NORMAL);
-                        emergencyDetected=1;
-                       }
-
+         {
+           if (userIsStanding(&fallDetectionContext,frameTimestamp))
+            {
+             fprintf(stderr,RED "\n\n  We have a standing user , so he is taking care of fallen user , will not emit emergency \n\n" NORMAL );
+            } else
+            {
+              fprintf(stderr,MAGENTA "\n\n  Already Fallen User Detected , EMERGENCY \n\n" NORMAL);
+              emergencyDetected=1;
+            }
+          }
     }
 
 
@@ -241,7 +244,8 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
         txtPosition.y += 24; snprintf(rectVal,123,"Temperature : %0.2f C",temperatureObjectDetected);
         putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , color , 2 , 8 );
 
-
+       if (userIsRecent(&fallDetectionContext,frameTimestamp))
+       {
         unsigned int i=0;
         for (i=0; i<fallDetectionContext.numberOfJoints; i++)
          {
@@ -252,6 +256,8 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
                circle(bgrMat,  centerPt , 10 , jointColor , -4, 8 , 0);
            }
          }
+
+       }
 
 
 	    cv::imshow("emergency_detector segmented rgb",bgrMat);

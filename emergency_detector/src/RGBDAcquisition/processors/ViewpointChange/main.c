@@ -158,11 +158,12 @@ int viewPointChange_newFramesCompare(unsigned char *  prototype , unsigned char 
 
 
 unsigned int viewPointChange_countDepths(unsigned short *  depth, unsigned int imageWidth , unsigned int imageHeight  ,
-                                unsigned int x , unsigned int y , unsigned int width , unsigned int height ,
-                                unsigned int depthRange )
+                                         unsigned int x , unsigned int y , unsigned int width , unsigned int height ,
+                                         unsigned int depthRange , unsigned int ignoreHoles)
 {
   unsigned int depthSamples = 0;
   unsigned int totalDepth = 0;
+  unsigned int holesIgnored = 0;
 
   unsigned short * depthPTR;
   unsigned short * depthStart=depth+ (y * imageWidth) +x;
@@ -174,8 +175,11 @@ unsigned int viewPointChange_countDepths(unsigned short *  depth, unsigned int i
    depthPTR = depthStart;
    while ( depthPTR < depthLimit )
    {
-     totalDepth+=*depthPTR;
-     ++depthSamples;
+     if ( (ignoreHoles) && (*depthPTR==0) ) { ++holesIgnored; } else
+                                            {
+                                              totalDepth+=*depthPTR;
+                                              ++depthSamples;
+                                            }
 
     ++depthPTR;
    }
