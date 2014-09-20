@@ -94,7 +94,7 @@ void broadcastNewPerson()
   msg.confidence = 0.5;
   msg.timestamp=frameTimestamp;
 
-  fprintf(stderr,"Publishing a new Person @ %0.2f %0.2f %0.2f\n",temperatureX,temperatureY,temperatureZ);
+  fprintf(stderr, "Publishing a new Person @ %0.2f %0.2f %0.2f\n" ,temperatureX,temperatureY,temperatureZ);
   personBroadcaster.publish(msg);
   ros::spinOnce();
 }
@@ -190,9 +190,7 @@ bool visualizeOff(std_srvs::Empty::Request& request, std_srvs::Empty::Response& 
 {
     doCVOutput=0;
     cv::destroyAllWindows();
-    cv::destroyWindow("emergency_detector rgb");
-    cv::destroyWindow("emergency_detector depth");
-    cv::destroyWindow("emergency_detector segmented depth");
+    cv::destroyWindow("emergency_detector visualization");
 
     cv::waitKey(1);
     return true;
@@ -240,13 +238,19 @@ void jointsReceived(const emergency_detector::Skeleton2D & msg)
   if (msg.numberOfJoints/2 < MAX_NUMBER_OF_2D_JOINTS)
   {
     unsigned int i=0;
+    fallDetectionContext.lastJointsTimestamp = fallDetectionContext.jointsTimestamp;
     fallDetectionContext.jointsTimestamp = frameTimestamp;
     fallDetectionContext.numberOfJoints = (unsigned int) msg.numberOfJoints/2;
     for (i=0; i<fallDetectionContext.numberOfJoints; i++)
     {
-        fallDetectionContext.lastJoint2D[i].x = (float) msg.joints2D[i*2];
-        fallDetectionContext.lastJoint2D[i].y = (float) msg.joints2D[1+(i*2)];
+        fallDetectionContext.lastJoint2D[i].x = fallDetectionContext.currentJoint2D[i].x;
+        fallDetectionContext.lastJoint2D[i].y = fallDetectionContext.currentJoint2D[i].y;
+
+        fallDetectionContext.currentJoint2D[i].x = (float) msg.joints2D[i*2];
+        fallDetectionContext.currentJoint2D[i].y = (float) msg.joints2D[1+(i*2)];
     }
+
+    logSkeletonState(&fallDetectionContext);
   }
 }
 

@@ -162,7 +162,9 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
                                               )
            )
             {
-                 personDetected=1;
+               if (temperatureZ==0)    { fprintf(stderr,YELLOW "Will not emit person message because we don't have a depth\n" NORMAL); } else
+               if (temperatureZ<=2500) { personDetected=1; } else
+                                       { fprintf(stderr,YELLOW "Will not emit person message because skeleton is too far (%0.2f mm) to trust thermometer\n" NORMAL,temperatureZ); }
             }
      }
   }
@@ -295,21 +297,26 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
 
        if (userIsRecent(&fallDetectionContext,frameTimestamp))
        {
+
+        txtPosition.y += 24; snprintf(rectVal,123,"Sk Movem. : %u",fallDetectionContext.skeletonVelocity);
+        putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , color , 2 , 8 );
+
+
         unsigned int i=0;
         for (i=0; i<fallDetectionContext.numberOfJoints; i++)
          {
            Scalar jointColor = Scalar ( 0 , 255 , 0 );
-           if ( ( fallDetectionContext.lastJoint2D[i].x!=0.0 ) || ( fallDetectionContext.lastJoint2D[i].y!=0.0) )
+           if ( ( fallDetectionContext.currentJoint2D[i].x!=0.0 ) || ( fallDetectionContext.currentJoint2D[i].y!=0.0) )
            {
-               centerPt.x=fallDetectionContext.lastJoint2D[i].x;       centerPt.y=fallDetectionContext.lastJoint2D[i].y;
-               circle(bgrMat,  centerPt , 10 , jointColor , -4, 8 , 0);
+               centerPt.x=fallDetectionContext.currentJoint2D[i].x;       centerPt.y=fallDetectionContext.currentJoint2D[i].y;
+               circle(bgrMat,  centerPt , 15 , jointColor , -4, 8 , 0);
            }
          }
 
        }
 
 
-	    cv::imshow("emergency_detector segmented rgb",bgrMat);
+	    cv::imshow("emergency_detector visualization",bgrMat);
 	    cv::waitKey(1);
       }
 

@@ -46,12 +46,17 @@ struct fallState
    struct floatTriplet posLast,posDelta,posCurrent,posAverage;
 
 
+
+   unsigned int skeletonVelocity;
    unsigned int jointsTimestamp;
+   unsigned int lastJointsTimestamp;
    unsigned int numberOfJoints;
+   struct floatTriplet currentJoint2D[MAX_NUMBER_OF_2D_JOINTS];
    struct floatTriplet lastJoint2D[MAX_NUMBER_OF_2D_JOINTS];
 
 };
 
+int logSkeletonState(struct fallState * fs);
 
 extern struct fallState fallDetectionContext;
 
