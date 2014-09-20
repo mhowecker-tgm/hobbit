@@ -68,12 +68,12 @@ int processBoundingBox(
 {
    bboxCX=ctX,bboxCY=ctY,bboxCZ=ctZ,bboxWidth=sizeX,bboxHeight=sizeY,bboxDepth=sizeZ;
    bboxTimeStamp=matchingTimestamp;
-
+/*
    if (userHasFallen(&fallDetectionContext,matchingTimestamp))
         {
           fprintf(stderr,MAGENTA "\n\n  Live Falling User Detected , EMERGENCY \n\n" NORMAL);
           emergencyDetected=1;
-        }
+        }*/
 
 }
 
@@ -174,7 +174,8 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
     if (userHasFallen(&fallDetectionContext,frameTimestamp))
         {
           fprintf(stderr,MAGENTA "\n\n  Live Falling User Detected , EMERGENCY \n\n" NORMAL);
-          emergencyDetected=1;
+          fprintf(stderr,RED "\n\n  Currently Disabled \n\n" NORMAL);
+          //emergencyDetected=1;
         }
 
    }
