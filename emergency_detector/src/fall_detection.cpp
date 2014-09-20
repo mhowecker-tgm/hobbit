@@ -30,9 +30,9 @@ int isSkeletonFallenAndFar(struct fallState * fs)
 {
   //If we are standing we have at least 1 particle high on the Y axis of the frame..!
   unsigned int i=0;
-  unsigned int height=0;
+  unsigned int height=6660;
 
-  if (fs->headLookingDirection==HEAD_LOOKING_CENTER) { height=400; } else
+  if (fs->headLookingDirection==HEAD_LOOKING_CENTER) { height=350; } else
   if (fs->headLookingDirection==HEAD_LOOKING_DOWN)   { height=240; }
 
   unsigned int lowPoints = 0;
