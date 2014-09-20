@@ -68,7 +68,6 @@ int processBoundingBox(
 {
    bboxCX=ctX,bboxCY=ctY,bboxCZ=ctZ,bboxWidth=sizeX,bboxHeight=sizeY,bboxDepth=sizeZ;
    bboxTimeStamp=matchingTimestamp;
-   //fprintf(stderr,"Received BBOX center(%0.2f,%0.2f,%0.2f) size(%0.2f,%0.2f,%0.2f) ts(%u)\n", ctX,ctY,ctZ, sizeX , sizeY , sizeZ , bboxTimeStamp);
 
    if (userHasFallen(&fallDetectionContext,matchingTimestamp))
         {
@@ -168,6 +167,14 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
                                        { fprintf(stderr,YELLOW "Will not emit person message because skeleton is too far (%0.2f mm) to trust thermometer\n" NORMAL,temperatureZ); }
             }
      }
+
+
+
+    if (userHasFallen(&fallDetectionContext,frameTimestamp))
+        {
+          fprintf(stderr,MAGENTA "\n\n  Live Falling User Detected , EMERGENCY \n\n" NORMAL);
+          emergencyDetected=1;
+        }
   }
 
 
@@ -214,11 +221,11 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
              else
             {
               //We are almost sure we have a fallen blob , but maybe the blob continues on the top side ( so it is a standing user after all
-              unsigned int overHeight=80;
+              unsigned int overHeight=120;
               unsigned int depthAvgOver = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , tempZoneStartX , tempZoneStartY-overHeight , tempZoneWidth , overHeight , maxScoreTrigger , 1 , &holesEncountered );
               fprintf(stderr,MAGENTA "\n\n  Top Avg is %u mm Holes are %0.2f %% \n\n" NORMAL , depthAvgOver, (float) (100*holesEncountered)/(tempZoneWidth*overHeight));
 
-              if (holesEncountered> ( (unsigned int) tempZoneWidth*overHeight*70/100 ) )
+              if (holesEncountered> ( (unsigned int) tempZoneWidth*overHeight*80/100 ) )
                {
                  fprintf(stderr,MAGENTA "\n\n  Already Fallen User Detected , EMERGENCY \n\n" NORMAL);
                  emergencyDetected=1;
@@ -229,9 +236,6 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
             }
           }
     }
-
-
-
 
       if (doCVOutput)
       {
@@ -263,14 +267,7 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
         int fontUsed=FONT_HERSHEY_SIMPLEX; //FONT_HERSHEY_SCRIPT_SIMPLEX;
         Point txtPosition;  txtPosition.x = pt1.x+15; txtPosition.y = pt1.y+20;
 
-        if (fallDetectionContext.headLookingDirection!=HEAD_LOOKING_DOWN)
-        {
-          putText(bgrMat , "Head Not Looking Down" , txtPosition , fontUsed , 0.7 , color , 2 , 8 );
-        } else
-        if (segmentedRGB==0)
-        {
-          putText(bgrMat , "Low Temp / Power Save" , txtPosition , fontUsed , 0.7 , color , 2 , 8 );
-        } else
+
         if ( emergencyDetected )
         {
           putText(bgrMat , "Emergency Detected ..! " , txtPosition , fontUsed , 0.7 , color , 2 , 8 );
@@ -297,9 +294,13 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
           line(bgrMat,ur,ptIn1 , colorEmergency , 2 , 8 , 0);
           line(bgrMat,dl,ptIn2 , colorEmergency , 2 , 8 , 0);
         } else
-        {
-          putText(bgrMat , "Scanning for emergency .." , txtPosition , fontUsed , 0.7 , color , 2 , 8 );
-        }
+        if (fallDetectionContext.headLookingDirection!=HEAD_LOOKING_DOWN)
+           { putText(bgrMat , "Head Not Looking Down" , txtPosition , fontUsed , 0.7 , color , 2 , 8 ); }
+            else
+        if (segmentedRGB==0)
+           { putText(bgrMat , "Low Temp / Power Save" , txtPosition , fontUsed , 0.7 , color , 2 , 8 ); }
+            else
+           { putText(bgrMat , "Scanning for emergency .." , txtPosition , fontUsed , 0.7 , color , 2 , 8 ); }
         txtPosition.y += 24; snprintf(rectVal,123,"Score : %u",depthAvg);
         putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , color , 2 , 8 );
         txtPosition.y += 24; snprintf(rectVal,123,"Temperature : %0.2f C",temperatureObjectDetected);
@@ -307,10 +308,8 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
 
        if (userIsRecent(&fallDetectionContext,frameTimestamp))
        {
-
         txtPosition.y += 24; snprintf(rectVal,123,"Sk Movem. : %u",fallDetectionContext.skeletonVelocity);
         putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , color , 2 , 8 );
-
 
         unsigned int i=0;
         for (i=0; i<fallDetectionContext.numberOfJoints; i++)
@@ -322,15 +321,11 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
                circle(bgrMat,  centerPt , 15 , jointColor , -4, 8 , 0);
            }
          }
-
        }
-
 
 	    cv::imshow("emergency_detector visualization",bgrMat);
 	    cv::waitKey(1);
       }
-
-
 
    if (segmentedRGB!=0)      { free (segmentedRGB);   }
    if (segmentedDepth!=0)    { free (segmentedDepth); }

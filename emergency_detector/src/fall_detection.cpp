@@ -26,6 +26,30 @@ int isSkeletonStanding(struct fallState * fs)
 
 
 
+int isSkeletonFallenAndFar(struct fallState * fs)
+{
+  //If we are standing we have at least 1 particle high on the Y axis of the frame..!
+  unsigned int i=0;
+  unsigned int height=0;
+
+  if (fs->headLookingDirection==HEAD_LOOKING_CENTER) { height=400; } else
+  if (fs->headLookingDirection==HEAD_LOOKING_DOWN)   { height=240; }
+
+  unsigned int lowPoints = 0;
+  unsigned int highPoints = 0;
+
+   for (i=0; i<fs->numberOfJoints; i++)
+   {
+    if ( (fs->lastJoint2D[i].y!=0)&& (fs->lastJoint2D[i].y>=height) )    { ++lowPoints;  }
+    if ( (fs->lastJoint2D[i].y!=0)&& (fs->lastJoint2D[i].y<height) )     { ++highPoints; }
+   }
+
+
+  if ( (highPoints==0) && (lowPoints>0) ) { return 1; }
+  return 0;
+}
+
+
 int logSkeletonState(struct fallState * fs)
 {
   fs->skeletonVelocity=0;
@@ -80,6 +104,7 @@ int userIsStanding(struct fallState * fs,unsigned int timeStamp)
 int userHasFallen(struct fallState * fs,unsigned int timeStamp)
 {
   if (!userIsRecent(fs,timeStamp)) { return 0; }
+  if (isSkeletonFallenAndFar(fs)) { return 1; }
   return 0;
 }
 
