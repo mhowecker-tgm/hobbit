@@ -35,9 +35,9 @@ unsigned int combinationMode=COMBINE_AND;
 unsigned int maximumFrameDifferenceForTemperatureToBeRelevant=10;
 
 unsigned int minimumAllowedHolePercentage = 15;
-unsigned int maximumAllowedHolePercentage = 70;
+unsigned int maximumAllowedHolePercentage = 75;
 
-float minHumanTemperature = 32.0;
+float minHumanTemperature = 31.5;
 float maxHumanTemperature = 37.0;
 
 unsigned int tempZoneWidth = 300;
