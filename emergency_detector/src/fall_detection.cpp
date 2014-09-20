@@ -1,4 +1,5 @@
 #include "fall_detection.h"
+#include <stdio.h>
 #include <math.h>
 
 struct fallState fallDetectionContext={0};
@@ -11,8 +12,9 @@ int isSkeletonStanding(struct fallState * fs)
 
   for (i=0; i<fs->numberOfJoints; i++)
   {
-    if (fs->lastJoint2D[i].y<150)
+    if ( (fs->lastJoint2D[i].y!=0)&& (fs->lastJoint2D[i].y<200) )
     {
+      //fprintf(stderr,"Joint #%u ( %0.2f,%0.2f ) is high",i,fs->lastJoint2D[i].x ,fs->lastJoint2D[i].y);
       return 1;
     }
   }
@@ -23,14 +25,16 @@ int isSkeletonStanding(struct fallState * fs)
 
 int logSkeletonState(struct fallState * fs)
 {
-  if (isSkeletonStanding(fs)) { fs->state=FALL_DETECTION_SKELETON_STANDING; return 1; }
-
-  if (ABSDIFF(fs->lastJointsTimestamp,fs->jointsTimestamp) > 30 ) { return 0; }
-
-  unsigned int i=0;
-
   fs->skeletonVelocity=0;
 
+  unsigned int timestampDiff = fs->jointsTimestamp-fs->lastJointsTimestamp;
+  if ( timestampDiff > 30 )
+    {
+      fprintf(stderr,"Cannot track skeleton movement , samples have a big delay ( this %u , last %u , diff %u  )" , fs->jointsTimestamp , fs->lastJointsTimestamp , timestampDiff);
+      return 0;
+    }
+
+  unsigned int i=0;
   for (i=0; i<fs->numberOfJoints; i++)
   {
       if (
@@ -49,6 +53,9 @@ int logSkeletonState(struct fallState * fs)
         fs->skeletonVelocity+=displacement;
       }
   }
+
+  if (isSkeletonStanding(fs)) { fprintf(stderr,"Skeleton Is Standing");  fs->state=FALL_DETECTION_SKELETON_STANDING; return 1; }
+
 
   return 1;
 }
