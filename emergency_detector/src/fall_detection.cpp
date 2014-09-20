@@ -9,15 +9,18 @@ int isSkeletonStanding(struct fallState * fs)
 {
   //If we are standing we have at least 1 particle high on the Y axis of the frame..!
   unsigned int i=0;
+  unsigned int height=0;
 
-  for (i=0; i<fs->numberOfJoints; i++)
-  {
-    if ( (fs->lastJoint2D[i].y!=0)&& (fs->lastJoint2D[i].y<200) )
-    {
-      //fprintf(stderr,"Joint #%u ( %0.2f,%0.2f ) is high",i,fs->lastJoint2D[i].x ,fs->lastJoint2D[i].y);
-      return 1;
+  if (fs->headLookingDirection==HEAD_LOOKING_CENTER) { height=200; } else
+  if (fs->headLookingDirection==HEAD_LOOKING_DOWN)   { height=100; }
+
+   for (i=0; i<fs->numberOfJoints; i++)
+   {
+    if ( (fs->lastJoint2D[i].y!=0)&& (fs->lastJoint2D[i].y<height) )
+     {
+       return 1;
     }
-  }
+   }
   return 0;
 }
 

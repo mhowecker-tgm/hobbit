@@ -166,7 +166,7 @@ unsigned int viewPointChange_countDepths(unsigned short *  depth, unsigned int i
   unsigned int holesIgnored = 0;
   *numberOfHolesIgnored=0;
 
-  unsigned short * depthPTR;
+  unsigned short * depthPTR=depth; //This needs to be set to something even if we will overwrite , so that first while will work
   unsigned short * depthStart=depth+ (y * imageWidth) +x;
   unsigned short * depthLimit = depthStart + width;
   unsigned short * depthTotalLimit = depthLimit + imageWidth*height;
@@ -188,10 +188,11 @@ unsigned int viewPointChange_countDepths(unsigned short *  depth, unsigned int i
    depthLimit+=imageWidth;
   }
 
+  fprintf(stderr,"viewPointChange_countDepths(%u,%u to %u,%u) => gathered %u samples and %u holes\n",x,y,x+width,y+height,depthSamples,holesIgnored);
 
   *numberOfHolesIgnored = holesIgnored;
 
   if (depthSamples==0) { depthSamples=1; }
-  return totalDepth/depthSamples;
+  return (unsigned int) totalDepth/depthSamples;
 }
 

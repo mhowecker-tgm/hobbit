@@ -34,7 +34,8 @@ unsigned int combinationMode=COMBINE_AND;
 
 unsigned int maximumFrameDifferenceForTemperatureToBeRelevant=10;
 
-unsigned int maximumAllowedHolePercentage = 60;
+unsigned int minimumAllowedHolePercentage = 15;
+unsigned int maximumAllowedHolePercentage = 70;
 
 float minHumanTemperature = 32.0;
 float maxHumanTemperature = 37.0;
@@ -42,7 +43,7 @@ float maxHumanTemperature = 37.0;
 unsigned int tempZoneWidth = 300;
 unsigned int tempZoneHeight = 200;
 
-unsigned int minScoreTrigger = 1500;
+unsigned int minScoreTrigger = 1600;
 unsigned int maxScoreTrigger = 2000;
 
 unsigned int doCVOutput=0;
@@ -171,11 +172,8 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
 
 
   if (fallDetectionContext.headLookingDirection!=HEAD_LOOKING_DOWN)
-  {
-     fprintf(stderr,RED "\n\n  Not Looking Down , Thermometer will never pick up someone on the floor if not looking down \n\n" NORMAL );
-
-  } else
-
+    { fprintf(stderr,RED "\n\n  Not Looking Down , Thermometer will never pick up the floor\n\n" NORMAL ); }
+     else
   if ( temperatureSensorSensesHuman( temperatureObjectDetected ,  tempTimestamp , frameTimestamp) )
   //if ( (minHumanTemperature<temperatureObjectDetected) && (temperatureObjectDetected<maxHumanTemperature) && (temperatureFrameOffset < maximumFrameDifferenceForTemperatureToBeRelevant )  )
     {
@@ -200,22 +198,34 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
       fprintf(stderr,"Avg Depth is %u mm , empty area is %0.2f %% \n",depthAvg , (float) (100*holesEncountered)/(tempZoneWidth*tempZoneHeight));
 
 
+      if (holesEncountered< ( (unsigned int) tempZoneWidth*tempZoneHeight*minimumAllowedHolePercentage/100 ) )
+         { fprintf(stderr,RED "\n\n  Too few holes , too big a blob , cannot be an emergency\n\n" NORMAL ); }
+          else
       if (holesEncountered> ( (unsigned int) tempZoneWidth*tempZoneHeight*maximumAllowedHolePercentage/100 ) )
-         {
-           fprintf(stderr,RED "\n\n  Too many holes , this cannot be an emergency \n\n" NORMAL );
-         }    else
+         { fprintf(stderr,RED "\n\n  Too many holes , this cannot be an emergency \n\n" NORMAL ); }
+          else
       if (
            ( depthAvg > minScoreTrigger) &&
            ( depthAvg < maxScoreTrigger)
          )
          {
            if (userIsStanding(&fallDetectionContext,frameTimestamp))
+            { fprintf(stderr,RED "\n\n  We have a standing user , so he is taking care of fallen user , will not emit emergency \n\n" NORMAL ); }
+             else
             {
-             fprintf(stderr,RED "\n\n  We have a standing user , so he is taking care of fallen user , will not emit emergency \n\n" NORMAL );
-            } else
-            {
-              fprintf(stderr,MAGENTA "\n\n  Already Fallen User Detected , EMERGENCY \n\n" NORMAL);
-              emergencyDetected=1;
+              //We are almost sure we have a fallen blob , but maybe the blob continues on the top side ( so it is a standing user after all
+              unsigned int overHeight=80;
+              unsigned int depthAvgOver = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , tempZoneStartX , tempZoneStartY-overHeight , tempZoneWidth , overHeight , maxScoreTrigger , 1 , &holesEncountered );
+              fprintf(stderr,MAGENTA "\n\n  Top Avg is %u mm Holes are %0.2f %% \n\n" NORMAL , depthAvgOver, (float) (100*holesEncountered)/(tempZoneWidth*overHeight));
+
+              if (holesEncountered> ( (unsigned int) tempZoneWidth*overHeight*70/100 ) )
+               {
+                 fprintf(stderr,MAGENTA "\n\n  Already Fallen User Detected , EMERGENCY \n\n" NORMAL);
+                 emergencyDetected=1;
+               } else
+               {
+                 fprintf(stderr,RED "\n\n  Blob continues over temperature area , maybe standing person \n\n" NORMAL);
+               }
             }
           }
     }
