@@ -25,7 +25,7 @@
 #include <sensor_msgs/CameraInfo.h>
 #include <image_transport/image_transport.h>
 
-#include "hand_gestures/SetQuality.h"
+//#include "hand_gestures/SetQuality.h"
 #include "services.h"
 
 
@@ -38,6 +38,8 @@
 //pass them to the gesture node instead of the defaults
 #define USE_NONDEFAULT_CALIBRATIONS 1
 #define DEFAULT_FRAME_RATE 7
+
+
 
 int rate=DEFAULT_FRAME_RATE;
 int first=0;
@@ -113,12 +115,27 @@ bool resume(std_srvs::Empty::Request& request, std_srvs::Empty::Response& respon
 
 
 
-bool setQuality( hand_gestures::SetQuality::Request  &request,
-                  hand_gestures::SetQuality::Response &response )
+bool lookingUp(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-   //request.quality <- the quality setting requested
-   return false;
+    headLookingDirection=HEAD_LOOKING_UP;
+    return true;
 }
+
+
+bool lookingDown(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+     headLookingDirection=HEAD_LOOKING_DOWN;
+    return true;
+}
+
+
+bool lookingCenter(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+     headLookingDirection=HEAD_LOOKING_CENTER;
+    return true;
+}
+
+
 
 int doDrawOut()
 {
@@ -245,7 +262,12 @@ int main(int argc, char **argv)
      ros::ServiceServer terminateService        = nh.advertiseService(name+"/terminate"    , terminate);
      ros::ServiceServer resumeService           = nh.advertiseService(name+"/pause"        , pause);
      ros::ServiceServer pauseService            = nh.advertiseService(name+"/resume"       , resume);
-     ros::ServiceServer setQualityService       = nh.advertiseService(name+"/set_quality"  , setQuality);
+     //ros::ServiceServer setQualityService       = nh.advertiseService(name+"/set_quality"  , setQuality);
+
+
+     ros::ServiceServer lookUpService          = nh.advertiseService(name+"/looking_up" , lookingUp);
+     ros::ServiceServer lookCenterService      = nh.advertiseService(name+"/looking_center" , lookingCenter);
+     ros::ServiceServer lookDownService        = nh.advertiseService(name+"/looking_down" , lookingDown);
 
      //Make our rostopic cmaera grabber
      message_filters::Synchronizer<RgbdSyncPolicy> *sync;

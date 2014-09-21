@@ -20,6 +20,9 @@ ros::Publisher gestureEventBroadcaster;
 #endif
 
 
+
+unsigned int headLookingDirection=HEAD_LOOKING_CENTER;
+
 ros::Publisher gestureBroadcaster;
 
 unsigned char dontPublishGestures=0;
@@ -35,11 +38,23 @@ unsigned short * depthFrameCopy =0;
 void broadcastNewGesture(unsigned int frameNumber,struct handGesture * gesture)
 {
     if ( (dontPublishGestures) || (gesture==0) ) { return ; }
- 
+
+
+    if (headLookingDirection!=HEAD_LOOKING_CENTER)
+    {
+      if (
+           (gesture->gestureID==GESTURE_REWARD)  ||
+           (gesture->gestureID==GESTURE_HELP)
+         )
+      {
+        fprintf(stderr,"Gesture will be hidden because we are not looking in the center position");
+        return ;
+      }
+    }
 
 #if BROADCAST_HOBBIT
     hobbit_msgs::Event evt;
-    
+
     std::stringstream ss;
     //std_msgs::String sROS;
     switch (gesture->gestureID)
@@ -85,7 +100,7 @@ void broadcastNewGesture(unsigned int frameNumber,struct handGesture * gesture)
     fprintf(stderr,"Publishing a new gesture\n");
     gestureBroadcaster.publish(msg);
 
- 
+
 
     return ;
 }
