@@ -37,7 +37,7 @@
 //This will make this node also register to color/depth calibrations and
 //pass them to the gesture node instead of the defaults
 #define USE_NONDEFAULT_CALIBRATIONS 1
-#define DEFAULT_FRAME_RATE 5
+#define DEFAULT_FRAME_RATE 3
 
 
 int rate=DEFAULT_FRAME_RATE;
@@ -69,7 +69,7 @@ cv::Mat rgb,depth;
 
 
 bool strictFalsePositives(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
-{ 
+{
     ROS_INFO("Strict False Positive Discarding is now enabled");
     useDepthHeadMinMaxSizeHeuristic=1;
     useDepthClassifier=1;
@@ -207,7 +207,7 @@ int main(int argc, char **argv)
 {
    ROS_INFO("Starting Up!!");
    try
-	{ 
+	{
   	 ros::init(argc, argv, NODE_NAME);
          ros::start();
 
@@ -232,7 +232,7 @@ int main(int argc, char **argv)
      private_node_handle_.param("frame", frame, std::string("frame"));
      private_node_handle_.param("rate", rate, int(DEFAULT_FRAME_RATE));
      ros::Rate loop_rate(rate); //  hz should be our target performance
-  
+
 
      //Pass root frame for TF poses
      strcpy(tfRoot,frame.c_str());
