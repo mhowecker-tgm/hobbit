@@ -362,6 +362,7 @@ int main(int argc, char **argv)
 
 
      fallDetectionContext.headLookingDirection=HEAD_UNKNOWN_DIRECTION;
+     fallDetectionContext.lastJointsTimestamp=100000;
      initializeProcess();
 
       //Create our context
