@@ -37,7 +37,7 @@
 //This will make this node also register to color/depth calibrations and
 //pass them to the gesture node instead of the defaults
 #define USE_NONDEFAULT_CALIBRATIONS 1
-#define DEFAULT_FRAME_RATE 6
+#define DEFAULT_FRAME_RATE 7
 
 int rate=DEFAULT_FRAME_RATE;
 int first=0;
