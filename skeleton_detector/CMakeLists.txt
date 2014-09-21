@@ -33,8 +33,8 @@ include_directories(${catkin_INCLUDEDIR}  ${BOOST_INCLUDE_DIRS} ${OpenCV_INCLUDE
 add_executable(skeleton_detector src/main.cpp src/services.cpp src/pose.cpp)
 
 target_link_libraries(skeleton_detector   
-                      ${CMAKE_CURRENT_SOURCE_DIR}/bin/libHobbitUpperBodyTrackerLib.a 
-                      #${CMAKE_CURRENT_SOURCE_DIR}/bin/libHobbitUpperBodyTrackerDynamic.so
+                      #${CMAKE_CURRENT_SOURCE_DIR}/bin/libHobbitUpperBodyTrackerLib.a 
+                      ${CMAKE_CURRENT_SOURCE_DIR}/bin/libHobbitUpperBodyTrackerDynamic.so
                       ${CMAKE_CURRENT_SOURCE_DIR}/bin/libMBVCore.so 
                       ${CMAKE_CURRENT_SOURCE_DIR}/bin/libMBVUtils.so  
                       ${CMAKE_CURRENT_SOURCE_DIR}/bin/libMBVDecoding.so
