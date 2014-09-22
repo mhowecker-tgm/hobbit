@@ -626,6 +626,16 @@ void execute(char * command,char * param)
     if (strcmp(param,"nitePausePoint")==0)   {  rosservice_call(cR,cRLen,(char *) "/rgbd_acquisition/pause_pointing_gesture_messages");    } else
     if (strcmp(param,"niteResumePoint")==0)  {  rosservice_call(cR,cRLen,(char *) "/rgbd_acquisition/resume_pointing_gesture_messages");   } else
 
+    if (strcmp(param,"vsPause")==0)                {  rosservice_call(cR,cRLen,(char *) "/vision_system/pauseEverything");   } else
+    if (strcmp(param,"vsResume")==0)               {  rosservice_call(cR,cRLen,(char *) "/vision_system/resumeEverything");   } else
+    if (strcmp(param,"vsFollowUser")==0)           {  rosservice_call(cR,cRLen,(char *) "/vision_system/followUser");   } else
+    if (strcmp(param,"vsLocateUser")==0)           {  rosservice_call(cR,cRLen,(char *) "/vision_system/locateUser");   } else
+    if (strcmp(param,"vsFitnessFunction")==0)      {  rosservice_call(cR,cRLen,(char *) "/vision_system/fitnessFunction");   } else
+    if (strcmp(param,"vsWhereIsUserPointing")==0)  {  rosservice_call(cR,cRLen,(char *) "/vision_system/seeWhereUserIsPointing");   } else
+    if (strcmp(param,"vsNavigating")==0)           {  rosservice_call(cR,cRLen,(char *) "/vision_system/navigating");   } else
+    if (strcmp(param,"vsIdle")==0)                 {  rosservice_call(cR,cRLen,(char *) "/vision_system/idle");   } else
+
+
     if (strcmp(param,"forthSKStartVisualization")==0)     {  rosservice_call(cR,cRLen,(char *) "/skeleton_detector/visualize_on");        } else
     if (strcmp(param,"forthSKStopVisualization")==0)      {  rosservice_call(cR,cRLen,(char *) "/skeleton_detector/visualize_off");       } else
     if (strcmp(param,"forthSKPause")==0)     {  rosservice_call(cR,cRLen,(char *) "/skeleton_detector/pause");        } else

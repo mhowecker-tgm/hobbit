@@ -34,6 +34,7 @@
 #define MAX_NUM_STR 128
 
 #define divisor 1000
+#define MAX_CMD 2048
 
 #define DEFAULT_FRAME_RATE 15
 
@@ -230,6 +231,111 @@ bool resume(std_srvs::Empty::Request& request, std_srvs::Empty::Response& respon
 
 
 
+int rosservice_call(const char * serviceName)
+{
+  char commandToRun[MAX_CMD]={0};
+  unsigned int maxCommandSize=MAX_CMD;
+  snprintf(commandToRun,maxCommandSize,"/bin/bash -c \"rosservice call %s\"",serviceName);
+  int i=system(commandToRun);
+  return (i==0);
+}
+
+
+int rosparam_set(const char * paramName,const char * paramValue)
+{
+  char commandToRun[MAX_CMD]={0};
+  unsigned int maxCommandSize=MAX_CMD;
+  snprintf(commandToRun,maxCommandSize,"/bin/bash -c \"rosparam set %s \"%s\" \"",paramName,paramValue);
+  int i=system(commandToRun);
+  return (i==0);
+}
+
+
+int rostopic_pub(const char * topicName,const char * topicType,const char * topicValue)
+{
+  char commandToRun[MAX_CMD]={0};
+  unsigned int maxCommandSize=MAX_CMD;
+  snprintf(commandToRun,maxCommandSize,"/bin/bash -c \"rostopic pub %s %s %s -1\"",topicName,topicType,topicValue);
+  int i=system(commandToRun);
+  return (i==0);
+}
+
+bool pauseEverything(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    rosservice_call("/rgbd_acquisition/pause_peopletracking");
+    rosservice_call("/emergency_detector/pause");
+    rosservice_call("/face_detection/pause");
+    rosservice_call("/hand_gestures/pause");
+    rosservice_call("/skeleton_detector/pause");
+    rosservice_call("/fitness_coordinator/pause");
+    return true;
+}
+
+bool resumeEverything(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    rosservice_call("/rgbd_acquisition/resume_peopletracking");
+    rosservice_call("/emergency_detector/resume");
+    rosservice_call("/face_detection/resume");
+    rosservice_call("/hand_gestures/resume");
+    rosservice_call("/skeleton_detector/resume");
+    rosservice_call("/fitness_coordinator/resume");
+    return true;
+}
+
+bool followUser(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    rosservice_call("/rgbd_acquisition/resume_peopletracking"); //Nite tracker might be useful
+    rosservice_call("/emergency_detector/resume");
+    rosservice_call("/skeleton_detector/resume");
+    rosservice_call("/skeleton_detector/simple"); //We want the simple skeleton detector , no hands but fast and more robust ( even without a face )
+    return true;
+}
+
+bool locateUser(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    rosservice_call("/rgbd_acquisition/resume_peopletracking"); //Nite tracker might be useful
+    rosservice_call("/emergency_detector/resume"); // So that we get
+    rosservice_call("/face_detection/resume");
+    rosservice_call("/hand_gestures/resume");
+    rosservice_call("/skeleton_detector/resume");
+    raw=0; //We want to be precise..
+    return true;
+}
+
+bool fitnessFunction(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    rosservice_call("/rgbd_acquisition/pause_peopletracking"); //Nite tracker is no longer used
+    rosservice_call("/skeleton_detector/resume");
+    rosservice_call("/skeleton_detector/advanced"); //We want the advanced skeleton detector
+    rosservice_call("/fitness_coordinator/resume");
+    return true;
+}
+
+
+bool whereIsUserPointing(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    rosservice_call("/rgbd_acquisition/pause_peopletracking"); //Nite tracker might be useful
+    rosservice_call("/skeleton_detector/resume");
+    rosservice_call("/skeleton_detector/advanced"); //We want the advanced skeleton detector
+    return true;
+}
+
+
+bool navigating(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    rosservice_call("/emergency_detector/resume"); // So that we get
+    return true;
+}
+
+
+bool idle(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    rosservice_call("/hand_gestures/resume");
+    return true;
+}
+
+
+
 int main(int argc, char **argv)
 {
    ROS_INFO("Starting Up!!");
@@ -259,6 +365,16 @@ int main(int argc, char **argv)
      ros::ServiceServer stopService     = nh.advertiseService(name+"/terminate", terminate);
      ros::ServiceServer preciseService  = nh.advertiseService(name+"/precise", switchToPrecise);
      ros::ServiceServer rawService      = nh.advertiseService(name+"/raw", switchToRaw);
+
+
+     ros::ServiceServer VSPauseService           = nh.advertiseService("/vision_system/pauseEverything", pauseEverything);
+     ros::ServiceServer VSResumeService          = nh.advertiseService("/vision_system/resumeEverything", resumeEverything);
+     ros::ServiceServer VSFollowUserService      = nh.advertiseService("/vision_system/followUser", followUser);
+     ros::ServiceServer VSLocateUserService      = nh.advertiseService("/vision_system/locateUser", locateUser);
+     ros::ServiceServer VSfitnessFunctionService = nh.advertiseService("/vision_system/fitnessFunction", fitnessFunction);
+     ros::ServiceServer VSSeePointingService     = nh.advertiseService("/vision_system/seeWhereUserIsPointing", whereIsUserPointing);
+     ros::ServiceServer VSNavigatingService      = nh.advertiseService("/vision_system/navigating", navigating);
+     ros::ServiceServer VSIdleService            = nh.advertiseService("/vision_system/idle", idle);
 
 
      personBroadcaster = nh.advertise <person_aggregator::Person> ("persons", divisor);
