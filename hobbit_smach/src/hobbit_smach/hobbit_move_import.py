@@ -192,12 +192,14 @@ class Stop(State):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
+        rospy.loginfo('DO FULL STOP')
         client = SimpleActionClient(
             'move_base',
             MoveBaseAction)
         client.wait_for_server()
         client.cancel_all_goals()
         self.stop_pub.publish('stop')
+        rospy.loginfo('FINISH FULL STOP')
         return 'succeeded'
 
 
