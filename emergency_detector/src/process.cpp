@@ -174,8 +174,7 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
     if (userHasFallen(&fallDetectionContext,frameTimestamp))
         {
           fprintf(stderr,MAGENTA "\n\n  Live Falling User Detected , EMERGENCY \n\n" NORMAL);
-          fprintf(stderr,RED "\n\n  Currently Disabled \n\n" NORMAL);
-          //emergencyDetected=1;
+          emergencyDetected=1;
         }
 
    }
