@@ -26,9 +26,9 @@ MyDialog::~MyDialog()
     if (ui->call_button->isChecked()) 
     {
 	current_place_type = "call_button_";
-        std::ostringstream oss;
-        oss<<n;
-	current_place_type += oss.str();
+        //std::ostringstream oss;
+        //oss<<n;
+	//current_place_type += oss.str();
     }
     if (ui->floor_clearing->isChecked()) current_place_type = "floor_clearing";
     if (ui->fitness->isChecked()) current_place_type = "fitness";

@@ -34,8 +34,6 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)  :
     ui->label->map_origin_x = 0;
     ui->label->map_origin_y = 0;
     ui->label->input_map_height = 400;
- 
-    num = 1;
 
 }
 
@@ -288,8 +286,6 @@ void MainWindow::on_save_place_clicked()
     MyDialog *subDialog = new MyDialog;
     subDialog->setWindowTitle("Sub Dialog");
     subDialog->show(); 
-    subDialog->n = num;
-    num++;
 
     subDialog->qnode = &qnode;
     std::string current_place_name = text_input.toStdString();
