@@ -19,6 +19,9 @@ extern float temperatureObjectDetected;
 extern unsigned int tempTimestamp;
 
 
+
+int setHobbitEMode();
+
 int processNewTemperatureReading(float temperature);
 
 int processBoundingBox( float ctX,float ctY,float ctZ,

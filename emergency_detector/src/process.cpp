@@ -58,7 +58,11 @@ unsigned int tempTimestamp=0;
 float bboxCX,bboxCY,bboxCZ,bboxWidth,bboxHeight,bboxDepth;
 unsigned int bboxTimeStamp=0;
 
-
+int setHobbitEMode()
+{
+    minHumanTemperature=29.5;
+    segConfDepth.planeNormalOffset=70.0;
+}
 
 
 int processBoundingBox(

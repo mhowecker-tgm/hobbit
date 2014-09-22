@@ -226,6 +226,14 @@ bool lookingCenter(std_srvs::Empty::Request& request, std_srvs::Empty::Response&
 
 
 
+bool setHobbitE(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+     setHobbitEMode();
+    return true;
+}
+
+
+
 void bboxReceived(const emergency_detector::SkeletonBBox & msg)
 {
    processBoundingBox(msg.centerX2D , msg.centerY2D , msg.centerZ2D  ,
@@ -338,6 +346,9 @@ int main(int argc, char **argv)
      ros::ServiceServer lookUpService          = nh.advertiseService(name+"/looking_up" , lookingUp);
      ros::ServiceServer lookCenterService      = nh.advertiseService(name+"/looking_center" , lookingCenter);
      ros::ServiceServer lookDownService        = nh.advertiseService(name+"/looking_down" , lookingDown);
+
+     ros::ServiceServer setHobbitEService        = nh.advertiseService(name+"/setHobbitE" , setHobbitE);
+
 
      //Make our rostopic camera grabber
      message_filters::Synchronizer<RgbdSyncPolicy> *sync;
