@@ -70,7 +70,7 @@ class DavidLookForObject(State):
             output_keys=['goal_position_x', 'goal_position_y', 'goal_position_yaw']
         )
 	self.listener = tf.TransformListener()
-	self.pubClust = rospy.Publisher("/objectclusters", PointCloud2)        
+	self.pubClust = rospy.Publisher("/objectclusters", PointCloud2)
 	self.rec = TD()
         self.restrictfind = False
         self.robotDistFromGraspPntForGrasping = 0.6
@@ -450,7 +450,7 @@ class DavidLookingPose(State):
         while True:
             try:
                 t = rospy.Time(0)
-              
+
                 #point_cloud.header.stamp = t
                 (trans,rot) = self.listener.lookupTransform('/headcam_rgb_optical_frame', target_frame, rospy.Time(0))
 		#print "rot1: ", rot
@@ -460,10 +460,10 @@ class DavidLookingPose(State):
 		#print "rot quat plus trans", rot
                 pvec = (self.pointingDirCCS[3],self.pointingDirCCS[4],self.pointingDirCCS[5])
 		pvec = (pvec[0]/numpy.linalg.norm(pvec),pvec[1]/numpy.linalg.norm(pvec),pvec[2]/numpy.linalg.norm(pvec))  #normalize
-		pvecWCS = numpy.dot(pvec,rot)                
+		pvecWCS = numpy.dot(pvec,rot)
 		print "======================================================="
 		print "pvec (CCS, normalized): ", pvec # (CCS)
-		#print "roation matrix: ", rot  
+		#print "roation matrix: ", rot
 		print "Pointing Vector in WCS: ", pvecWCS
 
 
@@ -485,7 +485,7 @@ class DavidLookingPose(State):
 	#publish marker for visualizing the pointing point on floor
 	print "========================> now the point on floor is published as marker "
 	obj_markerArray = MarkerArray()
-	
+
 	pose = Pose()
         pose.position.x = gpOnFloor[0]
         pose.position.y = gpOnFloor[1]
@@ -511,7 +511,7 @@ class DavidLookingPose(State):
     	ellipse.color.b = 1.0
 
         #marker1 = Marker()
-        #marker1.id = 1 
+        #marker1.id = 1
         #marker1.header.frame_id = "/map"
         #marker1.type = marker1.SPHERE
         #marker1.action = marker1.ADD
@@ -525,7 +525,7 @@ class DavidLookingPose(State):
 
         #marker1.pose.orientation = pose.orientation
         #marker1.pose.position = pose.position
-        
+
         #obj_markerArray.markers.append(marker1)
 	obj_markerArray.markers.append(ellipse)
 
@@ -693,8 +693,8 @@ def sayStartLooking():
         )
         Concurrence.add(
             'SAY_START_LOOKING',
-            # speech_output.sayText(info='T_PU_StartLooking')
-            speech_output.sayText(info='StartLooking')
+            speech_output.sayText(info='T_PU_StartLooking')
+            # speech_output.sayText(info='StartLooking')
         )
     return cc
 
