@@ -384,8 +384,8 @@ def goToPosition(frame='/map', room='None', place='dock'):
     rospy.loginfo(room + place)
     with seq:
         Sequence.add(
-            'MMUI_SAY_YesIAmComing',
-            speech_output.sayText(info='T_HM_YesIAmComing'),
+            'MMUI_SAY_IAmComing',
+            speech_output.sayText(info='T_CA_IAmComing'),
             transitions={'failed': 'aborted'}
         )
         Sequence.add(
@@ -467,8 +467,8 @@ def goToPose():
 
     with seq:
         Sequence.add(
-            'MMUI_SAY_YesIAmComing',
-            speech_output.sayText(info='T_HM_YesIAmComing'),
+            'MMUI_SAY_IAmComing',
+            speech_output.sayText(info='T_CA_IAmComing'),
             transitions={'failed': 'aborted'}
         )
         Sequence.add(

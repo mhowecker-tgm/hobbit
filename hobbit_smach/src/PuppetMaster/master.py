@@ -611,13 +611,10 @@ def main():
         StateMachine.add(
             'REWARD',
             speech_output.emo_say_something(
-                emo='HAPPY',
+                emo='VHAPPY',
                 time=4,
-                text='T_SR_Thankyou'
+                text='T_RW_YouAreWelcome'
             ),
-            # HobbitEmotions.ShowEmotions(
-            #     emotion='HAPPY',
-            #     emo_time=4),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
