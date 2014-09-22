@@ -34,6 +34,25 @@ unsigned char * colorFrameCopy=0;
 unsigned short * depthFrameCopy =0;
 
 
+void broadcastGesturesStatus(unsigned int frameNumber,unsigned int gesturesPaused)
+{
+    hobbit_msgs::Event evt;
+    std::stringstream ss;
+
+    if  (gesturesPaused) { ss<<"G_DISABLED";  } else
+                         { ss<<"G_ACTIVATED";  }
+    evt.event=ss.str();
+    evt.header.seq = frameNumber;
+    evt.header.frame_id = "hand_gestures";
+    evt.header.stamp = ros::Time::now();
+    evt.sessionID  = "SessionID";
+    evt.confidence = 1.0;
+    evt.params.resize(0);
+    fprintf(stderr,"Publishing a new Pause/Resume event ( pause=%u ) \n",gesturesPaused);
+    gestureEventBroadcaster.publish(evt);
+}
+
+
 
 void broadcastNewGesture(unsigned int frameNumber,struct handGesture * gesture)
 {

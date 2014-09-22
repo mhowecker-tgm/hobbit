@@ -19,6 +19,8 @@ enum HEAD_LOOK_DIRECTION_ENUM
 extern unsigned char dontPublishGestures;
 extern unsigned int headLookingDirection;
 
+void broadcastGesturesStatus(unsigned int frameNubmer,unsigned int gesturesPaused);
+
 int registerServices(ros::NodeHandle * nh,unsigned int width,unsigned int height);
 int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int colorWidth , unsigned int colorHeight ,
                                        unsigned short * depthFrame  , unsigned int depthWidth , unsigned int depthHeight ,
