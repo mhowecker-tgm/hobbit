@@ -60,8 +60,9 @@ unsigned int bboxTimeStamp=0;
 
 int setHobbitEMode()
 {
-    minHumanTemperature=28.5;
-    segConfDepth.planeNormalOffset=340.0;
+    minHumanTemperature=27.5;
+    segConfDepth.planeNormalOffset=430.0;
+    segConfDepth.maxDepth=2500;
 }
 
 
