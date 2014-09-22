@@ -189,18 +189,22 @@ class Stop(State):
                                         latch=False, queue_size=50)
 
     def execute(self, ud):
-        if self.preempt_requested():
-            self.service_preempt()
-            return 'preempted'
+        # This is a safety feature and should not be interruptable
+        # if self.preempt_requested():
+        #     self.service_preempt()
+        #     return 'preempted'
         rospy.loginfo('DO FULL STOP')
+        self.stop_pub.publish('stop')
         client = SimpleActionClient(
             'move_base',
             MoveBaseAction)
-        client.wait_for_server()
-        client.cancel_all_goals()
-        self.stop_pub.publish('stop')
-        rospy.loginfo('FINISH FULL STOP')
-        return 'succeeded'
+        if client.wait_for_server(timeout=rospy.Duration(3)):
+            client.cancel_all_goals()
+            rospy.loginfo('FINISH FULL STOP')
+            return 'succeeded'
+        else:
+            rospy.loginfo('Failed to reach actionserver@FULL STOP')
+        return 'aborted'
 
 
 def get_full_stop():
