@@ -27,6 +27,7 @@ from visualization_msgs.msg import Marker
 from visualization_msgs.msg import MarkerArray
 from std_msgs.msg import String
 from geometry_msgs.msg import Pose
+from hobbit_smach.ArmActionClient import ArmActionClient
 
 _DATATYPES = {}
 _DATATYPES[PointField.INT8]    = ('b', 1)
@@ -599,12 +600,56 @@ class DavidPickingUp(State):
             self,
             outcomes=['succeeded', 'failed', 'preempted']
         )
+	self.arm_client = ArmActionClient()
 
     def execute(self, ud):
         if self.preempt_requested():
             return 'preempted'
         # TODO: David please add the grasping in here
+	    
+	#OPEN GRIPPER
+	res = self.arm_client.arm_action_client(String ("SetOpenGripper"))
 
+	#PositionsForInterpolation(armactionserver) Intermediate Floor GraspPOS2
+	cmd = String ("SetPositionsForInterpolation 72 43 82 134 101 4")
+	res = self.arm_client.arm_action_client(cmd)
+	
+	#PositionsForInterpolation(armactionserver) Intermediate Floor GraspPOS4 (= Grasp at floor)
+	cmd = String ("SetPositionsForInterpolation 78 55 78 150 90 4")
+	res = self.arm_client.arm_action_client(cmd)
+	
+	#PositionsForInterpolationReady
+	cmd = String ("SetPositionsForInterpolationReady")
+	res = self.arm_client.arm_action_client(cmd)
+
+	#    raw_input("press key to move arm after position interpolation")
+	cmd = String("SetStartInterpolation")
+	res = self.arm_client.arm_action_client(cmd)
+
+	#CLOSE GRIPPER
+	cmd = String ("SetCloseGripper")
+	res = self.arm_client.arm_action_client(cmd)
+	
+	#wait (probably not needed)
+	rospy.sleep(1)
+
+
+	#PositionsForInterpolation(armactionserver) Intermediate Floor GraspPOS2")
+	cmd = String ("SetPositionsForInterpolation 72 43 82 134 101 4")
+	res = self.arm_client.arm_action_client(cmd)
+
+	#PositionsForInterpolation(armactionserver) POS1=PreGraspFromFloor
+	cmd = String ("SetPositionsForInterpolation 70 43 86 134 108 4")
+	res = self.arm_client.arm_action_client(cmd)
+
+	#PositionsForInterpolationReady (armactionserver)")
+	cmd = String ("SetPositionsForInterpolationReady")
+	res = self.arm_client.arm_action_client(cmd)
+
+	#raw_input("press key to move arm after position interpolation")
+	cmd = String("SetStartInterpolation")
+	res = self.arm_client.arm_action_client(cmd)
+	
         return 'succeeded'
 
 
