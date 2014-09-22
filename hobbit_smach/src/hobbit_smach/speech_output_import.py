@@ -172,15 +172,10 @@ def sayText(info='Text is missing'):
 
     seq = Sequence(
         outcomes=['succeeded', 'preempted', 'failed'],
-        connector_outcome='succeeded',
-        input_keys=['room_name', 'location_name']
+        connector_outcome='succeeded'
     )
 
     with seq:
-        Sequence.add(
-            'Test',
-            TestData()
-        )
         Sequence.add(
             'TALK',
             HobbitMMUI.ShowInfo(
