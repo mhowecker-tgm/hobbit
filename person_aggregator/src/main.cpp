@@ -262,7 +262,7 @@ int rostopic_pub(const char * topicName,const char * topicType,const char * topi
 
 bool pauseEverything(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    rosservice_call("/rgbd_acquisition/pause_peopletracking");
+    rosservice_call("/rgbd_acquisition/pause_peopletracker");
     rosservice_call("/emergency_detector/pause");
     rosservice_call("/face_detection/pause");
     rosservice_call("/hand_gestures/pause");
@@ -273,18 +273,19 @@ bool pauseEverything(std_srvs::Empty::Request& request, std_srvs::Empty::Respons
 
 bool resumeEverything(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    rosservice_call("/rgbd_acquisition/resume_peopletracking");
+    rosservice_call("/rgbd_acquisition/resume_peopletracker");
     rosservice_call("/emergency_detector/resume");
     rosservice_call("/face_detection/resume");
     rosservice_call("/hand_gestures/resume");
     rosservice_call("/skeleton_detector/resume");
     rosservice_call("/fitness_coordinator/resume");
+    raw=0;
     return true;
 }
 
 bool followUser(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    rosservice_call("/rgbd_acquisition/resume_peopletracking"); //Nite tracker might be useful
+    rosservice_call("/rgbd_acquisition/resume_peopletracker"); //Nite tracker might be useful
     rosservice_call("/emergency_detector/resume");
     rosservice_call("/skeleton_detector/resume");
     rosservice_call("/skeleton_detector/simple"); //We want the simple skeleton detector , no hands but fast and more robust ( even without a face )
@@ -293,7 +294,7 @@ bool followUser(std_srvs::Empty::Request& request, std_srvs::Empty::Response& re
 
 bool locateUser(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    rosservice_call("/rgbd_acquisition/resume_peopletracking"); //Nite tracker might be useful
+    rosservice_call("/rgbd_acquisition/resume_peopletracker"); //Nite tracker might be useful
     rosservice_call("/emergency_detector/resume"); // So that we get
     rosservice_call("/face_detection/resume");
     rosservice_call("/hand_gestures/resume");
@@ -304,7 +305,7 @@ bool locateUser(std_srvs::Empty::Request& request, std_srvs::Empty::Response& re
 
 bool fitnessFunction(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    rosservice_call("/rgbd_acquisition/pause_peopletracking"); //Nite tracker is no longer used
+    rosservice_call("/rgbd_acquisition/pause_peopletracker"); //Nite tracker is no longer used
     rosservice_call("/skeleton_detector/resume");
     rosservice_call("/skeleton_detector/advanced"); //We want the advanced skeleton detector
     rosservice_call("/fitness_coordinator/resume");
@@ -314,7 +315,7 @@ bool fitnessFunction(std_srvs::Empty::Request& request, std_srvs::Empty::Respons
 
 bool whereIsUserPointing(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    rosservice_call("/rgbd_acquisition/pause_peopletracking"); //Nite tracker might be useful
+    rosservice_call("/rgbd_acquisition/pause_peopletracker"); //Nite tracker might be useful
     rosservice_call("/skeleton_detector/resume");
     rosservice_call("/skeleton_detector/advanced"); //We want the advanced skeleton detector
     return true;
@@ -334,6 +335,15 @@ bool idle(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
     return true;
 }
 
+bool startScanning3DObject(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    return pauseEverything(request,response);
+}
+
+bool stopScanning3DObject(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    return resumeEverything(request,response);
+}
 
 
 int main(int argc, char **argv)
@@ -375,6 +385,9 @@ int main(int argc, char **argv)
      ros::ServiceServer VSSeePointingService     = nh.advertiseService("/vision_system/seeWhereUserIsPointing", whereIsUserPointing);
      ros::ServiceServer VSNavigatingService      = nh.advertiseService("/vision_system/navigating", navigating);
      ros::ServiceServer VSIdleService            = nh.advertiseService("/vision_system/idle", idle);
+     ros::ServiceServer VSStartScan3Service      = nh.advertiseService("/vision_system/startScanning3DObject", startScanning3DObject);
+     ros::ServiceServer VSStopScan3Service       = nh.advertiseService("/vision_system/stopScanning3DObject", stopScanning3DObject);
+
 
 
      personBroadcaster = nh.advertise <person_aggregator::Person> ("persons", divisor);
