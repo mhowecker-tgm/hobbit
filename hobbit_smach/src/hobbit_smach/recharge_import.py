@@ -232,7 +232,7 @@ def startDockProcedure():
     with sm:
         StateMachine.add('DOCKING_PROCEDURE', seq1,
                          transitions={'succeeded': 'succeeded',
-                                      'aborted': 'STOP'})
+                                      'aborted': 'aborted'})
         #StateMachine.add('STOP', hobbit_move.Stop(),
         #                 transitions={'succeeded': 'aborted'})
     return sm
