@@ -22,6 +22,9 @@ extern unsigned int tempTimestamp;
 
 int setHobbitEMode();
 
+int increasePlane();
+int decreasePlane();
+
 int processNewTemperatureReading(float temperature);
 
 int processBoundingBox( float ctX,float ctY,float ctZ,

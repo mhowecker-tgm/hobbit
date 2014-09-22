@@ -233,6 +233,19 @@ bool setHobbitE(std_srvs::Empty::Request& request, std_srvs::Empty::Response& re
 }
 
 
+bool increasePlaneDistance(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+     increasePlane();
+    return true;
+}
+
+bool decreasePlaneDistance(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+     decreasePlane();
+    return true;
+}
+
+
 
 void bboxReceived(const emergency_detector::SkeletonBBox & msg)
 {
@@ -348,6 +361,10 @@ int main(int argc, char **argv)
      ros::ServiceServer lookDownService        = nh.advertiseService(name+"/looking_down" , lookingDown);
 
      ros::ServiceServer setHobbitEService        = nh.advertiseService(name+"/setHobbitE" , setHobbitE);
+
+     ros::ServiceServer increasePlaneDistanceService = nh.advertiseService(name+"/increasePlaneDistance" , increasePlaneDistance);
+     ros::ServiceServer decreasePlaneDistanceService = nh.advertiseService(name+"/decreasePlaneDistance" , decreasePlaneDistance);
+
 
 
      //Make our rostopic camera grabber

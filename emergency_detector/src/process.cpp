@@ -60,10 +60,24 @@ unsigned int bboxTimeStamp=0;
 
 int setHobbitEMode()
 {
-    minHumanTemperature=29.5;
+    minHumanTemperature=28.5;
     segConfDepth.planeNormalOffset=70.0;
 }
 
+
+int increasePlane()
+{
+    segConfDepth.planeNormalOffset+=30.0;
+    fprintf(stderr,"Plane Increased to %0.2f ",segConfDepth.planeNormalOffset);
+}
+
+
+
+int decreasePlane()
+{
+    segConfDepth.planeNormalOffset-=30.0;
+    fprintf(stderr,"Plane Decreased to %0.2f ",segConfDepth.planeNormalOffset);
+}
 
 int processBoundingBox(
                         float ctX,float ctY,float ctZ,
