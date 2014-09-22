@@ -21,7 +21,7 @@ ros::Publisher gestureEventBroadcaster;
 
 
 
-unsigned int headLookingDirection=HEAD_LOOKING_CENTER;
+unsigned int headLookingDirection=HEAD_LOOKING_DOWN; //head looking down by default
 
 ros::Publisher gestureBroadcaster;
 
