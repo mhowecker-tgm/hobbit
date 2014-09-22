@@ -546,7 +546,7 @@ class DavidLookingPose(State):
         ud.goal_position_x = gpOnFloor[0] - robotDistFromGraspPnt * robotApproachDir[0]
         ud.goal_position_y = gpOnFloor[1] - robotDistFromGraspPnt * robotApproachDir[1]
         ud.goal_position_yaw = math.atan2(robotApproachDir[1],robotApproachDir[0]) + robotOffsetRotationForLooking #can be negative!  180/math.pi*math.atan2(y,x) = angle in degree of vector (x,y)
-        return 'succasökhfdsaölkjfdsaljfsaljfsadljafsljölkjfdsaöljafdsöljöljöljfadjeeded'
+        return 'succeeded'
 
 
 

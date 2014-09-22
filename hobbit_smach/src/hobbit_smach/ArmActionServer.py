@@ -103,8 +103,6 @@ class ArmActionServerROS(object):
 	    self._feedback.feedback.data = str(self.ArmClient.GetActualPosition())
 	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
 	    self._result.result = Bool(True)
-
-
 	elif cmd == 'GetArmAtHomePos':
 	    self._feedback.feedback.data = str(self.ArmClient.GetArmAtHomePos())
 	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
@@ -171,6 +169,10 @@ class ArmActionServerROS(object):
 	    self._result.result.data = str2bool(self._feedback.feedback.data)     
 	elif cmd == 'GetArmAtCandlePos':
 	    self._feedback.feedback.data = str(self.ArmClient.GetArmAtCandlePos())
+	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
+	    self._result.result.data = str2bool(self._feedback.feedback.data)     
+	elif cmd == 'GetArmAtPreGraspFromFloorPos':
+	    self._feedback.feedback.data = str(self.ArmClient.GetArmAtPreGraspFromFloorPos())
 	    print "ArmActionServer, feedback: ", self._feedback.feedback.data
 	    self._result.result.data = str2bool(self._feedback.feedback.data)     
 

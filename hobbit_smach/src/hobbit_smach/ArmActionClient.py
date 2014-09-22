@@ -54,7 +54,8 @@ class ArmActionClient():
 
 	# Prints out the result of executing the action
 	returnval = self.client.get_result()  # 
-	print returnval.result.data
+	print "cmd: ", cmd
+	print "ArmActionClient.py: class ArmActionClient: function arm_action_client (=> sends/receives actionlib data from/to server): returnval.result.data: ", returnval.result.data
 	return returnval
         
     def feedback_cb(self, feedback):
@@ -293,18 +294,22 @@ if __name__ == '__main__':
     cmd = String ("GetArmState")
     res = arm_client.arm_action_client(cmd)
     print "Result: ", res
-    #print "david last_feedback: ", arm_client.last_feedback
+    print "david last_feedback: ", arm_client.last_feedback
 
-    print "SetResetArm: ", arm_client.SetResetArm()
-    print "===============GetTurntableAtCWPos================"
-    print "get arm act pos: ", arm_client.GetActualPosition()
+    #print "SetResetArm: ", arm_client.SetResetArm()
+    print "===============GetArmAtPreGraspFromFloorPos()================"
+    print "get arm act pos: ", arm_client.GetArmAtPreGraspFromFloorPos()
+    print "===============GetArmAtCandlePos()================"
+    print "get arm act pos: ", arm_client.GetArmAtCandlePos()
+    print "===============GetArmAtLearningPos()================"
+    print "get arm act pos: ", arm_client.GetArmAtLearningPos()
     #print "set arm SetMoveToLearningPos: ", arm_client.SetMoveToLearningPos()
     #print "move to candle: ", arm_client.SetMoveToCandlePos()
     #res = arm_client.SetTurnTurntableCW()
     #print "get arm act pos: ", arm_client.GetActualPosition()
     #print "get arm at GetTurntableAtCWPos: ", arm_client.GetTurntableAtCWPos()
     #print "get arm at learning pos: ", arm_client.GetArmAtLearningPos()
-    print "storeturntable: ", arm_client.SetStoreTurntable()
+    #print "storeturntable: ", arm_client.SetStoreTurntable()
     #print "get arm at act pos: ", arm_client.GetActualPosition()
     #res = arm_client.SetMoveToTrayPos()
 
