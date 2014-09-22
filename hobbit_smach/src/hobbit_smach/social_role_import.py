@@ -5,12 +5,13 @@ PKG = 'hobbit_smach'
 NAME = 'SocialRole'
 
 import rospy
-import roslib
 import random
 
 from smach import State, StateMachine
 from hobbit_msgs import MMUIInterface as MMUI
+from hobbit_msgs.msg import Event
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
+import uashh_smach.util as util
 import hobbit_smach.sos_call_import as sos_call
 import hobbit_smach.speech_output as speech_output
 
@@ -131,7 +132,7 @@ class CheckHelpAccepted(State):
             return 'aborted'
 
 
-class RandomStuff(State):
+class RandomMenu(State):
     """
     Switch to a randomly chosen menu on the MMUI.
     Wrapped in a SMACH state.
@@ -142,8 +143,11 @@ class RandomStuff(State):
             self,
             outcomes=['succeeded', 'aborted', 'preempted']
         )
-        # TODO: Check the names of the actual menues
-        self.menues = ['M_GAMES', 'M_MUSIC, M_BOOKS']
+        self.menues = ['M_Audio, M_Entertain', 'M_Game',
+                       'M_Memory', 'M_Solitaire', 'M_Chess',
+                       'M_Simon', 'M_Sudoku', 'M_Muehle',
+                       'M_eBook', 'M_Picture', 'M_Internet',
+                       'M_Social', 'M_Checklist', 'M_Manual']
 
     def execute(self, ud):
         if self.preempt_requested():
@@ -156,6 +160,43 @@ class RandomStuff(State):
             return 'succeeded'
         else:
             return 'aborted'
+
+
+def get_surprise():
+    """
+    Return a SMACH Statemachine for surprise behaviour.
+    """
+
+    sm = StateMachine(
+        outcomes=['succeeded', 'aborted', 'preempted']
+    )
+
+    def msg_cb(msg, ud):
+        # print(str(Event))
+        if msg.event == 'P_E_BACK':
+            return True
+        else:
+            return False
+
+    with sm:
+        StateMachine.add_auto(
+            'RND_MENU',
+            RandomMenu(),
+            connector_outcomes=['succeeded', 'aborted', 'preempted']
+        )
+        StateMachine.add(
+            'WAIT_FOR_USER',
+            util.WaitForMsgState(
+                '/Event',
+                Event,
+                msg_cb,
+                timeout=30
+            ),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'WAIT_FOR_USER',
+                         'preempted': 'preempted'}
+        )
+    return sm
 
 
 def get_social_role_change():

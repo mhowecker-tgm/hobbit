@@ -466,6 +466,7 @@ def goToPose():
                    input_keys=['x', 'y', 'yaw', 'room_name', 'location_name'])
 
     with seq:
+        # TODO: Check if room_name and location_name are available
         Sequence.add(
             'MMUI_SAY_IAmComing',
             speech_output.sayText(info='T_CA_IAmComing'),

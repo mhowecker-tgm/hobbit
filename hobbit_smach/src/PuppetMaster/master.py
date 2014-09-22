@@ -16,6 +16,7 @@ import hobbit_smach.helper_import as helper
 import hobbit_smach.recharge_import as recharge
 import hobbit_smach.call_hobbit_import as call_hobbit
 import hobbit_smach.speech_output_import as speech_output
+import hobbit_smach.social_role_import as social_role
 import uashh_smach.util as util
 from hobbit_user_interaction import HobbitEmotions
 from hobbit_smach.bcolors import bcolors
@@ -595,7 +596,8 @@ def main():
         )
         StateMachine.add(
             'SURPRISE',
-            FakeForAllWithoutRunningActionSever(name='SURPRISE'),
+            # FakeForAllWithoutRunningActionSever(name='SURPRISE'),
+            social_role.get_surprise(),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
