@@ -651,7 +651,7 @@ def sayPointingGestureNotDetected1():
             'SAY_POINTING_NOT_DETECTED',
             #speech_output.askYesNo(question='T_PU_PointingGestureNotDetected1')
             # speech_output.askYesNo(question='PointingGestureNotDetected1')
-            HobbitMMUI.AskYesNo(question='PointingGestureNotDetected1')
+            HobbitMMUI.AskYesNo(question='_T_PU_PointingGestureNotDetected1')
         )
     return cc
 
@@ -672,7 +672,7 @@ def sayPointingGestureNotDetected2():
         )
         Concurrence.add(
             'SAY_POINTING_NOT_DETECTED',
-            speech_output.sayText(info='PointingGestureNotDetected2')
+            speech_output.sayText(info='T_PU_PointingGestureNotDetected2')
         )
     return cc
 
@@ -694,7 +694,6 @@ def sayStartLooking():
         Concurrence.add(
             'SAY_START_LOOKING',
             speech_output.sayText(info='T_PU_StartLooking')
-            # speech_output.sayText(info='StartLooking')
         )
     return cc
 
@@ -717,8 +716,7 @@ def sayObjectNotDetected1():
         Concurrence.add(
             'SAY_OBJECT_NOT_DETECTED',
             # speech_output.askYesNo(question='T_PU_ObjectNotDetected1')
-            # speech_output.askYesNo(question='ObjectNotDetected1')
-            HobbitMMUI.AskYesNo(question='ObjectNotDetected1')
+            HobbitMMUI.AskYesNo(question='T_PU_ObjectNotDetected1')
         )
     return cc
 
@@ -739,8 +737,7 @@ def sayObjectNotDetected2():
         )
         Concurrence.add(
             'SAY_OBJECT_NOT_DETECTED',
-            # speech_output.sayText(info='T_PU_ObjectNotDetected2')
-            speech_output.sayText(info='ObjectNotDetected2')
+            speech_output.sayText(info='T_PU_ObjectNotDetected2')
         )
     return cc
 
@@ -761,8 +758,7 @@ def sayObjectFoundRepositioning():
         )
         Concurrence.add(
             'SAY_OBJECT_FOUND',
-            # speech_output.sayText(info='T_PU_ObjectFoundRepositioning')
-            speech_output.sayText(info='ObjectFoundRepositioning')
+            speech_output.sayText(info='T_PU_ObjectFoundRepositioning')
         )
     return cc
 
@@ -784,9 +780,7 @@ def sayUnableToGraspObject():
         )
         Concurrence.add(
             'SAY_UNABLE_TO_GRASP_OBJECT',
-            # speech_output.sayText(info='T_PU_UnableToGraspObject')
-            # speech_output.sayText(info='UnableToGraspObject')
-            HobbitMMUI.AskYesNo(question='UnableToGraspObject')
+            HobbitMMUI.AskYesNo(question='T_PU_UnableToGraspObject')
         )
     return cc
 
@@ -807,8 +801,7 @@ def sayTryToRemoveObject():
         )
         Concurrence.add(
             'SAY_TRY_TO_REMOVE_OBJECT',
-            # speech_output.sayText(info='T_PU_TryToRemoveObject')
-            speech_output.sayText(info='TryToRemoveObject')
+            speech_output.sayText(info='T_PU_TryToRemoveObject')
         )
     return cc
 
@@ -829,8 +822,7 @@ def sayDidNotPickupObject1():
         )
         Concurrence.add(
             'SAY_DID_NOT_PICKUP_OBJECT',
-            # speech_output.sayText(info='T_PU_DidNotPickupObject1')
-            speech_output.sayText(info='DidNotPickupObject1')
+            speech_output.sayText(info='T_PU_DidNotPickupObject1')
         )
     return cc
 
@@ -851,8 +843,7 @@ def sayDidNotPickupObject2():
         )
         Concurrence.add(
             'SAY_DID_NOT_PICKUP_OBJECT',
-            # speech_output.sayText(info='T_PU_DidNotPickupObject2')
-            speech_output.sayText(info='DidNotPickupObject2')
+            speech_output.sayText(info='T_PU_DidNotPickupObject2')
         )
     return cc
 
@@ -873,8 +864,7 @@ def sayPickedUpObject():
         )
         Concurrence.add(
             'SAY_PICKED_UP_OBJECT',
-            # speech_output.sayText(info='T_PU_PickedUpObject')
-            speech_output.sayText(info='PickedUpObject')
+            speech_output.sayText(info='T_PU_PickedUpObject')
         )
     return cc
 
@@ -895,8 +885,7 @@ def sayRemoveObjectTakeObject():
         )
         Concurrence.add(
             'SAY_REMOVE_OBJECT_TAKE_OBJECT',
-            # speech_output.sayText(info='T_PU_RemovedObjectTakeObject')
-            speech_output.sayText(info='RemovedObjectTakeObject')
+            speech_output.sayText(info='T_PU_RemovedObjectTakeObject')
         )
     return cc
 

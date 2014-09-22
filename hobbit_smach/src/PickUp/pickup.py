@@ -353,8 +353,7 @@ def main():
         )
         StateMachine.add(
             'SAY_PICKING_UP',
-            #speech_output.sayText(info='T_PU_PickingUpObject')
-            speech_output.sayText(info='PickingUpObject'),
+            speech_output.sayText(info='T_PU_PickingUpObject')
             transitions={'succeeded': 'GRASP_OBJECT',
                          'failed': 'EMO_SAY_DID_NOT_PICKUP',
                          'preempted': 'preempted'}
@@ -369,8 +368,7 @@ def main():
         )
         StateMachine.add(
             'SAY_CHECK_GRASP',
-            #speech_output.sayText(info='T_PU_CheckingGrasp')
-            speech_output.sayText(info='CheckingGrasp'),
+            speech_output.sayText(info='T_PU_CheckingGrasp')
             transitions={'succeeded': 'CHECK_GRASP',
                          'failed': 'EMO_SAY_DID_NOT_PICKUP'}
         )
@@ -414,8 +412,7 @@ def main():
         )
         StateMachine.add(
             'SAY_THANK_YOU',
-            #speech_output.sayText(info='T_PU_ThankYouPointing'),
-            speech_output.sayText(info='ThankYouPointing'),
+            speech_output.sayText(info='T_PU_ThankYouPointing'),
             transitions={'succeeded': 'OFFER_RETURN_OF_FAVOR',
                          'failed': 'OFFER_RETURN_OF_FAVOR',
                          'preempted': 'preempted'}
