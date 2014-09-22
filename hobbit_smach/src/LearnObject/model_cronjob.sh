@@ -7,6 +7,7 @@
 # needed for the obejct recognition service
 
 rm /localhome/demo/.ros/sift_flann.idx
+rm /opt/ros/hobbit_hydro/src/recognition_service/sift_flann.idx
 
 cd /localhome/demo/data
 mkdir -p /localhome/demo/finished_data/
