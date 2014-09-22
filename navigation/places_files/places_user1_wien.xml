@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <rooms>
 	<room>
-		<name>chargingroom</name>
+		<name>laderaum</name>
 		<vertices>
 			<vertex x="-1.260000" y="2.160000" />
 			<vertex x="-2.780000" y="1.400000" />
@@ -16,19 +16,19 @@
 				<pose x="-0.880000" y="0.944000" theta="3.14" />
 			</place>
 			<place>
-				<name>center</name>
+				<name>mitte</name>
 				<type>goTo</type>
 				<pose x="-0.880000" y="0.511999" theta="-1.57" />
 			</place>
 			<place>
 				<name>dock</name>
 				<type>docking_base_point</type>
-				<pose x="-0.6" y="-0.0" theta="0.02" />
+				<pose x="-0.00787967443466" y="-0.164258986712" theta="-11.24" />
 			</place>
 		</places>
 	</room>
 	<room>
-		<name>kitchen</name>
+		<name>kueche</name>
 		<vertices>
 			<vertex x="-1.412100" y="4.896000" />
 			<vertex x="-1.412000" y="2.615999" />
@@ -42,14 +42,14 @@
 				<pose x="-0.652000" y="3.452000" theta="0.001" />
 			</place>
 			<place>
-				<name>cupboard</name>
+				<name>kasten</name>
 				<type>goTo</type>
 				<pose x="2.388000" y="3.528000" theta="0.005" />
 			</place>
 		</places>
 	</room>
 	<room>
-		<name>livingroom</name>
+		<name>wohnzimmer</name>
 		<vertices>
 			<vertex x="-1.564000" y="10.443999" />
 			<vertex x="-1.868000" y="4.896000" />
@@ -63,24 +63,24 @@
 				<pose x="-1.032001" y="6.644000" theta="3.14" />
 			</place>
 			<place>
-				<name>table</name>
+				<name>tisch</name>
 				<type>goTo</type>
 				<pose x="-0.424000" y="5.580000" theta="0.52" />
 			</place>
 			<place>
-				<name>call5</name>
-				<type>call_button_5</type>
-				<pose x="0.716000" y="7.860000" theta="0.52" />
+				<name>call4</name>
+				<type>call_button_4</type>
+				<pose x="0.6344" y="7.5772" theta="0.609" />
 			</place>
 			<place>
-				<name>armchair</name>
+				<name>sessel</name>
 				<type>goTo</type>
 				<pose x="-0.272000" y="8.012000" theta="1.57" />
 			</place>
 		</places>
 	</room>
 	<room>
-		<name>corridor</name>
+		<name>korridor</name>
 		<vertices>
 			<vertex x="-5.136000" y="7.099999" />
 			<vertex x="-2.020000" y="7.1" />
