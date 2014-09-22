@@ -59,14 +59,14 @@ def IsItNight(ud):
 def command_cb(msg, ud):
     try:
         rospy.loginfo('/Command data received:')
-        rospy.loginfo(str(msg.command))
+        # rospy.loginfo(str(msg.command))
         input_ce = msg.command.upper()
     except AttributeError, e:
         print(e)
         pass
     try:
         rospy.loginfo('/Event data received:')
-        rospy.loginfo(str(msg.event))
+        # rospy.loginfo(str(msg.event))
         input_ce = msg.event.upper()
     except AttributeError, e:
         print(e)
@@ -85,8 +85,8 @@ def command_cb(msg, ud):
             if item[0] == 'call_hobbit':
                 ud.command = item[0]
                 for i, v in enumerate(msg.params):
-                    print(v.name)
-                    print(v.value)
+                    # print(v.name)
+                    # print(v.value)
                     if v.name == 'bathroom' and v.value == 'true':
                         ud.command = 'emergency_bathroom'
                         ud.parameters['active_task'] = 'emergency_bathroom'
@@ -101,7 +101,7 @@ def command_cb(msg, ud):
                 return True
             elif item[0] == 'away' or item[0] == 'sleep':
                 times = [1, 2, 4, 6, 12, 24]
-                print(input_ce)
+                # print(input_ce)
                 index = int(input_ce[-1:]) - 1
                 print(times[index])
                 if input_ce[:-1] == 'SLEEP':
@@ -275,7 +275,7 @@ class FakeForAllWithoutRunningActionSever(State):
         State.__init__(
             self,
             outcomes=['succeeded', 'preempted', 'aborted', 'failed'])
-        if name == None:
+        if name is None:
             self.name = 'HOW_DID_WE_END_HERE?'
         else:
             self.name = name

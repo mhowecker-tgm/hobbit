@@ -172,35 +172,6 @@ class SetSuccess(smach.State):
         return 'succeeded'
 
 
-class CleanPositions(smach.State):
-    """Class for removing unneeded positions from the rooms. Only use the
-    default 'user search' positions. \
-            Remove the waiting, 'object search' and recharge positions"""
-    def __init__(self):
-        smach.State.__init__(self, outcomes=['succeeded', 'preempted'],
-                             input_keys=['response', 'positions'],
-                             output_keys=['positions', 'plan'])
-
-    def execute(self, ud):
-        if self.preempt_requested():
-            self.service_preempt()
-            return 'preempted'
-        ud.positions = []
-        for room in ud.response.rooms.rooms_vector:
-            for position in room.places_vector:
-                # Search position is the position the robot should be able to
-                #rotate 360 degree without hitting any objects (e.g. walls)
-                if 'default' in position.place_name:
-                    ud.positions.append({'x': position.x, 'y': position.y,
-                                         'theta': position.theta,
-                                         'room': room.room_name,
-                                         'distance': 'None',
-                                         'place_name': position.place_name,
-                                         'penalty': 1})
-        ud.plan = None
-        return 'succeeded'
-
-
 class MoveBase(smach.State):
     def __init__(self):
         smach.State.__init__(self, outcomes=['succeeded', 'preempted',
