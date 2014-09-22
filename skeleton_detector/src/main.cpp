@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <ros/ros.h>
 #include <ros/spinner.h>
- 
+
 #include <stdexcept>
 #include <opencv2/opencv.hpp>
 #include <opencv/cvwimage.h>
@@ -80,6 +80,8 @@ bool visualizeOff(std_srvs::Empty::Request& request, std_srvs::Empty::Response& 
     runFullSpeed=0;
 
     cv::destroyAllWindows();
+    cv::destroyWindow("body tracker");
+    ros::spinOnce();
     cv::waitKey(1);
     return true;
 }
