@@ -109,9 +109,12 @@ def readXml(inFile):
     print rooms
     return rooms
 
+
 def writeXml(inFile, rooms):
     """ Read and modify the updated probabilities of the objects to the xml file"""
-    outFile = inFile[:-4]+'-out.xml'
+    # outFile = inFile[:-4]+'-out.xml'
+    outFile = inFile
+
 
     r = ET.Element('rooms')
     for room in rooms.rooms_vector:
@@ -163,6 +166,7 @@ def updateProb(obj, location, room_name, rooms):
                 ob.probability = new_prob
     return True
 
+
 def addObject(object_name, rooms):
     for room in rooms.rooms_vector:
         for place in (x for x in room.places_vector if x.place_type.lower() == 'searchable'):
@@ -172,7 +176,7 @@ def addObject(object_name, rooms):
                 new = True
                 for obj in place.objects:
                     if object_name in obj.name:
-                        print object_name,'is already stored.'
+                        print object_name + 'is already stored.'
                         new = False
                 if new:
                     place.objects.append(Object(object_name, 0.0))
@@ -271,6 +275,17 @@ def get_robots_current_room(req_old):
     rospy.loginfo(resp)
     return resp.room_name.data
 
+
+def add_object_to_db(req):
+    """
+    Add the given object to the database
+    """
+    global rooms
+    rospy.loginfo('/add_object_to_db: Request received')
+    print(req)
+    addObject(req.object_name, rooms)
+    return True
+
 def main():
     rospy.init_node(NAME)
     global rooms
@@ -289,6 +304,7 @@ def main():
         s3 = rospy.Service('/get_coordinates', GetCoordinates, getCoordinates)
         s4 = rospy.Service('/getRooms', GetRooms, getAllRooms)
         s5 = rospy.Service('/get_robots_current_room', GetName, get_robots_current_room)
+        s6 = rospy.Service('/add_object_to_db', AddObject, add_object_to_db)
 
     # spin() keeps Python from exiting until node is shutdown
     rospy.spin()

@@ -39,6 +39,7 @@ add_message_files(
 add_service_files(
   DIRECTORY srv
   FILES
+  AddObject.srv
   ClustersOnPlane.srv
   GetCoordinates.srv
   GetName.srv
