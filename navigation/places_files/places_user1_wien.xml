@@ -23,7 +23,7 @@
 			<place>
 				<name>dock</name>
 				<type>docking_base_point</type>
-				<pose x="-0.00787967443466" y="-0.164258986712" theta="-11.24" />
+				<pose x="-0.00787967443466" y="-0.164258986712" theta="-0.196" />
 			</place>
 		</places>
 	</room>
