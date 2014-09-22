@@ -297,12 +297,98 @@ if __name__ == '__main__':
     print "david last_feedback: ", arm_client.last_feedback
 
     #print "SetResetArm: ", arm_client.SetResetArm()
+    print "===============GetActualPosition()================"
+    print "get arm act pos: ", arm_client.GetActualPosition()
+
     print "===============GetArmAtPreGraspFromFloorPos()================"
-    print "get arm act pos: ", arm_client.GetArmAtPreGraspFromFloorPos()
-    print "===============GetArmAtCandlePos()================"
-    print "get arm act pos: ", arm_client.GetArmAtCandlePos()
-    print "===============GetArmAtLearningPos()================"
-    print "get arm act pos: ", arm_client.GetArmAtLearningPos()
+    print "get arm GetArmAtPreGraspFromFloorPos: ", arm_client.GetArmAtPreGraspFromFloorPos()
+    
+
+    #raw_input("press key to get PositionsForInterpolation(armactionserver) POS1=PreGraspFromFloor")
+    #cmd = String ("SetPositionsForInterpolation 69.71 43.44 86.3 134.07 107.56 3.96")
+    #res = arm_client.arm_action_client(cmd)
+    
+    #OPEN GRIPPER
+    #raw_input("press key to open gripper get SetOpenGripper(armactionserver)")
+    #cmd = String ("SetOpenGripper")
+    #res = arm_client.arm_action_client(cmd)
+    #print "Result: ", res 
+
+	#69.71, 43.44, 86.3, 134.07, 107.56, 3.96 pregrap
+
+    #raw_input("press key to get PositionsForInterpolation(armactionserver) POS2")
+    #cmd = String ("SetPositionsForInterpolation 72 43 82 134 101 4")
+    #res = arm_client.arm_action_client(cmd)
+    #print "Result: ", res 
+
+    #raw_input("press key to get PositionsForInterpolation(armactionserver) POS3")
+    #cmd = String ("SetPositionsForInterpolation 78 43 84 134 96 4")
+    #res = arm_client.arm_action_client(cmd)
+    #print "Result: ", res 
+
+    #raw_input("press key to get PositionsForInterpolation(armactionserver) POS4")
+    #cmd = String ("SetPositionsForInterpolation 78 55 78 150 90 4")
+    #res = arm_client.arm_action_client(cmd)
+    #print "Result: ", res 
+
+    #raw_input("press key to get PositionsForInterpolationReady (armactionserver)")
+    cmd = String ("SetPositionsForInterpolationReady")
+    res = arm_client.arm_action_client(cmd)
+
+    raw_input("press key to move arm after position interpolation")
+    cmd = String("SetStartInterpolation")
+    res = arm_client.arm_action_client(cmd)
+
+    #CLOSE GRIPPER
+    #raw_input("press key to close gripper get SetCloseGripper(armactionserver)")
+    #cmd = String ("SetCloseGripper")
+    #res = arm_client.arm_action_client(cmd)
+    #print "Result: ", res 
+
+
+
+
+    #raw_input("press key to get PositionsForInterpolation(armactionserver) POS3")
+    #cmd = String ("SetPositionsForInterpolation 78 43 84 134 96 4")
+    #res = arm_client.arm_action_client(cmd)
+    #print "Result: ", res 
+
+    '''
+    #raw_input("press key to get PositionsForInterpolation(armactionserver) POS2")
+    cmd = String ("SetPositionsForInterpolation 72 43 82 134 101 4")
+    res = arm_client.arm_action_client(cmd)
+    print "Result: ", res 
+
+    #raw_input("press key to get PositionsForInterpolation(armactionserver) POS1=PreGraspFromFloor")
+    cmd = String ("SetPositionsForInterpolation 70 43 86 134 108 4")
+    res = arm_client.arm_action_client(cmd)
+    print "Result: ", res 
+
+    #raw_input("press key to get PositionsForInterpolationReady (armactionserver)")
+    cmd = String ("SetPositionsForInterpolationReady")
+    res = arm_client.arm_action_client(cmd)
+
+    raw_input("press key to move arm after position interpolation")
+    cmd = String("SetStartInterpolation")
+    res = arm_client.arm_action_client(cmd)
+    print "Result: ", res 
+
+    #OPEN GRIPPER
+    raw_input("press key to open gripper get SetOpenGripper(armactionserver)")
+    cmd = String ("SetOpenGripper")
+    res = arm_client.arm_action_client(cmd)
+    print "Result: ", res 
+    '''
+
+
+
+
+
+    
+    #print "===============GetArmAtCandlePos()================"
+    #print "get arm act pos: ", arm_client.GetArmAtCandlePos()
+    #print "===============GetArmAtLearningPos()================"
+    #print "get arm act pos: ", arm_client.GetArmAtLearningPos()
     #print "set arm SetMoveToLearningPos: ", arm_client.SetMoveToLearningPos()
     #print "move to candle: ", arm_client.SetMoveToCandlePos()
     #res = arm_client.SetTurnTurntableCW()
