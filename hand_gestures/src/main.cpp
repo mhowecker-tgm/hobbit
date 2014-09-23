@@ -70,7 +70,7 @@ cv::Mat rgb,depth;
 
 void personExists(const hand_gestures::Person & msg)
 {
-  fprintf(stderr,"Person Exists\n");
+  fprintf(stderr," p ");
   lastPersonTimestamp=frameTimestamp;
 }
 
