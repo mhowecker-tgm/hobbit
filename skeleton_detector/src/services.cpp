@@ -40,7 +40,7 @@ unsigned char dontPublishSkeletons=0;
 unsigned char dontPublishPointEvents=0;
 unsigned char dontPublishPersons=0;
 
-unsigned int processingMode = PROCESSING_MODE_SIMPLE_PERSON_DETECTOR;
+unsigned int processingMode = PROCESSING_MODE_UPPER_GESTURE_BODY_TRACKER;//PROCESSING_MODE_SIMPLE_PERSON_DETECTOR;
 
 unsigned int actualTimestamp=0;
 unsigned int actualInFieldOfView=0;
