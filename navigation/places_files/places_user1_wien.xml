@@ -46,9 +46,9 @@
         <objects/>
       </place>
       <place>
-        <name>kasten</name>
+        <name>eingang</name>
         <type>goTo</type>
-        <pose y="3.528" x="2.388" theta="0.005"/>
+        <pose y="3.452" x="-0.652" theta="0.001"/>
         <objects/>
       </place>
     </places>
@@ -63,8 +63,8 @@
     </vertices>
     <places>
       <place>
-        <name>call3</name>
-        <type>call_button_3</type>
+        <name>eingang</name>
+        <type>default</type>
         <pose y="6.644" x="-1.032001" theta="3.14"/>
         <objects/>
       </place>
@@ -75,9 +75,15 @@
         <objects/>
       </place>
       <place>
+        <name>call3</name>
+        <type>call_button_3</type>
+        <pose y="5.58" x="-0.424" theta="0.52"/>
+        <objects/>
+      </place>
+      <place>
         <name>call4</name>
         <type>call_button_4</type>
-        <pose y="7.69" x="0.85" theta="0.609"/>
+        <pose y="7.796" x="0.697" theta="0.47"/>
         <objects/>
       </place>
       <place>
