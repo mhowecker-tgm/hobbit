@@ -81,6 +81,7 @@ def command_cb(msg, ud):
             if item[0] == 'master_reset':
                     rospy.loginfo('Master RESET activated')
                     ud.parameters['active_task'] = 100
+                    ud.command = 'master_reset'
                     return True
             if item[0] == 'call_hobbit':
                 ud.command = item[0]
@@ -262,7 +263,7 @@ class SelectTask(State):
             self.service_preempt()
             return 'preempted'
         rospy.loginfo('Task Selection')
-        # print(ud.command)
+        print(ud.command)
         if ud.command == 'IDLE':
             return 'none'
         return ud.command
