@@ -38,8 +38,8 @@
 
 #define DEFAULT_FRAME_RATE 15
 
-float maximumDistanceForIntegration = 220;
-unsigned int integrationTime = 100000;
+float maximumDistanceForIntegration = 230;
+unsigned int integrationTimeMicroseconds = 5 * 1000* 1000;
 #define maxSource 5
 
 int rate=DEFAULT_FRAME_RATE;
@@ -54,6 +54,19 @@ unsigned int localityUsed=1;
 unsigned int lastTriggerTime = 0;
 
 ros::Publisher personBroadcaster;
+
+
+
+#define NORMAL "\033[0m"
+#define BLACK "\033[30m" /* Black */
+#define RED "\033[31m" /* Red */
+#define GREEN "\033[32m" /* Green */
+#define YELLOW "\033[33m" /* Yellow */
+#define BLUE "\033[34m" /* Blue */
+#define MAGENTA "\033[35m" /* Magenta */
+#define CYAN "\033[36m" /* Cyan */
+#define WHITE "\033[37m" /* White */
+
 
 struct position3D
 {
@@ -85,7 +98,7 @@ void broadcastNewPerson( struct personMessageSt * p)
   msg.confidence = p->actualConfidence;
   msg.timestamp=p->actualTimestamp;
 
-  fprintf(stderr,"Publishing a new Person\n");
+  fprintf(stderr,GREEN "Publishing a new Person\n" NORMAL);
   personBroadcaster.publish(msg);
 }
 
@@ -100,22 +113,29 @@ void aggregatePersonMessage(struct personMessageSt * p )
   {
     if (i!=p->source)
       {
-       fprintf(stderr,"Temporal Diff %u with %u is %u \n",p->source,i,EndTimer(i)-currentTime);
-       if (EndTimer(i)-currentTime < integrationTime)
+
+       unsigned int messageTimeOffsetMicroSeconds =  EndTimer(i)-currentTime;
+       float messageTimeOffsetSecs = (float) messageTimeOffsetMicroSeconds/1000000;
+       if (messageTimeOffsetMicroSeconds < integrationTimeMicroseconds)
         {
+          fprintf(stderr,GREEN "Temporal Diff %u with %u is %0.2f sec\n" NORMAL,p->source,i,messageTimeOffsetSecs);
           if (localityUsed)
           {
             double distance = sqrt( ((p->actualX-lastKnownPosition[i].x)*(p->actualX-lastKnownPosition[i].x)) +
                                      ((p->actualY-lastKnownPosition[i].y)*(p->actualY-lastKnownPosition[i].y)) +
                                      ((p->actualZ-lastKnownPosition[i].z)*(p->actualZ-lastKnownPosition[i].z))   );
 
-            fprintf(stderr,"Spatial Diff %u with %u is %0.2f \n",p->source,i,distance);
-            if (distance<maximumDistanceForIntegration)
+            if (distance<=maximumDistanceForIntegration)
             {
+              fprintf(stderr,GREEN "Spatial Diff %u with %u is %0.2f mm \n" NORMAL,p->source,i,distance);
               ++clues;
+            } else
+            {
+              fprintf(stderr,RED "Spatial Diff %u with %u is %0.2f mm \n" NORMAL,p->source,i,distance);
             }
           } else
           {
+            fprintf(stderr,RED "Distance is too far sources %u,%u are %0.2f mm away\n" NORMAL,p->source,i,messageTimeOffsetSecs);
             //If we don't use locality having two messages at the same period is good enough
             ++clues;
           }
@@ -123,18 +143,27 @@ void aggregatePersonMessage(struct personMessageSt * p )
       }
   }
 
-   fprintf(stderr,"Gathered %u clues for a person \n",clues);
    if (clues>=1)
    {
+     fprintf(stderr,GREEN "Gathered enough clues ( %u ) to broadcast a person \n" NORMAL ,clues);
      broadcastNewPerson(p);
+   } else
+   {
+     fprintf(stderr,RED "Gathered only %u clues , not sure if this is really a person\n" NORMAL ,clues);
    }
+
+
+     fprintf(stderr,YELLOW "----------------------------------------------\n\n\n\n\n\n" NORMAL);
+
 }
 
 
 void personMessageAggregator(const person_aggregator::Person & msg , unsigned int source)
 {
     unsigned int thisTriggerTime = EndTimer(0);
-    fprintf(stderr,"personMessageAggregator triggered %u , after %u time \n",source , thisTriggerTime-lastTriggerTime);
+    float messageTriggerTimeDifference = (float) (thisTriggerTime-lastTriggerTime)/1000000;
+    fprintf(stderr,"\n\n\n\n\n\n\n\n\n\n");
+    fprintf(stderr,"personMessageAggregator triggered by %u after %0.2f secs of inactivity\n",source , messageTriggerTimeDifference );
     lastTriggerTime = thisTriggerTime;
 
     struct personMessageSt prsn;
