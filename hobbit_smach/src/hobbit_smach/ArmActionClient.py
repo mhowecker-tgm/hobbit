@@ -39,11 +39,11 @@ class ArmActionClient():
 	self.client.wait_for_server()
 	print "server found!"
 
-	print "ArmActionClient: create goal"
+	#print "ArmActionClient: create goal"
 	# Creates a goal to send to the action server.
 	goal = hobbit_msgs.msg.ArmServerGoal(command=cmd)
 
-	print "ArmActionClient: send goal"
+	#print "ArmActionClient: send goal"
 	# Sends the goal to the action server.
 	self.client.send_goal(goal, feedback_cb=self.feedback_cb)
 
@@ -55,7 +55,7 @@ class ArmActionClient():
 	# Prints out the result of executing the action
 	returnval = self.client.get_result()  # 
 	print "cmd: ", cmd
-	print "ArmActionClient.py: class ArmActionClient: function arm_action_client (=> sends/receives actionlib data from/to server): returnval.result.data: ", returnval.result.data
+	#print "ArmActionClient.py: class ArmActionClient: function arm_action_client (=> sends/receives actionlib data from/to server): returnval.result.data: ", returnval.result.data
 	return returnval
         
     def feedback_cb(self, feedback):
@@ -294,7 +294,7 @@ if __name__ == '__main__':
     cmd = String ("GetArmState")
     res = arm_client.arm_action_client(cmd)
     print "Result: ", res
-    print "david last_feedback: ", arm_client.last_feedback
+    print "david last_feedb----------------------------------------------------------------------------------------------------ack: ", arm_client.last_feedback
 
     #print "SetResetArm: ", arm_client.SetResetArm()
     print "===============GetActualPosition()================"
@@ -304,10 +304,24 @@ if __name__ == '__main__':
     print "get arm GetArmAtPreGraspFromFloorPos: ", arm_client.GetArmAtPreGraspFromFloorPos()
     
 
-    #raw_input("press key to get PositionsForInterpolation(armactionserver) POS1=PreGraspFromFloor")
-    #cmd = String ("SetPositionsForInterpolation 69.71 43.44 86.3 134.07 107.56 3.96")
-    #res = arm_client.arm_action_client(cmd)
+
+    print "get arm act pos: ", arm_client.GetActualPosition()
+    print "david last_feedb----------------------------------------------------------------------------------------------------ack: ", arm_client.last_feedback
     
+
+    raw_input("press key to get SetAbsolutePos (PreGraspFromFloorPos)")
+    cmd = String ("SetAbsolutePos 69.7 43.4 86.3 134.3 107.6 4.0")
+    res = arm_client.arm_action_client(cmd)
+    print "Result: ", res 
+    
+    raw_input("press key to get startMove (armactionserver)")
+    cmd = String ("SetStartMove 2")
+    res = arm_client.arm_action_client(cmd)
+    print "Result: ", res 
+
+    #print "get arm act pos: ", arm_client.GetActualPosition()
+
+
     #OPEN GRIPPER
     #raw_input("press key to open gripper get SetOpenGripper(armactionserver)")
     #cmd = String ("SetOpenGripper")
@@ -331,13 +345,24 @@ if __name__ == '__main__':
     #res = arm_client.arm_action_client(cmd)
     #print "Result: ", res 
 
-    #raw_input("press key to get PositionsForInterpolationReady (armactionserver)")
-    cmd = String ("SetPositionsForInterpolationReady")
-    res = arm_client.arm_action_client(cmd)
 
-    raw_input("press key to move arm after position interpolation")
-    cmd = String("SetStartInterpolation")
-    res = arm_client.arm_action_client(cmd)
+    #raw_input("press key to get PositionsForInterpolation(armactionserver) POS1=PreGraspFromFloor")
+    #cmd = String ("SetPositionsForInterpolation 69.71 43.44 86.3 134.07 107.56 3.96")
+    #cmd = String ("SetPositionsForInterpolation 69.7 43.4 86.3 134.3 107.6 4.0 ")  #Pos von Andreas Flatscher
+    #res = arm_client.arm_action_client(cmd)
+    
+
+    #raw_input("press key to get PositionsForInterpolationReady (armactionserver)")
+    #cmd = String ("SetPositionsForInterpolationReady")
+    #res = arm_client.arm_action_client(cmd)
+
+    #raw_input("press key to move arm after position interpolation")
+    #cmd = String("SetStartInterpolation")
+    #res = arm_client.arm_action_client(cmd)
+
+
+    print "===============GetArmAtPreGraspFromFloorPos()================"
+    print "get arm GetArmAtPreGraspFromFloorPos: ", arm_client.GetArmAtPreGraspFromFloorPos()
 
     #CLOSE GRIPPER
     #raw_input("press key to close gripper get SetCloseGripper(armactionserver)")
