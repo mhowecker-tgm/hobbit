@@ -20,6 +20,8 @@
 #include <std_srvs/Empty.h>
 
 
+#include "hand_gestures/Person.h"
+
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
 #include <sensor_msgs/CameraInfo.h>
@@ -66,6 +68,13 @@ message_filters::Subscriber<sensor_msgs::CameraInfo> *depth_cam_info_sub;
 //OpenCV
 cv::Mat rgb,depth;
 //----------------------------------------------------------
+
+void personExists(const hand_gestures::Person & msg)
+{
+  fprintf(stderr,"Person Exists\n");
+}
+
+
 
 bool visualizeOn(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
@@ -270,6 +279,9 @@ int main(int argc, char **argv)
      ros::ServiceServer lookUpService          = nh.advertiseService(name+"/looking_up" , lookingUp);
      ros::ServiceServer lookCenterService      = nh.advertiseService(name+"/looking_center" , lookingCenter);
      ros::ServiceServer lookDownService        = nh.advertiseService(name+"/looking_down" , lookingDown);
+
+
+     ros::Subscriber personSub = nh.subscribe("/persons",1000,personExists);
 
      //Make our rostopic cmaera grabber
      message_filters::Synchronizer<RgbdSyncPolicy> *sync;
