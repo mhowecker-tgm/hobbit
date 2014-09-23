@@ -74,8 +74,8 @@ class DavidLookForObject(State):
 	self.pubClust = rospy.Publisher("/objectclusters", PointCloud2)
 	self.rec = TD()
         self.restrictfind = False
-        self.robotDistFromGraspPntForGrasping = 0.6
-        self.robotOffsetRotationForGrasping = math.pi/3
+        self.robotDistFromGraspPntForGrasping = 0.35
+        self.robotOffsetRotationForGrasping = math.pi/2
 
     def findobject(self, ud):
 	print "===> pickup_import.py: DavidLookForObject.findobject()"
@@ -610,9 +610,12 @@ class DavidPickingUp(State):
 	#OPEN GRIPPER
 	res = self.arm_client.arm_action_client(String ("SetOpenGripper"))
 
+	#clear buffer
+	res = self.arm_client.SetClearPosBuffer()	
+
 	#PositionsForInterpolation(armactionserver) Intermediate Floor GraspPOS2
-	cmd = String ("SetPositionsForInterpolation 72 43 82 134 101 4")
-	res = self.arm_client.arm_action_client(cmd)
+	#cmd = String ("SetPositionsForInterpolation 72 43 82 134 101 4")
+	#res = self.arm_client.arm_action_client(cmd)
 
 	#PositionsForInterpolation(armactionserver) Intermediate Floor GraspPOS4 (= Grasp at floor)
 	cmd = String ("SetPositionsForInterpolation 78 55 78 150 90 4")
@@ -630,16 +633,16 @@ class DavidPickingUp(State):
 	cmd = String ("SetCloseGripper")
 	res = self.arm_client.arm_action_client(cmd)
 
-	#wait (probably not needed)
-	rospy.sleep(1)
-
-
+	
 	#PositionsForInterpolation(armactionserver) Intermediate Floor GraspPOS2")
-	cmd = String ("SetPositionsForInterpolation 72 43 82 134 101 4")
-	res = self.arm_client.arm_action_client(cmd)
+	#cmd = String ("SetPositionsForInterpolation 72 43 82 134 101 4")
+	#res = self.arm_client.arm_action_client(cmd)
+
+	#clear buffer
+	res = self.arm_client.SetClearPosBuffer()
 
 	#PositionsForInterpolation(armactionserver) POS1=PreGraspFromFloor
-	cmd = String ("SetPositionsForInterpolation 70 43 86 134 108 4")
+	cmd = String ("SetPositionsForInterpolation 69.7 43.4 86.3 134.3 107.6 4")
 	res = self.arm_client.arm_action_client(cmd)
 
 	#PositionsForInterpolationReady (armactionserver)")
