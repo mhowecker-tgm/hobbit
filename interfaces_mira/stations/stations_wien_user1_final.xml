@@ -1,0 +1,580 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <DockingStations>
+    <key>1</key>
+    <item>
+      <!--Display name of the station-->
+      <Name>default</Name>
+      <!--The position of the docking station-->
+      <Station>
+        <!--The translational part of the transform-->
+        <X>0.473</X>
+        <!--The translational part of the transform-->
+        <Y>-0.468</Y>
+        <!--The orientation in degrees-->
+        <Phi>-6.486</Phi>
+      </Station>
+      <!--The position of the docking base point-->
+      <Base>
+        <!--The translational part of the transform-->
+        <X>0.109433531761</X>
+        <!--The translational part of the transform-->
+        <Y>-0.423927009106</Y>
+        <!--The orientation in degrees-->
+        <Phi>-5.76225280762</Phi>
+      </Base>
+      <!--The tolerance for reaching the docking station-->
+      <StationTolerance>
+        <!--The translational part of the transform-->
+        <X>0.0299999993294</X>
+        <!--The translational part of the transform-->
+        <Y>0.0299999993294</Y>
+        <!--The orientation in degrees-->
+        <Phi>5</Phi>
+      </StationTolerance>
+      <!--The tolerance for reaching the docking base point-->
+      <BaseTolerance>
+        <!--The translational part of the transform-->
+        <X>0.10000000149</X>
+        <!--The translational part of the transform-->
+        <Y>0.20000000298</Y>
+        <!--The orientation in degrees-->
+        <Phi>15.0000009537</Phi>
+      </BaseTolerance>
+      <!--The number of templates that are recored for this station-->
+      <NumberOfTemplates>1</NumberOfTemplates>
+      <!--Direction for docking BOTH = 0, BACKWARD = -1, FORWARD = 1-->
+      <Direction>1</Direction>
+      <!--Optional dockon velocity.-->
+      <DockOnVelocity>0.10000000149</DockOnVelocity>
+      <!--Optional dockoff velocity.-->
+      <DockOffVelocity>0.10000000149</DockOffVelocity>
+      <!--The polygon area of the template-->
+      <TemplatePolygon>
+        <item>
+          <!--The x-coordinate-->
+          <X>1.03317260742</X>
+          <!--The y-coordinate-->
+          <Y>-0.999705791473</Y>
+        </item>
+        <item>
+          <!--The x-coordinate-->
+          <X>0.511022806168</X>
+          <!--The y-coordinate-->
+          <Y>-1.00850105286</Y>
+        </item>
+        <item>
+          <!--The x-coordinate-->
+          <X>0.572265386581</X>
+          <!--The y-coordinate-->
+          <Y>-0.175524711609</Y>
+        </item>
+        <item>
+          <!--The x-coordinate-->
+          <X>1.02757382393</X>
+          <!--The y-coordinate-->
+          <Y>-0.286694049835</Y>
+        </item>
+        <item>
+          <!--The x-coordinate-->
+          <X>1.03317260742</X>
+          <!--The y-coordinate-->
+          <Y>-0.999705791473</Y>
+        </item>
+      </TemplatePolygon>
+      <!--The frame of the polygon area-->
+      <PolygonFrame>/GlobalFrame</PolygonFrame>
+      <!--Recorded templates of this station-->
+      <Templates>
+        <item>
+          <Curve>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.660164892673</X>
+              <!--The y-coordinate-->
+              <Y>-0.250490814447</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.659899055958</X>
+              <!--The y-coordinate-->
+              <Y>-0.244764477015</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.659898161888</X>
+              <!--The y-coordinate-->
+              <Y>-0.239209875464</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.659536361694</X>
+              <!--The y-coordinate-->
+              <Y>-0.233538642526</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.659846186638</X>
+              <!--The y-coordinate-->
+              <Y>-0.228209614754</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.657794713974</X>
+              <!--The y-coordinate-->
+              <Y>-0.221913203597</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.652726113796</X>
+              <!--The y-coordinate-->
+              <Y>-0.214449197054</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.649649441242</X>
+              <!--The y-coordinate-->
+              <Y>-0.207931891084</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.646871209145</X>
+              <!--The y-coordinate-->
+              <Y>-0.201631441712</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.641765534878</X>
+              <!--The y-coordinate-->
+              <Y>-0.19452907145</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.637654840946</X>
+              <!--The y-coordinate-->
+              <Y>-0.187934949994</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.633538842201</X>
+              <!--The y-coordinate-->
+              <Y>-0.181453317404</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.62869232893</X>
+              <!--The y-coordinate-->
+              <Y>-0.174825623631</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.62556219101</X>
+              <!--The y-coordinate-->
+              <Y>-0.168914109468</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.622689306736</X>
+              <!--The y-coordinate-->
+              <Y>-0.163178578019</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.617545485497</X>
+              <!--The y-coordinate-->
+              <Y>-0.156788527966</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.615649223328</X>
+              <!--The y-coordinate-->
+              <Y>-0.151548102498</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.611499547958</X>
+              <!--The y-coordinate-->
+              <Y>-0.145680531859</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.607580244541</X>
+              <!--The y-coordinate-->
+              <Y>-0.139984667301</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.605429649353</X>
+              <!--The y-coordinate-->
+              <Y>-0.134893551469</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.602494716644</X>
+              <!--The y-coordinate-->
+              <Y>-0.129647761583</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.598342120647</X>
+              <!--The y-coordinate-->
+              <Y>-0.12415215373</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.595393419266</X>
+              <!--The y-coordinate-->
+              <Y>-0.119065843523</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.592435419559</X>
+              <!--The y-coordinate-->
+              <Y>-0.11405146867</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.589469015598</X>
+              <!--The y-coordinate-->
+              <Y>-0.109108358622</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.585317850113</X>
+              <!--The y-coordinate-->
+              <Y>-0.103964082897</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.582343518734</X>
+              <!--The y-coordinate-->
+              <Y>-0.0991736724973</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.58036339283</X>
+              <!--The y-coordinate-->
+              <Y>-0.0946649163961</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.577376663685</X>
+              <!--The y-coordinate-->
+              <Y>-0.0900025516748</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.587001562119</X>
+              <!--The y-coordinate-->
+              <Y>0</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.589012205601</X>
+              <!--The y-coordinate-->
+              <Y>0.00396210886538</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.592023253441</X>
+              <!--The y-coordinate-->
+              <Y>0.00797735247761</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.596034824848</X>
+              <!--The y-coordinate-->
+              <Y>0.0120726088062</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.598046600819</X>
+              <!--The y-coordinate-->
+              <Y>0.0161699336022</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.600058615208</X>
+              <!--The y-coordinate-->
+              <Y>0.0203048940748</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.603070855141</X>
+              <!--The y-coordinate-->
+              <Y>0.0245305560529</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.605083048344</X>
+              <!--The y-coordinate-->
+              <Y>0.028751488775</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.608095228672</X>
+              <!--The y-coordinate-->
+              <Y>0.033082023263</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.611107230186</X>
+              <!--The y-coordinate-->
+              <Y>0.0374704375863</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.613118350506</X>
+              <!--The y-coordinate-->
+              <Y>0.0418299287558</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.616129100323</X>
+              <!--The y-coordinate-->
+              <Y>0.0463274605572</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.619138896465</X>
+              <!--The y-coordinate-->
+              <Y>0.0508850514889</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.623246908188</X>
+              <!--The y-coordinate-->
+              <Y>0.0556286871433</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.626261770725</X>
+              <!--The y-coordinate-->
+              <Y>0.0603193417192</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.629274725914</X>
+              <!--The y-coordinate-->
+              <Y>0.065072491765</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.632285475731</X>
+              <!--The y-coordinate-->
+              <Y>0.0698889121413</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.636294186115</X>
+              <!--The y-coordinate-->
+              <Y>0.0749189183116</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.639299333096</X>
+              <!--The y-coordinate-->
+              <Y>0.0798731669784</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.642300903797</X>
+              <!--The y-coordinate-->
+              <Y>0.0848930329084</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.645298361778</X>
+              <!--The y-coordinate-->
+              <Y>0.0899793505669</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.648291409016</X>
+              <!--The y-coordinate-->
+              <Y>0.0951329320669</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.652279853821</X>
+              <!--The y-coordinate-->
+              <Y>0.100549012423</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.656444013119</X>
+              <!--The y-coordinate-->
+              <Y>0.106088981032</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.659427940845</X>
+              <!--The y-coordinate-->
+              <Y>0.111470602453</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.660403370857</X>
+              <!--The y-coordinate-->
+              <Y>0.116479098797</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.660370826721</X>
+              <!--The y-coordinate-->
+              <Y>0.121291391551</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.660330414772</X>
+              <!--The y-coordinate-->
+              <Y>0.126120656729</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.659499228001</X>
+              <!--The y-coordinate-->
+              <Y>0.130772337317</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.659777462482</X>
+              <!--The y-coordinate-->
+              <Y>0.135716676712</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.660387933254</X>
+              <!--The y-coordinate-->
+              <Y>0.140777274966</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.660556077957</X>
+              <!--The y-coordinate-->
+              <Y>0.14574958384</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.660479903221</X>
+              <!--The y-coordinate-->
+              <Y>0.150678917766</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.66064542532</X>
+              <!--The y-coordinate-->
+              <Y>0.155703246593</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.660550892353</X>
+              <!--The y-coordinate-->
+              <Y>0.160677030683</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.679735779762</X>
+              <!--The y-coordinate-->
+              <Y>0.171754539013</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.681334257126</X>
+              <!--The y-coordinate-->
+              <Y>0.177514761686</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.67933267355</X>
+              <!--The y-coordinate-->
+              <Y>0.182131126523</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.670457184315</X>
+              <!--The y-coordinate-->
+              <Y>0.184372678399</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.667862296104</X>
+              <!--The y-coordinate-->
+              <Y>0.188696429133</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.666574597359</X>
+              <!--The y-coordinate-->
+              <Y>0.193477317691</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.667694032192</X>
+              <!--The y-coordinate-->
+              <Y>0.199166134</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.668177247047</X>
+              <!--The y-coordinate-->
+              <Y>0.204667538404</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.668908715248</X>
+              <!--The y-coordinate-->
+              <Y>0.210312217474</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.66902166605</X>
+              <!--The y-coordinate-->
+              <Y>0.215758740902</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.668748617172</X>
+              <!--The y-coordinate-->
+              <Y>0.221085906029</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.669812977314</X>
+              <!--The y-coordinate-->
+              <Y>0.227014631033</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.669174075127</X>
+              <!--The y-coordinate-->
+              <Y>0.232265502214</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.669896900654</X>
+              <!--The y-coordinate-->
+              <Y>0.238151401281</Y>
+            </item>
+            <item>
+              <!--The x-coordinate-->
+              <X>0.671143531799</X>
+              <!--The y-coordinate-->
+              <Y>0.24433465302</Y>
+            </item>
+          </Curve>
+          <Pose>
+            <!--The translational part of the transform-->
+            <X>0.109433531761</X>
+            <!--The translational part of the transform-->
+            <Y>-0.423927009106</Y>
+            <!--The orientation in degrees-->
+            <Phi>-5.76225280762</Phi>
+          </Pose>
+        </item>
+      </Templates>
+      <!--Distance to drive back for recording-->
+      <DockingDistance>0.4</DockingDistance>
+    </item>
+  </DockingStations>
+</root>
