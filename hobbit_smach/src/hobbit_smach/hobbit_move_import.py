@@ -417,7 +417,7 @@ def goToPosition(frame='/map', room='None', place='dock'):
         )
         Sequence.add(
             'MMUI_SAY_ReachedPlace',
-            speech_output.sayText(info='T_GT_ReachedMyDestination'),
+            speech_output.sayText(info='T_GT_ReachedMyDestination2'),
             transitions={'failed': 'aborted'}
         )
         Sequence.add(
@@ -488,16 +488,16 @@ def goToPose():
         )
         # Sequence.add('ENABLE_GESTURES',
         #              service_disable.enable_gestures())
-        Sequence.add(
-            'GET_ROBOTS_CURRENT_ROOM',
-            ServiceState(
-                'get_robots_current_room',
-                GetName,
-                response_key='robots_room_name')
-        )
+        # Sequence.add(
+        #     'GET_ROBOTS_CURRENT_ROOM',
+        #     ServiceState(
+        #         'get_robots_current_room',
+        #         GetName,
+        #         response_key='robots_room_name')
+        # )
         Sequence.add(
             'MMUI_SAY_ReachedPlace',
-            speech_output.sayText(info='T_GT_ReachedMyDestination'),
+            speech_output.sayText(info='T_GT_ReachedMyDestination2'),
             transitions={'failed': 'aborted'}
         )
         Sequence.add(
