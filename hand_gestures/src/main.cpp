@@ -100,6 +100,16 @@ bool visualizeOff(std_srvs::Empty::Request& request, std_srvs::Empty::Response& 
     return true;
 }
 
+bool toggleEmergency(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    if (!dontPublishEmergencies) { dontPublishEmergencies=1; ROS_INFO("Emergencies will not be published from now on.."); } else
+                                 { dontPublishEmergencies=0; ROS_INFO("Emergencies will be published from now on..");     }
+
+    return true;
+}
+
+
+
 bool terminate(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
     ROS_INFO("Stopping Hand Gestures");
@@ -271,10 +281,9 @@ int main(int argc, char **argv)
      ros::ServiceServer visualizeOnService      = nh.advertiseService(name+"/visualize_on" , visualizeOn);
      ros::ServiceServer visualizeOffService     = nh.advertiseService(name+"/visualize_off", visualizeOff);
      ros::ServiceServer terminateService        = nh.advertiseService(name+"/terminate"    , terminate);
+     ros::ServiceServer toggleEmergencyService  = nh.advertiseService(name+"/toggleEmergency"    , toggleEmergency);
      ros::ServiceServer resumeService           = nh.advertiseService(name+"/pause"        , pause);
      ros::ServiceServer pauseService            = nh.advertiseService(name+"/resume"       , resume);
-     //ros::ServiceServer setQualityService       = nh.advertiseService(name+"/set_quality"  , setQuality);
-
 
      ros::ServiceServer lookUpService          = nh.advertiseService(name+"/looking_up" , lookingUp);
      ros::ServiceServer lookCenterService      = nh.advertiseService(name+"/looking_center" , lookingCenter);

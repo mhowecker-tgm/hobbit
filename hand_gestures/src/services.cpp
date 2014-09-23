@@ -20,7 +20,7 @@ ros::Publisher gestureEventBroadcaster;
 #endif
 
 
-unsigned int MaximumDelayBetweenPersonAndGesture = 100;
+unsigned int MaximumDelayBetweenPersonAndGesture = 150;
 unsigned int headLookingDirection=HEAD_LOOKING_DOWN; //head looking down by default
 
 ros::Publisher gestureBroadcaster;
@@ -28,6 +28,7 @@ ros::Publisher gestureBroadcaster;
 unsigned int lastPersonTimestamp=0;
 unsigned int frameTimestamp =0;
 
+unsigned char dontPublishEmergencies=1;
 unsigned char dontPublishGestures=0;
 
 unsigned int actualTimestamp=0;
@@ -61,14 +62,21 @@ void broadcastNewGesture(unsigned int frameNumber,struct handGesture * gesture)
 {
     if ( (dontPublishGestures) || (gesture==0) ) { return ; }
 
+    if ( (dontPublishEmergencies) && (gesture->gestureID==GESTURE_HELP) )
+    {
+      fprintf(stderr,"Currently configured NOT to publish Emergencies , please `rosservice call /hand_gestures/toggleEmergency`\n");
+      return;
+    }
 
-    if (frameTimestamp<lastPersonTimestamp) { fprintf(stderr,"wtf , frame before person?");   }
+
+    if (frameTimestamp<lastPersonTimestamp) { fprintf(stderr,"\nframe before person , this should never happen..\n");   } else
     if (frameTimestamp-lastPersonTimestamp >= MaximumDelayBetweenPersonAndGesture )
     {
        fprintf(stderr,"Will not publish gesture , no person detected , could be false positive\n");
        return ;
     }
 
+/*
     if (headLookingDirection!=HEAD_LOOKING_CENTER)
     {
       if (
@@ -79,7 +87,7 @@ void broadcastNewGesture(unsigned int frameNumber,struct handGesture * gesture)
         fprintf(stderr,"Gesture will be hidden because we are not looking in the center position");
         return ;
       }
-    }
+    }*/
 
 #if BROADCAST_HOBBIT
     hobbit_msgs::Event evt;

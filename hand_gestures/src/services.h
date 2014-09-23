@@ -19,6 +19,7 @@ enum HEAD_LOOK_DIRECTION_ENUM
 extern unsigned int lastPersonTimestamp;
 extern unsigned int frameTimestamp;
 
+extern unsigned char dontPublishEmergencies;
 extern unsigned char dontPublishGestures;
 extern unsigned int headLookingDirection;
 
