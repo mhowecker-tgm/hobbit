@@ -20,10 +20,13 @@ ros::Publisher gestureEventBroadcaster;
 #endif
 
 
-
+unsigned int MaximumDelayBetweenPersonAndGesture = 100;
 unsigned int headLookingDirection=HEAD_LOOKING_DOWN; //head looking down by default
 
 ros::Publisher gestureBroadcaster;
+
+unsigned int lastPersonTimestamp=0;
+unsigned int frameTimestamp =0;
 
 unsigned char dontPublishGestures=0;
 
@@ -58,6 +61,13 @@ void broadcastNewGesture(unsigned int frameNumber,struct handGesture * gesture)
 {
     if ( (dontPublishGestures) || (gesture==0) ) { return ; }
 
+
+    if (frameTimestamp<lastPersonTimestamp) { fprintf(stderr,"wtf , frame before person?");   }
+    if (frameTimestamp-lastPersonTimestamp >= MaximumDelayBetweenPersonAndGesture )
+    {
+       fprintf(stderr,"Will not publish gesture , no person detected , could be false positive\n");
+       return ;
+    }
 
     if (headLookingDirection!=HEAD_LOOKING_CENTER)
     {

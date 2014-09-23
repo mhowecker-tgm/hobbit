@@ -47,7 +47,6 @@ int rate=DEFAULT_FRAME_RATE;
 int first=0;
 int key = 0;
 volatile int paused = 0;
-unsigned int frameTimestamp =0;
 unsigned int colorWidth = 640 , colorHeight =480 , depthWidth = 640 , depthHeight = 480;
 
 struct calibrationHT calib={0};
@@ -72,6 +71,7 @@ cv::Mat rgb,depth;
 void personExists(const hand_gestures::Person & msg)
 {
   fprintf(stderr,"Person Exists\n");
+  lastPersonTimestamp=frameTimestamp;
 }
 
 
@@ -306,6 +306,7 @@ int main(int argc, char **argv)
 		{
           ros::spinOnce();
           loop_rate.sleep();
+          ++frameTimestamp;
 		 }
 
 	   stopServices();
