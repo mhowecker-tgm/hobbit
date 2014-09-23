@@ -20,9 +20,10 @@ def main():
 
     mmui = MMUI.MMUIInterface()
     for menu in menues:
-        print(menu)
+        rospy.loginfo(menu)
         resp = mmui.GoToMenu(menu)
         rospy.loginfo(str(resp))
+        rospy.sleep(2)
 
     rospy.spin()
 
