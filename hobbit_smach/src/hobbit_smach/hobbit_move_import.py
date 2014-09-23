@@ -416,10 +416,6 @@ def goToPosition(frame='/map', room='None', place='dock'):
                 response_key='robots_room_name')
         )
         Sequence.add(
-            'TEST_DATA',
-            TestData()
-        )
-        Sequence.add(
             'MMUI_SAY_ReachedPlace',
             speech_output.sayText(info='T_GT_ReachedMyDestination'),
             transitions={'failed': 'aborted'}
@@ -504,6 +500,52 @@ def goToPose():
             speech_output.sayText(info='T_GT_ReachedMyDestination'),
             transitions={'failed': 'aborted'}
         )
+        Sequence.add(
+            'SHOW_MENU_MAIN',
+            HobbitMMUI.ShowMenu(menu='MAIN'),
+            transitions={'failed': 'aborted'}
+        )
+    return seq
+
+
+def goToPoseSilent():
+    """
+    Returns a move_base.MoveBaseState
+    We use it so that only hobbit_move has to be imported and all
+    SMACH navigation handling is concentrated around
+    hobbit_move_import.
+    """
+    frame = '/map'
+    seq = Sequence(outcomes=['succeeded', 'aborted', 'preempted'],
+                   connector_outcome='succeeded',
+                   input_keys=['x', 'y', 'yaw'])
+
+    with seq:
+        Sequence.add(
+            'MMUI_SAY_IAmComing',
+            speech_output.sayText(info='T_CA_IAmComing'),
+            transitions={'failed': 'aborted'}
+        )
+        Sequence.add(
+            'UNDOCK_IF_NEEDED',
+            undock_if_needed()
+        )
+        Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
+                     head_move.MoveTo(pose='down_center'))
+        Sequence.add('WAIT', SleepState(duration=1))
+        Sequence.add('ACTIVATE_OBSTACLES',
+                     SetObstacles(active=True))
+        if not DEBUG:
+            Sequence.add('MOVE_BASE_GOAL', move_base.MoveBaseState(frame),
+                         remapping={'x': 'x',
+                                    'y': 'y',
+                                    'yaw': 'yaw'})
+        Sequence.add(
+            'HEAD_UP_AFTER_MOVEMENT',
+            head_move.MoveTo(pose='center_center')
+        )
+        # Sequence.add('ENABLE_GESTURES',
+        #              service_disable.enable_gestures())
         Sequence.add(
             'SHOW_MENU_MAIN',
             HobbitMMUI.ShowMenu(menu='MAIN'),

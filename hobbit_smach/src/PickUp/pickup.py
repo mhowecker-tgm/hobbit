@@ -326,7 +326,7 @@ def main():
         )
         StateMachine.add(
             'MOVE_TO_GRASP_POSE',
-            hobbit_move.goToPose(),
+            hobbit_move.goToPoseSilent(),
             transitions={'succeeded': 'SAY_PICKING_UP',
                          'aborted': 'MOVE_COUNTER',
                          'preempted': 'preempted'},

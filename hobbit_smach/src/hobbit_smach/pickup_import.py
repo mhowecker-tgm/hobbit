@@ -606,18 +606,18 @@ class DavidPickingUp(State):
         if self.preempt_requested():
             return 'preempted'
         # TODO: David please add the grasping in here
-	    
+
 	#OPEN GRIPPER
 	res = self.arm_client.arm_action_client(String ("SetOpenGripper"))
 
 	#PositionsForInterpolation(armactionserver) Intermediate Floor GraspPOS2
 	cmd = String ("SetPositionsForInterpolation 72 43 82 134 101 4")
 	res = self.arm_client.arm_action_client(cmd)
-	
+
 	#PositionsForInterpolation(armactionserver) Intermediate Floor GraspPOS4 (= Grasp at floor)
 	cmd = String ("SetPositionsForInterpolation 78 55 78 150 90 4")
 	res = self.arm_client.arm_action_client(cmd)
-	
+
 	#PositionsForInterpolationReady
 	cmd = String ("SetPositionsForInterpolationReady")
 	res = self.arm_client.arm_action_client(cmd)
@@ -629,7 +629,7 @@ class DavidPickingUp(State):
 	#CLOSE GRIPPER
 	cmd = String ("SetCloseGripper")
 	res = self.arm_client.arm_action_client(cmd)
-	
+
 	#wait (probably not needed)
 	rospy.sleep(1)
 
@@ -649,7 +649,7 @@ class DavidPickingUp(State):
 	#raw_input("press key to move arm after position interpolation")
 	cmd = String("SetStartInterpolation")
 	res = self.arm_client.arm_action_client(cmd)
-	
+
         return 'succeeded'
 
 
@@ -962,7 +962,7 @@ def getStartLooking():
         )
         Sequence.add(
             'MOVE_TO_POSE',
-            hobbit_move.goToPose(),
+            hobbit_move.goToPoseSilent(),
             transitions={'aborted': 'failed'},
             remapping={'x':'goal_position_x',
                        'y':'goal_position_y',
