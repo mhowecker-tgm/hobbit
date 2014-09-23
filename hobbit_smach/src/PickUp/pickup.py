@@ -11,23 +11,23 @@ import rospy
 import smach
 import smach_ros
 import uashh_smach.util as util
-from uashh_smach.util import SleepState  #df 30.7.2014
-import tf
-import math
-from smach import StateMachine, State
+from uashh_smach.util import SleepState  # df 30.7.2014
+# import tf
+# import math
+from smach import StateMachine
 
 from std_msgs.msg import String
 from hobbit_msgs.msg import GeneralHobbitAction
-from smach_ros import ActionServerWrapper, SimpleActionState, ServiceState
 from sensor_msgs.msg import PointCloud2
-from geometry_msgs.msg import Pose2D, PoseStamped, Point, Quaternion, Vector3Stamped, PoseWithCovarianceStamped, Pose
+from geometry_msgs.msg import PoseStamped
 from rgbd_acquisition.msg import PointEvents
 import hobbit_smach.hobbit_move_import as hobbit_move
 import hobbit_smach.head_move_import as head_move
-import hobbit_smach.arm_move_import as arm_move
+# import hobbit_smach.arm_move_import as arm_move
 import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.pickup_import as pickup
 import hobbit_smach.return_of_favour_import as return_of_favour
+
 
 class bcolors:
     HEADER = '\033[95m'
@@ -36,7 +36,8 @@ class bcolors:
     WARNING = '\033[93m'
     FAIL = '\033[91m'
     ENDC = '\033[0m'
-def disable(self):
+
+    def disable(self):
         self.HEADER = ''
         self.OKBLUE = ''
         self.OKGREEN = ''
@@ -71,7 +72,7 @@ class CheckHelpAccepted(smach.State):
             rospy.set_param('/hobbit/help_accepted', 'no')
             return 'preempted'
         if rospy.has_param('/hobbit/help_accepted'):
-             self._help_accepted = rospy.get_param('/hobbit/help_accepted')
+            self._help_accepted = rospy.get_param('/hobbit/help_accepted')
         return self._help_accepted
 
 
@@ -85,13 +86,12 @@ class PointingCounter(smach.State):
 
     def execute(self, ud):
         self._counter += 1
-        print('self._counter: %d' % self._counter )
+        print('self._counter: %d' % self._counter)
         if self._counter > 1:
             self._counter = 0
             return 'second'
         else:
             return 'first'
-
 
 
 class GraspCounter(smach.State):
@@ -104,7 +104,7 @@ class GraspCounter(smach.State):
 
     def execute(self, ud):
         self._counter += 1
-        print('self._counter: %d' % self._counter )
+        print('self._counter: %d' % self._counter)
         if self._counter > 1:
             self._counter = 0
             return 'second'
@@ -122,7 +122,7 @@ class MoveCounter(smach.State):
 
     def execute(self, ud):
         self._counter += 1
-        print('self._counter: %d' % self._counter )
+        print('self._counter: %d' % self._counter)
         if self._counter > 1:
             self._counter = 0
             return 'second'
@@ -133,9 +133,12 @@ class MoveCounter(smach.State):
 class Init(smach.State):
     """Class to initialize certain parameters"""
     def __init__(self):
-        smach.State.__init__(self, outcomes=['succeeded', 'canceled'], output_keys=['social_role'])
+        smach.State.__init__(
+            self,
+            outcomes=['succeeded', 'canceled'],
+            output_keys=['social_role'])
 
-    def execute(self,ud):
+    def execute(self, ud):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
@@ -143,12 +146,17 @@ class Init(smach.State):
             ud.social_role = rospy.get_param('/hobbit/social_role')
         return 'succeeded'
 
+
 class CleanUp(smach.State):
-    """Class for setting the result message and clean up persistent variables"""
+    """
+    Class for setting the result message and clean up persistent variables
+    """
     def __init__(self):
-        smach.State.__init__(self, outcomes=['succeeded'],
-                input_keys=['command', 'visited_places'],
-                output_keys=['result','command', 'visited_places'])
+        smach.State.__init__(
+            self,
+            outcomes=['succeeded'],
+            input_keys=['command', 'visited_places'],
+            output_keys=['result', 'command', 'visited_places'])
 
     def execute(self, ud):
         ud.visited_places = []
@@ -157,7 +165,10 @@ class CleanUp(smach.State):
 
 
 class SetSuccess(smach.State):
-    """Class for setting the success message in the actionlib result and clean up of persistent variables"""
+    """
+    Class for setting the success message in the
+    actionlib result and clean up of persistent variables
+    """
     def __init__(self):
         smach.State.__init__(self, outcomes=['succeeded', 'preempted'],
                              input_keys=['result'],
@@ -178,7 +189,9 @@ class SetSuccess(smach.State):
 
 class DummyGrasp(smach.State):
     def __init__(self):
-        smach.State.__init__(self, outcomes=['succeeded', 'failed', 'preempted'])
+        smach.State.__init__(
+            self,
+            outcomes=['succeeded', 'failed', 'preempted'])
 
     def execute(self, ud):
         rospy.loginfo('Start DUMMY grasp')
@@ -186,12 +199,9 @@ class DummyGrasp(smach.State):
             self.service_preempt()
             return 'preempted'
         return 'succeeded'
-        #return 'failed'
 
 
 def get_robot_pose_cb(msg, ud):
-    #print bcolors.WARNING + 'received message: '+ bcolors.ENDC
-    #print msg
     try:
         pose = PoseStamped()
         pose.header.frame_id = 'map'
@@ -200,14 +210,8 @@ def get_robot_pose_cb(msg, ud):
         ud.robot_current_pose = pose
         return True
     except:
-        print bcolors.FAIL + 'no robot pose message received.'+ bcolors.ENDC
+        print bcolors.FAIL + 'no robot pose message received.' + bcolors.ENDC
         return False
-
-
-def point_cloud_cb(msg, ud):
-    print('point cloud received')
-    ud.cloud= msg
-    return True
 
 
 def main():
@@ -268,19 +272,19 @@ def main():
         )
         StateMachine.add(
             'HEAD_TO_SEARCH',
-            head_move.MoveTo(pose='to_grasp'),  #wait=True <=> df
-            transitions={'succeeded': 'WAIT_FINISH_HEAD_TO_SEARCH', #df
+            head_move.MoveTo(pose='to_grasp'),  # wait=True <=> df
+            transitions={'succeeded': 'WAIT_FINISH_HEAD_TO_SEARCH', # df
                          'aborted': 'EMO_SAY_OBJECT_NOT_DETECTED',
                          'preempted': 'preempted'}
         )
-	#df 30.7.2014
-	StateMachine.add(
-      	    'WAIT_FINISH_HEAD_TO_SEARCH',
+        # df 30.7.2014
+        StateMachine.add(
+            'WAIT_FINISH_HEAD_TO_SEARCH',
             SleepState(duration=10),
-	    transitions={'succeeded': 'GET_POINT_CLOUD',
-	                 'preempted': 'preempted'}
-        )
-	#df END
+            transitions={'succeeded': 'GET_POINT_CLOUD',
+                         'preempted': 'preempted'}
+            )
+        # df END
         StateMachine.add(
             'GET_POINT_CLOUD',
             util.WaitForMsgState(
@@ -289,9 +293,9 @@ def main():
                 point_cloud_cb,
                 timeout=5,
                 output_keys=['cloud']),
-            transitions={'succeeded':'LOOK_FOR_OBJECT',
-                         'aborted':'GET_POINT_CLOUD',
-                         'preempted':'preempted'})
+            transitions={'succeeded': 'LOOK_FOR_OBJECT',
+                         'aborted': 'GET_POINT_CLOUD',
+                         'preempted': 'preempted'})
         StateMachine.add(
             'LOOK_FOR_OBJECT',
             pickup.DavidLookForObject(),
@@ -299,13 +303,13 @@ def main():
                          'failed': 'EMO_SAY_OBJECT_NOT_DETECTED',
                          'preempted': 'preempted'}
         )
-        #StateMachine.add(
+        # StateMachine.add(
         #    'CALC_GRASP_POSE',
         #    pickup.DavidCalcGraspPose(),
         #    transitions={'succeeded': 'EMO_SAY_OBJECT_FOUND',
         #                 'aborted': 'EMO_SAY_OBJECT_NOT_DETECTED',
         #                 'preempted': 'preempted'}
-        #)
+        # )
         StateMachine.add(
             'EMO_SAY_OBJECT_NOT_DETECTED',
             pickup.sayObjectNotDetected1(),
@@ -326,9 +330,9 @@ def main():
             transitions={'succeeded': 'SAY_PICKING_UP',
                          'aborted': 'MOVE_COUNTER',
                          'preempted': 'preempted'},
-            remapping={'x':'goal_position_x',
-                       'y':'goal_position_y',
-                       'yaw':'goal_position_yaw'}
+            remapping={'x': 'goal_position_x',
+                       'y': 'goal_position_y',
+                       'yaw': 'goal_position_yaw'}
         )
         StateMachine.add(
             'MOVE_COUNTER',
@@ -353,7 +357,7 @@ def main():
         )
         StateMachine.add(
             'SAY_PICKING_UP',
-            speech_output.sayText(info='T_PU_PickingUpObject')
+            speech_output.sayText(info='T_PU_PickingUpObject'),
             transitions={'succeeded': 'GRASP_OBJECT',
                          'failed': 'EMO_SAY_DID_NOT_PICKUP',
                          'preempted': 'preempted'}
@@ -361,14 +365,14 @@ def main():
         StateMachine.add(
             'GRASP_OBJECT',
             pickup.getPickupSeq(),
-            #pickup.DavidPickingUp(),
+            # pickup.DavidPickingUp(),
             transitions={'succeeded': 'CHECK_GRASP',
                          'failed': 'EMO_SAY_DID_NOT_PICKUP',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
             'SAY_CHECK_GRASP',
-            speech_output.sayText(info='T_PU_CheckingGrasp')
+            speech_output.sayText(info='T_PU_CheckingGrasp'),
             transitions={'succeeded': 'CHECK_GRASP',
                          'failed': 'EMO_SAY_DID_NOT_PICKUP'}
         )
@@ -427,22 +431,25 @@ def main():
         StateMachine.add(
             'SET_SUCCESS',
             SetSuccess(),
-            transitions={'succeeded':'succeeded',
-                         'preempted':'CLEAN_UP'}
+            transitions={'succeeded': 'succeeded',
+                         'preempted': 'CLEAN_UP'}
         )
         StateMachine.add(
             'CLEAN_UP',
             CleanUp(),
-            transitions={'succeeded':'preempted'}
+            transitions={'succeeded': 'preempted'}
         )
 
     asw = smach_ros.ActionServerWrapper(
-            'pickup', GeneralHobbitAction, pickup_sm,
-            ['succeeded'], ['aborted'],['preempted'],
-            result_slots_map = {'result':'result'}
+        'pickup', GeneralHobbitAction, pickup_sm,
+        ['succeeded'], ['aborted'], ['preempted'],
+        result_slots_map={'result': 'result'}
     )
 
-    sis = smach_ros.IntrospectionServer('smach_server', pickup_sm, '/HOBBIT/PICKUP_SM_ROOT')
+    sis = smach_ros.IntrospectionServer(
+        'smach_server',
+        pickup_sm,
+        '/HOBBIT/PICKUP_SM_ROOT')
     sis.start()
     asw.run_server()
     rospy.spin()
