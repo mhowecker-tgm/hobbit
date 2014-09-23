@@ -43,17 +43,17 @@ import hobbit_msgs.msg
 #        cls.init()
 #        return cls._arm
 
-if not DEBUG:
-    pass
+#if not DEBUG:
+#    pass
     #new: 
-    arm_client = ArmActionClient()
+arm_client = ArmActionClient()
     #cmd = String ("GetArmState")
     #res = arm_client.arm_action_client(cmd)
     #changes done for new ArmActionServer based communication: arm.command() => arm_client.arm_action_client(String(command))  
     #old:
     #arm = ArmClientFunctions('192.168.2.190')
-else:
-    arm = True
+#else:
+#    arm = True
 
 def getArmAtPosition(position='home'):
     #status = ast.literal_eval(arm.GetArmState())
@@ -76,9 +76,6 @@ def getArmAtPosition(position='home'):
         if arm_client.GetArmAtHomePos():
             return True
     elif position == 'tray':
-        if arm_client.GetArmAtTrayPos():
-            return True
-    elif position == 'empty_into_tray':
         if arm_client.GetArmAtTrayPos():
             return True
     else:
@@ -200,7 +197,8 @@ class SetArmPosition(State):
             status = arm_client.SetMoveToLearningPos()
             return 'succeeded'
         elif self.position == 'tray':
-            status = self.arm_client.SetMoveToTrayPos()
+            status = arm_client.SetMoveToTrayPos()
+            return 'succeeded'
         elif self.position == 'pregrasp':
             status = arm_client.SetMoveToPreGraspFromFloorPos()
             return 'succeeded'
@@ -233,7 +231,7 @@ def goToPreGraspPosition():
     )
 
     with seq:
-        Sequence.add('MOVE_ARM_TO_TRAY_POSE',
+        Sequence.add('MOVE_ARM_TO_PREGRASP_POSE',
                      SetArmPosition(position='pregrasp'))
         Sequence.add('ARM_POSE_REACHED',
                      CheckArmReachedKnownPosition(position='pregrasp'),
@@ -247,7 +245,7 @@ def goToTrayPosition():
     """
     Return a SMACH Sequence that will move the arm to the tray pose.
     """
-
+    #moves automatically to home position!!
     seq = Sequence(
         outcomes=['succeeded', 'preempted', 'failed'],
         connector_outcome='succeeded'
@@ -255,9 +253,9 @@ def goToTrayPosition():
 
     with seq:
         Sequence.add('MOVE_ARM_TO_TRAY_POSE',
-                     SetArmPosition(position='empty_into_tray'))
+                     SetArmPosition(position='tray'))
         Sequence.add('ARM_POSE_REACHED',
-                     CheckArmReachedKnownPosition(position='empty_into_tray'),
+                     CheckArmReachedKnownPosition(position='home'),
                      transitions={'failed': 'ARM_POSE_REACHED'})
         Sequence.add('CHECK_ARM_IS_NOT_MOVING', CheckArmIsNotMoving(),
                      transitions={'failed': 'CHECK_ARM_IS_NOT_MOVING'})
