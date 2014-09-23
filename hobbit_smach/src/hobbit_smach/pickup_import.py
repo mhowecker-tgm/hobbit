@@ -74,8 +74,8 @@ class DavidLookForObject(State):
 	self.pubClust = rospy.Publisher("/objectclusters", PointCloud2)
 	self.rec = TD()
         self.restrictfind = False
-        self.robotDistFromGraspPntForGrasping = 0.35
-        self.robotOffsetRotationForGrasping = math.pi/2
+        self.robotDistFromGraspPntForGrasping = 0.43
+        self.robotOffsetRotationForGrasping = 0.06+math.pi/2.0
 
     def findobject(self, ud):
 	print "===> pickup_import.py: DavidLookForObject.findobject()"
@@ -994,11 +994,11 @@ def getEndPickupSeq():
                 'MOVE_ARM_TO_TRAY_AND_HOME',
                 arm_move.goToTrayPosition()
             )
-            Sequence.add(
-                'LOCATE_USER',
-		sayRemoveObjectTakeObject() # df 18.8.2014: delete this line again, only inserted to get code running!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            #Sequence.add(
+            #    'LOCATE_USER',
+		#sayRemoveObjectTakeObject() # df 18.8.2014: delete this line again, only inserted to get code running!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 #Dummy()
-            )
+            #)
         Sequence.add(
             'EMO_SAY_REMOVE_OBJECT',
             sayRemoveObjectTakeObject()
