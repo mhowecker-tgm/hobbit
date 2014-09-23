@@ -111,7 +111,7 @@ bool terminate(std_srvs::Empty::Request& request, std_srvs::Empty::Response& res
 bool pause(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
     ROS_INFO("Hand Gestures are now paused");
-    broadcastGesturesStatus(frameTimestamp,1);
+    if (!paused) { broadcastGesturesStatus(frameTimestamp,1); }
     paused=1;
     return true;
 }
@@ -119,7 +119,7 @@ bool pause(std_srvs::Empty::Request& request, std_srvs::Empty::Response& respons
 bool resume(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
     ROS_INFO("Hand Gestures are now resuming");
-    broadcastGesturesStatus(frameTimestamp,0);
+    if (paused) { broadcastGesturesStatus(frameTimestamp,0); }
     paused=0;
     return true;
 }
