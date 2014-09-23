@@ -51,6 +51,8 @@ unsigned int paused=0;
 unsigned int raw=0;
 unsigned int localityUsed=1;
 
+unsigned int lastTriggerTime = 0;
+
 ros::Publisher personBroadcaster;
 
 struct position3D
@@ -131,7 +133,9 @@ void aggregatePersonMessage(struct personMessageSt * p )
 
 void personMessageAggregator(const person_aggregator::Person & msg , unsigned int source)
 {
-    fprintf(stderr,"personMessageAggregator triggered %u , after %u time \n",source , EndTimer(0));
+    unsigned int thisTriggerTime = EndTimer(0);
+    fprintf(stderr,"personMessageAggregator triggered %u , after %u time \n",source , thisTriggerTime-lastTriggerTime);
+    lastTriggerTime = thisTriggerTime;
 
     struct personMessageSt prsn;
 
