@@ -112,7 +112,7 @@ def command_cb(msg, ud):
                 ud.parameters['sleep_time'] = times[index]
                 return True
             # elif index == 1 and night and index + 1 <= active_task:
-            elif item[0] == 'recharge' and not night and index <= active_task:
+            elif item[0] == 'recharge' and not night and index < active_task:
                 rospy.loginfo('RECHARGING')
                 ud.command = 'recharge'
                 ud.parameters['active_task'] = index
@@ -155,6 +155,7 @@ def child_cb(outcome_map):
 
 def child_cb1(outcome_map):
     rospy.loginfo('cc1 child termination callback')
+    print(outcome_map)
     if outcome_map['Commands'] == 'succeeded':
         return True
     else:
@@ -360,6 +361,10 @@ def sos_cb(ud, goal):
                              parameters=par)
     return goal
 
+def pickup_cb(ud, goal):
+    goal = GeneralHobbitGoal(command=String('pickup'))
+    return goal
+
 
 def main():
     rospy.init_node(NAME)
@@ -517,13 +522,14 @@ def main():
         )
         StateMachine.add(
             'REMINDER',
-            SimpleActionState(
-                'reminder',
-                GeneralHobbitAction,
-                goal_cb=task_reminder_cb,
-                preempt_timeout=rospy.Duration(5),
-                server_wait_timeout=rospy.Duration(10)
-            ),
+            FakeForAllWithoutRunningActionSever(name='CLEAR_FLOOR'),
+            # SimpleActionState(
+            #     'reminder',
+            #     GeneralHobbitAction,
+            #     goal_cb=task_reminder_cb,
+            #     preempt_timeout=rospy.Duration(5),
+            #     server_wait_timeout=rospy.Duration(10)
+            # ),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
@@ -585,7 +591,11 @@ def main():
         )
         StateMachine.add(
             'PICKUP',
-            FakeForAllWithoutRunningActionSever(name='PICKUP'),
+            SimpleActionState('pickup',
+                              GeneralHobbitAction,
+                              goal_cb=pickup_cb,
+                              input_keys=['parameters', 'params']),
+            # FakeForAllWithoutRunningActionSever(name='PICKUP'),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
@@ -597,8 +607,8 @@ def main():
         )
         StateMachine.add(
             'SURPRISE',
-            # FakeForAllWithoutRunningActionSever(name='SURPRISE'),
-            social_role.get_surprise(),
+            FakeForAllWithoutRunningActionSever(name='SURPRISE'),
+            # social_role.get_surprise(),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
