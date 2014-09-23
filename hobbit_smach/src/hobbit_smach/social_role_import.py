@@ -13,7 +13,7 @@ from hobbit_msgs.msg import Event
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 import uashh_smach.util as util
 import hobbit_smach.sos_call_import as sos_call
-import hobbit_smach.speech_output as speech_output
+import hobbit_smach.speech_output_import as speech_output
 
 
 class GetSocialRole(State):
