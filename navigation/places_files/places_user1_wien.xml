@@ -64,8 +64,8 @@
     <places>
       <place>
         <name>eingang</name>
-        <type>default</type>
-        <pose y="6.644" x="-1.032001" theta="3.14"/>
+        <type>goTo</type>
+        <pose y="6.644" x="-1.032001" theta="1.57"/>
         <objects/>
       </place>
       <place>
