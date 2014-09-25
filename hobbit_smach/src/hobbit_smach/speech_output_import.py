@@ -76,25 +76,23 @@ def sayTextObject(info='Text is missing', learn=False):
 
     seq = Sequence(
         outcomes=['succeeded', 'preempted', 'failed'],
-        connector_outcome='succeeded'
+        connector_outcome='succeeded',
+        input_keys=['object_name']
     )
-    if rospy.has_param('/hobbit/object_to_bring'):
-        if learn:
-            seq.userdata.object_name = rospy.get_param(
-                '/hobbit/object_to_learn')
-        else:
-            seq.userdata.object_name = rospy.get_param(
-                '/hobbit/object_to_bring')
-    else:
-        seq.userdata.object_name = 'mug'
-
+#    if rospy.has_param('/hobbit/object_to_bring'):
+#        if learn:
+#            seq.userdata.object_name = rospy.get_param(
+#                '/hobbit/object_to_learn')
+#        else:
+#            seq.userdata.object_name = rospy.get_param(
+#                '/hobbit/object_to_bring')
+#    else:
+#        seq.userdata.object_name = 'mug'
+#
     with seq:
         Sequence.add(
             'TALK',
-            HobbitMMUI.ShowInfo(
-                info=info,
-                object_name=seq.userdata.object_name
-            )
+            ShowInfoObject(info=info)
         )
         Sequence.add(
             'WAIT_FOR_MMUI',
@@ -102,6 +100,31 @@ def sayTextObject(info='Text is missing', learn=False):
             transitions={'aborted': 'WAIT_FOR_MMUI',
                          'succeeded': 'succeeded'})
     return seq
+
+
+class ShowInfoObject(State):
+
+    """
+    Class to interact with the MMUI
+    """
+
+    def __init__(self, info):
+        State.__init__(self,
+                       input_keys=['object_name'],
+                       outcomes=['succeeded', 'failed', 'preempted']
+                       )
+        self.info = info
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        print('ShowInfoRoom')
+        print(ud.object_name)
+        mmui = MMUI.MMUIInterface()
+        mmui.showMMUI_Info(
+            text=self.info, prm=ud.object_name)
+        return 'succeeded'
 
 
 class ShowInfoRoom(State):
