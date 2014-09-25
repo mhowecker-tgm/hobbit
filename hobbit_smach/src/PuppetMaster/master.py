@@ -18,7 +18,7 @@ import hobbit_smach.call_hobbit_import as call_hobbit
 import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.social_role_import as social_role
 import uashh_smach.util as util
-from hobbit_user_interaction import HobbitEmotions
+from hobbit_user_interaction import HobbitMMUI
 from hobbit_smach.bcolors import bcolors
 
 
@@ -533,12 +533,17 @@ def main():
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
-        StateMachine.add(
+        StateMachine.add_auto(
             'EMERGENCY',
             SimpleActionState('emergency_user',
                               GeneralHobbitAction,
                               goal_cb=sos_cb,
                               input_keys=['parameters', 'params']),
+            connector_outcome=['succeeded', 'aborted', 'preempted'])
+        )
+        StateMachine.add(
+            'MAIN_MENU',
+            HobbitMMUI.ShowMenu(menu=MAIN),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
@@ -621,13 +626,17 @@ def main():
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
-        StateMachine.add(
+        StateMachine.add_auto(
             'REWARD',
             speech_output.emo_say_something(
                 emo='VHAPPY',
                 time=4,
                 text='T_RW_YouAreWelcome'
             ),
+            connector_outcome=['succeeded'])
+        StateMachine.add(
+            'MAIN_MENU',
+            HobbitMMUI.ShowMenu(menu=MAIN),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )

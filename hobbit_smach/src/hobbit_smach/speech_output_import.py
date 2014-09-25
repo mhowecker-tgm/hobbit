@@ -63,7 +63,7 @@ def askYesNo(question='Text is missing'):
     return seq
 
 
-def sayTextObject(info='Text is missing', learn=False):
+def sayTextObject(info='Text is missing'):
     """
     Return a SMACH Sequence for speech output on the MMUI.
     The second State is needed to wait until the spoken text
@@ -79,16 +79,6 @@ def sayTextObject(info='Text is missing', learn=False):
         connector_outcome='succeeded',
         input_keys=['object_name']
     )
-#    if rospy.has_param('/hobbit/object_to_bring'):
-#        if learn:
-#            seq.userdata.object_name = rospy.get_param(
-#                '/hobbit/object_to_learn')
-#        else:
-#            seq.userdata.object_name = rospy.get_param(
-#                '/hobbit/object_to_bring')
-#    else:
-#        seq.userdata.object_name = 'mug'
-#
     with seq:
         Sequence.add(
             'TALK',

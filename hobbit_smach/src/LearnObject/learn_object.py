@@ -245,10 +245,6 @@ def main():
 
         with seq2:
             Sequence.add(
-                'TESTDATA',
-                TestData()
-            )
-            Sequence.add(
                 'SAY_LEARN_NEW_OBJECT',
                 cc1
             )
@@ -266,8 +262,7 @@ def main():
             Sequence.add(
                 'SAY_THANKS',
                 speech_output.sayTextObject(
-                    info='T_LO_ThankYouTeachingNewObject_O',
-                    learn=True)
+                    info='T_LO_ThankYouTeachingNewObject_O')
             )
             Sequence.add('MMUI_MAIN_MENU', HobbitMMUI.ShowMenu(menu='MAIN'))
 
