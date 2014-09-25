@@ -212,14 +212,14 @@ def startDockProcedure():
 
     with cc:
         Concurrence.add(
-            'WAIT', SleepState(duration=10))
+            'WAIT', SleepState(duration=20))
         Concurrence.add(
             'CHARGE_CHECK',
             seq)
 
     with seq1:
         Sequence.add('START_DOCK', hobbit_move.Dock())
-        Sequence.add('WAIT', SleepState(duration=10))
+        Sequence.add('WAIT', SleepState(duration=20))
         Sequence.add('CHECK', cc,
                          transitions={'succeeded': 'aborted',
                                       'failed': 'RETRY'})
