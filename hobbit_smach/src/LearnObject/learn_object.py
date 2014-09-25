@@ -22,6 +22,26 @@ import hobbit_smach.speech_output_import as speech_output
 # import hobbit_smach.hobbit_move_import as hobbit_move
 
 
+class TestData(State):
+    """
+    """
+
+    def __init__(self, ):
+        State.__init__(
+            self,
+            input_keys=['object_name'],
+            outcomes=['succeeded', 'failed', 'preempted']
+        )
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        print('TestData')
+        print(ud.object_name)
+        return 'succeeded'
+
+
 class Init(State):
     """Class to initialize certain parameters"""
     def __init__(self):
@@ -151,7 +171,8 @@ def main():
 
     seq2 = Sequence(
         outcomes=['succeeded', 'failed', 'preempted', 'aborted'],
-        connector_outcome='succeeded'
+        connector_outcome='succeeded',
+        input_keys=['object_name']
     )
     learn_object_sm.userdata.result = String('started')
     learn_object_sm.userdata.emotion = 'WONDERING'
@@ -224,6 +245,10 @@ def main():
 
         with seq2:
             Sequence.add(
+                'TESTDATA',
+                TestData()
+            )
+            Sequence.add(
                 'SAY_LEARN_NEW_OBJECT',
                 cc1
             )
@@ -240,8 +265,9 @@ def main():
             )
             Sequence.add(
                 'SAY_THANKS',
-                speech_output.sayTextObject(info='T_LO_ThankYouTeachingNewObject_O',
-                                            learn=True)
+                speech_output.sayTextObject(
+                    info='T_LO_ThankYouTeachingNewObject_O',
+                    learn=True)
             )
             Sequence.add('MMUI_MAIN_MENU', HobbitMMUI.ShowMenu(menu='MAIN'))
 
