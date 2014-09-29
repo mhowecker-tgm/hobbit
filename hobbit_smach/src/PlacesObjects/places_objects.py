@@ -134,7 +134,7 @@ def writeXml(inFile, rooms):
             i = ET.SubElement(f, 'pose', {'x': str(place.x), 'y': str(place.y), 'theta': str(place.theta)})
             j = ET.SubElement(f, 'objects')
             for obj in place.objects:
-                k = ET.SubElement(j, 'object', {'name': obj.name, 'probability': str(obj.probability)})
+                k = ET.SubElement(j, 'object', {'name': obj.name.data, 'probability': str(obj.probability)})
     tree = ET.ElementTree(r)
     tree.write(outFile, encoding='UTF-8',  xml_declaration=True, pretty_print=True)
     print 'file',outFile,'written.'
@@ -153,7 +153,7 @@ def updateProb(obj, location, room_name, rooms):
         for place in (x for x in room.places_vector if x.place_type.lower() == 'searchable'):
             count += 1
             if ((room.room_name.lower() == room_name.lower()) and (place.place_name.lower() == location.lower())):
-                for ob in (z for z in place.objects if z.name.lower() == obj.lower()):
+                for ob in (z for z in place.objects if z.name.data.lower() == obj.lower()):
                     diff = (1.0 - float(ob.probability))*0.5
                     ob.probability = float(ob.probability) + diff
                     rem_prob = 1.0 - ob.probability
@@ -162,7 +162,7 @@ def updateProb(obj, location, room_name, rooms):
     new_prob = rem_prob / count
     for room in (y for y in rooms.rooms_vector if not y.room_name.lower() == room_name.lower()):
         for place in (x for x in room.places_vector if x.place_type.lower() == 'searchable'):
-            for ob in (z for z in place.objects if z.name.lower() == obj.lower()):
+            for ob in (z for z in place.objects if z.name.data.lower() == obj.lower()):
                 ob.probability = new_prob
     return True
 
@@ -182,7 +182,7 @@ def addObject(object_name, rooms):
                     place.objects.append(Object(object_name, 0.0))
 
     #print rooms.rooms_vector
-    updateProb(object_name, 'None', 'None', rooms)
+    updateProb(object_name.data, 'None', 'None', rooms)
     return
 
 def getObjectLocations(req):
@@ -197,7 +197,7 @@ def getObjectLocations(req):
     print 'Return all locations of requested object:',req.object_name.data
     for room in rooms.rooms_vector:
         for place in (x for x in room.places_vector if x.place_type.lower() == 'searchable'):
-            for ob in (z for z in place.objects if z.name.lower() == query.lower()):
+            for ob in (z for z in place.objects if z.name.data.lower() == query.lower()):
                 places.append({'room': room.room_name, 'location': place.place_name, 'probability': ob.probability})
     sorted_places = sorted(places, key=itemgetter('probability'), reverse=True)
     newlist = ObjectLocationVector()
@@ -293,7 +293,7 @@ def main():
     if not rooms:
         rospy.signal_shutdown('No rooms were loaded. Check the input xml file')
     else:
-        addObject('mug', rooms)
+        addObject(String('mug'), rooms)
         updateProb('mug', 'default', 'Office', rooms)
         mug = GetObjectLocationsRequest()
         mug.object_name = String('mug')
