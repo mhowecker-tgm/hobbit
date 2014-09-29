@@ -32,7 +32,7 @@ commands = [['emergency', 'G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP',
             ['away', 'C_AWAY1', 'C_AWAY2', 'C_AWAY3', 'C_AWAY4', 'C_AWAY5', 'C_AWAY6',
             'C_SLEEP1', 'C_SLEEP2', 'C_SLEEP3', 'C_SLEEP4', 'C_SLEEP5', 'C_SLEEP6'],
             ['clear_floor', 'E_CLEARFLOOR'],
-            ['pickup', 'follow', 'learn_object', 'bring_object', 'goto', 'pickup'
+            ['pickup', 'follow', 'learn_object', 'bring_object', 'goto', 'pickup',
              'C_PICKUP', 'C_FOLLOW', 'C_LEARN', 'C_BRING', 'C_GOTOPOINT', 'G_POINTING'],
             ['patrol', 'E_PATROL'],
             ['surprise', 'C_SURPRISE'],
@@ -75,15 +75,13 @@ def command_cb(msg, ud):
     night = IsItNight(ud)
     active_task = ud.parameters['active_task']
     for index, item in enumerate(commands):
-        # print(input_ce)
         if input_ce in item:
-            # if index == 4:
             if item[0] == 'master_reset':
                     rospy.loginfo('Master RESET activated')
                     ud.parameters['active_task'] = 100
                     ud.command = 'master_reset'
                     return True
-            if item[0] == 'call_hobbit':
+            elif item[0] == 'call_hobbit':
                 ud.command = item[0]
                 for i, v in enumerate(msg.params):
                     # print(v.name)
@@ -131,10 +129,7 @@ def command_cb(msg, ud):
                 # if index == 7:
                 if item[0] == 'pickup':
                     i = item.index(input_ce)
-                    ud.command = item[i - 5]
-                    # print('COMMAND')
-                    # print(item[i-5])
-                    pass
+                    ud.command = item[i - 6]
                 else:
                     ud.command = item[0]
                 ud.params = msg.params
@@ -541,13 +536,7 @@ def main():
                               GeneralHobbitAction,
                               goal_cb=sos_cb,
                               input_keys=['parameters', 'params']),
-            connector_outcome=['succeeded', 'aborted', 'preempted']
-        )
-        StateMachine.add(
-            'MAIN_MENU',
-            HobbitMMUI.ShowMenu(menu='MAIN'),
-            transitions={'succeeded': 'RESET_ACTIVE_TASK',
-                         'aborted': 'RESET_ACTIVE_TASK'}
+            connector_outcomes=['succeeded', 'aborted', 'preempted']
         )
         StateMachine.add(
             'CLEAR_FLOOR',
@@ -635,12 +624,12 @@ def main():
                 time=4,
                 text='T_RW_YouAreWelcome'
             ),
-            connector_outcome=['succeeded'])
+            connector_outcomes=['succeeded', 'aborted'])
         StateMachine.add(
             'MAIN_MENU',
             HobbitMMUI.ShowMenu(menu='MAIN'),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
-                         'aborted': 'RESET_ACTIVE_TASK'}
+                         'failed': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'BRING_OBJECT',
