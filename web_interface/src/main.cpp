@@ -155,6 +155,48 @@ int getBackCommandLine(char *  command , char * what2GetBack , unsigned int what
   return 1;
 }
 
+
+int getBackCPUAndMEMUsageForProcess(unsigned int pid,float * cpuUsage , float * memUsage)
+{
+  if ( (cpuUsage==0) || (memUsage==0) ) { return 0; }
+
+  *cpuUsage=0.0;
+  *memUsage=0.0;
+
+  char what2GetBack[1024]={0};
+  char what2Execute[1024];
+  snprintf(what2Execute,1024,"ps aux | awk '{print $2\",\"$3\",\"$4\",\"$11}' | grep %u",pid);
+  //fprintf(stderr,"Executing %s\n",what2Execute);
+  if ( getBackCommandLine(what2Execute, what2GetBack , 1024 ) )
+  {
+      //We get back something like 21230,20.8,0.4,../../../devel/lib/skeleton_detector/skeleton_detector
+      //fprintf(stderr,"Got Back %s \n",what2GetBack);
+      char * firstComma = strchr(what2GetBack,',');
+      if (firstComma==0) { return 0; }
+      char * secondComma = strchr(firstComma+1,',');
+      if (secondComma ==0) { return 0; }
+      char * thirdComma = strchr(secondComma+1,',');
+      if (thirdComma ==0) { return 0; }
+
+      *thirdComma=0;
+      *secondComma=0;
+      ++secondComma;
+      ++firstComma;
+
+      *cpuUsage = atof(firstComma);
+      *memUsage = atof(secondComma);
+
+      return 1;
+  }
+  return 0;
+}
+
+int getBackCPUAndMEMUsageForThisProcess(float * cpuUsage , float * memUsage)
+{
+  unsigned int pid=getpid();
+  return getBackCPUAndMEMUsageForProcess(pid,cpuUsage,memUsage);
+}
+
 int processExists(char * safeProcessName)
 {
   char what2Execute[MAX_COMMAND_SIZE];
