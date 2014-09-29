@@ -81,7 +81,7 @@ def readXml(inFile):
         srv_room = Room()
         name = room.findall('name')
         srv_room.room_name = name[0].text
-        print name[0].text
+        # print name[0].text
         for vertices in room.findall('vertices'):
             for vertex in vertices.findall('vertex'):
                 srv_vertex = Point2D(float(vertex.attrib.get('x')), float(vertex.attrib.get('y')))
@@ -96,17 +96,17 @@ def readXml(inFile):
                 srv_place.x = float(pose.attrib.get('x'))
                 srv_place.y = float(pose.attrib.get('y'))
                 srv_place.theta = float(pose.attrib.get('theta'))
-                print srv_place
+                # print srv_place
                 # this is not yet in the hobbit_msgs/Place definition
                 srv_place.place_type = types.text
                 for objects in place.findall('objects'):
                     for obj in objects.findall('object'):
                         # this is not yet in the hobbit_msgs/Object definition
-                        srv_place.objects.append(Object(obj.attrib.get('name'), float(obj.attrib.get('probability'))))
-                        #print obj.tag, obj.attrib
+                        srv_place.objects.append(Object(String(obj.attrib.get('name')), float(obj.attrib.get('probability'))))
+                        # print obj.tag, obj.attrib
                 srv_room.places_vector.append(srv_place)
             rooms.rooms_vector.append(srv_room)
-    print rooms
+    # print rooms
     return rooms
 
 
@@ -137,16 +137,21 @@ def writeXml(inFile, rooms):
                 k = ET.SubElement(j, 'object', {'name': obj.name.data, 'probability': str(obj.probability)})
     tree = ET.ElementTree(r)
     tree.write(outFile, encoding='UTF-8',  xml_declaration=True, pretty_print=True)
-    print 'file',outFile,'written.'
+    print 'file:',outFile,'written.'
 
     return True
 
 def updateProb(obj, location, room_name, rooms):
-    """ Update the probabilities of the given object for all possible locations.
+    """ 
+    Update the probabilities of the given object for all possible locations.
     It will be lowered for all locations except the one it was found.
     """
-    #count = -1
-    count = 0
+
+    if room_name == 'None':
+        print('no room name')
+        count = 1
+    else:
+        count = 0
     rem_prob = 1.0
     for room in rooms.rooms_vector:
         rem_prob = 1.0
@@ -157,11 +162,16 @@ def updateProb(obj, location, room_name, rooms):
                     diff = (1.0 - float(ob.probability))*0.5
                     ob.probability = float(ob.probability) + diff
                     rem_prob = 1.0 - ob.probability
-    if count == 0:
-        count = 1
+    count = count - 1
+    print('updateProb: %d in total' % count)
+    print('updateProb: %d remaining probabilty' % rem_prob)
+    if count == -1:
+        return False
     new_prob = rem_prob / count
+    print('updateProb: %d new probabilty' % new_prob)
     for room in (y for y in rooms.rooms_vector if not y.room_name.lower() == room_name.lower()):
         for place in (x for x in room.places_vector if x.place_type.lower() == 'searchable'):
+            print('updateProb: place: %s' %str(place))
             for ob in (z for z in place.objects if z.name.data.lower() == obj.lower()):
                 ob.probability = new_prob
     return True
@@ -175,14 +185,14 @@ def addObject(object_name, rooms):
             else:
                 new = True
                 for obj in place.objects:
-                    if object_name in obj.name:
-                        print object_name + 'is already stored.'
+                    if object_name.data in obj.name.data:
+                        print('addObject: ' + object_name.data + ' is already stored.')
                         new = False
                 if new:
                     place.objects.append(Object(object_name, 0.0))
 
     #print rooms.rooms_vector
-    updateProb(object_name.data, 'None', 'None', rooms)
+    # updateProb(object_name.data, 'None', 'None', rooms)
     return
 
 def getObjectLocations(req):
@@ -257,7 +267,7 @@ def getAllRooms(req):
     global rooms
     rospy.loginfo('/getRooms: Request received')
     print(req)
-    print(rooms)
+    # print(rooms)
     # As rooms is already the RoomsVector we are looking for we just return it
     # TODO: The order of the RoomsVector should be with the 6 most important ones
     # at the front. kitchen, bedroom, livingroom, dining room
@@ -271,7 +281,6 @@ def get_robots_current_room(req_old):
     req.point.y = y
     req.point.z = 0.0
     resp = get_room_name(req)
-    print(type(resp.room_name.data))
     rospy.loginfo(resp)
     return resp.room_name.data
 
@@ -294,11 +303,12 @@ def main():
         rospy.signal_shutdown('No rooms were loaded. Check the input xml file')
     else:
         addObject(String('mug'), rooms)
-        updateProb('mug', 'default', 'Office', rooms)
+        # updateProb('mug', 'side_desk', 'Office', rooms)
+        writeXml(FILE, rooms)
+        print(rooms)
         mug = GetObjectLocationsRequest()
         mug.object_name = String('mug')
-        getObjectLocations(mug)
-        writeXml(FILE, rooms)
+        print(getObjectLocations(mug))
         s1 = rospy.Service(PROJECT+'/'+NAME+'/get_object_locations', GetObjectLocations, getObjectLocations)
         s2 = rospy.Service(PROJECT+'/'+NAME+'/get_room_name', GetRoomName, get_room_name)
         s3 = rospy.Service('/get_coordinates', GetCoordinates, getCoordinates)
