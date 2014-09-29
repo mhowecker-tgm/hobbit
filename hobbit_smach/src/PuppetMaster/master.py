@@ -519,7 +519,7 @@ def main():
         )
         StateMachine.add(
             'REMINDER',
-            FakeForAllWithoutRunningActionSever(name='CLEAR_FLOOR'),
+            FakeForAllWithoutRunningActionSever(name='REMINDER'),
             # SimpleActionState(
             #     'reminder',
             #     GeneralHobbitAction,
@@ -591,19 +591,19 @@ def main():
                               GeneralHobbitAction,
                               goal_cb=pickup_cb,
                               input_keys=['parameters', 'params']),
-            # FakeForAllWithoutRunningActionSever(name='PICKUP'),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'CALL',
+            # There is nothing to do during a phone call,
+            # so we just wait and do nothing.
             FakeForAllWithoutRunningActionSever(name='CALL'),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'SURPRISE',
-            # FakeForAllWithoutRunningActionSever(name='SURPRISE'),
             social_role.get_surprise(),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
