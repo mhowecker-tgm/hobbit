@@ -520,7 +520,6 @@ def main():
         )
         StateMachine.add(
             'REMINDER',
-            # FakeForAllWithoutRunningActionSever(name='REMINDER'),
             SimpleActionState(
                 'reminder',
                 GeneralHobbitAction,
@@ -678,7 +677,6 @@ def main():
         )
         StateMachine.add(
             'SOCIAL_ROLE',
-            # FakeForAllWithoutRunningActionSever(name='SOCIAL_ROLE'),
             social_role.get_social_role_change(),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
