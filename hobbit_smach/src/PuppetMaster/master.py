@@ -357,9 +357,11 @@ def goto_cb(ud, goal):
 def sos_cb(ud, goal):
     par = []
     par.append(String('user_initiated'))
-    goal = GeneralHobbitGoal(command=String('Emergency'),
-                             parameters=par)
+    goal = GeneralHobbitGoal(
+        command=String('Emergency'),
+        parameters=par)
     return goal
+
 
 def pickup_cb(ud, goal):
     goal = GeneralHobbitGoal(command=String('pickup'))
@@ -539,11 +541,11 @@ def main():
                               GeneralHobbitAction,
                               goal_cb=sos_cb,
                               input_keys=['parameters', 'params']),
-            connector_outcome=['succeeded', 'aborted', 'preempted'])
+            connector_outcome=['succeeded', 'aborted', 'preempted']
         )
         StateMachine.add(
             'MAIN_MENU',
-            HobbitMMUI.ShowMenu(menu=MAIN),
+            HobbitMMUI.ShowMenu(menu='MAIN'),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
@@ -612,8 +614,8 @@ def main():
         )
         StateMachine.add(
             'SURPRISE',
-            FakeForAllWithoutRunningActionSever(name='SURPRISE'),
-            # social_role.get_surprise(),
+            # FakeForAllWithoutRunningActionSever(name='SURPRISE'),
+            social_role.get_surprise(),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
@@ -636,14 +638,14 @@ def main():
             connector_outcome=['succeeded'])
         StateMachine.add(
             'MAIN_MENU',
-            HobbitMMUI.ShowMenu(menu=MAIN),
+            HobbitMMUI.ShowMenu(menu='MAIN'),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'BRING_OBJECT',
             FakeForAllWithoutRunningActionSever(name='BRING_OBJECT'),
-            #SimpleActionState('bring_object',
+            # SimpleActionState('bring_object',
             #                  GeneralHobbitAction,
             #                  goal_cb=bring_cb,
             #                  input_keys=['parameters', 'params']

@@ -143,11 +143,12 @@ class RandomMenu(State):
             self,
             outcomes=['succeeded', 'aborted', 'preempted']
         )
-        self.menues = ['M_Audio, M_Entertain', 'M_Game',
-                       'M_Memory', 'M_Solitaire', 'M_Chess',
-                       'M_Simon', 'M_Sudoku', 'M_Muehle',
-                       'M_eBook', 'M_Picture', 'M_Internet',
-                       'M_Social', 'M_Checklist', 'M_Manual']
+        self.menues = [
+            'M_Audio, M_Entertain', 'M_Game',
+            'M_Memory', 'M_Solitaire', 'M_Chess',
+            'M_Simon', 'M_Sudoku', 'M_Muehle',
+            'M_eBook', 'M_Picture', 'M_Internet',
+            'M_Social', 'M_Checklist', 'M_Manual']
 
     def execute(self, ud):
         if self.preempt_requested():
@@ -172,7 +173,7 @@ def get_surprise():
     )
 
     def msg_cb(msg, ud):
-        # print(str(Event))
+        rospy.loginfo(str(Event))
         if msg.event == 'P_E_BACK':
             return True
         else:
