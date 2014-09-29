@@ -48,6 +48,7 @@ int recordedFrames=0;
 volatile int paused = 0;
 unsigned int frameTimestamp =0;
 unsigned int runFullSpeed=0;
+unsigned int runMaxSpeed=0;
 unsigned int colorWidth = 640 , colorHeight =480 , depthWidth = 640 , depthHeight = 480;
 
 struct calibrationHUBT calib={0};
@@ -124,6 +125,13 @@ bool clearDump(std_srvs::Empty::Request& request, std_srvs::Empty::Response& res
     int i=system("./clearRecords.sh");
     if (i==0) { fprintf(stderr,"Success packaging..!\n"); } else
               { fprintf(stderr,"Error packaging..!\n");   }
+    return true;
+}
+
+bool benchmark(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    ROS_INFO("Skeleton Detector : Benchmark Mode on , will consume a LOT of CPU");
+    runMaxSpeed=1;
     return true;
 }
 
@@ -286,6 +294,7 @@ int main(int argc, char **argv)
      //We advertise the services we want accessible using "rosservice call *w/e*"
      ros::ServiceServer visualizeOnService      = nh.advertiseService(name+"/visualize_on" , visualizeOn);
      ros::ServiceServer visualizeOffService     = nh.advertiseService(name+"/visualize_off", visualizeOff);
+     ros::ServiceServer benchmarkService           = nh.advertiseService(name+"/benchmark" , benchmark);
      ros::ServiceServer terminateService        = nh.advertiseService(name+"/terminate"    , terminate);
      ros::ServiceServer resumeService           = nh.advertiseService(name+"/pause"        , pause);
      ros::ServiceServer dumpService             = nh.advertiseService(name+"/startDump"    , startDump);
@@ -329,7 +338,10 @@ int main(int argc, char **argv)
 
             unsigned int lastDetectedFrame = ABSDIFF(frameTimestamp,actualTimestamp);
 
-
+           if (runMaxSpeed)
+               {
+                 //No Sleep at all
+               } else
             if (runFullSpeed)
                 {
                   loop_rate_fullSpeed.sleep();
