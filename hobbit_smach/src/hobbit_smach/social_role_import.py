@@ -14,6 +14,8 @@ from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 import uashh_smach.util as util
 import hobbit_smach.sos_call_import as sos_call
 import hobbit_smach.speech_output_import as speech_output
+import hobbit_smach.locate_user_import as locate_user
+import hobbit_smach.logging_import as log
 
 
 class GetSocialRole(State):
@@ -211,6 +213,13 @@ def get_social_role_change():
 
     with sm:
         StateMachine.add(
+            'DETECT_USER',
+            locate_user.get_detect_user(),
+            transitions={'succeeded': 'SAY_OBTRUSIVE',
+                         'aborted': 'LOG_ABORTED',
+                         'preempted': 'LOG_PREEMPT'}
+        )
+        StateMachine.add(
             'SAY_OBTRUSIVE',
             HobbitMMUI.AskYesNo(
                 question='T_SR_Obtrusive'),
@@ -218,22 +227,38 @@ def get_social_role_change():
                          'no': 'HAPPY',
                          'timeout': 'SAY_OBTRUSIVE',
                          '3times': 'USER_NOT_RESPONDING',
-                         'preempted': 'preempted',
+                         'preempted': 'LOG_PREEMPT',
                          'failed': 'SAD'}
         )
-        StateMachine.add(
+        StateMachine.add_auto(
             'HAPPY',
             HobbitEmotions.ShowEmotions(
                 emotion='HAPPY',
                 emo_time=4
-            )
+            ),
+            connector_outcomes={'succeeded', 'aborted', 'preempted'}
         )
         StateMachine.add(
-            'SAD_1',
+            'SR_UP',
+            SetSocialRole(change=1),
+            transitions={'succeeded': 'SAY_SAFE_SECURE',
+                         'aborted': 'LOG_ABORTED',
+                         'preempted': 'LOG_PREEMPT'}
+        )
+        StateMachine.add(
+            'SAD',
             HobbitEmotions.ShowEmotions(
                 emotion='SAD',
                 emo_time=4
-            )
+            ),
+            connector_outcomes={'succeeded', 'aborted', 'preempted'}
+        )
+        StateMachine.add(
+            'SR_UP',
+            SetSocialRole(change=-1),
+            transitions={'succeeded': 'SAY_SAFE_SECURE',
+                         'aborted': 'LOG_ABORTED',
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'SAY_SAFE_SECURE',
@@ -243,7 +268,7 @@ def get_social_role_change():
                          'no': 'SAD_THANKS',
                          'timeout': 'SAY_SAFE_SECURE',
                          '3times': 'USER_NOT_RESPONDING',
-                         'preempted': 'preempted',
+                         'preempted': 'LOG_PREEMPT',
                          'failed': 'SAD_THANKS'}
         )
         # social_role =- 1
@@ -254,9 +279,9 @@ def get_social_role_change():
                 time=4,
                 text='T_SR_Thankyou'
             ),
-            transitions={'succeeded': 'succeeded',
-                         'aborted': 'aborted',
-                         'preempted': 'preempted'}
+            transitions={'succeeded': 'LOG_SUCCESS',
+                         'aborted': 'LOG_ABORTED',
+                         'preempted': 'LOG_PREEMPT'}
         )
         # social_role =- 1
         StateMachine.add(
@@ -266,15 +291,31 @@ def get_social_role_change():
                 time=4,
                 text='T_SR_Thankyou'
             ),
-            transitions={'succeeded': 'succeeded',
-                         'aborted': 'aborted',
-                         'preempted': 'preempted'}
+            transitions={'succeeded': 'LOG_SUCCESS',
+                         'aborted': 'LOG_ABORTED',
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'USER_NOT_RESPONDING',
             sos_call.get_call_sos_simple(),
-            transitions={'succeeded': 'aborted',
-                         'failed': 'LOG_SAFETY_CHECK_END',
-                         'aborted': 'LOG_SAFETY_CHECK_END',
-                         'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
+            transitions={'succeeded': 'LOG_ABORTED',
+                         'failed': 'LOG_ABORTED',
+                         'aborted': 'LOG_ABORTED',
+                         'preempted': 'LOG_SOCIAL_PREEMPT'}
         )
+        StateMachine.add(
+            'LOG_SUCCESS',
+            log.DoLogPreempt(scenario='Social Role'),
+            transitions={'succeeded': 'succeeded'}
+        )
+        StateMachine.add(
+            'LOG_PREEMPT',
+            log.DoLogPreempt(scenario='Social Role'),
+            transitions={'succeeded': 'preempted'}
+        )
+        StateMachine.add(
+            'LOG_ABORTED',
+            log.DoLogPreempt(scenario='Social Role'),
+            transitions={'succeeded': 'aborted'}
+        )
+    return sm

@@ -519,14 +519,14 @@ def main():
         )
         StateMachine.add(
             'REMINDER',
-            FakeForAllWithoutRunningActionSever(name='REMINDER'),
-            # SimpleActionState(
-            #     'reminder',
-            #     GeneralHobbitAction,
-            #     goal_cb=task_reminder_cb,
-            #     preempt_timeout=rospy.Duration(5),
-            #     server_wait_timeout=rospy.Duration(10)
-            # ),
+            # FakeForAllWithoutRunningActionSever(name='REMINDER'),
+            SimpleActionState(
+                'reminder',
+                GeneralHobbitAction,
+                goal_cb=task_reminder_cb,
+                preempt_timeout=rospy.Duration(5),
+                server_wait_timeout=rospy.Duration(10)
+            ),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
@@ -677,7 +677,8 @@ def main():
         )
         StateMachine.add(
             'SOCIAL_ROLE',
-            FakeForAllWithoutRunningActionSever(name='SOCIAL_ROLE'),
+            # FakeForAllWithoutRunningActionSever(name='SOCIAL_ROLE'),
+            social_role.get_social_role_change(),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
