@@ -79,7 +79,6 @@ void personExists(const hand_gestures::Person & msg)
 bool visualizeOn(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
     hobbitGestures_setVisualization(1);
-    //doCVOutput=1;
      doCalibrationOutput=1;
     return true;
 }
@@ -87,17 +86,8 @@ bool visualizeOn(std_srvs::Empty::Request& request, std_srvs::Empty::Response& r
 bool visualizeOff(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
     hobbitGestures_setVisualization(0);
-    //doCVOutput=0;
-      doCalibrationOutput=0;
+    doCalibrationOutput=0;
     cv::destroyAllWindows();
-    cv::destroyWindow("signs");
-    cv::destroyWindow("gestures");
-    cv::destroyWindow("raw_models");
-    cv::destroyWindow("hand_gestures RAW Depth");
-    cv::destroyWindow("hand_gestures RAW RGB");
-    cv::destroyWindow("rgbGest");
-    cv::destroyWindow("depthGest");
-    cv::destroyWindow("centers tracking");
     cv::waitKey(1);
     return true;
 }

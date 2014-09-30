@@ -79,11 +79,6 @@ bool visualizeOff(std_srvs::Empty::Request& request, std_srvs::Empty::Response& 
 {
     hobbitUpperBodyTracker_setVisualization(0);
     runFullSpeed=0;
-
-    cv::destroyAllWindows();
-    cv::destroyWindow("body tracker");
-    ros::spinOnce();
-    cv::waitKey(1);
     return true;
 }
 
