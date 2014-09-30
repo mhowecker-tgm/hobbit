@@ -226,6 +226,7 @@ struct skeletonPointing
 
 int hobbitUpperBodyTracker_setVisualization(int doVis);
 int hobbitUpperBodyTracker_setDumpToFiles(int doDump);
+int hobbitUpperBodyTracker_setPrintStats(int doPrintStats);
 
 int hobbitUpperBodyTracker_Initialize(unsigned int targetWidth,unsigned int targetHeight);
 
