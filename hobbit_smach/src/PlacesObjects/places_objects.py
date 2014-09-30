@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 # Service that returns all objects and their possible locations
 # author: Markus Bajones
@@ -30,29 +31,9 @@ import uashh_smach.util as util
 
 try:
       from lxml import etree as ET
-      print("running with lxml.etree")
+      # print("running with lxml.etree")
 except ImportError:
-    try:
-        # Python 2.5
-        import xml.etree.cElementTree as ET
-        print("running with cElementTree on Python 2.5+")
-    except ImportError:
-        try:
-            # Python 2.5
-            import xml.etree.ElementTree as ET
-            print("running with ElementTree on Python 2.5+")
-        except ImportError:
-            try:
-                # normal cElementTree install
-                import cElementTree as ET
-                print("running with cElementTree")
-            except ImportError:
-                try:
-                    # normal ElementTree install
-                    import elementtree.ElementTree as ET
-                    print("running with ElementTree")
-                except ImportError:
-                    print("Failed to import ElementTree from any known place")
+      print("Failed to import ElementTree from any known place")
 
 def prettify(elem):
     """Return a pretty-printed XML string for the Element.
@@ -91,8 +72,7 @@ def readXml(inFile):
             for place in places.findall('place'):
                 srv_place = Place()
                 name, types = place.find('name'),place.find('type')
-                #print name.text
-                srv_place.place_name = name.text
+                srv_place.place_name = unicode(name.text, encoding='utf-8')
                 pose = place.find('pose')
                 srv_place.x = float(pose.attrib.get('x'))
                 srv_place.y = float(pose.attrib.get('y'))
@@ -158,6 +138,9 @@ def updateProb(obj, location, room_name, rooms):
     """ Update the probabilities of the given object for all possible locations.
     It will be lowered for all locations except the one it was found.
     """
+    obj = unicode(obj, 'utf-8')
+    location = unicode(location, 'utf-8')
+    room_name = unicode(room_name, 'utf-8')
     global update_diff
     count = count_locations(rooms)
     for room in rooms.rooms_vector:
@@ -173,6 +156,7 @@ def updateProb(obj, location, room_name, rooms):
 
 
 def addObject(object_name, rooms):
+    object_name.data = unicode(object_name.data, 'utf-8')
     locations = count_locations(rooms)
     for room in rooms.rooms_vector:
         for place in (x for x in room.places_vector if x.place_type.lower() == 'searchable'):
@@ -299,13 +283,12 @@ def main():
     if not rooms:
         rospy.signal_shutdown('No rooms were loaded. Check the input xml file')
     else:
-        addObject(String('mug'), rooms)
-        updateProb('mug', 'side_desk', 'Office', rooms)
+        addObject(String('Häferl'), rooms)
+        updateProb('Häferl', 'side_desk', 'Küche', rooms)
         writeXml(FILE, rooms)
-        print(rooms)
         mug = GetObjectLocationsRequest()
         mug.object_name = String('mug')
-        print(getObjectLocations(mug))
+        # print(getObjectLocations(mug))
         s1 = rospy.Service(PROJECT+'/'+NAME+'/get_object_locations', GetObjectLocations, getObjectLocations)
         s2 = rospy.Service(PROJECT+'/'+NAME+'/get_room_name', GetRoomName, get_room_name)
         s3 = rospy.Service('/get_coordinates', GetCoordinates, getCoordinates)
