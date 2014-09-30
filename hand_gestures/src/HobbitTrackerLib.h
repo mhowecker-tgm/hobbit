@@ -70,8 +70,11 @@ struct calibrationHT
   double squareSize;
 };
 
-extern unsigned char doCVOutput;
 extern unsigned char doCalibrationOutput;
+
+
+int hobbitGestures_setVisualization(int doVis);
+int hobbitGestures_setPrintStats(int doPrint);
 
 int hobbitGestures_Initialize(unsigned int targetWidth , unsigned int targetHeight);
 int hobbitGestures_Close();

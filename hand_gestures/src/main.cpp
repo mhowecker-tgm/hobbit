@@ -78,14 +78,16 @@ void personExists(const hand_gestures::Person & msg)
 
 bool visualizeOn(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    doCVOutput=1;
+    hobbitGestures_setVisualization(1);
+    //doCVOutput=1;
      doCalibrationOutput=1;
     return true;
 }
 
 bool visualizeOff(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    doCVOutput=0;
+    hobbitGestures_setVisualization(0);
+    //doCVOutput=0;
       doCalibrationOutput=0;
     cv::destroyAllWindows();
     cv::destroyWindow("signs");
@@ -160,21 +162,6 @@ bool lookingCenter(std_srvs::Empty::Request& request, std_srvs::Empty::Response&
 
 int doDrawOut()
 {
-    if (doCVOutput)
-    {
-     /*Don't add this on output ( reduce cluttering )
-     cv::Mat rgbTmp = rgb.clone();
-     //Take care of drawing stuff as visual output
-	 cv::Mat bgrMat,rgbMat(colorHeight,colorWidth,CV_8UC3,rgbTmp.data,3*colorWidth);
-	 cv::cvtColor(rgbMat,bgrMat, CV_RGB2BGR);// opencv expects the image in BGR format
-     cv::Mat depthNorm;
-	 cv::normalize(depth,depthNorm,0,255,CV_MINMAX,CV_8UC1);
-
-     //After we have our bgr Frame ready and we added the FPS text , lets show it!
-	 cv::imshow("hand_gestures  RAW Depth",depthNorm);
-	 cv::imshow("hand_gestures RAW RGB",bgrMat);
-	 cv::waitKey(1);*/
-    }
  return 1;
 }
 

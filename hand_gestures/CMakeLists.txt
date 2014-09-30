@@ -39,7 +39,8 @@ add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencpp)
 
 target_link_libraries(
                       hand_gestures 
-                      ${CMAKE_CURRENT_SOURCE_DIR}/bin/libHobbitGestureTrackerLib.a
+                      #${CMAKE_CURRENT_SOURCE_DIR}/bin/libHobbitGestureTrackerLib.a
+                      ${CMAKE_CURRENT_SOURCE_DIR}/bin/libHobbitGestureTrackerDynamic.so
                       ${CMAKE_CURRENT_SOURCE_DIR}/../skeleton_detector/bin/libMBVCore.so 
                       ${CMAKE_CURRENT_SOURCE_DIR}/../skeleton_detector/bin/libMBVUtils.so  
                       ${CMAKE_CURRENT_SOURCE_DIR}/../skeleton_detector/bin/libMBVDecoding.so
