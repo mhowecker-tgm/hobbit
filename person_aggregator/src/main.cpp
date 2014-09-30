@@ -236,6 +236,25 @@ bool terminate(std_srvs::Empty::Request& request, std_srvs::Empty::Response& res
     return true;
 }
 
+bool trigger(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    ROS_INFO("Triggering Person Message" NODE_NAME);
+    struct personMessageSt p={0};
+    p.actualConfidence=0.5;
+    p.actualInFieldOfView=1;
+    p.actualTimestamp=frameTimestamp;
+    p.actualX=0;
+    p.actualY=0;
+    p.actualZ=1000;
+    p.actualTheta=0;
+    p.source=0;
+    //--------------
+    broadcastNewPerson(&p);
+
+    return true;
+}
+
+
 
 bool switchToPrecise(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
@@ -405,6 +424,7 @@ int main(int argc, char **argv)
      //We advertise the services we want accessible using "rosservice call *w/e*"
      ros::ServiceServer pauseService    = nh.advertiseService(name+"/pause", pause);
      ros::ServiceServer resumeService   = nh.advertiseService(name+"/resume", resume);
+     ros::ServiceServer triggerService  = nh.advertiseService(name+"/trigger", trigger);
      ros::ServiceServer stopService     = nh.advertiseService(name+"/terminate", terminate);
      ros::ServiceServer preciseService  = nh.advertiseService(name+"/precise", switchToPrecise);
      ros::ServiceServer rawService      = nh.advertiseService(name+"/raw", switchToRaw);
