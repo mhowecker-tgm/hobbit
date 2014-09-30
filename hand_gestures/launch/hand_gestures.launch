@@ -4,7 +4,7 @@
       <arg name="fromDepthTopicInfo" value="/headcam/depth_registered/camera_info" />
       <arg name="fromRGBTopic" value="headcam/rgb/image_rect_color" />
       <arg name="fromRGBTopicInfo" value="/headcam/rgb/camera_info" />
-      <arg name="rate" value="5" type="int" />
+      <arg name="rate" value="7" type="int" />
  
     <node name="hand_gestures" pkg="hand_gestures" type="run_it.sh" required="true">
       <param name="name" value="$(arg name)" /> 
