@@ -281,14 +281,15 @@ void MainWindow::on_save_place_clicked()
 {
     bool ok;  
     QString text_input = QInputDialog::getText(this,("Enter place name"),(""),QLineEdit::Normal,QString::null,&ok);
-    std::cout << "Place name " << text_input.toStdString() << std::endl;
+    std::string utf8_place_name = text_input.toUtf8().constData();
+    std::cout << "Place name " << utf8_place_name << std::endl;
 
     MyDialog *subDialog = new MyDialog;
     subDialog->setWindowTitle("Sub Dialog");
     subDialog->show(); 
 
     subDialog->qnode = &qnode;
-    std::string current_place_name = text_input.toStdString();
+    std::string current_place_name = utf8_place_name;
     subDialog->current_place_name = current_place_name;
 
     /*float x,y,th;
