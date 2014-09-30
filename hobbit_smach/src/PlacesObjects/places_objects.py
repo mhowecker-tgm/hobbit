@@ -8,6 +8,7 @@
 PKG = 'hobbit_msgs' # this package name
 NAME = 'place_handler'
 PROJECT = 'Hobbit'
+update_diff = 0.5
 
 # FILE='places.xml'
 #FILE='/home/bajo/work/development/catkin/src/navigation/places.xml'
@@ -141,47 +142,43 @@ def writeXml(inFile, rooms):
 
     return True
 
-def updateProb(obj, location, room_name, rooms):
-    """ 
-    Update the probabilities of the given object for all possible locations.
-    It will be lowered for all locations except the one it was found.
-    """
 
-    if room_name == 'None':
-        print('no room name')
-        count = 1
-    else:
-        count = 0
-    rem_prob = 1.0
+def count_locations(rooms):
+    """
+    returns the integer number of search locations
+    """
+    count = 0
     for room in rooms.rooms_vector:
-        rem_prob = 1.0
         for place in (x for x in room.places_vector if x.place_type.lower() == 'searchable'):
             count += 1
-            if ((room.room_name.lower() == room_name.lower()) and (place.place_name.lower() == location.lower())):
-                for ob in (z for z in place.objects if z.name.data.lower() == obj.lower()):
-                    diff = (1.0 - float(ob.probability))*0.5
-                    ob.probability = float(ob.probability) + diff
-                    rem_prob = 1.0 - ob.probability
-    count = count - 1
-    print('updateProb: %d in total' % count)
-    print('updateProb: %d remaining probabilty' % rem_prob)
-    if count == -1:
-        return False
-    new_prob = rem_prob / count
-    print('updateProb: %d new probabilty' % new_prob)
-    for room in (y for y in rooms.rooms_vector if not y.room_name.lower() == room_name.lower()):
+    return count
+    
+
+def updateProb(obj, location, room_name, rooms):
+    """ Update the probabilities of the given object for all possible locations.
+    It will be lowered for all locations except the one it was found.
+    """
+    global update_diff
+    count = count_locations(rooms)
+    for room in rooms.rooms_vector:
         for place in (x for x in room.places_vector if x.place_type.lower() == 'searchable'):
-            print('updateProb: place: %s' %str(place))
             for ob in (z for z in place.objects if z.name.data.lower() == obj.lower()):
-                ob.probability = new_prob
-    return True
+                if ((room.room_name.lower() == room_name.lower()) and (place.place_name.lower() == location.lower())):
+                    ob.probability = float(ob.probability) * (1 + update_diff)
+                else:
+                    ob.probability = float(ob.probability) * (1 - update_diff/(count - 1))
+        if count == 0:
+            rospy.loginfo('updateProb: The object is not in the database')
+    return
 
 
 def addObject(object_name, rooms):
+    locations = count_locations(rooms)
     for room in rooms.rooms_vector:
         for place in (x for x in room.places_vector if x.place_type.lower() == 'searchable'):
             if not place.objects:
-                place.objects.append(Object(object_name, 0.0))
+                rospy.loginfo('Adding object')
+                place.objects.append(Object(object_name, 1.0/locations))
             else:
                 new = True
                 for obj in place.objects:
@@ -189,10 +186,10 @@ def addObject(object_name, rooms):
                         print('addObject: ' + object_name.data + ' is already stored.')
                         new = False
                 if new:
-                    place.objects.append(Object(object_name, 0.0))
+                    rospy.loginfo('Adding object')
+                    place.objects.append(Object(object_name, 1.0/locations))
 
     #print rooms.rooms_vector
-    # updateProb(object_name.data, 'None', 'None', rooms)
     return
 
 def getObjectLocations(req):
@@ -303,7 +300,7 @@ def main():
         rospy.signal_shutdown('No rooms were loaded. Check the input xml file')
     else:
         addObject(String('mug'), rooms)
-        # updateProb('mug', 'side_desk', 'Office', rooms)
+        updateProb('mug', 'side_desk', 'Office', rooms)
         writeXml(FILE, rooms)
         print(rooms)
         mug = GetObjectLocationsRequest()
