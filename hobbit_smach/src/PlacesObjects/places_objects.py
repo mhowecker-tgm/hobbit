@@ -158,6 +158,7 @@ def updateProb(obj, location, room_name, rooms):
 def addObject(object_name, rooms):
     object_name.data = unicode(object_name.data, 'utf-8')
     locations = count_locations(rooms)
+    added = False
     for room in rooms.rooms_vector:
         for place in (x for x in room.places_vector if x.place_type.lower() == 'searchable'):
             if not place.objects:
@@ -172,19 +173,18 @@ def addObject(object_name, rooms):
                 if new:
                     rospy.loginfo('Adding object')
                     place.objects.append(Object(object_name, 1.0/locations))
+                    added = True
 
     #print rooms.rooms_vector
-    return
+    return added
 
 def getObjectLocations(req):
     """ Given the name of an object its positions (room and location) are returned.
     """
     rospy.loginfo('/get_object_location: Request received')
-    query = req.object_name.data
+    query = unicode(req.object_name.data, encoding='utf-8')
     places = []
-    out_places = []
     global rooms
-    #print rooms
     print 'Return all locations of requested object:',req.object_name.data
     for room in rooms.rooms_vector:
         for place in (x for x in room.places_vector if x.place_type.lower() == 'searchable'):
@@ -239,6 +239,7 @@ def getCoordinates(req):
     rospy.loginfo('/get_coordinates: Returned empty coordinates')
     return (Pose2D(float(0.0), float(0.0), float(0.0)))
 
+
 def getAllRooms(req):
     """
     Returns a RoomsVector with all available rooms inside.
@@ -246,11 +247,11 @@ def getAllRooms(req):
     global rooms
     rospy.loginfo('/getRooms: Request received')
     print(req)
-    # print(rooms)
     # As rooms is already the RoomsVector we are looking for we just return it
     # TODO: The order of the RoomsVector should be with the 6 most important ones
     # at the front. kitchen, bedroom, livingroom, dining room
     return rooms
+
 
 def get_robots_current_room(req_old):
     rospy.loginfo('/get_robots_current_room : Request received')
@@ -271,8 +272,7 @@ def add_object_to_db(req):
     global rooms
     rospy.loginfo('/add_object_to_db: Request received')
     print(req)
-    addObject(req.object_name, rooms)
-    return True
+    return addObject(String(req.object_name), rooms)
 
 def main():
     rospy.init_node(NAME)
@@ -299,3 +299,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    writeXml(FILE, rooms)
