@@ -236,7 +236,7 @@ def get_social_role_change():
                 emotion='HAPPY',
                 emo_time=4
             ),
-            connector_outcomes={'succeeded', 'aborted', 'preempted'}
+            connector_outcomes={'succeeded', 'failed', 'preempted'}
         )
         StateMachine.add(
             'SR_UP',
@@ -245,13 +245,13 @@ def get_social_role_change():
                          'aborted': 'LOG_ABORTED',
                          'preempted': 'LOG_PREEMPT'}
         )
-        StateMachine.add(
+        StateMachine.add_auto(
             'SAD',
             HobbitEmotions.ShowEmotions(
                 emotion='SAD',
                 emo_time=4
             ),
-            connector_outcomes={'succeeded', 'aborted', 'preempted'}
+            connector_outcomes={'succeeded', 'failed', 'preempted'}
         )
         StateMachine.add(
             'SR_UP',
