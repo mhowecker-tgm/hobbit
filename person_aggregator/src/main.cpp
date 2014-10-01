@@ -19,7 +19,7 @@
 
 #include <std_srvs/Empty.h>
 
-
+#include "person_aggregator/BoolSwitch.h"
 #include "person_aggregator/Person.h"
 
 #include <sensor_msgs/Image.h>
@@ -312,7 +312,10 @@ int rostopic_pub(const char * topicName,const char * topicType,const char * topi
   return (i==0);
 }
 
-bool pauseEverything(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+bool pauseEverything(person_aggregator::BoolSwitch::Request & request ,
+                     person_aggregator::BoolSwitch::Request & response
+                     //std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
+                    )
 {
     ROS_INFO("Pausing All User Sensing");
     rosservice_call("/rgbd_acquisition/pause_peopletracker");
@@ -321,10 +324,14 @@ bool pauseEverything(std_srvs::Empty::Request& request, std_srvs::Empty::Respons
     rosservice_call("/hand_gestures/pause");
     rosservice_call("/skeleton_detector/pause");
     rosservice_call("/fitness_coordinator/pause");
+    response.returnValue=true;
     return true;
 }
 
-bool resumeEverything(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+bool resumeEverything(person_aggregator::BoolSwitch::Request & request ,
+                     person_aggregator::BoolSwitch::Request & response
+                     //std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
+                     )
 {
     ROS_INFO("Resuming All User Sensing");
     rosservice_call("/rgbd_acquisition/resume_peopletracker");
@@ -333,21 +340,29 @@ bool resumeEverything(std_srvs::Empty::Request& request, std_srvs::Empty::Respon
     rosservice_call("/hand_gestures/resume");
     rosservice_call("/skeleton_detector/resume");
     rosservice_call("/fitness_coordinator/resume");
+    response.returnValue=true;
     raw=0;
     return true;
 }
 
-bool followUser(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+bool followUser(person_aggregator::BoolSwitch::Request & request ,
+                     person_aggregator::BoolSwitch::Request & response
+                     //std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
+                     )
 {
     ROS_INFO("Setting Vision System to Follow a User");
     rosservice_call("/rgbd_acquisition/resume_peopletracker"); //Nite tracker might be useful
     rosservice_call("/emergency_detector/resume");
     rosservice_call("/skeleton_detector/resume");
     rosservice_call("/skeleton_detector/simple"); //We want the simple skeleton detector , no hands but fast and more robust ( even without a face )
+    response.returnValue=true;
     return true;
 }
 
-bool locateUser(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+bool locateUser(person_aggregator::BoolSwitch::Request & request ,
+                     person_aggregator::BoolSwitch::Request & response
+                     //std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
+                     )
 {
     ROS_INFO("Setting Vision System to Locate a User");
     rosservice_call("/rgbd_acquisition/resume_peopletracker"); //Nite tracker might be useful
@@ -355,64 +370,93 @@ bool locateUser(std_srvs::Empty::Request& request, std_srvs::Empty::Response& re
     rosservice_call("/face_detection/resume");
     rosservice_call("/hand_gestures/resume");
     rosservice_call("/skeleton_detector/resume");
+    response.returnValue=true;
     raw=0; //We want to be precise..
     return true;
 }
 
-bool fitnessFunction(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+bool fitnessFunction(person_aggregator::BoolSwitch::Request & request ,
+                     person_aggregator::BoolSwitch::Request & response
+                     //std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
+                     )
 {
     ROS_INFO("Setting Vision System to do FitnessFunction");
     rosservice_call("/rgbd_acquisition/pause_peopletracker"); //Nite tracker is no longer used
     rosservice_call("/skeleton_detector/resume");
     rosservice_call("/skeleton_detector/advanced"); //We want the advanced skeleton detector
     rosservice_call("/fitness_coordinator/resume");
+    response.returnValue=true;
     return true;
 }
 
 
-bool whereIsUserPointing(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+bool whereIsUserPointing(person_aggregator::BoolSwitch::Request & request ,
+                     person_aggregator::BoolSwitch::Request & response
+                     //std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
+                     )
 {
     ROS_INFO("Setting Vision System to see where the User is Pointing");
     rosservice_call("/rgbd_acquisition/pause_peopletracker"); //Nite tracker might be useful
     rosservice_call("/skeleton_detector/resume");
     rosservice_call("/skeleton_detector/advanced"); //We want the advanced skeleton detector
+    response.returnValue=true;
     return true;
 }
 
 
-bool navigating(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+bool navigating(person_aggregator::BoolSwitch::Request & request ,
+                     person_aggregator::BoolSwitch::Request & response
+                     //std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
+                     )
 {
     ROS_INFO("Setting Vision System to Navigating");
     rosservice_call("/emergency_detector/resume"); // So that we get
     rosservice_call("/emergency_detector/looking_down"); // So that we get
+    response.returnValue=true;
     return true;
 }
 
-bool charging(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+bool charging(person_aggregator::BoolSwitch::Request & request ,
+                     person_aggregator::BoolSwitch::Request & response
+                     //std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
+                     )
 {
     ROS_INFO("Setting Vision System to Charging , low processing mode");
     rosservice_call("/hand_gestures/resume");
+    response.returnValue=true;
     return true;
 }
 
 
-bool idle(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+bool idle(person_aggregator::BoolSwitch::Request & request ,
+                     person_aggregator::BoolSwitch::Request & response
+                     //std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
+                     )
 {
     ROS_INFO("Setting Vision System to default idle mode");
     rosservice_call("/hand_gestures/resume");
     rosservice_call("/emergency_detector/looking_center"); // So that we get
+    response.returnValue=true;
     return true;
 }
 
-bool startScanning3DObject(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+bool startScanning3DObject(person_aggregator::BoolSwitch::Request & request ,
+                     person_aggregator::BoolSwitch::Request & response
+                     //std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
+                     )
 {
     ROS_INFO("Setting Vision System to 3D Scanning mode");
+    response.returnValue=true;
     return pauseEverything(request,response);
 }
 
-bool stopScanning3DObject(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+bool stopScanning3DObject(person_aggregator::BoolSwitch::Request & request ,
+                     person_aggregator::BoolSwitch::Request & response
+                     //std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
+                     )
 {
     ROS_INFO("Setting Vision System switching off from 3D Scanning mode");
+    response.returnValue=true;
     return resumeEverything(request,response);
 }
 
