@@ -308,7 +308,7 @@ void MainWindow::on_delete_place_clicked()
     bool ok;
     QString text_input = QInputDialog::getText(this,("Enter room name"),(""),QLineEdit::Normal,QString::null,&ok);
 
-    std::string room_to_be_deleted = text_input.toStdString();
+    std::string room_to_be_deleted = text_input.toUtf8().constData();
 
     bool room_found = false;
     bool place_found = false;
@@ -323,7 +323,7 @@ void MainWindow::on_delete_place_clicked()
 	    //cout << "room to be deleted found " << room_name << endl;
 
 	    QString text_input_place = QInputDialog::getText(this,("Enter place name"),(""),QLineEdit::Normal,QString::null,&ok);
-	    std::string place_to_be_deleted = text_input_place.toStdString();
+	    std::string place_to_be_deleted = text_input_place.toUtf8().constData();
             //if room is found look for the place name among the existing places
 	    for(unsigned int j=0; j<(*ui->label->rooms).rooms_vector[i].places_vector.size();j++)
 	    {
