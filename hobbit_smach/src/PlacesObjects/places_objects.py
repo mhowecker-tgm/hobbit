@@ -132,7 +132,7 @@ def count_locations(rooms):
         for place in (x for x in room.places_vector if x.place_type.lower() == 'searchable'):
             count += 1
     return count
-    
+
 
 def updateProb(obj, location, room_name, rooms):
     """ Update the probabilities of the given object for all possible locations.
@@ -219,21 +219,19 @@ def getCoordinates(req):
     """
     rospy.loginfo('/get_coordinates: Request received')
     global rooms
-    # print(rooms)
-    print req.room_name.data, req.location_name.data
-    # print 'call' in req.location_name.data
-    if req.room_name.data == 'dock' or req.room_name.data == None \
-        or 'call' in req.location_name.data or req.room_name.data == 'None':
-        rospy.loginfo('dock or bathroom')
+    req_room = unicode(req.room_name.data, encoding='utf-8')
+    req_location = unicode(req.location_name.data, encoding='utf-8')
+    if req_room == 'dock' or req_room == None \
+        or 'call' in req_location or req_room == 'None':
+        if req_room == 'dock' or req_location == dock:
+            req_location = unicode('dock', encoding='utf-8')
         gen = (x for x in rooms.rooms_vector)
     else:
-        gen = (x for x in rooms.rooms_vector if req.room_name.data in x.room_name)
+        gen = (x for x in rooms.rooms_vector if req_room in x.room_name)
 
     for x in gen:
-        print(x)
-        gen1 = (k for k in x.places_vector if req.location_name.data in k.place_name)
+        gen1 = (k for k in x.places_vector if req_location in k.place_name)
         for k in gen1:
-            print(k)
             pose = Pose2D(float(k.x), float(k.y), float(k.theta))
             print(pose)
             rospy.loginfo('/get_coordinates: Returned coordinates')
