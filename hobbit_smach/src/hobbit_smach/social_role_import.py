@@ -150,7 +150,7 @@ class RandomMenu(State):
             'M_Memory', 'M_Solitaire', 'M_Chess',
             'M_Simon', 'M_Sudoku', 'M_Muehle',
             'M_eBook', 'M_Picture', 'M_Internet',
-            'M_Social', 'M_Checklist', 'M_Manual']
+            'M_Social']
 
     def execute(self, ud):
         if self.preempt_requested():
@@ -175,8 +175,9 @@ def get_surprise():
     )
 
     def msg_cb(msg, ud):
-        rospy.loginfo(str(Event))
-        if msg.event == 'P_E_BACK':
+        rospy.loginfo('Waiting for back')
+        rospy.loginfo(str(msg.event))
+        if msg.event.lower() == 'P_E_BACK'.lower():
             return True
         else:
             return False
@@ -187,18 +188,18 @@ def get_surprise():
             RandomMenu(),
             connector_outcomes=['succeeded', 'aborted', 'preempted']
         )
-        StateMachine.add(
-            'WAIT_FOR_USER',
-            util.WaitForMsgState(
-                '/Event',
-                Event,
-                msg_cb,
-                timeout=30
-            ),
-            transitions={'succeeded': 'succeeded',
-                         'aborted': 'WAIT_FOR_USER',
-                         'preempted': 'preempted'}
-        )
+        # StateMachine.add(
+        #     'WAIT_FOR_USER',
+        #     util.WaitForMsgState(
+        #         '/Event',
+        #         Event,
+        #         msg_cb,
+        #         timeout=30
+        #     ),
+        #     transitions={'succeeded': 'succeeded',
+        #                  'aborted': 'WAIT_FOR_USER',
+        #                  'preempted': 'preempted'}
+        # )
     return sm
 
 
@@ -275,7 +276,7 @@ def get_social_role_change():
         StateMachine.add(
             'SAD_THANKS',
             speech_output.emo_say_something(
-                emotion='SAD',
+                emo='SAD',
                 time=4,
                 text='T_SR_Thankyou'
             ),
@@ -287,7 +288,7 @@ def get_social_role_change():
         StateMachine.add(
             'VERY_HAPPY_THANKS',
             speech_output.emo_say_something(
-                emotion='VERY_HAPPY',
+                emo='VERY_HAPPY',
                 time=4,
                 text='T_SR_Thankyou'
             ),
@@ -301,7 +302,7 @@ def get_social_role_change():
             transitions={'succeeded': 'LOG_ABORTED',
                          'failed': 'LOG_ABORTED',
                          'aborted': 'LOG_ABORTED',
-                         'preempted': 'LOG_SOCIAL_PREEMPT'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'LOG_SUCCESS',
