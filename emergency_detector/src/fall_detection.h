@@ -54,6 +54,10 @@ struct fallState
    struct floatTriplet currentJoint2D[MAX_NUMBER_OF_2D_JOINTS];
    struct floatTriplet lastJoint2D[MAX_NUMBER_OF_2D_JOINTS];
 
+
+   struct floatTriplet currentJoint3D[MAX_NUMBER_OF_2D_JOINTS];
+   struct floatTriplet lastJoint3D[MAX_NUMBER_OF_2D_JOINTS];
+
 };
 
 int logSkeletonState(struct fallState * fs);

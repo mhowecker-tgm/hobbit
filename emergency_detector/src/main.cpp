@@ -30,6 +30,7 @@
 
 #include "emergency_detector/SkeletonBBox.h"
 #include "emergency_detector/Skeleton2D.h"
+#include "emergency_detector/Skeleton3D.h"
 #include "emergency_detector/Person.h"
 
 #include <std_msgs/Float32.h>
@@ -191,6 +192,15 @@ bool visualizeOff(std_srvs::Empty::Request& request, std_srvs::Empty::Response& 
     doCVOutput=0;
     cv::destroyAllWindows();
     cv::destroyWindow("emergency_detector visualization");
+    cv::destroyWindow("signs");
+    cv::destroyWindow("gestures");
+    cv::destroyWindow("raw_models");
+    cv::destroyWindow("hand_gestures RAW Depth");
+    cv::destroyWindow("hand_gestures RAW RGB");
+    cv::destroyWindow("rgbGest");
+    cv::destroyWindow("depthGest");
+    cv::destroyWindow("centers tracking");
+
 
     cv::waitKey(1);
     return true;
@@ -254,7 +264,7 @@ void bboxReceived(const emergency_detector::SkeletonBBox & msg)
 }
 
 
-void jointsReceived(const emergency_detector::Skeleton2D & msg)
+void joints2DReceived(const emergency_detector::Skeleton2D & msg)
 {
   if (msg.numberOfJoints/2 < MAX_NUMBER_OF_2D_JOINTS)
   {
@@ -274,6 +284,33 @@ void jointsReceived(const emergency_detector::Skeleton2D & msg)
     logSkeletonState(&fallDetectionContext);
   }
 }
+
+
+
+void joints3DReceived(const emergency_detector::Skeleton3D & msg)
+{
+  if (msg.numberOfJoints/2 < MAX_NUMBER_OF_2D_JOINTS)
+  {
+    unsigned int i=0;
+    fallDetectionContext.lastJointsTimestamp = fallDetectionContext.jointsTimestamp;
+    fallDetectionContext.jointsTimestamp = frameTimestamp;
+    fallDetectionContext.numberOfJoints = (unsigned int) msg.numberOfJoints/2;
+    for (i=0; i<fallDetectionContext.numberOfJoints; i++)
+    {
+        fallDetectionContext.lastJoint3D[i].x = fallDetectionContext.currentJoint3D[i].x;
+        fallDetectionContext.lastJoint3D[i].y = fallDetectionContext.currentJoint3D[i].y;
+        fallDetectionContext.lastJoint3D[i].z = fallDetectionContext.currentJoint3D[i].z;
+
+        fallDetectionContext.currentJoint3D[i].x = (float) msg.joints3D[0+i*3];
+        fallDetectionContext.currentJoint3D[i].y = (float) msg.joints3D[1+(i*3)];
+        fallDetectionContext.currentJoint3D[i].y = (float) msg.joints3D[2+(i*3)];
+    }
+
+    logSkeletonState(&fallDetectionContext);
+  }
+}
+
+
 
 
 //RGBd Callback is called every time we get a new pair of frames , it is synchronized to the main thread
@@ -379,7 +416,8 @@ int main(int argc, char **argv)
      sync = new message_filters::Synchronizer<RgbdSyncPolicy>(RgbdSyncPolicy(rate), *rgb_img_sub, *depth_img_sub); //*rgb_cam_info_sub,
 	 sync->registerCallback(rgbdCallbackNoCalibration);
 
-     ros::Subscriber sub2D = nh.subscribe("joints2D",1000,jointsReceived);
+     ros::Subscriber sub2D = nh.subscribe("joints2D",1000,joints2DReceived);
+     ros::Subscriber sub3D = nh.subscribe("joints3D",1000,joints3DReceived);
      ros::Subscriber sub = nh.subscribe("jointsBBox",1000,bboxReceived);
      ros::Subscriber subTempAmbient = nh.subscribe("/head/tempAmbient",1000,getAmbientTemperature);
      ros::Subscriber subTempObject = nh.subscribe("/head/tempObject",1000,getObjectTemperature);

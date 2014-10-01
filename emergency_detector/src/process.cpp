@@ -96,6 +96,37 @@ int processBoundingBox(
 
 }
 
+
+int detectHighContrastUnusableRGB(unsigned char * rgbFrame , unsigned int width , unsigned int height , float percentageHigh)
+{
+  unsigned char * rgbPtr = rgbFrame;
+  unsigned char * rgbLimit = rgbFrame + width * height * 3;
+
+  float tmp = percentageHigh / 100;
+        tmp = tmp * width * height;
+  unsigned int targetHighContrastPixels = (unsigned int) tmp;
+  unsigned int highContrastPixels = 0;
+
+  unsigned char r, g , b;
+  while (rgbPtr<rgbLimit)
+  {
+    r = *rgbPtr++;
+    g = *rgbPtr++;
+    b = *rgbPtr++;
+    if (
+         ( (r<45) && (g<45)  && (b<45) ) ||
+         ( (r>200) && (g>200)  && (b>200) )
+       )
+    {
+     ++highContrastPixels;
+     if ( highContrastPixels>targetHighContrastPixels) { fprintf(stderr,"Bad View with %0.2f high contrast points \n",(float) (100*highContrastPixels)/(width*height)); return 1; }
+    }
+  }
+  fprintf(stderr,"Good View with %0.2f high contrast points \n",(float) (100*highContrastPixels)/(width*height));
+ return 0;
+}
+
+
 unsigned char * copyRGB(unsigned char * source , unsigned int width , unsigned int height)
 {
   if ( (source==0)  || (width==0) || (height==0) )
@@ -152,6 +183,7 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
   unsigned int tempZoneStartX = (unsigned int ) ((colorWidth-tempZoneWidth) / 2);
   unsigned int tempZoneStartY = (unsigned int ) ((colorHeight-tempZoneHeight) / 2);
   unsigned int depthAvg = 0;
+  unsigned int badView = detectHighContrastUnusableRGB(colorFrame,colorWidth,colorHeight,40.0);
 
   //unsigned int temperatureFrameOffset = ABSDIFF(frameTimestamp,tempTimestamp);
 
@@ -343,6 +375,14 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
                circle(bgrMat,  centerPt , 15 , jointColor , -4, 8 , 0);
            }
          }
+       }
+
+
+       if (badView)
+       {
+        txtPosition.y += 24; snprintf(rectVal,123,"BAD VIEW!");
+        putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , color , 2 , 8 );
+
        }
 
 	    cv::imshow("emergency_detector visualization",bgrMat);
