@@ -314,6 +314,7 @@ int rostopic_pub(const char * topicName,const char * topicType,const char * topi
 
 bool pauseEverything(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
+    ROS_INFO("Pausing All User Sensing");
     rosservice_call("/rgbd_acquisition/pause_peopletracker");
     rosservice_call("/emergency_detector/pause");
     rosservice_call("/face_detection/pause");
@@ -325,6 +326,7 @@ bool pauseEverything(std_srvs::Empty::Request& request, std_srvs::Empty::Respons
 
 bool resumeEverything(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
+    ROS_INFO("Resuming All User Sensing");
     rosservice_call("/rgbd_acquisition/resume_peopletracker");
     rosservice_call("/emergency_detector/resume");
     rosservice_call("/face_detection/resume");
@@ -337,6 +339,7 @@ bool resumeEverything(std_srvs::Empty::Request& request, std_srvs::Empty::Respon
 
 bool followUser(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
+    ROS_INFO("Setting Vision System to Follow a User");
     rosservice_call("/rgbd_acquisition/resume_peopletracker"); //Nite tracker might be useful
     rosservice_call("/emergency_detector/resume");
     rosservice_call("/skeleton_detector/resume");
@@ -346,6 +349,7 @@ bool followUser(std_srvs::Empty::Request& request, std_srvs::Empty::Response& re
 
 bool locateUser(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
+    ROS_INFO("Setting Vision System to Locate a User");
     rosservice_call("/rgbd_acquisition/resume_peopletracker"); //Nite tracker might be useful
     rosservice_call("/emergency_detector/resume"); // So that we get
     rosservice_call("/face_detection/resume");
@@ -357,6 +361,7 @@ bool locateUser(std_srvs::Empty::Request& request, std_srvs::Empty::Response& re
 
 bool fitnessFunction(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
+    ROS_INFO("Setting Vision System to do FitnessFunction");
     rosservice_call("/rgbd_acquisition/pause_peopletracker"); //Nite tracker is no longer used
     rosservice_call("/skeleton_detector/resume");
     rosservice_call("/skeleton_detector/advanced"); //We want the advanced skeleton detector
@@ -367,6 +372,7 @@ bool fitnessFunction(std_srvs::Empty::Request& request, std_srvs::Empty::Respons
 
 bool whereIsUserPointing(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
+    ROS_INFO("Setting Vision System to see where the User is Pointing");
     rosservice_call("/rgbd_acquisition/pause_peopletracker"); //Nite tracker might be useful
     rosservice_call("/skeleton_detector/resume");
     rosservice_call("/skeleton_detector/advanced"); //We want the advanced skeleton detector
@@ -376,24 +382,37 @@ bool whereIsUserPointing(std_srvs::Empty::Request& request, std_srvs::Empty::Res
 
 bool navigating(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
+    ROS_INFO("Setting Vision System to Navigating");
     rosservice_call("/emergency_detector/resume"); // So that we get
+    rosservice_call("/emergency_detector/looking_down"); // So that we get
+    return true;
+}
+
+bool charging(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    ROS_INFO("Setting Vision System to Charging , low processing mode");
+    rosservice_call("/hand_gestures/resume");
     return true;
 }
 
 
 bool idle(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
+    ROS_INFO("Setting Vision System to default idle mode");
     rosservice_call("/hand_gestures/resume");
+    rosservice_call("/emergency_detector/looking_center"); // So that we get
     return true;
 }
 
 bool startScanning3DObject(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
+    ROS_INFO("Setting Vision System to 3D Scanning mode");
     return pauseEverything(request,response);
 }
 
 bool stopScanning3DObject(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
+    ROS_INFO("Setting Vision System switching off from 3D Scanning mode");
     return resumeEverything(request,response);
 }
 
@@ -438,6 +457,7 @@ int main(int argc, char **argv)
      ros::ServiceServer VSSeePointingService     = nh.advertiseService("/vision_system/seeWhereUserIsPointing", whereIsUserPointing);
      ros::ServiceServer VSNavigatingService      = nh.advertiseService("/vision_system/navigating", navigating);
      ros::ServiceServer VSIdleService            = nh.advertiseService("/vision_system/idle", idle);
+     ros::ServiceServer VSChargingService        = nh.advertiseService("/vision_system/charging", charging);
      ros::ServiceServer VSStartScan3Service      = nh.advertiseService("/vision_system/startScanning3DObject", startScanning3DObject);
      ros::ServiceServer VSStopScan3Service       = nh.advertiseService("/vision_system/stopScanning3DObject", stopScanning3DObject);
 
