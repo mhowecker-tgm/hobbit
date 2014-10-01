@@ -13,6 +13,7 @@
 
 #include <skeleton_detector/Person.h>
 #include <skeleton_detector/Skeleton2D.h>
+#include <skeleton_detector/Skeleton3D.h>
 #include <skeleton_detector/SkeletonBBox.h>
 
 
@@ -29,6 +30,7 @@
 #include "skeleton_detector/PointEvents.h"
 
 ros::Publisher joint2DBroadcaster;
+ros::Publisher joint3DBroadcaster;
 ros::Publisher jointBBoxBroadcaster;
 ros::Publisher personBroadcaster;
 ros::Publisher pointEventsBroadcaster;
@@ -87,18 +89,6 @@ void broadcastNewPerson()
 void broadcast2DJoints(struct skeletonHuman * skeletonFound)
 {
   if (dontPublishPersons) { return ; }
-  if (processingMode == PROCESSING_MODE_SIMPLE_PERSON_DETECTOR) { fprintf(stderr,"Simple Person Detector should not emmit joints\n"); return ; }
-
-  /*
-  for (unsigned int z=0; z<HUMAN_SKELETON_PARTS; z++)
-  {
-    if ( (skeletonFound->joint2D[z].x==0) && (skeletonFound->joint2D[z].y==0) )
-    {
-        fprintf(stderr,"Will not send a joint configuration because tablet doesnt like zeros\n");
-        return;
-    }
-  }*/
-
 
   skeleton_detector::Skeleton2D msg;
   msg.joints2D.resize(HUMAN_SKELETON_PARTS * 2, 0.0);
@@ -111,13 +101,28 @@ void broadcast2DJoints(struct skeletonHuman * skeletonFound)
   msg.numberOfJoints=HUMAN_SKELETON_PARTS;
   msg.timestamp=actualTimestamp;
 
-  fprintf(stderr,"Publishing a new Joint 2D configuration .. ");
   joint2DBroadcaster.publish(msg);
-  //ros::spinOnce();
-  fprintf(stderr," done \n ");
-
 }
 
+
+void broadcast3DJoints(struct skeletonHuman * skeletonFound)
+{
+  if (dontPublishPersons) { return ; }
+
+  skeleton_detector::Skeleton3D msg;
+  msg.joints3D.resize(HUMAN_SKELETON_PARTS * 3, 0.0);
+
+  for (unsigned int i=0; i<HUMAN_SKELETON_PARTS; i++)
+  {
+    msg.joints3D[3*i+0]=skeletonFound->joint[i].x;
+    msg.joints3D[3*i+1]=skeletonFound->joint[i].y;
+    msg.joints3D[3*i+2]=skeletonFound->joint[i].z;
+  }
+  msg.numberOfJoints=HUMAN_SKELETON_PARTS;
+  msg.timestamp=actualTimestamp;
+
+  joint3DBroadcaster.publish(msg);
+}
 
 void broadcast2DBBox(struct skeletonHuman * skeletonFound)
 {
@@ -347,6 +352,7 @@ int registerServices(ros::NodeHandle * nh,unsigned int width,unsigned int height
   pointEventsBroadcaster = nh->advertise <skeleton_detector::PointEvents> ("pointEvents", 1000);
   personBroadcaster = nh->advertise <skeleton_detector::Person> (PERSON_TOPIC, divisor);
   joint2DBroadcaster = nh->advertise <skeleton_detector::Skeleton2D> ("joints2D", 1000);
+  joint3DBroadcaster = nh->advertise <skeleton_detector::Skeleton3D> ("joints3D", 1000);
   jointBBoxBroadcaster = nh->advertise <skeleton_detector::SkeletonBBox> ("jointsBBox", 1000);
 
 }
