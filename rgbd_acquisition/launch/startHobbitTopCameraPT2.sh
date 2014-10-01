@@ -36,7 +36,7 @@
       <param name="deviceID" value="$(arg deviceID)" /> 
       <param name="virtual_baseline" value="$(arg virtual_baseline)" />   
       <param name="frame" value="$(arg frame)" /> 
-      <param name="useSkeleton" value="1" />  
+      <param name="useSkeleton" value="0" />  
     </node>  
 
    <node pkg="nodelet" type="nodelet" name="rgbd_nodelet_manager" ns="$(arg camera)" args="manager" output="screen"/>
