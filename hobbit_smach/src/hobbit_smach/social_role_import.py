@@ -254,7 +254,7 @@ def get_social_role_change():
             connector_outcomes={'succeeded', 'failed', 'preempted'}
         )
         StateMachine.add(
-            'SR_UP',
+            'SR_DOWN',
             SetSocialRole(change=-1),
             transitions={'succeeded': 'SAY_SAFE_SECURE',
                          'aborted': 'LOG_ABORTED',
