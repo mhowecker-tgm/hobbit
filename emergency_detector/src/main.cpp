@@ -281,7 +281,7 @@ void joints2DReceived(const emergency_detector::Skeleton2D & msg)
         fallDetectionContext.currentJoint2D[i].y = (float) msg.joints2D[1+(i*2)];
     }
 
-    logSkeletonState(&fallDetectionContext);
+    logSkeletonState(&fallDetectionContext,0);
   }
 }
 
@@ -306,7 +306,7 @@ void joints3DReceived(const emergency_detector::Skeleton3D & msg)
         fallDetectionContext.currentJoint3D[i].y = (float) msg.joints3D[2+(i*3)];
     }
 
-    logSkeletonState(&fallDetectionContext);
+    logSkeletonState(&fallDetectionContext,1);
   }
 }
 

@@ -50,7 +50,7 @@ int isSkeletonFallenAndFar(struct fallState * fs)
 }
 
 
-int logSkeletonState(struct fallState * fs)
+int logSkeletonState(struct fallState * fs,unsigned int mode3D)
 {
   fs->skeletonVelocity=0;
 

@@ -60,7 +60,7 @@ struct fallState
 
 };
 
-int logSkeletonState(struct fallState * fs);
+int logSkeletonState(struct fallState * fs,unsigned int mode3D);
 
 extern struct fallState fallDetectionContext;
 
