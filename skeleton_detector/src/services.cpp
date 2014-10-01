@@ -8,6 +8,14 @@
 
 #define SKPREFIX "SK_"
 
+
+#define NORMAL "\033[0m"
+#define BLACK "\033[30m" /* Black */
+#define RED "\033[31m" /* Red */
+#define GREEN "\033[32m" /* Green */
+#define YELLOW "\033[33m" /* Yellow */
+
+
 #define BROADCAST_HOBBIT 1
 #define MAXIMUM_DISTANCE_FOR_POINTING 400
 
@@ -80,7 +88,7 @@ void broadcastNewPerson()
   msg.confidence = actualConfidence;
   msg.timestamp=actualTimestamp;
 
-  fprintf(stderr,"Publishing a new Person\n");
+  fprintf(stderr,GREEN "Publishing a new Person\n" NORMAL);
   personBroadcaster.publish(msg);
   //ros::spinOnce();
 }
@@ -146,10 +154,7 @@ void broadcast2DBBox(struct skeletonHuman * skeletonFound)
 
   msg.timestamp=actualTimestamp;
 
-  fprintf(stderr,"Publishing a new Joint BBox configuration .. ");
   jointBBoxBroadcaster.publish(msg);
-  //ros::spinOnce();
-  fprintf(stderr," done \n ");
 }
 
 
@@ -164,7 +169,7 @@ void broadcastPointing(unsigned int frameNumber ,struct skeletonPointing * skele
        ( (skeletonPointingFound->pointingVector.z>-0.0005)&&(skeletonPointingFound->pointingVector.z<0.0005) )
      )
   {
-    fprintf(stderr,"Will not broadcast a null pointing event \n");
+    fprintf(stderr,YELLOW "Skeleton is not pointing somewhere\n" NORMAL);
     return ;
   }
 
@@ -185,7 +190,7 @@ void broadcastPointing(unsigned int frameNumber ,struct skeletonPointing * skele
 
   msg.timestamp=frameNumber;
 
-  fprintf(stderr,"Publishing a new Pointing Event\n");
+  fprintf(stderr,GREEN "Publishing a new Pointing Event\n" NORMAL);
   pointEventsBroadcaster.publish(msg);
 
 }
@@ -260,26 +265,14 @@ void broadcastNewSkeleton(unsigned int frameNumber,unsigned int skeletonID , str
 {
     if ( (dontPublishSkeletons) || (skeletonFound==0) ) { return ; }
 
-  fprintf(stderr,"Broadcasting a skeleton at TF\n");
+  fprintf(stderr,GREEN "Broadcasting a skeleton at TF\n" NORMAL);
   unsigned int i=0;
+
+  //DO flips here ?
   for (i=0; i<HUMAN_SKELETON_PARTS; i++)
     {
-      //DO flips here ?
       skeletonFound->joint[i].z = -1 * skeletonFound->joint[i].z;
-     // fprintf(stderr,"%s(%f,%f,%f)\n",humanSkeletonJointNames[i],skeletonFound->joint[i].x,skeletonFound->joint[i].y,skeletonFound->joint[i].z);
     }
-
-   /*
-   fprintf(stderr,"\n\n");
-   fprintf(stderr,"2DPOSE(");
-   for (i=0; i<HUMAN_SKELETON_PARTS; i++)
-    {
-      if (i<HUMAN_SKELETON_PARTS-1) {  fprintf(stderr,"%s,%f,%f,",humanSkeletonJointNames[i],skeletonFound->joint2D[i].x,skeletonFound->joint2D[i].y); } else
-                                    {  fprintf(stderr,"%s,%f,%f)\n",humanSkeletonJointNames[i],skeletonFound->joint2D[i].x,skeletonFound->joint2D[i].y); }
-    }
-   fprintf(stderr,"\n\n");
-   */
-
 
      //Do TF Broadcast here
      char tag[256]={0};
