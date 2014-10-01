@@ -284,7 +284,8 @@ int main(int argc, char **argv)
 
      ros::NodeHandle private_node_handle_("~");
      private_node_handle_.param("useSkeleton", useSkeleton, int(0));
-     if (useSkeleton) { pauseSkeletonDetection=0; pauseFaceDetection=0; dontPublishPointEvents=0;}
+     if (useSkeleton) { pauseSkeletonDetection=0; pauseFaceDetection=0; dontPublishPointEvents=0;} else
+                      { pauseSkeletonDetection=1; pauseFaceDetection=1; dontPublishPointEvents=0;}
      private_node_handle_.param("name", name, std::string("rgbd_acquisition"));
      private_node_handle_.param("camera", camera, std::string("camera"));
      private_node_handle_.param("frame", frame, std::string("frame"));
@@ -311,6 +312,7 @@ int main(int argc, char **argv)
      std::cout<<"virtual_baseline : "<<virtual_baseline<<std::endl;
      std::cout<<"Device_id : "<<from<<" length "<<from.length()<<"  devID : "<<devID<<std::endl;
      std::cout<<"useSkeleton : "<<useSkeleton<<std::endl;
+     if (!useSkeleton) { std::cout<<"(please note that Nite2 is disabled , to re-enable rosservice call /rgbd_acquisition/resume_peopletracker"<<std::endl; }
      std::cout<<"--------------------------------------------------"<<std::endl;
 
 

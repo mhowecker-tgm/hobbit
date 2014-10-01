@@ -49,7 +49,7 @@ message(STATUS ${OpenNI2_LIBRARIES})
 #--------------------------------------------
 
 #Messages -----------------------------------
-add_message_files(DIRECTORY msg FILES Person.msg PointEvents.msg Skeleton2D.msg SkeletonBBox.msg )
+add_message_files(DIRECTORY msg FILES Person.msg PointEvents.msg Skeleton2D.msg Skeleton3D.msg SkeletonBBox.msg )
 
 #Services -----------------------------------
 add_service_files(DIRECTORY srv FILES SetQuality.srv)

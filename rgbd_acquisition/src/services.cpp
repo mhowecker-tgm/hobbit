@@ -8,6 +8,7 @@
 #include "rgbd_acquisition/Person.h"
 #include "rgbd_acquisition/PointEvents.h"
 #include "rgbd_acquisition/Skeleton2D.h"
+#include "rgbd_acquisition/Skeleton3D.h"
 #include "rgbd_acquisition/SkeletonBBox.h"
 #include "pose.h"
 
@@ -24,6 +25,7 @@
 
 
 ros::Publisher joint2DBroadcaster;
+ros::Publisher joint3DBroadcaster;
 ros::Publisher jointBBoxBroadcaster;
 ros::Publisher personBroadcaster;
 ros::Publisher pointEventsBroadcaster;
@@ -62,17 +64,6 @@ void broadcast2DJoints(struct skeletonHuman * skeletonFound)
 {
   if (dontPublishPersons) { return ; }
 
-
-  for (unsigned int z=0; z<HUMAN_SKELETON_PARTS; z++)
-  {
-    if ( (skeletonFound->joint2D[z].x==0) && (skeletonFound->joint2D[z].y==0) )
-    {
-        fprintf(stderr,"Will not send a joint configuration because tablet doesnt like zeros\n");
-        return;
-    }
-  }
-
-
   rgbd_acquisition::Skeleton2D msg;
   msg.joints2D.resize(HUMAN_SKELETON_PARTS * 2, 0.0);
 
@@ -84,9 +75,28 @@ void broadcast2DJoints(struct skeletonHuman * skeletonFound)
   msg.numberOfJoints=HUMAN_SKELETON_PARTS;
   msg.timestamp=actualTimestamp;
 
-  fprintf(stderr,"Publishing a new Joint 2D configuration\n");
   joint2DBroadcaster.publish(msg);
-  ros::spinOnce();
+  //ros::spinOnce();
+}
+
+
+void broadcast3DJoints(struct skeletonHuman * skeletonFound)
+{
+  if (dontPublishPersons) { return ; }
+
+  rgbd_acquisition::Skeleton3D msg;
+  msg.joints3D.resize(HUMAN_SKELETON_PARTS * 3, 0.0);
+
+  for (unsigned int i=0; i<HUMAN_SKELETON_PARTS; i++)
+  {
+    msg.joints3D[3*i+0]=skeletonFound->joint[i].x;
+    msg.joints3D[3*i+1]=skeletonFound->joint[i].y;
+    msg.joints3D[3*i+2]=skeletonFound->joint[i].z;
+  }
+  msg.numberOfJoints=HUMAN_SKELETON_PARTS;
+  msg.timestamp=actualTimestamp;
+
+  joint3DBroadcaster.publish(msg);
 }
 
 
@@ -190,6 +200,7 @@ int registerServices(ros::NodeHandle * nh)
     personBroadcaster = nh->advertise <rgbd_acquisition::Person> (PERSON_TOPIC, 1000);
     pointEventsBroadcaster = nh->advertise <rgbd_acquisition::PointEvents> ("pointEvents", 1000);
     joint2DBroadcaster = nh->advertise <rgbd_acquisition::Skeleton2D> ("joints2D", 1000);
+  joint3DBroadcaster = nh->advertise <rgbd_acquisition::Skeleton3D> ("joints3D", 1000);
     jointBBoxBroadcaster = nh->advertise <rgbd_acquisition::SkeletonBBox> ("jointsBBox", 1000);
 
 
