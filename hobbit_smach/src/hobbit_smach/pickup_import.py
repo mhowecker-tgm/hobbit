@@ -699,7 +699,7 @@ def sayPointingGestureNotDetected1():
             'SAY_POINTING_NOT_DETECTED',
             #speech_output.askYesNo(question='T_PU_PointingGestureNotDetected1')
             # speech_output.askYesNo(question='PointingGestureNotDetected1')
-            HobbitMMUI.AskYesNo(question='_T_PU_PointingGestureNotDetected1')
+            HobbitMMUI.AskYesNo(question='T_PU_PointingGestureNotDetected1')
         )
     return cc
 
