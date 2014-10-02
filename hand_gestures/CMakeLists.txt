@@ -35,7 +35,7 @@ add_executable(hand_gestures src/main.cpp src/services.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencpp)
+add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencpp hobbit_msgs )
 
 target_link_libraries(
                       hand_gestures 
