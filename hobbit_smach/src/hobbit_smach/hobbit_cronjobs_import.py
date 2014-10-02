@@ -12,21 +12,21 @@ from smach import State
 from crontab import CronTab
 
 cron = CronTab(user=True)
-tasks = {'wakeup': {'name': 'cron_GETUP.py',
+tasks = {'wakeup': {'name': 'cron_GETUP.sh',
                     'hour': latest_getup.hour,
                     'minutes': latest_getup.minutes},
-         'clearfloor': {'name': 'cron_GETUP.py',
+         'clearfloor': {'name': 'cron_CF.sh',
+                        'hour': latest_getup.hour,
+                        'minutes': latest_getup.minutes},
+         'safetycheck': {'name': 'cron_SF.sh',
+                        'hour': latest_getup.hour,
+                        'minutes': latest_getup.minutes},
+         'patrol': {'name': 'cron_P.sh',
                     'hour': latest_getup.hour,
                     'minutes': latest_getup.minutes},
-         'safetycheck': {'name': 'cron_GETUP.py',
-                    'hour': latest_getup.hour,
-                    'minutes': latest_getup.minutes},
-         'patrol': {'name': 'cron_GETUP.py',
-                    'hour': latest_getup.hour,
-                    'minutes': latest_getup.minutes},
-         'socialrole': {'name': 'cron_GETUP.py',
-                    'hour': latest_getup.hour,
-                    'minutes': latest_getup.minutes}}
+         'socialrole': {'name': 'cron_SR.sh',
+                        'hour': latest_getup.hour,
+                        'minutes': latest_getup.minutes}}
 
 
 class SetCronJob(State):
