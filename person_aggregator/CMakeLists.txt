@@ -6,7 +6,6 @@ find_package(catkin REQUIRED COMPONENTS roscpp roslib sensor_msgs OpenCV cv_brid
 
 #Messages -----------------------------------
 add_message_files(DIRECTORY msg FILES Person.msg )
-add_service_files(DIRECTORY srv FILES BoolSwitch.srv )
 
 
 ## Generate added messages and services
