@@ -19,7 +19,9 @@
 
 #include <std_srvs/Empty.h>
 
-#include "person_aggregator/BoolSwitch.h"
+#include "hobbit_msgs/Event.h"
+#include "hobbit_msgs/SwitchVision.h"
+//#include "person_aggregator/BoolSwitch.h"
 #include "person_aggregator/Person.h"
 
 #include <sensor_msgs/Image.h>
@@ -312,8 +314,8 @@ int rostopic_pub(const char * topicName,const char * topicType,const char * topi
   return (i==0);
 }
 
-bool pauseEverything(person_aggregator::BoolSwitch::Request & request ,
-                     person_aggregator::BoolSwitch::Request & response
+bool pauseEverything(hobbit_msgs::SwitchVision::Request & request ,
+                     hobbit_msgs::SwitchVision::Response & response
                      //std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
                     )
 {
@@ -324,12 +326,12 @@ bool pauseEverything(person_aggregator::BoolSwitch::Request & request ,
     rosservice_call("/hand_gestures/pause");
     rosservice_call("/skeleton_detector/pause");
     rosservice_call("/fitness_coordinator/pause");
-    response.returnValue=true;
+    response.result=true;
     return true;
 }
 
-bool resumeEverything(person_aggregator::BoolSwitch::Request & request ,
-                     person_aggregator::BoolSwitch::Request & response
+bool resumeEverything(hobbit_msgs::SwitchVision::Request & request ,
+                     hobbit_msgs::SwitchVision::Response & response
                      //std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
                      )
 {
@@ -340,13 +342,13 @@ bool resumeEverything(person_aggregator::BoolSwitch::Request & request ,
     rosservice_call("/hand_gestures/resume");
     rosservice_call("/skeleton_detector/resume");
     rosservice_call("/fitness_coordinator/resume");
-    response.returnValue=true;
+    response.result=true;
     raw=0;
     return true;
 }
 
-bool followUser(person_aggregator::BoolSwitch::Request & request ,
-                     person_aggregator::BoolSwitch::Request & response
+bool followUser(hobbit_msgs::SwitchVision::Request & request ,
+                     hobbit_msgs::SwitchVision::Response & response
                      //std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
                      )
 {
@@ -355,12 +357,12 @@ bool followUser(person_aggregator::BoolSwitch::Request & request ,
     rosservice_call("/emergency_detector/resume");
     rosservice_call("/skeleton_detector/resume");
     rosservice_call("/skeleton_detector/simple"); //We want the simple skeleton detector , no hands but fast and more robust ( even without a face )
-    response.returnValue=true;
+    response.result=true;
     return true;
 }
 
-bool locateUser(person_aggregator::BoolSwitch::Request & request ,
-                     person_aggregator::BoolSwitch::Request & response
+bool locateUser(hobbit_msgs::SwitchVision::Request & request ,
+                     hobbit_msgs::SwitchVision::Response & response
                      //std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
                      )
 {
@@ -370,13 +372,13 @@ bool locateUser(person_aggregator::BoolSwitch::Request & request ,
     rosservice_call("/face_detection/resume");
     rosservice_call("/hand_gestures/resume");
     rosservice_call("/skeleton_detector/resume");
-    response.returnValue=true;
+    response.result=true;
     raw=0; //We want to be precise..
     return true;
 }
 
-bool fitnessFunction(person_aggregator::BoolSwitch::Request & request ,
-                     person_aggregator::BoolSwitch::Request & response
+bool fitnessFunction(hobbit_msgs::SwitchVision::Request & request ,
+                     hobbit_msgs::SwitchVision::Response & response
                      //std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
                      )
 {
@@ -385,13 +387,13 @@ bool fitnessFunction(person_aggregator::BoolSwitch::Request & request ,
     rosservice_call("/skeleton_detector/resume");
     rosservice_call("/skeleton_detector/advanced"); //We want the advanced skeleton detector
     rosservice_call("/fitness_coordinator/resume");
-    response.returnValue=true;
+    response.result=true;
     return true;
 }
 
 
-bool whereIsUserPointing(person_aggregator::BoolSwitch::Request & request ,
-                     person_aggregator::BoolSwitch::Request & response
+bool whereIsUserPointing(hobbit_msgs::SwitchVision::Request & request ,
+                     hobbit_msgs::SwitchVision::Response & response
                      //std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
                      )
 {
@@ -399,64 +401,64 @@ bool whereIsUserPointing(person_aggregator::BoolSwitch::Request & request ,
     rosservice_call("/rgbd_acquisition/pause_peopletracker"); //Nite tracker might be useful
     rosservice_call("/skeleton_detector/resume");
     rosservice_call("/skeleton_detector/advanced"); //We want the advanced skeleton detector
-    response.returnValue=true;
+    response.result=true;
     return true;
 }
 
 
-bool navigating(person_aggregator::BoolSwitch::Request & request ,
-                     person_aggregator::BoolSwitch::Request & response
+bool navigating(hobbit_msgs::SwitchVision::Request & request ,
+                     hobbit_msgs::SwitchVision::Response & response
                      //std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
                      )
 {
     ROS_INFO("Setting Vision System to Navigating");
     rosservice_call("/emergency_detector/resume"); // So that we get
     rosservice_call("/emergency_detector/looking_down"); // So that we get
-    response.returnValue=true;
+    response.result=true;
     return true;
 }
 
-bool charging(person_aggregator::BoolSwitch::Request & request ,
-                     person_aggregator::BoolSwitch::Request & response
+bool charging(hobbit_msgs::SwitchVision::Request & request ,
+                     hobbit_msgs::SwitchVision::Response & response
                      //std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
                      )
 {
     ROS_INFO("Setting Vision System to Charging , low processing mode");
     rosservice_call("/hand_gestures/resume");
-    response.returnValue=true;
+    response.result=true;
     return true;
 }
 
 
-bool idle(person_aggregator::BoolSwitch::Request & request ,
-                     person_aggregator::BoolSwitch::Request & response
+bool idle(hobbit_msgs::SwitchVision::Request & request ,
+                     hobbit_msgs::SwitchVision::Response & response
                      //std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
                      )
 {
     ROS_INFO("Setting Vision System to default idle mode");
     rosservice_call("/hand_gestures/resume");
     rosservice_call("/emergency_detector/looking_center"); // So that we get
-    response.returnValue=true;
+    response.result=true;
     return true;
 }
 
-bool startScanning3DObject(person_aggregator::BoolSwitch::Request & request ,
-                     person_aggregator::BoolSwitch::Request & response
+bool startScanning3DObject(hobbit_msgs::SwitchVision::Request & request ,
+                     hobbit_msgs::SwitchVision::Response & response
                      //std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
                      )
 {
     ROS_INFO("Setting Vision System to 3D Scanning mode");
-    response.returnValue=true;
+    response.result=true;
     return pauseEverything(request,response);
 }
 
-bool stopScanning3DObject(person_aggregator::BoolSwitch::Request & request ,
-                     person_aggregator::BoolSwitch::Request & response
+bool stopScanning3DObject(hobbit_msgs::SwitchVision::Request & request ,
+                     hobbit_msgs::SwitchVision::Response & response
                      //std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
                      )
 {
     ROS_INFO("Setting Vision System switching off from 3D Scanning mode");
-    response.returnValue=true;
+    response.result=true;
     return resumeEverything(request,response);
 }
 
