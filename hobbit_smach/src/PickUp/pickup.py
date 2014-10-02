@@ -9,14 +9,15 @@ import roslib
 roslib.load_manifest(PKG)
 import rospy
 import smach
-import smach_ros
 import uashh_smach.util as util
 from uashh_smach.util import SleepState  # df 30.7.2014
 # import tf
 # import math
 from smach import StateMachine
+from smach_ros import ActionServerWrapper, IntrospectionServer, ServiceState
 
 from std_msgs.msg import String
+from std_srvs.srv import Empty
 from hobbit_msgs.msg import GeneralHobbitAction
 from sensor_msgs.msg import PointCloud2
 from geometry_msgs.msg import PoseStamped
@@ -228,8 +229,16 @@ def main():
         StateMachine.add(
             'INIT',
             Init(),
-            transitions={'succeeded': 'GET_POINTING_DIRECTION',
+            transitions={'succeeded': 'SWITCH_VISION',
                          'canceled': 'CLEAN_UP'}
+        )
+        StateMachine.add_auto(
+            'SWITCH_VISION',
+            ServiceState(
+                '/vision_system/seeWhereUserIsPointing',
+                Empty
+            ),
+            connector_outcomes=['succeeded', 'preempted', 'aborted']
         )
         StateMachine.add(
             'GET_POINTING_DIRECTION',
@@ -440,13 +449,13 @@ def main():
             transitions={'succeeded': 'preempted'}
         )
 
-    asw = smach_ros.ActionServerWrapper(
+    asw = ActionServerWrapper(
         'pickup', GeneralHobbitAction, pickup_sm,
         ['succeeded'], ['aborted'], ['preempted'],
         result_slots_map={'result': 'result'}
     )
 
-    sis = smach_ros.IntrospectionServer(
+    sis = IntrospectionServer(
         'smach_server',
         pickup_sm,
         '/HOBBIT/PICKUP_SM_ROOT')

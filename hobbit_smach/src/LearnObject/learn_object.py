@@ -11,8 +11,9 @@ import rospy
 from uashh_smach.util import SleepState
 
 from std_msgs.msg import String
+from std_srvs.srv import Empty
 from hobbit_msgs.msg import GeneralHobbitAction
-from smach_ros import ActionServerWrapper, IntrospectionServer
+from smach_ros import ActionServerWrapper, IntrospectionServer, ServiceState
 from smach import StateMachine, State, Sequence, Concurrence
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 import hobbit_smach.learn_object_import as learn_object
@@ -255,8 +256,7 @@ def main():
             Sequence.add(
                 'SAY_DONE',
                 speech_output.sayTextObject(
-                    info='T_LO_I_AM_DONE',
-                    learn=True
+                    info='T_LO_I_AM_DONE'
                 )
             )
             Sequence.add(
@@ -352,8 +352,16 @@ def main():
         StateMachine.add(
             'SAY_I_AM_LEARNING',
             speech_output.sayText(info='T_LO_I_AM_LEARNING_THE_OBJECT'),
-            transitions={'succeeded': 'LEARN_OBJECT_1',
+            transitions={'succeeded': 'SWITCH_VISION',
                          'failed': 'SET_FAILURE'}
+        )
+        StateMachine.add_auto(
+            'SWITCH_VISION',
+            ServiceState(
+                '/vision_system/startScanning3DObject',
+                Empty
+            ),
+            connector_outcomes=['succeeded', 'preempted', 'aborted']
         )
         StateMachine.add(
             'LEARN_OBJECT_1',
@@ -405,8 +413,16 @@ def main():
         StateMachine.add(
             'LEARN_OBJECT_2',
             learn_object.getDataCW(),
-            transitions={'succeeded': 'HEAD_UP',
+            transitions={'succeeded': 'SWITCH_VISION_BACK',
                          'failed': 'SET_FAILURE'}
+        )
+        StateMachine.add_auto(
+            'SWITCH_VISION_BACK',
+            ServiceState(
+                '/vision_system/stopScanning3DObject',
+                Empty
+            ),
+            connector_outcomes=['succeeded', 'preempted', 'aborted']
         )
         StateMachine.add(
             'HEAD_UP',

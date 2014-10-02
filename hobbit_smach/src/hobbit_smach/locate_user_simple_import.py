@@ -8,6 +8,7 @@ import tf
 import math
 
 from std_msgs.msg import String
+from std_srvs.srv import Empty
 from smach_ros import ServiceState
 from nav_msgs.srv import GetPlan, GetPlanRequest
 from geometry_msgs.msg import PoseStamped, Point, Quaternion
@@ -382,14 +383,21 @@ def get_detect_user():
         smach.StateMachine.add(
             'MOVE_BASE',
             hobbit_move.goToPose(),
-            transitions={'succeeded': 'MOVE_HEAD_UP',
+            transitions={'succeeded': 'SWITCH_VISION',
                          'preempted': 'CLEAN_UP',
                          'aborted': 'CLEAN_UP'},
             remapping={'x': 'goal_position_x',
                        'y': 'goal_position_y',
                        'yaw': 'goal_position_yaw'}
         )
-        # we should get data on where the heasd should point to
+        smach.StateMachine.add_auto(
+            'SWITCH_VISION',
+            ServiceState(
+                '/vision_system/locateUser',
+                Empty
+            ),
+            connector_outcomes=['succeeded', 'preempted', 'aborted']
+        )
         smach.StateMachine.add(
             'MOVE_HEAD_UP',
             head_move.MoveTo(pose='center_center'),

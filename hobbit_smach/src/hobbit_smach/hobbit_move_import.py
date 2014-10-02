@@ -17,6 +17,7 @@ from smach_ros import ServiceState
 from hobbit_msgs.srv import GetCoordinates, GetCoordinatesRequest, GetName
 from move_base_msgs.msg import MoveBaseAction
 from std_msgs.msg import String
+from std_srvs.srv import Empty
 from mira_msgs.msg import BatteryState
 from hobbit_user_interaction import HobbitMMUI
 from uashh_smach.util import SleepState, WaitForMsgState
@@ -25,6 +26,7 @@ import uashh_smach.platform.move_base as move_base
 import head_move_import as head_move
 import speech_output_import as speech_output
 import service_disable_import as service_disable
+import arm_move_import as arm_move
 from math import pi
 
 
@@ -394,12 +396,23 @@ def goToPosition(frame='/map', room='None', place='dock'):
         )
         # Sequence.add('DISABLE_GESTURES',
         #              service_disable.disable_gestures())
+        Sequence.add(
+            'SWITCH_VISION',
+            ServiceState(
+                '/vision_system/navigation',
+                Empty
+            )
+        )
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
                      head_move.MoveTo(pose='down_center'))
         Sequence.add('WAIT', SleepState(duration=1))
         Sequence.add('ACTIVATE_OBSTACLES',
                      SetObstacles(active=True))
         Sequence.add('SET_NAV_GOAL', SetNavigationGoal(room, place))
+        Sequence.add(
+            'CHECK_ARM',
+            arm_move.CheckArmAtHomePos()
+        )
         if not DEBUG:
             Sequence.add('MOVE_HOBBIT', move_base.MoveBaseState(frame))
         Sequence.add(
@@ -472,6 +485,13 @@ def goToPose():
             'UNDOCK_IF_NEEDED',
             undock_if_needed()
         )
+        Sequence.add(
+            'SWITCH_VISION',
+            ServiceState(
+                '/vision_system/navigation',
+                Empty
+            )
+        )
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
                      head_move.MoveTo(pose='down_center'))
         Sequence.add('WAIT', SleepState(duration=1))
@@ -529,6 +549,13 @@ def goToPoseSilent():
         Sequence.add(
             'UNDOCK_IF_NEEDED',
             undock_if_needed()
+        )
+        Sequence.add(
+            'SWITCH_VISION',
+            ServiceState(
+                '/vision_system/navigation',
+                Empty
+            )
         )
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
                      head_move.MoveTo(pose='down_center'))

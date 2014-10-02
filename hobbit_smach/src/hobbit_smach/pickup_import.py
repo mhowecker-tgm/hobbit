@@ -611,7 +611,7 @@ class DavidPickingUp(State):
 	res = self.arm_client.arm_action_client(String ("SetOpenGripper"))
 
 	#clear buffer
-	res = self.arm_client.SetClearPosBuffer()	
+	res = self.arm_client.SetClearPosBuffer()
 
 	#PositionsForInterpolation(armactionserver) Intermediate Floor GraspPOS2
 	#cmd = String ("SetPositionsForInterpolation 72 43 82 134 101 4")
@@ -633,7 +633,7 @@ class DavidPickingUp(State):
 	cmd = String ("SetCloseGripper")
 	res = self.arm_client.arm_action_client(cmd)
 
-	
+
 	#PositionsForInterpolation(armactionserver) Intermediate Floor GraspPOS2")
 	#cmd = String ("SetPositionsForInterpolation 72 43 82 134 101 4")
 	#res = self.arm_client.arm_action_client(cmd)

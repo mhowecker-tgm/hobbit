@@ -45,11 +45,11 @@ import hobbit_msgs.msg
 
 #if not DEBUG:
 #    pass
-    #new: 
+    #new:
 arm_client = ArmActionClient()
     #cmd = String ("GetArmState")
     #res = arm_client.arm_action_client(cmd)
-    #changes done for new ArmActionServer based communication: arm.command() => arm_client.arm_action_client(String(command))  
+    #changes done for new ArmActionServer based communication: arm.command() => arm_client.arm_action_client(String(command))
     #old:
     #arm = ArmClientFunctions('192.168.2.190')
 #else:
@@ -80,7 +80,7 @@ def getArmAtPosition(position='home'):
             return True
     else:
         # Unless the data is correct we just wait 3 seconds and assume the arm reached the goal
-	print "getArmAtPosition result was False at time of execution for position: [=> wait 3 sec and assume arm is in correct position!]",position         
+	print "getArmAtPosition result was False at time of execution for position: [=> wait 3 sec and assume arm is in correct position!]",position
 	rospy.sleep(3.0)
         return True
         # return False
@@ -127,6 +127,32 @@ class StoreTurntable(State):
             return 'succeeded'
         else:
             return 'failed'
+
+
+class CheckArmAtHomePos(State):
+    """
+    Check that the arm is at the home position. This has to be true
+    before hobbit will start navigation.
+    """
+    def __init__(self, position):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'aborted', 'preempted']
+        )
+        self.position = position
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        # TODO: check if this sleep is needed
+        rospy.sleep(1)
+        if not arm_client.GetArmIsEnabled():
+            return 'aborted'
+        if getArmAtPosition('home'):
+            return 'succeeded'
+        else:
+            return 'aborted'
 
 
 class CheckArmReachedKnownPosition(State):
