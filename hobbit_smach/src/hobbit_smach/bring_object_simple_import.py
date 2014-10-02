@@ -7,72 +7,124 @@ import uashh_smach.util as util
 import tf
 import math
 
-from hobbit_msgs.srv import SwitchVision, SwitchVisionRequest
+from hobbit_msgs.srv import SwitchVision, GetObjectLocations,\
+    SwitchVisionRequest
 from std_msgs.msg import String
 from smach_ros import ServiceState
 from nav_msgs.srv import GetPlan, GetPlanRequest
 from geometry_msgs.msg import PoseStamped, Point, Quaternion
+from sensor_msgs.msg import PointCloud2
+from recognizer_msg_and_services.srv import recognize
 # from hobbit_smach.bcolors import bcolors
-from rgbd_acquisition.msg import Person
-from hobbit_msgs.srv import GetRooms
 import hobbit_smach.hobbit_move_import as hobbit_move
 import uashh_smach.platform.move_base as move_base
 import hobbit_smach.head_move_import as head_move
+import hobbit_smach.logging_import as log
 
 
 def switch_vision_cb(ud, response):
     if response.result:
-
         return 'succeeded'
     else:
         return 'aborted'
 
 
-def detectUser():
-    sm = smach.StateMachine(
-        outcomes=['succeeded', 'preempted', 'failed']
-    )
-    with sm:
-        smach.StateMachine.add(
-            'DETECTION',
-            util.WaitForMsgState(
-                '/persons',
-                Person,
-                userdetection_cb,
-                timeout=1),
-            transitions={'succeeded': 'succeeded',
-                         'aborted': 'COUNTER',
-                         'preempted': 'preempted'}
-        )
-        smach.StateMachine.add(
-            'COUNTER',
-            UserCounter(),
-            transitions={'succeeded': 'DETECTION',
-                         'aborted': 'failed',
-                         'preempted': 'preempted'}
-        )
-        return sm
-
-
-class UserCounter(smach.State):
+class MoveCounter(smach.State):
     def __init__(self):
         smach.State.__init__(
             self,
-            outcomes=['succeeded', 'preempted', 'aborted'])
-        self.counter = 0
-        self.limit = 10
+            outcomes=['succeeded', 'preempted', 'failure'])
+        self.run_counter = -1
 
     def execute(self, ud):
-        if self.preempt_requested():
-            self.service_preempt()
-            return 'preempted'
-        print('Counter: %d' % self.counter)
-        self.counter += 1
-        if self.counter < self.limit:
+        print('Recognizer counter: ' + str(self.run_counter))
+        if self.run_counter < 3:
+            rospy.loginfo('Recognition run: #%d' % (self.run_counter + 2))
+            self.run_counter += 1
             return 'succeeded'
         else:
-            self.counter = 0
+            self.run_counter = -1
+        return 'failure'
+
+
+class ObjectDetected(smach.State):
+    def __init__(self):
+        smach.State.__init__(
+            self,
+            outcomes=['succeeded', 'aborted', 'preempted'],
+            input_keys=['ids', 'transforms', 'object_name', 'object_pose'],
+            output_keys=['object_pose'])
+
+    def execute(self, ud):
+        rospy.loginfo('Did we find the object?')
+        print(ud.ids)
+        print(type(ud.ids))
+        if not ud.ids:
             return 'aborted'
+        try:
+            for index, item in enumerate(ud.ids):
+                if ud.object_name.data in item.data:
+                    ud.object_pose = ud.transforms[index]
+                    return 'succeeded'
+        except:
+            if ud.object_name.data in ud.ids.data:
+                ud.object_pose = ud.transforms
+                return 'succeeded'
+        return 'aborted'
+
+
+def point_cloud_cb(msg, ud):
+    print('point cloud received')
+    ud.cloud = msg
+    return True
+
+
+def detect_object():
+    sm = smach.StateMachine(
+        outcomes=['succeeded', 'preempted', 'aborted']
+    )
+
+    with sm:
+        smach.StateMachine.add(
+            'MOVE_HEAD',
+            head_move.MoveTo(pose='search_table'),
+            transitions={'succeeded': 'REC_COUNTER',
+                         'preempted': 'preempted',
+                         'aborted': 'aborted'})
+        smach.StateMachine.add(
+            'REC_COUNTER',
+            MoveCounter(),
+            transitions={'succeeded': 'GET_POINT_CLOUD',
+                         'preempted': 'preempted',
+                         'failure': 'aborted'})
+        smach.StateMachine.add(
+            'GET_POINT_CLOUD',
+            util.WaitForMsgState(
+                '/headcam/depth_registered/points',
+                PointCloud2,
+                point_cloud_cb,
+                timeout=5,
+                output_keys=['cloud']),
+            transitions={'succeeded': 'START_OBJECT_RECOGNITION',
+                         'aborted': 'GET_POINT_CLOUD',
+                         'preempted': 'preempted'})
+        smach.StateMachine.add(
+            'START_OBJECT_RECOGNITION',
+            ServiceState(
+                'mp_recognition',
+                recognize,
+                request_slots=['cloud'],
+                response_slots=['ids', 'transforms']),
+            transitions={'succeeded': 'OBJECT_DETECTED',
+                         'preempted': 'preempted',
+                         'aborted': 'REC_COUNTER'})
+        smach.StateMachine.add(
+            'OBJECT_DETECTED',
+            ObjectDetected(),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'MOVE_HEAD',
+                         'preempted': 'preempted'})
+    return sm
 
 
 class Init(smach.State):
@@ -84,20 +136,12 @@ class Init(smach.State):
         smach.State.__init__(
             self,
             outcomes=['succeeded', 'canceled'],
-            input_keys=['command'],
-            output_keys=['social_role'])
-        self.pub_obstacle = rospy.Publisher(
-            '/headcam/active',
-            String,
-            queue_size=50)
-        self.pub_face = rospy.Publisher(
-            '/Hobbit/Emoticon', String,
-            queue_size=50)
-        self.pub_face.publish('EMO_NEUTRAL')
+            input_keys=['command', 'parameters'],
+            output_keys=['social_role', 'object_name'])
 
     def execute(self, ud):
-        self.pub_face.publish('EMO_NEUTRAL')
-        self.pub_obstacle.publish('active')
+        ud.object_name = ud.parameters[0]
+
         if rospy.has_param('/hobbit/social_role'):
             ud.social_role = rospy.get_param('/hobbit/social_role')
         if ud.command.data == 'cancel':
@@ -124,7 +168,7 @@ class CleanUp(smach.State):
     def execute(self, ud):
         self.pub_face.publish('EMO_SAD')
         ud.visited_places = []
-        ud.result = String('user not detected')
+        ud.result = String('object not detected')
         return 'succeeded'
 
 
@@ -324,28 +368,10 @@ def calc_path_length(end_pose, poses):
     return distance
 
 
-def userdetection_cb(msg, ud):
-    # print bcolors.OKGREEN + 'received message: '
-    # print msg
-    # print bcolors.ENDC
-    if 0.39 < msg.confidence <= 0.61:
-        # print bcolors.OKGREEN + 'Face detected!' + bcolors.ENDC
-        rospy.loginfo('Face detected!')
-        return True
-    elif msg.confidence > 0.61:
-        # print bcolors.OKGREEN + 'Skeleton detected!' + bcolors.ENDC
-        rospy.loginfo('Skeleton detected!')
-        return True
-    else:
-        rospy.loginfo('NO USER')
-        # print bcolors.FAIL + 'NO USER' + bcolors.ENDC
-        return False
-
-
-def get_detect_user():
+def get_bring_object():
     sm = smach.StateMachine(
         outcomes=['succeeded', 'aborted', 'preempted'],
-        input_keys=['command'],
+        input_keys=['command', 'parameters'],
         output_keys=['result'])
 
     sm.userdata.result = String('started')
@@ -358,17 +384,13 @@ def get_detect_user():
             transitions={'succeeded': 'GET_ALL_POSITIONS',
                          'canceled': 'CLEAN_UP'}
         )
-        # smach.StateMachine.add(
-        #     'DOCK_CHECK',
-        #     hobbit_move.undock_if_needed(),
-        #     transitions={'succeeded': 'GET_ALL_POSITIONS',
-        #                  'canceled': 'CLEAN_UP'}
-        # )
         smach.StateMachine.add(
             'GET_ALL_POSITIONS',
-            ServiceState('getRooms',
-                         GetRooms,
-                         response_key='response'),
+            ServiceState(
+                '/Hobbit/ObjectService/get_object_locations',
+                GetObjectLocations,
+                request_key='object_name',
+                response_key='response'),
             transitions={'succeeded': 'GET_ROBOT_POSE',
                          'aborted': 'CLEAN_UP'}
         )
@@ -419,14 +441,29 @@ def get_detect_user():
         smach.StateMachine.add(
             'WAIT',
             util.SleepState(duration=0.1),
-            transitions={'succeeded': 'USER_DETECTION'}
+            transitions={'succeeded': 'OBJECT_DETECTION'}
         )
         smach.StateMachine.add(
-            'USER_DETECTION',
-            detectUser(),
-            transitions={'succeeded': 'SET_SUCCESS',
-                         'preempted': 'preempted',
-                         'failed': 'PLAN_PATH'}
+            'OBJECT_DETECTION',
+            detect_object(),
+            transitions={'succeeded': 'LOG_SUCCESS',
+                         'preempted': 'LOG_PREEMPT',
+                         'aborted': 'PLAN_PATH'}
+        )
+        smach.StateMachine.add(
+            'LOG_SUCCESS',
+            log.DoLogPreempt(scenario='Bring object'),
+            transitions={'succeeded': 'succeeded'}
+        )
+        smach.StateMachine.add(
+            'LOG_PREEMPT',
+            log.DoLogPreempt(scenario='Bring object'),
+            transitions={'succeeded': 'preempted'}
+        )
+        smach.StateMachine.add(
+            'LOG_ABORTED',
+            log.DoLogPreempt(scenario='Bring object'),
+            transitions={'succeeded': 'aborted'}
         )
         smach.StateMachine.add(
             'SET_SUCCESS',

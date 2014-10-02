@@ -15,10 +15,9 @@ import math
 from smach import State, Sequence, StateMachine
 from smach_ros import ServiceState
 from hobbit_msgs.srv import GetCoordinates, GetCoordinatesRequest, GetName, \
-    SwitchVision
+    SwitchVision, SwitchVisionRequest
 from move_base_msgs.msg import MoveBaseAction
 from std_msgs.msg import String
-from std_srvs.srv import Empty
 from mira_msgs.msg import BatteryState
 from hobbit_user_interaction import HobbitMMUI
 from uashh_smach.util import SleepState, WaitForMsgState
@@ -29,6 +28,13 @@ import speech_output_import as speech_output
 import service_disable_import as service_disable
 import arm_move_import as arm_move
 from math import pi
+
+
+def switch_vision_cb(ud, response):
+    if response.result:
+        return 'succeeded'
+    else:
+        return 'aborted'
 
 
 def battery_cb(msg, ud):
@@ -401,8 +407,9 @@ def goToPosition(frame='/map', room='None', place='dock'):
             'SWITCH_VISION',
             ServiceState(
                 '/vision_system/navigation',
-                Empty
-                # SwitchVision
+                SwitchVision,
+                request=SwitchVisionRequest(dummyInput=True),
+                response_cb=switch_vision_cb
             )
         )
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
@@ -491,8 +498,9 @@ def goToPose():
             'SWITCH_VISION',
             ServiceState(
                 '/vision_system/navigation',
-                Empty
-                # SwitchVision
+                SwitchVision,
+                request=SwitchVisionRequest(dummyInput=True),
+                response_cb=switch_vision_cb
             )
         )
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
@@ -557,8 +565,9 @@ def goToPoseSilent():
             'SWITCH_VISION',
             ServiceState(
                 '/vision_system/navigation',
-                Empty
-                # SwitchVision
+                SwitchVision,
+                request=SwitchVisionRequest(dummyInput=True),
+                response_cb=switch_vision_cb
             )
         )
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',

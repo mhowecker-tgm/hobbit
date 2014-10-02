@@ -17,9 +17,8 @@ from smach import StateMachine
 from smach_ros import ActionServerWrapper, IntrospectionServer, ServiceState
 
 from std_msgs.msg import String
-from std_srvs.srv import Empty
 from hobbit_msgs.msg import GeneralHobbitAction
-from hobbit_msgs.srv import SwitchVision
+from hobbit_msgs.srv import SwitchVision, SwitchVisionRequest
 from sensor_msgs.msg import PointCloud2
 from geometry_msgs.msg import PoseStamped
 from rgbd_acquisition.msg import PointEvents
@@ -29,6 +28,13 @@ import hobbit_smach.head_move_import as head_move
 import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.pickup_import as pickup
 import hobbit_smach.return_of_favour_import as return_of_favour
+
+
+def switch_vision_cb(ud, response):
+    if response.result:
+        return 'succeeded'
+    else:
+        return 'aborted'
 
 
 class bcolors:
@@ -237,8 +243,9 @@ def main():
             'SWITCH_VISION',
             ServiceState(
                 '/vision_system/seeWhereUserIsPointing',
-                Empty
-                # SwitchVision
+                SwitchVision,
+                request=SwitchVisionRequest(dummyInput=True),
+                response_cb=switch_vision_cb
 
             ),
             connector_outcomes=['succeeded', 'preempted', 'aborted']

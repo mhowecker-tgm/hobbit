@@ -11,9 +11,8 @@ import rospy
 from uashh_smach.util import SleepState
 
 from std_msgs.msg import String
-from std_srvs.srv import Empty
 from hobbit_msgs.msg import GeneralHobbitAction
-from hobbit_msgs.srv import SwitchVision
+from hobbit_msgs.srv import SwitchVision, SwitchVisionRequest
 from smach_ros import ActionServerWrapper, IntrospectionServer, ServiceState
 from smach import StateMachine, State, Sequence, Concurrence
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
@@ -22,6 +21,15 @@ import hobbit_smach.head_move_import as head_move
 import hobbit_smach.arm_move_import as arm_move
 import hobbit_smach.speech_output_import as speech_output
 # import hobbit_smach.hobbit_move_import as hobbit_move
+
+
+def switch_vision_cb(ud, response):
+    if response.result:
+        rospy.loginfo('response from vision system was: True')
+        return 'succeeded'
+    else:
+        rospy.loginfo('response from vision system was: False')
+        return 'aborted'
 
 
 class TestData(State):
@@ -360,8 +368,9 @@ def main():
             'SWITCH_VISION',
             ServiceState(
                 '/vision_system/startScanning3DObject',
-                Empty
-                # SwitchVision
+                SwitchVision,
+                request=SwitchVisionRequest(dummyInput=True),
+                response_cb=switch_vision_cb
 
             ),
             connector_outcomes=['succeeded', 'preempted', 'aborted']
@@ -423,8 +432,9 @@ def main():
             'SWITCH_VISION_BACK',
             ServiceState(
                 '/vision_system/stopScanning3DObject',
-                Empty
-                # SwitchVision
+                SwitchVision,
+                request=SwitchVisionRequest(dummyInput=True),
+                response_cb=switch_vision_cb
             ),
             connector_outcomes=['succeeded', 'preempted', 'aborted']
         )
