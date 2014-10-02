@@ -52,6 +52,7 @@ add_service_files(
   PointCloud2FeatureHistogram.srv
   Request.srv
   SingleShotPC.srv
+  SwitchVision.srv
   Translate.srv
 )
 

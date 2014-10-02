@@ -19,6 +19,7 @@ from smach_ros import ActionServerWrapper, IntrospectionServer, ServiceState
 from std_msgs.msg import String
 from std_srvs.srv import Empty
 from hobbit_msgs.msg import GeneralHobbitAction
+from hobbit_msgs.srv import SwitchVision
 from sensor_msgs.msg import PointCloud2
 from geometry_msgs.msg import PoseStamped
 from rgbd_acquisition.msg import PointEvents
@@ -237,6 +238,8 @@ def main():
             ServiceState(
                 '/vision_system/seeWhereUserIsPointing',
                 Empty
+                # SwitchVision
+
             ),
             connector_outcomes=['succeeded', 'preempted', 'aborted']
         )

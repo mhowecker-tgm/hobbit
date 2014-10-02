@@ -13,6 +13,7 @@ from uashh_smach.util import SleepState
 from std_msgs.msg import String
 from std_srvs.srv import Empty
 from hobbit_msgs.msg import GeneralHobbitAction
+from hobbit_msgs.srv import SwitchVision
 from smach_ros import ActionServerWrapper, IntrospectionServer, ServiceState
 from smach import StateMachine, State, Sequence, Concurrence
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
@@ -360,6 +361,8 @@ def main():
             ServiceState(
                 '/vision_system/startScanning3DObject',
                 Empty
+                # SwitchVision
+
             ),
             connector_outcomes=['succeeded', 'preempted', 'aborted']
         )
@@ -421,6 +424,7 @@ def main():
             ServiceState(
                 '/vision_system/stopScanning3DObject',
                 Empty
+                # SwitchVision
             ),
             connector_outcomes=['succeeded', 'preempted', 'aborted']
         )

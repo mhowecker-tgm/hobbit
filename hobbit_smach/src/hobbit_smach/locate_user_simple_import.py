@@ -7,6 +7,7 @@ import uashh_smach.util as util
 import tf
 import math
 
+from hobbit_msgs.srv import SwitchVision
 from std_msgs.msg import String
 from std_srvs.srv import Empty
 from smach_ros import ServiceState
@@ -395,6 +396,7 @@ def get_detect_user():
             ServiceState(
                 '/vision_system/locateUser',
                 Empty
+                # SwitchVision
             ),
             connector_outcomes=['succeeded', 'preempted', 'aborted']
         )

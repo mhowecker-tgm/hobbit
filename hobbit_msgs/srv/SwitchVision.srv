@@ -1,0 +1,4 @@
+# Service definition to change the vision system properties
+bool switch
+---
+bool result

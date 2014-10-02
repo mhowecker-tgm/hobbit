@@ -14,7 +14,8 @@ import math
 
 from smach import State, Sequence, StateMachine
 from smach_ros import ServiceState
-from hobbit_msgs.srv import GetCoordinates, GetCoordinatesRequest, GetName
+from hobbit_msgs.srv import GetCoordinates, GetCoordinatesRequest, GetName, \
+    SwitchVision
 from move_base_msgs.msg import MoveBaseAction
 from std_msgs.msg import String
 from std_srvs.srv import Empty
@@ -401,6 +402,7 @@ def goToPosition(frame='/map', room='None', place='dock'):
             ServiceState(
                 '/vision_system/navigation',
                 Empty
+                # SwitchVision
             )
         )
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
@@ -490,6 +492,7 @@ def goToPose():
             ServiceState(
                 '/vision_system/navigation',
                 Empty
+                # SwitchVision
             )
         )
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
@@ -555,6 +558,7 @@ def goToPoseSilent():
             ServiceState(
                 '/vision_system/navigation',
                 Empty
+                # SwitchVision
             )
         )
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
