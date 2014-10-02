@@ -314,10 +314,7 @@ int rostopic_pub(const char * topicName,const char * topicType,const char * topi
   return (i==0);
 }
 
-bool pauseEverything(hobbit_msgs::SwitchVision::Request & request ,
-                     hobbit_msgs::SwitchVision::Response & response
-                     //std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
-                    )
+bool pauseEverything(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs::SwitchVision::Response & response  )
 {
     ROS_INFO("Pausing All User Sensing");
     rosservice_call("/rgbd_acquisition/pause_peopletracker");
@@ -330,10 +327,7 @@ bool pauseEverything(hobbit_msgs::SwitchVision::Request & request ,
     return true;
 }
 
-bool resumeEverything(hobbit_msgs::SwitchVision::Request & request ,
-                     hobbit_msgs::SwitchVision::Response & response
-                     //std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
-                     )
+bool resumeEverything(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs::SwitchVision::Response & response  )
 {
     ROS_INFO("Resuming All User Sensing");
     rosservice_call("/rgbd_acquisition/resume_peopletracker");
@@ -347,10 +341,7 @@ bool resumeEverything(hobbit_msgs::SwitchVision::Request & request ,
     return true;
 }
 
-bool followUser(hobbit_msgs::SwitchVision::Request & request ,
-                     hobbit_msgs::SwitchVision::Response & response
-                     //std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
-                     )
+bool followUser(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs::SwitchVision::Response & response  )
 {
     ROS_INFO("Setting Vision System to Follow a User");
     rosservice_call("/rgbd_acquisition/resume_peopletracker"); //Nite tracker might be useful
@@ -361,10 +352,7 @@ bool followUser(hobbit_msgs::SwitchVision::Request & request ,
     return true;
 }
 
-bool locateUser(hobbit_msgs::SwitchVision::Request & request ,
-                     hobbit_msgs::SwitchVision::Response & response
-                     //std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
-                     )
+bool locateUser(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs::SwitchVision::Response & response  )
 {
     ROS_INFO("Setting Vision System to Locate a User");
     rosservice_call("/rgbd_acquisition/resume_peopletracker"); //Nite tracker might be useful
@@ -377,10 +365,7 @@ bool locateUser(hobbit_msgs::SwitchVision::Request & request ,
     return true;
 }
 
-bool fitnessFunction(hobbit_msgs::SwitchVision::Request & request ,
-                     hobbit_msgs::SwitchVision::Response & response
-                     //std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
-                     )
+bool fitnessFunction(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs::SwitchVision::Response & response  )
 {
     ROS_INFO("Setting Vision System to do FitnessFunction");
     rosservice_call("/rgbd_acquisition/pause_peopletracker"); //Nite tracker is no longer used
@@ -392,10 +377,7 @@ bool fitnessFunction(hobbit_msgs::SwitchVision::Request & request ,
 }
 
 
-bool whereIsUserPointing(hobbit_msgs::SwitchVision::Request & request ,
-                     hobbit_msgs::SwitchVision::Response & response
-                     //std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
-                     )
+bool whereIsUserPointing(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs::SwitchVision::Response & response  )
 {
     ROS_INFO("Setting Vision System to see where the User is Pointing");
     rosservice_call("/rgbd_acquisition/pause_peopletracker"); //Nite tracker might be useful
@@ -406,10 +388,7 @@ bool whereIsUserPointing(hobbit_msgs::SwitchVision::Request & request ,
 }
 
 
-bool navigating(hobbit_msgs::SwitchVision::Request & request ,
-                     hobbit_msgs::SwitchVision::Response & response
-                     //std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
-                     )
+bool navigating(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs::SwitchVision::Response & response  )
 {
     ROS_INFO("Setting Vision System to Navigating");
     rosservice_call("/emergency_detector/resume"); // So that we get
@@ -418,10 +397,7 @@ bool navigating(hobbit_msgs::SwitchVision::Request & request ,
     return true;
 }
 
-bool charging(hobbit_msgs::SwitchVision::Request & request ,
-                     hobbit_msgs::SwitchVision::Response & response
-                     //std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
-                     )
+bool charging(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs::SwitchVision::Response & response  )
 {
     ROS_INFO("Setting Vision System to Charging , low processing mode");
     rosservice_call("/hand_gestures/resume");
@@ -430,10 +406,7 @@ bool charging(hobbit_msgs::SwitchVision::Request & request ,
 }
 
 
-bool idle(hobbit_msgs::SwitchVision::Request & request ,
-                     hobbit_msgs::SwitchVision::Response & response
-                     //std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
-                     )
+bool idle(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs::SwitchVision::Response & response  )
 {
     ROS_INFO("Setting Vision System to default idle mode");
     rosservice_call("/hand_gestures/resume");
@@ -442,20 +415,14 @@ bool idle(hobbit_msgs::SwitchVision::Request & request ,
     return true;
 }
 
-bool startScanning3DObject(hobbit_msgs::SwitchVision::Request & request ,
-                     hobbit_msgs::SwitchVision::Response & response
-                     //std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
-                     )
+bool startScanning3DObject(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs::SwitchVision::Response & response  )
 {
     ROS_INFO("Setting Vision System to 3D Scanning mode");
     response.result=true;
     return pauseEverything(request,response);
 }
 
-bool stopScanning3DObject(hobbit_msgs::SwitchVision::Request & request ,
-                     hobbit_msgs::SwitchVision::Response & response
-                     //std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
-                     )
+bool stopScanning3DObject(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs::SwitchVision::Response & response  )
 {
     ROS_INFO("Setting Vision System switching off from 3D Scanning mode");
     response.result=true;
