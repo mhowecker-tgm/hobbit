@@ -2,6 +2,8 @@
 
 PKG = 'hobbit_smach'
 NAME = 'hobbit_master'
+PREEMPT_TIMEOUT = 5
+SERVER_TIMEOUT = 5
 
 import roslib
 roslib.load_manifest(PKG)
@@ -22,24 +24,25 @@ from hobbit_user_interaction import HobbitMMUI
 from hobbit_smach.bcolors import bcolors
 
 
-commands = [['emergency', 'G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP',
-             'G_HELP', 'A_HELP', 'C_HELP', 'F_CALLSOS', 'G_EMERGENCY'],
-            ['recharge', 'E_RECHARGE', 'C_RECHARGE'],
-            ['reminder', 'E_REMINDER'],
-            ['stop', 'C_STOP', 'G_STOP', 'E_STOP', 'E_CANCEL'],
-            ['call_hobbit', 'C_CALLHOBBIT', 'E_CALLHOBBIT'],
-            ['call', 'E_CALLRING', 'E_CALLESTABLISHED', 'E_CALLENDED', 'C_MAKECALL'],
-            ['away', 'C_AWAY1', 'C_AWAY2', 'C_AWAY3', 'C_AWAY4', 'C_AWAY5', 'C_AWAY6',
-            'C_SLEEP1', 'C_SLEEP2', 'C_SLEEP3', 'C_SLEEP4', 'C_SLEEP5', 'C_SLEEP6'],
-            ['clear_floor', 'E_CLEARFLOOR'],
-            ['pickup', 'follow', 'learn_object', 'bring_object', 'goto', 'pickup',
-             'C_PICKUP', 'C_FOLLOW', 'C_LEARN', 'C_BRING', 'C_GOTOPOINT', 'G_POINTING'],
-            ['patrol', 'E_PATROL'],
-            ['surprise', 'C_SURPRISE'],
-            ['reward', 'C_REWARD', 'G_REWARD'],
-            ['social_role', 'E_SOCIALROLE'],
-            ['master_reset', 'C_MASTER_RESET']
-            ]
+commands = [
+    ['emergency', 'G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP',
+     'G_HELP', 'A_HELP', 'C_HELP', 'F_CALLSOS', 'G_EMERGENCY'],
+    ['recharge', 'E_RECHARGE', 'C_RECHARGE'],
+    ['reminder', 'E_REMINDER'],
+    ['stop', 'C_STOP', 'G_STOP', 'E_STOP', 'E_CANCEL'],
+    ['call_hobbit', 'C_CALLHOBBIT', 'E_CALLHOBBIT'],
+    ['call', 'E_CALLRING', 'E_CALLESTABLISHED', 'E_CALLENDED', 'C_MAKECALL'],
+    ['away', 'C_AWAY1', 'C_AWAY2', 'C_AWAY3', 'C_AWAY4', 'C_AWAY5', 'C_AWAY6',
+     'C_SLEEP1', 'C_SLEEP2', 'C_SLEEP3', 'C_SLEEP4', 'C_SLEEP5', 'C_SLEEP6'],
+    ['clear_floor', 'E_CLEARFLOOR'],
+    ['pickup', 'follow', 'learn_object', 'bring_object', 'goto', 'pickup',
+     'C_PICKUP', 'C_FOLLOW', 'C_LEARN', 'C_BRING', 'C_GOTOPOINT', 'G_POINTING'],
+    ['patrol', 'E_PATROL'],
+    ['surprise', 'C_SURPRISE'],
+    ['reward', 'C_REWARD', 'G_REWARD'],
+    ['social_role', 'E_SOCIALROLE'],
+    ['master_reset', 'C_MASTER_RESET']
+    ]
 
 
 def IsItNight(ud):
@@ -118,15 +121,15 @@ def command_cb(msg, ud):
                 return True
             elif index + 1 >= active_task and not night:
                 rospy.loginfo('New task has lower priority. DO NOTHING')
-                print(bcolors.FAIL + \
-                    'New task has lower priority. Do nothing' \
-                    + bcolors.ENDC)
+                print(bcolors.FAIL +
+                      'New task has lower priority. Do nothing'
+                      + bcolors.ENDC)
                 return False
             else:
                 rospy.loginfo('New task has higher priority. START IT.')
-                print(bcolors.OKGREEN +\
-                    'New task has higher priority. Start it.'\
-                    + bcolors.ENDC)
+                print(bcolors.OKGREEN +
+                      'New task has higher priority. Start it.'
+                      + bcolors.ENDC)
                 # if index == 7:
                 if item[0] == 'pickup':
                     i = item.index(input_ce)
@@ -391,6 +394,7 @@ def main():
         input_keys=['command', 'params', 'active_task', 'parameters'],
         output_keys=['command', 'active_task', 'parameters', 'params']
     )
+
     def cc_out_cb(outcome_map):
         if outcome_map['Event_Listener'] == 'succeeded':
             return 'succeeded'
@@ -512,8 +516,8 @@ def main():
                 'learn_object',
                 GeneralHobbitAction,
                 goal_cb=task_lo_cb,
-                preempt_timeout=rospy.Duration(5),
-                server_wait_timeout=rospy.Duration(10)
+                preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
+                server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
@@ -524,18 +528,22 @@ def main():
                 'reminder',
                 GeneralHobbitAction,
                 goal_cb=task_reminder_cb,
-                preempt_timeout=rospy.Duration(5),
-                server_wait_timeout=rospy.Duration(10)
+                preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
+                server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add_auto(
             'EMERGENCY',
-            SimpleActionState('emergency_user',
-                              GeneralHobbitAction,
-                              goal_cb=sos_cb,
-                              input_keys=['parameters', 'params']),
+            SimpleActionState(
+                'emergency_user',
+                GeneralHobbitAction,
+                goal_cb=sos_cb,
+                input_keys=['parameters', 'params'],
+                preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
+                server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
+            ),
             connector_outcomes=['succeeded', 'aborted', 'preempted']
         )
         StateMachine.add(
@@ -546,20 +554,28 @@ def main():
         )
         StateMachine.add(
             'PATROL',
-            SimpleActionState('locate_user',
-                              GeneralHobbitAction,
-                              goal_cb=patrol_cb,
-                              input_keys=['parameters', 'params']),
+            SimpleActionState(
+                'locate_user',
+                GeneralHobbitAction,
+                goal_cb=patrol_cb,
+                input_keys=['parameters', 'params'],
+                preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
+                server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
+            ),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'GOTO',
-            SimpleActionState('goto',
-                              GeneralHobbitAction,
-                              goal_cb=goto_cb,
-                              input_keys=['parameters', 'params'],
-                              output_keys=['goal_room']),
+            SimpleActionState(
+                'goto',
+                GeneralHobbitAction,
+                goal_cb=goto_cb,
+                input_keys=['parameters', 'params'],
+                output_keys=['goal_room'],
+                preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
+                server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
+            ),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
@@ -578,19 +594,27 @@ def main():
         )
         StateMachine.add(
             'EMERGENCY_BATHROOM',
-            SimpleActionState('emergency_bathroom',
-                              GeneralHobbitAction,
-                              goal_cb=away_cb,
-                              input_keys=['parameters', 'params']),
+            SimpleActionState(
+                'emergency_bathroom',
+                GeneralHobbitAction,
+                goal_cb=away_cb,
+                input_keys=['parameters', 'params'],
+                preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
+                server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
+            ),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'PICKUP',
-            SimpleActionState('pickup',
-                              GeneralHobbitAction,
-                              goal_cb=pickup_cb,
-                              input_keys=['parameters', 'params']),
+            SimpleActionState(
+                'pickup',
+                GeneralHobbitAction,
+                goal_cb=pickup_cb,
+                input_keys=['parameters', 'params'],
+                preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
+                server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
+            ),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
@@ -610,10 +634,14 @@ def main():
         )
         StateMachine.add(
             'FOLLOW',
-            SimpleActionState('follow',
-                              GeneralHobbitAction,
-                              goal_cb=follow_cb,
-                              input_keys=['parameters', 'params']),
+            SimpleActionState(
+                'follow',
+                GeneralHobbitAction,
+                goal_cb=follow_cb,
+                input_keys=['parameters', 'params'],
+                preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
+                server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
+            ),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
@@ -634,11 +662,14 @@ def main():
         StateMachine.add(
             'BRING_OBJECT',
             FakeForAllWithoutRunningActionSever(name='BRING_OBJECT'),
-            # SimpleActionState('bring_object',
-            #                  GeneralHobbitAction,
-            #                  goal_cb=bring_cb,
-            #                  input_keys=['parameters', 'params']
-            #                  ),
+            # SimpleActionState(
+            #     'bring_object',
+            #     GeneralHobbitAction,
+            #     goal_cb=bring_cb,
+            #     input_keys=['parameters', 'params'],
+            #     preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
+            #     server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
+            # ),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK',
                          'failed': 'RESET_ACTIVE_TASK'}
@@ -659,19 +690,27 @@ def main():
         )
         StateMachine.add(
             'AWAY',
-            SimpleActionState('away',
-                              GeneralHobbitAction,
-                              goal_cb=away_cb,
-                              input_keys=['parameters', 'params']),
+            SimpleActionState(
+                'away',
+                GeneralHobbitAction,
+                goal_cb=away_cb,
+                input_keys=['parameters', 'params'],
+                preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
+                server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
+            ),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'SLEEP',
-            SimpleActionState('sleep',
-                              GeneralHobbitAction,
-                              goal_cb=sleep_cb,
-                              input_keys=['parameters', 'params']),
+            SimpleActionState(
+                'sleep',
+                GeneralHobbitAction,
+                goal_cb=sleep_cb,
+                input_keys=['parameters', 'params'],
+                preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
+                server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
+            ),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )

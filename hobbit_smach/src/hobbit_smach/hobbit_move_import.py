@@ -199,7 +199,7 @@ class Stop(State):
         rospy.loginfo('DO FULL STOP')
         self.stop_pub.publish('stop')
         client = SimpleActionClient(
-            'move_base',
+            'mira_move_base',
             MoveBaseAction)
         if client.wait_for_server(timeout=rospy.Duration(3)):
             client.cancel_all_goals()
