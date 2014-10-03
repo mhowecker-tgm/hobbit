@@ -6,7 +6,7 @@ from std_msgs.msg import Header
 from mira_msgs.msg import BatteryState
 
 LIMIT = 1
-NAME = 'battery_check'
+NAME = 'battery_monitor'
 VOLT_LIMIT = 26.0
 
 

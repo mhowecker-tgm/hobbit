@@ -217,17 +217,17 @@ def set_nav_goal_cb(userdata, request):
     nav_request.room_name = String(userdata.room_name)
     return nav_request
 
-cc1 = Concurrence(
+cc1 = smach.Concurrence(
     outcomes=['succeeded', 'preempted', 'failed'],
     default_outcome='failed'
 )
 
 with cc1:
-    Concurrence.add(
+    smach.Concurrence.add(
         'EMO_HAPPY',
         HobbitEmotions.ShowEmotions(emotion='HAPPY', emo_time=4)
     )
-    Concurrence.add(
+    smach.Concurrence.add(
         'SAY_ATTENTION',
         speech_output.sayText(info='I will go there in five seconds')
     )
