@@ -15,6 +15,7 @@ update_diff = 0.5
 #FILE='/home/bajo/work/development/catkin/src/navigation/places.xml'
 FILE='/opt/ros/hobbit_hydro/src/navigation/places.xml'
 
+import sys
 import roslib; roslib.load_manifest(PKG)
 import rospy
 from hobbit_msgs.msg import ObjectLocationVector, ObjectLocation
@@ -156,7 +157,10 @@ def updateProb(obj, location, room_name, rooms):
 
 
 def addObject(object_name, rooms):
+    obj_name= unicode(object_name.data, 'utf-8')
+    print(type(obj_name))
     object_name.data = unicode(object_name.data, 'utf-8')
+    print(type(object_name.data))
     locations = count_locations(rooms)
     added = False
     for room in rooms.rooms_vector:
@@ -275,7 +279,7 @@ def add_object_to_db(req):
     return addObject(String(req.object_name), rooms)
 
 def clean_up():
-    rospy.loginfo(NODE+ 'is shutting down. Saving places.xml')
+    rospy.loginfo(NAME + 'is shutting down. Saving places.xml')
     writeXml(FILE, rooms)
 
 
@@ -304,4 +308,10 @@ def main():
     rospy.spin()
 
 if __name__ == "__main__":
+    # print sys.stdout.encoding
+    # stdin, stdout = sys.stdin, sys.stdout
+    # reload(sys)
+    # sys.stdin, sys.stdout = stdin, stdout
+    # sys.setdefaultencoding('utf-8')
+    # print sys.stdout.encoding
     main()
