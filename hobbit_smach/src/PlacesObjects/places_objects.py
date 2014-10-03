@@ -274,6 +274,11 @@ def add_object_to_db(req):
     print(req)
     return addObject(String(req.object_name), rooms)
 
+def clean_up():
+    rospy.loginfo(NODE+ 'is shutting down. Saving places.xml')
+    writeXml(FILE, rooms)
+
+
 def main():
     rospy.init_node(NAME)
     global rooms
@@ -295,8 +300,8 @@ def main():
         s6 = rospy.Service('/add_object_to_db', AddObject, add_object_to_db)
 
     # spin() keeps Python from exiting until node is shutdown
+    rospy.on_shutdown(clean_up)
     rospy.spin()
 
 if __name__ == "__main__":
     main()
-    writeXml(FILE, rooms)
