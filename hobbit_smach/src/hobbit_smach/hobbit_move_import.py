@@ -406,7 +406,7 @@ def goToPosition(frame='/map', room='None', place='dock'):
         Sequence.add(
             'SWITCH_VISION',
             ServiceState(
-                '/vision_system/navigation',
+                '/vision_system/navigating',
                 SwitchVision,
                 request=SwitchVisionRequest(dummyInput=True),
                 response_cb=switch_vision_cb
@@ -564,7 +564,7 @@ def goToPoseSilent():
         Sequence.add(
             'SWITCH_VISION',
             ServiceState(
-                '/vision_system/navigation',
+                '/vision_system/navigating',
                 SwitchVision,
                 request=SwitchVisionRequest(dummyInput=True),
                 response_cb=switch_vision_cb
