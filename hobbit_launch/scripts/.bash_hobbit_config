@@ -29,5 +29,6 @@ alias pntges="rostopic pub /pointEvents rgbd_acquisition/PointEvents '{x: 0, y: 
 # create and show visualization of tf-frames
 alias tfc="rosrun tf2_tools view_frames.py"
 alias tfs="gnome-open frames.pdf"
+alias smach="/opt/ros/hobbit_hydro/src/hobbit_smach/scripts/check_smach_nodes.sh"
 
 #/etc/init.d/chrony start
