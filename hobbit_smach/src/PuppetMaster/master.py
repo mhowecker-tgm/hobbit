@@ -4,6 +4,7 @@ PKG = 'hobbit_smach'
 NAME = 'hobbit_master'
 PREEMPT_TIMEOUT = 5
 SERVER_TIMEOUT = 5
+MUC_ENABLED = True
 
 import roslib
 roslib.load_manifest(PKG)
@@ -62,16 +63,16 @@ def IsItNight(ud):
 
 def command_cb(msg, ud):
     try:
-        rospy.loginfo('/Command data received:')
-        # rospy.loginfo(str(msg.command))
+        rospy.loginfo(str(msg.command))
         input_ce = msg.command.upper()
+        rospy.loginfo('/Command data received:')
     except AttributeError, e:
         print(e)
         pass
     try:
-        rospy.loginfo('/Event data received:')
-        # rospy.loginfo(str(msg.event))
+        rospy.loginfo(str(msg.event))
         input_ce = msg.event.upper()
+        rospy.loginfo('/Event data received:')
     except AttributeError, e:
         print(e)
         pass
@@ -645,14 +646,24 @@ def main():
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
-        StateMachine.add_auto(
-            'REWARD',
-            speech_output.emo_say_something(
-                emo='VHAPPY',
-                time=4,
-                text='T_RW_YouAreWelcome'
-            ),
-            connector_outcomes=['succeeded', 'aborted'])
+        if MUC_ENABLED:
+            StateMachine.add_auto(
+                'REWARD',
+                speech_output.emo_say_something(
+                    emo='HAPPY',
+                    time=4,
+                    text='T_RW_YouAreWelcome'
+                ),
+                connector_outcomes=['succeeded', 'aborted'])
+        else:
+            StateMachine.add_auto(
+                'REWARD',
+                speech_output.emo_say_something(
+                    emo='NEUTRAL',
+                    time=4,
+                    text='T_AnythingElse'
+                ),
+                connector_outcomes=['succeeded', 'aborted'])
         StateMachine.add(
             'MAIN_MENU',
             HobbitMMUI.ShowMenu(menu='MAIN'),
