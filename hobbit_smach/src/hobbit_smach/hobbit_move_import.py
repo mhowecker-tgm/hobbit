@@ -497,7 +497,7 @@ def goToPose():
         Sequence.add(
             'SWITCH_VISION',
             ServiceState(
-                '/vision_system/navigation',
+                '/vision_system/navigating',
                 SwitchVision,
                 request=SwitchVisionRequest(dummyInput=True),
                 response_cb=switch_vision_cb
