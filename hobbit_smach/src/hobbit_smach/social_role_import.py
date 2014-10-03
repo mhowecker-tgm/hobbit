@@ -7,11 +7,11 @@ NAME = 'SocialRole'
 import rospy
 import random
 
+from std_msgs.msg import String
 from smach import State, StateMachine
 from hobbit_msgs import MMUIInterface as MMUI
-from hobbit_msgs.msg import Event
+from hobbit_msgs.srv import GetCoordinates, GetCoordinatesRequest
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
-import uashh_smach.util as util
 import hobbit_smach.sos_call_import as sos_call
 import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.locate_user_import as locate_user
@@ -72,7 +72,7 @@ class SetSocialRole(State):
             return 'aborted'
 
 
-class CalculateNextPose(State):
+class GetSocialPose(State):
     """
     """
 
@@ -80,13 +80,32 @@ class CalculateNextPose(State):
         State.__init__(
             self,
             outcomes=['succeeded', 'aborted', 'preempted'],
+            input_keys=['room_name'],
             output_keys=['x', 'y', 'yaw']
         )
+
+    def _getGoal(self, room, place):
+        rospy.wait_for_service('get_coordinates',
+                               timeout=5)
+        serv = rospy.ServiceProxy(
+            'get_coordinates',
+            GetCoordinates,
+            persistent=False
+        )
+        req = GetCoordinatesRequest(String(room), String(place))
+        try:
+            resp = serv(req)
+        # print(resp.pose.x, resp.pose.y, resp.pose.theta)
+            return (resp.pose.x, resp.pose.y, resp.pose.theta)
+        except rospy.ServiceException as exc:
+            print("Service did not process request: " + str(exc))
+            return (0.0, 0.0, 0.0)
 
     def execute(self, ud):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
+        ud.x, ud.y, ud.yaw = self._getGoal(ud.room_name, 'center')
         return 'succeeded'
 
 

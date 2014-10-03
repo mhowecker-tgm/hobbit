@@ -20,6 +20,7 @@ import hobbit_smach.recharge_import as recharge
 import hobbit_smach.call_hobbit_import as call_hobbit
 import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.social_role_import as social_role
+import hobbit_smach.end_interaction_import as end_interaction
 import uashh_smach.util as util
 from hobbit_user_interaction import HobbitMMUI
 from hobbit_smach.bcolors import bcolors
@@ -737,6 +738,22 @@ def main():
             transitions={'succeeded': 'succeeded',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
+        if MUC_ENABLED:
+            StateMachine.add(
+                'END_USER_INTERACTION',
+                end_interaction.end_interaction_muc(),
+                transitions={'succeeded': 'RESET_ACTIVE_TASK',
+                             'aborted': 'SURPRISE',
+                             'preempted': 'preempted'}
+            )
+        else:
+            StateMachine.add(
+                'END_USER_INTERACTION',
+                end_interaction.move_away(),
+                transitions={'succeeded': 'RESET_ACTIVE_TASK',
+                             'aborted': 'RESET_ACTIVE_TASK',
+                             'preempted': 'preempted'}
+            )
 
     """
     Now we actually start the IntrospectionServer to visualize the StateMachine
