@@ -134,12 +134,11 @@ class CheckArmAtHomePos(State):
     Check that the arm is at the home position. This has to be true
     before hobbit will start navigation.
     """
-    def __init__(self, position):
+    def __init__(self):
         State.__init__(
             self,
             outcomes=['succeeded', 'aborted', 'preempted']
         )
-        self.position = position
 
     def execute(self, ud):
         if self.preempt_requested():
