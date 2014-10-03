@@ -6,7 +6,7 @@ from smach_ros import ServiceState
 from hobbit_msgs.srv import GetName
 import hobbit_smach.hobbit_move_import as hobbit_move
 import hobbit_smach.social_role_import as social_role
-import hobbit_smach.hobbit_cronjobs_import as cronjobs
+#import hobbit_smach.hobbit_cronjobs_import as cronjobs
 from hobbit_user_interaction import HobbitMMUI
 
 
@@ -29,7 +29,8 @@ def end_interaction_muc():
                          'timeout': 'OFFER_RETURN_OF_FAVOUR',
                          '3times': 'aborted',
                          'no': 'MOVE_AWAY',
-                         'preempted': 'preempted'}
+                         'preempted': 'preempted',
+                         'failed': 'aborted'}
         )
         StateMachine.add(
             'MOVE_AWAY',
@@ -74,7 +75,7 @@ def move_away():
             ServiceState(
                 'get_robots_current_room',
                 GetName,
-                response_key=['room_name']
+                response_key='room_name'
             )
         )
         StateMachine.add(
@@ -91,11 +92,11 @@ def move_away():
                          'aborted': 'aborted',
                          'preempted': 'preempted'}
         )
-        StateMachine.add(
-            'SET_3_HOURS_TIMER',
-            cronjobs.set_three_hours(),
-            transitions={'succeeded': 'succeeded',
-                         'aborted': 'aborted',
-                         'preempted': 'preempted'}
-        )
+        # StateMachine.add(
+        #     'SET_3_HOURS_TIMER',
+        #     cronjobs.set_three_hours(),
+        #     transitions={'succeeded': 'succeeded',
+        #                  'aborted': 'aborted',
+        #                  'preempted': 'preempted'}
+        # )
     return sm
