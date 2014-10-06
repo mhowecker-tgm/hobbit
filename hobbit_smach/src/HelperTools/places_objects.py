@@ -14,7 +14,6 @@ update_diff = 0.5
 # FILE = 'places.xml'
 # FILE = '/home/bajo/work/development/catkin/src/navigation/places.xml'
 FILE = '/opt/ros/hobbit_hydro/src/navigation/places.xml'
-FILE = '/opt/ros/hobbit_hydro/src/navigation/places_forth_22_9.xml'
 
 import sys
 import rospy
@@ -173,7 +172,7 @@ def updateProb(obj, location, room_name, rooms):
 
 
 def addObject(object_name, rooms):
-    obj_name = get_unicode(object_name.data)
+    object_name.data = get_unicode(object_name.data)
     locations = count_locations(rooms)
     added = False
     for room in rooms.rooms_vector:
@@ -184,12 +183,12 @@ def addObject(object_name, rooms):
             else:
                 new = True
                 for obj in place.objects:
-                    if object_name in obj.name.data:
-                        print('addObject: ' + object_name + ' is already stored.')
+                    if object_name.data in obj.name.data:
+                        print('addObject: ' + object_name.data + ' is already stored.')
                         new = False
                 if new:
                     rospy.loginfo('Adding object')
-                    place.objects.append(Object(object_name, 1.0/locations))
+                    place.objects.append(Object(object_name.data, 1.0/locations))
                     added = True
 
     # print rooms.rooms_vector
