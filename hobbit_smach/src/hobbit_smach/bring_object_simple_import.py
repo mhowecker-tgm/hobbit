@@ -19,6 +19,8 @@ from recognizer_msg_and_services.srv import recognize
 import hobbit_smach.hobbit_move_import as hobbit_move
 import uashh_smach.platform.move_base as move_base
 import hobbit_smach.head_move_import as head_move
+import hobbit_smach.speech_output_import as speech_output
+import hobbit_smach.locate_user_simple_import as locate_user
 import hobbit_smach.logging_import as log
 
 
@@ -446,9 +448,24 @@ def get_bring_object():
         smach.StateMachine.add(
             'OBJECT_DETECTION',
             detect_object(),
-            transitions={'succeeded': 'LOG_SUCCESS',
+            # TODO: s/TELL\_USER/GO_TO_USER/g
+            transitions={'succeeded': 'TELL_USER',
                          'preempted': 'LOG_PREEMPT',
                          'aborted': 'PLAN_PATH'}
+        )
+        smach.StateMachine.add(
+            'GO_TO_USER',
+            locate_user.get_detect_user(),
+            transitions={'succeeded': 'TELL_USER',
+                         'preempted': 'LOG_PREEMPT',
+                         'aborted': 'PLAN_PATH'}
+        )
+        smach.StateMachine.add(
+            'TELL_USER',
+            speech_output.say_text_found_object(),
+            transitions={'succeeded': 'LOG_SUCCESS',
+                         'preempted': 'LOG_PREEMPT',
+                         'failed': 'LOG_ABORTED'}
         )
         smach.StateMachine.add(
             'LOG_SUCCESS',

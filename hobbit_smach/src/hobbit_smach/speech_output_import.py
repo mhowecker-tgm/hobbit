@@ -63,6 +63,63 @@ def askYesNo(question='Text is missing'):
     return seq
 
 
+def say_text_found_object():
+    """
+    Return a SMACH Sequence that tells the user where the
+    object has been detected.
+    """
+
+    seq = Sequence(
+        outcomes=['succeeded', 'preempted', 'failed'],
+        connector_outcome='succeeded',
+        input_keys=['object_name']
+    )
+
+    with seq:
+        Sequence.add(
+            'TALK',
+            ShowInfoObject(info='Object found at')
+        )
+        Sequence.add(
+            'WAIT_FOR_MMUI',
+            HobbitMMUI.WaitforSoundEnd('/Event', Event),
+            transitions={'aborted': 'WAIT_FOR_MMUI',
+                         'succeeded': 'succeeded'})
+    return seq
+
+
+class ShowInfoFoundObject(State):
+
+    """
+    Class to interact with the MMUI
+    """
+
+    def __init__(self, info):
+        State.__init__(
+            self,
+            input_keys=['object_name', 'room_name', 'location_name'],
+            outcomes=['succeeded', 'failed', 'preempted']
+        )
+        self.info = info
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        print('ShowInfoFoundObject')
+        print(ud.object_name)
+        print(ud.room_name)
+        print(ud.location_name)
+        mmui = MMUI.MMUIInterface()
+        mmui.showMMUI_Info(
+            text=self.info,
+            prm=ud.object_name,
+            prm2=ud.room_name,
+            prm3=ud.location_name
+        )
+        return 'succeeded'
+
+
 def sayTextObject(info='Text is missing'):
     """
     Return a SMACH Sequence for speech output on the MMUI.

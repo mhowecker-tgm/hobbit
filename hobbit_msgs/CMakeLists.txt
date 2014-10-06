@@ -54,6 +54,7 @@ add_service_files(
   SingleShotPC.srv
   SwitchVision.srv
   Translate.srv
+  UpdateObject.srv
 )
 
 add_action_files(

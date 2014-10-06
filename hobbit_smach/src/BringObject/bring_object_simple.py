@@ -19,7 +19,7 @@ def main():
 
     bo_sm = StateMachine(
         outcomes=['succeeded', 'aborted', 'preempted'],
-        input_keys=['command'],
+        input_keys=['command', 'parameters'],
         output_keys=['result'])
 
     with bo_sm:
@@ -35,7 +35,8 @@ def main():
         'bring_object_simple', GeneralHobbitAction, bo_sm,
         ['succeeded'], ['aborted'], ['preempted'],
         result_slots_map={'result': 'result'},
-        goal_slots_map={'command': 'command'})
+        goal_slots_map={'command': 'command',
+                        'parameters': 'parameters'})
 
     sis = IntrospectionServer(
         'smach_server',
