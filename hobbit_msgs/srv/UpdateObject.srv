@@ -1,0 +1,5 @@
+string object_name
+string location_name
+string room_name
+---
+bool result
