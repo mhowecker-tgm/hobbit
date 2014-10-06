@@ -14,6 +14,7 @@ update_diff = 0.5
 # FILE = 'places.xml'
 # FILE = '/home/bajo/work/development/catkin/src/navigation/places.xml'
 FILE = '/opt/ros/hobbit_hydro/src/navigation/places.xml'
+FILE = '/opt/ros/hobbit_hydro/src/navigation/places_forth_22_9.xml'
 
 import sys
 import rospy
@@ -34,6 +35,18 @@ try:
     # print("running with lxml.etree")
 except ImportError:
     print("Failed to import ElementTree from any known place")
+
+
+def get_unicode(input_string):
+    try:
+        output_string = unicode(input_string, encoding='utf-8')
+        # print((output_string))
+        # print(type(output_string))
+        return output_string
+    except TypeError:
+        # print((input_string))
+        # print(type(input_string))
+        return input_string
 
 
 def prettify(elem):
@@ -75,7 +88,7 @@ def readXml(inFile):
             for place in places.findall('place'):
                 srv_place = Place()
                 name, types = place.find('name'),place.find('type')
-                srv_place.place_name = unicode(name.text, encoding='utf-8')
+                srv_place.place_name = get_unicode(name.text)
                 pose = place.find('pose')
                 srv_place.x = float(pose.attrib.get('x'))
                 srv_place.y = float(pose.attrib.get('y'))
@@ -141,9 +154,9 @@ def updateProb(obj, location, room_name, rooms):
     """ Update the probabilities of the given object for all possible locations.
     It will be lowered for all locations except the one it was found.
     """
-    obj = unicode(obj, 'utf-8')
-    location = unicode(location, 'utf-8')
-    room_name = unicode(room_name, 'utf-8')
+    obj = get_unicode(obj)
+    location = get_unicode(location)
+    room_name = get_unicode(room_name)
     global update_diff
     count = count_locations(rooms)
     if count == 0:
@@ -160,10 +173,7 @@ def updateProb(obj, location, room_name, rooms):
 
 
 def addObject(object_name, rooms):
-    obj_name= unicode(object_name.data, 'utf-8')
-    print(type(obj_name))
-    object_name.data = unicode(object_name.data, 'utf-8')
-    print(type(object_name.data))
+    obj_name = get_unicode(object_name.data)
     locations = count_locations(rooms)
     added = False
     for room in rooms.rooms_vector:
@@ -174,22 +184,23 @@ def addObject(object_name, rooms):
             else:
                 new = True
                 for obj in place.objects:
-                    if object_name.data in obj.name.data:
-                        print('addObject: ' + object_name.data + ' is already stored.')
+                    if object_name in obj.name.data:
+                        print('addObject: ' + object_name + ' is already stored.')
                         new = False
                 if new:
                     rospy.loginfo('Adding object')
                     place.objects.append(Object(object_name, 1.0/locations))
                     added = True
 
-    #print rooms.rooms_vector
+    # print rooms.rooms_vector
     return added
+
 
 def getObjectLocations(req):
     """ Given the name of an object its positions (room and location) are returned.
     """
     rospy.loginfo('/get_object_location: Request received')
-    query = unicode(req.object_name.data, encoding='utf-8')
+    query = get_unicode(req.object_name.data)
     places = []
     global rooms
     print 'Return all locations of requested object:',req.object_name.data
@@ -220,18 +231,19 @@ def get_room_name(req):
             return GetRoomNameResponse(String(room.room_name))
     return GetRoomNameResponse(String('UNKNOWN'))
 
+
 def getCoordinates(req):
     """ Given the name of the room and of the location their Pose is retrieved
     and returned
     """
     rospy.loginfo('/get_coordinates: Request received')
     global rooms
-    req_room = unicode(req.room_name.data, encoding='utf-8')
-    req_location = unicode(req.location_name.data, encoding='utf-8')
-    if req_room == 'dock' or req_room == None \
-        or 'call' in req_location or req_room == 'None':
+    req_room = get_unicode(req.room_name.data)
+    req_location = get_unicode(req.location_name.data)
+    if req_room == 'dock' or req_room is None \
+            or 'call' in req_location or req_room == 'None':
         if req_room == 'dock' or req_location == dock:
-            req_location = unicode('dock', encoding='utf-8')
+            req_location = get_unicode('dock')
         gen = (x for x in rooms.rooms_vector)
     else:
         gen = (x for x in rooms.rooms_vector if req_room in x.room_name)
@@ -283,7 +295,7 @@ def add_object_to_db(req):
 
 
 def clean_up():
-    rospy.loginfo(NAME + 'is shutting down. Saving places.xml')
+    rospy.loginfo(NAME + ' is shutting down. Saving places.xml')
     writeXml(FILE, rooms)
 
 
@@ -292,7 +304,8 @@ def update_object_prob(req):
     Update the probability of a detected object.
     Wrapped in a ROS service call.
     """
-    return updateProb(req.object_name, req.location_name, req.room_name)
+    global rooms
+    return updateProb(req.object_name, req.location_name, req.room_name, rooms)
 
 
 def main():
@@ -303,7 +316,7 @@ def main():
         rospy.signal_shutdown('No rooms were loaded. Check the input xml file')
     else:
         addObject(String('Häferl'), rooms)
-        updateProb('Häferl', 'side_desk', 'Küche', rooms)
+        # updateProb('Häferl', 'side_desk', 'Küche', rooms)
         writeXml(FILE, rooms)
         mug = GetObjectLocationsRequest()
         mug.object_name = String('mug')
