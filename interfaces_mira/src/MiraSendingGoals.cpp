@@ -81,6 +81,15 @@ void MiraSendingGoals::goal_status_channel_callback(mira::ChannelRead<std::strin
 		goal_status_pub.publish(goal_status);
 
 	}
+
+	if(data->value() == "TaskFailed")
+	{
+		goal_status.data = "aborted";
+		std::cout << "Goal aborted " << std::endl;
+		goal_status_pub.publish(goal_status);
+
+	}
+
 	if(data->value() == "NoData")
 	{
 		goal_status.data = "aborted";
