@@ -351,47 +351,47 @@ def main():
             Sequence.add(
                 'MMUI_SAY_GoingToPlace',
                 speech_output.sayTextRoom(info='T_GT_GoingToPlace'))
-	    Sequence.add(
-	        'TESTDATA',
-	        TestData(),
-	    )
-            Sequence.add(
-                'SET_NAV_GOAL',
-	        hobbit_move.get_set_nav_goal_state(),
-                transitions={'aborted': 'failed'}
-            )
-	    Sequence.add(
-	        'TESTDATA1',
-	        TestData(),
-	    )
-            Sequence.add(
-                'MOVE_TO_GOAL',
-                hobbit_move.goToPose(),
-                transitions={'aborted': 'EMO_SAD',
-                             'succeeded': 'EMO_HAPPY_1'}
-            )
-            Sequence.add(
-                'EMO_SAD',
-                #HobbitEmotions.ShowEmotions(emotion='EMO_SAD', emo_time=4))
-                HobbitEmotions.ShowEmotions(emotion='EMO_SAD', emo_time=1))
-            Sequence.add(
-                'MMUI_SAY_WayBlocked',
-                HobbitMMUI.ShowInfo(info='T_GT_WayBlocked'))
-                #speech_output.sayText(info='Way blocked'))
-            Sequence.add(
-                'SHOW_MENU_MAIN',
-                HobbitMMUI.ShowMenu(menu='MAIN'),
-                transitions={'succeeded': 'failed'})
-            Sequence.add(
-                'EMO_HAPPY_1',
-                #HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=4))
-                HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=1))
-            Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
+        Sequence.add(
+            'TESTDATA',
+            TestData(),
+        )
+        Sequence.add(
+            'SET_NAV_GOAL',
+            hobbit_move.get_set_nav_goal_state(),
+            transitions={'aborted': 'failed'}
+        )
+        Sequence.add(
+            'TESTDATA1',
+            TestData(),
+        )
+        Sequence.add(
+            'MOVE_TO_GOAL',
+            hobbit_move.goToPose(),
+            transitions={'aborted': 'EMO_SAD',
+                         'succeeded': 'EMO_HAPPY_1'}
+        )
+        Sequence.add(
+            'EMO_SAD',
+            #HobbitEmotions.ShowEmotions(emotion='EMO_SAD', emo_time=4))
+            HobbitEmotions.ShowEmotions(emotion='EMO_SAD', emo_time=1))
+        Sequence.add(
+            'MMUI_SAY_WayBlocked',
+            HobbitMMUI.ShowInfo(info='T_GT_WayBlocked'))
+            #speech_output.sayText(info='Way blocked'))
+        Sequence.add(
+            'SHOW_MENU_MAIN',
+            HobbitMMUI.ShowMenu(menu='MAIN'),
+            transitions={'succeeded': 'failed'})
+        Sequence.add(
+            'EMO_HAPPY_1',
+            #HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=4))
+            HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=1))
+        Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
                      head_move.MoveTo(pose='center_center'),
-                         transitions={'aborted': 'SHOW_MENU_MAIN_1'})
-            Sequence.add(
-                'SHOW_MENU_MAIN_1',
-                HobbitMMUI.ShowMenu(menu='MAIN'))
+                     transitions={'aborted': 'SHOW_MENU_MAIN_1'})
+        Sequence.add(
+            'SHOW_MENU_MAIN_1',
+            HobbitMMUI.ShowMenu(menu='MAIN'))
         StateMachine.add(
             'SET_SUCCESS',
             SetSuccess(),
