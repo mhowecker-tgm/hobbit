@@ -14,7 +14,8 @@ from uashh_smach.util import SleepState  # df 30.7.2014
 # import tf
 # import math
 from smach import StateMachine
-from smach_ros import ActionServerWrapper, IntrospectionServer, ServiceState
+from smach_ros import ActionServerWrapper, IntrospectionServer, ServiceState\
+    MonitorState
 
 from std_msgs.msg import String
 from hobbit_msgs.msg import GeneralHobbitAction
@@ -250,19 +251,31 @@ def main():
             ),
             connector_outcomes=['succeeded', 'preempted', 'aborted']
         )
-        StateMachine.add(
+        smach.StateMachine.add(
             'GET_POINTING_DIRECTION',
-            util.WaitForMsgState(
+            MonitorState(
                 '/pointEvents',
                 PointEvents,
-                msg_cb=pointevents_cb,
-                timeout=15,
+                cond_cb=pointevents_cb,
                 output_keys=['pointing_msg']
-                ),
-            transitions={'succeeded': 'START_LOOKING',
-                         'aborted': 'POINTING_COUNTER',
+            ),
+            transitions={'invalid': 'POINTING_COUNTER',
+                         'valid': 'START_LOOKING',
                          'preempted': 'preempted'}
         )
+        # StateMachine.add(
+        #     'GET_POINTING_DIRECTION',
+        #     util.WaitForMsgState(
+        #         '/pointEvents',
+        #         PointEvents,
+        #         msg_cb=pointevents_cb,
+        #         timeout=15,
+        #         output_keys=['pointing_msg']
+        #         ),
+        #     transitions={'succeeded': 'START_LOOKING',
+        #                  'aborted': 'POINTING_COUNTER',
+        #                  'preempted': 'preempted'}
+        # )
         StateMachine.add(
             'POINTING_COUNTER',
             PointingCounter(),
@@ -304,17 +317,29 @@ def main():
                          'preempted': 'preempted'}
             )
         # df END
-        StateMachine.add(
+        smach.StateMachine.add(
             'GET_POINT_CLOUD',
-            util.WaitForMsgState(
+            MonitorState(
                 '/headcam/depth_registered/points',
                 PointCloud2,
-                point_cloud_cb,
-                timeout=5,
-                output_keys=['cloud']),
-            transitions={'succeeded': 'LOOK_FOR_OBJECT',
-                         'aborted': 'GET_POINT_CLOUD',
-                         'preempted': 'preempted'})
+                cond_cb=point_cloud_cb,
+                output_keys=['cloud']
+            ),
+            transitions={'invalid': 'GET_POINT_CLOUD',
+                         'valid': 'LOOK_FOR_OBJECT',
+                         'preempted': 'preempted'}
+        )
+        # StateMachine.add(
+        #     'GET_POINT_CLOUD',
+        #     util.WaitForMsgState(
+        #         '/headcam/depth_registered/points',
+        #         PointCloud2,
+        #         point_cloud_cb,
+        #         timeout=5,
+        #         output_keys=['cloud']),
+        #     transitions={'succeeded': 'LOOK_FOR_OBJECT',
+        #                  'aborted': 'GET_POINT_CLOUD',
+        #                  'preempted': 'preempted'})
         StateMachine.add(
             'LOOK_FOR_OBJECT',
             pickup.DavidLookForObject(),

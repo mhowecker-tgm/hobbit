@@ -10,7 +10,7 @@ import math
 from hobbit_msgs.srv import SwitchVision, GetObjectLocations,\
     SwitchVisionRequest
 from std_msgs.msg import String
-from smach_ros import ServiceState
+from smach_ros import ServiceState, MonitorState
 from nav_msgs.srv import GetPlan, GetPlanRequest
 from geometry_msgs.msg import PoseStamped, Point, Quaternion
 from sensor_msgs.msg import PointCloud2
@@ -101,15 +101,26 @@ def detect_object():
                          'failure': 'aborted'})
         smach.StateMachine.add(
             'GET_POINT_CLOUD',
-            util.WaitForMsgState(
+            MonitorState(
                 '/headcam/depth_registered/points',
                 PointCloud2,
-                point_cloud_cb,
-                timeout=5,
-                output_keys=['cloud']),
-            transitions={'succeeded': 'START_OBJECT_RECOGNITION',
-                         'aborted': 'GET_POINT_CLOUD',
-                         'preempted': 'preempted'})
+                cond_cb=point_cloud_cb,
+                output_keys=['cloud']
+            ),
+            transitions={'invalid': 'GET_POINT_CLOUD',
+                         'valid': 'START_OBJECT_RECOGNITION',
+                         'preempted': 'preempted'}
+        )
+            # 'GET_POINT_CLOUD',
+            # util.WaitForMsgState(
+            #     '/headcam/depth_registered/points',
+            #     PointCloud2,
+            #     point_cloud_cb,
+            #     timeout=5,
+            #     output_keys=['cloud']),
+            # transitions={'succeeded': 'START_OBJECT_RECOGNITION',
+            #              'aborted': 'GET_POINT_CLOUD',
+            #              'preempted': 'preempted'})
         smach.StateMachine.add(
             'START_OBJECT_RECOGNITION',
             ServiceState(
