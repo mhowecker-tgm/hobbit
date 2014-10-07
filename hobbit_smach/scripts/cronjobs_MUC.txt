@@ -1,0 +1,7 @@
+# Put this cronjobs into your users crontab with the command
+# crontab -e
+# ONLY do this for the MUC enabled test group
+
+* 11 * * * /usr/bin/echo # proactive1
+* 16 * * * /usr/bin/echo # proactive1
+* 19 * * * /usr/bin/echo # proactive1

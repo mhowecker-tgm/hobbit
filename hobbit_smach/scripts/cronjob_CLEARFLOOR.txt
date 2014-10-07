@@ -1,0 +1,4 @@
+# Put this cronjob into your users crontab with the command
+# crontab -e
+
+* 14 * * * /opt/ros/hobbit_hydro/src/hobbit_smach/scrips/cron_CF.sh # clear floor

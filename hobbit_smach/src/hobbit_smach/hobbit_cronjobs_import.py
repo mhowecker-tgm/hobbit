@@ -101,12 +101,12 @@ def get_next_time():
 
 
 def check_sleep_times(next_time):
-    if rospy.has_param('/sleep_time'):
-        sleep_time = rospy.get_param('sleep_time')
+    if rospy.has_param('/Hobbit/sleep_time'):
+        sleep_time = rospy.get_param('/Hobbit/sleep_time')
     else:
         sleep_time = '22:00'
-    if rospy.has_param('wakeup_time'):
-        wakeup_time = rospy.get_param('wakeup_time')
+    if rospy.has_param('/Hobbit/wakeup_time'):
+        wakeup_time = rospy.get_param('/Hobbit/wakeup_time')
     else:
         wakeup_time = '06:30'
     sleep = sleep_time.split(':')
