@@ -22,8 +22,9 @@ cd $HOBBITDIR/src/rgbd_acquisition/bin
  
 echo "Doing a camera powercycle workaround for maximum robustness"
 
-LD_LIBRARY_PATH=. timeout 20 ./Grabber -module OPENNI2 -from "$DEVICE_BASE" -to /dev/null -maxFrames 30
-LD_LIBRARY_PATH=. timeout 20 ./Grabber -module OPENNI2 -from "$DEVICE_TOP" -to /dev/null -maxFrames 30
+LD_LIBRARY_PATH=. timeout 35 ./Grabber -module OPENNI2 -from "$DEVICE_BASE" -to /dev/null -maxFrames 30
+sleep 1
+LD_LIBRARY_PATH=. timeout 35 ./Grabber -module OPENNI2 -from "$DEVICE_TOP" -to /dev/null -maxFrames 30
 
 echo "Done " 
 exit 0
