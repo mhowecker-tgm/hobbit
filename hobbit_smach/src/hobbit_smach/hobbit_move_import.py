@@ -41,7 +41,7 @@ def battery_cb(msg, ud):
     print('Received battery_state message')
     print(msg.charging)
     rospy.sleep(2.0)
-    if msg.charging:
+    if msg.powerSupplyPresent:
         print('I am charging')
         return True
     else:
