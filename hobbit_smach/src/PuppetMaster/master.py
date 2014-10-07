@@ -136,6 +136,7 @@ def command_cb(msg, ud):
                 if item[0] == 'pickup':
                     i = item.index(input_ce)
                     ud.command = item[i - 6]
+                    rospy.loginfo('should be pickup now')
                 else:
                     ud.command = item[0]
                 ud.params = msg.params

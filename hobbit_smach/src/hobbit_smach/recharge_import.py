@@ -90,6 +90,14 @@ def getRecharge():
     seq.userdata.location_name = 'dock'
 
     with seq:
+        Sequence.add(
+            'SAY_TIRED',
+            speech_output.emo_say_something(
+                emo='TIRED',
+                time=0,
+                text='T_CH_MovingToChargingStation'
+            )
+        )
         if not DEBUG:
             Sequence.add(
                 'SET_NAV_GOAL',
