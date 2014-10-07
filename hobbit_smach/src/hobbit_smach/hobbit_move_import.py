@@ -39,13 +39,12 @@ def switch_vision_cb(ud, response):
 
 def battery_cb(msg, ud):
     print('Received battery_state message')
-    print(msg.charging)
     rospy.sleep(2.0)
     if msg.powerSupplyPresent:
-        print('I am charging')
+        print('I am in the docking station')
         return True
     else:
-        print('I am NOT charging')
+        print('I am outside of the docking station')
         return False
 
 
