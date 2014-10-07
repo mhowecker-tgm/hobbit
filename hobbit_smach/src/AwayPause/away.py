@@ -19,6 +19,7 @@ from smach import StateMachine, State, Sequence
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 import hobbit_smach.hobbit_move_import as hobbit_move
 import hobbit_smach.speech_output_import as speech_output
+import hobbit_smach.hobbit_cronjobs_import as cronjobs
 
 
 class bcolors:
@@ -300,7 +301,7 @@ def main():
         StateMachine.add(
             'CONFIRM_BRING_KEYS',
             HobbitMMUI.ConfirmInfo(info='T_BR_BringYourKeys'),
-            transitions={'succeeded': '',
+            transitions={'succeeded': 'SEQ1',
                          'failed': 'SET_FAILURE'}
         )
         StateMachine.add(
@@ -332,14 +333,6 @@ def main():
                 'SAY_GOOD_BYE_SLEEP',
                 speech_output.sayText(info='T_BR_Goodbye'),
                 transitions={'failed': 'failed'})
-            #Sequence.add(
-            #    'MMUI_SAY_GOOD_BYE_SLEEP',
-            #    HobbitMMUI.ShowInfo(info='T_BR_Goodbye')
-            #)
-            #Sequence.add(
-            #    'WAIT_FOR_MMUI',
-            #    HobbitMMUI.WaitforSoundEnd('/Event', Event, timeout=5),
-            #    transitions={'aborted': 'WAIT_FOR_MMUI'})
             Sequence.add(
                 'SET_NAV_GOAL',
                 hobbit_move.SetNavGoal(room='dock', place='dock')
@@ -348,8 +341,6 @@ def main():
                 'MOVE_TO_DOCK',
                 hobbit_move.goToPose(),
                 transitions={'aborted': 'failed'})
-            # Sequence.add('MOVE_TO_DOCK',
-            #              hobbit_move.goToPosition(room=None, place='dock'),
 
             seq2.userdata.text = 'Tell me when you are back/awake again.'
             # TODO: menu='MAIN' has to be changed to the 'User is back menu'
@@ -357,6 +348,10 @@ def main():
             Sequence.add(
                 'MMUI_SHOW_MENU_ME_BACK_AWAKE',
                 HobbitMMUI.ShowMenu(menu='MAIN'))
+            Sequence.add(
+                'SET_CRONJOB',
+                cronjobs.SleepAway()
+            )
         StateMachine.add(
             'SEQ2',
             seq2,
