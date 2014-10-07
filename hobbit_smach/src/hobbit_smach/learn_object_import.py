@@ -6,8 +6,6 @@ NAME = 'learn_object'
 DEBUG = False
 dir_param = '/hobbit/pcd_path'
 
-import roslib
-roslib.load_manifest(PKG)
 import rospy
 import os
 import glob
@@ -15,6 +13,7 @@ import shutil
 import random
 
 from smach import Sequence, Concurrence, State
+from smach_ros import MonitorState
 from sensor_msgs.msg import PointCloud2
 import uashh_smach.util as util
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
@@ -208,12 +207,19 @@ def getDataCW():
     with seq:
         Sequence.add(
             'GET_DATA',
-            util.WaitForMsgState('/headcam/depth_registered/points',
-                                 # util.WaitForMsgState('/camera/depth_registered/points',
-                                 PointCloud2,
-                                 msg_cb=msg_cb
-                                 ),
-            transitions={'aborted': 'GET_DATA'})
+            MonitorState(
+                '/headcam/depth_registered/points',
+                PointCloud2,
+                cond_cb=msg_cb
+            ),
+            # util.WaitForMsgState('/headcam/depth_registered/points',
+            #                      # util.WaitForMsgState('/camera/depth_registered/points',
+            #                      PointCloud2,
+            #                      msg_cb=msg_cb
+            #                      ),
+            # transitions={'aborted': 'GET_DATA'})
+            transitions={'invalid': 'GET_DATA',
+                         'valid': 'succeeded'})
 
     cc = Concurrence(
         outcomes=['succeeded', 'preempted', 'failed'],
@@ -260,12 +266,19 @@ def getDataCCW():
     with seq:
         Sequence.add(
             'GET_DATA',
-            util.WaitForMsgState('/headcam/depth_registered/points',
-                                 # util.WaitForMsgState('/camera/depth_registered/points',
-                                 PointCloud2,
-                                 msg_cb=msg_cb
-                                 ),
-            transitions={'aborted': 'GET_DATA'})
+            MonitorState(
+                '/headcam/depth_registered/points',
+                PointCloud2,
+                cond_cb=msg_cb
+            ),
+            transitions={'invalid': 'GET_DATA',
+                         'valid': 'succeeded'})
+            # util.WaitForMsgState('/headcam/depth_registered/points',
+            #                      # util.WaitForMsgState('/camera/depth_registered/points',
+            #                      PointCloud2,
+            #                      msg_cb=msg_cb
+            #                      ),
+            # transitions={'aborted': 'GET_DATA'})
 
     seq1 = Sequence(
         outcomes=['succeeded', 'preempted', 'failed'],
