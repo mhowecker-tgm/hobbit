@@ -307,7 +307,13 @@ if __name__ == '__main__':
 
     print "get arm act pos: ", arm_client.GetActualPosition()
     print "david last_feedb----------------------------------------------------------------------------------------------------ack: ", arm_client.last_feedback
+
+
     
+    exit()
+    
+
+
 
     raw_input("press key to get SetAbsolutePos (PreGraspFromFloorPos)")
     cmd = String ("SetAbsolutePos 69.7 43.4 86.3 134.3 107.6 4.0")
