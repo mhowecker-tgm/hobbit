@@ -14,6 +14,7 @@ update_diff = 0.5
 # FILE = 'places.xml'
 # FILE = '/home/bajo/work/development/catkin/src/navigation/places.xml'
 FILE = '/opt/ros/hobbit_hydro/src/navigation/places.xml'
+FILE = '/opt/ros/hobbit_hydro/src/navigation/places_forth_22_9.xml'
 
 import sys
 import rospy
@@ -241,7 +242,7 @@ def getCoordinates(req):
     req_location = get_unicode(req.location_name.data)
     if req_room == 'dock' or req_room is None \
             or 'call' in req_location or req_room == 'None':
-        if req_room == 'dock' or req_location == dock:
+        if req_room == 'dock' or req_location == 'dock':
             req_location = get_unicode('dock')
         gen = (x for x in rooms.rooms_vector)
     else:
