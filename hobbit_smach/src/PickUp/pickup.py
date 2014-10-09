@@ -14,9 +14,8 @@ from uashh_smach.util import SleepState  # df 30.7.2014
 # import tf
 # import math
 from smach import StateMachine
-from smach_ros import ActionServerWrapper, IntrospectionServer, ServiceState\
+from smach_ros import ActionServerWrapper, IntrospectionServer, ServiceState,\
     MonitorState
-
 from std_msgs.msg import String
 from hobbit_msgs.msg import GeneralHobbitAction
 from hobbit_msgs.srv import SwitchVision, SwitchVisionRequest
