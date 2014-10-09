@@ -78,7 +78,7 @@ def say_text_found_object():
     with seq:
         Sequence.add(
             'TALK',
-            ShowInfoObject(info='Object found at')
+            ShowInfoFoundObject()
         )
         Sequence.add(
             'WAIT_FOR_MMUI',
@@ -94,13 +94,13 @@ class ShowInfoFoundObject(State):
     Class to interact with the MMUI
     """
 
-    def __init__(self, info):
+    def __init__(self):
         State.__init__(
             self,
-            input_keys=['object_name', 'room_name', 'location_name'],
+            input_keys=['object_name', 'object_room', 'object_location'],
             outcomes=['succeeded', 'failed', 'preempted']
         )
-        self.info = info
+        self.info = 'T_BM_DidNotPickUpObject2'
 
     def execute(self, ud):
         if self.preempt_requested():
@@ -108,14 +108,14 @@ class ShowInfoFoundObject(State):
             return 'preempted'
         print('ShowInfoFoundObject')
         print(ud.object_name)
-        print(ud.room_name)
-        print(ud.location_name)
+        print(ud.object_room)
+        print(ud.object_location)
         mmui = MMUI.MMUIInterface()
         mmui.showMMUI_Info(
             text=self.info,
             prm=ud.object_name,
-            prm2=ud.room_name,
-            prm3=ud.location_name
+            prm2=ud.object_room,
+            prm3=ud.object_location
         )
         return 'succeeded'
 
