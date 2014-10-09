@@ -202,23 +202,28 @@ def get_surprise():
             return False
 
     with sm:
-        StateMachine.add_auto(
+        StateMachine.add(
             'RND_MENU',
             RandomMenu(),
-            connector_outcomes=['succeeded', 'aborted', 'preempted']
+            transitions={'succeeded': 'LOG_SUCCESS',
+                         'aborted': 'LOG_ABORT',
+                         'preempted': 'LOG_PREEMPT'}
         )
-        # StateMachine.add(
-        #     'WAIT_FOR_USER',
-        #     util.WaitForMsgState(
-        #         '/Event',
-        #         Event,
-        #         msg_cb,
-        #         timeout=30
-        #     ),
-        #     transitions={'succeeded': 'succeeded',
-        #                  'aborted': 'WAIT_FOR_USER',
-        #                  'preempted': 'preempted'}
-        # )
+        StateMachine.add(
+            'LOG_SUCCESS',
+            log.DoLogSuccess(scenario='Surprise'),
+            transitions={'succeeded': 'succeeded'}
+        )
+        StateMachine.add(
+            'LOG_PREEMPT',
+            log.DoLogPreempt(scenario='Surprise'),
+            transitions={'succeeded': 'preempted'}
+        )
+        StateMachine.add(
+            'LOG_ABORT',
+            log.DoLogAborted(scenario='Surprise'),
+            transitions={'succeeded': 'aborted'}
+        )
     return sm
 
 
@@ -336,6 +341,82 @@ def get_social_role_change():
         StateMachine.add(
             'LOG_ABORTED',
             log.DoLogPreempt(scenario='Social Role'),
+            transitions={'succeeded': 'aborted'}
+        )
+    return sm
+
+
+def get_reward_muc():
+    """
+    Return a SMACH Statemachine Says something nice. With MUC enabled
+    """
+    sm = StateMachine(
+        outcomes=['succeeded', 'aborted', 'preempted']
+    )
+
+    with sm:
+        StateMachine.add(
+            'REWARD',
+            speech_output.emo_say_something(
+                emo='HAPPY',
+                time=4,
+                text='T_RW_YouAreWelcome'
+            ),
+            transitions={'succeeded': 'LOG_SUCCESS',
+                         'aborted': 'LOG_ABORTED',
+                         'preempted': 'LOG_PREEMPT'}
+        )
+        StateMachine.add(
+            'LOG_SUCCESS',
+            log.DoLogSuccess(scenario='Reward MUC'),
+            transitions={'succeeded': 'succeeded'}
+        )
+        StateMachine.add(
+            'LOG_PREEMPT',
+            log.DoLogPreempt(scenario='Reward MUC'),
+            transitions={'succeeded': 'preempted'}
+        )
+        StateMachine.add(
+            'LOG_ABORTED',
+            log.DoLogAborted(scenario='Reward MUC'),
+            transitions={'succeeded': 'aborted'}
+        )
+    return sm
+
+
+def get_reward():
+    """
+    Return a SMACH Statemachine Says something nice. Without MUC enabled
+    """
+    sm = StateMachine(
+        outcomes=['succeeded', 'aborted', 'preempted']
+    )
+
+    with sm:
+        StateMachine.add(
+            'REWARD',
+            speech_output.emo_say_something(
+                emo='NEUTRAL',
+                time=4,
+                text='T_AnythingElse'
+            ),
+            transitions={'succeeded': 'LOG_SUCCESS',
+                         'aborted': 'LOG_ABORTED',
+                         'preempted': 'LOG_PREEMPT'}
+        )
+        StateMachine.add(
+            'LOG_SUCCESS',
+            log.DoLogSuccess(scenario='Reward'),
+            transitions={'succeeded': 'succeeded'}
+        )
+        StateMachine.add(
+            'LOG_PREEMPT',
+            log.DoLogPreempt(scenario='Reward'),
+            transitions={'succeeded': 'preempted'}
+        )
+        StateMachine.add(
+            'LOG_ABORTED',
+            log.DoLogAborted(scenario='Reward'),
             transitions={'succeeded': 'aborted'}
         )
     return sm

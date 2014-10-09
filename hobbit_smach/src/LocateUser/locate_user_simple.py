@@ -9,9 +9,9 @@ roslib.load_manifest(PKG)
 import rospy
 from smach import StateMachine
 from smach_ros import IntrospectionServer, ActionServerWrapper
-
 from hobbit_msgs.msg import GeneralHobbitAction
 import hobbit_smach.locate_user_simple_import as locate_user
+import hobbit_smach.logging_import as log
 
 
 def main():
@@ -26,9 +26,24 @@ def main():
         StateMachine.add(
             'LOCATE_USER',
             locate_user.get_detect_user(),
-            transitions={'succeeded': 'succeeded',
-                         'aborted': 'aborted',
-                         'preempted': 'preempted'}
+            transitions={'succeeded': 'LOG_SUCCESS',
+                         'aborted': 'LOG_ABORTED',
+                         'preempted': 'LOG_PREEMPT'}
+        )
+        StateMachine.add(
+            'LOG_SUCCESS',
+            log.DoLogSuccess(scenario='Locate user'),
+            transitions={'succeeded': 'succeeded'}
+        )
+        StateMachine.add(
+            'LOG_PREEMPT',
+            log.DoLogPreempt(scenario='Locate user'),
+            transitions={'succeeded': 'preempted'}
+        )
+        StateMachine.add(
+            'LOG_ABORTED',
+            log.DoLogAborted(scenario='Locate user'),
+            transitions={'succeeded': 'aborted'}
         )
 
     asw = ActionServerWrapper(

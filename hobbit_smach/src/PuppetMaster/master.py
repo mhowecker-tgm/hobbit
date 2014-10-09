@@ -590,7 +590,6 @@ def main():
         )
         StateMachine.add(
             'STOP',
-            # FakeForAllWithoutRunningActionSever(name='STOP'),
             helper.get_hobbit_full_stop(),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
@@ -657,20 +656,12 @@ def main():
         if MUC_ENABLED:
             StateMachine.add_auto(
                 'REWARD',
-                speech_output.emo_say_something(
-                    emo='HAPPY',
-                    time=4,
-                    text='T_RW_YouAreWelcome'
-                ),
+                social_role.get_reward_muc(),
                 connector_outcomes=['succeeded', 'aborted'])
         else:
             StateMachine.add_auto(
                 'REWARD',
-                speech_output.emo_say_something(
-                    emo='NEUTRAL',
-                    time=4,
-                    text='T_AnythingElse'
-                ),
+                social_role.get_reward(),
                 connector_outcomes=['succeeded', 'aborted'])
         StateMachine.add(
             'MAIN_MENU',

@@ -482,7 +482,7 @@ def get_bring_object():
         )
         smach.StateMachine.add(
             'LOG_SUCCESS',
-            log.DoLogPreempt(scenario='Bring object'),
+            log.DoLogSuccess(scenario='Bring object'),
             transitions={'succeeded': 'succeeded'}
         )
         smach.StateMachine.add(
@@ -492,7 +492,7 @@ def get_bring_object():
         )
         smach.StateMachine.add(
             'LOG_ABORTED',
-            log.DoLogPreempt(scenario='Bring object'),
+            log.DoLogAborted(scenario='Bring object'),
             transitions={'succeeded': 'aborted'}
         )
         smach.StateMachine.add(

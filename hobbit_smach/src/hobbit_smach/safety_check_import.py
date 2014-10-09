@@ -15,22 +15,13 @@ def get_safety_check():
         output_keys=['result'])
 
     with sm:
-        StateMachine.add(
-            'LOG_SAFETY_CHECK_START',
-            log.DoLog(
-                scenario='safety check',
-                data='Started'
-            ),
-            transitions={'succeeded': 'T_SC_CHECK_INITIATED',
-                         'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
-        )
         StateMachine.add_auto(
             'T_SC_CHECK_INITIATED',
             HobbitMMUI.ConfirmOk(text='T_SC_CHECKINITIATED'),
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'timeout': 'T_SC_CHECK_INITIATED',
                          '3times': 'USER_NOT_RESPONDING',
-                         'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add_auto(
             'T_SC_CHECK_CLOTHING',
@@ -38,7 +29,7 @@ def get_safety_check():
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'timeout': 'T_SC_CHECK_CLOTHING',
                          '3times': 'USER_NOT_RESPONDING',
-                         'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add_auto(
             'T_SC_CHECK_CLOTHING2',
@@ -46,7 +37,7 @@ def get_safety_check():
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'timeout': 'T_SC_CHECK_CLOTHING2',
                          '3times': 'USER_NOT_RESPONDING',
-                         'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add_auto(
             'T_SC_CHECK_CLOTHING3',
@@ -54,7 +45,7 @@ def get_safety_check():
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'timeout': 'T_SC_CHECK_CLOTHING3',
                          '3times': 'USER_NOT_RESPONDING',
-                         'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add_auto(
             'T_SC_CHECK_FLOORS',
@@ -62,7 +53,7 @@ def get_safety_check():
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'timeout': 'T_SC_CHECK_FLOORS',
                          '3times': 'USER_NOT_RESPONDING',
-                         'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add_auto(
             'T_SC_CHECK_FLOORS2',
@@ -70,7 +61,7 @@ def get_safety_check():
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'timeout': 'T_SC_CHECK_FLOORS2',
                          '3times': 'USER_NOT_RESPONDING',
-                         'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add_auto(
             'T_SC_LIGHTING',
@@ -78,7 +69,7 @@ def get_safety_check():
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'timeout': 'T_SC_LIGHTING',
                          '3times': 'USER_NOT_RESPONDING',
-                         'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add_auto(
             'T_SC_LIGHTING2',
@@ -86,7 +77,7 @@ def get_safety_check():
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'timeout': 'T_SC_LIGHTING2',
                          '3times': 'USER_NOT_RESPONDING',
-                         'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add_auto(
             'T_SC_HEALTH',
@@ -94,7 +85,7 @@ def get_safety_check():
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'timeout': 'T_SC_HEALTH',
                          '3times': 'USER_NOT_RESPONDING',
-                         'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add_auto(
             'T_SC_HEALTH2',
@@ -102,7 +93,7 @@ def get_safety_check():
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'timeout': 'T_SC_HEALTH2',
                          '3times': 'USER_NOT_RESPONDING',
-                         'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add_auto(
             'T_SC_HEALTH3',
@@ -110,7 +101,7 @@ def get_safety_check():
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'timeout': 'T_SC_HEALTH3',
                          '3times': 'USER_NOT_RESPONDING',
-                         'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add_auto(
             'T_SC_ROOMS',
@@ -118,7 +109,7 @@ def get_safety_check():
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'timeout': 'T_SC_ROOMS',
                          '3times': 'USER_NOT_RESPONDING',
-                         'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add_auto(
             'T_SC_LIVINGROOM',
@@ -126,7 +117,7 @@ def get_safety_check():
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'timeout': 'T_SC_LIVINGROOM',
                          '3times': 'USER_NOT_RESPONDING',
-                         'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add_auto(
             'T_SC_LIVINGROOM2',
@@ -134,7 +125,7 @@ def get_safety_check():
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'timeout': 'T_SC_LIVINGROOM2',
                          '3times': 'USER_NOT_RESPONDING',
-                         'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add_auto(
             'T_SC_LIVINGROOM3',
@@ -142,7 +133,7 @@ def get_safety_check():
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'timeout': 'T_SC_LIVINGROOM3',
                          '3times': 'USER_NOT_RESPONDING',
-                         'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add_auto(
             'T_SC_BEDROOM',
@@ -150,7 +141,7 @@ def get_safety_check():
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'timeout': 'T_SC_BEDROOM',
                          '3times': 'USER_NOT_RESPONDING',
-                         'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add_auto(
             'T_SC_BEDROOM2',
@@ -158,7 +149,7 @@ def get_safety_check():
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'timeout': 'T_SC_BEDROOM2',
                          '3times': 'USER_NOT_RESPONDING',
-                         'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add_auto(
             'T_SC_BEDROOM3',
@@ -166,7 +157,7 @@ def get_safety_check():
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'timeout': 'T_SC_BEDROOM3',
                          '3times': 'USER_NOT_RESPONDING',
-                         'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add_auto(
             'T_SC_KITCHEN',
@@ -174,7 +165,7 @@ def get_safety_check():
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'timeout': 'T_SC_KITCHEN',
                          '3times': 'USER_NOT_RESPONDING',
-                         'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add_auto(
             'T_SC_KITCHEN2',
@@ -182,7 +173,7 @@ def get_safety_check():
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'timeout': 'T_SC_KITCHEN2',
                          '3times': 'USER_NOT_RESPONDING',
-                         'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add_auto(
             'T_SC_KITCHEN3',
@@ -190,7 +181,7 @@ def get_safety_check():
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'timeout': 'T_SC_KITCHEN3',
                          '3times': 'USER_NOT_RESPONDING',
-                         'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add_auto(
             'T_SC_ANTEROOM',
@@ -198,7 +189,7 @@ def get_safety_check():
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'timeout': 'T_SC_ANTEROOM',
                          '3times': 'USER_NOT_RESPONDING',
-                         'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add_auto(
             'T_SC_ANTEROOM2',
@@ -206,7 +197,7 @@ def get_safety_check():
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'timeout': 'T_SC_ANTEROOM2',
                          '3times': 'USER_NOT_RESPONDING',
-                         'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add_auto(
             'T_SC_BATHROOM',
@@ -214,7 +205,7 @@ def get_safety_check():
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'timeout': 'T_SC_BATHROOM',
                          '3times': 'USER_NOT_RESPONDING',
-                         'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add_auto(
             'T_SC_BATHROOM2',
@@ -222,7 +213,7 @@ def get_safety_check():
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'timeout': 'T_SC_BATHROOM2',
                          '3times': 'USER_NOT_RESPONDING',
-                         'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add_auto(
             'T_SC_BATHROOM3',
@@ -230,7 +221,7 @@ def get_safety_check():
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'timeout': 'T_SC_BATHROOM3',
                          '3times': 'USER_NOT_RESPONDING',
-                         'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add_auto(
             'HAPPY_SAY',
@@ -240,35 +231,30 @@ def get_safety_check():
                 text='T_SC_CHECKFINISHED'
             ),
             connector_outcomes=['succeeded', 'aborted'],
-            transitions={'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
+            transitions={'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
-            'LOG_SAFETY_CHECK_END',
-            log.DoLog(
-                scenario='safety check',
-                data='Ended successfully.'
-            ),
-            transitions={'succeeded': 'succeeded',
-                         'preempted': 'LOG_SAFETY_CHECK_PREEMPT',
-                         'aborted': 'LOG_SAFETY_CHECK_PREEMPT'}
+            'LOG_SUCCESS',
+            log.DoLogSuccess(scenario='safety check'),
+            transitions={'succeeded': 'succeeded'}
         )
         StateMachine.add(
-            'LOG_SAFETY_CHECK_PREEMPT',
-            log.DoLog(
-                scenario='safety check',
-                data='Preempted.'
-            ),
-            transitions={'succeeded': 'preempted',
-                         'preempted': 'preempted',
-                         'aborted': 'preempted'}
+            'LOG_PREEMPT',
+            log.DoLogPreempt(scenario='safety check'),
+            transitions={'succeeded': 'preempted'}
+        )
+        StateMachine.add(
+            'LOG_ABORT',
+            log.DoLogAborted(scenario='safety check'),
+            transitions={'succeeded': 'aborted'}
         )
         StateMachine.add(
             'USER_NOT_RESPONDING',
             sos_call.get_call_sos_simple(),
-            transitions={'succeeded': 'aborted',
-                         'failed': 'LOG_SAFETY_CHECK_END',
-                         'aborted': 'LOG_SAFETY_CHECK_END',
-                         'preempted': 'LOG_SAFETY_CHECK_PREEMPT'}
+            transitions={'succeeded': 'LOG_ABORT',
+                         'failed': 'LOG_SUCCESS',
+                         'aborted': 'LOG_SUCCESS',
+                         'preempted': 'LOG_PREEMPT'}
         )
 
     return sm

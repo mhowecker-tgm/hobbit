@@ -5,6 +5,7 @@ from smach import State, Sequence
 from datetime import datetime, time
 from hobbit_user_interaction import HobbitMMUI
 import hobbit_smach.hobbit_move_import as hobbit_move
+import hobbit_smach.logging_import as log
 
 
 class TimeCheck(State):
@@ -78,6 +79,22 @@ def get_hobbit_full_stop():
         Sequence.add(
             'MAIN_MENU',
             HobbitMMUI.ShowMenu(menu='MAIN'),
-            transitions={'failed': 'aborted'}
+            transitions={'failed': 'LOG_ABORTED',
+                         'preempted': 'LOG_PREEMPT'}
+        )
+        Sequence.add(
+            'LOG_SUCCESS',
+            log.DoLogPreempt(scenario='Full Stop'),
+            transitions={'succeeded': 'succeeded'}
+        )
+        Sequence.add(
+            'LOG_PREEMPT',
+            log.DoLogPreempt(scenario='Full Stop'),
+            transitions={'succeeded': 'preempted'}
+        )
+        Sequence.add(
+            'LOG_ABORTED',
+            log.DoLogPreempt(scenario='Full Stop'),
+            transitions={'succeeded': 'aborted'}
         )
     return seq

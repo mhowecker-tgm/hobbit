@@ -20,6 +20,7 @@ from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 import hobbit_smach.hobbit_move_import as hobbit_move
 import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.hobbit_cronjobs_import as cronjobs
+import hobbit_smach.logging_import as log
 
 
 class bcolors:
@@ -249,7 +250,7 @@ def main():
         StateMachine.add(
             'UNTIL_MORNING',
             ParameterCheck(),
-            transitions={'preempted': 'preempted',
+            transitions={'preempted': 'LOG_PREEMPT',
                          'yes': 'ASK_Y_N_ACTIVITIES',
                          'no': 'ASK_Y_N_REMIND_SWITCH_OFF',
                          'failure': 'SET_FAILURE'}
@@ -259,7 +260,7 @@ def main():
             HobbitMMUI.AskYesNo(question='T_BR_RemindYouTomorrowActivities'),
             transitions={'yes': 'SEQ1',
                          'no': 'ASK_Y_N_REMIND_SWITCH_OFF',
-                         'preempted': 'preempted',
+                         'preempted': 'LOG_PREEMPT',
                          'failed': 'SET_FAILURE',
                          'timeout': 'ASK_Y_N_ACTIVITIES',
                          '3times': 'SET_FAILURE'}
@@ -281,7 +282,7 @@ def main():
             HobbitMMUI.AskYesNo(question='T_BR_RemindYouSwitchOff'),
             transitions={'yes': 'CONFIRM_SWITCH_OFF_OVEN',
                          'no': 'SEQ2',
-                         'preempted': 'preempted',
+                         'preempted': 'LOG_PREEMPT',
                          'failed': 'SET_FAILURE',
                          'timeout': 'ASK_Y_N_ACTIVITIES',
                          '3times': 'SET_FAILURE'}
@@ -309,7 +310,7 @@ def main():
             seq1,
             transitions={'succeeded': 'ASK_Y_N_REMIND_SWITCH_OFF',
                          'failed': 'SET_FAILURE',
-                         'preempted': 'preempted'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         #StateMachine.add(
         #    'EMO_HAPPY',
@@ -357,26 +358,41 @@ def main():
             seq2,
             transitions={'succeeded': 'SET_SUCCESS',
                          'failed': 'SET_FAILURE',
-                         'preempted': 'preempted'}
+                         'preempted': 'LOG_PREEMPT'}
         )
 
         StateMachine.add(
             'SET_SUCCESS',
             SetSuccess(),
-            transitions={'succeeded': 'succeeded',
+            transitions={'succeeded': 'LOG_SUCCESS',
                          'preempted': 'CLEAN_UP'}
         )
         StateMachine.add(
             'SET_FAILURE',
             SetFailure(),
-            transitions={'succeeded': 'failure',
-                         'preempted': 'preempted'}
+            transitions={'succeeded': 'LOG_ABORTED',
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'CLEAN_UP',
             CleanUp(),
-            transitions={'succeeded': 'preempted'})
-
+            transitions={'succeeded': 'LOG_PREEMPT'}
+        )
+        StateMachine.add(
+            'LOG_SUCCESS',
+            log.DoLogPreempt(scenario='away/sleep'),
+            transitions={'succeeded': 'succeeded'}
+        )
+        StateMachine.add(
+            'LOG_PREEMPT',
+            log.DoLogPreempt(scenario='away/sleep'),
+            transitions={'succeeded': 'preempted'}
+        )
+        StateMachine.add(
+            'LOG_ABORTED',
+            log.DoLogPreempt(scenario='away/sleep'),
+            transitions={'succeeded': 'failure'}
+        )
     asw = ActionServerWrapper(
         'away',
         GeneralHobbitAction,

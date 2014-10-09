@@ -115,17 +115,17 @@ def getRecharge():
                      transitions={'failed': 'aborted'})
         Sequence.add(
             'LOG_PREEMPT',
-            log.DoLogPreempt(scenario='Call Hobbit'),
+            log.DoLogPreempt(scenario='Recharge'),
             transitions={'succeeded': 'preempted'}
         )
         Sequence.add(
             'LOG_ABORT',
-            log.DoLogPreempt(scenario='Call Hobbit'),
+            log.DoLogPreempt(scenario='Recharge'),
             transitions={'succeeded': 'aborted'}
         )
         Sequence.add(
             'LOG_SUCCESS',
-            log.DoLogPreempt(scenario='Call Hobbit'),
+            log.DoLogPreempt(scenario='Recharge'),
             transitions={'succeeded': 'succeeded'}
         )
     return seq

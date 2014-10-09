@@ -192,12 +192,12 @@ def call_hobbit():
         )
         StateMachine.add(
             'LOG_ABORT',
-            log.DoLogPreempt(scenario='Call Hobbit'),
+            log.DoLogAborted(scenario='Call Hobbit'),
             transitions={'succeeded': 'aborted'}
         )
         StateMachine.add(
             'LOG_SUCCESS',
-            log.DoLogPreempt(scenario='Call Hobbit'),
+            log.DoLogSuccess(scenario='Call Hobbit'),
             transitions={'succeeded': 'succeeded'}
         )
 
