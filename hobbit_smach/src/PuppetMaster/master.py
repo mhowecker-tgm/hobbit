@@ -21,6 +21,7 @@ import hobbit_smach.call_hobbit_import as call_hobbit
 import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.social_role_import as social_role
 import hobbit_smach.end_interaction_import as end_interaction
+import hobbit_smach.logging_import as log
 import uashh_smach.util as util
 from hobbit_user_interaction import HobbitMMUI
 from hobbit_smach.bcolors import bcolors
@@ -231,7 +232,8 @@ class Init(State):
 
 
 class SelectTask(State):
-    """Select the task for execution
+    """
+    Select the task for execution
     """
     def __init__(self):
         State.__init__(
@@ -484,8 +486,12 @@ def main():
         )
 
     with sm2:
-        # sm2.userdata.room_name = 'dock'
-        # sm2.userdata.location_name = 'dock'
+        sm2.userdata.scenario = 'IDLE'
+        StateMachine.add_auto(
+            'LOG_TASK_STARTED',
+            log.DoLogStart(),
+            connector_outcomes=['succeeded', 'aborted']
+        )
         StateMachine.add(
             'SELECT_TASK',
             SelectTask(),
