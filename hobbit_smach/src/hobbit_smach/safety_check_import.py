@@ -3,7 +3,7 @@
 
 from smach import StateMachine
 from hobbit_user_interaction import HobbitMMUI
-import hobbit_smach.logging_import as logging
+import hobbit_smach.logging_import as log
 import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.sos_call_import as sos_call
 
@@ -17,7 +17,7 @@ def get_safety_check():
     with sm:
         StateMachine.add(
             'LOG_SAFETY_CHECK_START',
-            logging.DoLog(
+            log.DoLog(
                 scenario='safety check',
                 data='Started'
             ),
@@ -244,7 +244,7 @@ def get_safety_check():
         )
         StateMachine.add(
             'LOG_SAFETY_CHECK_END',
-            logging.DoLog(
+            log.DoLog(
                 scenario='safety check',
                 data='Ended successfully.'
             ),
@@ -254,7 +254,7 @@ def get_safety_check():
         )
         StateMachine.add(
             'LOG_SAFETY_CHECK_PREEMPT',
-            logging.DoLog(
+            log.DoLog(
                 scenario='safety check',
                 data='Preempted.'
             ),

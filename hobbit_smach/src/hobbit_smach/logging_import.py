@@ -56,8 +56,8 @@ class DoLogPreempt(DoLog):
         State.__init__(
             self,
             outcomes=['succeeded'],
-            input_keys=['scenario', 'data'] if
-            (scenario is None) else []
+            input_keys=['scenario', 'data', 'command'] if
+            (scenario is not None) else []
         )
         self.scenario = scenario
         self.data = 'Task has preempted.'
@@ -73,8 +73,8 @@ class DoLogSuccess(DoLog):
         State.__init__(
             self,
             outcomes=['succeeded'],
-            input_keys=['scenario', 'data'] if
-            (scenario is None) else []
+            input_keys=['scenario', 'data', 'command'] if
+            (scenario is not None) else []
         )
         self.scenario = scenario
         self.data = 'Task has succeeded.'
@@ -89,9 +89,9 @@ class DoLogAborted(DoLog):
     def __init__(self, scenario=None):
         State.__init__(
             self,
-            outcomes=['succeeded'],
-            input_keys=['scenario', 'data'] if
-            (scenario is None) else []
+            outcomes=['succeeded', 'aborted'],
+            input_keys=['scenario', 'data', 'command'] if
+            (scenario is not None) else []
         )
         self.scenario = scenario
         self.data = 'Task has aborted.'
