@@ -16,6 +16,7 @@ from smach import StateMachine, State
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 import hobbit_smach.sos_call_import as sos_call
 import hobbit_smach.speech_output_import as speech_output
+import hobbit_smach.logging_import as log
 from datetime import datetime, time
 import hobbit_smach.aal_lights_import as aal_lights
 
@@ -215,7 +216,7 @@ def main():
             transitions={'day': 'EMO_CONCERNED',
                          'night': 'ACTIVATE_LIGHTS',
                          'canceled': 'CLEAN_UP',
-                         # 'preempted': 'preempted'
+                         # 'preempted': 'LOG_PREEMPT'
                          }
         )
         StateMachine.add(
@@ -223,13 +224,13 @@ def main():
             aal_lights.SetLights(active=True),
             transitions={'succeeded': 'MMUI_CONFIRM_DoYouNeedHelp',
                          'failed': 'MMUI_CONFIRM_DoYouNeedHelp',
-                         'preempted': 'preempted'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'EMO_CONCERNED',
             HobbitEmotions.ShowEmotions(emotion='CONCERNED', emo_time=0),
             transitions={'succeeded': 'MMUI_CONFIRM_DoYouNeedHelp',
-                         'preempted': 'preempted',
+                         'preempted': 'LOG_PREEMPT',
                          'failed': 'SET_FAILURE'}
         )
         StateMachine.add(
@@ -255,7 +256,7 @@ def main():
             # HobbitMMUI.ShowInfo(info='T_HM_YouCanGetHelpAnytime'),
             speech_output.sayText(info='T_HM_YouCanGetHelpAnytime'),
             transitions={'succeeded': 'EMO_NEUTRAL',
-                         'preempted': 'preempted',
+                         'preempted': 'LOG_PREEMPT',
                          'failed': 'SET_FAILURE'}
         )
         StateMachine.add(
@@ -263,7 +264,7 @@ def main():
             sos_call.get_call_sos_simple(),
             transitions={'succeeded': 'SET_SUCCESS',
                          'failed': 'SET_FAILURE',
-                         'preempted': 'preempted',
+                         'preempted': 'LOG_PREEMPT',
                          'aborted': 'SET_SUCCESS'}
         )
         StateMachine.add(
@@ -271,31 +272,46 @@ def main():
             HobbitEmotions.ShowEmotions(emotion='NEUTRAL', emo_time=0),
             transitions={'succeeded': 'MMUI_MAIN_MENU',
                          'failed': 'SET_FAILURE',
-                         'preempted': 'preempted'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'MMUI_MAIN_MENU',
             HobbitMMUI.ShowMenu(menu='MAIN'),
             transitions={'succeeded': 'SET_SUCCESS',
-                         'preempted': 'preempted',
+                         'preempted': 'LOG_PREEMPT',
                          'failed': 'SET_FAILURE'}
         )
         StateMachine.add(
             'SET_SUCCESS',
             SetSuccess(),
-            transitions={'succeeded': 'succeeded',
+            transitions={'succeeded': 'LOG_SUCCESS',
                          'preempted': 'CLEAN_UP'}
         )
         StateMachine.add(
             'SET_FAILURE',
             SetFailure(),
-            transitions={'succeeded': 'failure',
-                         'preempted': 'preempted'}
+            transitions={'succeeded': 'LOG_ABORT',
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'CLEAN_UP',
             CleanUp(),
-            transitions={'succeeded': 'preempted'})
+            transitions={'succeeded': 'LOG_PREEMPT'})
+        StateMachine.add(
+            'LOG_SUCCESS',
+            log.DoLogSuccess(scenario='emergency user initiated'),
+            transitions={'succeeded': 'succeeded'}
+        )
+        StateMachine.add(
+            'LOG_PREEMPT',
+            log.DoLogPreempt(scenario='emergency user initiated'),
+            transitions={'succeeded': 'preempted'}
+        )
+        StateMachine.add(
+            'LOG_ABORT',
+            log.DoLogAborted(scenario='emergency user initiated'),
+            transitions={'succeeded': 'failure'}
+        )
 
     asw = ActionServerWrapper(
         'emergency_user',

@@ -19,6 +19,7 @@ import hobbit_smach.sos_call_import as sos_call
 import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.hobbit_move_import as hobbit_move
 import hobbit_smach.aal_lights_import as aal_lights
+import hobbit_smach.logging_import as log
 
 
 class Init(State):
@@ -243,13 +244,13 @@ def main():
             aal_lights.SetLights(active=True),
             transitions={'succeeded': 'MMUI_SAY_YesIAmComing',
                          'failed': 'MMUI_SAY_YesIAmComing',
-                         'preempted': 'preempted'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'MMUI_SAY_YesIAmComing',
             speech_output.sayText(info='T_HM_YesIAmComing'),
             transitions={'succeeded': 'MOVE_TO_BATHROOM',
-                         'preempted': 'preempted',
+                         'preempted': 'LOG_PREEMPT',
                          'failed': 'SET_FAILURE'}
         )
         if not DEBUG:
@@ -265,7 +266,7 @@ def main():
                 Dummy(),
                 transitions={'succeeded': 'MMUI_CONFIRM_DoYouNeedHelp',
                              'failed': 'SET_FAILURE',
-                             'preempted': 'preempted'}
+                             'preempted': 'LOG_PREEMPT'}
             )
         # TODO: Change volume to maximum
         StateMachine.add(
@@ -292,7 +293,7 @@ def main():
             sos_call.get_call_sos_simple(),
             transitions={'succeeded': 'MMUI_MAIN_MENU_1',
                          'failed': 'SET_FAILURE',
-                         'preempted': 'preempted',
+                         'preempted': 'LOG_PREEMPT',
                          'aborted': 'SET_SUCCESS'}
         )
         StateMachine.add(
@@ -300,13 +301,13 @@ def main():
             HobbitEmotions.ShowEmotions(emotion='NEUTRAL', emo_time=0),
             transitions={'succeeded': 'MMUI_MAIN_MENU',
                          'failed': 'SET_FAILURE',
-                         'preempted': 'preempted'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'MMUI_MAIN_MENU',
             HobbitMMUI.ShowMenu(menu='MAIN'),
             transitions={'succeeded': 'MMUI_SAY_YouCanGetHelpAnytime',
-                         'preempted': 'preempted',
+                         'preempted': 'LOG_PREEMPT',
                          'failed': 'SET_FAILURE'}
         )
         StateMachine.add(
@@ -318,45 +319,60 @@ def main():
             ),
             transitions={'succeeded': 'SET_SUCCESS',
                          'aborted': 'SET_FAILURE',
-                         'preempted': 'preempted'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'MMUI_SAY_YouCanGetHelpAnytime',
             speech_output.sayText(info='T_HM_YouCanGetHelpAnytime'),
             transitions={'succeeded': 'MMUI_MAIN_MENU_1',
-                         'preempted': 'preempted',
+                         'preempted': 'LOG_PREEMPT',
                          'failed': 'SET_FAILURE'}
         )
         StateMachine.add(
             'MMUI_MAIN_MENU_1',
             HobbitMMUI.ShowMenu(menu='MAIN'),
             transitions={'succeeded': 'SET_SUCCESS',
-                         'preempted': 'preempted',
+                         'preempted': 'LOG_PREEMPT',
                          'failed': 'SET_FAILURE'}
         )
         StateMachine.add(
             'EMO_NEUTRAL1',
             HobbitEmotions.ShowEmotions(emotion='NEUTRAL', emo_time=0),
-            transitions={'succeeded': 'succeeded',
+            transitions={'succeeded': 'SET_SUCCESS',
                          'failed': 'SET_FAILURE',
-                         'preempted': 'preempted'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'SET_SUCCESS',
             SetSuccess(),
-            transitions={'succeeded': 'succeeded',
+            transitions={'succeeded': 'LOG_SUCCESS',
                          'preempted': 'CLEAN_UP'}
         )
         StateMachine.add(
             'SET_FAILURE',
             SetFailure(),
-            transitions={'succeeded': 'failure',
-                         'preempted': 'preempted'}
+            transitions={'succeeded': 'LOG_ABORT',
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'CLEAN_UP',
             CleanUp(),
             transitions={'succeeded': 'preempted'})
+        StateMachine.add(
+            'LOG_SUCCESS',
+            log.DoLogSuccess(scenario='emergency bathroom'),
+            transitions={'succeeded': 'succeeded'}
+        )
+        StateMachine.add(
+            'LOG_PREEMPT',
+            log.DoLogPreempt(scenario='emergency bathroom'),
+            transitions={'succeeded': 'preempted'}
+        )
+        StateMachine.add(
+            'LOG_ABORT',
+            log.DoLogAborted(scenario='emergency bathrom'),
+            transitions={'succeeded': 'failure'}
+        )
 
     asw = ActionServerWrapper(
         'emergency_bathroom',

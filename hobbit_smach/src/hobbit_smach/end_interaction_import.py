@@ -24,7 +24,7 @@ def end_interaction_muc():
 
         StateMachine.add(
             'OFFER_RETURN_OF_FAVOUR',
-            HobbitMMUI.AskYesNo(question='T_CA_OfferReturnOfFavour'),
+            HobbitMMUI.AskYesNo(question='T_OfferReturnOfFavour'),
             transitions={'yes': 'aborted',
                          'timeout': 'OFFER_RETURN_OF_FAVOUR',
                          '3times': 'aborted',

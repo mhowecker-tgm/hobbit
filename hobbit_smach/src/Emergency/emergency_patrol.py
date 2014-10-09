@@ -261,16 +261,6 @@ def main():
             StateMachine.add(
                 'LOCATE_USER',
                 locate_user.get_detect_user(),
-                transitions={'succeeded': '',
-                             'aborted': 'CLEAN_UP',
-                             'preempted': 'preempted'}
-            )
-            StateMachine.add(
-                'APPROACH_USER',
-                SimpleActionState(
-                    'approach_user',
-                    GeneralHobbitAction,
-                    goal=GeneralHobbitGoal(command=String('approach'))),
                 transitions={'succeeded': 'SAY_CanIDoAnythingForYou',
                              'aborted': 'CLEAN_UP',
                              'preempted': 'preempted'}

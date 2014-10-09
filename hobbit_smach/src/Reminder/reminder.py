@@ -228,7 +228,7 @@ def main():
             transitions={'succeeded': 'LOG_PREEMPT'})
         StateMachine.add(
             'LOG_SUCCESS',
-            log.DoLogPreempt(scenario='Reminder'),
+            log.DoLogSuccess(scenario='Reminder'),
             transitions={'succeeded': 'succeeded'}
         )
         StateMachine.add(
@@ -238,7 +238,7 @@ def main():
         )
         StateMachine.add(
             'LOG_ABORT',
-            log.DoLogPreempt(scenario='Reminder'),
+            log.DoLogAborted(scenario='Reminder'),
             transitions={'succeeded': 'failure'}
         )
 

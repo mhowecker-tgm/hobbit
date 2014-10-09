@@ -55,7 +55,7 @@ class ObjectDetected(smach.State):
             self,
             outcomes=['succeeded', 'aborted', 'preempted'],
             input_keys=['ids', 'transforms', 'object_name', 'object_pose'],
-            output_keys=['object_pose'])
+            output_keys=['object_pose', 'object_room', 'object_location'])
 
     def execute(self, ud):
         rospy.loginfo('Did we find the object?')
@@ -83,7 +83,9 @@ def point_cloud_cb(msg, ud):
 
 def detect_object():
     sm = smach.StateMachine(
-        outcomes=['succeeded', 'preempted', 'aborted']
+        outcomes=['succeeded', 'preempted', 'aborted'],
+        input_keys=['object_name'],
+        output_keys=['object_pose', 'object_room', 'object_location']
     )
 
     with sm:
@@ -473,7 +475,7 @@ def get_bring_object():
         )
         smach.StateMachine.add(
             'TELL_USER',
-            speech_output.say_text_found_object(),
+            speech_output.ShowInfoFoundObject(),
             transitions={'succeeded': 'LOG_SUCCESS',
                          'preempted': 'LOG_PREEMPT',
                          'failed': 'LOG_ABORTED'}

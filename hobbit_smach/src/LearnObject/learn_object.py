@@ -20,7 +20,7 @@ import hobbit_smach.learn_object_import as learn_object
 import hobbit_smach.head_move_import as head_move
 import hobbit_smach.arm_move_import as arm_move
 import hobbit_smach.speech_output_import as speech_output
-# import hobbit_smach.hobbit_move_import as hobbit_move
+import hobbit_smach.logging_import as log
 
 
 def switch_vision_cb(ud, response):
@@ -57,7 +57,7 @@ class Init(State):
     def __init__(self):
         State.__init__(
             self,
-            outcomes=['succeeded', 'failure'],
+            outcomes=['succeeded'],
             output_keys=['social_role', 'block_counter'])
 
     def execute(self, ud):
@@ -170,7 +170,7 @@ def main():
     rospy.init_node(NAME)
 
     learn_object_sm = StateMachine(
-        outcomes=['succeeded', 'failure', 'preempted'],
+        outcomes=['succeeded', 'aborted', 'preempted'],
         input_keys=['command', 'previous_state', 'parameters'],
         output_keys=['result'])
 
@@ -487,9 +487,9 @@ def main():
         StateMachine.add(
             'MAIN_MENU',
             HobbitMMUI.ShowMenu(menu='MAIN'),
-            transitions={'succeeded': 'failure',
+            transitions={'succeeded': 'LOG_ABORTED',
                          'preempted': 'preempted',
-                         'failed': 'failure'}
+                         'failed': 'LOG_ABORTED'}
         )
         StateMachine.add(
             'CLEAN_UP',
@@ -502,12 +502,27 @@ def main():
                          'failed': 'SET_FAILURE',
                          'preempted': 'SET_FAILURE'}
         )
+        StateMachine.add(
+            'LOG_SUCCESS',
+            log.DoLogSuccess(scenario='learn object'),
+            transitions={'succeeded': 'succeeded'}
+        )
+        StateMachine.add(
+            'LOG_ABORTED',
+            log.DoLogAborted(scenario='learn object'),
+            transitions={'succeeded': 'aborted'}
+        )
+        StateMachine.add(
+            'LOG_PREEMPTED',
+            log.DoLogPreempt(scenario='learn object'),
+            transitions={'succeeded': 'preempted'}
+        )
 
     asw = ActionServerWrapper(
         'learn_object',
         GeneralHobbitAction,
         learn_object_sm,
-        ['succeeded'], ['failure'], ['preempted'],
+        ['succeeded'], ['aborted'], ['preempted'],
         result_slots_map={'result': 'result'},
         goal_slots_map={'command': 'command',
                         'previous_state': 'previous_state',

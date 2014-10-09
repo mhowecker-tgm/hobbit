@@ -27,7 +27,7 @@ import hobbit_smach.head_move_import as head_move
 # import hobbit_smach.arm_move_import as arm_move
 import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.pickup_import as pickup
-import hobbit_smach.return_of_favour_import as return_of_favour
+import hobbit_smach.logging_import as log
 
 
 def switch_vision_cb(ud, response):
@@ -260,7 +260,7 @@ def main():
             ),
             transitions={'invalid': 'POINTING_COUNTER',
                          'valid': 'START_LOOKING',
-                         'preempted': 'preempted'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         # StateMachine.add(
         #     'GET_POINTING_DIRECTION',
@@ -273,7 +273,7 @@ def main():
         #         ),
         #     transitions={'succeeded': 'START_LOOKING',
         #                  'aborted': 'POINTING_COUNTER',
-        #                  'preempted': 'preempted'}
+        #                  'preempted': 'LOG_PREEMPT'}
         # )
         StateMachine.add(
             'POINTING_COUNTER',
@@ -286,7 +286,7 @@ def main():
             pickup.sayPointingGestureNotDetected1(),
             transitions={'yes': 'GET_POINTING_DIRECTION',
                          'no': 'POINTING_NOT_DETECTED_2',
-                         'preempted': 'preempted',
+                         'preempted': 'LOG_PREEMPT',
                          'failed': 'POINTING_NOT_DETECTED_2'}
         )
         StateMachine.add(
@@ -306,14 +306,14 @@ def main():
             head_move.MoveTo(pose='to_grasp'),  # wait=True <=> df
             transitions={'succeeded': 'WAIT_FINISH_HEAD_TO_SEARCH', # df
                          'aborted': 'EMO_SAY_OBJECT_NOT_DETECTED',
-                         'preempted': 'preempted'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         # df 30.7.2014
         StateMachine.add(
             'WAIT_FINISH_HEAD_TO_SEARCH',
             SleepState(duration=10),
             transitions={'succeeded': 'GET_POINT_CLOUD',
-                         'preempted': 'preempted'}
+                         'preempted': 'LOG_PREEMPT'}
             )
         # df END
         smach.StateMachine.add(
@@ -326,7 +326,7 @@ def main():
             ),
             transitions={'invalid': 'GET_POINT_CLOUD',
                          'valid': 'LOOK_FOR_OBJECT',
-                         'preempted': 'preempted'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         # StateMachine.add(
         #     'GET_POINT_CLOUD',
@@ -338,27 +338,27 @@ def main():
         #         output_keys=['cloud']),
         #     transitions={'succeeded': 'LOOK_FOR_OBJECT',
         #                  'aborted': 'GET_POINT_CLOUD',
-        #                  'preempted': 'preempted'})
+        #                  'preempted': 'LOG_PREEMPT'})
         StateMachine.add(
             'LOOK_FOR_OBJECT',
             pickup.DavidLookForObject(),
             transitions={'succeeded': 'EMO_SAY_OBJECT_FOUND',
                          'failed': 'EMO_SAY_OBJECT_NOT_DETECTED',
-                         'preempted': 'preempted'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         # StateMachine.add(
         #    'CALC_GRASP_POSE',
         #    pickup.DavidCalcGraspPose(),
         #    transitions={'succeeded': 'EMO_SAY_OBJECT_FOUND',
         #                 'aborted': 'EMO_SAY_OBJECT_NOT_DETECTED',
-        #                 'preempted': 'preempted'}
+        #                 'preempted': 'LOG_PREEMPT'}
         # )
         StateMachine.add(
             'EMO_SAY_OBJECT_NOT_DETECTED',
             pickup.sayObjectNotDetected1(),
             transitions={'yes': 'GET_POINTING_DIRECTION',
                          'no': 'POINTING_NOT_DETECTED_2',
-                         'preempted': 'preempted',
+                         'preempted': 'LOG_PREEMPT',
                          'failed': 'POINTING_NOT_DETECTED_2'}
         )
         StateMachine.add(
@@ -372,7 +372,7 @@ def main():
             hobbit_move.goToPoseSilent(),
             transitions={'succeeded': 'SAY_PICKING_UP',
                          'aborted': 'MOVE_COUNTER',
-                         'preempted': 'preempted'},
+                         'preempted': 'LOG_PREEMPT'},
             remapping={'x': 'goal_position_x',
                        'y': 'goal_position_y',
                        'yaw': 'goal_position_yaw'}
@@ -389,21 +389,21 @@ def main():
             transitions={'yes': 'MOVE_TO_GRASP_POSE',
                          'no': 'EMO_SAY_TRY_TO_REMOVE_OBJECT',
                          'failed': 'EMO_SAY_TRY_TO_REMOVE_OBJECT',
-                         'preempted': 'preempted'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'EMO_SAY_TRY_TO_REMOVE_OBJECT',
             pickup.sayTryToRemoveObject(),
             transitions={'succeeded': 'aborted',
                          'failed': 'aborted',
-                         'preempted': 'preempted'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'SAY_PICKING_UP',
             speech_output.sayText(info='T_PU_PickingUpObject'),
             transitions={'succeeded': 'GRASP_OBJECT',
                          'failed': 'EMO_SAY_DID_NOT_PICKUP',
-                         'preempted': 'preempted'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'GRASP_OBJECT',
@@ -411,7 +411,7 @@ def main():
             # pickup.DavidPickingUp(),
             transitions={'succeeded': 'CHECK_GRASP',
                          'failed': 'EMO_SAY_DID_NOT_PICKUP',
-                         'preempted': 'preempted'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'SAY_CHECK_GRASP',
@@ -448,39 +448,47 @@ def main():
             pickup.getEndPickupSeq(),
             transitions={'succeeded': 'CHECK_HELP',
                          'failed': 'EMO_SAY_DID_NOT_PICKUP',
-                         'preempted': 'preempted'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'CHECK_HELP',
             CheckHelpAccepted(),
             transitions={'yes': 'SAY_THANK_YOU',
                          'no': 'SET_SUCCESS',
-                         'preempted': 'preempted'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'SAY_THANK_YOU',
             speech_output.sayText(info='T_PU_ThankYouPointing'),
-            transitions={'succeeded': 'OFFER_RETURN_OF_FAVOR',
-                         'failed': 'OFFER_RETURN_OF_FAVOR',
-                         'preempted': 'preempted'}
-        )
-        StateMachine.add(
-            'OFFER_RETURN_OF_FAVOR',
-            return_of_favour.offer(rof='pickup'),
             transitions={'succeeded': 'SET_SUCCESS',
                          'failed': 'SET_SUCCESS',
-                         'preempted': 'preempted'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'SET_SUCCESS',
             SetSuccess(),
-            transitions={'succeeded': 'succeeded',
+            transitions={'succeeded': 'LOG_SUCCESS',
                          'preempted': 'CLEAN_UP'}
         )
         StateMachine.add(
             'CLEAN_UP',
             CleanUp(),
+            transitions={'succeeded': 'LOG_PREEMPT'}
+        )
+        StateMachine.add(
+            'LOG_SUCCESS',
+            log.DoLogSuccess(scenario='Pickup'),
+            transitions={'succeeded': 'succeeded'}
+        )
+        StateMachine.add(
+            'LOG_PREEMPT',
+            log.DoLogPreempt(scenario='Pickup'),
             transitions={'succeeded': 'preempted'}
+        )
+        StateMachine.add(
+            'LOG_ABORT',
+            log.DoLogAborted(scenario='Pickup'),
+            transitions={'succeeded': 'aborted'}
         )
 
     asw = ActionServerWrapper(
