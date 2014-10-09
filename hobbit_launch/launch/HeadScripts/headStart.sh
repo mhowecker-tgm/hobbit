@@ -31,8 +31,9 @@ env
 echo "We are user"
 whoami
 
+sudo /etc/init.d/chrony stop #starts chrony df 10.7.2014 [sudo needed missing?]
 sudo ntpdate 192.168.2.122 # synchronizes time with xpc
-/etc/init.d/chrony start #starts chrony df 10.7.2014 [sudo needed missing?]
+sudo /etc/init.d/chrony start #starts chrony df 10.7.2014 [sudo needed missing?]
 
 echo "Starting blue_eyes"
 #screen -d -m -S "blue_eyes" /bin/bash -c "source /home/pi/.bashrc && source /home/pi/ros/setup.bash && rosrun blue_eyes blue_eyes.py"
