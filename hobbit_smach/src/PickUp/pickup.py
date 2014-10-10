@@ -28,6 +28,7 @@ import hobbit_smach.head_move_import as head_move
 import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.pickup_import as pickup
 import hobbit_smach.logging_import as log
+from hobbit_smach.helper_import import WaitForMsgState
 
 
 def switch_vision_cb(ud, response):
@@ -54,17 +55,19 @@ class bcolors:
         self.ENDC = ''
 
 
-def pointevents_cb(msg, ud):
+#def pointevents_cb(msg, ud):
+def pointevents_cb(ud, msg):
     print('pointevents_cb')
     print(msg)
     ud.pointing_msg = msg
-    return True
+    return False
 
 
-def point_cloud_cb(msg, ud):
+#def point_cloud_cb(msg, ud):
+def point_cloud_cb(ud, msg):
     print('point cloud received')
     ud.cloud = msg
-    return True
+    return False
 
 
 class CheckHelpAccepted(smach.State):
@@ -181,11 +184,12 @@ class SetSuccess(smach.State):
         smach.State.__init__(self, outcomes=['succeeded', 'preempted'],
                              input_keys=['result'],
                              output_keys=['result', 'visited_places'])
-        self.pub = rospy.Publisher('/DiscreteMotionCmd', String, queue_size=50)
 
     def execute(self, ud):
         ud.visited_places = []
-        self.pub.publish('Stop')
+        pub = rospy.Publisher('/DiscreteMotionCmd', String, queue_size=50)
+        rospy.sleep(1.0)
+        pub.publish('Stop')
         if self.preempt_requested():
             ud.result = String('preempted')
             self.service_preempt()
@@ -234,6 +238,12 @@ def main():
 
     with pickup_sm:
         StateMachine.add(
+            'SET_HEAD',
+            head_move.MoveTo(pose='center_center'),
+            transitions={'succeeded': 'INIT',
+                         'preempted': 'LOG_PREEMPT'}
+        )
+        StateMachine.add(
             'INIT',
             Init(),
             transitions={'succeeded': 'SWITCH_VISION',
@@ -256,15 +266,16 @@ def main():
                 '/pointEvents',
                 PointEvents,
                 cond_cb=pointevents_cb,
+                max_checks=20,
                 output_keys=['pointing_msg']
             ),
-            transitions={'invalid': 'POINTING_COUNTER',
-                         'valid': 'START_LOOKING',
+            transitions={'valid': 'POINTING_COUNTER',
+                         'invalid': 'START_LOOKING',
                          'preempted': 'LOG_PREEMPT'}
         )
         # StateMachine.add(
         #     'GET_POINTING_DIRECTION',
-        #     util.WaitForMsgState(
+        #     WaitForMsgState(
         #         '/pointEvents',
         #         PointEvents,
         #         msg_cb=pointevents_cb,
@@ -322,15 +333,16 @@ def main():
                 '/headcam/depth_registered/points',
                 PointCloud2,
                 cond_cb=point_cloud_cb,
+                max_checks=20,
                 output_keys=['cloud']
             ),
-            transitions={'invalid': 'GET_POINT_CLOUD',
-                         'valid': 'LOOK_FOR_OBJECT',
+            transitions={'valid': 'GET_POINT_CLOUD',
+                         'invalid': 'LOOK_FOR_OBJECT',
                          'preempted': 'LOG_PREEMPT'}
         )
         # StateMachine.add(
         #     'GET_POINT_CLOUD',
-        #     util.WaitForMsgState(
+        #     WaitForMsgState(
         #         '/headcam/depth_registered/points',
         #         PointCloud2,
         #         point_cloud_cb,
