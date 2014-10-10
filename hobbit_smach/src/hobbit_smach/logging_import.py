@@ -49,7 +49,7 @@ class DoLog(State):
         return 'succeeded'
 
 
-class DoLogPreempt(DoLog):
+class DoLogPreempt(State):
     """
     Inherit from DoLog but specialize in logging of preemption
     """
@@ -65,8 +65,22 @@ class DoLogPreempt(DoLog):
         self.data = 'Task has preempted.'
         self.pubEvent = rospy.Publisher('Event', Event, queue_size=50)
 
+    def execute(self, ud):
+        rospy.loginfo('LOG: scenario: %s: %s' % (self.scenario, self.data))
+        message = Event()
+        message.event = 'E_LOG'
+        params = []
+        par = Parameter(name='SCENARIO',
+                        value=self.scenario)
+        params.append(par)
+        par = Parameter(name='DATA',
+                        value=self.data)
+        params.append(par)
+        message.params = params
+        self.pubEvent.publish(message)
+        return 'succeeded'
 
-class DoLogSuccess(DoLog):
+class DoLogSuccess(State):
     """
     Inherit from DoLog but specialize in logging of preemption
     """
@@ -82,8 +96,23 @@ class DoLogSuccess(DoLog):
         self.data = 'Task has succeeded.'
         self.pubEvent = rospy.Publisher('Event', Event, queue_size=50)
 
+    def execute(self, ud):
+        rospy.loginfo('LOG: scenario: %s: %s' % (self.scenario, self.data))
+        message = Event()
+        message.event = 'E_LOG'
+        params = []
+        par = Parameter(name='SCENARIO',
+                        value=self.scenario)
+        params.append(par)
+        par = Parameter(name='DATA',
+                        value=self.data)
+        params.append(par)
+        message.params = params
+        self.pubEvent.publish(message)
+        return 'succeeded'
 
-class DoLogAborted(DoLog):
+
+class DoLogAborted(State):
     """
     Inherit from DoLog but specialize in logging of aborted
     """
@@ -98,6 +127,21 @@ class DoLogAborted(DoLog):
         self.scenario = scenario
         self.data = 'Task has aborted.'
         self.pubEvent = rospy.Publisher('Event', Event, queue_size=50)
+
+    def execute(self, ud):
+        rospy.loginfo('LOG: scenario: %s: %s' % (self.scenario, self.data))
+        message = Event()
+        message.event = 'E_LOG'
+        params = []
+        par = Parameter(name='SCENARIO',
+                        value=self.scenario)
+        params.append(par)
+        par = Parameter(name='DATA',
+                        value=self.data)
+        params.append(par)
+        message.params = params
+        self.pubEvent.publish(message)
+        return 'succeeded'
 
 
 class DoLogStart(DoLog):
