@@ -14,7 +14,6 @@ update_diff = 0.5
 # FILE = 'places.xml'
 # FILE = '/home/bajo/work/development/catkin/src/navigation/places.xml'
 FILE = '/opt/ros/hobbit_hydro/src/navigation/places.xml'
-FILE = '/opt/ros/hobbit_hydro/src/navigation/places_forth_22_9.xml'
 
 import sys
 import rospy
