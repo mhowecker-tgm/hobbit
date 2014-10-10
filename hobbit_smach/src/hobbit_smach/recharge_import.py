@@ -76,6 +76,7 @@ def undock_if_needed():
         )
         return sm
 
+
 def getRecharge():
     """This function handles the autonomous charging sequence.
     It is without the user interaction and is mainly used during
@@ -90,6 +91,10 @@ def getRecharge():
     seq.userdata.location_name = 'dock'
 
     with seq:
+        Sequence.add(
+            'LOG_RECHARGE',
+            log.do_log_battery_state()
+        )
         Sequence.add(
             'SAY_TIRED',
             speech_output.emo_say_something(

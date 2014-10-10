@@ -266,9 +266,15 @@ def get_social_role_change():
         StateMachine.add(
             'SR_UP',
             SetSocialRole(change=1),
-            transitions={'succeeded': 'SAY_SAFE_SECURE',
+            transitions={'succeeded': 'LOG_SR_UP',
                          'aborted': 'LOG_ABORTED',
                          'preempted': 'LOG_PREEMPT'}
+        )
+        StateMachine.add(
+            'LOG_SR_UP',
+            log.DoLogSocialRoleChange(change='up'),
+            transitions={'succeeded': 'SAY_SAFE_SECURE',
+                         'aborted': 'LOG_ABORTED'}
         )
         StateMachine.add_auto(
             'SAD',
@@ -281,9 +287,15 @@ def get_social_role_change():
         StateMachine.add(
             'SR_DOWN',
             SetSocialRole(change=-1),
-            transitions={'succeeded': 'SAY_SAFE_SECURE',
+            transitions={'succeeded': 'LOG_SR_DOWN',
                          'aborted': 'LOG_ABORTED',
                          'preempted': 'LOG_PREEMPT'}
+        )
+        StateMachine.add(
+            'LOG_SR_DOWN',
+            log.DoLogSocialRoleChange(change='down'),
+            transitions={'succeeded': 'SAY_SAFE_SECURE',
+                         'aborted': 'LOG_ABORTED'}
         )
         StateMachine.add(
             'SAY_SAFE_SECURE',

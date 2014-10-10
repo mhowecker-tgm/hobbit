@@ -7,6 +7,7 @@ from hobbit_msgs.srv import GetName
 import hobbit_smach.hobbit_move_import as hobbit_move
 import hobbit_smach.social_role_import as social_role
 import hobbit_smach.hobbit_cronjobs_import as cronjobs
+import hobbit_smach.logging_import as log
 from hobbit_user_interaction import HobbitMMUI
 
 
@@ -25,16 +26,34 @@ def end_interaction_muc():
         StateMachine.add(
             'OFFER_RETURN_OF_FAVOUR',
             HobbitMMUI.AskYesNo(question='T_OfferReturnOfFavour'),
-            transitions={'yes': 'aborted',
+            transitions={'yes': 'LOG_ACCEPT_ROF',
                          'timeout': 'OFFER_RETURN_OF_FAVOUR',
-                         '3times': 'aborted',
-                         'no': 'MOVE_AWAY',
+                         '3times': 'LOG_DID_NOT_ACCEPT_ROF',
+                         'no': 'LOG_DID_NOT_ACCEPT_ROF',
                          'preempted': 'preempted',
                          'failed': 'aborted'}
         )
         StateMachine.add(
+            'LOG_ACCEPT_ROF',
+            log.DoLog(
+                scenario='Return of favour',
+                data='User accepted return of favour'
+            ),
+            transitions={'succeeded': 'succeeded'}
+        )
+        StateMachine.add(
+            'LOG_DID_NOT_ACCEPT_ROF',
+            log.DoLog(
+                scenario='Return of favour',
+                data='User did not accept return of favour'
+            ),
+            transitions={'succeeded': 'aborted'}
+        )
+        StateMachine.add(
             'MOVE_AWAY',
-            move_away()
+            move_away(),
+            transitions={'succeeded': 'aborted'}
+
         )
     return sm
 
