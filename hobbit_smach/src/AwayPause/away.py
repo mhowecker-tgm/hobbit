@@ -351,7 +351,8 @@ def main():
                 HobbitMMUI.ShowMenu(menu='MAIN'))
             Sequence.add(
                 'SET_CRONJOB',
-                cronjobs.SleepAway()
+                cronjobs.SleepAway(),
+                transitions={'aborted': 'failed'}
             )
         StateMachine.add(
             'SEQ2',
