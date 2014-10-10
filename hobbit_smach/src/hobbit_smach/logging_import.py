@@ -3,8 +3,10 @@
 
 import rospy
 
-from smach import State
+from smach import State, Sequence
 from hobbit_msgs.msg import Event, Parameter
+from uashh_smach.util import WaitForMsgState
+from mira_msgs.msg import BatteryState
 
 
 class DoLog(State):
@@ -89,7 +91,7 @@ class DoLogAborted(DoLog):
     def __init__(self, scenario=None):
         State.__init__(
             self,
-            outcomes=['succeeded', 'aborted'],
+            outcomes=['succeeded'],
             input_keys=['scenario', 'data', 'command'] if
             (scenario is not None) else []
         )
@@ -109,3 +111,83 @@ class DoLogStart(DoLog):
         self.scenario = None
         self.data = 'Task has started.'
         self.pubEvent = rospy.Publisher('Event', Event, queue_size=50)
+
+
+class DoLogSocialRoleChange(DoLog):
+
+    """
+    The logging to the Event topic can be done from here
+    """
+
+    def __init__(self, change=None):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'aborted']
+        )
+        self.change = change
+        self.scenario = 'Social role change'
+        self.pubEvent = rospy.Publisher('Event', Event, queue_size=50)
+
+    def execute(self, ud):
+        if rospy.has_param('/social_role'):
+            sr = rospy.get_param('/social_role')
+        else:
+            return 'aborted'
+        data = 'Social role has changed:'
+        rospy.loginfo('LOG: scenario: %s: %s' % (self.scenario, data))
+        message = Event()
+        message.event = 'E_LOG'
+        params = []
+        par = Parameter(name='SCENARIO',
+                        value=self.scenario)
+        params.append(par)
+        par = Parameter(name='DATA',
+                        value=data)
+        params.append(par)
+        if self.change == 'up':
+            par = Parameter(name='OLD VALUE',
+                            value=str(sr - 1))
+        elif self.change == 'down':
+            par = Parameter(name='OLD VALUE',
+                            value=str(sr + 1))
+        else:
+            return 'aborted'
+        params.append(par)
+        par = Parameter(name='NEW VALUE',
+                        value=str(sr))
+        params.append(par)
+        message.params = params
+        self.pubEvent.publish(message)
+        return 'succeeded'
+
+
+def battery_log_cb(msg, ud):
+    pubEvent = rospy.Publisher('Event', Event, queue_size=1)
+    message = Event()
+    message.event = 'E_LOG'
+    params = []
+    par = Parameter(name='SCENARIO',
+                    value='Recharge')
+    params.append(par)
+    par = Parameter(name='Percentage',
+                    value=str(msg.lifePercent))
+    params.append(par)
+    par = Parameter(name='Voltage',
+                    value=str(msg.voltage))
+    params.append(par)
+    message.params = params
+    pubEvent.publish(message)
+    return True
+
+
+def do_log_battery_state():
+    seq = Sequence(outcomes=['succeeded', 'aborted', 'preempted'])
+    with seq:
+        Sequence.add(
+            'LOG_BATTERY_LEVEL',
+            WaitForMsgState(
+                '/battery_state',
+                BatteryState,
+                msg_cb=battery_log_cb)
+        )
+    return seq
