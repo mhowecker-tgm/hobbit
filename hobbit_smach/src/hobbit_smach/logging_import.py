@@ -181,7 +181,9 @@ def battery_log_cb(msg, ud):
 
 
 def do_log_battery_state():
-    seq = Sequence(outcomes=['succeeded', 'aborted', 'preempted'])
+    seq = Sequence(
+        outcomes=['succeeded', 'aborted', 'preempted'],
+        connector_outcome='succeeded')
     with seq:
         Sequence.add(
             'LOG_BATTERY_LEVEL',
