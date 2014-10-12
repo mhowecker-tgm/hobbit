@@ -338,7 +338,7 @@
  
    ////////////////////////////////////////////////////////////////////////
 
-   // copy previous obstacles from the blind area window
+   // copy previous obstacles and static state from the blind area window
    double w_size_x = 2*min_range;
    double w_size_y = 2*min_range;
    double start_point_x = robot_x - w_size_x / 2;
@@ -356,7 +356,7 @@
  
    unsigned int start_x, start_y, end_x, end_y;
  
-   //check for legality just in case
+   //check for legality just in case //FIXME
    if(!worldToMap(start_point_x, start_point_y, start_x, start_y) || !worldToMap(end_point_x, end_point_y, end_x, end_y))
      return;
  
@@ -386,7 +386,20 @@
    ////////////////////////////////////////////////////////////////////////
 
    //now we want to copy the local map back into the costmap
-   copyMapRegion(local_map, 0, 0, cell_size_x, costmap_, start_x, start_y, size_x_, cell_size_x, cell_size_y);
+   //copyMapRegion(local_map, 0, 0, cell_size_x, costmap_, start_x, start_y, size_x_, cell_size_x, cell_size_y);
+
+   int count_copy_ind = 0;
+   // copy local map back into the costmap ONLY if the cost value is higher  //FIXME
+   for (unsigned int iy = start_y; iy < end_y; iy++)
+   {
+	     for (unsigned int ix = start_x; ix < end_x; ix++)
+	     {
+	       	int ind = getIndex(ix, iy);
+		if ( local_map[count_copy_ind] > costmap_[ind])
+	       		costmap_[ind] = local_map[count_copy_ind];
+		count_copy_ind++;
+	     }
+   }
    //clean up
    delete[] local_map;
 
