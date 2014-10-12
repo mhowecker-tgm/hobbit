@@ -469,7 +469,7 @@
 	for (int it_j= 0; it_j< size_y_; it_j++)
 	{
 		int ind = getIndex(it_i,it_j);
-		if (master[ind]== NO_INFORMATION ||master[ind] < costmap_[ind]) 
+		//if (master[ind]== NO_INFORMATION ||master[ind] < costmap_[ind]) 
 		{
 			master[ind] = costmap_[ind];
 
