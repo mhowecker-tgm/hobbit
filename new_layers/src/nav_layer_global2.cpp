@@ -59,7 +59,7 @@
      source_node.param("min_obstacle_height", min_obstacle_height, 0.0);
      source_node.param("max_obstacle_height", max_obstacle_height, 2.0);
      source_node.param("inf_is_valid", inf_is_valid, false);
-     source_node.param("clearing", clearing, false);
+     //source_node.param("clearing", clearing, false);
      source_node.param("marking", marking, true);
 
      source_node.param("min_range", min_range, 0.45); //FIXME
@@ -100,9 +100,6 @@
      if (marking)
        marking_buffers_.push_back(observation_buffers_.back());
  
-     //check if we'll also add this buffer to our clearing observation buffers
-     if (clearing)
-       clearing_buffers_.push_back(observation_buffers_.back());
  
      ROS_DEBUG(
          "Created an observation buffer for source %s, topic %s, global frame: %s, expected update rate: %.2f, observation persistence: %.2f",
@@ -327,17 +324,8 @@
    //get the marking observations
    current = current && getMarkingObservations(observations);
  
-   //get the clearing observations
-   current = current && getClearingObservations(clearing_observations);
- 
    //update the global current status
    current_ = current;
- 
-   //raytrace freespace
-/*   for (unsigned int i = 0; i < clearing_observations.size(); ++i)
-   {
-     raytraceFreespace(clearing_observations[i], min_x, min_y, max_x, max_y);
-   }*/
 
    //Reset obstacles outside window
    resetMapOutsideWindow(robot_x, robot_y, 2*min_range, 2*min_range);  //FIXME, should be implemented in base class
@@ -423,8 +411,6 @@
  {
    if(marking)
      static_marking_observations_.push_back(obs);
-   if(clearing)
-     static_clearing_observations_.push_back(obs);
  }
  
  bool NavLayerGlobal2::getMarkingObservations(std::vector<Observation>& marking_observations) const
@@ -442,149 +428,6 @@
                                static_marking_observations_.begin(), static_marking_observations_.end());
    return current;
  }
- 
- bool NavLayerGlobal2::getClearingObservations(std::vector<Observation>& clearing_observations) const
- {
-   bool current = true;
-   //get the clearing observations
-   for (unsigned int i = 0; i < clearing_buffers_.size(); ++i)
-   {
-     clearing_buffers_[i]->lock();
-     clearing_buffers_[i]->getObservations(clearing_observations);
-     current = clearing_buffers_[i]->isCurrent() && current;
-     clearing_buffers_[i]->unlock();
-   }
-   clearing_observations.insert(clearing_observations.end(), 
-                               static_clearing_observations_.begin(), static_clearing_observations_.end());
-   return current;
- }
- 
- void NavLayerGlobal2::raytraceFreespace(const Observation& clearing_observation, double* min_x, double* min_y,
-                                               double* max_x, double* max_y)
- {
-   double ox = clearing_observation.origin_.x;
-   double oy = clearing_observation.origin_.y;
-   pcl::PointCloud < pcl::PointXYZ > cloud = *(clearing_observation.cloud_);
- 
-   //get the map coordinates of the origin of the sensor
-   unsigned int x0, y0;
-   if (!worldToMap(ox, oy, x0, y0))
-   {
-     ROS_WARN_THROTTLE(
-         1.0, "The origin for the sensor at (%.2f, %.2f) is out of map bounds. So, the costmap cannot raytrace for it.",
-         ox, oy);
-     return;
-   }
- 
-   //we can pre-compute the enpoints of the map outside of the inner loop... we'll need these later
-   double origin_x = origin_x_, origin_y = origin_y_;
-   double map_end_x = origin_x + size_x_ * resolution_;
-   double map_end_y = origin_y + size_y_ * resolution_;
- 
- 
-   touch(ox, oy, min_x, min_y, max_x, max_y); //FIXME
-
-   //copy costmap blind window before applying raytracing  !!!!!!
-   //unsigned char* costmap_copy; 
-
-   int min_x_ind = x0 - min_range_cells;
-   int max_x_ind = x0 + min_range_cells;
-   int min_y_ind = y0 - min_range_cells;
-   int max_y_ind = y0 + min_range_cells;
-
-
-   int copy_ind = 0;
-
-   for (unsigned int iy = min_y_ind; iy < max_y_ind; iy++)
-   {
-	     for (unsigned int ix = min_x_ind; ix < max_x_ind; ix++)
-	     {
-		
-	       	    int ind = getIndex(ix, iy);
-	       	    costmap_copy[copy_ind] = costmap_[ind];
-		    copy_ind++;
-
-	     }
-   }
-
- 
-   //for each point in the cloud, we want to trace a line from the origin and clear obstacles along it
-   for (unsigned int i = 0; i < cloud.points.size(); ++i)
-   {
-     double wx = cloud.points[i].x;
-     double wy = cloud.points[i].y;
- 
-     //now we also need to make sure that the enpoint we're raytracing
-     //to isn't off the costmap and scale if necessary
-     double a = wx - ox;
-     double b = wy - oy;
-
- 
-     //the minimum value to raytrace from is the origin
-     if (wx < origin_x)
-     {
-       double t = (origin_x - ox) / a;
-       wx = origin_x;
-       wy = oy + b * t;
-     }
-     if (wy < origin_y)
-     {
-       double t = (origin_y - oy) / b;
-       wx = ox + a * t;
-       wy = origin_y;
-     }
- 
-     //the maximum value to raytrace to is the end of the map
-     if (wx > map_end_x)
-     {
-       double t = (map_end_x - ox) / a;
-       wx = map_end_x - .001;
-       wy = oy + b * t;
-     }
-     if (wy > map_end_y)
-     {
-       double t = (map_end_y - oy) / b;
-       wx = ox + a * t;
-       wy = map_end_y - .001;
-     }
- 
-     //now that the vector is scaled correctly... we'll get the map coordinates of its endpoint
-     unsigned int x1, y1;
- 
-     //check for legality just in case
-     if (!worldToMap(wx, wy, x1, y1))
-       continue;
- 
-     unsigned int cell_raytrace_range = cellDistance(clearing_observation.raytrace_range_);
-     MarkCell marker(costmap_, FREE_SPACE);
-     //and finally... we can execute our trace to clear obstacles along that line
-     raytraceLine(marker, x0, y0, x1, y1, cell_raytrace_range);
-     updateRaytraceBounds(ox, oy, wx, wy, clearing_observation.raytrace_range_, min_x, min_y, max_x, max_y);
-   }
-
-   int count_copy_ind = 0;
-   // add obstacles inside blind zone  //FIXME, test and check
-   for (unsigned int iy = min_y_ind; iy < max_y_ind; iy++)
-   {
-	     for (unsigned int ix = min_x_ind; ix < max_x_ind; ix++)
-	     {
-		double xw, yw;
-		mapToWorld(ix,iy,xw,yw);
-                double a_sq = (xw-ox)*(xw-ox);
-		double b_sq = (yw-oy)*(yw-oy);
-		if(a_sq+b_sq < min_range*min_range)
-		{
-	       	    int ind = getIndex(ix, iy);
-	       	    costmap_[ind] = costmap_copy[count_copy_ind];
-		}
-		count_copy_ind++;
-
-	     }
-   }
-
-   //delete[] costmap_copy;
-
-}
  
  void NavLayerGlobal2::activate()
  {
