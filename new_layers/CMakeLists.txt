@@ -38,6 +38,7 @@ target_link_libraries(nav_layer_global ${PCL_LIBRARIES})
 add_library(nav_layer_global2 src/nav_layer_global2.cpp)
 target_link_libraries(nav_layer_global2 ${PCL_LIBRARIES})
 
-
+add_library(nav_layer_global3 src/nav_layer_global3.cpp)
+target_link_libraries(nav_layer_global3 ${PCL_LIBRARIES})
 
 

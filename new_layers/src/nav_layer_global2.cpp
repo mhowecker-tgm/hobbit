@@ -193,13 +193,6 @@
    std::cout << "size_x " << size_x_cells << std::endl;
    std::cout << "size_y " << size_y_cells << std::endl;
 
-  // make a copy of the original static map!!
-  static_map_copy = new unsigned char[size_x_cells*size_y_cells];
-
-  first_update = true;
-  
-  int c_num = 0;
-
  }
  
  void NavLayerGlobal2::setupDynamicReconfigure(ros::NodeHandle& nh)
@@ -406,65 +399,22 @@
    // before we merge this obstacle layer into the master_grid.
    //footprint_layer_.updateCosts(*this, min_i, min_j, max_i, max_j);
 
-   int c_num_count = 5;
-
-   if (c_num < c_num_count)
-   {
-     c_num++;
-     return;
-   }
-
    unsigned char* master = master_grid.getCharMap();
-	
-   if(c_num == c_num_count)  //the robot should start at a clean area with no obstacles!!
-   {
-	   for (int it_i= 0; it_i<size_x_; it_i++)
-	   {
-		for (int it_j= 0; it_j< size_y_; it_j++)
-		{
-			int ind = getIndex(it_i,it_j);
-			static_map_copy[ind] = master[ind];
-		        int static_value = master[ind];
-		        //std::cout << "static value " << static_value << std::endl;
-
-		}
-	   }
-           first_update = false;	
-           std::cout << "done ***********************************" << std::endl;
-	   c_num++;
-   }
-
-   //footprint_layer_.updateCosts(*this, min_i, min_j, max_i, max_j);
 
    for (int it_i= 0; it_i<size_x_; it_i++)
    {
 	for (int it_j= 0; it_j< size_y_; it_j++)
 	{
 		int ind = getIndex(it_i,it_j);
-		int val = costmap_[ind];
-		//if (val == LETHAL_OBSTACLE)
-			//std::cout << "val leth" << val << std::endl;
-		if(static_map_copy[ind]!= NO_INFORMATION && costmap_[ind] < static_map_copy[ind]) 
-			costmap_[ind] = static_map_copy[ind];
-	}	
-   }
-
-
-
-   for (int it_i= 0; it_i<size_x_; it_i++)
-   {
-	for (int it_j= 0; it_j< size_y_; it_j++)
-	{
-		int ind = getIndex(it_i,it_j);
-		//if (master[ind]== NO_INFORMATION ||master[ind] < costmap_[ind]) 
+		if (master[ind]== NO_INFORMATION ||master[ind] < costmap_[ind]) 
 		{
 			master[ind] = costmap_[ind];
-			//int val2 = costmap_[ind];
-			//if (val2 == LETHAL_OBSTACLE)
-				//std::cout << "val leth copied" << val << std::endl;
+
 		}
 	}
    }
+
+   std::cout << "************************************************ " << std::endl;
 
 
  }
@@ -610,9 +560,6 @@
      //and finally... we can execute our trace to clear obstacles along that line
      raytraceLine(marker, x0, y0, x1, y1, cell_raytrace_range);
      updateRaytraceBounds(ox, oy, wx, wy, clearing_observation.raytrace_range_, min_x, min_y, max_x, max_y);
-
-      
-
    }
 
    int count_copy_ind = 0;
@@ -726,15 +673,6 @@
      //now we want to copy the local map back into the costmap
      copyMapRegion(local_map, 0, 0, cell_size_x, costmap_, start_x, start_y, size_x_, cell_size_x, cell_size_y);
 
-
-/*     for (int it_i= start_x; it_i<end_x; it_i++)
-		for (int it_j= start_y; it_j<end_y; it_j++)
-		{
-			int ind = getIndex(it_i,it_j);
-			//std::cout << "ind " << ind << std::endl;
-			costmap_[ind] = LETHAL_OBSTACLE;
-			//std::cout << "costmap value copied " << count << " : " << value << std::endl;
-		}*/
  
      //clean up
      delete[] local_map;

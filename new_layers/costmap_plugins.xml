@@ -4,11 +4,6 @@
       <description>layer for RGB-D</description>
     </class>
   </library>
-  <library path="lib/libmap_layer">
-    <class type="costmap_2d::MapLayer" base_class_type="costmap_2d::Layer">
-      <description>layer for RGB-D</description>
-    </class>
-  </library>
   <library path="lib/libnav_layer_global">
     <class type="costmap_2d::NavLayerGlobal" base_class_type="costmap_2d::Layer">
       <description>layer for RGB-D</description>
@@ -16,6 +11,11 @@
   </library>
   <library path="lib/libnav_layer_global2">
     <class type="costmap_2d::NavLayerGlobal2" base_class_type="costmap_2d::Layer">
+      <description>layer for RGB-D</description>
+    </class>
+  </library>
+  <library path="lib/libnav_layer_global3">
+    <class type="costmap_2d::NavLayerGlobal3" base_class_type="costmap_2d::Layer">
       <description>layer for RGB-D</description>
     </class>
   </library>
