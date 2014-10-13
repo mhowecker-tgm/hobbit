@@ -188,9 +188,11 @@ protected:
    unsigned char* static_copy; 
    int min_range_cells;
 
-   bool first_update; 
+   bool initialized; 
 
    int c_num;
+
+   void init();
 
 private:
   void reconfigureCB(costmap_2d::ObstaclePluginConfig &config, uint32_t level);

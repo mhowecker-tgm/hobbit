@@ -183,11 +183,7 @@
    setupDynamicReconfigure(nh);
    footprint_layer_.initialize( layered_costmap_, name_ + "_footprint", tf_);
 
-   min_range_cells = cellDistance(min_range);
-   static_copy = new unsigned char[4*min_range_cells]; //FIXME take care to delete it! destructor
-
-   Costmap2D* master = layered_costmap_->getCostmap();
-   static_copy = master->getCharMap();
+   min_range_cells = cellDistance(min_range); 
 
    //std::cout << "min_range " << min_range << std::endl;
 
@@ -195,6 +191,28 @@
    int size_y_cells = getSizeInCellsY();
    std::cout << "size_x " << size_x_cells << std::endl;
    std::cout << "size_y " << size_y_cells << std::endl;
+
+   static_copy = new unsigned char[size_x_cells*size_y_cells];
+
+   initialized = false;
+
+ }
+
+ void NavLayerGlobal3::init()  //FIXME
+ {
+   Costmap2D* master = layered_costmap_->getCostmap();
+   unsigned char* static_copy_init = new unsigned char[getSizeInCellsX()*getSizeInCellsY()];
+   static_copy_init = master->getCharMap();
+
+   for (int it_i= 0; it_i<size_x_; it_i++)
+   {
+	for (int it_j= 0; it_j< size_y_; it_j++)
+	{
+		int ind = getIndex(it_i,it_j);
+		double val = static_copy_init[ind];
+		static_copy[ind] = val;
+	}
+   }
 
  }
  
@@ -302,6 +320,7 @@
  void NavLayerGlobal3::updateBounds(double robot_x, double robot_y, double robot_yaw, double* min_x,
                                            double* min_y, double* max_x, double* max_y)
  {
+
    //std::cout << "updateBounds" << std::endl;
    if (rolling_window_)
    {
@@ -363,31 +382,42 @@
    ROS_ASSERT(end_x >= start_x && end_y >= start_y);
    unsigned int cell_size_x = end_x - start_x;
    unsigned int cell_size_y = end_y - start_y;
+
+   //std::cout << "cell_size_x " << cell_size_x << std::endl;
+   //std::cout << "cell_size_y " << cell_size_y << std::endl; 
  
    //we need a local map to store the obstacles in the window temporarily
-   unsigned char* local_map = new unsigned char[cell_size_x * cell_size_y];
+   unsigned char* local_map = new unsigned char[cell_size_x * cell_size_y]; 
  
    //copy the local window in the costmap to the local map
    copyMapRegion(costmap_, start_x, start_y, size_x_, local_map, 0, 0, cell_size_x, cell_size_x, cell_size_y);
 
    ////////////////////////////////////////////////////////////////////////
 
-   Costmap2D* master = layered_costmap_->getCostmap();
-   costmap_ = master->getCharMap();  //FIXME
+   //copy static map to this layer's costmap
+   //copyMapRegion(static_copy, 0, 0, getSizeInCellsX(), costmap_, 0, 0, getSizeInCellsX(), getSizeInCellsX(), getSizeInCellsY());
+
+   for (int it_i= 0; it_i<size_x_; it_i++)
+   {
+	for (int it_j= 0; it_j< size_y_; it_j++)
+	{
+		int ind = getIndex(it_i,it_j);
+		double val = static_copy[ind];
+		costmap_[ind] = val;
+	}
+   }  
  
    ////////////////////////////////////////////////////////////////////////
 
    //raytrace freespace outside local window
-   for (unsigned int i = 0; i < clearing_observations.size(); ++i)
+ /*  for (unsigned int i = 0; i < clearing_observations.size(); ++i)
    {
      raytraceFreespace(clearing_observations[i], min_x, min_y, max_x, max_y);
-   }
+   } */
 
    ////////////////////////////////////////////////////////////////////////
 
    //now we want to copy the local map back into the costmap
-   //copyMapRegion(local_map, 0, 0, cell_size_x, costmap_, start_x, start_y, size_x_, cell_size_x, cell_size_y);
-
    int count_copy_ind = 0;
    // copy local map back into the costmap ONLY if the cost value is higher  //FIXME
    for (unsigned int iy = start_y; iy < end_y; iy++)
@@ -400,12 +430,13 @@
 		count_copy_ind++;
 	     }
    }
-   //clean up
-   delete[] local_map;
+   //clean up 
+   delete[] local_map; 
 
    ////////////////////////////////////////////////////////////////////////
  
    //place the new obstacles into a priority queue... each with a priority of zero to begin with
+
    for (std::vector<Observation>::const_iterator it = observations.begin(); it != observations.end(); ++it)
    {
      const Observation& obs = *it;
@@ -446,17 +477,26 @@
  
        unsigned int index = getIndex(mx, my);
        costmap_[index] = LETHAL_OBSTACLE;
+       //std::cout << "index " << index << std::endl;
        touch(px, py, min_x, min_y, max_x, max_y);
       }
     }
  
    footprint_layer_.updateBounds(robot_x, robot_y, robot_yaw, min_x, min_y, max_x, max_y);
+   std::cout << "min_x, min_y, max_x, max_y " << *min_x << " " << *min_y << " " << *max_x << " " << *max_y << std::endl;
  }
  
  void NavLayerGlobal3::updateCosts(costmap_2d::Costmap2D& master_grid, int min_i, int min_j, int max_i, int max_j)
  {
    if (!enabled_)
      return;
+
+   if(!initialized)
+   {
+	init();
+        initialized = true;
+	return;
+   }
  
    // The footprint layer clears the footprint in this NavLayerGlobal3
    // before we merge this obstacle layer into the master_grid.
@@ -469,11 +509,8 @@
 	for (int it_j= 0; it_j< size_y_; it_j++)
 	{
 		int ind = getIndex(it_i,it_j);
-		//if (master[ind]== NO_INFORMATION ||master[ind] < costmap_[ind]) 
-		{
-			master[ind] = costmap_[ind];
-
-		}
+		//if (costmap_[ind]== NO_INFORMATION) costmap_[ind] = FREE_SPACE;
+		master[ind] = costmap_[ind];
 	}
    }
    
@@ -606,23 +643,14 @@
    int min_y_ind = y0 - min_range_cells;
    int max_y_ind = y0 + min_range_cells;
 
-   int count_copy_ind = 0;
    // add static map inside blind zone  //FIXME
    for (unsigned int iy = min_y_ind; iy < max_y_ind; iy++)
    {
 	     for (unsigned int ix = min_x_ind; ix < max_x_ind; ix++)
 	     {
-		double xw, yw;
-		mapToWorld(ix,iy,xw,yw);
-                double a_sq = (xw-ox)*(xw-ox);
-		double b_sq = (yw-oy)*(yw-oy);
-		if(a_sq+b_sq < min_range*min_range)
-		{
-	       	    int ind = getIndex(ix, iy);
-	       	    costmap_[ind] = static_copy[count_copy_ind];
-		}
-		count_copy_ind++;
-
+	       	int ind = getIndex(ix, iy);
+		double val = static_copy[ind];
+	       	costmap_[ind] = val;
 	     }
    }
 
