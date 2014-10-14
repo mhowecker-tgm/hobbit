@@ -14,9 +14,4 @@
       <description>layer for RGB-D</description>
     </class>
   </library>
-  <library path="lib/libnav_layer_global3">
-    <class type="costmap_2d::NavLayerGlobal3" base_class_type="costmap_2d::Layer">
-      <description>layer for RGB-D</description>
-    </class>
-  </library>
 </class_libraries>

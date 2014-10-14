@@ -37,8 +37,8 @@
 
  * Modified by Paloma de la Puente
  *********************************************************************/
-#ifndef NAV2GLOB_COSTMAP_PLUGIN_H_
-#define NAV2GLOB_COSTMAP_PLUGIN_H_
+#ifndef NAV3GLOB_COSTMAP_PLUGIN_H_
+#define NAV3GLOB_COSTMAP_PLUGIN_H_
 #include <ros/ros.h>
 #include <costmap_2d/costmap_layer.h>
 #include <costmap_2d/layered_costmap.h>
@@ -66,6 +66,8 @@ public:
   {
     costmap_ = NULL; // this is the unsigned char* member of parent class Costmap2D.
   }
+
+  virtual ~NavLayerGlobal2(){delete static_copy;}
 
   virtual void onInitialize();
   virtual void updateBounds(double robot_x, double robot_y, double robot_yaw, double* min_x, double* min_y, double* max_x,
@@ -146,7 +148,8 @@ protected:
    * @param max_x
    * @param max_y
    */
-  //virtual void raytraceFreespace(const costmap_2d::Observation& clearing_observation, double* min_x, double* min_y, double* max_x, double* max_y);
+  virtual void raytraceFreespace(const costmap_2d::Observation& clearing_observation, double* min_x, double* min_y,
+                                 double* max_x, double* max_y);
 
   void updateRaytraceBounds(double ox, double oy, double wx, double wy, double range, double* min_x, double* min_y,
 			    double* max_x, double* max_y);
@@ -182,14 +185,16 @@ protected:
 
   double min_range;
 
-   unsigned char* costmap_copy; 
+   unsigned char* static_copy; 
    int min_range_cells;
 
-   unsigned char* static_map_copy;
-
-   bool first_update; 
+   bool initialized; 
 
    int c_num;
+
+   void init();
+
+   double min_x_static, min_y_static, max_x_static, max_y_static;
 
 private:
   void reconfigureCB(costmap_2d::ObstaclePluginConfig &config, uint32_t level);

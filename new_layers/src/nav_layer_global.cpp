@@ -1,25 +1,25 @@
 #include "../include/new_layers/nav_layer_global.h"
-#include<costmap_2d/costmap_math.h>
-
-#include <pluginlib/class_list_macros.h>
-PLUGINLIB_EXPORT_CLASS(costmap_2d::NavLayerGlobal, costmap_2d::Layer)
+ #include<costmap_2d/costmap_math.h>
  
-using costmap_2d::NO_INFORMATION;
-using costmap_2d::LETHAL_OBSTACLE;
-using costmap_2d::FREE_SPACE;
+ #include <pluginlib/class_list_macros.h>
+ PLUGINLIB_EXPORT_CLASS(costmap_2d::NavLayerGlobal, costmap_2d::Layer)
  
-using costmap_2d::ObservationBuffer;
-using costmap_2d::Observation;
+ using costmap_2d::NO_INFORMATION;
+ using costmap_2d::LETHAL_OBSTACLE;
+ using costmap_2d::FREE_SPACE;
  
-namespace costmap_2d
-{
-void NavLayerGlobal::onInitialize()
-{
+ using costmap_2d::ObservationBuffer;
+ using costmap_2d::Observation;
+ 
+ namespace costmap_2d
+ {
+ void NavLayerGlobal::onInitialize()
+ {
    ros::NodeHandle nh("~/" + name_), g_nh;
    rolling_window_ = layered_costmap_->isRolling();
  
    bool track_unknown_space;
-   nh.param("track_unknown_space", track_unknown_space, true);
+   nh.param("track_unknown_space", track_unknown_space, layered_costmap_->isTrackingUnknown());
    if(track_unknown_space)
      default_value_ = NO_INFORMATION;
    else
@@ -53,13 +53,13 @@ void NavLayerGlobal::onInitialize()
  
      source_node.param("topic", topic, source);
      source_node.param("sensor_frame", sensor_frame, std::string(""));
-     source_node.param("observation_persistence", observation_keep_time, 0.0);
+     source_node.param("observation_persistence", observation_keep_time, 1.0);
      source_node.param("expected_update_rate", expected_update_rate, 0.0);
      source_node.param("data_type", data_type, std::string("PointCloud"));
      source_node.param("min_obstacle_height", min_obstacle_height, 0.0);
      source_node.param("max_obstacle_height", max_obstacle_height, 2.0);
      source_node.param("inf_is_valid", inf_is_valid, false);
-     source_node.param("clearing", clearing, true);
+     //source_node.param("clearing", clearing, false);
      source_node.param("marking", marking, true);
 
      source_node.param("min_range", min_range, 0.45); //FIXME
@@ -100,9 +100,6 @@ void NavLayerGlobal::onInitialize()
      if (marking)
        marking_buffers_.push_back(observation_buffers_.back());
  
-     //check if we'll also add this buffer to our clearing observation buffers
-     if (clearing)
-       clearing_buffers_.push_back(observation_buffers_.back());
  
      ROS_DEBUG(
          "Created an observation buffer for source %s, topic %s, global frame: %s, expected update rate: %.2f, observation persistence: %.2f",
@@ -140,7 +137,7 @@ void NavLayerGlobal::onInitialize()
  
        if( inf_is_valid )
        {
-        ROS_WARN("nav_layer: inf_is_valid option is not applicable to PointCloud observations.");
+        ROS_WARN("obstacle_layer: inf_is_valid option is not applicable to PointCloud observations.");
        }
  
        boost::shared_ptr < tf::MessageFilter<sensor_msgs::PointCloud>
@@ -158,7 +155,7 @@ void NavLayerGlobal::onInitialize()
  
        if( inf_is_valid )
        {
-        ROS_WARN("nav_layer: inf_is_valid option is not applicable to PointCloud observations.");
+        ROS_WARN("obstacle_layer: inf_is_valid option is not applicable to PointCloud observations.");
        }
  
        boost::shared_ptr < tf::MessageFilter<sensor_msgs::PointCloud2>
@@ -185,6 +182,14 @@ void NavLayerGlobal::onInitialize()
 
    min_range_cells = cellDistance(min_range);
    costmap_copy = new unsigned char[4*min_range_cells];
+
+   //std::cout << "min_range " << min_range << std::endl;
+
+   int size_x_cells = getSizeInCellsX();
+   int size_y_cells = getSizeInCellsY();
+   std::cout << "size_x " << size_x_cells << std::endl;
+   std::cout << "size_y " << size_y_cells << std::endl;
+
  }
  
  void NavLayerGlobal::setupDynamicReconfigure(ros::NodeHandle& nh)
@@ -199,7 +204,7 @@ void NavLayerGlobal::onInitialize()
  {
    enabled_ = config.enabled;
    max_obstacle_height_ = config.max_obstacle_height;
-   //combination_method_ = config.combination_method;
+   combination_method_ = config.combination_method;
  }
  
  void NavLayerGlobal::laserScanCallback(const sensor_msgs::LaserScanConstPtr& message,
@@ -212,7 +217,7 @@ void NavLayerGlobal::onInitialize()
    //project the scan into a point cloud
    try
    {
-     projector_.transformLaserScanToPointCloud(global_frame_, *message, cloud, *tf_);
+     projector_.transformLaserScanToPointCloud(message->header.frame_id, *message, cloud, *tf_);
    }
    catch (tf::TransformException &ex)
    {
@@ -226,7 +231,7 @@ void NavLayerGlobal::onInitialize()
    buffer->bufferCloud(cloud);
    buffer->unlock();
  }
-
+ 
  void NavLayerGlobal::laserScanValidInfCallback(const sensor_msgs::LaserScanConstPtr& raw_message, 
                                                const boost::shared_ptr<ObservationBuffer>& buffer){
    // Filter positive infinities ("Inf"s) to max_range.
@@ -293,7 +298,11 @@ void NavLayerGlobal::onInitialize()
  {
    //std::cout << "updateBounds" << std::endl;
    if (rolling_window_)
+   {
+     std::cout << "rolling window" << std::endl;
      updateOrigin(robot_x - getSizeInMetersX() / 2, robot_y - getSizeInMetersY() / 2);
+	
+   }
    if (!enabled_)
      return;
    if (has_been_reset_)
@@ -315,17 +324,8 @@ void NavLayerGlobal::onInitialize()
    //get the marking observations
    current = current && getMarkingObservations(observations);
  
-   //get the clearing observations
-   current = current && getClearingObservations(clearing_observations);
- 
    //update the global current status
    current_ = current;
- 
-   //raytrace freespace
-   for (unsigned int i = 0; i < clearing_observations.size(); ++i)
-   {
-     raytraceFreespace(clearing_observations[i], min_x, min_y, max_x, max_y);
-   }
 
    //Reset obstacles outside window
    resetMapOutsideWindow(robot_x, robot_y, 2*min_range, 2*min_range);  //FIXME, should be implemented in base class
@@ -371,13 +371,9 @@ void NavLayerGlobal::onInitialize()
  
        unsigned int index = getIndex(mx, my);
        costmap_[index] = LETHAL_OBSTACLE;
-       //touch(px, py, min_x, min_y, max_x, max_y);   //FIXME
-       *min_x = std::min(px, *min_x);
-       *min_y = std::min(py, *min_y);
-       *max_x = std::max(px, *max_x);
-       *max_y = std::max(py, *max_y);
-     }
-   }
+       touch(px, py, min_x, min_y, max_x, max_y);
+      }
+    }
  
    footprint_layer_.updateBounds(robot_x, robot_y, robot_yaw, min_x, min_y, max_x, max_y);
  }
@@ -389,34 +385,32 @@ void NavLayerGlobal::onInitialize()
  
    // The footprint layer clears the footprint in this NavLayerGlobal
    // before we merge this obstacle layer into the master_grid.
-   footprint_layer_.updateCosts(*this, min_i, min_j, max_i, max_j);
-   unsigned char* master_array = master_grid.getCharMap();
-   unsigned int span = master_grid.getSizeInCellsX();
-   for (int j = min_j; j < max_j; j++)
-   {
-	     unsigned int it = j * span + min_i;
-	     for (int i = min_i; i < max_i; i++)
-	     {
-		if (costmap_[it] == NO_INFORMATION)
-		{
-		 it++;
-		 continue;
-		}
+   //footprint_layer_.updateCosts(*this, min_i, min_j, max_i, max_j);
 
-		unsigned char old_cost = master_array[it];
-		if (old_cost == NO_INFORMATION || old_cost < costmap_[it])
-		 master_array[it] = costmap_[it];
-		it++;
-	     }
+   unsigned char* master = master_grid.getCharMap();
+
+   for (int it_i= 0; it_i<size_x_; it_i++)
+   {
+	for (int it_j= 0; it_j< size_y_; it_j++)
+	{
+		int ind = getIndex(it_i,it_j);
+		if (master[ind]== NO_INFORMATION && costmap_[ind] == LETHAL_OBSTACLE ||master[ind] < costmap_[ind]) 
+		{
+			master[ind] = costmap_[ind];
+
+		}
+	}
    }
+
+   std::cout << "************************************************ update" << std::endl;
+
+
  }
  
  void NavLayerGlobal::addStaticObservation(costmap_2d::Observation& obs, bool marking, bool clearing)
  {
    if(marking)
      static_marking_observations_.push_back(obs);
-   if(clearing)
-     static_clearing_observations_.push_back(obs);
  }
  
  bool NavLayerGlobal::getMarkingObservations(std::vector<Observation>& marking_observations) const
@@ -433,156 +427,6 @@ void NavLayerGlobal::onInitialize()
    marking_observations.insert(marking_observations.end(), 
                                static_marking_observations_.begin(), static_marking_observations_.end());
    return current;
- }
- 
- bool NavLayerGlobal::getClearingObservations(std::vector<Observation>& clearing_observations) const
- {
-   bool current = true;
-   //get the clearing observations
-   for (unsigned int i = 0; i < clearing_buffers_.size(); ++i)
-   {
-     clearing_buffers_[i]->lock();
-     clearing_buffers_[i]->getObservations(clearing_observations);
-     current = clearing_buffers_[i]->isCurrent() && current;
-     clearing_buffers_[i]->unlock();
-   }
-   clearing_observations.insert(clearing_observations.end(), 
-                               static_clearing_observations_.begin(), static_clearing_observations_.end());
-   return current;
- }
- 
- void NavLayerGlobal::raytraceFreespace(const Observation& clearing_observation, double* min_x, double* min_y,
-                                               double* max_x, double* max_y)
- {
-   double ox = clearing_observation.origin_.x;
-   double oy = clearing_observation.origin_.y;
-   pcl::PointCloud < pcl::PointXYZ > cloud = *(clearing_observation.cloud_);
- 
-   //get the map coordinates of the origin of the sensor
-   unsigned int x0, y0;
-   if (!worldToMap(ox, oy, x0, y0))
-   {
-     ROS_WARN_THROTTLE(
-         1.0, "The origin for the sensor at (%.2f, %.2f) is out of map bounds. So, the costmap cannot raytrace for it.",
-         ox, oy);
-     return;
-   }
- 
-   //we can pre-compute the enpoints of the map outside of the inner loop... we'll need these later
-   double origin_x = origin_x_, origin_y = origin_y_;
-   double map_end_x = origin_x + size_x_ * resolution_;
-   double map_end_y = origin_y + size_y_ * resolution_;
- 
- 
-   //touch(ox, oy, min_x, min_y, max_x, max_y); //FIXME
-   *min_x = std::min(ox, *min_x);
-   *min_y = std::min(oy, *min_y);
-   *max_x = std::max(ox, *max_x);
-   *max_y = std::max(oy, *max_y);
-
-   //copy costmap blind window before applying raytracing  !!!!!!
-   //unsigned char* costmap_copy; 
-
-   int min_x_ind = x0 - min_range_cells;
-   int max_x_ind = x0 + min_range_cells;
-   int min_y_ind = y0 - min_range_cells;
-   int max_y_ind = y0 + min_range_cells;
-
-
-   int copy_ind = 0;
-
-   for (unsigned int iy = min_y_ind; iy < max_y_ind; iy++)
-   {
-	     for (unsigned int ix = min_x_ind; ix < max_x_ind; ix++)
-	     {
-		
-	       	    int ind = getIndex(ix, iy);
-	       	    costmap_copy[copy_ind] = costmap_[ind];
-		    copy_ind++;
-
-	     }
-   }
-
- 
-   //for each point in the cloud, we want to trace a line from the origin and clear obstacles along it
-   for (unsigned int i = 0; i < cloud.points.size(); ++i)
-   {
-     double wx = cloud.points[i].x;
-     double wy = cloud.points[i].y;
- 
-     //now we also need to make sure that the enpoint we're raytracing
-     //to isn't off the costmap and scale if necessary
-     double a = wx - ox;
-     double b = wy - oy;
-
- 
-     //the minimum value to raytrace from is the origin
-     if (wx < origin_x)
-     {
-       double t = (origin_x - ox) / a;
-       wx = origin_x;
-       wy = oy + b * t;
-     }
-     if (wy < origin_y)
-     {
-       double t = (origin_y - oy) / b;
-       wx = ox + a * t;
-       wy = origin_y;
-     }
- 
-     //the maximum value to raytrace to is the end of the map
-     if (wx > map_end_x)
-     {
-       double t = (map_end_x - ox) / a;
-       wx = map_end_x - .001;
-       wy = oy + b * t;
-     }
-     if (wy > map_end_y)
-     {
-       double t = (map_end_y - oy) / b;
-       wx = ox + a * t;
-       wy = map_end_y - .001;
-     }
- 
-     //now that the vector is scaled correctly... we'll get the map coordinates of its endpoint
-     unsigned int x1, y1;
- 
-     //check for legality just in case
-     if (!worldToMap(wx, wy, x1, y1))
-       continue;
- 
-     unsigned int cell_raytrace_range = cellDistance(clearing_observation.raytrace_range_);
-     MarkCell marker(costmap_, FREE_SPACE);
-     //and finally... we can execute our trace to clear obstacles along that line
-     raytraceLine(marker, x0, y0, x1, y1, cell_raytrace_range);
-     updateRaytraceBounds(ox, oy, wx, wy, clearing_observation.raytrace_range_, min_x, min_y, max_x, max_y);
-
-      
-
-   }
-
-   int count_copy_ind = 0;
-   // add obstacles inside blind zone  //FIXME, test and check
-   for (unsigned int iy = min_y_ind; iy < max_y_ind; iy++)
-   {
-	     for (unsigned int ix = min_x_ind; ix < max_x_ind; ix++)
-	     {
-		double xw, yw;
-		mapToWorld(ix,iy,xw,yw);
-                double a_sq = (xw-ox)*(xw-ox);
-		double b_sq = (yw-oy)*(yw-oy);
-		if(a_sq+b_sq < min_range*min_range)
-		{
-	       	    int ind = getIndex(ix, iy);
-	       	    costmap_[ind] = costmap_copy[count_copy_ind];
-		}
-		count_copy_ind++;
-
-	     }
-   }
-
-   //delete[] costmap_copy;
-
  }
  
  void NavLayerGlobal::activate()
@@ -613,14 +457,10 @@ void NavLayerGlobal::onInitialize()
                                           double* max_x, double* max_y)
  {
    double dx = wx-ox, dy = wy-oy;
-   double full_distance = sqrt( dx*dx+dy*dy );
+   double full_distance = ::hypot(dx, dy);
    double scale = std::min(1.0, range / full_distance);
    double ex = ox + dx * scale, ey = oy + dy * scale;
-   //touch(ex, ey, min_x, min_y, max_x, max_y);   //FIXME
-   *min_x = std::min(ex, *min_x);
-   *min_y = std::min(ey, *min_y);
-   *max_x = std::max(ex, *max_x);
-   *max_y = std::max(ey, *max_y);
+   touch(ex, ey, min_x, min_y, max_x, max_y);
  }
  
  void NavLayerGlobal::reset()
@@ -675,9 +515,11 @@ void NavLayerGlobal::onInitialize()
  
      //now we want to copy the local map back into the costmap
      copyMapRegion(local_map, 0, 0, cell_size_x, costmap_, start_x, start_y, size_x_, cell_size_x, cell_size_y);
+
  
      //clean up
      delete[] local_map;
  }
  
  } // end namespace costmap_2d
+
