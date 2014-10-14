@@ -1,0 +1,17 @@
+<Robot name="HobbitPT2">
+  <robot file="./Hobbit.dae"/>
+  <manipulator name="hand">
+    <base>BaseLink</base>
+    <!--effector>Link6</effector-->
+    <effector>Link6</effector>
+    <translation>0.0 0.0 0.33</translation>
+    <!--joints>hob_joint7</joints-->
+    <joints>Joint_Jaw1 Joint_Jaw2</joints>
+    <!--rotationaxis>1 0 0 180</rotationaxis-->
+    <closingdirection>1 0</closingdirection>
+    <direction>1 0.001 0.001</direction>
+    <!--iksolver>Transform6D</iksolver-->
+    <iksolver>TranslationDirection5D</iksolver>
+  </manipulator>
+</Robot>
+
