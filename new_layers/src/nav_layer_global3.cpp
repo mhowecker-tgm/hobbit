@@ -194,6 +194,8 @@
 
    static_copy = new unsigned char[size_x_cells*size_y_cells];
 
+   min_x_static =  min_y_static = 1e30;
+   max_x_static = max_y_static = -1e30;
    initialized = false;
 
  }
@@ -320,8 +322,15 @@
  void NavLayerGlobal3::updateBounds(double robot_x, double robot_y, double robot_yaw, double* min_x,
                                            double* min_y, double* max_x, double* max_y)
  {
-
+   if (!initialized) 
+   {
+     min_x_static = *min_x;
+     min_y_static = *min_y;
+     max_x_static = *max_x;
+     max_y_static = *max_y;
+   }
    //std::cout << "updateBounds" << std::endl;
+
    if (rolling_window_)
    {
      std::cout << "rolling window" << std::endl;
@@ -395,25 +404,15 @@
    ////////////////////////////////////////////////////////////////////////
 
    //copy static map to this layer's costmap
-   //copyMapRegion(static_copy, 0, 0, getSizeInCellsX(), costmap_, 0, 0, getSizeInCellsX(), getSizeInCellsX(), getSizeInCellsY());
-
-   for (int it_i= 0; it_i<size_x_; it_i++)
-   {
-	for (int it_j= 0; it_j< size_y_; it_j++)
-	{
-		int ind = getIndex(it_i,it_j);
-		double val = static_copy[ind];
-		costmap_[ind] = val;
-	}
-   }  
+   copyMapRegion(static_copy, 0, 0, getSizeInCellsX(), costmap_, 0, 0, getSizeInCellsX(), getSizeInCellsX(), getSizeInCellsY());
  
    ////////////////////////////////////////////////////////////////////////
 
    //raytrace freespace outside local window
- /*  for (unsigned int i = 0; i < clearing_observations.size(); ++i)
+   for (unsigned int i = 0; i < clearing_observations.size(); ++i)
    {
      raytraceFreespace(clearing_observations[i], min_x, min_y, max_x, max_y);
-   } */
+   } 
 
    ////////////////////////////////////////////////////////////////////////
 
@@ -477,13 +476,18 @@
  
        unsigned int index = getIndex(mx, my);
        costmap_[index] = LETHAL_OBSTACLE;
-       //std::cout << "index " << index << std::endl;
-       touch(px, py, min_x, min_y, max_x, max_y);
+       //touch(px, py, min_x, min_y, max_x, max_y);
       }
     }
- 
+
    footprint_layer_.updateBounds(robot_x, robot_y, robot_yaw, min_x, min_y, max_x, max_y);
-   std::cout << "min_x, min_y, max_x, max_y " << *min_x << " " << *min_y << " " << *max_x << " " << *max_y << std::endl;
+
+   //set bounds so that the whole map area is updated... (reinflated) //FIXME
+     *min_x = min_x_static;
+     *min_y = min_y_static;
+     *max_x = max_x_static;
+     *max_y = max_y_static; 
+   
  }
  
  void NavLayerGlobal3::updateCosts(costmap_2d::Costmap2D& master_grid, int min_i, int min_j, int max_i, int max_j)

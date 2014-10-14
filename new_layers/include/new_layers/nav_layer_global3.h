@@ -194,6 +194,8 @@ protected:
 
    void init();
 
+   double min_x_static, min_y_static, max_x_static, max_y_static;
+
 private:
   void reconfigureCB(costmap_2d::ObstaclePluginConfig &config, uint32_t level);
 };
