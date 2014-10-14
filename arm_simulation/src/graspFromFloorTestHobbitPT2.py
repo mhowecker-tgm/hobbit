@@ -12,6 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """ Finds trajectories for grasps for pick up object from floor
 
 Description
@@ -20,8 +21,8 @@ Description
 This node receives a grasp destination (x,y,z) near the floor where the HobbitPT2 arm should
 
 """
-from __future__ import with_statement # for python 2.5
-__author__ = 'Rosen Diankov'
+#from __future__ import with_statement # for python 2.5
+#__author__ = 'Rosen Diankov'
 
 import time
 from itertools import izip
@@ -31,11 +32,13 @@ if not __openravepy_build_doc__:
 	from openravepy import *
 	from numpy import *
 
-#gp_pnt = [0.299942150,-0.403854100,0.15]# grasp pre-point coordinates (working coordinates)
-gp_pnt_fixed = [0.32,-0.34	,0.15]# grasp pre-point coordinates
+gp_pnt_fixed = [0.32, -0.34, 0.15]# grasp pre-point coordinates
 grasp_area_param = 5	#this parameter defines how big the area is where grasps should be possible: value of 5 means that that the gripper hast 10cm (50cm/5=10cm) space in each direction
 grasp_xy_variation_param = 25 #defines how much offset grasp-x-y-position can have to get valid grasp (trajectory): value of 25 <=> 2 cm offset in each direction (50cm/25=2cm)
 grasp_distance_from_floor_cm = 3 #distance how near gripper should approach the floor
+
+
+class GraspTrajectoryFromFloor():
 
 def main(env,options):
     "Main example code."
@@ -50,8 +53,6 @@ def main(env,options):
         basemanip = interfaces.BaseManipulation(robot)
         taskmanip = interfaces.TaskManipulation(robot)
         robot.SetJointValues([-0.97, -0.97],ikmodel.manip.GetGripperIndices())
-        #Tstart = array([[ -1,  0,  0,   2.00000000e-01], [  0,0,   1, 6.30000000e-01], [  0,   1  , 0,   5.50000000e-02], [  0,0,0,1]])
-        #sol = ikmodel.manip.FindIKSolution(Tstart,IkFilterOptions.CheckEnvCollisions)
         
     #PosLearning = [70*pi/180,58*pi/180,38*pi/180,-35.5*pi/180,118*pi/180,19*pi/180,10*pi/180,10*pi/180]
     PosStart = [30*pi/180, 0, 0, 170*pi/180-20*pi/180, 90*pi/180, -90*pi/180,  10*pi/180, 10*pi/180]
@@ -70,10 +71,6 @@ def main(env,options):
     while True:
         with env:
 	    print "failedattempt: ", failedattempt
-            #Tee = dot(ikmodel.manip.GetTransform(),matrixFromAxisAngle(random.rand(3)-0.5,0.2*random.rand()))
-	    #Tee = eye(4)
-            #Tee = matrixFromAxisAngle(random.rand(3)-0.5,pi*random.rand())
-	      #get current transfrom of gripper (further grasping done with same orientation of gripper)
  
 	    direction = array([0,0,-1])	#this direction defines apprach direction
 	
@@ -85,7 +82,6 @@ def main(env,options):
 
 	    if failedattempt > 1:	#if variation is needed to get possible grasp trajectory
 		Tee[0:2,3] = gp_pnt_xy + (random.rand(2)-0.5)/grasp_xy_variation_param	#vary position to get possible solution
-		#print "Tee: ", Tee[0:3,3]
 
 
 	    maxsteps = 15-grasp_distance_from_floor_cm
@@ -99,7 +95,6 @@ def main(env,options):
             print " MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMDAVID waypoint 0: ",trajdata.GetWaypoint(0)*180.0/3.1415926
             print " MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMDAVID waypoint middle: ",trajdata.GetWaypoint(num_waypoints/2)*180.0/3.1415926
             print " MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMDAVID waypoint last: ", trajdata.GetWaypoint(num_waypoints-1)[0:6]*180.0/3.1415926
-            #trajdata2 = RaveCreateTrajectory(self.simulator.simulator,'').deserialize(trajdata_str2)
             print "trajdata.GetNumWaypoints(): ",trajdata.GetNumWaypoints()
             
 	    params = (direction,Tee)
