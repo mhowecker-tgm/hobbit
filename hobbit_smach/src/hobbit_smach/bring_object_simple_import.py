@@ -75,7 +75,8 @@ class ObjectDetected(smach.State):
         return 'aborted'
 
 
-def point_cloud_cb(msg, ud):
+#def point_cloud_cb(msg, ud):
+def point_cloud_cb(ud, msg):
     print('point cloud received')
     ud.cloud = msg
     return True

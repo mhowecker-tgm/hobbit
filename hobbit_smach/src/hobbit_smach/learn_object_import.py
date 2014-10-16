@@ -173,7 +173,8 @@ def child_term_cb(outcome_map):
         return True
 
 
-def msg_cb(msg, ud):
+#def msg_cb(msg, ud):
+def msg_cb(ud, msg):
     pub = rospy.Publisher('/hobbit/object/points', PointCloud2)
     pub.publish(msg)
     return False
