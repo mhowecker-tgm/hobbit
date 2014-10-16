@@ -13,133 +13,157 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Finds trajectories for grasps for pick up object from floor
+""" Finds trajectories for grasps for pick up objects from floor for HobbitPT2
+
+AUTHOR:     David Fischinger
+DATE:       15.10.2014
+MODIFIED (completely): from OpenRAVE tutorial 
 
 Description
 -----------
 
-This node receives a grasp destination (x,y,z) near the floor where the HobbitPT2 arm should
+This node receives a grasp destination (x,y,z) near the floor where the HobbitPT2 arm should grasp
 
 """
-#from __future__ import with_statement # for python 2.5
-#__author__ = 'Rosen Diankov'
+
+
+PKG = 'hobbit_smach'
+
+import roslib
+roslib.load_manifest(PKG)
+
+import actionlib
+# david from hobbit_msgs.msg import *
+#from std_msgs.msg import String, Bool
 
 import time
+import math
 from itertools import izip
 import rospy
 import openravepy
 if not __openravepy_build_doc__:
-	from openravepy import *
-	from numpy import *
-
-gp_pnt_fixed = [0.32, -0.34, 0.15]# grasp pre-point coordinates
-grasp_area_param = 5	#this parameter defines how big the area is where grasps should be possible: value of 5 means that that the gripper hast 10cm (50cm/5=10cm) space in each direction
-grasp_xy_variation_param = 25 #defines how much offset grasp-x-y-position can have to get valid grasp (trajectory): value of 25 <=> 2 cm offset in each direction (50cm/25=2cm)
-grasp_distance_from_floor_cm = 3 #distance how near gripper should approach the floor
-
-
-class GraspTrajectoryFromFloor():
-
-def main(env,options):
-    "Main example code."
-    env.Load(options.scene)
-    robot = env.GetRobots()[0]
-    if options.manipname is not None:
-        robot.SetActiveManipulator(options.manipname)
-    with env:
-        ikmodel = databases.inversekinematics.InverseKinematicsModel(robot=robot,iktype=IkParameterization.Type.Transform6D)
-        if not ikmodel.load():
-            ikmodel.autogenerate()
-        basemanip = interfaces.BaseManipulation(robot)
-        taskmanip = interfaces.TaskManipulation(robot)
-        robot.SetJointValues([-0.97, -0.97],ikmodel.manip.GetGripperIndices())
-        
-    #PosLearning = [70*pi/180,58*pi/180,38*pi/180,-35.5*pi/180,118*pi/180,19*pi/180,10*pi/180,10*pi/180]
-    PosStart = [30*pi/180, 0, 0, 170*pi/180-20*pi/180, 90*pi/180, -90*pi/180,  10*pi/180, 10*pi/180]
-    #print "PosStart: ", PosStart
-    robot.SetJointValues(PosStart)
-    Tee_start = ikmodel.manip.GetTransform()
-    Tee = Tee_start
-
-
-    print 'checking for existance of trajectories with for grasping from floor'
- 
-    stepsize=0.01
-    failedattempt = 0
-    succeeded = True
-    grasp_tilt_variation_param = 1
-    while True:
-        with env:
-	    print "failedattempt: ", failedattempt
- 
-	    direction = array([0,0,-1])	#this direction defines apprach direction
-	
-	    if succeeded:	#if trajectory was found for last grasp point/position
-		#define new grasp point
-		gp_pnt_xy = gp_pnt_fixed[0:2] + (random.rand(2)-0.5)/grasp_area_param
-		print "New grasp postion (x and y value): ", gp_pnt_xy
-		Tee[0:2,3] = gp_pnt_xy
-
-	    if failedattempt > 1:	#if variation is needed to get possible grasp trajectory
-		Tee[0:2,3] = gp_pnt_xy + (random.rand(2)-0.5)/grasp_xy_variation_param	#vary position to get possible solution
-
-
-	    maxsteps = 15-grasp_distance_from_floor_cm
-	    minsteps = 15-grasp_distance_from_floor_cm
-            h = env.drawlinelist(array([Tee[0:3,3],Tee[0:3,3]+direction*maxsteps*stepsize]),1)
-        try:
-            trajdata_str = basemanip.MoveHandStraight(direction=direction,starteematrix=Tee,stepsize=stepsize,minsteps=minsteps,maxsteps=maxsteps,outputtraj=True)
-            #print "result MoveHandStraight: ",trajdata_str
-            trajdata = RaveCreateTrajectory(env,'').deserialize(trajdata_str)
-            num_waypoints = trajdata.GetNumWaypoints()
-            print " MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMDAVID waypoint 0: ",trajdata.GetWaypoint(0)*180.0/3.1415926
-            print " MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMDAVID waypoint middle: ",trajdata.GetWaypoint(num_waypoints/2)*180.0/3.1415926
-            print " MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMDAVID waypoint last: ", trajdata.GetWaypoint(num_waypoints-1)[0:6]*180.0/3.1415926
-            print "trajdata.GetNumWaypoints(): ",trajdata.GetNumWaypoints()
-            
-	    params = (direction,Tee)
-            print '%d failed attemps before found'%failedattempt,repr(params)
-	    print "direction: ",    direction
-	    raw_input("enter")
-            failedattempt = 0
-	    succeeded = True
-	    grasp_tilt_variation_param = 1
-	    Tee = Tee_start	# set manipulator orientation to originally desired one
-            h = env.drawlinelist(array([Tee[0:3,3],Tee[0:3,3]+direction*maxsteps*stepsize]),4,[0,0,1])
-            robot.WaitForController(0)
-            
-        except planning_error,e:
-            failedattempt += 1
-	    #raw_input("david")
-	    if failedattempt % 100 == 0:
-		grasp_tilt_variation_param += 0.05
-		print "===> New grasp_tilt_variation_param: ", grasp_tilt_variation_param
-		robot.SetJointValues(PosStart)
-		Tee = dot(ikmodel.manip.GetTransform(),matrixFromAxisAngle(random.rand(3)-0.5,grasp_tilt_variation_param*0.2*random.rand())) 
-	    succeeded = False
-
-
-
+    from openravepy import *
+    from numpy import *
 
 from optparse import OptionParser
 from openravepy.misc import OpenRAVEGlobalArguments
+#from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 
-@openravepy.with_destroy 
-def run(args=None):
-    """Command-line execution of the example.
 
-    :param args: arguments for script to parse, if not specified will use sys.argv
-    """
-    parser = OptionParser(description='Shows how choose IK solutions so that move hand straight can move without discontinuities.')
-    OpenRAVEGlobalArguments.addOptions(parser)
-    parser.add_option('--scene',
-                      action="store",type='string',dest='scene',default='/opt/ros/grasping/catkin_ws/src/HobbitArm/Hobbit_BG_SLDASM/Hobbit.env.xml',
-                      help='Scene file to load (default=%default)')
-    parser.add_option('--manipname',
-                      action="store",type='string',dest='manipname',default=None,
-                      help='Choose the manipulator to perform movement for')
-    (options, leftargs) = parser.parse_args(args=args)
-    OpenRAVEGlobalArguments.parseAndCreateThreadedUser(options,main,defaultviewer=True)
+#class ArmActionServerROS(object):
+
+class GraspTrajectoryActionServerFromFloor():
+
+    # create messages that are used to publish feedback/result for action lib
+#david    _feedback = hobbit_msgs.msg.ArmServerFeedback()
+#david    _result   = hobbit_msgs.msg.ArmServerResult()
+
+    gp_pnt_fixed = [0.32, -0.34, 0.15]    # grasp pre-point coordinates
+    grasp_area_param = 5                #this parameter defines how big the area is where grasps should be possible: value of 5 means that that the gripper hast 10cm (50cm/5=10cm) space in each direction
+    grasp_xy_variation_param = 25         #defines how much offset grasp-x-y-position can have to get valid grasp (trajectory): value of 25 <=> 2 cm offset in each direction (50cm/25=2cm)
+    grasp_distance_from_floor_cm = 3     #distance how near gripper should approach the floor
+    
+    #set up the environment
+    #@openravepy.with_destroy
+    def __init__(self):
+        # create arm_action_client
+        # david self.arm_action_client = actionlib.SimpleActionClient("arm_action_server", hobbit_msgs.msg.ArmServerAction)   #"arm_action_server" has to be nodename of ArmActionServer(.py)
+        
+        #OpenRAVE scene setup
+        sceneName = '/opt/ros/hobbit_hydro/src/arm_simulation/data/Hobbit.env.xml'           
+        self.env = Environment()
+        #self.env.SetDebugLevel(DebugLevel.Debug)
+        self.env.SetViewer('qtcoin')
+        self.env.Load(sceneName)
+       
+        self.robot = self.env.GetRobots()[0]
+        manip = self.robot.GetActiveManipulator()
+        self.robot.SetActiveManipulator(manip.GetName())
+        with self.env:
+            self.ikmodel = databases.inversekinematics.InverseKinematicsModel(robot=self.robot,iktype=IkParameterization.Type.Transform6D)
+            if not self.ikmodel.load():
+                self.ikmodel.autogenerate()
+            self.basemanip = interfaces.BaseManipulation(self.robot)
+            self.taskmanip = interfaces.TaskManipulation(self.robot)
+            self.robot.SetJointValues([-0.97, -0.97],self.ikmodel.manip.GetGripperIndices())
+    
+  
+    # calculates grasping trajectory of given grasp position
+    def getTrajForGraspFromFloor(self):
+		#define steps for trajectory
+        stepsize=0.01
+        maxsteps = 15-self.grasp_distance_from_floor_cm
+        minsteps = 15-self.grasp_distance_from_floor_cm
+        
+        failedattempt = 0
+        succeeded = True #indicates if trajectory was found
+        grasp_tilt_variation_param = 1 #parameter varies tilt relaxation
+        # start position where manipulator is oriented normal to the ground (defines manipulator orientation for grasping in this implementation) 
+        PosStart = [30*pi/180, 0, 0, 170*pi/180-20*pi/180, 90*pi/180, -90*pi/180,  10*pi/180, 10*pi/180]
+        self.robot.SetJointValues(PosStart)
+        Tee_start = self.ikmodel.manip.GetTransform()
+        Tee = Tee_start
+        Tee[0:2,3] = self.gp_pnt_xy
+
+        print 'checking for existence of trajectories with for grasping from floor'
+
+        while True:
+            with self.env:
+                print "failedattempt: ", failedattempt
+                direction = array([0,0,-1])    #this direction defines approach direction
+        
+                if failedattempt > 1:    #if variation is needed to get possible grasp trajectory
+                    Tee[0:2,3] = self.gp_pnt_xy + (random.rand(2)-0.5)/self.grasp_xy_variation_param    #vary position to get possible solution
+
+                h = self.env.drawlinelist(array([Tee[0:3,3],Tee[0:3,3]+direction*maxsteps*stepsize]),1)
+            try:
+                trajdata_str = self.basemanip.MoveHandStraight(direction=direction,starteematrix=Tee,stepsize=stepsize,minsteps=minsteps,maxsteps=maxsteps,outputtraj=True)
+                #print "result MoveHandStraight: ",trajdata_str
+                trajdata = RaveCreateTrajectory(self.env,'').deserialize(trajdata_str)
+                num_waypoints = trajdata.GetNumWaypoints()
+                
+                
+                
+                tra1 = trajdata.GetWaypoint(0)[0:6]*180.0/math.pi
+                tra2 = trajdata.GetWaypoint(num_waypoints/2)[0:6]*180.0/math.pi
+                tra3 =  trajdata.GetWaypoint(num_waypoints-1)[0:6]*180.0/math.pi
+                
+                print " MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMDAVID waypoint 0: ",tra1, type(tra1)
+                print " MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMDAVID waypoint middle: ",tra2, type(tra2)
+                print " MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMDAVID waypoint last: ", tra3, type(tra3)
+                # write command (for ArmActionServer) and the first, the one in the middle and the last waypoint of the trajectory into the trajectory_string variable traj_str
+                traj_str = "SetExecuteGrasp " + numpy.array_str(tra1).strip("[]") + " --- " + numpy.array_str(tra2).strip("[]") + " --- " + numpy.array_str(tra3).strip("[]")
+                print "traj_str: \n", traj_str
+                raw_input("dsaf")
+                print "trajdata.GetNumWaypoints(): ",trajdata.GetNumWaypoints()
+                
+                params = (direction,Tee)
+                print '%d failed attemps before found'%failedattempt,repr(params)
+                raw_input("trajectory found. press enter")
+                h = self.env.drawlinelist(array([Tee[0:3,3],Tee[0:3,3]+direction*maxsteps*stepsize]),4,[0,0,1])
+                self.robot.WaitForController(0)
+                
+                break    #exit trajectory calculation
+                
+            except planning_error,e:
+                failedattempt += 1
+
+            if failedattempt % 100 == 0:    #after a number of tries (100) the tilt direction is relaxed
+                grasp_tilt_variation_param += 0.05
+                print "===> New grasp_tilt_variation_param: ", grasp_tilt_variation_param
+                self.robot.SetJointValues(PosStart)
+                Tee = dot(self.ikmodel.manip.GetTransform(),matrixFromAxisAngle(random.rand(3)-0.5,grasp_tilt_variation_param*0.2*random.rand())) 
+            #succeeded = False
+
+
+
+ 
 
 if __name__ == "__main__":
-    run()
+    trajSim = GraspTrajectoryActionServerFromFloor()
+    while True:
+    	trajSim.gp_pnt_xy = trajSim.gp_pnt_fixed[0:2] + (random.rand(2)-0.5)/trajSim.grasp_area_param
+        print "New grasp position (x and y value): ", trajSim.gp_pnt_xy
+    	trajSim.getTrajForGraspFromFloor()
+    
+    
