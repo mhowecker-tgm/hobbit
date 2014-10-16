@@ -14,10 +14,10 @@ export MIRA_PATH=$MIRA_PATH:/localhome/demo/mira/mira-hobbit
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/localhome/demo/mira/mira-hobbit/lib
 
 # ROS configuration
-export ROS_HOSTNAME=192.168.2.122				   
+#export ROS_HOSTNAME=192.168.2.122				   
 export ROS_IP=192.168.2.122                                        
 export ROS_MASTER_URI=http://192.168.2.122:11311
-source /opt/ros/hydro/setup.bash
+#source /opt/ros/hydro/setup.bash
 source /opt/ros/hobbit_hydro/devel/setup.bash
 
 #needed for bash autocompletion with ROS
