@@ -137,9 +137,8 @@ def getRecharge():
 
 
 def getEndRecharge():
-    """This function handles the autonomous charging sequence.
-    It is without the user interaction and is mainly used during
-    the night or as part of the recharging scenario.
+    """
+    This function handles the autonomous undocking sequence.
     """
 
     seq = Sequence(
@@ -147,6 +146,22 @@ def getEndRecharge():
         input_keys=['room_name', 'location_name'],
         connector_outcome='succeeded'
     )
+
+    seq1 = Sequence(
+        outcomes=['succeeded', 'aborted', 'preempted'],
+        input_keys=['room_name', 'location_name'],
+        connector_outcome='succeeded'
+    )
+
+    with seq1:
+        Sequence.add(
+            'UNDOCK',
+            hobbit_move.get_undock_action())
+        #  Sequence.add(
+        #      'SOUND',
+        #      speech_output.playMoveOut()
+        #  )
+    return seq1
 
     with seq:
         Sequence.add(
@@ -168,13 +183,6 @@ def getEndRecharge():
         Sequence.add(
             'MOVE_AWAY_FROM_DOCK',
             hobbit_move.goToPose())
-        # Sequence.add(
-        #     'SET_NAV_GOAL_RANDOM',
-        #     hobbit_move.SetNavGoal(room='maincorridor', place='default')
-        # )
-        # Sequence.add(
-        #     'MOVE_AWAY',
-        #     hobbit_move.goToPose())
     return seq
 
 
@@ -225,20 +233,22 @@ def startDockProcedure():
 
     with cc:
         Concurrence.add(
-            'WAIT', SleepState(duration=20))
+            'WAIT', SleepState(duration=5))
         Concurrence.add(
             'CHARGE_CHECK',
             seq)
 
     with seq1:
-        Sequence.add('START_DOCK', hobbit_move.Dock())
-        Sequence.add('WAIT', SleepState(duration=20))
+        Sequence.add('START_DOCK', hobbit_move.get_dock_action())
+        # Sequence.add('START_DOCK', hobbit_move.Dock())
+        # Sequence.add('WAIT', SleepState(duration=20))
         Sequence.add('CHECK',
                      cc,
                      transitions={'succeeded': 'aborted',
                                   'failed': 'RETRY'})
-        Sequence.add('RETRY', hobbit_move.get_undock())
-        Sequence.add('WAIT1', SleepState(duration=10))
+        Sequence.add('START_DOCK', hobbit_move.get_undock_action())
+        # Sequence.add('RETRY', hobbit_move.get_undock())
+        # Sequence.add('WAIT1', SleepState(duration=10))
         Sequence.add('CHECK_1',
                      cc,
                      transitions={'succeeded': 'aborted',
