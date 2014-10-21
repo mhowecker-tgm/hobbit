@@ -3,7 +3,7 @@
 ## David Fischinger
 ## first version: 12.08.2014
 # 
-# Test if chech_free_space service works
+# Test if check_free_space service works
 #
 # subscribes to /SS/doSingleShotTestCFS", if String comes in:
 #     subscribes to /headcam/depth_registered/points and uses point cloud for service call
