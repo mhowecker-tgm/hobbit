@@ -4,6 +4,7 @@
 PKG = 'hobbit_smach'
 NAME = 'hobbit_move'
 DEBUG = False
+TIMEOUT = 5
 
 import roslib
 roslib.load_manifest(PKG)
@@ -13,10 +14,11 @@ import uashh_smach.util as util
 import math
 
 from smach import State, Sequence, StateMachine
-from smach_ros import ServiceState
+from smach_ros import ServiceState, SimpleActionState
 from hobbit_msgs.srv import GetCoordinates, GetCoordinatesRequest, GetName, \
     SwitchVision, SwitchVisionRequest
 from move_base_msgs.msg import MoveBaseAction
+from interfaces_mira import MiraDockingAction, MiraDockingGoal
 from std_msgs.msg import String
 from mira_msgs.msg import BatteryState
 from hobbit_user_interaction import HobbitMMUI
@@ -25,7 +27,7 @@ from actionlib import SimpleActionClient
 import uashh_smach.platform.move_base as move_base
 import head_move_import as head_move
 import speech_output_import as speech_output
-import service_disable_import as service_disable
+# import service_disable_import as service_disable
 import arm_move_import as arm_move
 from math import pi
 
@@ -95,6 +97,43 @@ def get_undock():
             SleepState(duration=5)
         )
     return seq
+
+
+def docking_result_cb(userdata, status, result):
+    if result:
+        return 'succeeded'
+    else:
+        return 'aborted'
+
+
+def get_dock_action():
+    """
+    Return exactly on SimpleActionState to start the dock procedure
+    """
+    docking_goal = MiraDockingGoal(docking_task=0)
+    state = SimpleActionState('docking_task',
+                              MiraDockingAction,
+                              goal=docking_goal,
+                              result_cb=docking_result_cb,
+                              preempt_timeout=rospy.Duration(TIMEOUT),
+                              server_wait_timeout=rospy.Duration(TIMEOUT)
+                              )
+    return state
+
+
+def get_undock_action():
+    """
+    Return exactly on SimpleActionState to start the undock procedure
+    """
+    docking_goal = MiraDockingGoal(docking_task=1)
+    state = SimpleActionState('docking_task',
+                              MiraDockingAction,
+                              goal=docking_goal,
+                              result_cb=docking_result_cb,
+                              preempt_timeout=rospy.Duration(TIMEOUT),
+                              server_wait_timeout=rospy.Duration(TIMEOUT)
+                              )
+    return state
 
 
 class SetObstacles(State):
@@ -273,7 +312,7 @@ class SetNavigationGoal(ServiceState):
     and stored in the userdata.
     """
     def __init__(self, frame='/map', room=String('None'), place='dock'):
-        #print('Inside SetNavigationGoal __init__')
+        # print('Inside SetNavigationGoal __init__')
         ServiceState.__init__(
             self,
             'get_coordinates',
@@ -288,9 +327,9 @@ class SetNavigationGoal(ServiceState):
         self.place = place
 
     def __request_cb(self, ud, request):
-        print('Inside SetNavigationGoal')
-        print('userdata: ', ud.room_name, ud.location_name)
-        print(self.room, self.place)
+        # print('Inside SetNavigationGoal')
+        # print('userdata: ', ud.room_name, ud.location_name)
+        # print(self.room, self.place)
         if not ud.room_name == 'None':
             self.room = ud.room_name
             if not ud.location_name == 'None':
@@ -314,8 +353,8 @@ class SetNavigationGoal(ServiceState):
         ud.x = response.pose.x
         ud.y = response.pose.y
         ud.yaw = response.pose.theta
-        #ud.room_name = 'None'
-        #ud.location_name = 'None'
+        # ud.room_name = 'None'
+        # ud.location_name = 'None'
         return 'succeeded'
 
 
