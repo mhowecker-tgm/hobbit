@@ -18,7 +18,7 @@ from smach_ros import ServiceState, SimpleActionState
 from hobbit_msgs.srv import GetCoordinates, GetCoordinatesRequest, GetName, \
     SwitchVision, SwitchVisionRequest
 from move_base_msgs.msg import MoveBaseAction
-from interfaces_mira import MiraDockingAction, MiraDockingGoal
+from interfaces_mira.msg import MiraDockingAction, MiraDockingGoal
 from std_msgs.msg import String
 from mira_msgs.msg import BatteryState
 from hobbit_user_interaction import HobbitMMUI
@@ -71,7 +71,8 @@ def undock_if_needed():
         )
         StateMachine.add(
             'UNDOCK',
-            get_undock(),
+            # get_undock(),
+            get_undock_action(),
             transitions={'succeeded': 'succeeded',
                          'aborted': 'aborted',
                          'preempted': 'preempted'}

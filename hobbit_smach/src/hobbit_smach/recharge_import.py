@@ -69,7 +69,8 @@ def undock_if_needed():
         )
         StateMachine.add(
             'UNDOCK',
-            hobbit_move.get_undock(),
+            # hobbit_move.get_undock(),
+            hobbit_move.get_undock_action(),
             transitions={'succeeded': 'succeeded',
                          'aborted': 'aborted',
                          'preempted': 'preempted'}
@@ -246,7 +247,7 @@ def startDockProcedure():
                      cc,
                      transitions={'succeeded': 'aborted',
                                   'failed': 'RETRY'})
-        Sequence.add('START_DOCK', hobbit_move.get_undock_action())
+        Sequence.add('RETRY', hobbit_move.get_undock_action())
         # Sequence.add('RETRY', hobbit_move.get_undock())
         # Sequence.add('WAIT1', SleepState(duration=10))
         Sequence.add('CHECK_1',
