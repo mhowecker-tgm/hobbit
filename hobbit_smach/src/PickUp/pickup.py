@@ -28,7 +28,7 @@ import hobbit_smach.head_move_import as head_move
 import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.pickup_import as pickup
 import hobbit_smach.logging_import as log
-from hobbit_smach.helper_import import WaitForMsgState
+# from hobbit_smach.helper_import import WaitForMsgState
 
 
 def switch_vision_cb(ud, response):
