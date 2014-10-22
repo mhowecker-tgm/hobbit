@@ -64,7 +64,7 @@ class GraspTrajectoryActionServerFromFloor():
     gp_pnt_fixed = [0.32, -0.34, 0.15]    # grasp pre-point coordinates
     grasp_area_param = 5                #this parameter defines how big the area is where grasps should be possible: value of 5 means that that the gripper has 10cm (50cm/5=10cm) space in each direction
     grasp_xy_variation_param = 25         #defines how much offset grasp-x-y-position can have to get valid grasp (trajectory): value of 25 <=> 2 cm offset in each direction (50cm/25=2cm)
-    grasp_distance_from_floor_cm = 5     #distance how near gripper should approach the floor
+    grasp_distance_from_floor_cm = 7     #distance how near gripper should approach the floor
     
     #set up the environment
     #@openravepy.with_destroy
@@ -77,7 +77,7 @@ class GraspTrajectoryActionServerFromFloor():
         sceneName = '/opt/ros/hobbit_hydro/src/arm_simulation/data/Hobbit.env.xml'           
         self.env = Environment()
         #self.env.SetDebugLevel(DebugLevel.Debug)
-        #self.env.SetViewer('qtcoin')    #turn off/on visualization in openrave
+        self.env.SetViewer('qtcoin')    #turn off/on visualization in openrave
         self.env.Load(sceneName)
         arm_client = ArmActionClient()
         self.ArmClient = ArmActionClient() #new!!! (21.10.2014) create instance of arm action client to send command to arm
@@ -105,12 +105,14 @@ class GraspTrajectoryActionServerFromFloor():
         succeeded = True #indicates if trajectory was found
         grasp_tilt_variation_param = 1 #parameter varies tilt relaxation
         # start position where manipulator is oriented normal to the ground (defines manipulator orientation for grasping in this implementation) 
-        PosStart = [30*pi/180, 0, 0, 170*pi/180-20*pi/180, 90*pi/180, -90*pi/180,  10*pi/180, 10*pi/180]
+        #PosStart = [30*pi/180,    0,           0,           170*pi/180-20*pi/180, 90*pi/180,     -90*pi/180,  10*pi/180, 10*pi/180]
+        PosStart = [69.71*pi/180, 43.4*pi/180, 86.3*pi/180, 134.3*pi/180,         107.64*pi/180, 4.03*pi/180,  10*pi/180, 10*pi/180] # pregrasp from floor pos
         self.robot.SetJointValues(PosStart)
         Tee_start = self.ikmodel.manip.GetTransform()
         Tee = Tee_start
         Tee[0:2,3] = self.gp_pnt_xy
 
+        raw_input("new")
         print 'checking for existence of trajectories with for grasping from floor'
 
         while True:
