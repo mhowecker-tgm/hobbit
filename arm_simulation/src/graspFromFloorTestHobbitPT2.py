@@ -162,6 +162,7 @@ class GraspTrajectoryActionServerFromFloor():
  
 
 if __name__ == "__main__":
+    rospy.init_node('graspFromFloor')
     trajSim = GraspTrajectoryActionServerFromFloor()
     while True:
     	trajSim.gp_pnt_xy = trajSim.gp_pnt_fixed[0:2] + (random.rand(2)-0.5)/trajSim.grasp_area_param
