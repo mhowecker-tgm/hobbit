@@ -65,6 +65,7 @@ class GraspTrajectoryActionServerFromFloor():
     grasp_area_param = 5                #this parameter defines how big the area is where grasps should be possible: value of 5 means that that the gripper has 10cm (50cm/5=10cm) space in each direction
     grasp_xy_variation_param = 25         #defines how much offset grasp-x-y-position can have to get valid grasp (trajectory): value of 25 <=> 2 cm offset in each direction (50cm/25=2cm)
     grasp_distance_from_floor_cm = 7     #distance how near gripper should approach the floor
+    max_traj_diff_rad = 40*pi/180             # maximal joint difference between two trajectory points in rad  => now: 40 degrees tolerated per joint between pos:graspfromfloor and calculated trajectory
     
     #set up the environment
     #@openravepy.with_destroy
@@ -77,7 +78,7 @@ class GraspTrajectoryActionServerFromFloor():
         sceneName = '/opt/ros/hobbit_hydro/src/arm_simulation/data/Hobbit.env.xml'           
         self.env = Environment()
         #self.env.SetDebugLevel(DebugLevel.Debug)
-        self.env.SetViewer('qtcoin')    #turn off/on visualization in openrave
+        #self.env.SetViewer('qtcoin')    #turn off/on visualization in openrave
         self.env.Load(sceneName)
         arm_client = ArmActionClient()
         self.ArmClient = ArmActionClient() #new!!! (21.10.2014) create instance of arm action client to send command to arm
@@ -112,7 +113,6 @@ class GraspTrajectoryActionServerFromFloor():
         Tee = Tee_start
         Tee[0:2,3] = self.gp_pnt_xy
 
-        raw_input("new")
         print 'checking for existence of trajectories with for grasping from floor'
 
         while True:
@@ -134,21 +134,26 @@ class GraspTrajectoryActionServerFromFloor():
                 tra2 = trajdata.GetWaypoint(num_waypoints/2)[0:6]*180.0/math.pi
                 tra3 =  trajdata.GetWaypoint(num_waypoints-1)[0:6]*180.0/math.pi
                 
-                # write command (for ArmActionServer) and the first, the one in the middle and the last waypoint of the trajectory into the trajectory_string variable traj_str
-                traj_str = "SetExecuteGrasp " + numpy.array_str(tra1).strip("[]") + numpy.array_str(tra2).strip("[]") + numpy.array_str(tra3).strip("[]")
-                print "traj_str: \n", traj_str
-                print "trajdata.GetNumWaypoints(): ",trajdata.GetNumWaypoints()
-                
-                params = (direction,Tee)
-                print '%d failed attemps before found'%failedattempt#,repr(params)
-                raw_input("trajectory found. press enter")
-                h = self.env.drawlinelist(array([Tee[0:3,3],Tee[0:3,3]+direction*maxsteps*stepsize]),4,[0,0,1])
-                self.robot.WaitForController(0)
-                
-                raw_input("press enter to send trajectory to arm_action_server")
-                self.ArmClient.arm_action_client(String(traj_str))    #should execute the whole grasp trajectory
-                
-                break    #exit trajectory calculation
+                if self.checkTrajectoryOk(PosStart, trajdata.GetWaypoint(0)[0:6]) and self.checkTrajectoryOk(trajdata.GetWaypoint(0)[0:6], trajdata.GetWaypoint(num_waypoints/2)[0:6]):  # tajectory is accepted 
+                    
+                    # write command (for ArmActionServer) and the first, the one in the middle and the last waypoint of the trajectory into the trajectory_string variable traj_str
+                    traj_str = "SetExecuteGrasp " + numpy.array_str(tra1).strip("[]") + numpy.array_str(tra2).strip("[]") + numpy.array_str(tra3).strip("[]")
+                    print "traj_str: \n", traj_str
+                    #print "trajdata.GetNumWaypoints(): ",trajdata.GetNumWaypoints()
+                    
+                    params = (direction,Tee)
+                    print '%d failed attemps before found'%failedattempt#,repr(params)
+                    raw_input("trajectory found. press enter")
+                    h = self.env.drawlinelist(array([Tee[0:3,3],Tee[0:3,3]+direction*maxsteps*stepsize]),4,[0,0,1])
+                    self.robot.WaitForController(0)
+                    
+                    raw_input("press enter to send trajectory to arm_action_server")
+                    self.ArmClient.arm_action_client(String(traj_str))    #should execute the whole grasp trajectory
+                    
+                    break    #exit trajectory calculation
+                else:
+                    print "=============================================================================> trajectory was not accepted because to much movement necessary"
+                    failedattempt += 1
                 
             except planning_error,e:
                 failedattempt += 1
@@ -160,7 +165,21 @@ class GraspTrajectoryActionServerFromFloor():
                 Tee = dot(self.ikmodel.manip.GetTransform(),matrixFromAxisAngle(random.rand(3)-0.5,grasp_tilt_variation_param*0.2*random.rand())) 
             #succeeded = False
 
-
+    #tests if for two trajectory waypoints tra1 and tra2 the maximal joint difference (each joint is compared) is lower then the treshold self.max_traj_diff_rad
+    def checkTrajectoryOk(self, tra1, tra2):
+        maxdiff = 0
+        #print "tra1, tra2, len(tra1), len(tra2):"
+        #print tra1, len(tra1)
+        #print tra2, len(tra2)
+        for x in range(0,5): # first 5 joints
+            if abs(tra1[x]-tra2[x]) > maxdiff:
+                maxdiff = abs(tra1[x]-tra2[x])
+        if maxdiff < self.max_traj_diff_rad:    # in rad
+            return True
+        else:
+            print "checkTrajectoryOk: max diff in degree: ", maxdiff*180.0/pi
+            return False
+        
  
 
 if __name__ == "__main__":
