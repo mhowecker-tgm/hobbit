@@ -22,18 +22,22 @@ MODIFIED (completely): from OpenRAVE tutorial
 Description
 -----------
 
-This node receives a grasp destination (x,y,z) near the floor where the HobbitPT2 arm should grasp
+This node receives a grasp destination (x,y,z) near the floor where the HobbitPT2 arm should grasp.
+The arm trajectory is calculated and saved as a string and a service of the ArmActionServer is 
+called for executing the execution of the trajectory. 
 
 """
 
 
 PKG = 'hobbit_smach'
+#PKG = 'arm_simulation'
 
 import roslib
 roslib.load_manifest(PKG)
 
 import actionlib
-# david from hobbit_msgs.msg import *
+from hobbit_msgs.msg import *
+from hobbit_smach.ArmActionClient import ArmActionClient    #new!!! (21.10.2014)
 #from std_msgs.msg import String, Bool
 
 import time
@@ -47,7 +51,6 @@ if not __openravepy_build_doc__:
 
 from optparse import OptionParser
 from openravepy.misc import OpenRAVEGlobalArguments
-#from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 
 
 #class ArmActionServerROS(object):
@@ -55,26 +58,29 @@ from openravepy.misc import OpenRAVEGlobalArguments
 class GraspTrajectoryActionServerFromFloor():
 
     # create messages that are used to publish feedback/result for action lib
-#david    _feedback = hobbit_msgs.msg.ArmServerFeedback()
-#david    _result   = hobbit_msgs.msg.ArmServerResult()
+    #_feedback = hobbit_msgs.msg.ArmServerFeedback()
+    #_result   = hobbit_msgs.msg.ArmServerResult()
 
     gp_pnt_fixed = [0.32, -0.34, 0.15]    # grasp pre-point coordinates
-    grasp_area_param = 5                #this parameter defines how big the area is where grasps should be possible: value of 5 means that that the gripper hast 10cm (50cm/5=10cm) space in each direction
+    grasp_area_param = 5                #this parameter defines how big the area is where grasps should be possible: value of 5 means that that the gripper has 10cm (50cm/5=10cm) space in each direction
     grasp_xy_variation_param = 25         #defines how much offset grasp-x-y-position can have to get valid grasp (trajectory): value of 25 <=> 2 cm offset in each direction (50cm/25=2cm)
-    grasp_distance_from_floor_cm = 3     #distance how near gripper should approach the floor
+    grasp_distance_from_floor_cm = 5     #distance how near gripper should approach the floor
     
     #set up the environment
     #@openravepy.with_destroy
     def __init__(self):
+        
         # create arm_action_client
-        # david self.arm_action_client = actionlib.SimpleActionClient("arm_action_server", hobbit_msgs.msg.ArmServerAction)   #"arm_action_server" has to be nodename of ArmActionServer(.py)
+        #self.arm_action_client = actionlib.SimpleActionClient("arm_action_server", hobbit_msgs.msg.ArmServerAction)   #"arm_action_server" has to be nodename of ArmActionServer(.py)
         
         #OpenRAVE scene setup
         sceneName = '/opt/ros/hobbit_hydro/src/arm_simulation/data/Hobbit.env.xml'           
         self.env = Environment()
         #self.env.SetDebugLevel(DebugLevel.Debug)
-        self.env.SetViewer('qtcoin')
+        #self.env.SetViewer('qtcoin')    #turn off/on visualization in openrave
         self.env.Load(sceneName)
+        arm_client = ArmActionClient()
+        self.ArmClient = ArmActionClient() #new!!! (21.10.2014) create instance of arm action client to send command to arm
        
         self.robot = self.env.GetRobots()[0]
         manip = self.robot.GetActiveManipulator()
@@ -122,26 +128,23 @@ class GraspTrajectoryActionServerFromFloor():
                 trajdata = RaveCreateTrajectory(self.env,'').deserialize(trajdata_str)
                 num_waypoints = trajdata.GetNumWaypoints()
                 
-                
-                
                 tra1 = trajdata.GetWaypoint(0)[0:6]*180.0/math.pi
                 tra2 = trajdata.GetWaypoint(num_waypoints/2)[0:6]*180.0/math.pi
                 tra3 =  trajdata.GetWaypoint(num_waypoints-1)[0:6]*180.0/math.pi
                 
-                print " MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMDAVID waypoint 0: ",tra1, type(tra1)
-                print " MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMDAVID waypoint middle: ",tra2, type(tra2)
-                print " MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMDAVID waypoint last: ", tra3, type(tra3)
                 # write command (for ArmActionServer) and the first, the one in the middle and the last waypoint of the trajectory into the trajectory_string variable traj_str
-                traj_str = "SetExecuteGrasp " + numpy.array_str(tra1).strip("[]") + " --- " + numpy.array_str(tra2).strip("[]") + " --- " + numpy.array_str(tra3).strip("[]")
+                traj_str = "SetExecuteGrasp " + numpy.array_str(tra1).strip("[]") + numpy.array_str(tra2).strip("[]") + numpy.array_str(tra3).strip("[]")
                 print "traj_str: \n", traj_str
-                raw_input("dsaf")
                 print "trajdata.GetNumWaypoints(): ",trajdata.GetNumWaypoints()
                 
                 params = (direction,Tee)
-                print '%d failed attemps before found'%failedattempt,repr(params)
+                print '%d failed attemps before found'%failedattempt#,repr(params)
                 raw_input("trajectory found. press enter")
                 h = self.env.drawlinelist(array([Tee[0:3,3],Tee[0:3,3]+direction*maxsteps*stepsize]),4,[0,0,1])
                 self.robot.WaitForController(0)
+                
+                raw_input("press enter to send trajectory to arm_action_server")
+                self.ArmClient.arm_action_client(traj_str)    #should execute the whole grasp trajectory
                 
                 break    #exit trajectory calculation
                 
@@ -154,7 +157,6 @@ class GraspTrajectoryActionServerFromFloor():
                 self.robot.SetJointValues(PosStart)
                 Tee = dot(self.ikmodel.manip.GetTransform(),matrixFromAxisAngle(random.rand(3)-0.5,grasp_tilt_variation_param*0.2*random.rand())) 
             #succeeded = False
-
 
 
  
