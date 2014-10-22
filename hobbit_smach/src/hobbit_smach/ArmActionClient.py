@@ -33,36 +33,36 @@ class ArmActionClient():
     # use this method with a String cmd to send goal to the ArmActionServer and return its result value
     def arm_action_client(self, cmd):
 
-	# Waits until the action server has started up and started
-	# listening for goals.
-	print "ArmActionClient: wait_for_server()"
-	self.client.wait_for_server()
-	print "server found!"
+        # Waits until the action server has started up and started
+        # listening for goals.
+        print "ArmActionClient: wait_for_server()"
+        self.client.wait_for_server()
+        print "server found!"
 
-	#print "ArmActionClient: create goal"
-	# Creates a goal to send to the action server.
-	goal = hobbit_msgs.msg.ArmServerGoal(command=cmd)
+        #print "ArmActionClient: create goal"
+        # Creates a goal to send to the action server.
+        goal = hobbit_msgs.msg.ArmServerGoal(command=cmd)
 
-	#print "ArmActionClient: send goal"
-	# Sends the goal to the action server.
-	self.client.send_goal(goal, feedback_cb=self.feedback_cb)
+        #print "ArmActionClient: send goal"
+        # Sends the goal to the action server.
+        self.client.send_goal(goal, feedback_cb=self.feedback_cb)
 
-	print "wait for result"
-	# Waits for the server to finish performing the action.
-	self.client.wait_for_result()
+        print "wait for result"
+        # Waits for the server to finish performing the action.
+        self.client.wait_for_result()
 	
 
-	# Prints out the result of executing the action
-	returnval = self.client.get_result()  # 
-	print "cmd: ", cmd
-	#print "ArmActionClient.py: class ArmActionClient: function arm_action_client (=> sends/receives actionlib data from/to server): returnval.result.data: ", returnval.result.data
-	return returnval
+        # Prints out the result of executing the action
+        returnval = self.client.get_result()  # 
+        print "cmd: ", cmd
+        #print "ArmActionClient.py: class ArmActionClient: function arm_action_client (=> sends/receives actionlib data from/to server): returnval.result.data: ", returnval.result.data
+        return returnval
         
     def feedback_cb(self, feedback):
-	print "feedback_cb executed!"
-	#print "feedback type: ", (type) (feedback)
-	self.last_feedback = feedback
-	print "==========> feedback: ", self.last_feedback 
+        print "feedback_cb executed!"
+        #print "feedback type: ", (type) (feedback)
+        self.last_feedback = feedback
+        print "==========> feedback: ", self.last_feedback 
 
 
 
@@ -75,109 +75,109 @@ class ArmActionClient():
    #as
     def SetStartInterpolation(self):
         result = self.arm_action_client(String('SetStartInterpolation'))
-	return result.result.data
+        return result.result.data
         
     
     #as
     def SetPositionsForInterpolation(self,Value1, Value2, Value3, Value4, Value5, Value6):
         result = self.arm_action_client(String('SetPositionsForInterpolation {Val1} {Val2} {Val3} {Val4} {Val5} {Val6}'.format(Val1=Value1,Val2=Value2,Val3=Value3,Val4=Value4,Val5=Value5,Val6=Value6)))
-	return result.result.data
+        return result.result.data
     
     #as
     def SetPositionsForInterpolationReady(self):
         result = self.arm_action_client(String('SetPositionsForInterpolationReady'))
-	return result.result.data        
+        return result.result.data        
     
     #as
     def SetStartMove(self, Velocity):
         # Velocity in [deg/s]; Maximum Velocity = 20
         result = self.arm_action_client(String('SetStartMove {Val1}'.format(Val1=round(Velocity,2))))
-	return result.result.data
+        return result.result.data
 
     #as   
     def SetMoveToHomePos(self):
         result = self.arm_action_client(String('SetMoveToHomePos'))
-	return result.result.data
+        return result.result.data
 
     #as  
     def SetMoveToLearningPos(self):
         result = self.arm_action_client(String('SetMoveToLearningPos'))
-   	return result.result.data
+        return result.result.data
     
     #as
     def SetMoveToTrayPos(self):
         result = self.arm_action_client(String('SetMoveToTrayPos'))
-	return result.result.data
+        return result.result.data
     
     #as
     def SetMoveToPreGraspFromFloorPos(self):
         result = self.arm_action_client(String('SetMoveToPreGraspFromFloorPos'))
-	return result.result.data
+        return result.result.data
     
     #as
     def SetMoveToPreGraspFromTablePos(self):
         result = self.arm_action_client(String('SetMoveToPreGraspFromTablePos'))
-	return result.result.data
+        return result.result.data
     
     #as
     def SetStoreTurntable(self):
         result = self.arm_action_client(String('SetStoreTurntable'))
-	return result.result.data
+        return result.result.data
     
     #as
     def SetMoveToCandlePos(self):
         result = self.arm_action_client(String('SetMoveToCandlePos'))
-	return result.result.data
+        return result.result.data
     
     #as
     def SetTurnTurntableCW(self):
         result = self.arm_action_client(String('SetTurnTurntableCW'))
-	return result.result.data
+        return result.result.data
     
     #as
     def SetTurnTurntableCCW(self):
         result = self.arm_action_client(String('SetTurnTurntableCCW'))
-	return result.result.data
+        return result.result.data
     
     #as
     def SetStartArmReference(self):
         result = self.arm_action_client(String('SetStartArmReference'))
-	return result.result.data
+        return result.result.data
 
     #as
     def SetDisableArm(self):
         result = self.arm_action_client(String('SetDisableArm'))
-	return result.result.data
+        return result.result.data
 
     #as    
     def SetEnableArm(self):
         result = self.arm_action_client(String('SetEnableArm'))
-	return result.result.data
+        return result.result.data
     
     #as
     def SetOpenGripper(self):
         result = self.arm_action_client(String('SetOpenGripper'))
-	return result.result.data
+        return result.result.data
     
     #as
     def SetCloseGripper(self):
         result = self.arm_action_client(String('SetCloseGripper'))
-	return result.result.data
+        return result.result.data
 
     #as
     def SetResetArm(self):
         result = self.arm_action_client(String('SetResetArm'))
-	return result.result.data
+        return result.result.data
     
     #as
     def SetStopArmMove(self):
         result = self.arm_action_client(String('SetStopArmMove'))
-	return result.result.data
+        return result.result.data
 
     #as
     def SetClearPosBuffer(self):
         result = self.arm_action_client(String('SetClearPosBuffer'))
-	return result.result.data
+        return result.result.data
     
     
     
@@ -185,102 +185,102 @@ class ArmActionClient():
     #as
     def GetArmState(self):
         result = self.arm_action_client(String('GetArmState'))
-	return result.result.data
+        return result.result.data
        
     #as
     def GetActualPosition(self):
         result = self.arm_action_client(String('GetActualPosition'))
-	return result.result.data
+        return result.result.data
        
     #as
     def GetGripperIsClosed(self):
         result = self.arm_action_client(String('GetGripperIsClosed'))
-	return result.result.data
+        return result.result.data
        
     #as    
     def GetArmIsMoving(self):
         result = self.arm_action_client(String('GetArmIsMoving'))
-	return result.result.data
+        return result.result.data
        
     #as    
     def GetArmHasError(self):
         result = self.arm_action_client(String('GetArmHasError'))
-	return result.result.data
+        return result.result.data
        
     #as
     def GetArmHasStopped(self):
         result = self.arm_action_client(String('GetArmHasStopped'))
-	return result.result.data
+        return result.result.data
        
     #as    
     def GetArmIsEnabled(self):
         result = self.arm_action_client(String('GetArmIsEnabled'))
-	return result.result.data
+        return result.result.data
        
     #as
     def GetArmIsHomed(self):
         result = self.arm_action_client(String('GetArmIsHomed'))
-	return result.result.data
+        return result.result.data
        
     #as    
     def GetArmInPositionArea(self):
         result = self.arm_action_client(String('GetArmInPositionArea'))
-	return result.result.data
+        return result.result.data
        
     #as    
     def GetArmInTargetPos(self):
         result =  self.arm_action_client(String('GetArmInTargetPos'))
-	return result.result.data
+        return result.result.data
        
     #as    
     def GetArmAtHomePos(self):
         result = self.arm_action_client(String('GetArmAtHomePos'))
-	return result.result.data
+        return result.result.data
 
     #as    
     def GetArmAtLearningPos(self):
         result = self.arm_action_client(String('GetArmAtLearningPos'))
-	return result.result.data
+        return result.result.data
        
     #as
     def GetArmAtTrayPos(self):
         result = self.arm_action_client(String('GetArmAtTrayPos'))
-	return result.result.data
+        return result.result.data
        
     #as
     def GetArmAtTurntablePos(self):
         result = self.arm_action_client(String('GetArmAtTurntablePos'))
-	return result.result.data
+        return result.result.data
        
     #as    
     def GetArmAtPreGraspFromFloorPos(self):
         result = self.arm_action_client(String('GetArmAtPreGraspFromFloorPos'))
-	return result.result.data
+        return result.result.data
        
     #as
     def GetTurntableAtCCWPos(self):
         result = self.arm_action_client(String('GetTurntableAtCCWPos'))
-	return result.result.data
+        return result.result.data
        
     #as
     def GetTurntableAtCWPos(self):
         result = self.arm_action_client(String('GetTurntableAtCWPos'))
-	return result.result.data
+        return result.result.data
 
     #as
     def GetArmAtCandlePos(self):
         result = self.arm_action_client(String('GetArmAtCandlePos'))
-	return result.result.data
+        return result.result.data
  
     #as
     def GetArmSoftLimitMax(self):
         result = self.arm_action_client(String('GetArmSoftLimitMax'))
-	return result.result.data
+        return result.result.data
     
     #as
     def GetArmSoftLimitMin(self):
         result = self.arm_action_client(String('GetArmSoftLimitMin'))
-	return result.result.data
+        return result.result.data
 
 
 if __name__ == '__main__':
