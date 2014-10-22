@@ -38,7 +38,7 @@ roslib.load_manifest(PKG)
 import actionlib
 from hobbit_msgs.msg import *
 from hobbit_smach.ArmActionClient import ArmActionClient    #new!!! (21.10.2014)
-#from std_msgs.msg import String, Bool
+from std_msgs.msg import String, Bool
 
 import time
 import math
@@ -144,7 +144,7 @@ class GraspTrajectoryActionServerFromFloor():
                 self.robot.WaitForController(0)
                 
                 raw_input("press enter to send trajectory to arm_action_server")
-                self.ArmClient.arm_action_client(traj_str)    #should execute the whole grasp trajectory
+                self.ArmClient.arm_action_client(String(traj_str))    #should execute the whole grasp trajectory
                 
                 break    #exit trajectory calculation
                 
