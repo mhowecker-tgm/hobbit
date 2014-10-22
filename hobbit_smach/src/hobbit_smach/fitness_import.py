@@ -120,7 +120,7 @@ def get_do_fitness():
             HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=4),
             transitions={'preempted': 'LOG_PREEMPT',
                          'succeeded': 'MOVE_BASE',
-                         'failed': 'SET_FAILURE'}
+                         'failed': 'LOG_ABORTED'}
         )
         StateMachine.add(
             'MOVE_BASE',
@@ -151,7 +151,7 @@ def get_do_fitness():
                          'aborted': 'DO_FITNESS'}
         )
         StateMachine.add(
-            'MAIN_MENU',
+            'DO_FITNESS',
             HobbitMMUI.ShowMenu(
                 menu='FITNESS'
             ),
