@@ -104,10 +104,11 @@ struct skeletonHuman
   struct point3D joint[HUMAN_SKELETON_PARTS];
 };
 
+int rememberSkeleton(struct skeletonHuman * poseToRemember);
 
 unsigned int getPoseState(unsigned int * leftState , unsigned int * rightState , struct skeletonHuman * skeleton);
 
-
+unsigned int haveWeSeenThisPoseBefore(struct skeletonHuman * observedSkeleton , unsigned int * poseThatLooksMostLikeIt , double * resultScore);
 
 
 #endif

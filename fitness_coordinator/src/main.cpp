@@ -46,6 +46,7 @@ unsigned int frameTimestamp=0;
 ros::NodeHandle * nhPtr=0;
 unsigned int paused=0;
 unsigned int autotrigger=1;
+unsigned int rememberNext = 0;
 
 
 struct fitnessState state;
@@ -89,6 +90,11 @@ bool terminate(std_srvs::Empty::Request& request, std_srvs::Empty::Response& res
     return true;
 }
 
+bool remember(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    rememberNext=1;
+    return true;
+}
 
 bool trigger(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
@@ -174,6 +180,9 @@ int main(int argc, char **argv)
      ros::ServiceServer resumeService   = nh.advertiseService(name+"/resume", resume);
      ros::ServiceServer stopService     = nh.advertiseService(name+"/terminate", terminate);
      ros::ServiceServer triggerService     = nh.advertiseService(name+"/trigger", trigger);
+     ros::ServiceServer rememberService     = nh.advertiseService(name+"/remember", remember);
+
+
 
      ros::Subscriber sub = nh.subscribe("fitness",1000,fitnessMessage);
 
@@ -190,7 +199,17 @@ int main(int argc, char **argv)
                   loop_rate.sleep();
 
                   collectSkeletonFromTF(&sk);
+
+                  if (rememberNext)
+                  {
+                     rememberSkeleton(&sk);
+                     rememberNext=0;
+                  }
+
                   checkSkeletonForRepetition(&state,&sk);
+
+
+
 
                   ++repetitions;
                   if ( (autotrigger) && (repetitions%40==0) && ( state.started ) )

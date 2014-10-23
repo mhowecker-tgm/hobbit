@@ -46,6 +46,12 @@ int signalRepetition(struct fitnessState * state)
 int checkSkeletonForRepetition(struct fitnessState * state , struct skeletonHuman * skeleton)
 {
   //Check skeleton here
+  unsigned int poseThatLooksMostLikeIt;
+  double resultScore;
+  if (haveWeSeenThisPoseBefore(skeleton , &poseThatLooksMostLikeIt , &resultScore))
+  {
+    fprintf(stderr,"Pose Looks like :  %u ( score %0.2f ) \n",poseThatLooksMostLikeIt,resultScore);
+  }
 
   // If skeleton is changed ++state->repetitions
 
