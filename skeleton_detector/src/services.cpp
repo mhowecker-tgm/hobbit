@@ -6,7 +6,8 @@
 #include <ros/spinner.h>
 #include "pose.h"
 
-#define SKPREFIX "SK_"
+//#define SKPREFIX "SK_"
+#define SKPREFIX ""
 
 
 #define NORMAL "\033[0m"
