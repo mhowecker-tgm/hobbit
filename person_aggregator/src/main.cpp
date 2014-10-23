@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <ros/ros.h>
 #include <ros/spinner.h>
- 
+
 #include <stdexcept>
 #include <image_transport/image_transport.h>
 
@@ -291,6 +291,14 @@ int rosservice_call(const char * serviceName)
   unsigned int maxCommandSize=MAX_CMD;
   snprintf(commandToRun,maxCommandSize,"/bin/bash -c \"rosservice call %s\"",serviceName);
   int i=system(commandToRun);
+
+  if (i!=0)
+    {
+      char msg[512]={0};
+      snprintf(msg,512,"Could not rosservice call %s \n",serviceName);
+      ROS_ERROR(msg);
+    }
+
   return (i==0);
 }
 
@@ -301,6 +309,14 @@ int rosparam_set(const char * paramName,const char * paramValue)
   unsigned int maxCommandSize=MAX_CMD;
   snprintf(commandToRun,maxCommandSize,"/bin/bash -c \"rosparam set %s \"%s\" \"",paramName,paramValue);
   int i=system(commandToRun);
+
+  if (i!=0)
+    {
+      char msg[512]={0};
+      snprintf(msg,512,"Could not rosparam set %s \"%s\" \n",paramName,paramValue);
+      ROS_ERROR(msg);
+    }
+
   return (i==0);
 }
 
@@ -311,6 +327,14 @@ int rostopic_pub(const char * topicName,const char * topicType,const char * topi
   unsigned int maxCommandSize=MAX_CMD;
   snprintf(commandToRun,maxCommandSize,"/bin/bash -c \"rostopic pub %s %s %s -1\"",topicName,topicType,topicValue);
   int i=system(commandToRun);
+
+  if (i!=0)
+    {
+      char msg[512]={0};
+      snprintf(msg,512,"Could not rostopic pub %s %s %s \n",topicName,topicType,topicValue);
+      ROS_ERROR(msg);
+    }
+
   return (i==0);
 }
 
