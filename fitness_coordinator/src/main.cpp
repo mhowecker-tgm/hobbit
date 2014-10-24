@@ -45,7 +45,7 @@ int key = 0;
 unsigned int frameTimestamp=0;
 ros::NodeHandle * nhPtr=0;
 unsigned int paused=0;
-unsigned int autotrigger=1;
+unsigned int autotrigger=0;
 unsigned int rememberNext = 0;
 
 
@@ -89,6 +89,23 @@ bool terminate(std_srvs::Empty::Request& request, std_srvs::Empty::Response& res
     exit(0);
     return true;
 }
+
+
+bool save(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    saveRememberedSkeletons("skeleton.sk");
+    return true;
+}
+
+
+
+bool load(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    loadRememberedSkeletons("skeleton.sk");
+    return true;
+}
+
+
 
 bool remember(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
@@ -176,6 +193,8 @@ int main(int argc, char **argv)
 
 
      //We advertise the services we want accessible using "rosservice call *w/e*"
+     ros::ServiceServer saveService    = nh.advertiseService(name+"/save", save);
+     ros::ServiceServer loadService    = nh.advertiseService(name+"/load", load);
      ros::ServiceServer pauseService    = nh.advertiseService(name+"/pause", pause);
      ros::ServiceServer resumeService   = nh.advertiseService(name+"/resume", resume);
      ros::ServiceServer stopService     = nh.advertiseService(name+"/terminate", terminate);
@@ -186,6 +205,11 @@ int main(int argc, char **argv)
 
      ros::Subscriber sub = nh.subscribe("fitness",1000,fitnessMessage);
 
+
+     if (!loadRememberedSkeletons("skeleton.sk"))
+     {
+       ROS_ERROR("Could not load fitness function presets , check file and rosservice call /fitness_coordinator/load");
+     }
       //Create our context
       //---------------------------------------------------------------------------------------------------
 	  //////////////////////////////////////////////////////////////////////////

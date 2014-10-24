@@ -7,6 +7,48 @@
 struct skeletonHuman rememberedSkeletons[MAX_REMEMBERED_SKELETON_CONFIGS]={0};
 unsigned int currentRememberedSkeletons=0;
 
+int saveRememberedSkeletons(char * filename)
+{
+  FILE * fp = fopen(filename,"wb");
+  if (fp!=0)
+  {
+   fwrite((const void*) & currentRememberedSkeletons,sizeof(unsigned int),1,fp);
+
+   unsigned int i=0;
+   for (i=0; i<currentRememberedSkeletons; i++)
+    {
+     fwrite((const void*) & rememberedSkeletons[i],sizeof(struct skeletonHuman),1,fp);
+    }
+
+   fclose(fp);
+   return 1;
+  }
+ return 0;
+}
+
+int loadRememberedSkeletons(char * filename)
+{
+  currentRememberedSkeletons=0; //Initial state
+
+  FILE * fp = fopen(filename,"rb");
+  if (fp!=0)
+  {
+   fread((void*) & currentRememberedSkeletons,sizeof(unsigned int),1,fp);
+
+   unsigned int i=0;
+   for (i=0; i<currentRememberedSkeletons; i++)
+    {
+     fread((void*) & rememberedSkeletons[i],sizeof(struct skeletonHuman),1,fp);
+    }
+
+   fclose(fp);
+   return 1;
+  }
+ return 0;
+}
+
+
+
 int rememberSkeleton(struct skeletonHuman * poseToRemember)
 {
   fprintf(stderr,"\n Remembering a new skeleton ( %u )\n",currentRememberedSkeletons);

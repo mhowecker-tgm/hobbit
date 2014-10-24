@@ -104,6 +104,9 @@ struct skeletonHuman
   struct point3D joint[HUMAN_SKELETON_PARTS];
 };
 
+int saveRememberedSkeletons(char * filename);
+int loadRememberedSkeletons(char * filename);
+
 int rememberSkeleton(struct skeletonHuman * poseToRemember);
 
 unsigned int getPoseState(unsigned int * leftState , unsigned int * rightState , struct skeletonHuman * skeleton);
