@@ -197,10 +197,11 @@ void broadcastSkeleton(unsigned int frameNumber ,struct skeletonHuman * skeleton
 
 int registerServices(ros::NodeHandle * nh)
 {
+    ROS_INFO("Registering services for publishing point events , joints etc..");
     personBroadcaster = nh->advertise <rgbd_acquisition::Person> (PERSON_TOPIC, 1000);
     pointEventsBroadcaster = nh->advertise <rgbd_acquisition::PointEvents> ("pointEvents", 1000);
     joint2DBroadcaster = nh->advertise <rgbd_acquisition::Skeleton2D> ("joints2D", 1000);
-  joint3DBroadcaster = nh->advertise <rgbd_acquisition::Skeleton3D> ("joints3D", 1000);
+    joint3DBroadcaster = nh->advertise <rgbd_acquisition::Skeleton3D> ("joints3D", 1000);
     jointBBoxBroadcaster = nh->advertise <rgbd_acquisition::SkeletonBBox> ("jointsBBox", 1000);
 
 

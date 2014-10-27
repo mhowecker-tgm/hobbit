@@ -356,6 +356,8 @@ int main(int argc, char **argv)
 	  //////////////////////////////////////////////////////////////////////////
       registerServices(&nh);
 
+
+	 ROS_INFO("Done Initializing RGBDAcqusition , now entering grab loop..");
 	  while ( ( key!='q' ) && (ros::ok()) )
 		{
                   loopEvent(); //<- this keeps our ros node messages handled up until synergies take control of the main thread

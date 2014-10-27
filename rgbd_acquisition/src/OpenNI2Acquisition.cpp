@@ -53,7 +53,6 @@ VideoFrameRef depthFrame[MAX_OPENNI2_DEVICES],colorFrame[MAX_OPENNI2_DEVICES];
 unsigned int frameSnapped=0;
 
 #if USE_CALIBRATION
-
  struct calibration calibRGB[MAX_OPENNI2_DEVICES];
  struct calibration calibDepth[MAX_OPENNI2_DEVICES];
 #endif

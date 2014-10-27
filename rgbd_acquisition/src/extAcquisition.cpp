@@ -96,11 +96,19 @@ void externalAcquisitionCallback()
 
 int  acquistionStartUp(char * moduleName , unsigned int devUsed , char * from , unsigned int width , unsigned int height , unsigned int fps)
 {
-     if (!startOpenNI2Module(10,(char*) 0) ) { ROS_INFO("Could not start OpenNI2 Module"); return 0; }
+     if (!startOpenNI2Module(10,(char*) 0) ) { ROS_ERROR("Could not start OpenNI2 Module"); return 0; }
      devID=devUsed;
 
-     if (!createOpenNI2Device(devID,from,width,height,fps)) { ROS_INFO("Could not start OpenNI2 Device");  return 0; }
-     if (!snapOpenNI2Frames(devID)) { ROS_INFO("Could not snap a first frame from OpenNI2 Device");  return 0; }
+     ROS_INFO("Trying to open an OpenNI2 Device");
+     if (!createOpenNI2Device(devID,from,width,height,fps)) { ROS_ERROR("Could not start OpenNI2 Device");  return 0; }
+
+     ROS_INFO("Trying to snap the first frame out of an OpenNI2 Device");
+     if (!snapOpenNI2Frames(devID)) { ROS_ERROR("Could not snap a first frame from OpenNI2 Device");  return 0; }
+     if (!snapOpenNI2Frames(devID)) { ROS_ERROR("Could not snap a first frame from OpenNI2 Device");  return 0; }
+     if (!snapOpenNI2Frames(devID)) { ROS_ERROR("Could not snap a first frame from OpenNI2 Device");  return 0; }
+     if (!snapOpenNI2Frames(devID)) { ROS_ERROR("Could not snap a first frame from OpenNI2 Device");  return 0; }
+     ROS_INFO("Survived snapping the first frame out of OpenNI2 Device");
+
     first=1; //This is a "first frame" for the new mode!
     useRGBDAcqusition=1; //We are now using RGBDAcquisition
     return 1;
