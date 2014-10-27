@@ -87,14 +87,24 @@ double getJointDistance(struct skeletonHuman * pose1 , struct skeletonHuman * po
 }
 
 
-double comparePoses(struct skeletonHuman * pose1 , struct skeletonHuman * pose2)
+double comparePoses(struct skeletonHuman * pose1 , struct skeletonHuman * pose2,struct skeletonJointsWeCareAbout * what2Use)
 {
   double score=0.0;
-  unsigned int i=0;
+  unsigned int i=0,okToUse=1,jointsUsed=0;
   for (i=0; i<HUMAN_SKELETON_PARTS; i++)
   {
-    score+= getJointDistance(pose1,pose2,i);
+    if (what2Use!=0)
+    {
+      if (what2Use->joint[i]) { okToUse=1; } else
+                              { okToUse=0; }
+    }
+
+
+    if (okToUse) { score+= getJointDistance(pose1,pose2,i); ++jointsUsed; }
   }
+
+  if (jointsUsed>0) { score=score/jointsUsed; }
+
   return score;
 }
 
@@ -108,7 +118,7 @@ unsigned int getPoseState(unsigned int * leftState , unsigned int * rightState ,
 
 
 
-unsigned int haveWeSeenThisPoseBefore(struct skeletonHuman * observedSkeleton , unsigned int * poseThatLooksMostLikeIt , double * resultScore)
+unsigned int haveWeSeenThisPoseBefore(struct skeletonHuman * observedSkeleton ,struct skeletonJointsWeCareAbout * what2Use, unsigned int * poseThatLooksMostLikeIt , double * resultScore)
 {
   if (currentRememberedSkeletons==0)
      { return 0; }
@@ -120,7 +130,7 @@ unsigned int haveWeSeenThisPoseBefore(struct skeletonHuman * observedSkeleton , 
   unsigned int i=0;
   for (i=0; i<currentRememberedSkeletons; i++)
   {
-    currentScore = comparePoses( observedSkeleton , &rememberedSkeletons[i] );
+    currentScore = comparePoses( observedSkeleton , &rememberedSkeletons[i] , what2Use);
     //fprintf(stderr,"Observation vs %u is %0.2f \n",i,currentScore);
     if (currentScore<bestScore)
     {

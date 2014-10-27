@@ -23,6 +23,8 @@ struct excerciseDeclaration
 
 extern int learnExcercise;
 extern struct excerciseDeclaration activeExcercise;
+extern struct skeletonJointsWeCareAbout usedJointsByExcercise;
+
 
 int addToStateTree(struct fitnessState * state , struct skeletonHuman * skeleton , unsigned int pose , struct excerciseDeclaration * ed);
 

@@ -106,6 +106,12 @@ struct skeletonHuman
   struct point3D joint[HUMAN_SKELETON_PARTS];
 };
 
+struct skeletonJointsWeCareAbout
+{
+  unsigned int joint[HUMAN_SKELETON_PARTS];
+};
+
+
 int saveRememberedSkeletons(const char * filename);
 int loadRememberedSkeletons(const char * filename);
 
@@ -113,7 +119,7 @@ int rememberSkeleton(struct skeletonHuman * poseToRemember);
 
 unsigned int getPoseState(unsigned int * leftState , unsigned int * rightState , struct skeletonHuman * skeleton);
 
-unsigned int haveWeSeenThisPoseBefore(struct skeletonHuman * observedSkeleton , unsigned int * poseThatLooksMostLikeIt , double * resultScore);
+unsigned int haveWeSeenThisPoseBefore(struct skeletonHuman * observedSkeleton ,struct skeletonJointsWeCareAbout * what2Use, unsigned int * poseThatLooksMostLikeIt , double * resultScore);
 
 
 #endif

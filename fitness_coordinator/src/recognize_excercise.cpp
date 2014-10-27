@@ -7,7 +7,7 @@
 int learnExcercise=0;
 
 struct excerciseDeclaration activeExcercise={0};
-
+struct skeletonJointsWeCareAbout usedJointsByExcercise={0};
 
 int addToStateTree(struct fitnessState * state , struct skeletonHuman * skeleton , unsigned int pose , struct excerciseDeclaration * ed)
 {

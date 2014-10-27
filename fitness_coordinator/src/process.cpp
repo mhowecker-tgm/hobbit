@@ -54,7 +54,7 @@ int checkSkeletonForRepetition(struct fitnessState * state , struct skeletonHuma
   //Check skeleton here
   unsigned int poseThatLooksMostLikeIt;
   double resultScore;
-  if (haveWeSeenThisPoseBefore(skeleton , &poseThatLooksMostLikeIt , &resultScore))
+  if (haveWeSeenThisPoseBefore(skeleton , &usedJointsByExcercise , &poseThatLooksMostLikeIt , &resultScore))
   {
     fprintf(stderr,"Pose Looks like :  %u ( score %0.2f ) \n",poseThatLooksMostLikeIt,resultScore);
 
