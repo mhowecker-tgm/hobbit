@@ -28,6 +28,7 @@
 #include <image_transport/image_transport.h>
 
 #include "recognize_pose.h"
+#include "recognize_excercise.h"
 #include "process.h"
 #include "hobbit_msgs/Fitness.h"
 

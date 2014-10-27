@@ -12,7 +12,7 @@ catkin_package()
 include_directories(${catkin_INCLUDEDIR} 
 		    ${OpenCV_INCLUDEDIR})
 
-add_executable(fitness_coordinator src/main.cpp src/process.cpp src/recognize_pose.cpp  )
+add_executable(fitness_coordinator src/main.cpp src/process.cpp src/recognize_pose.cpp src/recognize_excercise.cpp  )
  
 target_link_libraries(fitness_coordinator ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 
