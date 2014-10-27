@@ -18,13 +18,11 @@ struct excerciseDeclaration
   unsigned int acceptedStates[MAX_REMEMBERED_SKELETON_CONFIGS];
 };
 
-
-
-
 extern int learnExcercise;
 extern struct excerciseDeclaration activeExcercise;
 extern struct skeletonJointsWeCareAbout usedJointsByExcercise;
 
+int loadExercise(const char * filename);
 
 int addToStateTree(struct fitnessState * state , struct skeletonHuman * skeleton , unsigned int pose , struct excerciseDeclaration * ed);
 

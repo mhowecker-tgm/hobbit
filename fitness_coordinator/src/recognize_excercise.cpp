@@ -5,9 +5,24 @@
 #include <stdlib.h>
 
 int learnExcercise=0;
-
 struct excerciseDeclaration activeExcercise={0};
 struct skeletonJointsWeCareAbout usedJointsByExcercise={0};
+
+
+
+int loadExercise(const char * filename)
+{
+ int i=0;
+ for (i=0; i<HUMAN_SKELETON_PARTS; i++)
+ {
+     usedJointsByExcercise.joint[i]=1;
+ }
+
+ return 1;
+}
+
+
+
 
 int addToStateTree(struct fitnessState * state , struct skeletonHuman * skeleton , unsigned int pose , struct excerciseDeclaration * ed)
 {

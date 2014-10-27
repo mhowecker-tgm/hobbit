@@ -214,6 +214,11 @@ int main(int argc, char **argv)
 
      ros::Subscriber sub = nh.subscribe("fitness",1000,fitnessMessage);
 
+     if (!loadExercise("nothing.exercise"))
+     {
+       ROS_ERROR("Could not load fitness function presets , check file and rosservice call /fitness_coordinator/load");
+     }
+
 
      if (!loadRememberedSkeletons("skeleton.sk"))
      {
