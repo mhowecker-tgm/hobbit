@@ -107,6 +107,14 @@ bool load(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
 
 
 
+bool learn(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    if (learnExcercise) { learnExcercise=0; } else
+                        { learnExcercise=1; }
+    return true;
+}
+
+
 bool remember(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
     rememberNext=1;
@@ -198,9 +206,9 @@ int main(int argc, char **argv)
      ros::ServiceServer pauseService    = nh.advertiseService(name+"/pause", pause);
      ros::ServiceServer resumeService   = nh.advertiseService(name+"/resume", resume);
      ros::ServiceServer stopService     = nh.advertiseService(name+"/terminate", terminate);
-     ros::ServiceServer triggerService     = nh.advertiseService(name+"/trigger", trigger);
-     ros::ServiceServer rememberService     = nh.advertiseService(name+"/remember", remember);
-
+     ros::ServiceServer triggerService  = nh.advertiseService(name+"/trigger", trigger);
+     ros::ServiceServer rememberService = nh.advertiseService(name+"/remember", remember);
+     ros::ServiceServer learnService    = nh.advertiseService(name+"/learn", learn);
 
 
      ros::Subscriber sub = nh.subscribe("fitness",1000,fitnessMessage);

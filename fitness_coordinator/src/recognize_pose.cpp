@@ -3,11 +3,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MAX_REMEMBERED_SKELETON_CONFIGS 100
+
 struct skeletonHuman rememberedSkeletons[MAX_REMEMBERED_SKELETON_CONFIGS]={0};
 unsigned int currentRememberedSkeletons=0;
 
-int saveRememberedSkeletons(char * filename)
+int saveRememberedSkeletons(const char * filename)
 {
   FILE * fp = fopen(filename,"wb");
   if (fp!=0)
@@ -26,7 +26,7 @@ int saveRememberedSkeletons(char * filename)
  return 0;
 }
 
-int loadRememberedSkeletons(char * filename)
+int loadRememberedSkeletons(const char * filename)
 {
   currentRememberedSkeletons=0; //Initial state
 

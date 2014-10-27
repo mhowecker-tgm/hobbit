@@ -2,6 +2,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
+#define MAX_FILENAME 256 //Changing this will potentially fuck up the binary file ..!
+
+
+int learnExcercise=0;
+
+struct excerciseDeclaration
+{
+  unsigned int numberOfStates;
+  unsigned int totalStates;
+
+  char skeletonSetFilename[MAX_FILENAME];
+  unsigned int stateTree[MAX_REMEMBERED_SKELETON_CONFIGS];
+  unsigned int stateTreeDuration[MAX_REMEMBERED_SKELETON_CONFIGS];
+
+  unsigned int acceptedStates[MAX_REMEMBERED_SKELETON_CONFIGS];
+};
+
+
+struct excerciseDeclaration activeExcercise={0};
+
+
 int broadcastExcerciseGeneric(char * tag , char * name , char * value)
 {
   char what2execute[MAX_CMD_STR]={0};
@@ -43,6 +65,31 @@ int signalRepetition(struct fitnessState * state)
   return broadcastExcerciseRepetition(state->exercise,state->repetitions);
 }
 
+
+int addToStateTree(struct fitnessState * state , struct skeletonHuman * skeleton , unsigned int pose , struct excerciseDeclaration * ed)
+{
+   if (ed->numberOfStates==0)
+   { // Just add
+     fprintf(stderr,"Initial State for Excercise \n");
+     ed->stateTree[ed->numberOfStates]=pose;
+     ++ed->numberOfStates;
+   } else
+   {
+      if (ed->stateTree[ed->numberOfStates-1]==pose)
+        {
+          fprintf(stderr,"Lingering on Pose %u ( %u time )  \n",pose,ed->stateTreeDuration[ed->numberOfStates-1]);
+          ++ed->stateTreeDuration[ed->numberOfStates-1];
+         } else
+        {
+          fprintf(stderr,"Transitioning from Pose %u to %u \n",ed->stateTreeDuration[ed->numberOfStates-1],pose);
+          ed->stateTree[ed->numberOfStates]=pose;
+          ++ed->numberOfStates;
+        }
+
+   }
+}
+
+
 int checkSkeletonForRepetition(struct fitnessState * state , struct skeletonHuman * skeleton)
 {
   //Check skeleton here
@@ -51,6 +98,12 @@ int checkSkeletonForRepetition(struct fitnessState * state , struct skeletonHuma
   if (haveWeSeenThisPoseBefore(skeleton , &poseThatLooksMostLikeIt , &resultScore))
   {
     fprintf(stderr,"Pose Looks like :  %u ( score %0.2f ) \n",poseThatLooksMostLikeIt,resultScore);
+
+    if (learnExcercise)
+    {
+       addToStateTree(state ,skeleton , poseThatLooksMostLikeIt , &activeExcercise );
+    }
+
   }
 
   // If skeleton is changed ++state->repetitions

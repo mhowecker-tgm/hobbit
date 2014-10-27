@@ -22,6 +22,8 @@ o- - - -  0 - - - -  |       |  - - - -  0 - - - - o
 */
 
 
+#define MAX_REMEMBERED_SKELETON_CONFIGS 100 //Changing this will potentially fuck up the binary file ..!
+
 enum humanHandPose
 {
    POSE_HAND_UP = 0,
@@ -104,8 +106,8 @@ struct skeletonHuman
   struct point3D joint[HUMAN_SKELETON_PARTS];
 };
 
-int saveRememberedSkeletons(char * filename);
-int loadRememberedSkeletons(char * filename);
+int saveRememberedSkeletons(const char * filename);
+int loadRememberedSkeletons(const char * filename);
 
 int rememberSkeleton(struct skeletonHuman * poseToRemember);
 

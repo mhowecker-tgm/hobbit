@@ -7,6 +7,8 @@
 
 #include "recognize_pose.h"
 
+extern int learnExcercise;
+
 int broadcastExcerciseGeneric(char * tag , char * name , char * value);
 int broadcastExcerciseRepetition(unsigned int exerciseNumber,unsigned int repetitionNumber);
 int broadcastExcerciseStarted(char * name , char * value);
