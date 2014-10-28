@@ -166,7 +166,7 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 	{
 		unsigned int s = 1; //FIXME
 
-		std::cout << "Docking off" << std::endl;
+		std::cout << "Docking off received" << std::endl;
 
 		// Get docking service
 		auto providers = robot_->getMiraAuthority().queryServicesForInterface("IDockingProcess");
