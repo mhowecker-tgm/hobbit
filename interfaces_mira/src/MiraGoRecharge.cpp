@@ -1,3 +1,4 @@
+
 #include <interfaces_mira/MiraGoRecharge.h>
 
 #include <navigation/Task.h>
@@ -13,61 +14,62 @@ using namespace mira::navigation;
 MiraGoRecharge::MiraGoRecharge() : MiraRobotModule(std::string ("GoRecharge")) {
 }
 
-void MiraGoRecharge::initialize() {
-        
-  go_to_place_sub = robot_->getRosNode().subscribe("/docking_task", 1000, &MiraGoRecharge::docking_task_callback, this);
+void MiraGoRecharge::initialize() 
+{
+  robot_->getMiraAuthority().subscribe<std::string>("/localization/TemplateLocalizationEvent", &MiraGoRecharge::template_channel_callback, this);
+  robot_->getMiraAuthority().subscribe<std::string>("/docking/DockingStatus", &MiraGoRecharge::status_channel_callback, this);
 
-  //stop_sub = robot_->getRosNode().subscribe(STOP_REQUEST, 2, &MiraGoRecharge::stop_request_callback, this);
+  status.data = "idle";
 
-  goal_status_pub = robot_->getRosNode().advertise<std_msgs::String>(GOAL_STATUS, 20);
+  as_ = new actionlib::SimpleActionServer<interfaces_mira::MiraDockingAction>(robot_->getRosNode(), "docking_task", boost::bind(&MiraGoRecharge::executeCb, this, _1), false);
+  as_->start();
 
-  robot_->getMiraAuthority().subscribe<std::string>("PilotEvent", &MiraGoRecharge::goal_status_channel_callback, this);
-
-  goal_status.data = "idle";
-  goal_status_pub.publish(goal_status);
+  status_updated = false;
 
 }
 
-void MiraGoRecharge::goal_status_channel_callback(mira::ChannelRead<std::string> data) 
+void MiraGoRecharge::template_channel_callback(mira::ChannelRead<std::string> data) 
 {
-        if(data->value().c_str() == "Idle") 
+
+        if(data->value().compare("Success") == 0) 
 	{
-		goal_status.data = "idle";
-		goal_status_pub.publish(goal_status);
-	}
-	if(data->value().c_str() == "PlanAndDrive") 
-	{
-  		goal_status.data = "active";
-		goal_status_pub.publish(goal_status);
-	}
-	if(data->value().c_str() =="GoalReached") 
-	{
-		goal_status.data = "reached";
-		std::cout << "Goal reached " << std::endl;
-		goal_status_pub.publish(goal_status);
-	}
-	if(data->value().c_str() == "PathTemporarilyLost") 
-	{
-		goal_status.data = "preempted";
-		std::cout << "Goal preempted " << std::endl;
-		goal_status_pub.publish(goal_status);
-	}
-	if(data->value().c_str() == "NoPathPlannable" || data->value().c_str() == "NoValidMotionCommand")
-	{
-		goal_status.data = "aborted";
-		std::cout << "Goal aborted " << std::endl;
-		goal_status_pub.publish(goal_status);
+		status.data = "template_found";
+		std::cout << "template_found " << std::endl;
 
 	}
-	if(data->value().c_str() == "NoData")
+	if(data->value().compare("Failure") == 0) 
 	{
-		goal_status.data = "aborted";
-		std::cout << "Goal aborted " << std::endl;
-		goal_status_pub.publish(goal_status);
+  		status.data = "template_not_found";
+		std::cout << "template_not_found " << std::endl;
+	}
+
+	status_updated = true;
+
+}
+
+void MiraGoRecharge::status_channel_callback(mira::ChannelRead<std::string> data) 
+{
+	
+
+        if(data->value().compare("Docked") == 0) 
+	{
+		status.data = "docked";
+		std::cout << "docked " << std::endl;
+	}
+	if(data->value().compare("UnDocked") == 0) 
+	{
+		status.data = "undocked";
+		std::cout << "undocked " << std::endl;
+
+	}
+	if(data->value().compare("Failure") == 0) 
+	{
+  		status.data = "failure";
+		std::cout << "failure " << std::endl;
 
 	}
 
-
+	status_updated = true;
 }
 
 void MiraGoRecharge::docking_task_callback(const std_msgs::String::ConstPtr& msg)
@@ -75,19 +77,10 @@ void MiraGoRecharge::docking_task_callback(const std_msgs::String::ConstPtr& msg
 
 	//if (msg->data.compare("docking_station") || msg->data.compare("DockingStation") || msg->data.compare("Recharge") || msg->data.compare("recharge"))
 
-	std::cout << "data " << msg->data << std::endl;
+	/*std::cout << "data " << msg->data << std::endl;
 	
 	if (msg->data.compare("docking_on") == 0)
 	{
-
-		/*TaskPtr task(new Task());
-		task->addSubTask(SubTaskPtr(new PreferredDirectionTask(mira::navigation::PreferredDirectionTask::FORWARD, 1.0f)));
-		task->addSubTask(SubTaskPtr(new mira::navigation::DockingTask()));
-
-		std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
-		robot_->getMiraAuthority().callService<void>(navService, "setTask", task);*/
-
-
 		unsigned int s = 1; //FIXME
 
 		std::cout << "Docking on" << std::endl;
@@ -131,24 +124,209 @@ void MiraGoRecharge::docking_task_callback(const std_msgs::String::ConstPtr& msg
 
 		rpcFuture.get();
 
-	}
+	}*/
 
 }
 
-/*void MiraGoRecharge::stop_request_callback(const std_msgs::String::ConstPtr& msg)
+void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& docking_action)
 {
-	if (msg->data.compare("stop") || msg->data.compare("Stop") || msg->data.compare("STOP"))
-	{
-		TaskPtr task(new Task());
-		//cancel the task
-		std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
-  		robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
 
-		goal_status.data = "cancelled";
-		std::cout << "Docking cancelled " << std::endl;
-		goal_status_pub.publish(goal_status);
+        //std_msgs::String task = docking_action->docking_task;
+	int task = docking_action->docking_task;
+
+	status_updated = false;
+
+	//if (task.data.compare("docking_on") == 0)
+	if (task == 0)
+	{
+		unsigned int s = 1; //FIXME
+
+		std::cout << "Docking on received" << std::endl;
+
+		// Get docking service
+		auto providers = robot_->getMiraAuthority().queryServicesForInterface("IDockingProcess");
+		if(providers.empty()) 
+		{
+		    std::cout << "no providers for IDockingProcess" << std::endl;
+		    return;
+		}
+
+		// Assume that our DockingProcess is the first and only available IDockingProcess provider.
+		const std::string service = providers.front();
+
+		// Let the robot dock on
+		auto rpcFuture = robot_->getMiraAuthority().callService<void>(service, "dockOn", s);
+
+		// Get the result, even though it is void. If an exception has occurred, this will throw as well.
+		rpcFuture.get();
+
+
+	}
+	else if (task == 1)
+	{
+		unsigned int s = 1; //FIXME
+
+		std::cout << "Docking off" << std::endl;
+
+		// Get docking service
+		auto providers = robot_->getMiraAuthority().queryServicesForInterface("IDockingProcess");
+		if(providers.empty()) 
+		{
+		    std::cout << "no providers for IDockingProcess" << std::endl;
+		    return;
+		}
+
+		// Assume that our DockingProcess is the first and only available IDockingProcess provider.
+		const std::string service = providers.front();
+
+		//docking_off
+		auto rpcFuture = robot_->getMiraAuthority().callService<void>(service, "dockOff", s);
+
+		rpcFuture.get();
+
+	}
+	else
+	{
+	 	as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting because no proper task was received");
 	}
 
-}*/
+ 	ros::NodeHandle n = robot_->getRosNode();
+    	while(n.ok())
+    	{
 
+              //std::cout << "actionlib server executeCb ok" << std::endl;
+	      if(as_->isPreemptRequested())
+	      {
+			std::cout << "preempt requested" << std::endl;
+		
+			TaskPtr task(new Task());
+			//cancel the task
+
+			if(as_->isNewGoalAvailable())
+			{
+			  //if we're active and a new docking task is available, we'll accept it, but this should not happen 
+			  interfaces_mira::MiraDockingGoal new_task = *as_->acceptNewGoal();
+			  std::cout << "new task available, THIS SHOULD NOT HAPPEN? " << new_task.docking_task << std::endl;
+
+			  if(new_task.docking_task != 0 && new_task.docking_task != 1)
+			  {
+			    as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting because the new task is not valid");
+			    return;
+			  }
+
+
+			  //we have a new task
+			  if (new_task.docking_task == 0)
+			  {
+				unsigned int s = 1; //FIXME
+
+				std::cout << "Docking on received" << std::endl;
+
+				// Get docking service
+				auto providers = robot_->getMiraAuthority().queryServicesForInterface("IDockingProcess");
+				if(providers.empty()) 
+				{
+				    std::cout << "no providers for IDockingProcess" << std::endl;
+				    return;
+				}
+
+				// Assume that our DockingProcess is the first and only available IDockingProcess provider.
+				const std::string service = providers.front();
+
+				// Let the robot dock on
+				auto rpcFuture = robot_->getMiraAuthority().callService<void>(service, "dockOn", s);
+
+				// Get the result, even though it is void. If an exception has occurred, this will throw as well.
+				rpcFuture.get();
+
+
+			  }
+			  else if (new_task.docking_task == 1)
+			  {
+				unsigned int s = 1; //FIXME
+
+				std::cout << "Docking off" << std::endl;
+
+				// Get docking service
+				auto providers = robot_->getMiraAuthority().queryServicesForInterface("IDockingProcess");
+				if(providers.empty()) 
+				{
+				    std::cout << "no providers for IDockingProcess" << std::endl;
+				    return;
+				}
+
+				// Assume that our DockingProcess is the first and only available IDockingProcess provider.
+				const std::string service = providers.front();
+
+				//docking_off
+				auto rpcFuture = robot_->getMiraAuthority().callService<void>(service, "dockOff", s);
+
+				rpcFuture.get();
+
+			  }
+			  
+			  else 
+			  {
+
+				//notify the ActionServer that we've successfully preempted
+				ROS_DEBUG_NAMED("interfaces_mira","preempting the current docking task");
+				as_->setPreempted();
+				std::cout << "docking task preempted, preemt received" << std::endl;
+
+				//we'll actually return from execute after preempting
+				return;
+			  }
+	        	} // end of is new task available
+
+
+	  	} // end of preempt requested
+
+		if (!status_updated) continue;
+
+		interfaces_mira::MiraDockingFeedback feedback;
+		feedback.feedback = status.data.c_str();
+		as_->publishFeedback(feedback);
+
+		if (status.data.compare("docked") == 0)
+		{
+			std::cout << "task succeeded, robot recharging " << std::endl;
+			as_->setSucceeded(interfaces_mira::MiraDockingResult(), "Task succeeded, robot stoppped moving forwards");
+			status_updated = false;
+			return;
+		}
+
+		if (status.data.compare("undocked") == 0)
+		{
+			std::cout << "task succeeded, robot undocked " << std::endl;
+			as_->setSucceeded(interfaces_mira::MiraDockingResult(), "Task succeeded, robot stopped moving backwards");
+			status_updated = false;
+			return;
+		}
+
+		if (status.data.compare("template_not_found") == 0)
+		{
+			//std::cout << "task preempted, template not found " << std::endl;
+			//as_->setPreempted();
+			std::cout << "task aborted, template not foundd " << std::endl;
+			as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting, template not found");
+			status_updated = false;
+			return;
+		}  
+
+		if (status.data.compare("failure") == 0)
+		{
+			std::cout << "task aborted, failure " << std::endl;
+			as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting because task failed");
+			status_updated = false;
+			return;
+		}
+		
+	} // end of while
+
+	//if the node is killed then we'll abort and return
+	as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting because the node is killed");
+
+
+
+}
 

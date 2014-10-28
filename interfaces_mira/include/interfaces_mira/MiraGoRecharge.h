@@ -23,6 +23,9 @@
 #include <hobbit_msgs/Pose2DStamped.h>
 #include <std_msgs/String.h>
 
+#include <actionlib/server/simple_action_server.h>
+#include <interfaces_mira/MiraDockingAction.h>
+
 
 class MiraGoRecharge: public MiraRobotModule {
 public:
@@ -36,21 +39,21 @@ public:
 
         //void stop_request_callback(const std_msgs::String::ConstPtr& msg);  //FIXME?
 
-        void goal_status_channel_callback(mira::ChannelRead<std::string> data);
+        void status_channel_callback(mira::ChannelRead<std::string> data);
+	void template_channel_callback(mira::ChannelRead<std::string> data);
 
 private:
         MiraGoRecharge();
 
 
-        ros::Subscriber go_to_place_sub;
-	ros::Subscriber stop_sub;
+	std_msgs::String status;
 
-	ros::Publisher goal_status_pub;
+	void executeCb(const interfaces_mira::MiraDockingGoalConstPtr& docking_task);
+	actionlib::SimpleActionServer<interfaces_mira::MiraDockingAction>* as_;
 
-	std_msgs::String goal_status;
+	bool status_updated;
 
 };
 
 
 #endif
-

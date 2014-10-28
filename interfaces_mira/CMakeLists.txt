@@ -42,7 +42,7 @@ include(CMakeLists.mira)
 
 add_action_files(
   DIRECTORY action
-  FILES MiraSendingGoals.action
+  FILES MiraSendingGoals.action MiraDocking.action
   MiraDocking.action
 )
 
