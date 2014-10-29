@@ -66,7 +66,7 @@ int reallocateCopySpaceIfNeccessary(
                                      unsigned int newDepthWidth , unsigned int newDepthHeight
                                   )
 {
-  if  ( (newColorWidth * newColorHeight * 3 < colorCopyWidth * colorCopyHeight * 3 ) )
+  if  ( (newColorWidth * newColorHeight * 3 > colorCopyWidth * colorCopyHeight * 3 ) )
   {
     if (colorFrameCopy!=0) { free(colorFrameCopy); colorFrameCopy=0; }
     colorFrameCopy = (unsigned char * ) malloc(newColorWidth*newColorHeight*3*sizeof(unsigned char));
@@ -76,7 +76,7 @@ int reallocateCopySpaceIfNeccessary(
   }
 
 
-  if  ( (newColorWidth * newColorHeight * 3 < colorCopyWidth * colorCopyHeight * 3 ) )
+  if  ( (newDepthWidth * newDepthHeight  > depthCopyWidth * depthCopyHeight ) )
   {
     if (depthFrameCopy!=0) { free(depthFrameCopy); depthFrameCopy=0; }
     depthFrameCopy = (unsigned short * ) malloc(newDepthWidth*newDepthHeight*1*sizeof(unsigned short));
@@ -356,12 +356,14 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
   memcpy(colorFrameCopy,colorFrame,colorWidth*colorHeight*3*sizeof(unsigned char));
   memcpy(depthFrameCopy,depthFrame,depthWidth*depthHeight*1*sizeof(unsigned short));
 
+ // fprintf(stderr,"Passing new frame .. ");
   int retres = hobbitUpperBodyTracker_NewFrame(colorFrameCopy , colorWidth , colorHeight ,
                                                depthFrameCopy  , depthWidth , depthHeight ,
                                                calib ,
                                                processingMode ,
                                                frameTimestamp );
 
+ // fprintf(stderr," survived \n");
 
 
   return retres;
