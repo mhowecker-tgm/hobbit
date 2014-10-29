@@ -57,8 +57,39 @@ unsigned int actualTimestamp=0;
 unsigned int actualInFieldOfView=0;
 float actualX=0.0,actualY=0.0,actualZ=0.0,actualTheta=0.0,actualConfidence=0.51;
 
-unsigned char * colorFrameCopy=0;
-unsigned short * depthFrameCopy =0;
+unsigned char * colorFrameCopy=0;   unsigned int colorCopyWidth = 0; unsigned int colorCopyHeight = 0;
+unsigned short * depthFrameCopy =0; unsigned int depthCopyWidth = 0; unsigned int depthCopyHeight = 0;
+
+
+int reallocateCopySpaceIfNeccessary(
+                                     unsigned int newColorWidth , unsigned int newColorHeight ,
+                                     unsigned int newDepthWidth , unsigned int newDepthHeight
+                                  )
+{
+  if  ( (newColorWidth * newColorHeight * 3 < colorCopyWidth * colorCopyHeight * 3 ) )
+  {
+    if (colorFrameCopy!=0) { free(colorFrameCopy); colorFrameCopy=0; }
+    colorFrameCopy = (unsigned char * ) malloc(newColorWidth*newColorHeight*3*sizeof(unsigned char));
+    if (colorFrameCopy==0) { fprintf(stderr,"Cannot make an intermediate copy of color frame \n");  }
+    colorCopyWidth=newColorWidth;
+    colorCopyHeight=newColorHeight;
+  }
+
+
+  if  ( (newColorWidth * newColorHeight * 3 < colorCopyWidth * colorCopyHeight * 3 ) )
+  {
+    if (depthFrameCopy!=0) { free(depthFrameCopy); depthFrameCopy=0; }
+    depthFrameCopy = (unsigned short * ) malloc(newDepthWidth*newDepthHeight*1*sizeof(unsigned short));
+    if (depthFrameCopy==0) { fprintf(stderr,"Cannot make an intermediate copy of depth frame \n"); }
+    depthCopyWidth=newDepthWidth;
+    depthCopyHeight=newDepthHeight;
+  }
+
+
+
+
+  return 1;
+}
 
 
 float simpPow(float base,unsigned int exp)
@@ -317,6 +348,10 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
                                          unsigned int frameTimestamp )
 {
   if ( (colorFrameCopy==0) ||  (depthFrameCopy==0) ) { fprintf(stderr,"Cannot run handtracker due to not allocated intermediate buffer\n"); return 0; }
+
+  //Make sure we have enough space on our buffers..!
+  reallocateCopySpaceIfNeccessary(colorWidth , colorHeight , depthWidth ,depthHeight );
+
   //Unfortunately gestures need its dedicated frame buffer read/write so we copy frames here before passing them
   memcpy(colorFrameCopy,colorFrame,colorWidth*colorHeight*3*sizeof(unsigned char));
   memcpy(depthFrameCopy,depthFrame,depthWidth*depthHeight*1*sizeof(unsigned short));
@@ -331,6 +366,8 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
 
   return retres;
 }
+
+
 
 
 int registerServices(ros::NodeHandle * nh,unsigned int width,unsigned int height)
