@@ -242,14 +242,14 @@ def startDockProcedure():
     with seq1:
         Sequence.add('START_DOCK', hobbit_move.get_dock_action())
         # Sequence.add('START_DOCK', hobbit_move.Dock())
-        # Sequence.add('WAIT', SleepState(duration=20))
+        Sequence.add('WAIT', SleepState(duration=5))
         Sequence.add('CHECK',
                      cc,
                      transitions={'succeeded': 'aborted',
                                   'failed': 'RETRY'})
         Sequence.add('RETRY', hobbit_move.get_undock_action())
         # Sequence.add('RETRY', hobbit_move.get_undock())
-        # Sequence.add('WAIT1', SleepState(duration=10))
+        Sequence.add('WAIT1', SleepState(duration=5))
         Sequence.add('CHECK_1',
                      cc,
                      transitions={'succeeded': 'aborted',
