@@ -1,0 +1,19 @@
+<package>
+
+  <name>virtual_laser2</name>
+  <version> 0.0.0</version>
+  <description> VirtualLaser2</description>
+  <maintainer email="someone@todo.todo">Peter Einramhof and Paloma de la Puente</maintainer>
+  <license>BSD</license>
+  <url>http://ros.org/wiki/virtual_laser</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>tf</build_depend>
+  <build_depend>rospy</build_depend>
+
+</package>
+
+
