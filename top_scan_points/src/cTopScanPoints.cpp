@@ -1,3 +1,4 @@
+
 #include "ros/ros.h"
 #include "../include/TopScanPoints/cTopScanPoints.h"
 #include "pcl/conversions.h"
@@ -5,6 +6,7 @@
 #include <pcl_ros/point_cloud.h>
 
 //#include <pcl/visualization/cloud_viewer.h>
+#include <pcl_conversions/pcl_conversions.h>
 
 #include <tf_conversions/tf_eigen.h>
 
@@ -37,6 +39,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 */
 
+//Modified by Paloma de la Puente
+
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Constructor. Initialises member attributes and allocates resources.
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -54,14 +58,14 @@ cTopScanPoints::cTopScanPoints(int argc, char **argv) : init_argc(argc), init_ar
 	output.time_increment = 0.0;
 	output.scan_time = 1.0/30.0;
 	output.range_min = 0.1;
-	output.range_max = 1;
+	output.range_max = 1.5;
 
 
 	obstacle_trans.header.frame_id = "base_link";
     	obstacle_trans.child_frame_id = "obstacle_link";
-    	obstacle_trans.transform.translation.x = -0.248;
-    	obstacle_trans.transform.translation.y = -0.208;
-   	obstacle_trans.transform.translation.z = 1.108;
+    	obstacle_trans.transform.translation.x = 0;
+    	obstacle_trans.transform.translation.y = 0;
+   	obstacle_trans.transform.translation.z = 0;
     	obstacle_trans.transform.rotation.x = 0.0;
     	obstacle_trans.transform.rotation.y = 0.0;
     	obstacle_trans.transform.rotation.z = 0.0;
@@ -74,15 +78,23 @@ cTopScanPoints::cTopScanPoints(int argc, char **argv) : init_argc(argc), init_ar
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 cTopScanPoints::~cTopScanPoints()
 {
-  printf("cTopScanPoints::~cTopScanPoints(): shutting down ROS\n");
-  usleep(100000);
-  if (ros::isStarted())
-  {
-    ros::shutdown();
-    ros::waitForShutdown();
-  }
-  usleep(100000);
-  printf(" - done\n");
+  	printf("cTopScanPoints::~cTopScanPoints(): shutting down ROS\n");
+  	usleep(100000);
+  	if (ros::isStarted())
+  	{
+    		ros::shutdown();
+    		ros::waitForShutdown();
+  	}
+  	usleep(100000);
+  	printf(" - done\n");
+}
+
+void cTopScanPoints::open(ros::NodeHandle & n)
+{
+	cloudSubscriber = n.subscribe<sensor_msgs::PointCloud2>("/headcam/depth_registered/points", 1, &cTopScanPoints::callback, this);
+
+        laserPublisher = n.advertise<sensor_msgs::LaserScan>("obstacle_scan", 1); 
+
 }
 
 
@@ -92,30 +104,14 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 {
 	//std::cout << "callback " << std::endl;
 	sensor_msgs::PointCloud2 point_cloud2;
-	point_cloud2.data = msg-> data;
-
-	float *pCloud;
-	pCloud = (float *)(&(msg->data[0]));
+	point_cloud2 = *msg;
 
 	pcl::PointCloud<pcl::PointXYZ> pcl_cloud;
 
-	int i = 0;
-	for (int x = 0; x < DEPTH_DATA_WIDTH; x++)
-  	{
-		for (int y = 0; y < DEPTH_DATA_HEIGHT; y++)
-		{
-			pcl::PointXYZ point(pCloud[i], pCloud[i+1], pCloud[i+2]);
-			//pcl::PointXYZ point(0,0,1);
-			pcl_cloud.push_back(point);
-			i+=4;
-
-		}
-	}
-
-	//fromROSMsg not working
+  	fromROSMsg(point_cloud2, pcl_cloud);
 
 	pcl::PointCloud<pcl::PointXYZ> point_cloud_new_frame;
-	pcl::PointCloud<pcl::PointXYZ> point_cloud_new_frame2;
+	/*pcl::PointCloud<pcl::PointXYZ> point_cloud_new_frame2;
 
 	 Eigen::Vector3f trans_base_to_neck(-0.260, 0.000, 1.090);
     	 Eigen::Matrix4f base_to_neck;
@@ -138,12 +134,12 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
     	 neck_to_cam.block<3,3>(0,0) = q_neck_to_cam.toRotationMatrix();
     	 neck_to_cam.block<3,1>(0,3) = trans_neck_to_cam;
 
-    	 Eigen::Matrix4f matrix = base_to_neck * rotation_learning * neck_to_cam;
+    	 Eigen::Matrix4f matrix = base_to_neck * rotation_learning * neck_to_cam;*/
 
 	 try
 	 {
 
-		//Apply transform
+/*		//Apply transform
 		Eigen::Matrix4d matrix_d(matrix.cast<double>());
 		Eigen::Affine3d affine_trans(matrix_d);
 		tf::Transform trans;
@@ -154,15 +150,15 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 		float z = trans.getRotation().z();
 		float w = trans.getRotation().w();
 		//std::cout << "quaternion" << x << " " << y << " " << z << " " << w << std::endl;
-		pcl_ros::transformPointCloud(pcl_cloud, point_cloud_new_frame, trans);
+		pcl_ros::transformPointCloud(pcl_cloud, point_cloud_new_frame, trans); */
 
 	/*	// Define tf transformation
 		tf::StampedTransform trans;
-  		trans.setOrigin(tf::Vector3(-0.152, -0.047, 1.215));
+  		trans.setOrigin(tf::Vector3(-0.160, -0.046, 1.223));
 		//trans.setRotation(tf::createQuaternionFromRPY(0.96, M_PI, M_PI/2));
-		trans.setRotation(tf::Quaternion(-0.620, 0.630, -0.334, 0.328));
-		//Apply transform to new reference frame
-		pcl_ros::transformPointCloud(pcl_cloud, point_cloud_new_frame, trans);*/
+		trans.setRotation(tf::Quaternion(-0.610, 0.616, -0.355, 0.351));
+		//Apply transform to new reference frame */
+		pcl_ros::transformPointCloud(pcl_cloud, point_cloud_new_frame, transform);
 	
 
 	}
@@ -190,8 +186,6 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 	//"Thin" laser height from pointcloud
 	for (pcl::PointCloud<pcl::PointXYZ>::const_iterator it = point_cloud_new_frame.begin(); it != point_cloud_new_frame.end(); ++it)
 	{
-		//process = !process;
-		//if (!process) continue;
 		count++;
 		if (count < num_points_proc) continue; //use only one point from every n points
 		count = 0;
@@ -206,8 +200,9 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 		float cam_disp_x = -0.248;
 		float cam_disp_y = -0.208;
 
-		float min_height_ = 0.3;
+		float min_height_ = 0.15;
         	float max_height_ = 1.4; //FIXME
+
 
 		if (!std::isfinite(x) || !std::isfinite(y) || !std::isfinite(z) )
 		{
@@ -248,10 +243,11 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 			//std::cout << "angle " << angle * 180/M_PI << std::endl;
 		}
 	} //for it
+	//std::cout << "************************************************ " << std::endl;
+	//std::cout << "min_height " << min_height << std::endl;
 
 	output.header.stamp = ros::Time::now ();
 	laserPublisher.publish(output);
-
 	obstacle_trans.header.stamp = ros::Time::now ();
         (*p_obstacle_broadcaster).sendTransform(obstacle_trans);
 
@@ -261,25 +257,15 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 //run
 void cTopScanPoints::Run(void)
 {
-
-	 ros::init(init_argc, init_argv, "topScan");
-         ros::NodeHandle n;
-
-        cloudSubscriber = n.subscribe<sensor_msgs::PointCloud2>("/headcam/depth_registered/points", 1, &cTopScanPoints::callback, this);
-
-        laserPublisher = n.advertise<sensor_msgs::LaserScan>("obstacle_scan", 1);
-
-	 tf::TransformBroadcaster obstacle_broadcaster;
-         p_obstacle_broadcaster = &obstacle_broadcaster;
-
-	// ROS main loop.
-    ros::Rate r(10);
-    while (ros::ok()){
-        ros::spinOnce();
-        r.sleep();
-    }
-    //ros::spin();
+	try 
+	{
+	    listener.waitForTransform("base_link", "headcam_rgb_optical_frame", ros::Time(0), ros::Duration(10.0));
+	    listener.lookupTransform("base_link", "headcam_rgb_optical_frame", ros::Time(0), transform);
+	} 
+	catch (tf::TransformException ex) 
+	{
+    	     ROS_ERROR("%s",ex.what());
+	}
 
 }
-
 

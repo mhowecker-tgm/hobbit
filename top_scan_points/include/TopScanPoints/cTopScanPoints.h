@@ -20,8 +20,13 @@ public:
   //Constructor
   cTopScanPoints(int argc, char **argv);
   ~cTopScanPoints();
+  void open(ros::NodeHandle & n);
   void Run(void);
   void callback(const sensor_msgs::PointCloud2::ConstPtr& msg);
+
+
+  geometry_msgs::TransformStamped obstacle_trans;
+  tf::TransformBroadcaster *p_obstacle_broadcaster;
 
 private:
 
@@ -34,16 +39,16 @@ private:
   sensor_msgs::LaserScan output;
   ros::Publisher laserPublisher;
 
-  geometry_msgs::TransformStamped obstacle_trans;
-  tf::TransformBroadcaster *p_obstacle_broadcaster;
-
   int init_argc;
   char **init_argv;
 
-  //tf::TransformListener listener;
-  //tf::StampedTransform transform;
+  tf::TransformListener listener;
+  tf::StampedTransform transform;
 
 };
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #endif
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
