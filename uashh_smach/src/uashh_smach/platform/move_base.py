@@ -196,7 +196,7 @@ class HasMovedState(State):
 
     def execute(self, userdata):
         currentX, currentY = self._getXY()
-        current_distance = math.sqrt(math.pow(currentX, 2) + math.pow(currentY, 2))
+        current_distance = math.sqrt(math.pow(currentX - self.lastX, 2) + math.pow(currentY - self.lastY, 2))
         rospy.loginfo("current XY: %f,%f last XY: %f,%f current distance: %f minimum distance: %f",
                        self.lastX, self.lastY, currentX, currentY, current_distance, self.minimum_distance)
         if current_distance >= self.minimum_distance:

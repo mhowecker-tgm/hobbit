@@ -712,6 +712,7 @@ def sayPointingGestureNotDetected2():
         )
         Concurrence.add(
             'SAY_POINTING_NOT_DETECTED',
+            #speech_output.sayText(info='What the hell')
             speech_output.sayText(info='T_PU_PointingGestureNotDetected2')
         )
     return cc

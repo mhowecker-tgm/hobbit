@@ -294,90 +294,71 @@ if __name__ == '__main__':
     cmd = String ("GetArmState")
     res = arm_client.arm_action_client(cmd)
     print "Result: ", res
-    print "david last_feedb----------------------------------------------------------------------------------------------------ack: ", arm_client.last_feedback
+    #print "david last_feedb----------------------------------------------------------------------------------------------------ack: ", arm_client.last_feedback
 
-    #print "SetResetArm: ", arm_client.SetResetArm()
     print "===============GetActualPosition()================"
     print "get arm act pos: ", arm_client.GetActualPosition()
 
-    print "===============GetArmAtPreGraspFromFloorPos()================"
-    print "get arm GetArmAtPreGraspFromFloorPos: ", arm_client.GetArmAtPreGraspFromFloorPos()
-    
-
-
-    print "get arm act pos: ", arm_client.GetActualPosition()
-    print "david last_feedb----------------------------------------------------------------------------------------------------ack: ", arm_client.last_feedback
-
-
-    
-    exit()
-    
-
-
-
-    raw_input("press key to get SetAbsolutePos (PreGraspFromFloorPos)")
-    cmd = String ("SetAbsolutePos 69.7 43.4 86.3 134.3 107.6 4.0")
-    res = arm_client.arm_action_client(cmd)
-    print "Result: ", res 
-    
-    raw_input("press key to get startMove (armactionserver)")
-    cmd = String ("SetStartMove 2")
-    res = arm_client.arm_action_client(cmd)
-    print "Result: ", res 
-
-    #print "get arm act pos: ", arm_client.GetActualPosition()
-
+    raw_input("press key to SetMoveToPreGraspFromFloorPos")
+    res = arm_client.SetMoveToPreGraspFromFloorPos()
 
     #OPEN GRIPPER
     #raw_input("press key to open gripper get SetOpenGripper(armactionserver)")
-    #cmd = String ("SetOpenGripper")
-    #res = arm_client.arm_action_client(cmd)
+    cmd = String ("SetOpenGripper")
+    res = arm_client.arm_action_client(cmd)
+    #print "Result: ", res 
+    #69.71, 43.44, 86.3, 134.07, 107.56, 3.96 pregrap
+
+    raw_input("press key to set PositionsForInterpolation(armactionserver) start [+ middle + end position]")
+    #pos: start near pre-grasp-from-floor-pos
+    cmd = String ("SetPositionsForInterpolation 42.04504386 61.52334755 79.77157983 155.82112212 128.77648718 83.76476425")
+    res = arm_client.arm_action_client(cmd)
     #print "Result: ", res 
 
-	#69.71, 43.44, 86.3, 134.07, 107.56, 3.96 pregrap
-
-    #raw_input("press key to get PositionsForInterpolation(armactionserver) POS2")
-    #cmd = String ("SetPositionsForInterpolation 72 43 82 134 101 4")
-    #res = arm_client.arm_action_client(cmd)
+    #pos2: between end-floor-grasp-pos and pre-grasp-from-floor-pos
+    cmd = String ("SetPositionsForInterpolation 51.31769508 62.3654593 77.74358254 155.87566346 117.64206414 83.61801603")
+    res = arm_client.arm_action_client(cmd)
     #print "Result: ", res 
 
-    #raw_input("press key to get PositionsForInterpolation(armactionserver) POS3")
-    #cmd = String ("SetPositionsForInterpolation 78 43 84 134 96 4")
-    #res = arm_client.arm_action_client(cmd)
-    #print "Result: ", res 
-
-    #raw_input("press key to get PositionsForInterpolation(armactionserver) POS4")
-    #cmd = String ("SetPositionsForInterpolation 78 55 78 150 90 4")
-    #res = arm_client.arm_action_client(cmd)
-    #print "Result: ", res 
-
-
-    #raw_input("press key to get PositionsForInterpolation(armactionserver) POS1=PreGraspFromFloor")
-    #cmd = String ("SetPositionsForInterpolation 69.71 43.44 86.3 134.07 107.56 3.96")
-    #cmd = String ("SetPositionsForInterpolation 69.7 43.4 86.3 134.3 107.6 4.0 ")  #Pos von Andreas Flatscher
-    #res = arm_client.arm_action_client(cmd)
-    
+    #pos3: end-floor-grasp-pos 
+    cmd = String ("SetPositionsForInterpolation 56.98342518 64.28071272 72.53537543 157.63020355 107.04036435 82.17067261")
+    res = arm_client.arm_action_client(cmd)
 
     #raw_input("press key to get PositionsForInterpolationReady (armactionserver)")
-    #cmd = String ("SetPositionsForInterpolationReady")
-    #res = arm_client.arm_action_client(cmd)
+    cmd = String ("SetPositionsForInterpolationReady")
+    res = arm_client.arm_action_client(cmd)
+    cmd = String("SetStartInterpolation")
+    res = arm_client.arm_action_client(cmd)
 
-    #raw_input("press key to move arm after position interpolation")
-    #cmd = String("SetStartInterpolation")
-    #res = arm_client.arm_action_client(cmd)
-
-
-    print "===============GetArmAtPreGraspFromFloorPos()================"
-    print "get arm GetArmAtPreGraspFromFloorPos: ", arm_client.GetArmAtPreGraspFromFloorPos()
 
     #CLOSE GRIPPER
-    #raw_input("press key to close gripper get SetCloseGripper(armactionserver)")
-    #cmd = String ("SetCloseGripper")
-    #res = arm_client.arm_action_client(cmd)
+    raw_input("press key to close gripper SetCloseGripper(armactionserver)")
+    cmd = String ("SetCloseGripper")
+    res = arm_client.arm_action_client(cmd)
     #print "Result: ", res 
 
 
+    raw_input("press key to move arm back to pre-grasp-position (middle + start position + pre-grasp")
+    #pos2: between end-floor-grasp-pos and pre-grasp-from-floor-pos
+    cmd = String ("SetPositionsForInterpolation 51.31769508 62.3654593 77.74358254 155.87566346 117.64206414 83.61801603")
+    res = arm_client.arm_action_client(cmd)
+    #pos: start near pre-grasp-from-floor-pos
+    cmd = String ("SetPositionsForInterpolation 42.04504386   61.52334755   79.77157983  155.82112212  128.77648718  83.76476425")
+    res = arm_client.arm_action_client(cmd)
+    #pos: pre-grasp-from-floor-pos
+    cmd = String ("SetPositionsForInterpolation 69.7 43.4 86.3 134.3 107.6 4.0")
+    res = arm_client.arm_action_client(cmd)
 
+    cmd = String ("SetPositionsForInterpolationReady")
+    res = arm_client.arm_action_client(cmd)
+    cmd = String("SetStartInterpolation")
+    res = arm_client.arm_action_client(cmd)
+    
+    cmd = String ("SetOpenGripper")
+    res = arm_client.arm_action_client(cmd)
+
+
+    exit()
 
     #raw_input("press key to get PositionsForInterpolation(armactionserver) POS3")
     #cmd = String ("SetPositionsForInterpolation 78 43 84 134 96 4")
@@ -412,7 +393,15 @@ if __name__ == '__main__':
     '''
 
 
-
+    #raw_input("GRIPPER MUST BE ALREADY IN PREGRASPPOSITION!!!! press key to SetAbsolutePos (PreGraspFromFloorPos)")
+    #cmd = String ("SetAbsolutePos 69.7 43.4 86.3 134.3 107.6 4.0")
+    #res = arm_client.arm_action_client(cmd)
+    #print "Result: ", res 
+    
+    #raw_input("press key to get startMove (armactionserver)")
+    #cmd = String ("SetStartMove 2")
+    #res = arm_client.arm_action_client(cmd)
+    #print "Result: ", res 
 
 
     

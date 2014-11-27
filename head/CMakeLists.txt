@@ -23,5 +23,5 @@ generate_messages(DEPENDENCIES std_msgs tf)
 
 catkin_package(
 
-  CATKIN_DEPENDS message_runtime
+  CATKIN_DEPENDS message_runtime tf std_msgs
 )

@@ -293,7 +293,7 @@ def add_object_to_db(req):
     return addObject(String(req.object_name), rooms)
 
 
-def clean_up():
+def clean_up(h):
     rospy.loginfo(NAME + ' is shutting down. Saving places.xml')
     writeXml(FILE, rooms)
 

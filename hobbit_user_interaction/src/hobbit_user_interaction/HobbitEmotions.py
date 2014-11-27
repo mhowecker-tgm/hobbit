@@ -33,7 +33,8 @@ class ShowEmotions(State):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
-        self.default_emotion = rospy.get_param('/Hobbit/current_emotion')
+	if rospy.has_param('/Hobbit/current_emotion'):
+            self.default_emotion = rospy.get_param('/Hobbit/current_emotion')
         rospy.set_param('/Hobbit/current_emotion', self.emotion)
         self.pub_emo.publish(self.emotion)
         if self.emo_time == 0:

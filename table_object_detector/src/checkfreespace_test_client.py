@@ -6,9 +6,9 @@
 # Test if check_free_space service works
 #
 # subscribes to /SS/doSingleShotTestCFS", if String comes in:
-#     subscribes to /headcam/depth_registered/points and uses point cloud for service call
+#     subscribes to /basecam/depth_registered/points and uses point cloud for service call
 # publishes result (= number of points in defined area)
-# after that it unregisters subscriber of /headcam/depth_registered/points 
+# after that it unregisters subscriber of /basecam/depth_registered/points 
 
 
 
@@ -30,7 +30,7 @@ class Trigger():
         ss_sub = rospy.Subscriber("/SS/doSingleShotTestCFS", String, self.start_shot, queue_size=1)
         self.pc_sub = None
         #Publisher
-        #self.pc_pub = rospy.Publisher("/SS/headcam/depth_registered/points", PointCloud2 )
+        #self.pc_pub = rospy.Publisher("/SS/basecam/depth_registered/points", PointCloud2 )
          
         self.pc_ = None
         t = None
@@ -40,14 +40,14 @@ class Trigger():
         print "start shot"
         self.t = None
         #start subscriber
-        self.pc_sub = rospy.Subscriber("/headcam/depth_registered/points", PointCloud2, self.pc_callback, queue_size=1)
+        self.pc_sub = rospy.Subscriber("/basecam/depth_registered/points", PointCloud2, self.pc_callback, queue_size=1)
         
     
     #starts method to publish point cloud for camera1; unregisters subscriber camera1
     def pc_callback(self,msg):
         self.pc_ = msg
         self.pc_sub.unregister()
-        print "speichert punktwolke von headcam"
+        print "speichert punktwolke von basecam"
         self.do_publish_cam1()
         
     

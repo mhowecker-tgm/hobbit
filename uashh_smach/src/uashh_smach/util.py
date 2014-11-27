@@ -107,7 +107,7 @@ class WaitForMsgState(smach.State):
     output_keys: Userdata keys that the message callback needs to write to.
     """
 
-    def __init__(self, topic, msg_type, msg_cb=None, input_keys=None, output_keys=None, latch=False, timeout=None):
+    def __init__(self, topic, msg_type, msg_cb=None, input_keys=['dummy'], output_keys=None, latch=False, timeout=None):
         if output_keys is None:
             output_keys = []
         if input_keys is None:
