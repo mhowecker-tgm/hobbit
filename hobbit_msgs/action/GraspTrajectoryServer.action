@@ -1,0 +1,8 @@
+# Define the input command (defines grasp for gripper, tbd)
+std_msgs/String command
+---
+# Define the result, if succeeded
+std_msgs/Bool result
+---
+# Define a feedback message
+std_msgs/String feedback
