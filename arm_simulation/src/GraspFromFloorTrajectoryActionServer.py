@@ -22,9 +22,10 @@ MODIFIED (completely): from OpenRAVE tutorial
 Description
 -----------
 
-This node receives a grasp destination (x,y,z) near the floor where the HobbitPT2 arm should grasp.
+This node is an ActionServer for calculation trajectories given an input defining a graps.
+Old: receives a grasp destination (x,y,z) near the floor where the HobbitPT2 arm should grasp.
 The arm trajectory is calculated and saved as a string and a service of the ArmActionServer is 
-called for executing the execution of the trajectory. 
+called for execution of the trajectory. 
 
 """
 
@@ -203,7 +204,7 @@ class GraspTrajectoryActionServerFromFloor():
         self._result.result = Bool(True)
   
 
-        self.gp_pnt_xy = [0.32, -0.34]#trajSim.gp_pnt_fixed[0:2] + (random.rand(2)-0.5)/trajSim.grasp_area_param  #david: hier die daten vom actionservergoal einsetzen
+        self.gp_pnt_xy = [input[0],input[1]] #[0.32, -0.34]#trajSim.gp_pnt_fixed[0:2] + (random.rand(2)-0.5)/trajSim.grasp_area_param  #david: hier die daten vom actionservergoal einsetzen
         print "New grasp position (x and y value): ", self.gp_pnt_xy
         
         #get trajectory (execution of trajectory via ArmServer is included here)
