@@ -58,8 +58,8 @@ from openravepy.misc import OpenRAVEGlobalArguments
 class GraspTrajectoryActionServerFromFloor():
 
     # create messages that are used to publish feedback/result for action lib
-    #_feedback = hobbit_msgs.msg.ArmServerFeedback()
-    #_result   = hobbit_msgs.msg.ArmServerResult()
+    _feedback = hobbit_msgs.msg.GraspTrajectoryServerFeedback()
+    _result   = hobbit_msgs.msg.GraspTrajectoryServerResult()
 
     gp_pnt_fixed = [0.32, -0.34, 0.15]    # grasp pre-point coordinates
     grasp_area_param = 5                #this parameter defines how big the area is where grasps should be possible: value of 5 means that that the gripper has 10cm (50cm/5=10cm) space in each direction
@@ -69,7 +69,13 @@ class GraspTrajectoryActionServerFromFloor():
     
     #set up the environment
     #@openravepy.with_destroy
-    def __init__(self):
+    def __init__(self, name):
+        
+        self._action_name = name
+        self._as = actionlib.SimpleActionServer(self._action_name, hobbit_msgs.msg.GraspTrajectoryServerAction, execute_cb=self.execute_cb, auto_start = False)
+        self._as.start()
+        print "GraspTrajectoryServer was started"
+        self.gp_pnt_xy = None
         
         # create arm_action_client
         #self.arm_action_client = actionlib.SimpleActionClient("arm_action_server", hobbit_msgs.msg.ArmServerAction)   #"arm_action_server" has to be nodename of ArmActionServer(.py)
@@ -78,7 +84,7 @@ class GraspTrajectoryActionServerFromFloor():
         sceneName = '/opt/ros/hobbit_hydro/src/arm_simulation/data/Hobbit.env.xml'           
         self.env = Environment()
         #self.env.SetDebugLevel(DebugLevel.Debug)
-        #self.env.SetViewer('qtcoin')    #turn off/on visualization in openrave
+        self.env.SetViewer('qtcoin')    #turn off/on visualization in openrave
         self.env.Load(sceneName)
         arm_client = ArmActionClient()
         self.ArmClient = ArmActionClient() #new!!! (21.10.2014) create instance of arm action client to send command to arm
@@ -181,13 +187,43 @@ class GraspTrajectoryActionServerFromFloor():
             return False
         
  
+ 
+     # commands triggered by call of ActionServer
+    def execute_cb(self, goal):
+        self._result.result = Bool(False) #default value for result
+        #get command from goal
+        strdata = str(goal.command.data)
+        print "\n input (definition for grasp) for GraspTrajectoryActionServer (command) received: >> ", strdata
+        input = strdata.split()        
+        
+        #return False/True if appropriate, otherwise True if command was executed
+        self._feedback.feedback.data = str("feedback bla bla")
+        print "GraspTrajectoryActionServer, feedback: ", self._feedback.feedback.data
+        
+        self._result.result = Bool(True)
+  
+
+        self.gp_pnt_xy = [0.32, -0.34]#trajSim.gp_pnt_fixed[0:2] + (random.rand(2)-0.5)/trajSim.grasp_area_param  #david: hier die daten vom actionservergoal einsetzen
+        print "New grasp position (x and y value): ", self.gp_pnt_xy
+        
+        #get trajectory (execution of trajectory via ArmServer is included here)
+        self.getTrajForGraspFromFloor()
+    
+        #publish feedback
+        self._as.publish_feedback(self._feedback)
+        self._as.set_succeeded(self._result)
+    
+
+ 
+ 
 
 if __name__ == "__main__":
-    rospy.init_node('graspFromFloor')
-    trajSim = GraspTrajectoryActionServerFromFloor()
-    while True:
-    	trajSim.gp_pnt_xy = trajSim.gp_pnt_fixed[0:2] + (random.rand(2)-0.5)/trajSim.grasp_area_param
-        print "New grasp position (x and y value): ", trajSim.gp_pnt_xy
-    	trajSim.getTrajForGraspFromFloor()
+    rospy.init_node('grasp_trajectory_action_server')
+    print "ROS node grasp_trajectory_action_server started"
+    trajSim = GraspTrajectoryActionServerFromFloor(rospy.get_name())
+    
+    rospy.spin()
+
+
     
     

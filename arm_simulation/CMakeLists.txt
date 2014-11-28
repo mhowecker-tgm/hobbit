@@ -5,13 +5,13 @@ project(arm_simulation)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  message_generation
   rospy
   std_msgs
   actionlib  
   hobbit_msgs
   sensor_msgs
 #  geometry_msgs
-  message_generation
 )
 
 ## System dependencies are found with CMake's conventions
@@ -61,20 +61,20 @@ find_package(catkin REQUIRED COMPONENTS
 #)
 
 ## Generate actions in the 'action' folder
-# add_action_files(
+#add_action_files(
 #   FILES
-#   Action1.action
+#    ArmServer.action
 #   Action2.action
-# )
+#)
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  std_msgs
+#generate_messages(
+#  DEPENDENCIES
+#  std_msgs
 # geometry_msgs
-  hobbit_msgs
-  sensor_msgs
-)
+#  hobbit_msgs
+#  sensor_msgs
+#)
 
 ###################################
 ## catkin specific configuration ##
@@ -88,7 +88,7 @@ generate_messages(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES distance_to_obstacle
- CATKIN_DEPENDS rospy std_msgs message_runtime hobbit_msgs sensor_msgs actionlib
+ CATKIN_DEPENDS message_runtime rospy std_msgs hobbit_msgs sensor_msgs actionlib
 #  DEPENDS system_lib
 )
 
