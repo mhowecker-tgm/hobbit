@@ -85,7 +85,7 @@ find_package(OpenCV REQUIRED)
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
+  INCLUDE_DIRS include
 #  LIBRARIES calc_grasppoints_svm
 #  CATKIN_DEPENDS opencv2 roscpp sensor_msgs
 #  DEPENDS system_lib
@@ -98,7 +98,7 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 # include_directories(include)
-include_directories(/opt/ros/grasping/catkin_ws/src/calc_grasppoints_svm/include /usr/include/pcl-1.7/pcl/
+include_directories(include /usr/include/pcl-1.7/pcl/
   ${catkin_INCLUDE_DIRS}
 )
 
