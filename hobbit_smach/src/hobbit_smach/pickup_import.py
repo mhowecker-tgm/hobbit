@@ -10,6 +10,7 @@ roslib.load_manifest(PKG)
 import rospy
 import numpy
 from smach import Concurrence, Sequence, State
+from smach_ros import MonitorState
 from hobbit_user_interaction import HobbitEmotions, HobbitMMUI
 from sensor_msgs.msg import PointCloud, PointCloud2
 from geometry_msgs.msg import Point, PointStamped
@@ -1014,6 +1015,19 @@ def getPickupSeq():
             Sequence.add(
                 'MOVE_ARM_TO_PRE_GRASP_POSITION',
                 arm_move.goToPreGraspPosition()
+            )
+            Sequence.add(
+            'GET_POINT_CLOUD',
+            MonitorState(
+                '/headcam/depth_registered/points',
+                PointCloud2,
+                cond_cb=point_cloud_cb,
+                max_checks=20,
+                output_keys=['cloud']
+            ),
+            transitions={'valid': 'GET_POINT_CLOUD',
+                         'invalid': 'GRASP_OBJECT',
+                         'preempted': 'preempted'}
             )
         Sequence.add(
             'GRASP_OBJECT',
