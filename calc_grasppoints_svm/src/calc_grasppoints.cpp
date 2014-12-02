@@ -13,8 +13,7 @@
  *     are published.
  *
  *      == Input ==
- *      A point cloud from objects inside a box
- *      (points of box are eliminated)
+ *      A point cloud of objects
  *
  *      == Output ==
  *      Grasp points and approach vectors which are detected using Support Vector Machines
@@ -143,7 +142,7 @@ public:
 		this->box_center_y = -0.18;
 		outputpath_full = "/tmp/features.txt";
 		return_only_best_gp = true;
-		graspval_th = 70;					//treshhold if grasp hypothesis should be returned (in funtion - so programm internal) (for top result of one loop run)
+		graspval_th = 70;					//treshold if grasp hypothesis should be returned (in function - so programm internal) (for top result of one loop run)
 		graspval_top = 119;
 		graspval_max_diff_for_pub = 80;		//if the value of grasps is more that graspval_max_diff_for_pub lower than optimal value graspval_top, nothing gets published (for top result of one whole roll run)
 		id_row_top_overall = -1;
@@ -211,7 +210,7 @@ void CCalc_Grasppoints::read_pc_cb(const sensor_msgs::PointCloud2ConstPtr& pc_in
 
 
 //controls the execution of class methods
-//loop goes through all rolls and tilts and executes neccessary mehtods for calculation of gps
+//loop goes through all rolls and tilts and executes necessary methods for calculation of gps
 void CCalc_Grasppoints::loop_control(pcl::PointCloud<pcl::PointXYZ> pcl_cloud_in)
 {
 
@@ -247,7 +246,7 @@ void CCalc_Grasppoints::loop_control(pcl::PointCloud<pcl::PointXYZ> pcl_cloud_in
 			predict_bestgp_withsvm(svm_with_probability);
 			show_predicted_gps(roll, tilt, svm_with_probability);
 		}
-		//david new 7.2.: always send best gh aufter all rolls where tried
+		//david new 7.2.: always send best gh after all rolls where tried
 		//if (this->graspval_top - this->topval_gp_overall > this->graspval_max_diff_for_pub ){
 		//	transform_gp_in_wcs_and_publish(this->id_row_top_overall, this->id_col_top_overall, this->nr_roll_top_overall,this->nr_tilt_top_overall, this->topval_gp_overall-20); //last entry is "scaled" (=> -16)
 		//}
@@ -870,7 +869,7 @@ void CCalc_Grasppoints::transform_gp_in_wcs_and_publish(int id_row_top_all, int 
 
 	//david : set mat_tilt correctly, rewrite matrizes and bring mat_tilt in correct order with the other ones
 	//NEW
-	float beta = nr_tilt_top_all*TILT_STEPS_DEGREE*PI/180; //angel for tilt in Rad, vorzeichen richtig??
+	float beta = nr_tilt_top_all*TILT_STEPS_DEGREE*PI/180; //angle for tilt in Rad, vorzeichen richtig??
 	mat_tilt(0,0) = cos(beta);
 	mat_tilt(0,2) = -sin(beta);
 	mat_tilt(2,0) = sin(beta);
@@ -895,43 +894,6 @@ void CCalc_Grasppoints::transform_gp_in_wcs_and_publish(int id_row_top_all, int 
 		}
 	}
 
-	float h_threshold = h_locmax_roll - 0.05;	//we are interested in all heightvalues bigger 0 and at least not 5 cm smaller than the max height (otherwise not so relavant for grasping)
-	if (h_threshold <= 0){
-		h_threshold = 0.001;
-	}
-	int min_row_with_obj = 0;	//defines first row (in relevant area) where object points with grasp relevant heigth were found
-	int max_row_with_obj = 0;	//defines last row (in relevant area) where object points with grasp relevant heigth were found
-	//new for michelangelohand: calculate approximate hand opening width when finger touching object => grasp points are adapted (needed because of finger closing trajectory of michelangelo hand)
-	for (int row_z = -6; row_z < 6; row_z++){	//row_z defines which rows are taken into account for the calc. of max z
-		for (int col_z = -5; col_z < 6; col_z++){
-			//cout << "this->heightsgridroll[" << nr_roll_top_all << "][" << nr_tilt_top_all << "][" << id_row_top_all+row_z << "][" << id_col_top_all+col_z << "]: " << this->heightsgridroll[nr_roll_top_all][nr_tilt_top_all][id_row_top_all+row_z][id_col_top_all+col_z] << endl;
-			if (id_row_top_all+row_z >= 0 and id_col_top_all+col_z>=0 and h_threshold < this->heightsgridroll[nr_roll_top_all][nr_tilt_top_all][id_row_top_all+row_z][id_col_top_all+col_z]){
-				min_row_with_obj = min(min_row_with_obj, row_z);
-				max_row_with_obj = max(max_row_with_obj, row_z);
-
-				//cout << "this->heightsgridroll[" << nr_roll_top_all <<"][" << nr_tilt_top_all<<"][" <<id_row_top_all+row_z<<"][" << id_col_top_all+col_z<<"]: " << this->heightsgridroll[nr_roll_top_all][nr_tilt_top_all][id_row_top_all+row_z][id_col_top_all+col_z] << endl;
-			}
-		}
-	}
-	cout << "\n !!!!!!!!!!!!!!!! \n min_row_with_obj: " << min_row_with_obj << "\n max_row_with_obj: " << max_row_with_obj << endl;
-
-	/*int object_thickness = max_row_with_obj - min_row_with_obj;
-	cout << "\n !!!!!!!!!!!!!!!! \n object_thickness: " << object_thickness << endl;
-	if (object_thickness > 7){
-		y_gp_roll += 0.03;
-		cout << "moved gp by 3 cm in y direction (openrave)" << endl;
-		x_gp_roll -= 0.01;
-		cout << "moved gp by -1 cm in x direction (openrave)" << endl;
-	} else if (object_thickness > 5){
-		y_gp_roll += 0.02;
-		cout << "moved gp by 2 cm in y direction (openrave)" << endl;
-	} else {
-		y_gp_roll += 0.01;
-		cout << "moved gp by 1 cm in y direction (openrave)" << endl;
-	}*/
-
-	y_gp_roll += 0.01;
-	cout << "moved gp by 1 cm in y direction (openrave)" << endl;
 
 	h_locmax_roll -= 0.02;
 	float z_gp_roll = h_locmax_roll;
@@ -940,10 +902,9 @@ void CCalc_Grasppoints::transform_gp_in_wcs_and_publish(int id_row_top_all, int 
 	//make rotation
 	//pcl::transformPointCloud(pcl_cloud_in, pcl_cloud_in_roll, mat_transform);
     float x_gp_dis = 0.03; //distance from grasp center to "real" grasp point
-    float gp1_mh_shift = 0.02;	//shift for michelangelo hand => to get the hand turned without changing hand coordinate frame (which would be probably better)
 
-	Eigen::Vector4f gp1(x_gp_roll-x_gp_dis, y_gp_roll+gp1_mh_shift,z_gp_roll,1.0);
-	Eigen::Vector4f gp2(x_gp_roll+x_gp_dis, y_gp_roll-gp1_mh_shift,z_gp_roll,1.0);
+	Eigen::Vector4f gp1(x_gp_roll-x_gp_dis, y_gp_roll,z_gp_roll,1.0);
+	Eigen::Vector4f gp2(x_gp_roll+x_gp_dis, y_gp_roll,z_gp_roll,1.0);
 	Eigen::Vector4f gp1_wcs, gp2_wcs;
 	Eigen::Vector3f appr_vec(0,0,1);
 
