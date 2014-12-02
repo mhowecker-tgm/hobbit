@@ -42,13 +42,13 @@ class TD:
         self.pubM = rospy.Publisher("/wwclusters", PointCloud2)   
         
     def run(self):
-	print "david1"
+        print "david1"
         r = rospy.Rate(10) # 10hz
         #pointcloud = self.getSingleShot()
         #groundplane = self.findGroundPlane(pointcloud)        
         while not rospy.is_shutdown():
             r.sleep()
-	    print "david2"
+            print "david2"
             pointcloud = self.getSingleShot()
             #groundplane = self.findGroundPlane(pointcloud)        
             clusters = self.findObjectsOnFloor(pointcloud, [0,0,0,0])
@@ -165,11 +165,8 @@ class TD:
           return None
 
     def findObjectsOnFloor(self, pointcloud, groundplane):
-	print "david3"
         rospy.wait_for_service('/CloudSegmenthor/findObjectsOnFloor')
-	print "david3.5"
         servicecall = rospy.ServiceProxy('/CloudSegmenthor/findObjectsOnFloor', ClustersOnPlane)
-	print "david4"
         try:
             resp = servicecall(pointcloud, groundplane)    # call the service            
             return resp.clusters
