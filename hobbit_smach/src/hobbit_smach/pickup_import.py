@@ -278,7 +278,7 @@ class DavidLookForObject(State):
 
 
     def ispossibleobject(self, pnt):    #pnt is in rcs
-	print "===> pickup_import.py: DavidLookForObject.ispossibleobject()"
+        print "===> pickup_import.py: DavidLookForObject.ispossibleobject()"
         #criteria for valid objects
         x_min = -0.5
         x_max = 1.0
@@ -307,7 +307,7 @@ class DavidLookForObject(State):
 
 
     def getCenterOfCluster(self):
-	print "===> pickup_import.py: DavidLookForObject.getCenterOfCluster()"
+        print "===> pickup_import.py: DavidLookForObject.getCenterOfCluster()"
         #extract points from PointCloud2 in python....
         fmt = self._get_struct_fmt(self.pc)
         narr = list()
@@ -599,54 +599,181 @@ class DavidPickingUp(State):
     def __init__(self):
         State.__init__(
             self,
-            outcomes=['succeeded', 'failed', 'preempted']
+            outcomes=['succeeded', 'failed', 'preempted'],
+            input_keys=['cloud']
         )
-	self.arm_client = ArmActionClient()
+        self.arm_client = ArmActionClient()
+        self.listener = tf.TransformListener()
+        self.pubClust = rospy.Publisher("/objectclusters", PointCloud2)
+        self.rec = TD()
+        self.restrictfind = True
+
 
     def execute(self, ud):
+        print "===> pickup_import.py: DavidPickingUp.execute()"
         if self.preempt_requested():
             return 'preempted'
         # TODO: David please add the grasping in here
 
-	#OPEN GRIPPER
-	res = self.arm_client.arm_action_client(String ("SetOpenGripper"))
-
-	#clear buffer
-	res = self.arm_client.SetClearPosBuffer()
-
-	#PositionsForInterpolation(armactionserver) Intermediate Floor GraspPOS4 (= Grasp at floor)
-	cmd = String ("SetPositionsForInterpolation 78 55 78 150 90 4")
-	res = self.arm_client.arm_action_client(cmd)
-
-	#PositionsForInterpolationReady
-	cmd = String ("SetPositionsForInterpolationReady")
-	res = self.arm_client.arm_action_client(cmd)
-
-	#    raw_input("press key to move arm after position interpolation")
-	cmd = String("SetStartInterpolation")
-	res = self.arm_client.arm_action_client(cmd)
-
-	#CLOSE GRIPPER
-	cmd = String ("SetCloseGripper")
-	res = self.arm_client.arm_action_client(cmd)
-
-
-	#clear buffer
-	res = self.arm_client.SetClearPosBuffer()
-
-	#PositionsForInterpolation(armactionserver) POS1=PreGraspFromFloor
-	cmd = String ("SetPositionsForInterpolation 69.7 43.4 86.3 134.3 107.6 4")
-	res = self.arm_client.arm_action_client(cmd)
-
-	#PositionsForInterpolationReady (armactionserver)")
-	cmd = String ("SetPositionsForInterpolationReady")
-	res = self.arm_client.arm_action_client(cmd)
-
-	#raw_input("press key to move arm after position interpolation")
-	cmd = String("SetStartInterpolation")
-	res = self.arm_client.arm_action_client(cmd)
-
+        if self.findobject(ud):
+            
+            print "DavidPickingUp.execute: findobject was successful"
+            #self.pc_rcs is available () => calc_grasp_points.cpp (AS) and get back grasp pose definition
+            #todo:
+            # 1) call calc_grasp_points AS
+            # 2) call openrave trajectory AS
+            # 3) call Arm AS (arm client already included in code)
+            #grasp pose definition => simulation => execution
+            
+            """ arm makes fix grasping-from-floor-movement (old)
+            #OPEN GRIPPER
+            res = self.arm_client.arm_action_client(String ("SetOpenGripper"))
+            #clear buffer
+            res = self.arm_client.SetClearPosBuffer()
+            #PositionsForInterpolation(armactionserver) Intermediate Floor GraspPOS4 (= Grasp at floor)
+            cmd = String ("SetPositionsForInterpolation 78 55 78 150 90 4")
+            res = self.arm_client.arm_action_client(cmd)
+            #PositionsForInterpolationReady
+            cmd = String ("SetPositionsForInterpolationReady")
+            res = self.arm_client.arm_action_client(cmd)
+        	#    raw_input("press key to move arm after position interpolation")
+            cmd = String("SetStartInterpolation")
+            res = self.arm_client.arm_action_client(cmd)
+        	#CLOSE GRIPPER
+            cmd = String ("SetCloseGripper")
+            res = self.arm_client.arm_action_client(cmd)
+        	#clear buffer
+            res = self.arm_client.SetClearPosBuffer()
+        	#PositionsForInterpolation(armactionserver) POS1=PreGraspFromFloor
+            cmd = String ("SetPositionsForInterpolation 69.7 43.4 86.3 134.3 107.6 4")
+            res = self.arm_client.arm_action_client(cmd)
+        	#PositionsForInterpolationReady (armactionserver)")
+            cmd = String ("SetPositionsForInterpolationReady")
+            res = self.arm_client.arm_action_client(cmd)
+        	#raw_input("press key to move arm after position interpolation")
+            cmd = String("SetStartInterpolation")
+            res = self.arm_client.arm_action_client(cmd)
+            """
+            
         return 'succeeded'
+
+#===========
+    def findobject(self, ud):
+        print "===> pickup_import.py: DavidPickingUp.findobject()"
+        pc_ccs = ud.cloud   #point cloud in camera coordinate system
+        clusters = self.rec.findObjectsOnFloor(pointcloud, [0,0,0,0])
+        print "number of object clusters on floor found: ", len(clusters)
+
+        for cluster in clusters:
+            self.pc = cluster
+            print " ==============> publish cluster"
+            self.pubClust.publish(cluster)
+            #self.pubClust.publish(pointcloud)
+            if self.isGraspableObject():
+                return True
+
+        print "findobect(): no graspable object found"
+        return False
+
+
+    #checks if object is suitable for grasping
+    def isGraspableObject(self):
+        print "\n ===> F(): DavidPickingUp.isGraspableObject() start (pickup_import.py)"
+
+        print "trying to get tf transform"
+        while True:
+            try:
+                (trans,rot) = self.listener.lookupTransform('/headcam_rgb_optical_frame', '/base_link', rospy.Time(0))
+                print trans,rot
+                break
+            except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+                print "- isGraspableObject(): tf transform /headcam_rgb_optical_frame to /base_link not found"
+                rospy.sleep(1)
+                continue
+
+        m = self.getCenterOfCluster()
+        print "center of cluster", m
+        p = PointStamped()
+        p.header.frame_id = '/headcam_rgb_optical_frame'
+        p.point.x = m[0]
+        p.point.y = m[1]
+        p.point.z = m[2]
+
+        pnt_rcs = self.listener.transformPoint('/base_link', p)     #center of cluster in robot coordinate system
+
+        #print "============== center of cluster in camera coordinate system: ", p
+        print "============== center of cluster in rcs:                    : ", pnt_rcs
+        
+        isgraspable = self.ispossibleobject(pnt_rcs)
+        if isgraspable:
+            self.pc_rcs = self.transformPointCloud('/base_link',self.pc)
+        return isgraspable
+
+
+    def getCenterOfCluster(self):
+        print "===> pickup_import.py: DavidPickingUp.getCenterOfCluster()"
+        #extract points from PointCloud2 in python....
+        fmt = self._get_struct_fmt(self.pc)
+        narr = list()
+        offset = 0
+        for i in xrange(self.pc.width * self.pc.height):
+            p = struct.unpack_from(fmt, self.pc.data, offset)
+            offset += self.pc.point_step
+            narr.append(p[0:3])
+
+        a = numpy.asarray(narr)
+        pcmean = numpy.mean(a, axis=0)
+        amin = numpy.min(a, axis=0)
+        amax = numpy.max(a,axis=0)
+        
+        return [(amax[0]+amin[0])/2.0, (amax[1]+amin[1])/2.0, (amax[2]+amin[2])/2.0]
+
+
+    def _get_struct_fmt(self, cloud, field_names=None):
+        #print cloud
+        fmt = '>' if cloud.is_bigendian else '<'
+        offset = 0
+        for field in (f for f in sorted(cloud.fields, key=lambda f: f.offset) if field_names is None or f.name in field_names):
+            if offset < field.offset:
+                fmt += 'x' * (field.offset - offset)
+                offset = field.offset
+            if field.datatype not in _DATATYPES:
+                print >> sys.stderr, 'Skipping unknown PointField datatype [%d]' % field.datatype
+            else:
+                datatype_fmt, datatype_length = _DATATYPES[field.datatype]
+                fmt    += field.count * datatype_fmt
+                offset += field.count * datatype_length
+        return fmt
+
+    def ispossibleobject(self, pnt):    #pnt is in rcs
+        print "===> pickup_import.py: DavidPickingUp.ispossibleobject()"
+        #criteria for valid objects  => has to me more accurate!
+        x_min = -0.5
+        x_max = 1.0
+        y_min = -1.0
+        y_max = 0.5
+        z_min = 0.0
+        z_max = 0.25    #only that high because of buggy camera
+
+        if (self.restrictfind): #only search for objects where grasped object was lying
+            x_min = 0.15
+            x_max = 0.45
+            y_min = -0.45
+            y_max = -0.17
+            z_min = 0.01
+            z_max = 0.25    #only that high because of buggy camera
+
+        #print "pnt.point.x: ", pnt.point.x
+        if (pnt.point.x > x_min and pnt.point.x < x_max and pnt.point.y > y_min and pnt.point.y < y_max and pnt.point.z > z_min and pnt.point.z < z_max):
+            print "ispossibleobject(): object ACCEPTED"
+            return True
+        else:
+            print "ispossibleobject(): object DENIED (x,y,z coordinates of center of cluster not in acceptable range)"
+            return False
+
+
+
+
 
 
 class DavidCheckGrasp(State):
