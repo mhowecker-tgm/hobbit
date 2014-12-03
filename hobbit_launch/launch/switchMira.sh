@@ -85,16 +85,16 @@ then
  rosnode kill interfaces_node&
 
  sleep $DELAY_BETWEEN_STEPS
- cd /opt/ros/hobbit_hydro/src/interfaces_mira/launch
- roslaunch startup.launch&
-
- sleep $DELAY_BETWEEN_STEPS
  cd /opt/ros/hobbit_hydro/src/interfaces_mira/resources
  mira mira_config2.xml -p1234&
 
  sleep $DELAY_BETWEEN_STEPS
  cd /opt/ros/hobbit_hydro/src/interfaces_mira/resources
  miracenter mira_vis_config.xml&
+
+ sleep $DELAY_BETWEEN_STEPS
+ cd /opt/ros/hobbit_hydro/src/interfaces_mira/launch
+ roslaunch startup.launch&
 
 fi
 
