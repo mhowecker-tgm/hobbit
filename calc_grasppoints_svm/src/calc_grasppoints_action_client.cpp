@@ -63,6 +63,7 @@ int main (int argc, char **argv)
   ros::NodeHandle nh_;
   CCalcGrasppointsClient grasp_client(nh_);
 
+  ros::spin();
   //exit
   return 0;
 }
