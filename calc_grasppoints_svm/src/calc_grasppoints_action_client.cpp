@@ -59,6 +59,7 @@ void CCalcGrasppointsClient::save_pc_cb(const sensor_msgs::PointCloud2ConstPtr& 
 
 int main (int argc, char **argv)
 {
+  ROS_INFO("ROS NODE calc_grasppoints_client started");
   ros::init(argc, argv, "calc_grasppoint_client");
   ros::NodeHandle nh_;
   CCalcGrasppointsClient grasp_client(nh_);
