@@ -128,6 +128,7 @@ add_library(CHaarFeature src/CHaarFeature.cpp)
 add_library(CIntImage_to_Featurevec src/CIntImage_to_Featurevec.cpp)
 add_executable(calc_grasppoints src/calc_grasppoints.cpp)
 add_executable(calc_grasppoints_action_server src/calc_grasppoints_action_server.cpp)
+add_executable(calc_grasppoints_action_client src/calc_grasppoints_action_client.cpp)
 
 
 target_link_libraries(CIntImage_to_Featurevec CHaarFeature ${catkin_LIBRARIES} ${OpenCV_LIBS} ${PCL_LIBRARIES})
