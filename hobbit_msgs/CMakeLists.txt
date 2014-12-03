@@ -63,6 +63,7 @@ add_action_files(
   ApproachUser.action
   ArmServer.action
   GraspTrajectoryServer.action
+  CalcGraspPointsServer.action
   BringObject.action
   CallUser.action
   LocateUser.action
