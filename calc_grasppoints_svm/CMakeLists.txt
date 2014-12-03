@@ -11,6 +11,9 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   cv_bridge 
   image_geometry
+  actionlib_msgs
+  hobbit_msgs
+  actionlib
 )
 
 find_package(OpenCV REQUIRED)
@@ -70,10 +73,12 @@ find_package(OpenCV REQUIRED)
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
+ generate_messages(
+   DEPENDENCIES
+   actionlib_msgs
+   hobbit_msgs
 #   sensor_msgs
-# )
+ )
 
 ###################################
 ## catkin specific configuration ##
@@ -87,7 +92,7 @@ find_package(OpenCV REQUIRED)
 catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES calc_grasppoints_svm
-#  CATKIN_DEPENDS opencv2 roscpp sensor_msgs
+  CATKIN_DEPENDS actionlib_msgs hobbit_msgs
 #  DEPENDS system_lib
 )
 
@@ -113,6 +118,7 @@ link_directories(${PCL_LIBRARY_DIRS})
 ## Declare a cpp executable
 # add_executable(calc_grasppoints_svm_node src/calc_grasppoints_svm_node.cpp)
 
+
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 # add_dependencies(calc_grasppoints_svm_node calc_grasppoints_svm_generate_messages_cpp)
@@ -121,10 +127,13 @@ link_directories(${PCL_LIBRARY_DIRS})
 add_library(CHaarFeature src/CHaarFeature.cpp)
 add_library(CIntImage_to_Featurevec src/CIntImage_to_Featurevec.cpp)
 add_executable(calc_grasppoints src/calc_grasppoints.cpp)
+add_executable(calc_grasppoints_action_server src/calc_grasppoints_action_server.cpp)
 
 
 target_link_libraries(CIntImage_to_Featurevec CHaarFeature ${catkin_LIBRARIES} ${OpenCV_LIBS} ${PCL_LIBRARIES})
 target_link_libraries(calc_grasppoints CIntImage_to_Featurevec ${catkin_LIBRARIES} ${OpenCV_LIBS} ${PCL_LIBRARIES})
+target_link_libraries(calc_grasppoints_action_server CIntImage_to_Featurevec ${catkin_LIBRARIES} ${OpenCV_LIBS} ${PCL_LIBRARIES})
+
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(calc_grasppoints_svm_node
 #   ${catkin_LIBRARIES}
