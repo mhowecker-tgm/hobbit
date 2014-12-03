@@ -35,6 +35,15 @@ void MiraSendingGoals::initialize() {
   as_->start();
   as2_->start();
 
+  user_nav_mode_service = robot_->getRosNode().advertiseService("/user_nav_mode", &MiraSendingGoals::user_nav_mode, this);
+  obs_nav_mode_service = robot_->getRosNode().advertiseService("/obs_nav_mode", &MiraSendingGoals::obs_nav_mode, this);
+
+  //get current DecayRate value
+  mira::RPCFuture<std::string> r = robot_->getMiraAuthority().callService<std::string>("/navigation/laser/GridMapperLaser#builtin", std::string("getProperty"), std::string("DecayRate"));
+  r.timedWait(mira::Duration::seconds(1));
+  decay_value = r.get();
+  std::cout << "current decay rate " << decay_value << std::endl;
+
 }
 
 void MiraSendingGoals::spin() 
@@ -47,6 +56,25 @@ void MiraSendingGoals::spin()
 		r.sleep();
 		goal_status_pub.publish(goal_status);
 	}
+}
+
+bool MiraSendingGoals::user_nav_mode(mira_msgs::UserNavMode::Request &req, mira_msgs::UserNavMode::Response &res)
+{
+        mira::RPCFuture<void> r = robot_->getMiraAuthority().callService<void>("/navigation/laser/GridMapperLaser#builtin", std::string("setProperty"), std::string("DecayRate"), std::string("0.0"));
+        r.timedWait(mira::Duration::seconds(1));
+        r.get();
+        return true;
+
+}
+
+bool MiraSendingGoals::obs_nav_mode(mira_msgs::ObsNavMode::Request &req, mira_msgs::ObsNavMode::Response &res)
+{
+
+	mira::RPCFuture<void> r = robot_->getMiraAuthority().callService<void>("/navigation/laser/GridMapperLaser#builtin", std::string("setProperty"), std::string("DecayRate"), std::string(decay_value));
+        r.timedWait(mira::Duration::seconds(1));
+        r.get();
+	return true;
+
 }
 
 void MiraSendingGoals::goal_status_channel_callback(mira::ChannelRead<std::string> data) 
@@ -74,7 +102,7 @@ void MiraSendingGoals::goal_status_channel_callback(mira::ChannelRead<std::strin
 		std::cout << "Goal preempted " << std::endl;
 		goal_status_pub.publish(goal_status);
 	}
-	if(data->value() == "NoPathPlannable" || data->value().c_str() == "NoValidMotionCommand")
+	if(data->value() == "NoPathPlannable" || data->value() == "NoValidMotionCommand")
 	{
 		goal_status.data = "aborted";
 		std::cout << "Goal aborted " << std::endl;

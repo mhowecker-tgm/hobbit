@@ -27,6 +27,9 @@
 #include <move_base_msgs/MoveBaseAction.h>
 
 
+#include <mira_msgs/UserNavMode.h>
+#include <mira_msgs/ObsNavMode.h>
+
 class MiraSendingGoals: public MiraRobotModule {
 public:
         static MiraRobotModule* Create() {
@@ -60,6 +63,13 @@ private:
         bool isQuaternionValid(const geometry_msgs::Quaternion& q);
 
         void spin();
+
+	ros::ServiceServer user_nav_mode_service;
+	ros::ServiceServer obs_nav_mode_service;
+
+	bool user_nav_mode(mira_msgs::UserNavMode::Request &req, mira_msgs::UserNavMode::Response &res);
+	bool obs_nav_mode(mira_msgs::ObsNavMode::Request &req, mira_msgs::ObsNavMode::Response &res);
+	std::string decay_value;
 
 };
 
