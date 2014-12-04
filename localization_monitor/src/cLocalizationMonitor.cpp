@@ -284,7 +284,7 @@ bool cLocalizationMonitor::checkScan()
 
 	for (int i=0; i<scan.ranges.size();i++)
 	{
-		std::cout << "angle " << angle_i*180/M_PI << std::endl;
+		//std::cout << "angle " << angle_i*180/M_PI << std::endl;
 	
 		double r = scan.ranges[i];
 		double ang = angle_i;
@@ -313,10 +313,10 @@ bool cLocalizationMonitor::checkScan()
 			score--;
 		}
 
-		std::cout << "range " << r << std::endl;
+		/*std::cout << "range " << r << std::endl;
 		std::cout << "global point " << global_x << " " << global_y << std::endl;
 		std::cout << "point_ok " << point_ok << std::endl;
-		std::cout << "********************* " << std::endl;
+		std::cout << "********************* " << std::endl;*/
 
 		valid_points++;
 
