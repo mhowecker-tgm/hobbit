@@ -61,10 +61,12 @@ void cLocalizationMonitor::open(ros::NodeHandle & n)
 
 	mapTestPublisher = n.advertise<nav_msgs::OccupancyGrid>("map_test", 1); 
 
+	get_loc_status_service = n.advertiseService("/get_loc_status", &cLocalizationMonitor::getLocStatus, this);
+
 /////////////////////////////////////////////////////////////////////////////////////////////////
 	//load static global map, we don't want to run the map server
 /////////////////////////////////////////////////////////////////////////////////////////////////
-  	std::string fname("/home/racin/hobbit_hydro/src/navigation/share/map.yaml");
+  	std::string fname("/opt/ros/hobbit_hydro/src/navigation/share/map.yaml");
 	double res;
 
 	nav_msgs::MapMetaData meta_data_message_;
@@ -298,6 +300,7 @@ bool cLocalizationMonitor::checkScan()
 	}
 
 	double rel_score = score/scan.ranges.size();
+	std::cout << "rel_score " << rel_score << std::endl;
 	if (rel_score > score_thres)
 		return true;
 	else 
@@ -311,19 +314,13 @@ bool cLocalizationMonitor::checkUncertainty()
 	  int cov_n = 2;
 
    	  Eigen::MatrixXd cov;
+	  cov.resize(2,2);
+	  cov.setZero(2,2);
 
-  	  for (int i=1; i<=cov_n; i++)
-	  for (int j=1; j<=cov_n; j++)
-	  {
-		cov(i,j) = 0;
-
-	  }
-
-  	  cov(1,1) = current_pose.pose.covariance[0]; 
-          cov(1,2) = current_pose.pose.covariance[1]; 
-          cov(2,1) = current_pose.pose.covariance[6];
-          cov(2,2) = current_pose.pose.covariance[7];
-  
+  	  cov(0,0) = current_pose.pose.covariance[0]; 
+          cov(0,1) = current_pose.pose.covariance[1]; 
+          cov(1,0) = current_pose.pose.covariance[6];
+          cov(1,1) = current_pose.pose.covariance[7];
 
           Eigen::VectorXcd eigenvalues = cov.eigenvalues();
           std::cout << "The eigenvalues of the current covariance are:" << std::endl << eigenvalues << std::endl;
@@ -347,7 +344,8 @@ bool cLocalizationMonitor::getLocStatus(hobbit_msgs::GetState::Request  &req, ho
 	bool uncertainty_ok = checkUncertainty();
 	std::cout << "uncertainty_ok " << uncertainty_ok << std::endl;
 
-	res.state = (scan_ok && uncertainty_ok);
+	//res.state = (scan_ok && uncertainty_ok);
+	res.state = scan_ok;
 
 	ROS_INFO("sending back loc_state response");
 

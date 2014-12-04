@@ -58,13 +58,13 @@ private:
   double thres;
 
 //services
+  ros::ServiceServer get_loc_status_service;
   bool getLocStatus(hobbit_msgs::GetState::Request  &req, hobbit_msgs::GetState::Response &res);
 
   sensor_msgs::LaserScan scan;
 
   bool checkScan();
   bool checkUncertainty();
-
 
 
 };
