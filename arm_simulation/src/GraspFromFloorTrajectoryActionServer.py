@@ -54,19 +54,17 @@ from optparse import OptionParser
 from openravepy.misc import OpenRAVEGlobalArguments
 
 
-#class ArmActionServerROS(object):
-
 class GraspTrajectoryActionServerFromFloor():
 
     # create messages that are used to publish feedback/result for action lib
     _feedback = hobbit_msgs.msg.GraspTrajectoryServerFeedback()
     _result   = hobbit_msgs.msg.GraspTrajectoryServerResult()
 
-    gp_pnt_fixed = [0.32, -0.34, 0.15]    # grasp pre-point coordinates
-    grasp_area_param = 5                #this parameter defines how big the area is where grasps should be possible: value of 5 means that that the gripper has 10cm (50cm/5=10cm) space in each direction
-    grasp_xy_variation_param = 25         #defines how much offset grasp-x-y-position can have to get valid grasp (trajectory): value of 25 <=> 2 cm offset in each direction (50cm/25=2cm)
+    gp_pnt_fixed = [0.32, -0.34, 0.15]   # grasp pre-point coordinates
+    grasp_area_param = 5                 #this parameter defines how big the area is where grasps should be possible: value of 5 means that the gripper has 10cm (50cm/5=10cm) space in each direction
+    grasp_xy_variation_param = 25        #defines how much offset grasp-x-y-position can have to get valid grasp (trajectory): value of 25 <=> 2 cm offset in each direction (50cm/25=2cm)
     grasp_distance_from_floor_cm = 7     #distance how near gripper should approach the floor
-    max_traj_diff_rad = 40*pi/180             # maximal joint difference between two trajectory points in rad  => now: 40 degrees tolerated per joint between pos:graspfromfloor and calculated trajectory
+    max_traj_diff_rad = 40*pi/180        # maximal joint difference between two trajectory points in rad  => now: 40 degrees tolerated per joint between pos:graspfromfloor and calculated trajectory
     
     #set up the environment
     #@openravepy.with_destroy
@@ -104,7 +102,7 @@ class GraspTrajectoryActionServerFromFloor():
   
     # calculates grasping trajectory of given grasp position
     def getTrajForGraspFromFloor(self):
-		#define steps for trajectory
+	#define steps for trajectory
         stepsize=0.01
         maxsteps = 15-self.grasp_distance_from_floor_cm
         minsteps = 15-self.grasp_distance_from_floor_cm
@@ -120,7 +118,7 @@ class GraspTrajectoryActionServerFromFloor():
         Tee = Tee_start
         Tee[0:2,3] = self.gp_pnt_xy
 
-        print 'checking for existence of trajectories with for grasping from floor'
+        print 'checking for existence of trajectories for grasping from floor'
 
         while True:
             with self.env:
@@ -142,7 +140,6 @@ class GraspTrajectoryActionServerFromFloor():
                 tra3 =  trajdata.GetWaypoint(num_waypoints-1)[0:6]*180.0/math.pi
                 
                 if self.checkTrajectoryOk(PosStart, trajdata.GetWaypoint(0)[0:6]) and self.checkTrajectoryOk(trajdata.GetWaypoint(0)[0:6], trajdata.GetWaypoint(num_waypoints/2)[0:6]):  # tajectory is accepted 
-                    
                     # write command (for ArmActionServer) and the first, the one in the middle and the last waypoint of the trajectory into the trajectory_string variable traj_str
                     traj_str = "SetExecuteGrasp " + numpy.array_str(tra1).strip("[]") + numpy.array_str(tra2).strip("[]") + numpy.array_str(tra3).strip("[]")
                     print "traj_str: \n", traj_str
@@ -155,7 +152,11 @@ class GraspTrajectoryActionServerFromFloor():
                     self.robot.WaitForController(0)
                     
                     raw_input("press enter to send trajectory to arm_action_server")
-                    self.ArmClient.arm_action_client(String(traj_str))    #should execute the whole grasp trajectory
+                    if (self.ArmClient.GetArmAtPreGraspFromFloorPos()):
+                        # !!!!!!!!!!!!!!!!!!!!!!!!!!1 NO EXECUTION OF REAL ARM MOVEMENT 3.12.2014 !!!!!!!!!self.ArmClient.arm_action_client(String(traj_str))   daviddavid #should execute the whole grasp trajectory
+                        pass
+                    else:
+                        print " ================> ARM NOT IN PREGRASPFROMFLOOR POSITION - IDIOT! "
                     
                     break    #exit trajectory calculation
                 else:
@@ -175,9 +176,6 @@ class GraspTrajectoryActionServerFromFloor():
     #tests if for two trajectory waypoints tra1 and tra2 the maximal joint difference (each joint is compared) is lower then the treshold self.max_traj_diff_rad
     def checkTrajectoryOk(self, tra1, tra2):
         maxdiff = 0
-        #print "tra1, tra2, len(tra1), len(tra2):"
-        #print tra1, len(tra1)
-        #print tra2, len(tra2)
         for x in range(0,5): # first 5 joints
             if abs(tra1[x]-tra2[x]) > maxdiff:
                 maxdiff = abs(tra1[x]-tra2[x])
@@ -195,6 +193,7 @@ class GraspTrajectoryActionServerFromFloor():
         #get command from goal
         strdata = str(goal.command.data)
         print "\n input (definition for grasp) for GraspTrajectoryActionServer (command) received: >> ", strdata
+	#input format (string): "(0)eval_val (1)gp1_x (2)gp1_y (3)gp1_z (4)gp2_x (5)gp2_y (6)gp2_z (7)ap_vec_x (8)ap_vec_y (9)ap_vec_z (10)gp_center_x (11)gp_center_y (12)gp_center_z (13)roll"
         input = strdata.split()        
         
         #return False/True if appropriate, otherwise True if command was executed
@@ -203,8 +202,9 @@ class GraspTrajectoryActionServerFromFloor():
         
         self._result.result = Bool(True)
   
-
-        self.gp_pnt_xy = [input[0],input[1]] #[0.32, -0.34]#trajSim.gp_pnt_fixed[0:2] + (random.rand(2)-0.5)/trajSim.grasp_area_param  #david: hier die daten vom actionservergoal einsetzen
+        print "type: "
+        print type(input[10])
+        self.gp_pnt_xy = [float(input[10]),float(input[11])] #[0.32, -0.34]#trajSim.gp_pnt_fixed[0:2] + (random.rand(2)-0.5)/trajSim.grasp_area_param  #david: hier die daten vom actionservergoal einsetzen
         print "New grasp position (x and y value): ", self.gp_pnt_xy
         
         #get trajectory (execution of trajectory via ArmServer is included here)

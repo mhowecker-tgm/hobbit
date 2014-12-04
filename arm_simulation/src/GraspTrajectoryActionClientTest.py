@@ -70,7 +70,8 @@ if __name__ == '__main__':
     rospy.init_node('grasp_trajectory_action_client_test')
     print "node grasp_trajectory_action_client test started"
     grasp_trajectory_client = GraspTrajectoryActionClient()
-    cmd = String ("0.32 -0.34 0.05 0 0 0 0 0 0") #dummy command/input
+    #cmd = String ("0.32 -0.34 0.05 0 0 0 0 0 0") #dummy command/input  old
+    cmd = String ("81 0.04 -0.45 0.127266 0.04 -0.51 0.127266 0 0 1 0.04 -0.48 0.127266 90") #input (=> = output from calc_grasppoints_svm_action_server)
     res = grasp_trajectory_client.grasp_trajectory_action_client(cmd)
     print "Result: ", res
  
