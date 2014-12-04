@@ -19,7 +19,6 @@ public:
 
 	CCalcGrasppointsClient(ros::NodeHandle nh_)
 	{
-
 		//subscriber for the pointcloud
 		this->pc_sub = nh_.subscribe("/SS/headcam/depth_registered/points_edited_in_rcs",1, &CCalcGrasppointsClient::save_pc_cb, this);
 	}
@@ -50,14 +49,14 @@ void CCalcGrasppointsClient::save_pc_cb(const sensor_msgs::PointCloud2ConstPtr& 
 	if (finished_before_timeout)
 	{
 	    actionlib::SimpleClientGoalState state = ac.getState();
-	    hobbit_msgs::CalcGraspPointsServerResult result = ac.getResult();
-	    ROS_INFO("Result: %s", result;
+	    boost::shared_ptr<const hobbit_msgs::CalcGraspPointsServerResult_<std::allocator<void> > > result = ac.getResult();
+	    ROS_INFO("Result: %s", (*(result)).result.data.c_str());
 	    ROS_INFO("Action finished: %s",state.toString().c_str());
 	}
 	else
 	    ROS_INFO("Action did not finish before the time out.");
-
 }
+
 
 int main (int argc, char **argv)
 {

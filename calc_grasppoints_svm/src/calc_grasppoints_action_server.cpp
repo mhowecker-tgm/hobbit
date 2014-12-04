@@ -146,10 +146,8 @@ public:
 	    as_(nh_, name, boost::bind(&CCalc_Grasppoints::read_pc_cb/*executeCB*/, this, _1), false),
 	    action_name_(name)
 	{
-		//this->box_position_sub = nh_.subscribe("SS/basket_position",1, &CCalc_Grasppoints::set_box_position_cb, this);	//callback for reading/setting box center and rotation angle of box
 		//this->pc_sub = nh_.subscribe("/SS/points2_object_in_rcs",1, &CCalc_Grasppoints::read_pc_cb, this);	//callback for reading point cloud of box content
 		//this->pubGraspPoints = nh_.advertise<std_msgs::String>("/SVM/grasp_hypothesis", 1);
-		//this->pubGraspPointsEval = nh_.advertise<std_msgs::String>("/SVM/grasp_hypothesis_eval", 1);
 		this->vis_pub = nh_.advertise<visualization_msgs::Marker>( "visualization_marker", 2 );				//Marker
 		this->vis_pub_ma = nh_.advertise<visualization_msgs::MarkerArray>( "visualization_marker_array", 2 );	//MarkerArray
 		box_position_set = true;
@@ -286,10 +284,6 @@ void CCalc_Grasppoints::loop_control(pcl::PointCloud<pcl::PointXYZ> pcl_cloud_in
 			predict_bestgp_withsvm(svm_with_probability);
 			show_predicted_gps(roll, tilt, svm_with_probability);
 		}
-		//david new 7.2.: always send best gh after all rolls where tried
-		//if (this->graspval_top - this->topval_gp_overall > this->graspval_max_diff_for_pub ){
-		//	transform_gp_in_wcs_and_publish(this->id_row_top_overall, this->id_col_top_overall, this->nr_roll_top_overall,this->nr_tilt_top_overall, this->topval_gp_overall-20); //last entry is "scaled" (=> -16)
-		//}
 	}
 	transform_gp_in_wcs_and_publish(this->id_row_top_overall, this->id_col_top_overall, this->nr_roll_top_overall,this->nr_tilt_top_overall, this->topval_gp_overall-20); //last entry is "scaled" (=> -16)
 
@@ -297,11 +291,10 @@ void CCalc_Grasppoints::loop_control(pcl::PointCloud<pcl::PointXYZ> pcl_cloud_in
 	timedif = difftime (end,start);
 	cout << "\n Gesamtzeit fuer Loop: " << timedif << endl;
 
-    if(success)
+    if(success)	// ActionServer: return grasp representation (overall best grasp)
     {
-      //result_.sequence = feedback_.sequence; //change to grasp definition of grasp pose
-      result_.result.data = this->gp_result;
-      ROS_INFO("%s: Succeeded", action_name_.c_str());
+      result_.result.data = this->gp_result; //ss.str();
+      ROS_INFO("%s: Succeeded", this->gp_result.c_str());
       // set the action state to succeeded
       as_.setSucceeded(result_);
     }

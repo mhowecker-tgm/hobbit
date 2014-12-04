@@ -10,6 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   roslib
   sensor_msgs
+  std_msgs
   cv_bridge 
   image_geometry
   actionlib_msgs
@@ -78,6 +79,7 @@ find_package(OpenCV REQUIRED)
    DEPENDENCIES
    actionlib_msgs
    hobbit_msgs
+   std_msgs
 #   sensor_msgs
  )
 
@@ -93,7 +95,7 @@ find_package(OpenCV REQUIRED)
 catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES calc_grasppoints_svm
-  CATKIN_DEPENDS actionlib_msgs hobbit_msgs
+  CATKIN_DEPENDS actionlib_msgs hobbit_msgs std_msgs
 #  DEPENDS system_lib
 )
 
