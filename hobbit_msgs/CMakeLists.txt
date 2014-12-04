@@ -55,6 +55,7 @@ add_service_files(
   SwitchVision.srv
   Translate.srv
   UpdateObject.srv
+  GetState.srv
 )
 
 add_action_files(
