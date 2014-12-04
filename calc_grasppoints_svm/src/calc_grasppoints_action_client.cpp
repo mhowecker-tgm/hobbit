@@ -21,7 +21,7 @@ public:
 	{
 
 		//subscriber for the pointcloud
-		this->pc_sub = nh_.subscribe("/SS/points2_object_in_rcs",1, &CCalcGrasppointsClient::save_pc_cb, this);
+		this->pc_sub = nh_.subscribe("/SS/headcam/depth_registered/points_edited_in_rcs",1, &CCalcGrasppointsClient::save_pc_cb, this);
 	}
 };
 
