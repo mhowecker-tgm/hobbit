@@ -8,6 +8,7 @@ project(calc_grasppoints_svm)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  roslib
   sensor_msgs
   cv_bridge 
   image_geometry

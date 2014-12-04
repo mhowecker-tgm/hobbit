@@ -153,8 +153,8 @@ public:
 		this->vis_pub = nh_.advertise<visualization_msgs::Marker>( "visualization_marker", 2 );				//Marker
 		this->vis_pub_ma = nh_.advertise<visualization_msgs::MarkerArray>( "visualization_marker_array", 2 );	//MarkerArray
 		box_position_set = true;
-		this->box_center_x = 0.32;
-		this->box_center_y = -0.34;
+		this->box_center_x = 0.03;
+		this->box_center_y = -0.38;
 		outputpath_full = "/tmp/features.txt";
 		return_only_best_gp = true;
 		graspval_th = 70;					//treshold if grasp hypothesis should be returned (in function - so programm internal) (for top result of one loop run)
@@ -278,7 +278,7 @@ void CCalc_Grasppoints::loop_control(pcl::PointCloud<pcl::PointXYZ> pcl_cloud_in
 			}
 
 			generate_grid(roll, tilt, pcl_cloud_in);
-			//print_heights(roll,tilt);
+			print_heights(roll,tilt);
 			calc_intimage(roll, tilt);
 			calc_featurevectors(roll, tilt);
 			//ii_to_fv->print_heights(ii_to_fv->intimagemat);
