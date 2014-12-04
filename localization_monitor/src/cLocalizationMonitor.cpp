@@ -31,6 +31,8 @@ cLocalizationMonitor::cLocalizationMonitor(int argc, char **argv) : init_argc(ar
 	low_res = 0.1;
 	thres = 0.2;
 
+        max_lim = 3;
+
 
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -282,28 +284,39 @@ bool cLocalizationMonitor::checkScan()
 
 	for (int i=0; i<scan.ranges.size();i++)
 	{
-		double r = scan.ranges[i];
-		if (!std::isfinite(r) || r >= scan.range_max || r <= scan.range_min)
-			continue;
-		double global_x = current_x + r*cos(angle_i)*cos(current_theta) - r*sin(angle_i)*sin(current_theta);
-		double global_y = current_y + r*cos(angle_i)*sin(current_theta) + r*sin(angle_i)*cos(current_theta);
-		
-		/*std::cout << "range " << r << std::endl;
 		std::cout << "angle " << angle_i*180/M_PI << std::endl;
-		std::cout << "global point " << global_x << " " << global_y << std::endl;
-		std::cout << "********************* " << std::endl;*/
-
+	
+		double r = scan.ranges[i];
+		double ang = angle_i;
 		angle_i+= scan.angle_increment;
 
+		if (!std::isfinite(r) || r >= max_lim || r <= scan.range_min)
+			continue;
+		double global_x = current_x + r*cos(ang)*cos(current_theta) - r*sin(ang)*sin(current_theta);
+		double global_y = current_y + r*cos(ang)*sin(current_theta) + r*sin(ang)*cos(current_theta);
+		
 		geometry_msgs::Point glob_point;
 		glob_point.x = global_x;
 		glob_point.y = global_y;
 		int index = occupancy_grid_utils::pointIndex(static_map_modified.info,glob_point);
 
+ 		int point_ok;
+
 		if (static_map_modified.data[index] == occupancy_grid_utils::OCCUPIED)
+		{
+			point_ok = 1;
 			score++;
+		}	
 		if (static_map_modified.data[index] == occupancy_grid_utils::UNOCCUPIED)
+		{
+			point_ok = -1;
 			score--;
+		}
+
+		std::cout << "range " << r << std::endl;
+		std::cout << "global point " << global_x << " " << global_y << std::endl;
+		std::cout << "point_ok " << point_ok << std::endl;
+		std::cout << "********************* " << std::endl;
 
 		valid_points++;
 

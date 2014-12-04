@@ -66,6 +66,7 @@ private:
   bool checkScan();
   bool checkUncertainty();
 
+  double max_lim;
 
 };
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
