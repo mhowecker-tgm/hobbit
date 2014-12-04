@@ -49,7 +49,7 @@
 #include <pcl/io/pcd_io.h>
 //ROS includes
 #include "ros/ros.h"
-#include <ros/package.h>
+#include "ros/package.h"
 #include "std_msgs/String.h"
 #include "sensor_msgs/PointCloud2.h"
 #include <visualization_msgs/Marker.h>
