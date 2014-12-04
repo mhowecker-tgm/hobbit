@@ -280,10 +280,15 @@ bool cLocalizationMonitor::checkScan()
 	for (int i=0; i<scan.ranges.size();i++)
 	{
 		double r = scan.ranges[i];
+		std::cout << "range " << r << std::endl;
+		std::cout << "angle " << angle_i << std::endl;
 		if (!std::isfinite(r) || r == scan.range_max)
 			continue;
 		double global_x = current_x - r*cos(angle_i)*cos(current_theta) - r*sin(angle_i)*sin(current_theta);
 		double global_y = current_y - r*cos(angle_i)*sin(current_theta) + r*sin(angle_i)*cos(current_theta);
+
+		std::cout << "global point " << global_x << " " << global_y << std::endl;
+		std::cout << "********************* " << std::endl;
 
 		angle_i+= scan.angle_increment;
 
