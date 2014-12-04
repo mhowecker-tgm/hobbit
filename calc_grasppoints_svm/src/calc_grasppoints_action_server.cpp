@@ -169,29 +169,9 @@ public:
 
 	    as_.start();
 	}
-
-	//CCalc_Grasppoints::~CalcGraspPointsServerAction(void)
-	//{
-	//}
-
 };
 
 
-/*void CCalc_Grasppoints::set_box_position_cb(std_msgs::String box_position_str)
-{
-	ROS_INFO("\n calc_grasppoints.cpp: box_position (grasp center position) received");
-	int start = 0, end = 0;
-	end = box_position_str.data.find(" ", start);
-	this->box_center_x = atof(box_position_str.data.substr(start,end-start).c_str()) ;
-	start = end+1;
-	end = box_position_str.data.find(" ", start);
-	this->box_center_y = atof(box_position_str.data.substr(start,end-start).c_str());
-	start = end+1;
-	this->boxrot_angle_init = atof(box_position_str.data.substr(start,box_position_str.data.size()-start).c_str());
-	cout << "\n box_center_x: " << this->box_center_x << "box_center_y: " << this->box_center_y << "rot_angle: " << this->boxrot_angle_init << endl;
-	box_position_set = true;
-}
-*/
 
 //print heigts of heightsgridroll
 void CCalc_Grasppoints::print_heights(int nr_roll, int nr_tilt)
@@ -215,7 +195,6 @@ void CCalc_Grasppoints::read_pc_cb(const hobbit_msgs::CalcGraspPointsServerGoalC
 	ROS_INFO("\nFrom calc_grasppoints_action_server: point cloud goal received");
 	//transform point cloud to PCL
 	pcl::PointCloud<pcl::PointXYZ> pcl_cloud_in;
-	//pcl::fromROSMsg (*pc_in, pcl_cloud_in);			// transform ROS-pc to PCL-pc  ===== old =======
 	pcl::fromROSMsg (goal->input_pc, pcl_cloud_in);			// transform ROS-pc to PCL-pc  ====== 3.12.2014 ======
 
 	//set initial values for row,col,tilt,topval for top grasp points
