@@ -26,7 +26,7 @@ cLocalizationMonitor::cLocalizationMonitor(int argc, char **argv) : init_argc(ar
 	high_uncertainty = false;
 	matching_ok = true;
 
-	score_thres = 0.7;
+	score_thres = 0.7;  //consider lowering this threshold to account for changes in the environment
 
 	low_res = 0.1;
 	thres = 0.2;
