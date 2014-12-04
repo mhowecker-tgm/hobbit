@@ -273,17 +273,20 @@ bool cLocalizationMonitor::checkScan()
 	double current_y = current_pose.pose.pose.position.y;
 	double current_theta = tf::getYaw(current_pose.pose.pose.orientation);
 
+	std::cout << "current_pose " << current_x << " " << current_y << " " << current_theta*180/M_PI << std::endl;
+
 	double angle_i = scan.angle_min;
 
 	double score = 0;
+        int valid_points = 0;
 
 	for (int i=0; i<scan.ranges.size();i++)
 	{
 		double r = scan.ranges[i];
-		if (!std::isfinite(r) || r == scan.range_max || r <= scan.range_min)
+		if (!std::isfinite(r) || r >= scan.range_max || r <= scan.range_min)
 			continue;
-		double global_x = current_x - r*cos(angle_i)*cos(current_theta) - r*sin(angle_i)*sin(current_theta);
-		double global_y = current_y - r*cos(angle_i)*sin(current_theta) + r*sin(angle_i)*cos(current_theta);
+		double global_x = current_x + r*cos(angle_i)*cos(current_theta) - r*sin(angle_i)*sin(current_theta);
+		double global_y = current_y + r*cos(angle_i)*sin(current_theta) + r*sin(angle_i)*cos(current_theta);
 		
 		std::cout << "range " << r << std::endl;
 		std::cout << "angle " << angle_i*180/M_PI << std::endl;
@@ -302,9 +305,11 @@ bool cLocalizationMonitor::checkScan()
 		if (static_map_modified.data[index] == occupancy_grid_utils::UNOCCUPIED)
 			score--;
 
+		valid_points++;
+
 	}
 
-	double rel_score = score/scan.ranges.size();
+	double rel_score = score/valid_points;
 	std::cout << "rel_score " << rel_score << std::endl;
 	if (rel_score > score_thres)
 		return true;
