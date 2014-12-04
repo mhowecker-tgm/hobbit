@@ -50,6 +50,8 @@ void CCalcGrasppointsClient::save_pc_cb(const sensor_msgs::PointCloud2ConstPtr& 
 	if (finished_before_timeout)
 	{
 	    actionlib::SimpleClientGoalState state = ac.getState();
+	    hobbit_msgs::CalcGraspPointsServerResult result = ac.getResult();
+	    ROS_INFO("Result: %s", result;
 	    ROS_INFO("Action finished: %s",state.toString().c_str());
 	}
 	else
