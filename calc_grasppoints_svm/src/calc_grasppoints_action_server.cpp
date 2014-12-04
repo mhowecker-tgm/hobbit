@@ -595,8 +595,8 @@ void CCalc_Grasppoints::predict_bestgp_withsvm(bool svm_with_probability){
 	//scale feature vectors
 
 	try{
-		//string pkg_path = ros::package::getPath("roslib");
-		string pkg_path = string("/opt/ros/hobbit/CalcGraspPoints");
+		string pkg_path = ros::package::getPath("calc_grasppoints_svm");
+		//daviddavid string pkg_path = string("/opt/ros/hobbit/CalcGraspPoints");
 		//scale: use existing scaling file to scale feature values
 
 		stringstream ss, ss2;
