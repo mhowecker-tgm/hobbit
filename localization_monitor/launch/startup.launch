@@ -1,0 +1,4 @@
+<launch>
+  <node pkg="localization_monitor" type="localization_monitor" name="localization_monitor" output="screen"/>
+</launch>
+
