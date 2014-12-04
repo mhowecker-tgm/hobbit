@@ -273,7 +273,7 @@ bool cLocalizationMonitor::checkScan()
 	double current_y = current_pose.pose.pose.position.y;
 	double current_theta = tf::getYaw(current_pose.pose.pose.orientation);
 
-	std::cout << "current_pose " << current_x << " " << current_y << " " << current_theta*180/M_PI << std::endl;
+	//std::cout << "current_pose " << current_x << " " << current_y << " " << current_theta*180/M_PI << std::endl;
 
 	double angle_i = scan.angle_min;
 
@@ -288,10 +288,10 @@ bool cLocalizationMonitor::checkScan()
 		double global_x = current_x + r*cos(angle_i)*cos(current_theta) - r*sin(angle_i)*sin(current_theta);
 		double global_y = current_y + r*cos(angle_i)*sin(current_theta) + r*sin(angle_i)*cos(current_theta);
 		
-		std::cout << "range " << r << std::endl;
+		/*std::cout << "range " << r << std::endl;
 		std::cout << "angle " << angle_i*180/M_PI << std::endl;
 		std::cout << "global point " << global_x << " " << global_y << std::endl;
-		std::cout << "********************* " << std::endl;
+		std::cout << "********************* " << std::endl;*/
 
 		angle_i+= scan.angle_increment;
 
@@ -358,6 +358,7 @@ bool cLocalizationMonitor::getLocStatus(hobbit_msgs::GetState::Request  &req, ho
 	res.state = scan_ok;
 
 	ROS_INFO("sending back loc_state response");
+        std::cout << "********************* " << std::endl;
 
 
 	return true;
