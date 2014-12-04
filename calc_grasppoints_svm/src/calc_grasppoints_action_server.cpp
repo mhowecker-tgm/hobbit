@@ -944,7 +944,7 @@ void CCalc_Grasppoints::transform_gp_in_wcs_and_publish(int id_row_top_all, int 
     std::stringstream ss;
 
     //David: achtung, jetzt noch mit eval!!
-    ss << scaled_gp_eval << " " << gp1_wcs[0] <<" "<< gp1_wcs[1] << " "<< gp1_wcs[2] << " "<< gp2_wcs[0] << " " << gp2_wcs[1] << " " << gp2_wcs[2] << " "<< appr_vec(0) << " "<< appr_vec(1) << " "<< appr_vec(2) << " ";
+    ss << scaled_gp_eval << " " << gp1_wcs[0] <<" "<< gp1_wcs[1] << " "<< gp1_wcs[2] << " "<< gp2_wcs[0] << " " << gp2_wcs[1] << " " << gp2_wcs[2] << " "<< appr_vec(0) << " "<< appr_vec(1) << " "<< appr_vec(2) << " " << (gp1_wcs[0]+gp2_wcs[0])/2.0 <<" " << (gp1_wcs[1]+gp2_wcs[1])/2.0 <<" " << (gp1_wcs[2]+gp2_wcs[2])/2.0 <<" " << nr_roll_top_all*ROLL_STEPS_DEGREE;
  	msgStrPoints.data = ss.str();
  	this->gp_result = ss.str();		//new 3.12.2014
  	//publish best grasp as rviz visualization_msgs::Marker
