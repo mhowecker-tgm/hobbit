@@ -26,9 +26,10 @@ cLocalizationMonitor::cLocalizationMonitor(int argc, char **argv) : init_argc(ar
 	high_uncertainty = false;
 	matching_ok = true;
 
-	score_thres = 0.7;  //consider lowering this threshold to account for changes in the environment
+	score_thres = 0.5;  //consider lowering this threshold to account for changes in the environment, compromise needed 
 
-	low_res = 0.1;
+	//low_res = 0.1;
+
 	thres = 0.2;
 
         max_lim = 3;
@@ -71,7 +72,6 @@ void cLocalizationMonitor::open(ros::NodeHandle & n)
   	std::string fname("/opt/ros/hobbit_hydro/src/navigation/share/map.yaml");
 	double res;
 
-	nav_msgs::MapMetaData meta_data_message_;
      	nav_msgs::GetMap::Response map_resp_;
 
         std::string mapfname = "";   
@@ -168,7 +168,7 @@ void cLocalizationMonitor::open(ros::NodeHandle & n)
         /////////////////////////////////////////////////////////////////////////////////////////////////
         //create low resolution map copy
         /////////////////////////////////////////////////////////////////////////////////////////////////
-        static_map_low_res.info.width = map_resp_.map.info.width*map_resp_.map.info.resolution/low_res;
+/*        static_map_low_res.info.width = map_resp_.map.info.width*map_resp_.map.info.resolution/low_res;
         static_map_low_res.info.height = map_resp_.map.info.height*map_resp_.map.info.resolution/low_res;
         static_map_low_res.info.resolution = low_res;
         static_map_low_res.info.origin = map_resp_.map.info.origin;
@@ -204,14 +204,14 @@ void cLocalizationMonitor::open(ros::NodeHandle & n)
 		 int st_index = occupancy_grid_utils::cellIndex(static_map.info, occupancy_grid_utils::Cell(ind_i,ind_j));
 		 if (static_map.data[st_index] == occupancy_grid_utils::OCCUPIED)
 		 {
-			 int low_res_index = occupancy_grid_utils::pointIndex(static_map_low_res.info,glob_point); //FIXME
+			 int low_res_index = occupancy_grid_utils::pointIndex(static_map_low_res.info,glob_point); 
 
-			 /*if (st_index != low_res_index)
+			 //if (st_index != low_res_index)
 			 {
-				 std::cout << "st index " << st_index << std::endl;
-				 std::cout << "low_res_index " << low_res_index << std::endl;
+				 //std::cout << "st index " << st_index << std::endl;
+				 //std::cout << "low_res_index " << low_res_index << std::endl;
 
-			 }*/
+			 }
 			
 			 if (static_map_low_res.data[low_res_index] != occupancy_grid_utils::OCCUPIED)
 				 static_map_low_res.data[low_res_index] = occupancy_grid_utils::OCCUPIED;
@@ -220,7 +220,7 @@ void cLocalizationMonitor::open(ros::NodeHandle & n)
 
 		
 	    }
-        }
+        }*/
         /////////////////////////////////////////////////////////////////////////////////////////////////
         static_map_modified = static_map;
         std::vector<int> indices;
@@ -300,7 +300,7 @@ bool cLocalizationMonitor::checkScan()
 		glob_point.y = global_y;
 		int index = occupancy_grid_utils::pointIndex(static_map_modified.info,glob_point);
 
- 		int point_ok;
+ 		//int point_ok;
 
 		if (static_map_modified.data[index] == occupancy_grid_utils::OCCUPIED)
 		{
@@ -346,7 +346,7 @@ bool cLocalizationMonitor::checkUncertainty()
           cov(1,1) = current_pose.pose.covariance[7];
 
           Eigen::VectorXcd eigenvalues = cov.eigenvalues();
-          std::cout << "The eigenvalues of the current covariance are:" << std::endl << eigenvalues << std::endl;
+          //std::cout << "The eigenvalues of the current covariance are:" << std::endl << eigenvalues << std::endl;
 
           double sq_area_estimate = std::real(eigenvalues(0))*std::real(eigenvalues(1)); //the eigenvalues of the covariance must be real and non-negative
 

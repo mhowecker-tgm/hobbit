@@ -48,9 +48,8 @@ private:
 
   nav_msgs::OccupancyGrid static_map;
 
-  nav_msgs::OccupancyGrid static_map_low_res;
-
-  double low_res;
+  /*nav_msgs::OccupancyGrid static_map_low_res;
+  double low_res;*/
 
   ros::Publisher mapTestPublisher;
 
