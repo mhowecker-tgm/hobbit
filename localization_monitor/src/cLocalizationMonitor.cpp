@@ -21,7 +21,7 @@
 cLocalizationMonitor::cLocalizationMonitor(int argc, char **argv) : init_argc(argc), init_argv(argv)
 {
 	loc_ok = true;
-	uncertainty_thres = 1;
+	uncertainty_thres = 0.1;
 
 	high_uncertainty = false;
 	matching_ok = true;
@@ -304,13 +304,13 @@ bool cLocalizationMonitor::checkScan()
 
 		if (static_map_modified.data[index] == occupancy_grid_utils::OCCUPIED)
 		{
-			point_ok = 1;
+			//point_ok = 1;
 			score++;
 		}	
 		if (static_map_modified.data[index] == occupancy_grid_utils::UNOCCUPIED)
 		{
-			point_ok = -1;
-			score--;
+			//point_ok = -1;
+			//score--;
 		}
 
 		/*std::cout << "range " << r << std::endl;
@@ -348,9 +348,11 @@ bool cLocalizationMonitor::checkUncertainty()
           Eigen::VectorXcd eigenvalues = cov.eigenvalues();
           std::cout << "The eigenvalues of the current covariance are:" << std::endl << eigenvalues << std::endl;
 
-          double sq_area_estimate = std::real(eigenvalues(1))*std::real(eigenvalues(2)); //the eigenvalues of the covariance must be real and non-negative
+          double sq_area_estimate = std::real(eigenvalues(0))*std::real(eigenvalues(1)); //the eigenvalues of the covariance must be real and non-negative
 
-          if (sq_area_estimate < 2*uncertainty_thres * 2*uncertainty_thres)
+	  double axes_prod = uncertainty_thres*uncertainty_thres;
+	  std::cout << " sq_area_estimate " << sq_area_estimate << " thres " << axes_prod*axes_prod << std::endl;
+          if (sq_area_estimate < axes_prod*axes_prod)
 	     return true;
   	  else 
 	     return false;
@@ -367,8 +369,8 @@ bool cLocalizationMonitor::getLocStatus(hobbit_msgs::GetState::Request  &req, ho
 	bool uncertainty_ok = checkUncertainty();
 	std::cout << "uncertainty_ok " << uncertainty_ok << std::endl;
 
-	//res.state = (scan_ok && uncertainty_ok);
-	res.state = scan_ok;
+	res.state = (scan_ok && uncertainty_ok);
+	//res.state = scan_ok;
 
 	ROS_INFO("sending back loc_state response");
         std::cout << "********************* " << std::endl;
