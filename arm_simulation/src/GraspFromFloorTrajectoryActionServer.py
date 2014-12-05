@@ -60,12 +60,14 @@ class GraspTrajectoryActionServerFromFloor():
     _feedback = hobbit_msgs.msg.GraspTrajectoryServerFeedback()
     _result   = hobbit_msgs.msg.GraspTrajectoryServerResult()
 
-    gp_pnt_fixed = [0.32, -0.34, 0.15]   # grasp pre-point coordinates
+    #gp_pnt_fixed = [0.32, -0.34, 0.15]   # grasp pre-point coordinates
     grasp_area_param = 5                 #this parameter defines how big the area is where grasps should be possible: value of 5 means that the gripper has 10cm (50cm/5=10cm) space in each direction
     grasp_xy_variation_param = 25        #defines how much offset grasp-x-y-position can have to get valid grasp (trajectory): value of 25 <=> 2 cm offset in each direction (50cm/25=2cm)
     grasp_distance_from_floor_cm = 7     #distance how near gripper should approach the floor
     max_traj_diff_rad = 40*pi/180        # maximal joint difference between two trajectory points in rad  => now: 40 degrees tolerated per joint between pos:graspfromfloor and calculated trajectory
-    
+    max_obj_height = 15			 #max height of object (grasp point z-value) and also the height the lowest gripper part is away from floor in pre-grasp-position
+    gripper_go_further_down_blind_grasp = 3    # amount the gripper goes forther down the the gp_z value (now: without collision check)
+
     #set up the environment
     #@openravepy.with_destroy
     def __init__(self, name):
@@ -83,7 +85,7 @@ class GraspTrajectoryActionServerFromFloor():
         sceneName = '/opt/ros/hobbit_hydro/src/arm_simulation/data/Hobbit.env.xml'           
         self.env = Environment()
         #self.env.SetDebugLevel(DebugLevel.Debug)
-        self.env.SetViewer('qtcoin')    #turn off/on visualization in openrave
+        #self.env.SetViewer('qtcoin')    #turn off/on visualization in openrave
         self.env.Load(sceneName)
         arm_client = ArmActionClient()
         self.ArmClient = ArmActionClient() #new!!! (21.10.2014) create instance of arm action client to send command to arm
@@ -101,22 +103,24 @@ class GraspTrajectoryActionServerFromFloor():
     
   
     # calculates grasping trajectory of given grasp position
-    def getTrajForGraspFromFloor(self):
+    def getTrajForGraspFromFloor(self, gp_z, roll):
 	#define steps for trajectory
         stepsize=0.01
-        maxsteps = 15-self.grasp_distance_from_floor_cm
-        minsteps = 15-self.grasp_distance_from_floor_cm
+        maxsteps = self.max_obj_height-round(gp_z)+self.gripper_go_further_down_blind_grasp
+        minsteps = self.max_obj_height-round(gp_z)+self.gripper_go_further_down_blind_grasp
         
         failedattempt = 0
         succeeded = True #indicates if trajectory was found
         grasp_tilt_variation_param = 1 #parameter varies tilt relaxation
         # start position where manipulator is oriented normal to the ground (defines manipulator orientation for grasping in this implementation) 
         #PosStart = [30*pi/180,    0,           0,           170*pi/180-20*pi/180, 90*pi/180,     -90*pi/180,  10*pi/180, 10*pi/180]
-        PosStart = [69.71*pi/180, 43.4*pi/180, 86.3*pi/180, 134.3*pi/180,         107.64*pi/180, 4.03*pi/180,  10*pi/180, 10*pi/180] # pregrasp from floor pos
+        PosStart = [69.71*pi/180, 43.4*pi/180, 86.3*pi/180, 134.3*pi/180,         107.64*pi/180, (4.03+roll)*pi/180,  10*pi/180, 10*pi/180] # pregrasp from floor pos
         self.robot.SetJointValues(PosStart)
         Tee_start = self.ikmodel.manip.GetTransform()
         Tee = Tee_start
         Tee[0:2,3] = self.gp_pnt_xy
+        print "==================================================================>"
+        print Tee[2,3]
 
         print 'checking for existence of trajectories for grasping from floor'
 
@@ -204,11 +208,13 @@ class GraspTrajectoryActionServerFromFloor():
   
         print "type: "
         print type(input[10])
-        self.gp_pnt_xy = [float(input[10]),float(input[11])] #[0.32, -0.34]#trajSim.gp_pnt_fixed[0:2] + (random.rand(2)-0.5)/trajSim.grasp_area_param  #david: hier die daten vom actionservergoal einsetzen
+        self.gp_pnt_xy = [float(input[10]),float(input[11])] #[0.32, -0.34]
+	gp_z = float(input[12]) #z-value of calculated grasp point z
+	roll = float(input[13])	#roll of gripper
         print "New grasp position (x and y value): ", self.gp_pnt_xy
         
         #get trajectory (execution of trajectory via ArmServer is included here)
-        self.getTrajForGraspFromFloor()
+        self.getTrajForGraspFromFloor(gp_z, roll)
     
         #publish feedback
         self._as.publish_feedback(self._feedback)
