@@ -11,6 +11,7 @@ int main(int argc, char *argv[])
    for (i=0; i<argc; i++)
    {
      if (strcmp(argv[i],"update")==0)             { return system("dpkg --configure -a && apt-get update && apt-get upgrade -y && rpi-update"); } else
+     if (strcmp(argv[i],"rw")==0)                 { return system("mount -o remount,rw /"); } else
      if (strcmp(argv[i],"refresh")==0)            { return system("./activateHeadAutoStart.sh"); } else
      if (strcmp(argv[i],"restart")==0)            { return system("init 6"); } else
      if (strcmp(argv[i],"shutdown")==0)           { return system("init 0"); } else
