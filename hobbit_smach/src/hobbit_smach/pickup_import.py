@@ -591,6 +591,55 @@ class DavidLookingPose(State):
 #        return 'succeeded'
 
 
+
+
+
+class CalcGrasppointsActionClient():
+
+    last_feedback = None
+
+    def __init__(self):
+        self.calc_grasppoints_client = actionlib.SimpleActionClient("calc_grasppoints_svm_action_server", hobbit_msgs.msg.CalcGraspPointsServerAction)
+
+
+    # use this method with a String cmd to send goal to the ArmActionServer and return its result value
+    def calc_grasppoints_action_client(self, cmd):
+
+        # Waits until the action server has started up and started
+        # listening for goals.
+        print "CalcGrasppointsActionClient: wait_for_server()"
+        self.calc_grasppoints_client.wait_for_server()
+        print "server found!"
+
+        print "CalcGrasppointsActionClient: create goal"
+        # Creates a goal to send to the action server.
+        goal = hobbit_msgs.msg.CalcGraspPointsServerGoal(command=cmd)
+
+        #print "CalcGrasppointsActionClient: send goal"
+        # Sends the goal to the action server.
+        self.calc_grasppoints_client.send_goal(goal, feedback_cb=self.feedback_cb)
+
+        print "wait for result"
+        # Waits for the server to finish performing the action.
+        self.calc_grasppoints_client.wait_for_result()
+    
+
+        # Prints out the result of executing the action
+        returnval = self.calc_grasppoints_client.get_result()  # 
+        print "returnval from calc_grasppoints: ", returnval
+        print "cmd: ", cmd
+        return returnval
+        
+    def feedback_cb(self, feedback):
+        print "feedback_cb executed!"
+        #print "feedback type: ", (type) (feedback)
+        self.last_feedback = feedback
+        print "==========> feedback: ", self.last_feedback 
+
+
+
+
+
 class DavidPickingUp(State):
     """
     This state moves the arm from the PreGrasping position to the object,
@@ -607,6 +656,7 @@ class DavidPickingUp(State):
         self.pubClust = rospy.Publisher("/objectclusters", PointCloud2)
         self.rec = TD()
         self.restrictfind = True
+        self.calc_graspoints_client = CalcGrasppointsActionClient()
 
 
     def execute(self, ud):
@@ -624,6 +674,9 @@ class DavidPickingUp(State):
             # 2) call openrave trajectory AS
             # 3) call Arm AS (arm client already included in code)
             #grasp pose definition => simulation => execution
+            
+            #grasp_definition = calc_aS(self.pc_rcs) self.pc_rcs
+            gp_representation = self.calc_graspoints_client.calc_grasppoints_action_client(ud.cloud)
             
             """ arm makes fix grasping-from-floor-movement (old)
             #OPEN GRIPPER
@@ -1140,10 +1193,6 @@ def getPickupSeq():
     with seq:
         if not DEBUG:
             Sequence.add(
-                'MOVE_ARM_TO_PRE_GRASP_POSITION',
-                arm_move.goToPreGraspPosition()
-            )
-            Sequence.add(
             'GET_POINT_CLOUD',
             MonitorState(
                 '/headcam/depth_registered/points',
@@ -1153,8 +1202,12 @@ def getPickupSeq():
                 output_keys=['cloud']
             ),
             transitions={'valid': 'GET_POINT_CLOUD',
-                         'invalid': 'GRASP_OBJECT',
+                         'invalid': 'MOVE_ARM_TO_PRE_GRASP_POSITION',
                          'preempted': 'preempted'}
+            )
+            Sequence.add(
+                'MOVE_ARM_TO_PRE_GRASP_POSITION',
+                arm_move.goToPreGraspPosition()
             )
         Sequence.add(
             'GRASP_OBJECT',
