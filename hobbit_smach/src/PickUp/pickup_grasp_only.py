@@ -62,12 +62,12 @@ def pointevents_cb(ud, msg):
     ud.pointing_msg = msg
     return False
 
-
 #def point_cloud_cb(msg, ud):
 def point_cloud_cb(ud, msg):
     print('point cloud received')
     ud.cloud = msg
     return False
+
 
 
 class CheckHelpAccepted(smach.State):

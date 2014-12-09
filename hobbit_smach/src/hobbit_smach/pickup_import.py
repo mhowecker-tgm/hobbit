@@ -827,6 +827,11 @@ class DavidPickingUp(State):
 
 
 
+def point_cloud_cb(ud, msg):
+    print('point cloud received')
+    ud.cloud = msg
+    return False
+
 
 
 class DavidCheckGrasp(State):
