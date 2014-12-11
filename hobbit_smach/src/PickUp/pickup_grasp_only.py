@@ -112,13 +112,14 @@ def main():
         StateMachine.add(
             'WAIT_FINISH_HEAD_TO_SEARCH',
             SleepState(duration=10),
-            transitions={'succeeded': 'GET_POINT_CLOUD_FOR_GRASP',
+            transitions={'succeeded': 'GRASP_OBJECT',
                          'preempted': 'LOG_ABORT'}
         )
         
         
         
         #================> NEW 10.12.2014
+        """       
         smach.StateMachine.add(
             'GET_POINT_CLOUD_FOR_GRASP',
             MonitorState(
@@ -132,7 +133,7 @@ def main():
                          'invalid': 'GRASP_OBJECT', #'MOVE_ARM_TO_PRE_GRASP_POSITION',
                          'preempted': 'LOG_ABORT'}
         )        
-        
+        """    
         
         #smach.StateMachine.add(
         #    'MOVE_ARM_TO_PRE_GRASP_POSITION',
@@ -143,8 +144,8 @@ def main():
         #)       
         StateMachine.add(
             'GRASP_OBJECT',
-            #pickup.getPickupSeq(), changed/commented: 10.12.2014
-            pickup.DavidPickingUp(),
+            pickup.getPickupSeq(), #changed/commented: 10.12.2014
+            #pickup.DavidPickingUp(),
             transitions={'succeeded': 'LOG_ABORT',
                          'preempted': 'LOG_ABORT',
                          'failed': 'LOG_ABORT'}
