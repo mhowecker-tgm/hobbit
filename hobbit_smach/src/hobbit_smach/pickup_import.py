@@ -29,6 +29,8 @@ from visualization_msgs.msg import MarkerArray
 from std_msgs.msg import String
 from geometry_msgs.msg import Pose
 from hobbit_smach.ArmActionClient import ArmActionClient
+import actionlib
+import hobbit_msgs.msg
 
 _DATATYPES = {}
 _DATATYPES[PointField.INT8]    = ('b', 1)
@@ -1187,12 +1189,11 @@ def getEndPickupSeq():
 
 def getPickupSeq():
     """
-    Return a SMACH Sequence that gives feedback to the user, stores a grasped
-    object on the tray and searches for the user.
+    Return a SMACH Sequence
     """
     seq = Sequence(
         outcomes=['succeeded', 'preempted', 'failed'],
-        connector_outcome='succeeded'
+        #connector_outcome='succeeded'
     )
 
     with seq:
