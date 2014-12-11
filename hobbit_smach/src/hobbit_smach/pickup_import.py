@@ -1212,16 +1212,16 @@ def getPickupSeq():
                 output_keys=['cloud']
             ),
             transitions={'valid': 'GET_POINT_CLOUD',
-                         'invalid': 'MOVE_ARM_TO_PRE_GRASP_POSITION',
+                         'invalid': 'GRASP_OBJECT',#'MOVE_ARM_TO_PRE_GRASP_POSITION',
                          'preempted': 'preempted'}
             )
-            StateMachine.add(
-                'MOVE_ARM_TO_PRE_GRASP_POSITION',
-                arm_move.goToPreGraspPosition(),
-            transitions={'succeeded': 'GRASP_OBJECT',
-                         'preempted': 'preempted',
-                         'failed': 'failed'}
-            )
+            #StateMachine.add(
+            #    'MOVE_ARM_TO_PRE_GRASP_POSITION',
+            #    arm_move.goToPreGraspPosition(),
+            #transitions={'succeeded': 'GRASP_OBJECT',
+            #             'preempted': 'preempted',
+            #             'failed': 'failed'}
+            #)
         StateMachine.add(
             'GRASP_OBJECT',
             DavidPickingUp(),
