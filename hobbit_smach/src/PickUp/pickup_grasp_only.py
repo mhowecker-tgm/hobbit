@@ -129,18 +129,18 @@ def main():
                 output_keys=['cloud']
             ),
             transitions={'valid': 'GET_POINT_CLOUD_FOR_GRASP',
-                         'invalid': 'MOVE_ARM_TO_PRE_GRASP_POSITION',
+                         'invalid': 'GRASP_OBJECT', #'MOVE_ARM_TO_PRE_GRASP_POSITION',
                          'preempted': 'LOG_ABORT'}
         )        
         
         
-        smach.StateMachine.add(
-            'MOVE_ARM_TO_PRE_GRASP_POSITION',
-            arm_move.goToPreGraspPosition(),
-            transitions={'succeeded': 'GRASP_OBJECT', 
-                         'preempted': 'LOG_ABORT',
-                         'failed': 'MOVE_ARM_TO_PRE_GRASP_POSITION'}    # better failure handling appreciated
-        )       
+        #smach.StateMachine.add(
+        #    'MOVE_ARM_TO_PRE_GRASP_POSITION',
+        #    arm_move.goToPreGraspPosition(),
+        #    transitions={'succeeded': 'GRASP_OBJECT', 
+        #                 'preempted': 'LOG_ABORT',
+        #                 'failed': 'MOVE_ARM_TO_PRE_GRASP_POSITION'}    # better failure handling appreciated
+        #)       
         StateMachine.add(
             'GRASP_OBJECT',
             #pickup.getPickupSeq(), changed/commented: 10.12.2014
