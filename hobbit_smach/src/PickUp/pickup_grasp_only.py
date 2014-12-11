@@ -24,7 +24,7 @@ from geometry_msgs.msg import PoseStamped
 from rgbd_acquisition.msg import PointEvents
 import hobbit_smach.hobbit_move_import as hobbit_move
 import hobbit_smach.head_move_import as head_move
-# import hobbit_smach.arm_move_import as arm_move
+import hobbit_smach.arm_move_import as arm_move
 import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.pickup_import as pickup
 import hobbit_smach.logging_import as log
