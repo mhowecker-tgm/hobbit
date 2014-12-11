@@ -18,7 +18,8 @@ from smach_ros import ServiceState, SimpleActionState
 from hobbit_msgs.srv import GetCoordinates, GetCoordinatesRequest, GetName, \
     SwitchVision, SwitchVisionRequest
 from move_base_msgs.msg import MoveBaseAction
-from interfaces_mira.msg import MiraDockingAction, MiraDockingGoal
+#from interfaces_mira.msg import MiraDockingAction, MiraDockingGoal
+from hobbit_msgs.msg import MiraDockingAction, MiraDockingGoal
 from std_msgs.msg import String
 from mira_msgs.msg import BatteryState
 from hobbit_user_interaction import HobbitMMUI

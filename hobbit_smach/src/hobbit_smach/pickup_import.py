@@ -9,7 +9,7 @@ import roslib
 roslib.load_manifest(PKG)
 import rospy
 import numpy
-from smach import Concurrence, Sequence, State
+from smach import Concurrence, Sequence, State, StateMachine
 from smach_ros import MonitorState
 from hobbit_user_interaction import HobbitEmotions, HobbitMMUI
 from sensor_msgs.msg import PointCloud, PointCloud2
@@ -624,19 +624,19 @@ class CalcGrasppointsActionClient():
         print "wait for result"
         # Waits for the server to finish performing the action.
         self.calc_grasppoints_client.wait_for_result()
-    
+
 
         # Prints out the result of executing the action
-        returnval = self.calc_grasppoints_client.get_result()  # 
+        returnval = self.calc_grasppoints_client.get_result()  #
         print "returnval from calc_grasppoints: ", returnval
         print "cmd: ", cmd
         return returnval
-        
+
     def feedback_cb(self, feedback):
         print "feedback_cb executed!"
         #print "feedback type: ", (type) (feedback)
         self.last_feedback = feedback
-        print "==========> feedback: ", self.last_feedback 
+        print "==========> feedback: ", self.last_feedback
 
 
 
@@ -668,7 +668,7 @@ class DavidPickingUp(State):
         # TODO: David please add the grasping in here
 
         if self.findobject(ud):
-            
+
             print "DavidPickingUp.execute: findobject was successful"
             #self.pc_rcs is available () => calc_grasp_points.cpp (AS) and get back grasp pose definition
             #todo:
@@ -676,10 +676,10 @@ class DavidPickingUp(State):
             # 2) call openrave trajectory AS
             # 3) call Arm AS (arm client already included in code)
             #grasp pose definition => simulation => execution
-            
+
             #grasp_definition = calc_aS(self.pc_rcs) self.pc_rcs
             gp_representation = self.calc_graspoints_client.calc_grasppoints_action_client(ud.cloud)
-            
+
             """ arm makes fix grasping-from-floor-movement (old)
             #OPEN GRIPPER
             res = self.arm_client.arm_action_client(String ("SetOpenGripper"))
@@ -709,7 +709,7 @@ class DavidPickingUp(State):
             cmd = String("SetStartInterpolation")
             res = self.arm_client.arm_action_client(cmd)
             """
-            
+
         return 'succeeded'
 
 #===========
@@ -758,7 +758,7 @@ class DavidPickingUp(State):
 
         #print "============== center of cluster in camera coordinate system: ", p
         print "============== center of cluster in rcs:                    : ", pnt_rcs
-        
+
         isgraspable = self.ispossibleobject(pnt_rcs)
         if isgraspable:
             self.pc_rcs = self.transformPointCloud('/base_link',self.pc)
@@ -780,7 +780,7 @@ class DavidPickingUp(State):
         pcmean = numpy.mean(a, axis=0)
         amin = numpy.min(a, axis=0)
         amax = numpy.max(a,axis=0)
-        
+
         return [(amax[0]+amin[0])/2.0, (amax[1]+amin[1])/2.0, (amax[2]+amin[2])/2.0]
 
 
@@ -1191,19 +1191,43 @@ def getPickupSeq():
     """
     Return a SMACH Sequence
     """
-    seq = Sequence(
-        outcomes=['succeeded', 'preempted', 'failed'],
-        connector_outcome='succeeded'
+    #seq = Sequence(
+    #    outcomes=['succeeded', 'preempted', 'failed'],
+    #    connector_outcome='succeeded'
+    #)
+    sm = StateMachine(
+        outcomes=['succeeded', 'preempted', 'failed']
     )
 
-    with seq:
+    #with seq:
+    with sm:
         if not DEBUG:
             Sequence.add(
-                'MOVE_ARM_TO_PRE_GRASP_POSITION',
-                arm_move.goToPreGraspPosition()
+            'GET_POINT_CLOUD',
+            MonitorState(
+                '/headcam/depth_registered/points',
+                PointCloud2,
+                cond_cb=point_cloud_cb,
+                max_checks=20,
+                output_keys=['cloud']
+            ),
+            transitions={'valid': 'GET_POINT_CLOUD',
+                         'invalid': 'MOVE_ARM_TO_PRE_GRASP_POSITION',
+                         'preempted': 'preempted'}
             )
-        Sequence.add(
+            StateMachine.add(
+                'MOVE_ARM_TO_PRE_GRASP_POSITION',
+                arm_move.goToPreGraspPosition(),
+            transitions={'succeeded': 'GRASP_OBJECT',
+                         'preempted': 'preempted',
+                         'failed': 'failed'}
+            )
+        StateMachine.add(
             'GRASP_OBJECT',
-            DavidPickingUp()
+            DavidPickingUp(),
+            transitions={'succeeded': 'succeeded',
+                         'preempted': 'preempted',
+                         'failed': 'failed'}
         )
-        return seq
+        return sm
+        #return seq

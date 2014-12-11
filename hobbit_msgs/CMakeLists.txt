@@ -70,6 +70,8 @@ add_action_files(
   LocateUser.action
   EndUserInteraction.action
   GeneralHobbit.action
+  MiraDocking.action
+  MiraSendingGoals.action
 )
 
 generate_messages(DEPENDENCIES std_msgs sensor_msgs actionlib geometry_msgs)
