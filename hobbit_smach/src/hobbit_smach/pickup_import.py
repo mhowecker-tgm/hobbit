@@ -607,7 +607,6 @@ class CalcGrasppointsActionClient():
     # use this method with a String cmd to send goal to the ArmActionServer and return its result value
     def calc_grasppoints_action_client(self, cmd):
 
-        print "==================> pickup_import.py: calc_grasppoints_action_client(self, cmd): cmd = ", cmd
         print "type of cmd: ", type(cmd)
         # Waits until the action server has started up and started
         # listening for goals.
@@ -618,7 +617,7 @@ class CalcGrasppointsActionClient():
 
         print "CalcGrasppointsActionClient: create goal"
         # Creates a goal to send to the action server.
-        goal = hobbit_msgs.msg.CalcGraspPointsServerGoal(command=cmd)
+        goal = hobbit_msgs.msg.CalcGraspPointsServerGoal(input_pc=cmd)
 
         #print "CalcGrasppointsActionClient: send goal"
         # Sends the goal to the action server.
