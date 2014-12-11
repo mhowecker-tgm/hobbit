@@ -608,7 +608,7 @@ class CalcGrasppointsActionClient():
     def calc_grasppoints_action_client(self, cmd):
 
         print "==================> pickup_import.py: calc_grasppoints_action_client(self, cmd): cmd = ", cmd
-
+        print "type of cmd: ", type(cmd)
         # Waits until the action server has started up and started
         # listening for goals.
         print "CalcGrasppointsActionClient: wait_for_server()"
