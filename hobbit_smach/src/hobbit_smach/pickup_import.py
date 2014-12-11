@@ -784,6 +784,55 @@ class DavidPickingUp(State):
         return [(amax[0]+amin[0])/2.0, (amax[1]+amin[1])/2.0, (amax[2]+amin[2])/2.0]
 
 
+
+    def transformPointCloud(self, target_frame, point_cloud):
+        """
+        :param target_frame: the tf target frame, a string
+        :param ps: the sensor_msgs.msg.PointCloud2 message
+        :return: new sensor_msgs.msg.PointCloud2 message, in frame target_frame
+        :raises: any of the exceptions that :meth:`~tf.Transformer.lookupTransform` can raise
+
+        Transforms a geometry_msgs PoseStamped message to frame target_frame, returns a new PoseStamped message.
+        """
+        print "===> pickup_import.py: DavidLookForObject.transformPointCloud()"
+        r = PointCloud()
+        r.header.stamp = rospy.Time.now() #point_cloud.header.stamp
+        r.header.frame_id = target_frame
+        #r.channels = point_cloud.channels
+
+        #get points from pc2
+        fmt = self._get_struct_fmt(point_cloud)
+        narr = list()
+        offset = 0
+        for i in xrange(point_cloud.width * point_cloud.height):
+            p = struct.unpack_from(fmt, point_cloud.data, offset)
+            offset += point_cloud.point_step
+            narr.append(p[0:3])
+
+        while True:
+            try:
+                t = rospy.Time(0)
+                point_cloud.header.stamp = t
+                (trans,rot) = self.listener.lookupTransform('/headcam_rgb_optical_frame', target_frame, rospy.Time(0))
+                print trans,rot
+                break
+            except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+                print "isGraspableObject(): tf transform /headcam_rgb_optical_frame to ", target_frame," not found"
+                rospy.sleep(1)
+                continue
+        mat44 = self.listener.asMatrix(target_frame, point_cloud.header)
+        #print mat44
+
+        def xf(p):
+            #xyz = tuple(numpy.dot(mat44, numpy.array([p.x, p.y, p.z, 1.0])))[:3]
+            xyz = tuple(numpy.dot(mat44, numpy.array([p[0], p[1], p[2], 1.0])))[:3]
+            return Point(*xyz)
+        #r.points = [xf(p) for p in point_cloud.points]
+        r.points = [xf(p) for p in narr]
+        return r
+
+
+
     def _get_struct_fmt(self, cloud, field_names=None):
         #print cloud
         fmt = '>' if cloud.is_bigendian else '<'
