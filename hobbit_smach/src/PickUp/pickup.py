@@ -422,8 +422,8 @@ def main():
             pickup.getPickupSeq(),
             # pickup.DavidPickingUp(),
             transitions={'succeeded': 'CHECK_GRASP',
-                         'failed': 'EMO_SAY_DID_NOT_PICKUP',
-                         'preempted': 'LOG_PREEMPT'}
+                         'preempted': 'LOG_PREEMPT',
+                         'failed': 'EMO_SAY_DID_NOT_PICKUP'}
         )
         StateMachine.add(
             'SAY_CHECK_GRASP',
