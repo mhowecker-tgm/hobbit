@@ -1193,7 +1193,7 @@ def getPickupSeq():
     """
     seq = Sequence(
         outcomes=['succeeded', 'preempted', 'failed'],
-        #connector_outcome='succeeded'
+        connector_outcome='succeeded'
     )
 
     with seq:
