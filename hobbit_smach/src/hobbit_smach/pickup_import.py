@@ -811,12 +811,12 @@ class DavidPickingUp(State):
         z_max = 0.25    #only that high because of buggy camera
 
         if (self.restrictfind): #only search for objects where grasped object was lying
-            x_min = 0.15
-            x_max = 0.45
-            y_min = -0.45
-            y_max = -0.17
+            x_min = -0.15
+            x_max = 0.20
+            y_min = -0.55
+            y_max = -0.23
             z_min = 0.01
-            z_max = 0.25    #only that high because of buggy camera
+            z_max = 0.20    #only that high because of buggy camera
 
         #print "pnt.point.x: ", pnt.point.x
         if (pnt.point.x > x_min and pnt.point.x < x_max and pnt.point.y > y_min and pnt.point.y < y_max and pnt.point.z > z_min and pnt.point.z < z_max):
