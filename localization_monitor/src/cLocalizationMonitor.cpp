@@ -322,6 +322,7 @@ bool cLocalizationMonitor::checkScan()
 
 	}
 
+	if (!valid_points) return true; //open space, we cannot tell if the robot is lost yet
 	double rel_score = score/valid_points;
 	std::cout << "rel_score " << rel_score << std::endl;
 	if (rel_score > score_thres)
