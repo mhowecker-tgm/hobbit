@@ -716,7 +716,7 @@ class DavidPickingUp(State):
     def findobject(self, ud):
         print "===> pickup_import.py: DavidPickingUp.findobject()"
         pc_ccs = ud.cloud   #point cloud in camera coordinate system
-        clusters = self.rec.findObjectsOnFloor(pointcloud, [0,0,0,0])
+        clusters = self.rec.findObjectsOnFloor(pc_ccs, [0,0,0,0]) #before: pointcloud instead of pc_ccs
         print "number of object clusters on floor found: ", len(clusters)
 
         for cluster in clusters:
