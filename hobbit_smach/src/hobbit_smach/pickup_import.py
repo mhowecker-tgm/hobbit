@@ -1202,7 +1202,7 @@ def getPickupSeq():
     #with seq:
     with sm:
         if not DEBUG:
-            Sequence.add(
+            StateMachine.add(
             'GET_POINT_CLOUD',
             MonitorState(
                 '/headcam/depth_registered/points',

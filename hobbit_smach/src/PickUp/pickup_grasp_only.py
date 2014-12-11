@@ -144,7 +144,7 @@ def main():
         #)       
         StateMachine.add(
             'GRASP_OBJECT',
-            pickup.getPickupSeq(), #changed/commented: 10.12.2014
+            pickup.getPickupSeq(),#changed/commented: 10.12.2014
             #pickup.DavidPickingUp(),
             transitions={'succeeded': 'LOG_ABORT',
                          'preempted': 'LOG_ABORT',
