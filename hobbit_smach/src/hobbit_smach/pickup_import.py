@@ -1199,19 +1199,6 @@ def getPickupSeq():
     with seq:
         if not DEBUG:
             Sequence.add(
-            'GET_POINT_CLOUD',
-            MonitorState(
-                '/headcam/depth_registered/points',
-                PointCloud2,
-                cond_cb=point_cloud_cb,
-                max_checks=20,
-                output_keys=['cloud']
-            ),
-            transitions={'valid': 'GET_POINT_CLOUD',
-                         'invalid': 'MOVE_ARM_TO_PRE_GRASP_POSITION',
-                         'preempted': 'preempted'}
-            )
-            Sequence.add(
                 'MOVE_ARM_TO_PRE_GRASP_POSITION',
                 arm_move.goToPreGraspPosition()
             )

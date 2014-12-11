@@ -24,7 +24,7 @@ from geometry_msgs.msg import PoseStamped
 from rgbd_acquisition.msg import PointEvents
 import hobbit_smach.hobbit_move_import as hobbit_move
 import hobbit_smach.head_move_import as head_move
-# import hobbit_smach.arm_move_import as arm_move
+import hobbit_smach.arm_move_import as arm_move
 import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.pickup_import as pickup
 import hobbit_smach.logging_import as log
@@ -340,17 +340,6 @@ def main():
                          'invalid': 'LOOK_FOR_OBJECT',
                          'preempted': 'LOG_PREEMPT'}
         )
-        # StateMachine.add(
-        #     'GET_POINT_CLOUD',
-        #     WaitForMsgState(
-        #         '/headcam/depth_registered/points',
-        #         PointCloud2,
-        #         point_cloud_cb,
-        #         timeout=5,
-        #         output_keys=['cloud']),
-        #     transitions={'succeeded': 'LOOK_FOR_OBJECT',
-        #                  'aborted': 'GET_POINT_CLOUD',
-        #                  'preempted': 'LOG_PREEMPT'})
         StateMachine.add(
             'LOOK_FOR_OBJECT',
             pickup.DavidLookForObject(),
@@ -413,17 +402,43 @@ def main():
         StateMachine.add(
             'SAY_PICKING_UP',
             speech_output.sayText(info='T_PU_PickingUpObject'),
-            transitions={'succeeded': 'GRASP_OBJECT',
+            transitions={'succeeded': 'GET_POINT_CLOUD_FOR_GRASP',
                          'failed': 'EMO_SAY_DID_NOT_PICKUP',
                          'preempted': 'LOG_PREEMPT'}
         )
+        
+        #================> NEW 10.12.2014
+        smach.StateMachine.add(
+            'GET_POINT_CLOUD_FOR_GRASP',
+            MonitorState(
+                '/headcam/depth_registered/points',
+                PointCloud2,
+                cond_cb=point_cloud_cb,
+                max_checks=20,
+                output_keys=['cloud']
+            ),
+            transitions={'valid': 'GET_POINT_CLOUD_FOR_GRASP',
+                         'invalid': 'MOVE_ARM_TO_PRE_GRASP_POSITION',
+                         'preempted': 'LOG_PREEMPT'}
+        )        
+        
+        
+        smach.StateMachine.add(
+            'MOVE_ARM_TO_PRE_GRASP_POSITION',
+            arm_move.goToPreGraspPosition(),
+            transitions={'succeeded': 'GRASP_OBJECT', 
+                         'preempted': 'LOG_PREEMPT',
+                         'failed': 'MOVE_ARM_TO_PRE_GRASP_POSITION'}    # better failure handling appreciated
+        )       
         StateMachine.add(
             'GRASP_OBJECT',
-            pickup.getPickupSeq(),
-            # pickup.DavidPickingUp(),
+            #pickup.getPickupSeq(), changed/commented: 10.12.2014
+            pickup.DavidPickingUp(),
             transitions={'succeeded': 'CHECK_GRASP',
                          'preempted': 'LOG_PREEMPT',
                          'failed': 'EMO_SAY_DID_NOT_PICKUP'}
+                         
+        #================> NEW 10.12.2014  ENDE                         
         )
         StateMachine.add(
             'SAY_CHECK_GRASP',
