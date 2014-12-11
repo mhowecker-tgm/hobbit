@@ -112,17 +112,58 @@ def main():
         StateMachine.add(
             'WAIT_FINISH_HEAD_TO_SEARCH',
             SleepState(duration=10),
-            transitions={'succeeded': 'GRASP_OBJECT',
-                         'preempted': 'LOG_ABORT'}
-            )
-        StateMachine.add(
-            'GRASP_OBJECT',
-            pickup.getPickupSeq(),
-            # pickup.DavidPickingUp(),
-            transitions={'aborted': 'CHECK_GRASP',
-                         'succeeded': 'LOG_ABORT',
+            transitions={'succeeded': 'GET_POINT_CLOUD_FOR_GRASP',
                          'preempted': 'LOG_ABORT'}
         )
+        
+        
+        
+        #================> NEW 10.12.2014
+        smach.StateMachine.add(
+            'GET_POINT_CLOUD_FOR_GRASP',
+            MonitorState(
+                '/headcam/depth_registered/points',
+                PointCloud2,
+                cond_cb=point_cloud_cb,
+                max_checks=20,
+                output_keys=['cloud']
+            ),
+            transitions={'valid': 'GET_POINT_CLOUD_FOR_GRASP',
+                         'invalid': 'MOVE_ARM_TO_PRE_GRASP_POSITION',
+                         'preempted': 'LOG_ABORT'}
+        )        
+        
+        
+        smach.StateMachine.add(
+            'MOVE_ARM_TO_PRE_GRASP_POSITION',
+            arm_move.goToPreGraspPosition(),
+            transitions={'succeeded': 'GRASP_OBJECT', 
+                         'preempted': 'LOG_ABORT',
+                         'failed': 'MOVE_ARM_TO_PRE_GRASP_POSITION'}    # better failure handling appreciated
+        )       
+        StateMachine.add(
+            'GRASP_OBJECT',
+            #pickup.getPickupSeq(), changed/commented: 10.12.2014
+            pickup.DavidPickingUp(),
+            transitions={'succeeded': 'LOG_ABORT',
+                         'preempted': 'LOG_ABORT',
+                         'failed': 'LOG_ABORT'}
+                         
+        #================> NEW 10.12.2014  ENDE                         
+        )        
+        
+        
+        
+        
+        
+        #StateMachine.add(
+        #    'GRASP_OBJECT',
+        #    pickup.getPickupSeq(),
+        #    # pickup.DavidPickingUp(),
+        #    transitions={'aborted': 'CHECK_GRASP',
+        #                 'succeeded': 'LOG_ABORT',
+        #                 'preempted': 'LOG_ABORT'}
+        #)
         StateMachine.add(
             'LOG_ABORT',
             log.DoLogAborted(scenario='Pickup'),
