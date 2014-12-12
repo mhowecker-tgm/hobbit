@@ -90,8 +90,8 @@ class DavidLookForObject(State):
         for cluster in clusters:
             self.pc = cluster
 	    print " ==============> publish cluster"
-	    self.pubClust.publish(cluster)
-	    self.pubClust.publish(pointcloud)					#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! new 31.7.2014
+	    #self.pubClust.publish(cluster)
+	    #self.pubClust.publish(pointcloud)					#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! new 31.7.2014
             if self.isGraspableObject():
                     self.pubClust.publish(cluster)
                     #self.showMMUI_Info("T_CF_I_FOUND_OBJECT_ON_FLOOR","1")
