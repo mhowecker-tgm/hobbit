@@ -725,7 +725,7 @@ class DavidPickingUp(State):
             self.pc = cluster
             print " ==============> publish cluster"
             self.pubClust.publish(cluster)
-            #self.pubClust.publish(pointcloud)
+            self.pubClust.publish(pointcloud)
             if self.isGraspableObject():
                 return True
 
