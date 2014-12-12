@@ -629,7 +629,7 @@ class DavidPickingUp(State):
             #grasp pose definition => simulation => execution
 
             #grasp_definition = calc_aS(self.pc_rcs) self.pc_rcs
-            gp_representation = self.calc_graspoints_client.calc_grasppoints_action_client(self.pc_rcs)#self.pc_rcs) #ud.cloud) 12.12.2014
+            gp_representation = self.calc_graspoints_client.calc_grasppoints_action_client(self.pc_ccs)#self.pc_rcs) #ud.cloud) 12.12.2014
 
             """ arm makes fix grasping-from-floor-movement (old)
             #OPEN GRIPPER
@@ -712,6 +712,7 @@ class DavidPickingUp(State):
         isgraspable = self.ispossibleobject(pnt_rcs)
         if isgraspable:
             self.pc_rcs = self.transformPointCloud('/base_link',self.pc)
+            self.pc_ccs = self.pc
         return isgraspable
 
 
