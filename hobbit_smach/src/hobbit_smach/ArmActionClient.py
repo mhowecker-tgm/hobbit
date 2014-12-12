@@ -309,7 +309,7 @@ if __name__ == '__main__':
     #print "Result: ", res 
     #69.71, 43.44, 86.3, 134.07, 107.56, 3.96 pregrap
 
-    raw_input("press key to set PositionsForInterpolation(armactionserver) start [+ middle + end position]")
+    #raw_input("press key to set PositionsForInterpolation(armactionserver) start [+ middle + end position]")
     #pos: start near pre-grasp-from-floor-pos
     cmd = String ("SetPositionsForInterpolation 42.04504386 61.52334755 79.77157983 155.82112212 128.77648718 83.76476425")
     res = arm_client.arm_action_client(cmd)
@@ -321,7 +321,8 @@ if __name__ == '__main__':
     #print "Result: ", res 
 
     #pos3: end-floor-grasp-pos 
-    cmd = String ("SetPositionsForInterpolation 56.98342518 64.28071272 72.53537543 157.63020355 107.04036435 82.17067261")
+    #very high above floor (safe) version: cmd = String ("SetPositionsForInterpolation 56.98342518 64.28071272 72.53537543 157.63020355 107.04036435 82.17067261")
+    cmd = String ("SetPositionsForInterpolation 70.49 64.28071272 72.53537543 157.63020355 91.0 82.17067261")
     res = arm_client.arm_action_client(cmd)
 
     #raw_input("press key to get PositionsForInterpolationReady (armactionserver)")
@@ -332,7 +333,7 @@ if __name__ == '__main__':
 
 
     #CLOSE GRIPPER
-    raw_input("press key to close gripper SetCloseGripper(armactionserver)")
+    #raw_input("press key to close gripper SetCloseGripper(armactionserver)")
     cmd = String ("SetCloseGripper")
     res = arm_client.arm_action_client(cmd)
     #print "Result: ", res 
@@ -354,8 +355,13 @@ if __name__ == '__main__':
     cmd = String("SetStartInterpolation")
     res = arm_client.arm_action_client(cmd)
     
-    cmd = String ("SetOpenGripper")
+    #cmd = String ("SetOpenGripper")
+    #res = arm_client.arm_action_client(cmd)
+
+    #raw_input("press key to move arm back to home-position")
+    cmd = String ("SetMoveToTrayPos")
     res = arm_client.arm_action_client(cmd)
+    
 
 
     exit()
