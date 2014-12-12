@@ -16,6 +16,9 @@ find_package(catkin REQUIRED COMPONENTS
   actionlib_msgs
   hobbit_msgs
   actionlib
+  pcl_conversions 
+  pcl_ros
+  tf
 )
 
 find_package(OpenCV REQUIRED)

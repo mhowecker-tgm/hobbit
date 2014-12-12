@@ -38,7 +38,13 @@
 #include <unistd.h>
 #include <math.h>
 #include <time.h>
-
+//tf
+#include <pcl_ros/point_cloud.h>
+#include <ros/ros.h>
+#include <tf/tf.h>
+#include <tf/transform_broadcaster.h>
+#include <tf/transform_datatypes.h>
+#include <tf/transform_listener.h>
 
 #include "pcl_ros/transforms.h"
 
@@ -199,19 +205,35 @@ void CCalc_Grasppoints::print_heights(int nr_roll, int nr_tilt)
 //void CCalc_Grasppoints::read_pc_cb(const sensor_msgs::PointCloud2ConstPtr& pc_in)
 void CCalc_Grasppoints::read_pc_cb(const hobbit_msgs::CalcGraspPointsServerGoalConstPtr &goal)
 {
+	tf::TransformListener tf_listener;
 	ROS_INFO("\nFrom calc_grasppoints_action_server: point cloud goal received");
 	//transform point cloud to PCL
 	pcl::PointCloud<pcl::PointXYZ> pcl_cloud_in;
-	pcl::fromROSMsg (goal->input_pc, pcl_cloud_in);			// transform ROS-pc to PCL-pc  ====== 3.12.2014 ======
+	//pcl::fromROSMsg (goal->input_pc, pcl_cloud_in);			// david transform ROS-pc to PCL-pc  ====== 3.12.2014 ======
+	pcl::PointCloud<pcl::PointXYZ> pc_new_cs;
 
-	//============================
-	//transform pcl_cloutIn to ros_pc
-	//#sensor_msgs::PointCloud2 ros_pc_in;
-    //pcl::toROSMsg(pcl_cloud_in, ros_pc_in);
+
+	//search for tf transform between camera ("frame") and robot ("base_link") camera coordinate system
+	ros::Time now = ros::Time::now();
+	bool foundTransform = tf_listener.waitForTransform(/*req.frame_id_desired.data.c_str()*/"/base_link", /*req.frame_id_original.data.c_str()*/"frame", now, ros::Duration(13.0));
+	if (!foundTransform)
+	{
+		ROS_WARN("CCalc_Grasppoints::read_pc_cb: No transform for point cloud found");
+	}
+
+	//ROS_INFO(tf_listener);
+	ROS_INFO("CCalc_Grasppoints::read_pc_cb: Transform for point cloud found");
+
+	pcl::PointCloud<pcl::PointXYZ> pcl_cloud_in_old_cs;
+	pcl::fromROSMsg(goal->input_pc, pcl_cloud_in_old_cs); // transform ROS msg in intp PCL-pointcloud
+
+	pcl_ros::transformPointCloud(/*req.frame_id_desired.data.c_str()*/"/base_link", pcl_cloud_in_old_cs, pc_new_cs, tf_listener);
+	pcl_cloud_in = pc_new_cs;
+
+
+
 	//publish input pc:
 	this->pubInputPCROS.publish(goal->input_pc);
-	//this->pubInputPCPCL.publish(pcl_cloud_in);
-	//============================
 
 	//set initial values for row,col,tilt,topval for top grasp points
 	id_row_top_overall = -1;
