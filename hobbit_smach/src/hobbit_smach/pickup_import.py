@@ -228,56 +228,6 @@ class DavidLookForObject(State):
         return r
 
 
-    """def transformPointCloud(self, target_frame, point_cloud):
-        " ""
-        :param target_frame: the tf target frame, a string
-        :param ps: the sensor_msgs.msg.PointCloud2 message
-        :return: new sensor_msgs.msg.PointCloud2 message, in frame target_frame
-        :raises: any of the exceptions that :meth:`~tf.Transformer.lookupTransform` can raise
-
-        Transforms a geometry_msgs PoseStamped message to frame target_frame, returns a new PoseStamped message.
-        "" "
-	print "===> pickup_import.py: DavidLookForObject.transformPointCloud()"
-        r = PointCloud()
-        r.header.stamp = rospy.Time.now() #point_cloud.header.stamp
-        r.header.frame_id = target_frame
-        #r.channels = point_cloud.channels
-
-        #get points from pc2
-        fmt = self._get_struct_fmt(point_cloud)
-        narr = list()
-        offset = 0
-        for i in xrange(point_cloud.width * point_cloud.height):
-            p = struct.unpack_from(fmt, point_cloud.data, offset)
-            offset += point_cloud.point_step
-            narr.append(p[0:3])
-
-        self.Hpub.publish("down_right")
-        rospy.sleep(2)
-
-        while True:
-            try:
-                #self.Hpub.publish("down")
-                t = rospy.Time(0)
-                point_cloud.header.stamp = t
-                (trans,rot) = self.listener.lookupTransform('/headcam_rgb_optical_frame', '/hobbit_wrt_down_right_cam', rospy.Time(0))
-                print trans,rot
-                break
-            except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
-                print "isGraspableObject(): tf transform /headcam_rgb_optical_frame to /hobbit_wrt_down_right_cam not found"
-                rospy.sleep(1)
-                continue
-        mat44 = self.listener.asMatrix(target_frame, point_cloud.header)
-        print mat44
-
-        def xf(p):
-            #xyz = tuple(numpy.dot(mat44, numpy.array([p.x, p.y, p.z, 1.0])))[:3]
-            xyz = tuple(numpy.dot(mat44, numpy.array([p[0], p[1], p[2], 1.0])))[:3]
-            return Point(*xyz)
-        #r.points = [xf(p) for p in point_cloud.points]
-        r.points = [xf(p) for p in narr]
-        return r"""
-
 
     def ispossibleobject(self, pnt):    #pnt is in rcs
         print "===> pickup_import.py: DavidLookForObject.ispossibleobject()"
@@ -813,11 +763,11 @@ class DavidPickingUp(State):
             try:
                 t = rospy.Time(0)
                 point_cloud.header.stamp = t
-                (trans,rot) = self.listener.lookupTransform('/headcam_rgb_optical_frame', target_frame, rospy.Time(0))
+                (trans,rot) = self.listener.lookupTransform('/frame', target_frame, rospy.Time(0))   #12.12.2014: /headcam_rgb_optical_frame => /frame => FORTH changed it!
                 print trans,rot
                 break
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
-                print "isGraspableObject(): tf transform /headcam_rgb_optical_frame to ", target_frame," not found"
+                print "isGraspableObject(): tf transform /frame to ", target_frame," not found"
                 rospy.sleep(1)
                 continue
         mat44 = self.listener.asMatrix(target_frame, point_cloud.header)
