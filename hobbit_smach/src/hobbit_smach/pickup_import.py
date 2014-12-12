@@ -93,7 +93,7 @@ class DavidLookForObject(State):
 	    self.pubClust.publish(cluster)
 	    self.pubClust.publish(pointcloud)					#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! new 31.7.2014
             if self.isGraspableObject():
-                    #self.pubClust.publish(cluster)
+                    self.pubClust.publish(cluster)
                     #self.showMMUI_Info("T_CF_I_FOUND_OBJECT_ON_FLOOR","1")
                     #print "findobject(): cluster saved and published"
                     return True
@@ -725,7 +725,6 @@ class DavidPickingUp(State):
             self.pc = cluster
             print " ==============> publish cluster"
             self.pubClust.publish(cluster)
-            self.pubClust.publish(pointcloud)
             if self.isGraspableObject():
                 return True
 
