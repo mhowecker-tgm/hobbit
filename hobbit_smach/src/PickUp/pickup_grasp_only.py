@@ -102,19 +102,19 @@ def main():
     pickup_sm.userdata.detection = False
 
     with pickup_sm:
-        #StateMachine.add(
-        #    'HEAD_TO_SEARCH',
-        #    head_move.MoveTo(pose='to_grasp'),  # wait=True <=> df
-        #    transitions={'succeeded': 'WAIT_FINISH_HEAD_TO_SEARCH', # df
-        #                 'aborted': 'LOG_ABORT',
-        #                 'preempted': 'LOG_ABORT'}
-        #)
-        #StateMachine.add(
-        #    'WAIT_FINISH_HEAD_TO_SEARCH',
-        #    SleepState(duration=7),
-        #    transitions={'succeeded': 'GRASP_OBJECT',
-        #                 'preempted': 'LOG_ABORT'}
-        #)
+        StateMachine.add(
+            'HEAD_TO_SEARCH',
+            head_move.MoveTo(pose='to_grasp'),  # wait=True <=> df
+            transitions={'succeeded': 'WAIT_FINISH_HEAD_TO_SEARCH', # df
+                         'aborted': 'LOG_ABORT',
+                         'preempted': 'LOG_ABORT'}
+        )
+        StateMachine.add(
+            'WAIT_FINISH_HEAD_TO_SEARCH',
+            SleepState(duration=7),
+            transitions={'succeeded': 'GRASP_OBJECT',
+                         'preempted': 'LOG_ABORT'}
+        )
         
         
         
