@@ -39,6 +39,9 @@
 #include <math.h>
 #include <time.h>
 
+
+#include "pcl_ros/transforms.h"
+
 //PCL includes
 #include "/usr/include/pcl-1.7/pcl/io/io.h"
 #include "pcl/point_types.h"
@@ -99,6 +102,8 @@ protected:
 public:
 	ros::Subscriber box_position_sub;	//subscriber for x and y coordinates of the box center and the rotation
 	ros::Subscriber pc_sub;				//subscriber for the pointcloud (point of objects without basket)
+	ros::Publisher pubInputPCPCL;
+	ros::Publisher pubInputPCROS;
 	ros::Publisher pubGraspPoints;		//publisher for grasp points
 	ros::Publisher pubGraspPointsEval;	//publisher for grasp points with evaluation at the first 2 position (value: 10-99)
 	ros::Publisher vis_pub;				//Marker
@@ -150,6 +155,8 @@ public:
 		//this->pubGraspPoints = nh_.advertise<std_msgs::String>("/SVM/grasp_hypothesis", 1);
 		this->vis_pub = nh_.advertise<visualization_msgs::Marker>( "visualization_marker", 2 );				//Marker
 		this->vis_pub_ma = nh_.advertise<visualization_msgs::MarkerArray>( "visualization_marker_array", 2 );	//MarkerArray
+		this->pubInputPCROS = nh_.advertise<sensor_msgs::PointCloud2>( "/calc_gp_as_inputpcROS", 1);
+		this->pubInputPCPCL = nh_.advertise<sensor_msgs::PointCloud2>( "/calc_gp_as_inputpcPCL", 1);
 		box_position_set = true;
 		this->box_center_x = 0.03;
 		this->box_center_y = -0.38;
@@ -196,6 +203,15 @@ void CCalc_Grasppoints::read_pc_cb(const hobbit_msgs::CalcGraspPointsServerGoalC
 	//transform point cloud to PCL
 	pcl::PointCloud<pcl::PointXYZ> pcl_cloud_in;
 	pcl::fromROSMsg (goal->input_pc, pcl_cloud_in);			// transform ROS-pc to PCL-pc  ====== 3.12.2014 ======
+
+	//============================
+	//transform pcl_cloutIn to ros_pc
+	//#sensor_msgs::PointCloud2 ros_pc_in;
+    //pcl::toROSMsg(pcl_cloud_in, ros_pc_in);
+	//publish input pc:
+	this->pubInputPCROS.publish(goal->input_pc);
+	//this->pubInputPCPCL.publish(pcl_cloud_in);
+	//============================
 
 	//set initial values for row,col,tilt,topval for top grasp points
 	id_row_top_overall = -1;
