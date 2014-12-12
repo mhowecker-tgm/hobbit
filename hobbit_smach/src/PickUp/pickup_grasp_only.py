@@ -172,7 +172,7 @@ def main():
         )
 
     asw = ActionServerWrapper(
-        'pickupgrasponly', GeneralHobbitAction, pickup_sm,
+        'pickup_object_grasp_only', GeneralHobbitAction, pickup_sm,
         ['succeeded'], ['aborted'], ['preempted'],
         result_slots_map={'result': 'result'}
     )
