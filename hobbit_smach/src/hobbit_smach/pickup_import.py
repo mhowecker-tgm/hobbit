@@ -631,7 +631,6 @@ class CalcGrasppointsActionClient():
         # Prints out the result of executing the action
         returnval = self.calc_grasppoints_client.get_result()  #
         print "returnval from calc_grasppoints: ", returnval
-        print "cmd: ", cmd
         return returnval
 
     def feedback_cb(self, feedback):
