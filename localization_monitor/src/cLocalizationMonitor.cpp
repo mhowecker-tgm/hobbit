@@ -26,11 +26,14 @@ cLocalizationMonitor::cLocalizationMonitor(int argc, char **argv) : init_argc(ar
 	high_uncertainty = false;
 	matching_ok = true;
 
-	score_thres = 0.5;  //consider lowering this threshold to account for changes in the environment, compromise needed 
+	score_thres = 0.3;  //consider lowering this threshold to account for changes in the environment, compromise needed 
 
 	thres = 0.2;
         max_lim = 3;
 	min_valid_points = 20; //FIXME
+
+	check_cov = true;
+	check_scan = true;
 
 
 }
@@ -249,7 +252,8 @@ void cLocalizationMonitor::open(ros::NodeHandle & n)
 	for(int i=0; i<indices.size();i++)
 	{
 		int index = indices[i];
-		static_map_modified.data[index] = occupancy_grid_utils::OCCUPIED;
+		if (static_map_modified.data[index] != occupancy_grid_utils::OCCUPIED)
+			static_map_modified.data[index] = occupancy_grid_utils::OCCUPIED;
 
 	}
 
@@ -321,6 +325,7 @@ bool cLocalizationMonitor::checkScan()
 	}
 
 	if (valid_points < min_valid_points) return true; //open space, we cannot tell if the robot is lost yet
+
 	double rel_score = score/valid_points;
 	std::cout << "rel_score " << rel_score << std::endl;
 	if (rel_score > score_thres)

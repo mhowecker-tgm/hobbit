@@ -67,6 +67,9 @@ private:
 
   double max_lim;
 
+  bool check_cov;
+  bool check_scan;
+
   int min_valid_points;
 
 };
