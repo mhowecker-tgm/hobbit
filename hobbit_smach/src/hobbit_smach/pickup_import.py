@@ -726,7 +726,10 @@ class DavidPickingUp(State):
             p = struct.unpack_from(fmt, self.pc.data, offset)
             offset += self.pc.point_step
             narr.append(p[0:3])
+            
 
+        df = narr.__len__(); #length of point cloud
+        print "===> pickup_import.py: DavidPickingUp.getCenterOfCluster() LENGTH OF POINTCLOUD:", df
         a = numpy.asarray(narr)
         pcmean = numpy.mean(a, axis=0)
         amin = numpy.min(a, axis=0)
