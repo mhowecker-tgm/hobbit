@@ -48,9 +48,9 @@ done
 echo "Top Cam - Started succesfully"
 
  
-
-echo "Starting up hand_gestures"
-screen -d -m -S "hand_gestures" /bin/bash -c "source ~/.bashrc && source $HOBBITDIR/devel/setup.bash && roslaunch hand_gestures hand_gestures.launch"
+echo "Hand Gestures are now handled by Skeleton Detector"
+#echo "Starting up hand_gestures"
+#screen -d -m -S "hand_gestures" /bin/bash -c "source ~/.bashrc && source $HOBBITDIR/devel/setup.bash && roslaunch hand_gestures hand_gestures.launch"
 echo "Starting up face_detection"
 screen -d -m -S "face_detection" /bin/bash -c "source ~/.bashrc && source $HOBBITDIR/devel/setup.bash && roslaunch face_detection face_detection.launch"
 echo "Starting up emergency_detection"
