@@ -36,6 +36,10 @@
 
 
 
+#include "hobbit_msgs/Event.h"
+#include <std_msgs/String.h>
+ros::Publisher gestureEventBroadcaster;
+
 #include "skeleton_detector/PointEvents.h"
 
 ros::Publisher joint2DBroadcaster;
@@ -189,6 +193,41 @@ void broadcast2DBBox(struct skeletonHuman * skeletonFound)
   jointBBoxBroadcaster.publish(msg);
 }
 
+
+void broadcastNewGesture(unsigned int frameNumber,struct handGesture * gesture)
+{
+    if (gesture==0)  { return ; }
+
+    hobbit_msgs::Event evt;
+    std::stringstream ss;
+    switch (gesture->gestureID)
+    {
+     case GESTURE_NONE   : ss<<"G_NONE";   break;
+     case GESTURE_CANCEL : ss<<"G_CANCEL"; break;
+     case GESTURE_HELP   : ss<<"G_HELP";   break;
+     case GESTURE_YES    : ss<<"G_YES";    break;
+     case GESTURE_NO     : ss<<"G_NO";     break;
+     case GESTURE_REWARD : ss<<"G_REWARD"; break;
+     case GESTURE_POINT  : ss<<"G_POINT";  break;
+     case GESTURE_COME   : ss<<"G_COME";  break;
+     case GESTURE_WAVE   : ss<<"G_WAVE";  break;
+     default :             ss<<"G_NOTFOUND"; break;
+    };
+
+    //sROS.data=ss.str();
+    evt.event=ss.str();
+    evt.header.seq = frameNumber;
+    evt.header.frame_id = "skeleton_detector";
+    evt.header.stamp = ros::Time::now();
+    evt.sessionID  = "SessionID";
+    evt.confidence = 1.0;
+    evt.params.resize(0);
+    fprintf(stderr,"Publishing a new Event ( %u ) \n",gesture->gestureID);
+    gestureEventBroadcaster.publish(evt);
+
+
+    return ;
+}
 
 
 void broadcastPointing(unsigned int frameNumber ,struct skeletonPointing * skeletonPointingFound)
@@ -344,7 +383,7 @@ void broadcastNewSkeleton(unsigned int frameNumber,unsigned int skeletonID , str
 
 int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int colorWidth , unsigned int colorHeight ,
                                        unsigned short * depthFrame  , unsigned int depthWidth , unsigned int depthHeight ,
-                                        struct calibrationHUBT * calib ,
+                                        struct calibrationHobbit * calib ,
                                          unsigned int frameTimestamp )
 {
   if ( (colorFrameCopy==0) ||  (depthFrameCopy==0) ) { fprintf(stderr,"Cannot run handtracker due to not allocated intermediate buffer\n"); return 0; }
@@ -379,8 +418,14 @@ int registerServices(ros::NodeHandle * nh,unsigned int width,unsigned int height
   depthFrameCopy = (unsigned short * ) malloc(width*height*1*sizeof(unsigned short));
   if (depthFrameCopy==0) { fprintf(stderr,"Cannot make an intermidiate copy of depth frame \n"); }
 
+
+
   hobbitUpperBodyTracker_Initialize(width , height);
   hobbitUpperBodyTracker_RegisterSkeletonDetectedEvent((void *) &broadcastNewSkeleton);
+  hobbitUpperBodyTracker_setFloor(51.46 , 622.97 , 1722.0 , 0.02 , -0.91 , -0.42); //default plane
+  hobbitUpperBodyTracker_useGestures(1);
+  gestureEventBroadcaster = nh->advertise <hobbit_msgs::Event> ("Event", 1000);
+  hobbitUpperBodyTracker_RegisterGestureDetectedEvent((void *) &broadcastNewGesture);
 
   pointEventsBroadcaster = nh->advertise <skeleton_detector::PointEvents> ("pointEvents", 1000);
   personBroadcaster = nh->advertise <skeleton_detector::Person> (PERSON_TOPIC, divisor);

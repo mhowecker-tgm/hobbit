@@ -51,7 +51,7 @@ unsigned int runFullSpeed=0;
 unsigned int runMaxSpeed=0;
 unsigned int colorWidth = 640 , colorHeight =480 , depthWidth = 640 , depthHeight = 480;
 
-struct calibrationHUBT calib={0};
+struct calibrationHobbit calib={0};
 
 #if USE_NONDEFAULT_CALIBRATIONS
  typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image, sensor_msgs::CameraInfo> RgbdSyncPolicy;
