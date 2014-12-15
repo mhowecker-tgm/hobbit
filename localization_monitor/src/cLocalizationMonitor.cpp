@@ -28,11 +28,9 @@ cLocalizationMonitor::cLocalizationMonitor(int argc, char **argv) : init_argc(ar
 
 	score_thres = 0.5;  //consider lowering this threshold to account for changes in the environment, compromise needed 
 
-	//low_res = 0.1;
-
 	thres = 0.2;
-
         max_lim = 3;
+	min_valid_points = 20; //FIXME
 
 
 }
@@ -322,7 +320,7 @@ bool cLocalizationMonitor::checkScan()
 
 	}
 
-	if (!valid_points) return true; //open space, we cannot tell if the robot is lost yet
+	if (valid_points < min_valid_points) return true; //open space, we cannot tell if the robot is lost yet
 	double rel_score = score/valid_points;
 	std::cout << "rel_score " << rel_score << std::endl;
 	if (rel_score > score_thres)

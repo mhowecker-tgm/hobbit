@@ -67,6 +67,8 @@ private:
 
   double max_lim;
 
+  int min_valid_points;
+
 };
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #endif
