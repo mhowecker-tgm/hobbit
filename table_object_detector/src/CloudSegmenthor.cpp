@@ -583,7 +583,7 @@ public:
 		pcl::PassThrough<pcl::PointXYZRGB> pass;
 		pass.setInputCloud(cloud.makeShared());
 		pass.setFilterFieldName("z");
-		pass.setFilterLimits(1.1, 1.7);
+		pass.setFilterLimits(0.95, 1.7);
 		pass.filter(cloud_filtered);
 
 //		pcl::PassThrough<pcl::PointXYZRGB> passx;
