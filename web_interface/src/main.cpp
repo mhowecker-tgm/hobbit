@@ -344,7 +344,7 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
    addServiceCheck(statusControl , (char*) "RGBDAcquisition"      , (char*)  "rgbd" );
    addScreenCheck (statusControl , (char*) "Base Camera"          , (char*)  "basecam" );
    addServiceCheck(statusControl , (char*)  "Skeleton Detector"   , (char*)  "skeleton" );
-   addServiceCheck(statusControl , (char*)  "Hand Gestures"       , (char*)  "hand" );
+   //addServiceCheck(statusControl , (char*)  "Hand Gestures"       , (char*)  "hand" ); -- Hand Gestures are deprecated 
    addServiceCheck(statusControl , (char*)  "Face Detection"      , (char*)  "face_det" );
    addServiceCheck(statusControl , (char*)  "Person Aggregator"   , (char*)  "person_aggre" );
    addServiceCheck(statusControl , (char*)  "Emergency Detection" , (char*)  "emergency" );
