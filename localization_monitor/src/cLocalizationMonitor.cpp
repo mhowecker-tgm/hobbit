@@ -21,7 +21,7 @@
 cLocalizationMonitor::cLocalizationMonitor(int argc, char **argv) : init_argc(argc), init_argv(argv)
 {
 	loc_ok = true;
-	uncertainty_thres = 0.1;
+	uncertainty_thres = 0.15;
 
 	high_uncertainty = false;
 	matching_ok = true;
