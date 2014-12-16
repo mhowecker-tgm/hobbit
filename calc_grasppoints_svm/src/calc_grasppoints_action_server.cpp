@@ -845,7 +845,7 @@ void CCalc_Grasppoints::publish_grasp_grid(int nr_roll, int tilt, float graspsgr
 void CCalc_Grasppoints::gp_to_marker(visualization_msgs::Marker *marker, float x, float y, float z, float green, bool pubmarker, int gripperwidth=1){
 	//cout << "gp_to_marker: start" << endl;
 	//visualization_msgs::Marker marker;
-	(*marker).header.frame_id = "lwr_";//"marker"; //"hobbit_wrt_down_right_cam" david
+	(*marker).header.frame_id = "base_link";//"marker"; //"hobbit_wrt_down_right_cam" david
 	(*marker).header.stamp = ros::Time();
 	(*marker).ns = "my_namespace";
 	(*marker).id = marker_cnt++;
