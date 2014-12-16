@@ -39,10 +39,15 @@ void MiraSendingGoals::initialize() {
   obs_nav_mode_service = robot_->getRosNode().advertiseService("/obs_nav_mode", &MiraSendingGoals::obs_nav_mode, this);
 
   //get current DecayRate value
-  mira::RPCFuture<std::string> r = robot_->getMiraAuthority().callService<std::string>("/navigation/laser/GridMapperLaser#builtin", std::string("getProperty"), std::string("DecayRate"));
-  r.timedWait(mira::Duration::seconds(1));
-  decay_value = r.get();
+  mira::RPCFuture<std::string> r1 = robot_->getMiraAuthority().callService<std::string>("/navigation/laser/GridMapperLaser#builtin", std::string("getProperty"), std::string("DecayRate"));
+  r1.timedWait(mira::Duration::seconds(1));
+  decay_value = r1.get();
   std::cout << "current decay rate " << decay_value << std::endl;
+
+  //get current MaxRange value
+  mira::RPCFuture<std::string> r2 = robot_->getMiraAuthority().callService<std::string>("/navigation/laser/GridMapperLaser#builtin", std::string("getProperty"), std::string("MaxRange"));
+  r2.timedWait(mira::Duration::seconds(1));
+  max_range_value = r2.get();
 
 }
 
@@ -60,9 +65,14 @@ void MiraSendingGoals::spin()
 
 bool MiraSendingGoals::user_nav_mode(mira_msgs::UserNavMode::Request &req, mira_msgs::UserNavMode::Response &res)
 {
-        mira::RPCFuture<void> r = robot_->getMiraAuthority().callService<void>("/navigation/laser/GridMapperLaser#builtin", std::string("setProperty"), std::string("DecayRate"), std::string("0.0"));
-        r.timedWait(mira::Duration::seconds(1));
-        r.get();
+
+	mira::RPCFuture<void> r1 = robot_->getMiraAuthority().callService<void>("/navigation/laser/GridMapperLaser#builtin", std::string("setProperty"), std::string("MaxRange"), std::string("0.0"));
+        r1.timedWait(mira::Duration::seconds(1));
+        r1.get();
+
+        mira::RPCFuture<void> r2 = robot_->getMiraAuthority().callService<void>("/navigation/laser/GridMapperLaser#builtin", std::string("setProperty"), std::string("DecayRate"), std::string("0.0"));
+        r2.timedWait(mira::Duration::seconds(1));
+        r2.get();
         return true;
 
 }
@@ -70,9 +80,13 @@ bool MiraSendingGoals::user_nav_mode(mira_msgs::UserNavMode::Request &req, mira_
 bool MiraSendingGoals::obs_nav_mode(mira_msgs::ObsNavMode::Request &req, mira_msgs::ObsNavMode::Response &res)
 {
 
-	mira::RPCFuture<void> r = robot_->getMiraAuthority().callService<void>("/navigation/laser/GridMapperLaser#builtin", std::string("setProperty"), std::string("DecayRate"), std::string(decay_value));
-        r.timedWait(mira::Duration::seconds(1));
-        r.get();
+	mira::RPCFuture<void> r1 = robot_->getMiraAuthority().callService<void>("/navigation/laser/GridMapperLaser#builtin", std::string("setProperty"), std::string("MaxRange"), std::string(max_range_value));
+        r1.timedWait(mira::Duration::seconds(1));
+        r1.get();
+
+	mira::RPCFuture<void> r2 = robot_->getMiraAuthority().callService<void>("/navigation/laser/GridMapperLaser#builtin", std::string("setProperty"), std::string("DecayRate"), std::string(decay_value));
+        r2.timedWait(mira::Duration::seconds(1));
+        r2.get();
 	return true;
 
 }

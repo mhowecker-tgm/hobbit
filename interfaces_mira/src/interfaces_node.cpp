@@ -1,3 +1,6 @@
+
+//Based on code from the Strands project
+
 #include <ros/ros.h>
 #include <ros/console.h>
 

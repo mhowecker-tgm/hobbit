@@ -29,8 +29,10 @@
 	<!-- Here we patch in the kinect as the laser to use for navigation -->
 	<namespace name="navigation">
 		<namespace name="laser">
-			<parameter name="GridMapperLaser.Sensors"> 
-				<item>/VirtualLaserObs</item>
+			<parameter name="GridMapperLaser">
+				<Sensors>
+					<item>/VirtualLaserObs</item>
+				</Sensors>
 			</parameter>
 		</namespace>
 	</namespace>

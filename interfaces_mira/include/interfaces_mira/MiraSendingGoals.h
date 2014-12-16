@@ -70,6 +70,7 @@ private:
 	bool user_nav_mode(mira_msgs::UserNavMode::Request &req, mira_msgs::UserNavMode::Response &res);
 	bool obs_nav_mode(mira_msgs::ObsNavMode::Request &req, mira_msgs::ObsNavMode::Response &res);
 	std::string decay_value;
+	std::string max_range_value;
 
 };
 
