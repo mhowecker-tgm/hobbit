@@ -1,0 +1,59 @@
+<root>
+	<!--<var MCFFile="${find map2.mcf}" />-->
+	<var MCFFile="../maps/current_map/mcf.xml" />
+	<include file="${findpkg SCITOSConfigs}/etc/SCITOS-application.xml" />
+
+	<!-- Here we patch in the kinect as the laser to use for localization -->
+	<namespace name="localization">
+		<parameter name="Poseidon.Sensors[?].item{mira::localization::RangeScanSensor}">
+			<RangeChannels>
+				<item>/VirtualLaserLoc</item>
+			</RangeChannels>
+		</parameter>
+	</namespace>
+
+	<namespace name="robot">
+		<link child="LaserFrame" parent="RobotFrame">
+			<X>0.135</X>
+			<Y>0</Y>
+			<Z>0.295</Z>
+			<Yaw>0</Yaw>
+			<Pitch>0</Pitch>
+			<Roll>0</Roll>
+		</link>
+		<namespace name="frontLaser">
+			<using name="/VirtualLaserLoc" as="Laser" />
+		</namespace>
+	</namespace>
+
+	<!-- Here we patch in the kinect as the laser to use for navigation -->
+	<namespace name="navigation">
+		<namespace name="laser">
+			<parameter name="GridMapperLaser">
+				<Sensors>
+					<item>/VirtualLaserObs</item>
+					<item>/VirtualLaserLoc</item>
+				</Sensors>
+			</parameter>
+		</namespace>
+	</namespace>
+
+	<namespace name="robot">
+	    <link child="TopCameraMountFrame" parent="RobotFrame">
+		<X>0</X>  <!-- FIXME -0.2? -->
+		<Y>0</Y>
+		<Z>0</Z>
+		<Yaw>0</Yaw>
+		<Pitch>0</Pitch>
+		<Roll>0</Roll>
+	    </link>
+	    <link child="TopCameraFrame" parent="TopCameraMountFrame">
+		<X>0.0</X>
+		<Y>0.0</Y>
+		<Z>0.0</Z>
+		<Yaw>0</Yaw>
+		<Pitch>0</Pitch>
+		<Roll>0</Roll>
+	    </link>
+	</namespace>
+</root>
