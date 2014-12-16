@@ -193,7 +193,7 @@ void CCalc_Grasppoints::print_heights(int nr_roll, int nr_tilt)
 	cout << "\n print heights matrix for roll number : " << nr_roll << "\t and tilt nr: "<< nr_tilt << endl;
 	for (int i = 0; i < HEIGHT; i++){  //rows
 		for (int j = 0; j < WIDTH; j++){  //cols
-			cout << setw(7) << setprecision(3) << this->heightsgridroll[nr_roll][nr_tilt][HEIGHT-i-1][WIDTH-j-1];
+			cout << setw(5) << setprecision(2) << this->heightsgridroll[nr_roll][nr_tilt][HEIGHT-i-1][WIDTH-j-1];
 		}
 		cout << "\n";
 	}
