@@ -134,7 +134,7 @@ public:
 	int topval_gp_overall;
 	int marker_cnt;
 	string gp_result; //saves return values for ActionServer (bad programming style)
-
+	tf::TransformListener tf_listener;
 
  	//void set_box_position_cb(std_msgs::String box_position_str);
  	void print_heights(int nr_roll, int nr_tilt);
@@ -205,7 +205,6 @@ void CCalc_Grasppoints::print_heights(int nr_roll, int nr_tilt)
 //void CCalc_Grasppoints::read_pc_cb(const sensor_msgs::PointCloud2ConstPtr& pc_in)
 void CCalc_Grasppoints::read_pc_cb(const hobbit_msgs::CalcGraspPointsServerGoalConstPtr &goal)
 {
-	tf::TransformListener tf_listener;
 	ROS_INFO("\nFrom calc_grasppoints_action_server: point cloud goal received");
 	//transform point cloud to PCL
 	pcl::PointCloud<pcl::PointXYZ> pcl_cloud_in;
