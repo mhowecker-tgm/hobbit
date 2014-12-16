@@ -674,7 +674,7 @@ class DavidPickingUp(State):
 
         for cluster in clusters:
             self.pc = cluster
-            raw_input(" ==============> publish cluster")
+            print " ==============> publish cluster"
             self.pubClust.publish(cluster)
             if self.isGraspableObject():
                 return True
