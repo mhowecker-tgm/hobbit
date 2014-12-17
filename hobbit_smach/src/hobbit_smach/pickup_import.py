@@ -31,7 +31,7 @@ from geometry_msgs.msg import Pose
 from hobbit_smach.ArmActionClient import ArmActionClient
 import actionlib
 import hobbit_msgs.msg
-import GraspTrajectoryActionClient# as grasptraj #
+import arm_simulation #GraspTrajectoryActionClient# as grasptraj #
 #from arm_simulation import GraspTrajectoryActionClient
 
 _DATATYPES = {}
