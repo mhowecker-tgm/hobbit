@@ -31,7 +31,7 @@ from geometry_msgs.msg import Pose
 from hobbit_smach.ArmActionClient import ArmActionClient
 import actionlib
 import hobbit_msgs.msg
-from GraspTrajectoryActionClient import *#GraspTrajectoryActionClient
+import arm_simulation # GraspTrajectoryActionClient import *#GraspTrajectoryActionClient
 
 _DATATYPES = {}
 _DATATYPES[PointField.INT8]    = ('b', 1)
