@@ -640,7 +640,7 @@ class DavidPickingUp(State):
             grasp_traj_ac = arm_simulation.GraspTrajectoryActionClient.GraspTrajectoryActionClient()
             print "=================================================>",grasp_traj_ac
             #calculate grasp grajectory (way points)
-            cmd = gp_representation.data #String ("81 0.04 -0.45 0.127266 0.04 -0.51 0.127266 0 0 1 0.04 -0.48 0.127266 0") #input (=> = output from calc_grasppoints_svm_action_server)
+            cmd = gp_representation.result #String ("81 0.04 -0.45 0.127266 0.04 -0.51 0.127266 0 0 1 0.04 -0.48 0.127266 0") #input (=> = output from calc_grasppoints_svm_action_server)
             res = grasp_traj_ac.grasp_trajectory_action_client(cmd)
             
             print "result of trajectory calculation:           ", res
