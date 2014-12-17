@@ -654,7 +654,7 @@ public:
 		sensor_msgs::PointCloud2 output;
 		pcl::toROSMsg (objectcloud, output);
 		output.header.frame_id = "/headcam_rgb_optical_frame";
-		// Publish the data
+		// Publish the data (= data without detected plane => ros topic /debug)
 		pub.publish (output);
 		//return;
 		/*

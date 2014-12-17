@@ -31,6 +31,7 @@ from geometry_msgs.msg import Pose
 from hobbit_smach.ArmActionClient import ArmActionClient
 import actionlib
 import hobbit_msgs.msg
+import arm_simulation.GraspTrajectoryActionClient
 
 _DATATYPES = {}
 _DATATYPES[PointField.INT8]    = ('b', 1)
@@ -628,9 +629,15 @@ class DavidPickingUp(State):
             # 3) call Arm AS (arm client already included in code)
             #grasp pose definition => simulation => execution
 
-            #grasp_definition = calc_aS(self.pc_rcs) self.pc_rcs
+            # 1) call calc_grasppoints_action_server/client (calc_aS(self.pc_rcs)) and receive a grasp_representation in the format (string):
+            # "(0)eval_val (1)gp1_x (2)gp1_y (3)gp1_z (4)gp2_x (5)gp2_y (6)gp2_z (7)ap_vec_x (8)ap_vec_y (9)ap_vec_z (10)gp_center_x (11)gp_center_y (12)gp_center_z (13)roll"
             gp_representation = self.calc_graspoints_client.calc_grasppoints_action_client(ud.cloud)#self.pc_rcs) #ud.cloud) 12.12.2014
 
+            # 2) call GraspFromFloorTrajectoryActionServer/Client to receive a trajectory (that will be later directly executed) by calling the ArmActionServer/client
+            #daviddavid
+            grasp_traj_ac = GraspTrajectoryActionClient()
+            print grasp_traj_ac
+            
             """ arm makes fix grasping-from-floor-movement (old)
             #OPEN GRIPPER
             res = self.arm_client.arm_action_client(String ("SetOpenGripper"))
