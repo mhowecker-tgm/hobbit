@@ -32,7 +32,7 @@ from hobbit_smach.ArmActionClient import ArmActionClient
 import actionlib
 import hobbit_msgs.msg
 #import arm_simulation.GraspTrajectoryActionClient as grasptraj #
-from arm_simulation import GraspTrajectoryActionClient2
+from arm_simulation import GraspTrajectoryActionClient
 
 _DATATYPES = {}
 _DATATYPES[PointField.INT8]    = ('b', 1)
