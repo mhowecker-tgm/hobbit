@@ -48,7 +48,7 @@
   <build_depend>tf</build_depend>
   <build_depend>sensor_msgs</build_depend>
   <build_depend>visualization_msgs</build_depend>
-    <build_depend>arm_simulation</build_depend>
+  <build_depend>arm_simulation</build_depend>
   <run_depend>arm_simulation</run_depend>
   <run_depend>visualization_msgs</run_depend>
   <run_depend>sensor_msgs</run_depend>
