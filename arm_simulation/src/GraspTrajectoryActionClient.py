@@ -67,7 +67,7 @@ if __name__ == '__main__':
     #   === T E S T  ===
 
     # Node name
-    rospy.init_node('grasp_trajectory_action_client_test')
+    rospy.init_node('grasp_trajectory_action_client')
     print "node grasp_trajectory_action_client test started"
     grasp_trajectory_client = GraspTrajectoryActionClient()
     #cmd = String ("0.32 -0.34 0.05 0 0 0 0 0 0") #dummy command/input  old
