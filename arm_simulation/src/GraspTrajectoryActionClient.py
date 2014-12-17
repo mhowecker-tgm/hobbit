@@ -5,7 +5,7 @@ Created on 28.11.2014
 author: david fischinger
 '''
 
-PKG = 'hobbit_smach'
+PKG = 'arm_simulation'
 
 import roslib
 roslib.load_manifest(PKG)
