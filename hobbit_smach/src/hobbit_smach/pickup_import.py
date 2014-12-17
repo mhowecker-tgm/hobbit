@@ -636,7 +636,7 @@ class DavidPickingUp(State):
 
             # 2) call GraspFromFloorTrajectoryActionServer/Client to receive a trajectory (that will be later directly executed) by calling the ArmActionServer/client
             #daviddavid
-            grasp_traj_ac = GraspTrajectoryActionClient.GraspTrajectoryActionClient()
+            grasp_traj_ac = arm_simulation.GraspTrajectoryActionClient.GraspTrajectoryActionClient()
             print grasp_traj_ac
             
             """ arm makes fix grasping-from-floor-movement (old)
