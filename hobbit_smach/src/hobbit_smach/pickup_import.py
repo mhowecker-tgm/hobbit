@@ -31,8 +31,8 @@ from geometry_msgs.msg import Pose
 from hobbit_smach.ArmActionClient import ArmActionClient
 import actionlib
 import hobbit_msgs.msg
-#import arm_simulation.GraspTrajectoryActionClient as grasptraj #
-from arm_simulation import GraspTrajectoryActionClient
+import GraspTrajectoryActionClient# as grasptraj #
+#from arm_simulation import GraspTrajectoryActionClient
 
 _DATATYPES = {}
 _DATATYPES[PointField.INT8]    = ('b', 1)
@@ -117,7 +117,7 @@ class DavidLookForObject(State):
 
 
         if self.findobject(ud):
-
+            
             (robot_x, robot_y, robot_yaw) = util.get_current_robot_position(frame='/map')
             posRobot = [robot_x, robot_y] #Bajo, please fill in
 	    print "actual robot position: ", posRobot
