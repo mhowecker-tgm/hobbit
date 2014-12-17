@@ -107,8 +107,8 @@ class GraspTrajectoryActionServerFromFloor():
     def getTrajForGraspFromFloor(self, gp_z_cm, roll_degree):
 	#define steps for trajectory
         stepsize=0.01
-        maxsteps = self.max_obj_height-round(gp_z_cm)+self.gripper_go_further_down_blind_grasp - gripper_floor_safetey_buffer_cm  #!!!!!!!!!!!!!! delete this (safety buffer)
-        minsteps = self.max_obj_height-round(gp_z_cm)+self.gripper_go_further_down_blind_grasp - gripper_floor_safetey_buffer_cm  #!!!!!!!!!!!!!! delete this (safety buffer)
+        maxsteps = self.max_obj_height-round(gp_z_cm)+self.gripper_go_further_down_blind_grasp - self.gripper_floor_safetey_buffer_cm  #!!!!!!!!!!!!!! delete this (safety buffer)
+        minsteps = self.max_obj_height-round(gp_z_cm)+self.gripper_go_further_down_blind_grasp - self.gripper_floor_safetey_buffer_cm  #!!!!!!!!!!!!!! delete this (safety buffer)
         
         failedattempt = 0
         succeeded = True #indicates if trajectory was found
