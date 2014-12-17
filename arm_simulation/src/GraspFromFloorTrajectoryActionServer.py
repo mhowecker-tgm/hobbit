@@ -66,7 +66,7 @@ class GraspTrajectoryActionServerFromFloor():
     grasp_distance_from_floor_cm = 7     #distance how near gripper should approach the floor
     max_traj_diff_rad = 40*pi/180        # maximal joint difference between two trajectory points in rad  => now: 40 degrees tolerated per joint between pos:graspfromfloor and calculated trajectory
     max_obj_height = 15			 #max height of object (grasp point z-value) and also the height the lowest gripper part is away from floor in pre-grasp-position
-    gripper_go_further_down_blind_grasp = 3    # amount the gripper goes forther down the the gp_z value (now: without collision check)
+    gripper_go_further_down_blind_grasp = 3    # amount the gripper goes further down the the gp_z value (now: without collision check)
     gripper_floor_safetey_buffer_cm = 3
 
     #set up the environment
@@ -198,7 +198,7 @@ class GraspTrajectoryActionServerFromFloor():
         #get command from goal
         strdata = str(goal.command.data)
         print "\n input (definition for grasp) for GraspTrajectoryActionServer (command) received: >> ", strdata
-	#input format (string): "(0)eval_val (1)gp1_x (2)gp1_y (3)gp1_z (4)gp2_x (5)gp2_y (6)gp2_z (7)ap_vec_x (8)ap_vec_y (9)ap_vec_z (10)gp_center_x (11)gp_center_y (12)gp_center_z (13)roll"
+        #input format (string): "(0)eval_val (1)gp1_x (2)gp1_y (3)gp1_z (4)gp2_x (5)gp2_y (6)gp2_z (7)ap_vec_x (8)ap_vec_y (9)ap_vec_z (10)gp_center_x (11)gp_center_y (12)gp_center_z (13)roll"
         input = strdata.split()        
         
         #return False/True if appropriate, otherwise True if command was executed
@@ -210,8 +210,8 @@ class GraspTrajectoryActionServerFromFloor():
         print "type: "
         print type(input[10])
         self.gp_pnt_xy = [float(input[10]),float(input[11])] #[0.32, -0.34]
-	gp_z_cm = 100*float(input[12]) #z-value of calculated grasp point z
-	roll = float(input[13])	#roll of gripper
+        gp_z_cm = 100*float(input[12]) #z-value of calculated grasp point z
+        roll = float(input[13])	#roll of gripper
         print "New grasp position (x and y value): ", self.gp_pnt_xy
         
         #get trajectory (execution of trajectory via ArmServer is included here)
