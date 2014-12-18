@@ -66,8 +66,8 @@ class GraspTrajectoryActionServerFromFloor():
     grasp_xy_variation_param = 25        #defines how much offset grasp-x-y-position can have to get valid grasp (trajectory): value of 25 <=> 2 cm offset in each direction (50cm/25=2cm)
     max_traj_diff_rad = 40*pi/180        # maximal joint difference between two trajectory points in rad  => now: 40 degrees tolerated per joint between pos:graspfromfloor and calculated trajectory
     max_obj_height = 12			 #max height of object (grasp point z-value) and also the height the lowest gripper part is away from floor in pre-grasp-position
-    gripper_go_further_down_blind_grasp = 8    # amount the gripper goes further down the the gp_z value (now: without collision check)
-    gripper_floor_safetey_buffer_cm = 0
+    gripper_go_further_down_blind_grasp = 6    # amount the gripper goes further down the the gp_z value (now: without collision check)
+    gripper_floor_safetey_buffer_cm = 1
 
     #set up the environment
     #@openravepy.with_destroy
