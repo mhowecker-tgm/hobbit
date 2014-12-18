@@ -168,9 +168,8 @@ class GraspTrajectoryActionServerFromFloor():
                             print "Arm was moved to PreGraspFromFloorPos"
                         
                         if (self.ArmClient.GetArmAtPreGraspFromFloorPos()):
-                            # !!!!!!!!!!!!!!!!!!!!!!!!!!1 NO EXECUTION OF REAL ARM MOVEMENT 3.12.2014 !!!!!!!!!self.ArmClient.arm_action_client(String(traj_str))   daviddavid #should execute the whole grasp trajectory
-                            print "here the arm is normally moved for grasping"
-                            pass
+                            self.ArmClient.arm_action_client(String(traj_str))    #should execute the whole grasp trajectory from pregrapsfromflorpos
+                            print "the arm is moved for grasping!! tatatata"
                         else:
                             print " ================> ARM NOT IN PREGRASPFROMFLOOR POSITION - IDIOT! "
                         
