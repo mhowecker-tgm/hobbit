@@ -315,6 +315,11 @@ class ArmActionServerROS(object):
             nr_j  = 6    # number of joints for arm
             nr_wp = (len(input)-1)/6  #number of waypoint for trajectory
          
+            #MOVE ARM to Position above grasp Position
+            feedback = self.ArmClient.SetAbsolutePos(float(input[1]),float(input[2]),float(input[3]),float(input[4]),float(input[5]),float(input[6])) #(90, 0, 50, 0, 110, 0)
+            print self.ArmClient.SetStartMove(10.0)   #(10) #10 Grad/Sec
+            print "sleep 10 seconds"
+            rospy.sleep(10)
             #MOVE ARM TO GRASP POSITION
             #set waypoints for moving arm to target position
             for x in range(0, nr_wp):
