@@ -65,7 +65,7 @@ class GraspTrajectoryActionServerFromFloor():
     grasp_xy_variation_param = 25        #defines how much offset grasp-x-y-position can have to get valid grasp (trajectory): value of 25 <=> 2 cm offset in each direction (50cm/25=2cm)
     grasp_distance_from_floor_cm = 7     #distance how near gripper should approach the floor
     max_traj_diff_rad = 40*pi/180        # maximal joint difference between two trajectory points in rad  => now: 40 degrees tolerated per joint between pos:graspfromfloor and calculated trajectory
-    max_obj_height = 15			 #max height of object (grasp point z-value) and also the height the lowest gripper part is away from floor in pre-grasp-position
+    max_obj_height = 20			 #max height of object (grasp point z-value) and also the height the lowest gripper part is away from floor in pre-grasp-position
     gripper_go_further_down_blind_grasp = 3    # amount the gripper goes further down the the gp_z value (now: without collision check)
     gripper_floor_safetey_buffer_cm = 3
 
