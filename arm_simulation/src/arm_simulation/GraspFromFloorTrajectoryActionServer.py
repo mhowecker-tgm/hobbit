@@ -32,6 +32,7 @@ called for execution of the trajectory.
 
 PKG = 'hobbit_smach'
 #PKG = 'arm_simulation'
+EXECUTE_ARM_MOVEMENT = True
 
 import roslib
 roslib.load_manifest(PKG)
@@ -156,14 +157,20 @@ class GraspTrajectoryActionServerFromFloor():
                     h = self.env.drawlinelist(array([Tee[0:3,3],Tee[0:3,3]+direction*maxsteps*stepsize]),4,[0,0,1])
                     self.robot.WaitForController(0)
                     
-                    raw_input("press enter to send trajectory to arm_action_server")
-                    if (self.ArmClient.GetArmAtPreGraspFromFloorPos()):
-                        # !!!!!!!!!!!!!!!!!!!!!!!!!!1 NO EXECUTION OF REAL ARM MOVEMENT 3.12.2014 !!!!!!!!!self.ArmClient.arm_action_client(String(traj_str))   daviddavid #should execute the whole grasp trajectory
-                        pass
-                    else:
-                        print " ================> ARM NOT IN PREGRASPFROMFLOOR POSITION - IDIOT! "
-                    
-                    break    #exit trajectory calculation
+                    if (EXECUTE_ARM_MOVEMENT):
+                        raw_input("press enter to send trajectory to arm_action_server")
+                        #EXECUTE arm movement for grasping from floor
+                        if (self.ArmClient.SetMoveToPreGraspFromFloorPos()):
+                            print "Arm was moved to PreGraspFromFloorPos"
+                        
+                        if (self.ArmClient.GetArmAtPreGraspFromFloorPos()):
+                            # !!!!!!!!!!!!!!!!!!!!!!!!!!1 NO EXECUTION OF REAL ARM MOVEMENT 3.12.2014 !!!!!!!!!self.ArmClient.arm_action_client(String(traj_str))   daviddavid #should execute the whole grasp trajectory
+                            print "here the arm is normally moved for grasping"
+                            pass
+                        else:
+                            print " ================> ARM NOT IN PREGRASPFROMFLOOR POSITION - IDIOT! "
+                        
+                        break    #exit trajectory calculation
                 else:
                     print "=============================================================================> trajectory was not accepted because to much movement necessary"
                     failedattempt += 1
