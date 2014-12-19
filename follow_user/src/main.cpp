@@ -20,6 +20,8 @@
 #include <std_srvs/Empty.h>
 
 
+#include "PeopleTracker.h"
+
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
 #include <sensor_msgs/CameraInfo.h>
@@ -29,10 +31,8 @@
 
 
 
-
 //This will make this node also register to color/depth calibrations and
 //pass them to the gesture node instead of the defaults
-#define USE_NONDEFAULT_CALIBRATIONS 1
 #define MAX_RECORDED_FRAMES 1000
 
 
@@ -50,12 +50,21 @@ unsigned int runFullSpeed=0;
 unsigned int runMaxSpeed=0;
 unsigned int colorWidth = 640 , colorHeight =480 , depthWidth = 640 , depthHeight = 480;
 
+//#define USE_BASECAM 1
 
-#if USE_NONDEFAULT_CALIBRATIONS
- typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image, sensor_msgs::CameraInfo> RgbdSyncPolicy;
+#if USE_BASECAM
+#define depthTopic "/basecam/depth_registered/image_rect"
+#define depthTopicInfo "/basecam/depth_registered/camera_info"
+#define rgbTopic "/basecam/rgb/image_rect_color"
+#define rgbTopicInfo "/basecam/rgb/camera_info"
 #else
- typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image> RgbdSyncPolicy;
-#endif
+#define depthTopic "/headcam/depth_registered/image_rect"
+#define depthTopicInfo "/headcam/depth_registered/camera_info"
+#define rgbTopic "/headcam/rgb/image_rect_color"
+#define rgbTopicInfo "/headcam/rgb/camera_info"
+#endif // USE_BASECAM
+
+typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image, sensor_msgs::CameraInfo> RgbdSyncPolicy;
 
 //RGB/DEPTH Subscribers
 message_filters::Subscriber<sensor_msgs::Image> *rgb_img_sub;
@@ -66,16 +75,17 @@ message_filters::Subscriber<sensor_msgs::CameraInfo> *depth_cam_info_sub;
 cv::Mat rgb,depth;
 //----------------------------------------------------------
 
+
 bool visualizeOn(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    //hobbitUpperBodyTracker_setVisualization(1);
+    internalSetVisualization(1);
     runFullSpeed=1;
     return true;
 }
 
 bool visualizeOff(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    //hobbitUpperBodyTracker_setVisualization(0);
+    internalSetVisualization(0);
     runFullSpeed=0;
     return true;
 }
@@ -103,7 +113,6 @@ bool resume(std_srvs::Empty::Request& request, std_srvs::Empty::Response& respon
 
 
 
-#if USE_NONDEFAULT_CALIBRATIONS
 //RGBd Callback is called every time we get a new pair of frames , it is synchronized to the main thread
 void rgbdCallback(const sensor_msgs::Image::ConstPtr rgb_img_msg,
                     const sensor_msgs::Image::ConstPtr depth_img_msg,
@@ -141,41 +150,7 @@ void rgbdCallback(const sensor_msgs::Image::ConstPtr rgb_img_msg,
  first = false;
  return;
 }
-#else
-//RGBd Callback is called every time we get a new pair of frames , it is synchronized to the main thread
-void rgbdCallbackNoCalibration(const sensor_msgs::Image::ConstPtr rgb_img_msg,
-                                 const sensor_msgs::Image::ConstPtr depth_img_msg  )
-{
- if (paused) { return; } //If we are paused spend no time with new input
-  //A new pair of frames has arrived , copy and convert them so that they are ready
-  colorWidth = rgb_img_msg->width;   colorHeight = rgb_img_msg->height;
-  depthWidth = depth_img_msg->width; depthHeight = depth_img_msg->height;
 
-  cv_bridge::CvImageConstPtr orig_rgb_img;
-  cv_bridge::CvImageConstPtr orig_depth_img;
-  orig_rgb_img = cv_bridge::toCvCopy(rgb_img_msg, "rgb8");
-  orig_rgb_img->image.copyTo(rgb);
-  orig_depth_img = cv_bridge::toCvCopy(depth_img_msg, sensor_msgs::image_encodings::TYPE_16UC1);
-  orig_depth_img->image.copyTo(depth);
-
-
-          if (recording) { ++recordedFrames; }
-          if (recordedFrames>MAX_RECORDED_FRAMES)
-          {
-            fprintf(stderr,"Automatic Cut Off of recording activated..");
-            stopDumpInternal();
-          }
-
-  runServicesThatNeedColorAndDepth((unsigned char*) rgb.data, colorWidth , colorHeight ,
-                                   (unsigned short*) depth.data ,  depthWidth , depthHeight ,
-                                     0 , frameTimestamp );
-
- ++frameTimestamp;
- //After running (at least) once it is not a first run any more!
- first = false;
-return;
-}
-#endif
 
 int main(int argc, char **argv)
 {
@@ -195,12 +170,12 @@ int main(int argc, char **argv)
      std::string fromRGBTopicInfo;
 
 
-     private_node_handle_.param("fromDepthTopic", fromDepthTopic, std::string("/basecam/depth_registered/image_rect"));
-     private_node_handle_.param("fromDepthTopicInfo", fromDepthTopicInfo, std::string("/basecam/depth_registered/camera_info"));
-     private_node_handle_.param("fromRGBTopic", fromRGBTopic, std::string("/basecam/rgb/image_rect_color"));
-     private_node_handle_.param("fromRGBTopicInfo", fromRGBTopicInfo, std::string("/basecam/rgb/camera_info"));
+     private_node_handle_.param("fromDepthTopic", fromDepthTopic, std::string( depthTopic ));
+     private_node_handle_.param("fromDepthTopicInfo", fromDepthTopicInfo, std::string( depthTopicInfo ));
+     private_node_handle_.param("fromRGBTopic", fromRGBTopic, std::string( rgbTopic ));
+     private_node_handle_.param("fromRGBTopicInfo", fromRGBTopicInfo, std::string( rgbTopicInfo ));
      private_node_handle_.param("name", name, std::string("follow_user"));
-     private_node_handle_.param("rate", rate, int(5));
+     private_node_handle_.param("rate", rate, int(20));
      ros::Rate loop_rate_ultra_low(1); //  hz should be our target performance
      ros::Rate loop_rate(rate); //  hz should be our target performance
      unsigned int fastRate = rate*2;
@@ -231,14 +206,9 @@ int main(int argc, char **argv)
 
      std::cerr<<"Done\n";
 
+	 sync = new message_filters::Synchronizer<RgbdSyncPolicy>(RgbdSyncPolicy(rate), *rgb_img_sub, *depth_img_sub,*depth_cam_info_sub); //*rgb_cam_info_sub,
+     sync->registerCallback(rgbdCallback);
 
-     #if USE_NONDEFAULT_CALIBRATIONS
-	   sync = new message_filters::Synchronizer<RgbdSyncPolicy>(RgbdSyncPolicy(rate), *rgb_img_sub, *depth_img_sub,*depth_cam_info_sub); //*rgb_cam_info_sub,
- 	   sync->registerCallback(rgbdCallback);
-     #else
-       sync = new message_filters::Synchronizer<RgbdSyncPolicy>(RgbdSyncPolicy(rate), *rgb_img_sub, *depth_img_sub); //*rgb_cam_info_sub,
-	   sync->registerCallback(rgbdCallbackNoCalibration);
-    #endif
 
      registerServices(&nh,640,480);
 

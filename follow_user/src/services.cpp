@@ -32,6 +32,7 @@
 #endif // USE_PERSON_AGGREGATOR
 
 
+#include "PeopleTracker.h"
 
 #include "hobbit_msgs/Event.h"
 #include <std_msgs/String.h>
@@ -44,6 +45,9 @@ ros::Publisher pointEventsBroadcaster;
 
 #define divisor 1000
 //ros::Publisher gestureBroadcaster;
+
+
+struct peopleTrackerContext * ptcx;
 
 
 unsigned int actualTimestamp=0;
@@ -124,9 +128,22 @@ void broadcast2DBBox(struct skeletonHuman * skeletonFound)
 }
 
 
+void broadcastTrackedMotion(struct peopleTrackerMotion * ptm)
+{
+
+}
+
+void broadcastTrackedTarget(struct peopleTrackerTarget * ptt)
+{
+
+}
 
 
 
+int internalSetVisualization(int state)
+{
+    peopleTracker_SetVisualization(ptcx,state);
+}
 
 
 
@@ -145,16 +162,13 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
   memcpy(depthFrameCopy,depthFrame,depthWidth*depthHeight*1*sizeof(unsigned short));
 
   int retres=0;
- // fprintf(stderr,"Passing new frame .. ");
- /*
-   retres = hobbitUpperBodyTracker_NewFrame(colorFrameCopy , colorWidth , colorHeight ,
-                                               depthFrameCopy  , depthWidth , depthHeight ,
-                                               calib ,
-                                               processingMode ,
-                                               frameTimestamp );
-*/
- // fprintf(stderr," survived \n");
+  fprintf(stderr,"Passing new frame .. ");
+   retres = peopleTracker_NewFrame(ptcx,
+                                   colorFrameCopy , colorWidth , colorHeight ,
+                                   depthFrameCopy  , depthWidth , depthHeight ,
+                                   frameTimestamp );
 
+  fprintf(stderr," survived \n");
 
   return retres;
 }
@@ -171,10 +185,16 @@ int registerServices(ros::NodeHandle * nh,unsigned int width,unsigned int height
 
   jointBBoxBroadcaster = nh->advertise <follow_user::SkeletonBBox> ("jointsBBox", 1000);
 
+  peopleTracker_RegisterTargetDetectedEvent((void *) & broadcastTrackedTarget);
+  peopleTracker_RegisterPositionUpdateEvent((void *) & broadcastTrackedMotion);
+
+  ptcx = peopleTracker_Initialize("options.ini");
 }
 
 int stopServices()
 {
+  peopleTracker_Close(ptcx);
+
   if (colorFrameCopy!=0) { free(colorFrameCopy); colorFrameCopy=0; }
   if (depthFrameCopy!=0) { free(depthFrameCopy); depthFrameCopy=0; }
 }

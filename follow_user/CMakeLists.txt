@@ -33,12 +33,13 @@ include_directories(${catkin_INCLUDEDIR}  ${BOOST_INCLUDE_DIRS} ${OpenCV_INCLUDE
 add_executable(follow_user src/main.cpp src/services.cpp src/pose.cpp)
 
 target_link_libraries(follow_user    
-                      #${CMAKE_CURRENT_SOURCE_DIR}/bin/libHobbitUpperBodyTrackerDynamic.so
-                      #${CMAKE_CURRENT_SOURCE_DIR}/bin/libMBVCore.so 
-                     # ${CMAKE_CURRENT_SOURCE_DIR}/bin/libMBVUtils.so  
-                     # ${CMAKE_CURRENT_SOURCE_DIR}/bin/libMBVDecoding.so
-                    #  ${CMAKE_CURRENT_SOURCE_DIR}/bin/libglog.so.0
-                    #  ${CMAKE_CURRENT_SOURCE_DIR}/bin/libMBVUtils.so  
+                      ${CMAKE_CURRENT_SOURCE_DIR}/bin/libHobbitPeopleTracker.so
+                      ${CMAKE_CURRENT_SOURCE_DIR}/bin/libPeopleTrackerLib.so
+                      ${CMAKE_CURRENT_SOURCE_DIR}/bin/libMBVCore.so 
+                      ${CMAKE_CURRENT_SOURCE_DIR}/bin/libMBVUtils.so  
+                      ${CMAKE_CURRENT_SOURCE_DIR}/bin/libMBVAcquisition.so
+                      ${CMAKE_CURRENT_SOURCE_DIR}/bin/libMBVOptimization.so
+                    #  ${CMAKE_CURRENT_SOURCE_DIR}/bin/libglog.so.0 
                       ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} 
                       #${Boost_LIBRARIES}   
                      )

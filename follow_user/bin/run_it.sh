@@ -14,7 +14,7 @@ export GLOG_logtostderr=1
  
 echo `pwd`
 
-BINNAME="skeleton_detector"
+BINNAME="follow_user"
 
 PATHOFBIN="../../../devel/lib/$BINNAME/$BINNAME"
 if [ -e $PATHOFBIN ]
