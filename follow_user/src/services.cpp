@@ -20,7 +20,8 @@
 #define BROADCAST_HOBBIT 1
 #define MAXIMUM_DISTANCE_FOR_POINTING 400
 
-#include <follow_user/SkeletonBBox.h>
+#include <follow_user/CameraMotion.h>
+#include <follow_user/TrackerTarget.h>
 
 
 #define USE_PERSON_AGGREGATOR 1
@@ -37,11 +38,8 @@
 #include "hobbit_msgs/Event.h"
 #include <std_msgs/String.h>
 
-ros::Publisher joint2DBroadcaster;
-ros::Publisher joint3DBroadcaster;
-ros::Publisher jointBBoxBroadcaster;
-ros::Publisher personBroadcaster;
-ros::Publisher pointEventsBroadcaster;
+ros::Publisher trackerTargetBroadcaster;
+ros::Publisher cameraMotionBroadcaster;
 
 #define divisor 1000
 //ros::Publisher gestureBroadcaster;
@@ -102,40 +100,31 @@ float simpPow(float base,unsigned int exp)
 }
 
 
-
-void broadcast2DBBox(struct skeletonHuman * skeletonFound)
-{
-
-  follow_user::SkeletonBBox msg;
-/*
-  msg.width3D=skeletonFound->bboxDimensions.x;
-  msg.height3D=skeletonFound->bboxDimensions.y;
-  msg.depth3D=skeletonFound->bboxDimensions.z;
-
-  msg.centerX3D = skeletonFound->centerOfMass.x;
-  msg.centerY3D = skeletonFound->centerOfMass.y;
-  msg.centerZ3D = skeletonFound->centerOfMass.z;
-
-  msg.width2D=skeletonFound->bboxDimensions.x;
-  msg.height2D=skeletonFound->bboxDimensions.y;
-
-  msg.centerX2D = skeletonFound->centerOfMass.x;
-  msg.centerY2D = skeletonFound->centerOfMass.y;
-
-  msg.timestamp=actualTimestamp; */
-
-  jointBBoxBroadcaster.publish(msg);
-}
-
-
 void broadcastTrackedMotion(struct peopleTrackerMotion * ptm)
 {
-
+  follow_user::CameraMotion msg;
+  msg.dX=ptm->dX;
+  msg.dY=ptm->dY;
+  msg.dZ=ptm->dZ;
+  msg.angleX=ptm->angleX;
+  msg.angleY=ptm->angleY;
+  msg.angleZ=ptm->angleZ;
+  cameraMotionBroadcaster.publish(msg);
 }
 
 void broadcastTrackedTarget(struct peopleTrackerTarget * ptt)
 {
+  follow_user::TrackerTarget msg;
+  msg.x=ptt->x;
+  msg.y=ptt->y;
+  msg.vX=ptt->vx;
+  msg.vY=ptt->vy;
+  msg.radious=ptt->rad;
 
+  msg.id=ptt->id;
+  msg.state=ptt->state;
+  msg.status=ptt->status;
+  trackerTargetBroadcaster.publish(msg);
 }
 
 
@@ -183,7 +172,8 @@ int registerServices(ros::NodeHandle * nh,unsigned int width,unsigned int height
   depthFrameCopy = (unsigned short * ) malloc(width*height*1*sizeof(unsigned short));
   if (depthFrameCopy==0) { fprintf(stderr,"Cannot make an intermidiate copy of depth frame \n"); }
 
-  jointBBoxBroadcaster = nh->advertise <follow_user::SkeletonBBox> ("jointsBBox", 1000);
+  trackerTargetBroadcaster = nh->advertise <follow_user::TrackerTarget> ("trackedTargets", 1000);
+  cameraMotionBroadcaster = nh->advertise <follow_user::CameraMotion> ("cameraMotion", 1000);
 
   peopleTracker_RegisterTargetDetectedEvent((void *) & broadcastTrackedTarget);
   peopleTracker_RegisterPositionUpdateEvent((void *) & broadcastTrackedMotion);
