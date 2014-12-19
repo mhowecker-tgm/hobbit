@@ -363,6 +363,13 @@ class ArmActionServerROS(object):
             self._feedback.feedback.data = str(feedback)
             print "ArmActionServer, feedback: ", self._feedback.feedback.data
             self._as.publish_feedback(self._feedback)
+            #move arm MANUALLY (fixed values ->DANGEROUS!!!) to pregraspfromfloor position
+            print "sleep 5 seconds before arm moves MANUALLY (fixed values ->DANGEROUS!!!) to pregraspfromfloor position"
+            rospy.sleep(5)
+            feedback = self.ArmClient.SetAbsolutePos(69.71,31.39,96.31,122.2,109.74,0) #(90, 0, 50, 0, 110, 0)
+            print self.ArmClient.SetStartMove(4.0)   #(10) #10 Grad/Sec
+            
+            
             self._result.result = self.CheckTargetPos(feedback, self.ArmClient.GetArmInTargetPos, 60)  # wait until arm has reached its initial pre-grasp position
             #=======================================================        =======================================================
             

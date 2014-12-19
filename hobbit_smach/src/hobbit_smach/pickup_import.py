@@ -645,6 +645,10 @@ class DavidPickingUp(State):
             
             print "result of trajectory calculation:           ", res
             
+            #move object to tray
+            res = self.arm_client.arm_action_client(String ("SetMoveToTrayPos"))
+            
+            
             """ arm makes fix grasping-from-floor-movement (old)
             #OPEN GRIPPER
             res = self.arm_client.arm_action_client(String ("SetOpenGripper"))
