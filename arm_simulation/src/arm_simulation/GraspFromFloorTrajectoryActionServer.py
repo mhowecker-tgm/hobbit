@@ -65,9 +65,9 @@ class GraspTrajectoryActionServerFromFloor():
     grasp_area_param = 5                 #this parameter defines how big the area is where grasps should be possible: value of 5 means that the gripper has 10cm (50cm/5=10cm) space in each direction
     grasp_xy_variation_param = 25        #defines how much offset grasp-x-y-position can have to get valid grasp (trajectory): value of 25 <=> 2 cm offset in each direction (50cm/25=2cm)
     max_traj_diff_rad = 40*pi/180        # maximal joint difference between two trajectory points in rad  => now: 40 degrees tolerated per joint between pos:graspfromfloor and calculated trajectory
-    max_obj_height = 12			 #max height of object (grasp point z-value) and also the height the lowest gripper part is away from floor in pre-grasp-position
+    max_obj_height = 20		 #max height of object (grasp point z-value) and also the height the lowest gripper part is away from floor in pre-grasp-position
     gripper_go_further_down_blind_grasp = 6    # amount the gripper goes further down the the gp_z value (now: without collision check)
-    gripper_floor_safetey_buffer_cm = 1
+    gripper_floor_safetey_buffer_cm = 3
 
     #set up the environment
     #@openravepy.with_destroy
@@ -107,8 +107,8 @@ class GraspTrajectoryActionServerFromFloor():
     def getTrajForGraspFromFloor(self, gp_z_cm, roll_degree):
 	#define steps for trajectory
         stepsize=0.01
-        maxsteps = min(self.max_obj_height, self.max_obj_height-round(gp_z_cm)+self.gripper_go_further_down_blind_grasp - self.gripper_floor_safetey_buffer_cm)  #!!!!!!!!!!!!!! delete this (safety buffer)
-        minsteps = self.max_obj_height-round(gp_z_cm)+self.gripper_go_further_down_blind_grasp - self.gripper_floor_safetey_buffer_cm  #!!!!!!!!!!!!!! delete this (safety buffer)
+        maxsteps = min(self.max_obj_height-self.gripper_floor_safetey_buffer_cm, self.max_obj_height-round(gp_z_cm)+self.gripper_go_further_down_blind_grasp - self.gripper_floor_safetey_buffer_cm)  #!!!!!!!!!!!!!! delete this (safety buffer)
+        minsteps = maxsteps #self.max_obj_height-round(gp_z_cm)+self.gripper_go_further_down_blind_grasp - self.gripper_floor_safetey_buffer_cm  #!!!!!!!!!!!!!! delete this (safety buffer)
         print "maxsteps: ", maxsteps
         print "max_obj_height: ", self.max_obj_height
         print "round(gp_z_cm)",round(gp_z_cm)
