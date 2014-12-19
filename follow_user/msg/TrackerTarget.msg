@@ -13,3 +13,5 @@ float32 vY
 
 float32 radious 
 
+#Timestamps are actually the number of the frame
+int32 timestamp

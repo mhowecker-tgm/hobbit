@@ -9,3 +9,5 @@ float32 angleY
 float32 angleZ 
 
 
+#Timestamps are actually the number of the frame
+int32 timestamp

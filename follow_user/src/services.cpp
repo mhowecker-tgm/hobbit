@@ -100,7 +100,7 @@ float simpPow(float base,unsigned int exp)
 }
 
 
-void broadcastTrackedMotion(struct peopleTrackerMotion * ptm)
+void broadcastTrackedMotion(unsigned int frameTimestamp , struct peopleTrackerMotion * ptm)
 {
   follow_user::CameraMotion msg;
   msg.dX=ptm->dX;
@@ -109,10 +109,13 @@ void broadcastTrackedMotion(struct peopleTrackerMotion * ptm)
   msg.angleX=ptm->angleX;
   msg.angleY=ptm->angleY;
   msg.angleZ=ptm->angleZ;
+
+  msg.timestamp = frameTimestamp;
+
   cameraMotionBroadcaster.publish(msg);
 }
 
-void broadcastTrackedTarget(struct peopleTrackerTarget * ptt)
+void broadcastTrackedTarget(unsigned int frameTimestamp , unsigned int trackerID , struct peopleTrackerTarget * ptt)
 {
   follow_user::TrackerTarget msg;
   msg.x=ptt->x;
@@ -124,6 +127,8 @@ void broadcastTrackedTarget(struct peopleTrackerTarget * ptt)
   msg.id=ptt->id;
   msg.state=ptt->state;
   msg.status=ptt->status;
+
+  msg.timestamp = frameTimestamp;
   trackerTargetBroadcaster.publish(msg);
 }
 
@@ -151,13 +156,12 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
   memcpy(depthFrameCopy,depthFrame,depthWidth*depthHeight*1*sizeof(unsigned short));
 
   int retres=0;
-  fprintf(stderr,"Passing new frame .. ");
+  //fprintf(stderr,"Passing new frame .. ");
    retres = peopleTracker_NewFrame(ptcx,
                                    colorFrameCopy , colorWidth , colorHeight ,
                                    depthFrameCopy  , depthWidth , depthHeight ,
                                    frameTimestamp );
-
-  fprintf(stderr," survived \n");
+  //fprintf(stderr," survived \n");
 
   return retres;
 }
