@@ -39,7 +39,7 @@ target_link_libraries(follow_user
                       ${CMAKE_CURRENT_SOURCE_DIR}/bin/libMBVUtils.so  
                       ${CMAKE_CURRENT_SOURCE_DIR}/bin/libMBVAcquisition.so
                       ${CMAKE_CURRENT_SOURCE_DIR}/bin/libMBVOptimization.so
-                    #  ${CMAKE_CURRENT_SOURCE_DIR}/bin/libglog.so.0 
+                      ${CMAKE_CURRENT_SOURCE_DIR}/bin/libglog.so.0 
                       ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} 
                       #${Boost_LIBRARIES}   
                      )
