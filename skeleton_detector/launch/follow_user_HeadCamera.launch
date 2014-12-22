@@ -1,0 +1,11 @@
+<launch>   
+    <node name="follow_user" pkg="follow_user" type="run_it.sh" required="true">
+      <param name="name" value="follow_user" /> 
+
+      <param name="fromDepthTopic" value="/headcam/depth_registered/image_rect" /> 
+      <param name="fromDepthTopicInfo" value="/headcam/depth_registered/camera_info" /> 
+      <param name="fromRGBTopic" value="/headcam/rgb/image_rect_color" /> 
+      <param name="fromRGBTopicInfo" value="/headcam/rgb/camera_info" /> 
+ 
+    </node>   
+</launch>
