@@ -67,12 +67,32 @@ using namespace pcl;
 using namespace pcl::io;
 using namespace std;
 
-int meshcnt; //mesh count
-ros::Publisher iv_filename_pub;
-tf::TransformListener tf_listener;
 
-void generateInventor(const sensor_msgs::PointCloud2::ConstPtr& msg){
 
+class CPCTOIV
+{
+protected:
+	ros::NodeHandle nh;
+
+public:
+	int meshcnt; //mesh count
+	ros::Publisher iv_filename_pub;
+	tf::TransformListener tf_listener;
+	ros::Subscriber sub;
+
+	void generateInventor(const sensor_msgs::PointCloud2::ConstPtr& msg);
+
+	CPCTOIV(ros::NodeHandle nh_)
+	{
+		nh = nh_;
+		iv_filename_pub = nh.advertise<std_msgs::String>("/pc_to_iv/generated_ivfilename",10);
+		sub = nh.subscribe("/pickup/graspableobjectCCS", 1, &CPCTOIV::generateInventor, this);
+	}
+};
+
+
+void CPCTOIV::generateInventor(const sensor_msgs::PointCloud2::ConstPtr& msg)
+{
 
   ROS_INFO("Generating iv-file");
   ROS_INFO(" - Read point cloud");
@@ -98,10 +118,7 @@ void generateInventor(const sensor_msgs::PointCloud2::ConstPtr& msg){
   // convert pc_rcs (sensormsgs::pointcloud2 already in rcs) to pcd pointcloud
   fromROSMsg(pc2_rcs,*pc_rcs);
 
-//=====================
-
-
-
+//===============7.1.2015 ende======
 
   ROS_INFO(" - Convert point cloud");
   
@@ -173,24 +190,20 @@ void generateInventor(const sensor_msgs::PointCloud2::ConstPtr& msg){
   return;
 }
 
-/*void setMeshcnt(const std_msgs::StringConstPtr& str){
-  meshcnt = 0;
-}*/
+
+
+
 
 int main(int argc, char **argv){
 
+  ROS_INFO("Starting closed mesh generator");
   //Subscribe to point cloud topic
   //meshcnt = 0;
   ros::init (argc, argv, "pc_to_iv");
   ros::NodeHandle nh;
-  iv_filename_pub = nh.advertise<std_msgs::String>("/pc_to_iv/generated_ivfilename",10);
-  //ros::Duration(0.3).sleep(); //needed?
+  CPCTOIV * pc_to_iv = new CPCTOIV(nh);
 
-  //ros::Subscriber sub = nh.subscribe("/SS/points2_object_in_rcs", 1, generateInventor);
-  //ros::Subscriber sub = nh.subscribe("/cloud_pcd", 1, generateInventor);
-  ros::Subscriber sub = nh.subscribe("/pickup/graspableobjectCCS", 1, generateInventor);
-  //ros::Subscriber meshcnt_sub = nh.subscribe("SS/doSingleShot", 1, setMeshcnt);
-  ROS_INFO("Starting closed mesh generator");
+
   ros::spin();
   return 0;
 }
