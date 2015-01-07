@@ -138,13 +138,45 @@ void rgbdCallback(const sensor_msgs::Image::ConstPtr rgb_img_msg,
  cv_bridge::CvImageConstPtr orig_depth_img;
  orig_rgb_img = cv_bridge::toCvCopy(rgb_img_msg, "rgb8");
  orig_rgb_img->image.copyTo(rgb);
- orig_depth_img = cv_bridge::toCvCopy(depth_img_msg, sensor_msgs::image_encodings::TYPE_16UC1);
- orig_depth_img->image.copyTo(depth);
 
 
+ if (depth_img_msg->encoding.compare("32FC1")==0)
+ {
+  orig_depth_img = cv_bridge::toCvCopy(depth_img_msg, depth_img_msg->encoding);
+  orig_depth_img->image.copyTo(depth);
+    std::cerr<<"Detected Border case \n\n\n\n";
+    std::cerr<<"Input Image Encoding `"<<depth_img_msg->encoding<<"` \n";
+    cv::Mat depth32FC1 = cv::Mat(depthHeight,depthWidth,CV_32FC1,depth.data,4*depthWidth);
+   // std::cerr<<"Min "<<depth32FC1.min()<<" \n";
+   // std::cerr<<"Max "<<depth32FC1.max()<<" \n";
+
+
+
+
+    cv::Mat depth16UC1;
+    double scalefactor=65536;
+    depth32FC1.convertTo(depth16UC1 , CV_16UC1, scalefactor);
+
+    cv::imshow("depth16UC1",depth16UC1);
+    cv::imshow("depth32FC1",depth32FC1);
+
+
+   //----------------------------------
+    runServicesThatNeedColorAndDepth((unsigned char*) rgb.data, colorWidth , colorHeight ,
+                                     (unsigned short*) depth16UC1.data ,  depthWidth , depthHeight ,
+                                      /*&calib*/ 0, frameTimestamp );
+   //----------------------------------
+ } else
+ {
+  //----------------------------------
+  orig_depth_img = cv_bridge::toCvCopy(depth_img_msg, sensor_msgs::image_encodings::TYPE_16UC1);
+  orig_depth_img->image.copyTo(depth);
+  //----------------------------------
   runServicesThatNeedColorAndDepth((unsigned char*) rgb.data, colorWidth , colorHeight ,
                                    (unsigned short*) depth.data ,  depthWidth , depthHeight ,
                                      /*&calib*/ 0, frameTimestamp );
+  //----------------------------------
+ }
  ++frameTimestamp;
  //After running (at least) once it is not a first run any more!
  first = false;
