@@ -696,6 +696,9 @@ class DavidPickingUp(State):
             print " ==============> publish cluster"
             self.pubClust.publish(cluster)
             if self.isGraspableObject():
+                print "type(self.pc): ",type(self.pc)
+                print "type(self.pc_rcs): ",type(self.pc_rcs)
+                self.pubGraspableObjectRCS.publish(self.pc)
                 self.pubGraspableObjectRCS.publish(self.pc_rcs)     #new 7.1.2015: publish graspable objects for simulation and visualization in openrave
                 return True
 
