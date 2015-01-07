@@ -609,7 +609,7 @@ class DavidPickingUp(State):
         self.arm_client = ArmActionClient()
         self.listener = tf.TransformListener()
         self.pubClust = rospy.Publisher("/pickup/objectclusters", PointCloud2)
-        self.pubGraspableObjectRCS = rospy.Publisher("/pickup/graspableobjectRCS", PointCloud2)
+        self.pubGraspableObjectCCS = rospy.Publisher("/pickup/graspableobjectCCS", PointCloud2)
         self.rec = TD()
         self.restrictfind = True
         self.calc_graspoints_client = CalcGrasppointsActionClient()
@@ -696,10 +696,7 @@ class DavidPickingUp(State):
             print " ==============> publish cluster"
             self.pubClust.publish(cluster)
             if self.isGraspableObject():
-                print "type(self.pc): ",type(self.pc)
-                print "type(self.pc_rcs): ",type(self.pc_rcs)
-                self.pubGraspableObjectRCS.publish(self.pc)
-                self.pubGraspableObjectRCS.publish(self.pc_rcs)     #new 7.1.2015: publish graspable objects for simulation and visualization in openrave
+                self.pubGraspableObjectCCS.publish(cluster)
                 return True
 
         print "findobect(): no graspable object found"

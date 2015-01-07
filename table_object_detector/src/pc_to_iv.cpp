@@ -8,12 +8,14 @@
  *
  * input:
  *
- *   pointcloud from topic /pickup/graspableobjectRCS
+ *   pointcloud from topic /pickup/graspableobjectCCS
  *
  * output:
- *   pointcloud edited
+ *   pointcloud as iv file (saved at /tmp/<FILENAME>)
+ *	 output point cloud w.r.t. tf_frame /base_link (=> base of hobbit)
  *
- *   output point cloud w.r.t. tf_frame /base_link (base of hobbit) on topic /pickup/graspableobjectRCS
+ *	 publish filename at topic: /pc_to_iv/generated_ivfilename
+ *
  *
 
 */
@@ -36,6 +38,21 @@
 #include <pcl/io/vtk_io.h>
 #include <iv_io.h>
 
+//========begin=====
+#include <pcl_ros/point_cloud.h>
+#include <ros/ros.h>
+#include <pcl/point_types.h>
+#include <tf/tf.h>
+#include <tf/transform_broadcaster.h>
+#include <tf/transform_datatypes.h>
+#include <tf/transform_listener.h>
+#include "pcl_ros/transforms.h"
+
+#include "tf/transform_broadcaster.h"
+#include "tf/transform_datatypes.h"
+#include "tf/transform_listener.h"
+//==========end====
+
 //#include <opencv2/highgui.h>
 
 //Ros includes  
@@ -52,14 +69,39 @@ using namespace std;
 
 int meshcnt; //mesh count
 ros::Publisher iv_filename_pub;
+tf::TransformListener tf_listener;
 
 void generateInventor(const sensor_msgs::PointCloud2::ConstPtr& msg){
 
 
   ROS_INFO("Generating iv-file");
   ROS_INFO(" - Read point cloud");
-  PointCloud<PointXYZ>::Ptr pc (new PointCloud<PointXYZ>);
-  fromROSMsg(*msg,*pc);
+  sensor_msgs::PointCloud2 pc2_rcs;
+  PointCloud<PointXYZ>::Ptr pc_rcs (new PointCloud<PointXYZ>);
+  //fromROSMsg(*msg,*pc_in);
+
+
+  //search for tf transform for pc_in from cam1
+  ros::Time now = ros::Time::now();
+  bool foundTransform = tf_listener.waitForTransform("/base_link", "/headcam_rgb_optical_frame", now
+  		                                             /*(*pcl_in).header.stamp*/, ros::Duration(13.0));
+  if (!foundTransform)
+  {
+  	ROS_WARN("pc_to_iv.cpp: No transform found");
+  	//m.unlock();
+  	return;
+  }
+  ROS_INFO("Transform pc_cam1: headcam_rgb_optical_frame to base_link found");
+
+  //bool 	transformPointCloud (const std::string &target_frame, const sensor_msgs::PointCloud2 &in, sensor_msgs::PointCloud2 &out, const tf::TransformListener &tf_listener)
+  pcl_ros::transformPointCloud("/base_link", *msg, pc2_rcs, tf_listener);
+  // convert pc_rcs (sensormsgs::pointcloud2 already in rcs) to pcd pointcloud
+  fromROSMsg(pc2_rcs,*pc_rcs);
+
+//=====================
+
+
+
 
   ROS_INFO(" - Convert point cloud");
   
@@ -68,8 +110,8 @@ void generateInventor(const sensor_msgs::PointCloud2::ConstPtr& msg){
   NormalEstimation<PointXYZ, Normal> n;
   PointCloud<Normal>::Ptr normals (new PointCloud<Normal>);
   search::KdTree<PointXYZ>::Ptr tree (new search::KdTree<PointXYZ>);
-  tree->setInputCloud (pc);
-  n.setInputCloud (pc);
+  tree->setInputCloud (pc_rcs);
+  n.setInputCloud (pc_rcs);
   n.setSearchMethod (tree);
   n.setKSearch (30);
   n.compute (*normals);
@@ -77,7 +119,7 @@ void generateInventor(const sensor_msgs::PointCloud2::ConstPtr& msg){
 
   // Concatenate the XYZ and normal fields
   PointCloud<PointNormal>::Ptr pc_with_normals (new PointCloud<PointNormal>);
-  pcl::concatenateFields (*pc, *normals, *pc_with_normals);
+  pcl::concatenateFields (*pc_rcs, *normals, *pc_with_normals);
 
   // Create search tree
   search::KdTree<PointNormal>::Ptr tree2 (new search::KdTree<PointNormal>);
@@ -146,7 +188,7 @@ int main(int argc, char **argv){
 
   //ros::Subscriber sub = nh.subscribe("/SS/points2_object_in_rcs", 1, generateInventor);
   //ros::Subscriber sub = nh.subscribe("/cloud_pcd", 1, generateInventor);
-  ros::Subscriber sub = nh.subscribe("/pickup/graspableobjectRCS", 1, generateInventor);
+  ros::Subscriber sub = nh.subscribe("/pickup/graspableobjectCCS", 1, generateInventor);
   //ros::Subscriber meshcnt_sub = nh.subscribe("SS/doSingleShot", 1, setMeshcnt);
   ROS_INFO("Starting closed mesh generator");
   ros::spin();
