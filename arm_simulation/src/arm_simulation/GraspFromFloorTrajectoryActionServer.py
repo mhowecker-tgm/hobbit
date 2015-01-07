@@ -76,6 +76,7 @@ class GraspTrajectoryActionServerFromFloor():
         self._action_name = name
         self._as = actionlib.SimpleActionServer(self._action_name, hobbit_msgs.msg.GraspTrajectoryServerAction, execute_cb=self.execute_cb, auto_start = False)
         self._as.start()
+        self.iv_model_sub = rospy.Subscriber("/pc_to_iv/generated_ivfilename", String, self.insert_iv_object)
         print "GraspTrajectoryServer was started"
         self.gp_pnt_xy = None
         
@@ -102,6 +103,23 @@ class GraspTrajectoryActionServerFromFloor():
             self.taskmanip = interfaces.TaskManipulation(self.robot)
             self.robot.SetJointValues([-0.97, -0.97],self.ikmodel.manip.GetGripperIndices())
     
+    
+    def insert_iv_object(self, data):
+
+        iv_filename = str(data.data)
+        print 'GraspFromFloorTrajectoryActionServer.py: insert_iv_object ', iv_filename
+        unknown = self.env.ReadKinBodyXMLFile(iv_filename)
+        bodyName = unknown.GetName()
+        objectInEnv = self.env.GetKinBody(bodyName)
+        if objectInEnv is not None:   
+            print 'Removing Object'
+            self.env.Remove(objectInEnv)
+            self.env.UpdatePublishedBodies()
+            time.sleep(0.1) # give time for environment to update
+
+        self.env.UpdatePublishedBodies()
+        self.env.AddKinBody(unknown)   
+        self.env.UpdatePublishedBodies()
   
     # calculates grasping trajectory of given grasp position
     def getTrajForGraspFromFloor(self, gp_z_cm, roll_degree):

@@ -8,14 +8,13 @@
  *
  * input:
  *
- *   pointcloud from topic /SS/headcam/depth_registered/points_edited_in_rcs
+ *   pointcloud from topic /pickup/graspableobjectRCS
  *
  * output:
  *   pointcloud edited
  *
- *   output point cloud w.r.t. tf_frame /base_link (base of hobbit) on topic /SS/headcam/depth_registered/points_edited_in_rcs
+ *   output point cloud w.r.t. tf_frame /base_link (base of hobbit) on topic /pickup/graspableobjectRCS
  *
-/SS/headcam/depth_registered/points_edited_in_rcs
 
 */
 
@@ -147,7 +146,7 @@ int main(int argc, char **argv){
 
   //ros::Subscriber sub = nh.subscribe("/SS/points2_object_in_rcs", 1, generateInventor);
   //ros::Subscriber sub = nh.subscribe("/cloud_pcd", 1, generateInventor);
-  ros::Subscriber sub = nh.subscribe("/SS/headcam/depth_registered/points_edited_in_rcs", 1, generateInventor);
+  ros::Subscriber sub = nh.subscribe("/pickup/graspableobjectRCS", 1, generateInventor);
   //ros::Subscriber meshcnt_sub = nh.subscribe("SS/doSingleShot", 1, setMeshcnt);
   ROS_INFO("Starting closed mesh generator");
   ros::spin();
