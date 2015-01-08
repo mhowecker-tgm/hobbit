@@ -471,30 +471,13 @@ bool MiraSendingGoals::isRotationSafe()
 	//local_map should be updated...
 
 	mira::Point2f loc_offset = local_map.getWorldOffset();
-	std::cout << "loc_offset " << loc_offset.x() << " " << loc_offset.y() << std::endl;
+	/*std::cout << "loc_offset " << loc_offset.x() << " " << loc_offset.y() << std::endl;
 
 	std::cout << "local_map.width() " << local_map.width() << std::endl;
 	std::cout << "local_map.height() " << local_map.height() << std::endl;
 
-	std::cout << "local_map.channels() " << local_map.channels() << std::endl;
+	std::cout << "local_map.channels() " << local_map.channels() << std::endl;*/
 
-	mira::maps::OccupancyGrid local_map_copy = local_map;
-
-	/*for (int k=0;k<local_map.width()*local_map.height();k++)
-	{
-		unsigned int cost = local_map.data()[k];
-		if (cost > 127)
-		{
-			local_map_copy.data()[k] = 254;
-		}
-	}
-
-	std::cout << std::endl;
-
-	//const mira::maps::OccupancyGrid local_map_copy(mira::Size2i(284,284),0.2);
-
-	mira::Path path("/localhome/demo/local_map_copy.png");
-	mira::maps::saveOccupancyGridToFile(path, local_map_copy); */
 
 	int ind = 0;
 	for(int i=0; i<local_map.width();i++)
@@ -505,16 +488,6 @@ bool MiraSendingGoals::isRotationSafe()
 			mira::Point2f rel_point = local_map.map2world(grid_point); //FIXME check, local coord?
 			//std::cout << "grid point " << grid_point.x() << " " << grid_point.y() << std::endl;
 			//std::cout << "rel point " << rel_point.x() << " " << rel_point.y() << std::endl;
-
-
-			//std::cout << "rel point " << rel_point(0) << " " << rel_point(1) << std::endl;
-
-			/*double current_x = current_pose.pose.pose.position.x;
-			double current_y = current_pose.pose.pose.position.y;
-			double current_theta = tf::getYaw(current_pose.pose.pose.orientation);
-
-			double global_x = current_x + loc_x*cos(current_theta) - loc_y*sin(current_theta);
-		        double global_y = current_y + loc_x*sin(current_theta) + loc_y*cos(current_theta);*/
 
 			const mira::PoseCov2 global_pose = robot_->getMiraAuthority().getTransform<mira::PoseCov2>("/robot/RobotFrame", "/maps/MapFrame", Time::now());
 			double current_x = global_pose.x();
