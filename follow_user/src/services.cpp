@@ -125,10 +125,6 @@ void broadcastNewPerson(unsigned int frameTimestamp , unsigned int trackerID , s
   follow_user::Person msg;
 
 /*
-
-*/
-
-/*
   from Hobbit README.first
   In relation to a body the standard is :
 
@@ -142,8 +138,6 @@ void broadcastNewPerson(unsigned int frameTimestamp , unsigned int trackerID , s
     x right
     y down
 */
-
-
   msg.x=ptt->x*1000;
   msg.y=0.0*1000;
   msg.z=ptt->y*1000;
