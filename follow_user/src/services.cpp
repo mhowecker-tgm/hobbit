@@ -124,10 +124,29 @@ void broadcastNewPerson(unsigned int frameTimestamp , unsigned int trackerID , s
 {
   follow_user::Person msg;
 
-  //Stupid coord headaches
-  msg.x=ptt->y*1000;
-  msg.y=ptt->x*1000;
-  msg.z=0.5*1000;
+/*
+
+*/
+
+/*
+  from Hobbit README.first
+  In relation to a body the standard is :
+
+    x forward
+    y left
+    z up
+
+   In the case of cameras, there is often a second frame defined with a "_optical" suffix. This uses a slightly different convention:
+
+    z forward
+    x right
+    y down
+*/
+
+
+  msg.x=ptt->x*1000;
+  msg.y=0.0*1000;
+  msg.z=ptt->y*1000;
   msg.source = 6;
   msg.theta = 0;
 
@@ -137,7 +156,10 @@ void broadcastNewPerson(unsigned int frameTimestamp , unsigned int trackerID , s
 
   personBroadcaster.publish(msg);
 
-  postPoseTransform((char*) "head",/*-1.0**/msg.x/1000,/*-1.0**/msg.y/1000,msg.z/1000);
+  char targetName[128]={0};
+  snprintf(targetName,128,"follow_user_target_%u",trackerID);
+
+  postPoseTransform((char*) targetName,/*-1.0**/msg.x/1000,/*-1.0**/msg.y/1000,msg.z/1000);
 }
 
 void broadcastTrackedTarget(unsigned int frameTimestamp , unsigned int trackerID , struct peopleTrackerTarget * ptt)
