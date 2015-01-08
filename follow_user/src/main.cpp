@@ -71,8 +71,7 @@ message_filters::Subscriber<sensor_msgs::Image> *rgb_img_sub;
 message_filters::Subscriber<sensor_msgs::CameraInfo> *rgb_cam_info_sub;
 message_filters::Subscriber<sensor_msgs::Image> *depth_img_sub;
 message_filters::Subscriber<sensor_msgs::CameraInfo> *depth_cam_info_sub;
-//OpenCV
-cv::Mat rgb,depth;
+
 //----------------------------------------------------------
 
 
@@ -138,22 +137,18 @@ void rgbdCallback(const sensor_msgs::Image::ConstPtr rgb_img_msg,
   //A new pair of frames has arrived , copy and convert them so that they are ready
  cv_bridge::CvImageConstPtr orig_rgb_img;
  cv_bridge::CvImageConstPtr orig_depth_img;
- orig_rgb_img = cv_bridge::toCvCopy(rgb_img_msg, "rgb8");
- orig_rgb_img->image.copyTo(rgb);
-
+ orig_rgb_img = cv_bridge::toCvShare(rgb_img_msg, "rgb8");
 
  if (depth_img_msg->encoding.compare("32FC1")==0)
  {
-  orig_depth_img = cv_bridge::toCvCopy(depth_img_msg, depth_img_msg->encoding);
-  orig_depth_img->image.copyTo(depth);
-
-  cv::Mat depth32FC1 = cv::Mat(depthHeight,depthWidth,CV_32FC1,depth.data,4*depthWidth);
+  orig_depth_img = cv_bridge::toCvShare(depth_img_msg, depth_img_msg->encoding);
+  cv::Mat depth32FC1 = cv::Mat(depthHeight,depthWidth,CV_32FC1,orig_depth_img->image.data,4*depthWidth);
 
   cv::Mat depth16UC1;
   double scalefactor=1000; //Using meters , so go to millimeters
   depth32FC1.convertTo(depth16UC1 , CV_16UC1, scalefactor);
    //----------------------------------
-    runServicesThatNeedColorAndDepth((unsigned char*) rgb.data, colorWidth , colorHeight ,
+    runServicesThatNeedColorAndDepth((unsigned char*) orig_rgb_img->image.data, colorWidth , colorHeight ,
                                      (unsigned short*) depth16UC1.data ,  depthWidth , depthHeight ,
                                       /*&calib*/ 0, frameTimestamp );
    //----------------------------------
@@ -161,11 +156,10 @@ void rgbdCallback(const sensor_msgs::Image::ConstPtr rgb_img_msg,
  {
   //Our grabber uses millimeters , maybe I should change this
   //----------------------------------
-  orig_depth_img = cv_bridge::toCvCopy(depth_img_msg, sensor_msgs::image_encodings::TYPE_16UC1);
-  orig_depth_img->image.copyTo(depth);
+  orig_depth_img = cv_bridge::toCvShare(depth_img_msg, sensor_msgs::image_encodings::TYPE_16UC1);
   //----------------------------------
-  runServicesThatNeedColorAndDepth((unsigned char*) rgb.data, colorWidth , colorHeight ,
-                                   (unsigned short*) depth.data ,  depthWidth , depthHeight ,
+  runServicesThatNeedColorAndDepth((unsigned char*) orig_rgb_img->image.data, colorWidth , colorHeight ,
+                                   (unsigned short*) orig_depth_img->image.data ,  depthWidth , depthHeight ,
                                      /*&calib*/ 0, frameTimestamp );
   //----------------------------------
  }
