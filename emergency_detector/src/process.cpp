@@ -188,7 +188,6 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
   //unsigned int temperatureFrameOffset = ABSDIFF(frameTimestamp,tempTimestamp);
 
 
-
   //If we are looking Center then we might detect a person..!
   if (fallDetectionContext.headLookingDirection==HEAD_LOOKING_CENTER)
   {
@@ -411,7 +410,7 @@ void initializeProcess()
  segConfDepth.p3[0]=250.41; segConfDepth.p3[1]=403.77; segConfDepth.p3[2]=2198.00;
 
  segConfDepth.normal[0]=0.02; segConfDepth.normal[1]=-0.91; segConfDepth.normal[2]=-0.42;
- segConfDepth.center[0]=51.46; segConfDepth.normal[1]=622.97; segConfDepth.normal[2]=1722.0;
+ segConfDepth.center[0]=51.46; segConfDepth.center[1]=622.97; segConfDepth.center[2]=1722.0;
 
 // segConfDepth.doNotGenerateNormalFrom3Points=1;
 
