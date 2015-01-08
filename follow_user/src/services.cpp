@@ -119,11 +119,6 @@ void broadcastTrackedMotion(unsigned int frameTimestamp , struct peopleTrackerMo
 }
 
 
-
-void broadcastNewPerson(unsigned int frameTimestamp , unsigned int trackerID , struct peopleTrackerTarget * ptt)
-{
-  follow_user::Person msg;
-
 /*
   from Hobbit README.first
   In relation to a body the standard is :
@@ -138,6 +133,11 @@ void broadcastNewPerson(unsigned int frameTimestamp , unsigned int trackerID , s
     x right
     y down
 */
+
+void broadcastNewPerson(unsigned int frameTimestamp , unsigned int trackerID , struct peopleTrackerTarget * ptt)
+{
+  follow_user::Person msg;
+
   msg.x=ptt->x*1000;
   msg.y=0.0*1000;
   msg.z=ptt->y*1000;
