@@ -365,7 +365,7 @@ int fitsFaceDepth(unsigned short * depthPixels ,   unsigned int depthWidth ,unsi
 
    if (!checkHeadSize(tileWidth,averageDepth))
    {
-     fprintf(stderr,RED "Discarding bad head #%u due to bad tile size heuristic ( tile %u - depth %u ) \n" NORMAL,discardedFaceByHeuristics,tileWidth,averageDepth);
+     fprintf(stderr,RED "Discarding bad head #%u due to size heuristic (tile %u / depth %u)\n" NORMAL,discardedFaceByHeuristics,tileWidth,averageDepth);
      return 0;
    }
 
