@@ -158,15 +158,14 @@ void rgbdCallback(const sensor_msgs::Image::ConstPtr rgb_img_msg,
  //TODO maybe populate calib.extrinsics here
 
   //A new pair of frames has arrived , copy and convert them so that they are ready
+
  cv_bridge::CvImageConstPtr orig_rgb_img;
  cv_bridge::CvImageConstPtr orig_depth_img;
- orig_rgb_img = cv_bridge::toCvCopy(rgb_img_msg, "rgb8");
- orig_rgb_img->image.copyTo(rgb);
- orig_depth_img = cv_bridge::toCvCopy(depth_img_msg, sensor_msgs::image_encodings::TYPE_16UC1);
- orig_depth_img->image.copyTo(depth);
+ orig_rgb_img = cv_bridge::toCvShare(rgb_img_msg, "rgb8");
+ orig_depth_img = cv_bridge::toCvShare(depth_img_msg, sensor_msgs::image_encodings::TYPE_16UC1);
 
-  runServicesThatNeedColorAndDepth((unsigned char*) rgb.data, colorWidth , colorHeight ,
-                                   (unsigned short*) depth.data ,  depthWidth , depthHeight ,
+  runServicesThatNeedColorAndDepth((unsigned char*) orig_rgb_img->image.data , colorWidth , colorHeight ,
+                                   (unsigned short*) orig_depth_img->image.data ,  depthWidth , depthHeight ,
                                      &calib , frameTimestamp );
   ++frameTimestamp;
 
