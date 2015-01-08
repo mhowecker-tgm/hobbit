@@ -126,7 +126,7 @@ class GraspTrajectoryActionServerFromFloor():
 	#define steps for trajectory
         stepsize=0.01
         maxsteps = min(self.max_obj_height-self.gripper_floor_safetey_buffer_cm, self.max_obj_height-round(gp_z_cm)+self.gripper_go_further_down_blind_grasp - self.gripper_floor_safetey_buffer_cm)  #!!!!!!!!!!!!!! delete this (safety buffer)
-        minsteps = maxsteps #self.max_obj_height-round(gp_z_cm)+self.gripper_go_further_down_blind_grasp - self.gripper_floor_safetey_buffer_cm  #!!!!!!!!!!!!!! delete this (safety buffer)
+        minsteps = 2 #maxsteps #self.max_obj_height-round(gp_z_cm)+self.gripper_go_further_down_blind_grasp - self.gripper_floor_safetey_buffer_cm  #!!!!!!!!!!!!!! delete this (safety buffer)
         print "maxsteps: ", maxsteps
         print "max_obj_height: ", self.max_obj_height
         print "round(gp_z_cm)",round(gp_z_cm)
