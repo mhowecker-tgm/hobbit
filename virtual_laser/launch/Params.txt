@@ -6,7 +6,7 @@ MaxAngle=30.0
 DeltaAngle=0.5
 LinkX=0.135
 LinkY=0.0
-LinkZ=0.295
+LinkZ=0.35
 
 #LinkX_old=0.19
 #LinkY_old=0.044
