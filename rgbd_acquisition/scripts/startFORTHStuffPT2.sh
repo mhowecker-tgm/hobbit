@@ -48,23 +48,32 @@ done
 echo "Top Cam - Started succesfully"
 
  
+#====================================================== 
 echo "Hand Gestures are now handled by Skeleton Detector"
 #echo "Starting up hand_gestures"
 #screen -d -m -S "hand_gestures" /bin/bash -c "source ~/.bashrc && source $HOBBITDIR/devel/setup.bash && roslaunch hand_gestures hand_gestures.launch"
+#====================================================== 
 echo "Starting up face_detection"
 screen -d -m -S "face_detection" /bin/bash -c "source ~/.bashrc && source $HOBBITDIR/devel/setup.bash && roslaunch face_detection face_detection.launch"
+#======================================================
 echo "Starting up emergency_detection"
 screen -d -m -S "emergency_detector" /bin/bash -c "source ~/.bashrc && source $HOBBITDIR/devel/setup.bash && roslaunch emergency_detector emergency_detector.launch"
-
+#======================================================
 echo "Starting up Skeleton Detector"
 screen -d -m -S "skeleton_detector" /bin/bash -c "source ~/.bashrc && source $HOBBITDIR/devel/setup.bash && roslaunch skeleton_detector skeleton_detector.launch"
- 
+#====================================================== 
+echo "Starting up Person Aggregator"
+screen -d -m -S "person_aggregator" /bin/bash -c "source ~/.bashrc && source $HOBBITDIR/devel/setup.bash && roslaunch person_aggregator person_aggregator.launch"
+#====================================================== 
+echo "Starting up Follow User"
+screen -d -m -S "follow_user" /bin/bash -c "source ~/.bashrc && source $HOBBITDIR/devel/setup.bash && roslaunch follow_user follow_user.launch"
+#====================================================== 
+
+
 echo "Fitness coordinator disabled because it floods with TCP/IP packets.." 
 #echo "Starting up Fitness Function Coordinator"
 #screen -d -m -S "fitness_coordinator" /bin/bash -c "source ~/.bashrc && source $HOBBITDIR/devel/setup.bash && roslaunch fitness_coordinator fitness_coordinator.launch"
- 
-echo "Starting up Person Aggregator"
-screen -d -m -S "person_aggregator" /bin/bash -c "source ~/.bashrc && source $HOBBITDIR/devel/setup.bash && roslaunch person_aggregator person_aggregator.launch"
+
 
 
 exit 0
