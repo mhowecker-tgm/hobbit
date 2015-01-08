@@ -137,7 +137,7 @@ class GraspTrajectoryActionServerFromFloor():
         grasp_tilt_variation_param = 1 #parameter varies tilt relaxation
         # start position where manipulator is oriented normal to the ground (defines manipulator orientation for grasping in this implementation) 
         #PosStart = [30*pi/180,    0,           0,           170*pi/180-20*pi/180, 90*pi/180,     -90*pi/180,  10*pi/180, 10*pi/180]
-        PosStart = [69.71*pi/180, 43.4*pi/180, 86.3*pi/180, 134.3*pi/180,         107.64*pi/180, (4.03+roll_degree)*pi/180,  10*pi/180, 10*pi/180] # pregrasp from floor pos
+        PosStart = [69.71*pi/180, 31.39*pi/180, 96.31*pi/180, 122.2*pi/180,         109.74*pi/180, (0.0+roll_degree)*pi/180,  10*pi/180, 10*pi/180] # pregrasp from floor pos
         self.robot.SetJointValues(PosStart)
         Tee_start = self.ikmodel.manip.GetTransform()
         Tee = Tee_start
