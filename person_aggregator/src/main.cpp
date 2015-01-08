@@ -349,9 +349,10 @@ bool pauseEverything(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs
     ROS_INFO("Pausing All User Sensing");
     int i=0,target=0;
     ++target; i+=rosservice_call("/rgbd_acquisition/pause_peopletracker");
+    ++target; i+=rosservice_call("/follow_user/pause");
     ++target; i+=rosservice_call("/emergency_detector/pause");
     ++target; i+=rosservice_call("/face_detection/pause");
-    ++target; i+=rosservice_call("/hand_gestures/pause");
+    //++target; i+=rosservice_call("/hand_gestures/pause");
     ++target; i+=rosservice_call("/skeleton_detector/pause");
     ++target; i+=rosservice_call("/fitness_coordinator/pause");
     if (target==i) { response.result=true; } else { response.result=false; }
@@ -363,10 +364,11 @@ bool resumeEverything(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msg
 {
     ROS_INFO("Resuming All User Sensing");
      int i=0,target=0;
-    ++target; i+=rosservice_call("/rgbd_acquisition/resume_peopletracker");
+    //Never Resume People tracker : ++target; i+=rosservice_call("/rgbd_acquisition/resume_peopletracker");
+    ++target; i+=rosservice_call("/follow_user/resume");
     ++target; i+=rosservice_call("/emergency_detector/resume");
     ++target; i+=rosservice_call("/face_detection/resume");
-    ++target; i+=rosservice_call("/hand_gestures/resume");
+    //++target; i+=rosservice_call("/hand_gestures/resume");
     ++target; i+=rosservice_call("/skeleton_detector/resume");
     ++target; i+=rosservice_call("/fitness_coordinator/resume");
     if (target==i) { response.result=true; } else { response.result=false; }
@@ -379,7 +381,8 @@ bool followUser(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs::Swi
 {
     ROS_INFO("Setting Vision System to Follow a User");
      int i=0,target=0;
-    ++target; i+=rosservice_call("/rgbd_acquisition/resume_peopletracker"); //Nite tracker might be useful
+    //Never Resume People tracker : ++target; i+=rosservice_call("/rgbd_acquisition/resume_peopletracker"); //Nite tracker might be useful
+    ++target; i+=rosservice_call("/follow_user/resume");
     ++target; i+=rosservice_call("/emergency_detector/resume");
     ++target; i+=rosservice_call("/skeleton_detector/resume");
     ++target; i+=rosservice_call("/skeleton_detector/simple"); //We want the simple skeleton detector , no hands but fast and more robust ( even without a face )
@@ -392,10 +395,11 @@ bool locateUser(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs::Swi
 {
     ROS_INFO("Setting Vision System to Locate a User");
      int i=0,target=0;
-    ++target; i+=rosservice_call("/rgbd_acquisition/resume_peopletracker"); //Nite tracker might be useful
+    //Never Resume People tracker : ++target; i+=rosservice_call("/rgbd_acquisition/resume_peopletracker"); //Nite tracker might be useful
+    ++target; i+=rosservice_call("/follow_user/resume");
     ++target; i+=rosservice_call("/emergency_detector/resume"); // So that we get
     ++target; i+=rosservice_call("/face_detection/resume");
-    ++target; i+=rosservice_call("/hand_gestures/resume");
+    //++target; i+=rosservice_call("/hand_gestures/resume");
     ++target; i+=rosservice_call("/skeleton_detector/resume");
     if (target==i) { response.result=true; } else { response.result=false; }
     if (!response.result) { ROS_ERROR("Could not successfully set all relevant nodes to the new mode"); }
@@ -408,6 +412,7 @@ bool fitnessFunction(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs
     ROS_INFO("Setting Vision System to do FitnessFunction");
      int i=0,target=0;
     ++target; i+=rosservice_call("/rgbd_acquisition/pause_peopletracker"); //Nite tracker is no longer used
+    ++target; i+=rosservice_call("/follow_user/pause");
     ++target; i+=rosservice_call("/skeleton_detector/resume");
     ++target; i+=rosservice_call("/skeleton_detector/advanced"); //We want the advanced skeleton detector
     ++target; i+=rosservice_call("/fitness_coordinator/resume");
@@ -422,6 +427,7 @@ bool whereIsUserPointing(hobbit_msgs::SwitchVision::Request & request ,  hobbit_
     ROS_INFO("Setting Vision System to see where the User is Pointing");
      int i=0,target=0;
     ++target; i+=rosservice_call("/rgbd_acquisition/pause_peopletracker"); //Nite tracker might be useful
+    ++target; i+=rosservice_call("/follow_user/pause");
     ++target; i+=rosservice_call("/skeleton_detector/resume");
     ++target; i+=rosservice_call("/skeleton_detector/advanced"); //We want the advanced skeleton detector
     if (target==i) { response.result=true; } else { response.result=false; }
@@ -434,6 +440,7 @@ bool navigating(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs::Swi
 {
     ROS_INFO("Setting Vision System to Navigating");
      int i=0,target=0;
+    ++target; i+=rosservice_call("/follow_user/resume");
     ++target; i+=rosservice_call("/emergency_detector/resume"); // So that we get
     ++target; i+=rosservice_call("/emergency_detector/looking_down"); // So that we get
     if (target==i) { response.result=true; } else { response.result=false; }
@@ -445,7 +452,8 @@ bool charging(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs::Switc
 {
     ROS_INFO("Setting Vision System to Charging , low processing mode");
     int i=0,target=0;
-    ++target; i+=rosservice_call("/hand_gestures/resume");
+    ++target; i+=rosservice_call("/follow_user/pause");
+    ++target; i+=rosservice_call("/skeleton_detector/resume");
     if (target==i) { response.result=true; } else { response.result=false; }
     if (!response.result) { ROS_ERROR("Could not successfully set all relevant nodes to the new mode"); }
     return true;
@@ -456,7 +464,8 @@ bool idle(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs::SwitchVis
 {
     ROS_INFO("Setting Vision System to default idle mode");
     int i=0,target=0;
-    ++target; i+=rosservice_call("/hand_gestures/resume");
+    ++target; i+=rosservice_call("/follow_user/pause");
+    ++target; i+=rosservice_call("/skeleton_detector/resume");
     ++target; i+=rosservice_call("/emergency_detector/looking_center"); // So that we get
     if (target==i) { response.result=true; } else { response.result=false; }
     if (!response.result) { ROS_ERROR("Could not successfully set all relevant nodes to the new mode"); }
