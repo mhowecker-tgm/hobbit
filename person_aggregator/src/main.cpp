@@ -42,7 +42,7 @@
 
 float maximumDistanceForIntegration = 230;
 unsigned int integrationTimeMicroseconds = 5 * 1000* 1000;
-#define maxSource 5
+#define maxSource 7
 
 int rate=DEFAULT_FRAME_RATE;
 
@@ -227,6 +227,12 @@ void personMessageEmergency(const person_aggregator::Person & msg)
 {
   personMessageAggregator(msg,5);
 }
+
+void personMessageFollowUser(const person_aggregator::Person & msg)
+{
+  personMessageAggregator(msg,6);
+}
+
 
 
 //----------------------------------------------------------
@@ -523,6 +529,7 @@ int main(int argc, char **argv)
      ros::Subscriber sub3 = nh.subscribe("/face_detection/persons",divisor,personMessageFaceDetector);
      ros::Subscriber sub4 = nh.subscribe("/hand_gestures/persons",divisor,personMessageGestures);
      ros::Subscriber sub5 = nh.subscribe("/emergency_detector/persons",divisor,personMessageEmergency);
+     ros::Subscriber sub6 = nh.subscribe("/follow_user/persons",divisor,personMessageFollowUser);
 
      //Create our context
      //---------------------------------------------------------------------------------------------------
