@@ -633,7 +633,7 @@ class DavidPickingUp(State):
 
             # 1) call calc_grasppoints_action_server/client (calc_aS(self.pc_rcs)) and receive a grasp_representation in the format (string):
             # "(0)eval_val (1)gp1_x (2)gp1_y (3)gp1_z (4)gp2_x (5)gp2_y (6)gp2_z (7)ap_vec_x (8)ap_vec_y (9)ap_vec_z (10)gp_center_x (11)gp_center_y (12)gp_center_z (13)roll"
-            gp_representation = self.calc_graspoints_client.calc_grasppoints_action_client(ud.cloud)#self.pc_rcs) #ud.cloud) 12.12.2014
+            gp_representation = self.calc_graspoints_client.calc_grasppoints_action_client(self.pc_ccs)#ud.cloud)#self.pc_rcs) #ud.cloud) 12.12.2014
             print "gp_representation: ", gp_representation
             print type(gp_representation)
             # 2) call GraspFromFloorTrajectoryActionServer/Client to receive a trajectory (that will be later directly executed) by calling the ArmActionServer/client
