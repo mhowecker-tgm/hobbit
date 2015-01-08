@@ -144,22 +144,28 @@ void rgbdCallback(const sensor_msgs::Image::ConstPtr rgb_img_msg,
  {
   orig_depth_img = cv_bridge::toCvCopy(depth_img_msg, depth_img_msg->encoding);
   orig_depth_img->image.copyTo(depth);
-    std::cerr<<"Detected Border case \n\n\n\n";
-    std::cerr<<"Input Image Encoding `"<<depth_img_msg->encoding<<"` \n";
+
+    //std::cerr<<"Detected Border case \n\n\n\n";
+    //std::cerr<<"Input Image Encoding `"<<depth_img_msg->encoding<<"` \n";
     cv::Mat depth32FC1 = cv::Mat(depthHeight,depthWidth,CV_32FC1,depth.data,4*depthWidth);
-   // std::cerr<<"Min "<<depth32FC1.min()<<" \n";
-   // std::cerr<<"Max "<<depth32FC1.max()<<" \n";
 
-
-
+    /*
+    double minVal, maxVal;
+    cv::minMaxLoc(depth32FC1, &minVal, &maxVal); //find minimum and maximum intensities
+    std::cerr<<"depth32FC1 Min "<<minVal<<" Max "<<maxVal<<" \n\n\n\n";
+    */
 
     cv::Mat depth16UC1;
-    double scalefactor=65536;
+    double scalefactor=1000;
     depth32FC1.convertTo(depth16UC1 , CV_16UC1, scalefactor);
+
+    /*
+    cv::minMaxLoc(depth16UC1, &minVal, &maxVal); //find minimum and maximum intensities
+    std::cerr<<"depth16UC1 Min "<<minVal<<" Max "<<maxVal<<" \n\n\n\n";
 
     cv::imshow("depth16UC1",depth16UC1);
     cv::imshow("depth32FC1",depth32FC1);
-
+    */
 
    //----------------------------------
     runServicesThatNeedColorAndDepth((unsigned char*) rgb.data, colorWidth , colorHeight ,
