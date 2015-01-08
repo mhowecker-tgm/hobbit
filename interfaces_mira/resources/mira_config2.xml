@@ -16,7 +16,7 @@
 		<link child="LaserFrame" parent="RobotFrame">
 			<X>0.135</X>
 			<Y>0</Y>
-			<Z>0.295</Z>
+			<Z>0.35</Z>
 			<Yaw>0</Yaw>
 			<Pitch>0</Pitch>
 			<Roll>0</Roll>
