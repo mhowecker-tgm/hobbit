@@ -26,9 +26,15 @@
 #include <interfaces_mira/MiraSendingGoalsAction.h>
 #include <move_base_msgs/MoveBaseAction.h>
 
-
 #include <mira_msgs/UserNavMode.h>
 #include <mira_msgs/ObsNavMode.h>
+
+#include "hobbit_msgs/GetState.h"
+#include <maps/GridMap.h>
+#include <maps/OccupancyGrid.h>
+
+#define COST_LIMIT 127
+
 
 class MiraSendingGoals: public MiraRobotModule {
 public:
@@ -71,6 +77,14 @@ private:
 	bool obs_nav_mode(mira_msgs::ObsNavMode::Request &req, mira_msgs::ObsNavMode::Response &res);
 	std::string decay_value;
 	std::string max_range_value;
+
+	ros::ServiceServer check_rotation_service;
+	bool checkRotationStatus(hobbit_msgs::GetState::Request  &req, hobbit_msgs::GetState::Response &res);
+
+	bool isRotationSafe();
+	double outer_dis;
+	mira::maps::OccupancyGrid local_map;
+	void local_map_callback(mira::ChannelRead<mira::maps::OccupancyGrid> data);
 
 };
 

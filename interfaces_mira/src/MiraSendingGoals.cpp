@@ -11,10 +11,14 @@
 
 #include <string>
 
+#include <ctime>
 
+using namespace mira;
 using namespace mira::navigation;
 
-MiraSendingGoals::MiraSendingGoals() : MiraRobotModule(std::string ("SendingGoal")), as_(NULL) {
+MiraSendingGoals::MiraSendingGoals() : MiraRobotModule(std::string ("SendingGoal")), as_(NULL) 
+{
+	outer_dis = 0.55;
 }
 
 void MiraSendingGoals::initialize() {
@@ -48,6 +52,10 @@ void MiraSendingGoals::initialize() {
   mira::RPCFuture<std::string> r2 = robot_->getMiraAuthority().callService<std::string>("/navigation/laser/GridMapperLaser#builtin", std::string("getProperty"), std::string("MaxRange"));
   r2.timedWait(mira::Duration::seconds(1));
   max_range_value = r2.get();
+
+robot_->getMiraAuthority().subscribe<mira::maps::OccupancyGrid>("/navigation/MergedMap", &MiraSendingGoals::local_map_callback, this); //FIXME, service?? 
+  check_rotation_service = robot_->getRosNode().advertiseService("/check_rotation", &MiraSendingGoals::checkRotationStatus, this);
+
 
 }
 
@@ -430,4 +438,109 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
     return;
 
 
+}
+
+
+void MiraSendingGoals::local_map_callback(mira::ChannelRead<mira::maps::OccupancyGrid> data) 
+{
+	local_map = (*data);
+  
+}
+
+bool MiraSendingGoals::checkRotationStatus(hobbit_msgs::GetState::Request  &req, hobbit_msgs::GetState::Response &res)
+{
+	
+	ROS_INFO("check_rotation_state request received");
+
+	bool rotation_ok = isRotationSafe();
+	std::cout << "rotation_ok " << rotation_ok << std::endl;
+
+	res.state = (rotation_ok);
+
+	ROS_INFO("sending back check_rotation_state response");
+        std::cout << "********************* " << std::endl;
+
+
+	return true;
+
+}
+
+bool MiraSendingGoals::isRotationSafe()
+{
+	//call service to get MergedMap
+	//local_map should be updated...
+
+	mira::Point2f loc_offset = local_map.getWorldOffset();
+	std::cout << "loc_offset " << loc_offset.x() << " " << loc_offset.y() << std::endl;
+
+	std::cout << "local_map.width() " << local_map.width() << std::endl;
+	std::cout << "local_map.height() " << local_map.height() << std::endl;
+
+	std::cout << "local_map.channels() " << local_map.channels() << std::endl;
+
+	mira::maps::OccupancyGrid local_map_copy = local_map;
+
+	/*for (int k=0;k<local_map.width()*local_map.height();k++)
+	{
+		unsigned int cost = local_map.data()[k];
+		if (cost > 127)
+		{
+			local_map_copy.data()[k] = 254;
+		}
+	}
+
+	std::cout << std::endl;
+
+	//const mira::maps::OccupancyGrid local_map_copy(mira::Size2i(284,284),0.2);
+
+	mira::Path path("/localhome/demo/local_map_copy.png");
+	mira::maps::saveOccupancyGridToFile(path, local_map_copy); */
+
+	int ind = 0;
+	for(int i=0; i<local_map.width();i++)
+	{
+		for(int j=0; j<local_map.height();j++)
+	 	{
+			mira::Point2i grid_point(i,j);
+			mira::Point2f rel_point = local_map.map2world(grid_point); //FIXME check, local coord?
+			//std::cout << "grid point " << grid_point.x() << " " << grid_point.y() << std::endl;
+			//std::cout << "rel point " << rel_point.x() << " " << rel_point.y() << std::endl;
+
+
+			//std::cout << "rel point " << rel_point(0) << " " << rel_point(1) << std::endl;
+
+			/*double current_x = current_pose.pose.pose.position.x;
+			double current_y = current_pose.pose.pose.position.y;
+			double current_theta = tf::getYaw(current_pose.pose.pose.orientation);
+
+			double global_x = current_x + loc_x*cos(current_theta) - loc_y*sin(current_theta);
+		        double global_y = current_y + loc_x*sin(current_theta) + loc_y*cos(current_theta);*/
+
+			const mira::PoseCov2 global_pose = robot_->getMiraAuthority().getTransform<mira::PoseCov2>("/robot/RobotFrame", "/maps/MapFrame", Time::now());
+			double current_x = global_pose.x();
+			double current_y = global_pose.y();
+
+			const mira::Pose2 global_point = robot_->getMiraAuthority().getTransform<mira::Pose2>("/robot/OdometryFrame", "/maps/MapFrame", Time::now()) * mira::Pose2(rel_point(0), rel_point(1), 0.0f);
+
+			double global_x = global_point.x();
+		        double global_y = global_point.y();
+
+			//std::cout << "glob point " << global_x << " " << global_y << std::endl;
+
+			if ((global_x-current_x)*(global_x-current_x) + (global_y-current_y)*(global_y-current_y) < outer_dis*outer_dis)
+			{
+				double cost = local_map.data()[ind];
+				if (cost > COST_LIMIT) //FIXME, check costs
+					return false;
+			}
+			
+			ind++;
+			
+			
+			
+
+	 	}
+	}
+
+	return true;
 }

@@ -90,6 +90,9 @@ include_directories(include
   ${catkin_INCLUDE_DIRS}
   ${MIRA_ROOT_DIR}/toolboxes/RobotDataTypes/include
   ${MIRA_ROOT_DIR}/toolboxes/Navigation/include
+  #${MIRA_ROOT_DIR}/toolboxes/Mapping/include //previous versions
+  ${MIRA_ROOT_DIR}/../mira-commercial/toolboxes/Mapping/include #different from previous versions of Mira
+
 )
 
 ## Declare a cpp library
@@ -114,7 +117,7 @@ add_executable(interfaces_node src/interfaces_node.cpp
 # make sure configure headers are build before node using them
 add_dependencies(interfaces_node ${PROJECT_NAME}_gencfg mira_msgs_gencpp) #FIXME
 
-target_link_libraries(interfaces_node ${catkin_LIBRARIES} Navigation)
+target_link_libraries(interfaces_node ${catkin_LIBRARIES} Navigation Mapping Maps)
 
 
 ## Add cmake target dependencies of the executable/library
