@@ -91,27 +91,26 @@ bool visualizeOff(std_srvs::Empty::Request& request, std_srvs::Empty::Response& 
 
 bool terminate(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    ROS_INFO("Stopping Skeleton Detector");
+    ROS_INFO("Stopping Follow User");
     exit(0);
     return true;
 }
 
 bool pause(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    ROS_INFO("Skeleton Detector is now paused");
+    ROS_INFO("Follow User is now paused");
     paused =1;
     return true;
 }
 
 bool resume(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    ROS_INFO("Skeleton Detector is now resuming");
+    ROS_INFO("Follow User is now resuming");
     paused =0;
 
     resumeServices();
     return true;
 }
-
 
 
 //RGBd Callback is called every time we get a new pair of frames , it is synchronized to the main thread
