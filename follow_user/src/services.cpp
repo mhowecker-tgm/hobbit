@@ -24,6 +24,7 @@
 #include <follow_user/TrackerTarget.h>
 
 
+#include <follow_user/Person.h>
 #define USE_PERSON_AGGREGATOR 1
 
 #if USE_PERSON_AGGREGATOR
@@ -37,6 +38,8 @@
 
 #include "hobbit_msgs/Event.h"
 #include <std_msgs/String.h>
+
+ros::Publisher personBroadcaster;
 
 ros::Publisher trackerTargetBroadcaster;
 ros::Publisher cameraMotionBroadcaster;
@@ -115,6 +118,28 @@ void broadcastTrackedMotion(unsigned int frameTimestamp , struct peopleTrackerMo
   cameraMotionBroadcaster.publish(msg);
 }
 
+
+
+void broadcastNewPerson(unsigned int frameTimestamp , unsigned int trackerID , struct peopleTrackerTarget * ptt)
+{
+  follow_user::Person msg;
+
+  //Stupid coord headaches
+  msg.x=ptt->y*1000;
+  msg.y=ptt->x*1000;
+  msg.z=0.5*1000;
+  msg.source = 6;
+  msg.theta = 0;
+
+  msg.inFieldOfView = 1;
+  msg.confidence = 0.8;
+  msg.timestamp=frameTimestamp;
+
+  personBroadcaster.publish(msg);
+
+  postPoseTransform((char*) "head",/*-1.0**/msg.x/1000,/*-1.0**/msg.y/1000,msg.z/1000);
+}
+
 void broadcastTrackedTarget(unsigned int frameTimestamp , unsigned int trackerID , struct peopleTrackerTarget * ptt)
 {
   follow_user::TrackerTarget msg;
@@ -130,7 +155,11 @@ void broadcastTrackedTarget(unsigned int frameTimestamp , unsigned int trackerID
 
   msg.timestamp = frameTimestamp;
   trackerTargetBroadcaster.publish(msg);
+
+  //Also trigger a person message
+  broadcastNewPerson( frameTimestamp , trackerID , ptt );
 }
+
 
 
 
@@ -175,6 +204,9 @@ int registerServices(ros::NodeHandle * nh,unsigned int width,unsigned int height
   if (colorFrameCopy==0) { fprintf(stderr,"Cannot make an intermidiate copy of color frame \n");  }
   depthFrameCopy = (unsigned short * ) malloc(width*height*1*sizeof(unsigned short));
   if (depthFrameCopy==0) { fprintf(stderr,"Cannot make an intermidiate copy of depth frame \n"); }
+
+
+  personBroadcaster = nh->advertise <follow_user::Person> (PERSON_TOPIC, 1000);
 
   trackerTargetBroadcaster = nh->advertise <follow_user::TrackerTarget> ("trackedTargets", 1000);
   cameraMotionBroadcaster = nh->advertise <follow_user::CameraMotion> ("cameraMotion", 1000);
