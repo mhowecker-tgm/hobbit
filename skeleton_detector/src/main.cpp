@@ -64,8 +64,7 @@ message_filters::Subscriber<sensor_msgs::Image> *rgb_img_sub;
 message_filters::Subscriber<sensor_msgs::CameraInfo> *rgb_cam_info_sub;
 message_filters::Subscriber<sensor_msgs::Image> *depth_img_sub;
 message_filters::Subscriber<sensor_msgs::CameraInfo> *depth_cam_info_sub;
-//OpenCV
-cv::Mat rgb,depth;
+
 //----------------------------------------------------------
 
 bool visualizeOn(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
@@ -197,11 +196,8 @@ void rgbdCallback(const sensor_msgs::Image::ConstPtr rgb_img_msg,
   //A new pair of frames has arrived , copy and convert them so that they are ready
  cv_bridge::CvImageConstPtr orig_rgb_img;
  cv_bridge::CvImageConstPtr orig_depth_img;
- orig_rgb_img = cv_bridge::toCvCopy(rgb_img_msg, "rgb8");
- orig_rgb_img->image.copyTo(rgb);
- orig_depth_img = cv_bridge::toCvCopy(depth_img_msg, sensor_msgs::image_encodings::TYPE_16UC1);
- orig_depth_img->image.copyTo(depth);
-
+ orig_rgb_img = cv_bridge::toCvShare(rgb_img_msg, "rgb8");
+ orig_depth_img = cv_bridge::toCvShare(depth_img_msg, sensor_msgs::image_encodings::TYPE_16UC1);
 
           if (recording) { ++recordedFrames; }
           if (recordedFrames>MAX_RECORDED_FRAMES)
@@ -211,8 +207,8 @@ void rgbdCallback(const sensor_msgs::Image::ConstPtr rgb_img_msg,
           }
 
 
-  runServicesThatNeedColorAndDepth((unsigned char*) rgb.data, colorWidth , colorHeight ,
-                                   (unsigned short*) depth.data ,  depthWidth , depthHeight ,
+  runServicesThatNeedColorAndDepth((unsigned char*) orig_rgb_img->image.data, colorWidth , colorHeight ,
+                                   (unsigned short*) orig_depth_img->image.data ,  depthWidth , depthHeight ,
                                      &calib , frameTimestamp );
  ++frameTimestamp;
  //After running (at least) once it is not a first run any more!
@@ -229,12 +225,10 @@ void rgbdCallbackNoCalibration(const sensor_msgs::Image::ConstPtr rgb_img_msg,
   colorWidth = rgb_img_msg->width;   colorHeight = rgb_img_msg->height;
   depthWidth = depth_img_msg->width; depthHeight = depth_img_msg->height;
 
-  cv_bridge::CvImageConstPtr orig_rgb_img;
-  cv_bridge::CvImageConstPtr orig_depth_img;
-  orig_rgb_img = cv_bridge::toCvCopy(rgb_img_msg, "rgb8");
-  orig_rgb_img->image.copyTo(rgb);
-  orig_depth_img = cv_bridge::toCvCopy(depth_img_msg, sensor_msgs::image_encodings::TYPE_16UC1);
-  orig_depth_img->image.copyTo(depth);
+ cv_bridge::CvImageConstPtr orig_rgb_img;
+ cv_bridge::CvImageConstPtr orig_depth_img;
+ orig_rgb_img = cv_bridge::toCvShare(rgb_img_msg, "rgb8");
+ orig_depth_img = cv_bridge::toCvShare(depth_img_msg, sensor_msgs::image_encodings::TYPE_16UC1);
 
 
           if (recording) { ++recordedFrames; }
@@ -244,8 +238,8 @@ void rgbdCallbackNoCalibration(const sensor_msgs::Image::ConstPtr rgb_img_msg,
             stopDumpInternal();
           }
 
-  runServicesThatNeedColorAndDepth((unsigned char*) rgb.data, colorWidth , colorHeight ,
-                                   (unsigned short*) depth.data ,  depthWidth , depthHeight ,
+  runServicesThatNeedColorAndDepth((unsigned char*) orig_rgb_img->image.data, colorWidth , colorHeight ,
+                                   (unsigned short*) orig_depth_img->image.data ,  depthWidth , depthHeight ,
                                      0 , frameTimestamp );
 
  ++frameTimestamp;

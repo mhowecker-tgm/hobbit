@@ -418,8 +418,6 @@ int registerServices(ros::NodeHandle * nh,unsigned int width,unsigned int height
   depthFrameCopy = (unsigned short * ) malloc(width*height*1*sizeof(unsigned short));
   if (depthFrameCopy==0) { fprintf(stderr,"Cannot make an intermidiate copy of depth frame \n"); }
 
-
-
   hobbitUpperBodyTracker_Initialize(width , height);
   hobbitUpperBodyTracker_RegisterSkeletonDetectedEvent((void *) &broadcastNewSkeleton);
   hobbitUpperBodyTracker_setFloor(51.46 , 622.97 , 1722.0 , 0.02 , -0.91 , -0.42); //default plane
