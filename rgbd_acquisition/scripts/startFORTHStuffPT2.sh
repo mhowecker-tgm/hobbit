@@ -69,11 +69,10 @@ screen -d -m -S "person_aggregator" /bin/bash -c "source ~/.bashrc && source $HO
 echo "Starting up Follow User"
 screen -d -m -S "follow_user" /bin/bash -c "source ~/.bashrc && source $HOBBITDIR/devel/setup.bash && roslaunch follow_user follow_user.launch"
 #====================================================== 
-
-
-echo "Fitness coordinator disabled because it floods with TCP/IP packets.." 
+echo "Fitness coordinator disabled because it is now handled by Skeleton Detector" 
 #echo "Starting up Fitness Function Coordinator"
 #screen -d -m -S "fitness_coordinator" /bin/bash -c "source ~/.bashrc && source $HOBBITDIR/devel/setup.bash && roslaunch fitness_coordinator fitness_coordinator.launch"
+#====================================================== 
 
 
 
