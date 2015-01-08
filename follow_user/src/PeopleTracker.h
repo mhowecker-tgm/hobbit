@@ -11,6 +11,7 @@ struct peopleTrackerTarget
 {
 	float x,y,vx,vy,rad;
 	int id,state,status;
+	//enum ACTOR_STATE
 };
 
 
@@ -25,11 +26,17 @@ struct peopleTrackerContext
 {
   void * tracker;
   unsigned int framesProcessed;
+  unsigned int visualizationEnabled;
+
+  void * targetDetectedCallback;
+  void * positionUpdateCallback;
 };
 
 
-int peopleTracker_RegisterTargetDetectedEvent(void * callback);
-int peopleTracker_RegisterPositionUpdateEvent(void * callback);
+int peopleTracker_RegisterTargetDetectedEvent(struct peopleTrackerContext * ptcx,void * callback);
+int peopleTracker_RegisterPositionUpdateEvent(struct peopleTrackerContext * ptcx,void * callback);
+
+int peopleTracker_Reset(struct peopleTrackerContext * ptcx);
 
 struct peopleTrackerContext * peopleTracker_Initialize(const char * optionsFile);
 int peopleTracker_Close(struct peopleTrackerContext * ptcx);

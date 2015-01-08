@@ -211,7 +211,10 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
   return retres;
 }
 
-
+int resumeServices()
+{
+  peopleTracker_Reset(ptcx);
+}
 
 
 int registerServices(ros::NodeHandle * nh,unsigned int width,unsigned int height)
@@ -227,10 +230,10 @@ int registerServices(ros::NodeHandle * nh,unsigned int width,unsigned int height
   trackerTargetBroadcaster = nh->advertise <follow_user::TrackerTarget> ("trackedTargets", 1000);
   cameraMotionBroadcaster = nh->advertise <follow_user::CameraMotion> ("cameraMotion", 1000);
 
-  peopleTracker_RegisterTargetDetectedEvent((void *) & broadcastTrackedTarget);
-  peopleTracker_RegisterPositionUpdateEvent((void *) & broadcastTrackedMotion);
-
   ptcx = peopleTracker_Initialize("options.ini");
+  peopleTracker_RegisterTargetDetectedEvent(ptcx,(void *) & broadcastTrackedTarget);
+  peopleTracker_RegisterPositionUpdateEvent(ptcx,(void *) & broadcastTrackedMotion);
+
 }
 
 int stopServices()

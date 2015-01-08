@@ -108,6 +108,8 @@ bool resume(std_srvs::Empty::Request& request, std_srvs::Empty::Response& respon
 {
     ROS_INFO("Skeleton Detector is now resuming");
     paused =0;
+
+    resumeServices();
     return true;
 }
 
@@ -203,7 +205,7 @@ int main(int argc, char **argv)
      unsigned int fastRate = rate*2;
      if (fastRate > 30) { fastRate=30; } //Cap fast speed at 30Hz ( i.e. frame rate of Depth camera )
      ros::Rate loop_rate_fast(fastRate); //  hz should be our target performance
-     ros::Rate loop_rate_fullSpeed(30); //  hz should be our target performance
+     ros::Rate loop_rate_fullSpeed(rate); //  hz should be our target performance
 
      //We advertise the services we want accessible using "rosservice call *w/e*"
      ros::ServiceServer visualizeOnService      = nh.advertiseService(name+"/visualize_on" , visualizeOn);
@@ -219,6 +221,7 @@ int main(int argc, char **argv)
      std::cerr<<"follow_user , RGB Info "<<fromRGBTopicInfo<<" \n";
      std::cerr<<"follow_user , Depth feed "<<fromDepthTopic<<" \n";
      std::cerr<<"follow_user , Depth Info "<<fromDepthTopicInfo<<" \n";
+     std::cerr<<"frame rate set to : "<<rate<<" \n\n\n\n";
 
 	 depth_img_sub = new message_filters::Subscriber<sensor_msgs::Image>(nh,fromDepthTopic,1);
 	 depth_cam_info_sub = new message_filters::Subscriber<sensor_msgs::CameraInfo>(nh,fromDepthTopicInfo,1);
