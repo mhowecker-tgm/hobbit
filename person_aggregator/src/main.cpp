@@ -50,7 +50,7 @@ int key = 0;
 unsigned int frameTimestamp=0;
 ros::NodeHandle * nhPtr=0;
 unsigned int paused=0;
-unsigned int raw=0;
+unsigned int raw=1;
 unsigned int localityUsed=1;
 
 unsigned int lastTriggerTime = 0;
@@ -373,7 +373,7 @@ bool resumeEverything(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msg
     ++target; i+=rosservice_call("/fitness_coordinator/resume");
     if (target==i) { response.result=true; } else { response.result=false; }
     if (!response.result) { ROS_ERROR("Could not successfully set all relevant nodes to the new mode"); }
-    raw=0;
+    raw=1;
     return true;
 }
 
@@ -403,7 +403,7 @@ bool locateUser(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs::Swi
     ++target; i+=rosservice_call("/skeleton_detector/resume");
     if (target==i) { response.result=true; } else { response.result=false; }
     if (!response.result) { ROS_ERROR("Could not successfully set all relevant nodes to the new mode"); }
-    raw=0; //We want to be precise..
+    raw=1; //We want to be precise..
     return true;
 }
 
