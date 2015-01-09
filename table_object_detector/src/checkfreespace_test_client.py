@@ -56,18 +56,20 @@ class Trigger():
     def pc_callback(self,msg):
         self.pc_ = msg
         self.pc_sub.unregister()
-        print "speichert punktwolke von basecam"
+        print "point cloud from camera saved"
         self.do_publish_cam1()
         
     #sets space limit parameters for reducing/cutting point cloud before points are counted
     def setspacelimits_callback(self,msg):
         str = msg.data.split()
+        print "str: ", str
         self.limit_x1 = str[0]
-        #self.limit_x2 = str[1]
-        #self.limit_y1 = str[2]
-        #self.limit_y2 = str[3]
-        #self.limit_z1 = str[4]
-        #self.limit_z2 = str[5]
+        self.limit_x2 = str[1]
+        self.limit_y1 = str[2]
+        self.limit_y2 = str[3]
+        self.limit_z1 = str[4]
+        self.limit_z2 = str[5]
+        print "new space limit parameter values are set"
         
         
     #publishes pc for cam1
