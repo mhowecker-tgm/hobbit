@@ -35,6 +35,8 @@ cLocalizationMonitor::cLocalizationMonitor(int argc, char **argv) : init_argc(ar
 	check_cov = true;
 	check_scan = true;
 
+	is_charging = false;
+
 
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -66,6 +68,10 @@ void cLocalizationMonitor::open(ros::NodeHandle & n)
 	mapTestPublisher = n.advertise<nav_msgs::OccupancyGrid>("map_test", 1); 
 
 	get_loc_status_service = n.advertiseService("/get_loc_status", &cLocalizationMonitor::getLocStatus, this);
+
+	batterySubs = n.subscribe<mira_msgs::BatteryState>("battery_state", 1, &cLocalizationMonitor::battery_state_callback, this);
+
+        reset_loc_client = n.serviceClient<std_srvs::Empty>("/reset_loc"); 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 	//load static global map, we don't want to run the map server
@@ -405,6 +411,38 @@ void cLocalizationMonitor::Run(void)
 void cLocalizationMonitor::loc_pose_callback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg)
 {
   current_pose = (*msg);
+
+        
+}
+
+void cLocalizationMonitor::battery_state_callback(const mira_msgs::BatteryState::ConstPtr& msg)
+{
+  bool charging = (*msg).charging;
+
+  /*std::cout << "*********************" << std::endl;
+  std::cout << "is_charging " << is_charging << std::endl;
+  std::cout << "charging " << charging << std::endl;*/
+
+  if (!is_charging && charging)
+  {
+	// reset localization
+        std::cout << "here " << std::endl;
+	 std_srvs::Empty srv;
+	 if (reset_loc_client.call(srv))
+	 {
+	          //ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+		  std::cout << "Localization reset at docking station " << std::endl;
+	 }
+	 else
+	 {
+	          ROS_DEBUG("Failed to call service get_loc_state");
+	 }
+
+  }
+
+  is_charging = charging;
+
+  
 
         
 }

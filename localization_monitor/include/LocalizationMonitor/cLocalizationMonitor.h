@@ -13,6 +13,10 @@
 
 #include "hobbit_msgs/GetState.h"
 
+#include <mira_msgs/BatteryState.h>
+
+#include "std_srvs/Empty.h"
+
 class cLocalizationMonitor
 {
 public:
@@ -71,6 +75,12 @@ private:
   bool check_scan;
 
   int min_valid_points;
+
+  bool is_charging;
+  void battery_state_callback(const mira_msgs::BatteryState::ConstPtr& msg);
+  ros::Subscriber batterySubs;
+
+  ros::ServiceClient reset_loc_client;
 
 };
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
