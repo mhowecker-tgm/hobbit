@@ -6,9 +6,9 @@
 # Test if check_free_space service works
 #
 # subscribes to /SS/doSingleShotTestCFS", if String comes in:
-#     subscribes to /basecam/depth_registered/points and uses point cloud for service call
+#     subscribes to /headcam/depth_registered/points and uses point cloud for service call
 # publishes result (= number of points in defined area)
-# after that it unregisters subscriber of /basecam/depth_registered/points 
+# after that it unregisters subscriber of /headcam/depth_registered/points 
 
 
 
@@ -30,17 +30,26 @@ class Trigger():
         ss_sub = rospy.Subscriber("/SS/doSingleShotTestCFS", String, self.start_shot, queue_size=1)
         self.pc_sub = None
         #Publisher
-        #self.pc_pub = rospy.Publisher("/SS/basecam/depth_registered/points", PointCloud2 )
+        #self.pc_pub = rospy.Publisher("/SS/headcam/depth_registered/points", PointCloud2 )
          
         self.pc_ = None
         t = None
+        #set space limits (default value)
+        self.limit_x1 = -0.5
+        self.limit_x2 = 1
+        self.limit_y1 = -1
+        self.limit_y2 = 1
+        self.limit_z1 = 0
+        self.limit_z2 = 1.5
     
     #triggers the process for publishing 
     def start_shot(self, msg):
         print "start shot"
         self.t = None
         #start subscriber
-        self.pc_sub = rospy.Subscriber("/basecam/depth_registered/points", PointCloud2, self.pc_callback, queue_size=1)
+        self.pc_sub = rospy.Subscriber("/headcam/depth_registered/points", PointCloud2, self.pc_callback, queue_size=1)
+        #read space limits for cutting point cloud (in new tf system)
+        self.spacelimits_sub = rospy.Subscriber("/checkfreespacetestclient/setspacelimitparametersheadcam", String, self.setspacelimits_callback, queue_size=1)
         
     
     #starts method to publish point cloud for camera1; unregisters subscriber camera1
@@ -50,8 +59,17 @@ class Trigger():
         print "speichert punktwolke von basecam"
         self.do_publish_cam1()
         
-    
-
+    #sets space limit parameters for reducing/cutting point cloud before points are counted
+    def setspacelimits_callback(self,msg):
+        str = msg.data.split()
+        self.limit_x1 = str[0]
+        #self.limit_x2 = str[1]
+        #self.limit_y1 = str[2]
+        #self.limit_y2 = str[3]
+        #self.limit_z1 = str[4]
+        #self.limit_z2 = str[5]
+        
+        
     #publishes pc for cam1
     def do_publish_cam1(self):
         print "test check_free_space service"
@@ -61,7 +79,7 @@ class Trigger():
             return
         self.pc_.header.stamp = self.t
         #self.pc_pub.publish(self.pc_)
-	'''rospy.wait_for_service('check_free_space')
+        rospy.wait_for_service('check_free_space')
     	try:
             check_free_space = rospy.ServiceProxy('check_free_space', CheckFreeSpace)
 	    input = CheckFreeSpace()
@@ -93,6 +111,7 @@ class Trigger():
    	input_cdist.cloud = self.pc_
 	resp_cdist = check_camera_distance_center(input_cdist.cloud)
 	print "resp_cdist",resp_cdist
+	'''
    
 
 def main(args):       
