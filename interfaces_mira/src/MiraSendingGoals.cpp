@@ -18,6 +18,11 @@ using namespace mira::navigation;
 
 MiraSendingGoals::MiraSendingGoals() : MiraRobotModule(std::string ("SendingGoal")), as_(NULL) 
 {
+	dis_covered_sq = 0;
+	dis_thres = 3;
+
+	loc_check_active = false;
+
 	outer_dis = 0.55;
 }
 
@@ -53,8 +58,14 @@ void MiraSendingGoals::initialize() {
   r2.timedWait(mira::Duration::seconds(1));
   max_range_value = r2.get();
 
-robot_->getMiraAuthority().subscribe<mira::maps::OccupancyGrid>("/navigation/MergedMap", &MiraSendingGoals::local_map_callback, this); //FIXME, service?? 
+  robot_->getMiraAuthority().subscribe<mira::maps::OccupancyGrid>("/navigation/MergedMap",   &MiraSendingGoals::local_map_callback, this); //FIXME, service?? 
   check_rotation_service = robot_->getRosNode().advertiseService("/check_rotation", &MiraSendingGoals::checkRotationStatus, this);
+
+  loc_status_client = robot_->getRosNode().serviceClient<hobbit_msgs::GetState>("get_loc_status");
+
+  current_loc_sub = robot_->getRosNode().subscribe<geometry_msgs::PoseWithCovarianceStamped>("/amcl_pose", 2, &MiraSendingGoals::loc_pose_callback, this);
+
+  discrete_motion_cmd_pub = robot_->getRosNode().advertise<std_msgs::String>("/discrete_motion_cmd", 20);
 
 
 }
@@ -354,6 +365,80 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
     while(n.ok())
     {
 
+        dis_covered_sq = (currentPose.pose.pose.position.x-prevPose.pose.pose.position.x)*(currentPose.pose.pose.position.x-prevPose.pose.pose.position.x) + (currentPose.pose.pose.position.y-prevPose.pose.pose.position.y)*(currentPose.pose.pose.position.y-prevPose.pose.pose.position.y);
+	if(loc_check_active && dis_covered_sq > dis_thres*dis_thres)
+	{
+		//call service 
+		hobbit_msgs::GetState srv;
+		bool loc_ok = true;
+	        if (loc_status_client.call(srv))
+	        {
+	          //ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+		  loc_ok = srv.response.state;
+	        }
+	        else
+	        {
+	          ROS_DEBUG("Failed to call service get_loc_state");
+	        }
+		//check if rotation is safe //FIXME, service to get LocalMap, get outer circle...
+		if (!loc_ok)
+		{
+			// call service, remember obstacles
+			mira_msgs::UserNavMode srv_user;
+			user_nav_mode(srv_user.request, srv_user.response);
+
+			//cancel the task
+			TaskPtr task(new Task());
+			std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
+			robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
+
+			if (isRotationSafe())
+			{
+				// rotate
+				std_msgs::String rotate_cmd;
+				rotate_cmd.data = "Turn 360";
+		  		discrete_motion_cmd_pub.publish(rotate_cmd);
+				//wait until rotation is finished and the drive mode is back to normal (0)
+				double time_limit = 30;
+				clock_t begin = clock();
+				double elapsed_secs = 0;
+				//TODO, check current and initial orientation?
+				while (std::stoi(get_mira_param_("MainControlUnit.DriveMode")) && elapsed_secs < time_limit) //FIXME?
+				{
+					clock_t end = clock();
+		  			elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+				} 
+				//sleep (1);
+
+				//check localization again
+				if (loc_status_client.call(srv))
+	        		{
+	          			//ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+		  			loc_ok = srv.response.state;
+	        		}
+
+				//resend the goal
+				if (loc_ok)
+				{
+					//reset dis covered
+					prevPose = currentPose;
+					//resend the goal
+					robot_->getMiraAuthority().callService<void>(navService, "setTask", goal_task);
+
+					continue;
+				}
+
+			}
+
+			// call service, forget obstacles
+			mira_msgs::ObsNavMode srv_obs;
+			obs_nav_mode(srv_obs.request, srv_obs.response);
+
+			std::cout << "The robot is lost and rotation is not safe " << std::endl;
+			// TODO notify that the robot is lost, stop navigation?? !!!! //TODO TODO TODO
+		}
+      }
+
       //std::cout << "actionlib server executeCb ok" << std::endl;
       if(as2_->isPreemptRequested())
       {
@@ -517,3 +602,11 @@ bool MiraSendingGoals::isRotationSafe()
 
 	return true;
 }
+
+void MiraSendingGoals::loc_pose_callback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg)
+{
+  currentPose = (*msg);  
+}
+
+
+

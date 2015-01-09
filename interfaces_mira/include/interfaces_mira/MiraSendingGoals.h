@@ -33,6 +33,8 @@
 #include <maps/GridMap.h>
 #include <maps/OccupancyGrid.h>
 
+#include "geometry_msgs/PoseWithCovarianceStamped.h"
+
 #define COST_LIMIT 127
 
 
@@ -78,6 +80,12 @@ private:
 	std::string decay_value;
 	std::string max_range_value;
 
+	double dis_covered_sq;
+	double dis_thres;
+
+	geometry_msgs::PoseWithCovarianceStamped currentPose;
+	geometry_msgs::PoseWithCovarianceStamped prevPose;
+
 	ros::ServiceServer check_rotation_service;
 	bool checkRotationStatus(hobbit_msgs::GetState::Request  &req, hobbit_msgs::GetState::Response &res);
 
@@ -85,6 +93,13 @@ private:
 	double outer_dis;
 	mira::maps::OccupancyGrid local_map;
 	void local_map_callback(mira::ChannelRead<mira::maps::OccupancyGrid> data);
+
+	ros::ServiceClient loc_status_client;
+
+	bool loc_check_active;
+        void loc_pose_callback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg);
+        ros::Subscriber current_loc_sub;
+	ros::Publisher discrete_motion_cmd_pub;
 
 };
 

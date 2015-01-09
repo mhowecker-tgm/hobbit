@@ -22,6 +22,8 @@
 #include "geometry_msgs/TransformStamped.h"
 #include "tf/transform_broadcaster.h"
 
+#include "std_srvs/Empty.h"
+
 class MiraGetPose: public MiraRobotModule {
 public:
         static MiraRobotModule* Create() {
@@ -30,7 +32,8 @@ public:
 
         void initialize();
 
-	
+	ros::ServiceServer reset_loc_service;
+
 
 private:
         MiraGetPose();
@@ -41,6 +44,10 @@ private:
 
 	geometry_msgs::TransformStamped robot_trans;
         tf::TransformBroadcaster *p_robot_broadcaster;
+
+	bool resetLoc(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res);
+
+	mira::PoseCov2 docking_pose;
 
 };
 
