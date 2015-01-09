@@ -426,7 +426,6 @@ void cLocalizationMonitor::battery_state_callback(const mira_msgs::BatteryState:
   if (!is_charging && charging)
   {
 	// reset localization
-        std::cout << "here " << std::endl;
 	 std_srvs::Empty srv;
 	 if (reset_loc_client.call(srv))
 	 {
