@@ -225,7 +225,8 @@ void personMessageGestures(const person_aggregator::Person & msg)
 
 void personMessageEmergency(const person_aggregator::Person & msg)
 {
-  personMessageAggregator(msg,5);
+   ROS_INFO("Emergency Node is no longer allowed to trigger persons ");
+   //personMessageAggregator(msg,5);
 }
 
 void personMessageFollowUser(const person_aggregator::Person & msg)
