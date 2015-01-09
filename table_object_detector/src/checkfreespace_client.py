@@ -1,9 +1,10 @@
 #!/usr/bin/python
 
 ## David Fischinger
-## first version: 12.08.2014
+## first version: 9.1.2015
 # 
-# Test if check_free_space service works
+# Class that takes single camera shot from head camera, defines space limit for cube and sends point cloud to service where point cloud is transformed to 
+# tf /basse_link (defined in this file as parameter for the service call) and the points in the defined space are returned
 #
 # subscribes to /SS/doSingleShotTestCFS", if String comes in:
 #     subscribes to /headcam/depth_registered/points and uses point cloud for service call
@@ -28,6 +29,9 @@ class Trigger():
 
         #Subscriber
         ss_sub = rospy.Subscriber("/SS/doSingleShotTestCFS", String, self.start_shot, queue_size=1)
+        #read space limits for cutting point cloud (in new tf system)
+        self.spacelimits_sub = rospy.Subscriber("/checkfreespacetestclient/setspacelimitparametersheadcam", String, self.setspacelimits_callback, queue_size=1)
+        
         self.pc_sub = None
         #Publisher
         #self.pc_pub = rospy.Publisher("/SS/headcam/depth_registered/points", PointCloud2 )
@@ -42,15 +46,16 @@ class Trigger():
         self.limit_z1 = 0.25
         self.limit_z2 = 1.2
         #self.cnt = 0
+        
+        self.nr_of_points_in_given_space = -1 # -1 <=> not correctly calculated, not valid
     
     #triggers the process for publishing 
     def start_shot(self, msg):
         print "start shot"
+        self.nr_of_points_in_given_space = -1
         self.t = None
         #start subscriber
         self.pc_sub = rospy.Subscriber("/headcam/depth_registered/points", PointCloud2, self.pc_callback, queue_size=1)
-        #read space limits for cutting point cloud (in new tf system)
-        self.spacelimits_sub = rospy.Subscriber("/checkfreespacetestclient/setspacelimitparametersheadcam", String, self.setspacelimits_callback, queue_size=1)
         
     
     #starts method to publish point cloud for camera1; unregisters subscriber camera1
@@ -106,6 +111,8 @@ class Trigger():
             #return resp1.nr_points_in_area
     	except rospy.ServiceException, e:
             print "Service call failed: %s"%e
+            
+        self.nr_of_points_in_given_space = resp1.nr_points_in_area
 	'''
 	#check normal distance from object to camera
 	print "check normal distance from object to camera:"

@@ -33,6 +33,7 @@ import actionlib
 import hobbit_msgs.msg
 import arm_simulation.GraspTrajectoryActionClient # as grasptraj #
 #from arm_simulation import GraspTrajectoryActionClient
+from table_object_detector.srv import *
 
 _DATATYPES = {}
 _DATATYPES[PointField.INT8]    = ('b', 1)
@@ -613,6 +614,13 @@ class DavidPickingUp(State):
         self.rec = TD()
         self.restrictfind = True
         self.calc_graspoints_client = CalcGrasppointsActionClient()
+        #define limits for checking free space for grasping
+        self.limit_x1 = -0.5
+        self.limit_x2 = 0.4
+        self.limit_y1 = -1
+        self.limit_y2 = -0.35
+        self.limit_z1 = 0.25
+        self.limit_z2 = 1.2
 
 
     def execute(self, ud):
@@ -626,10 +634,17 @@ class DavidPickingUp(State):
             print "DavidPickingUp.execute: findobject was successful"
             #self.pc_rcs is available () => calc_grasp_points.cpp (AS) and get back grasp pose definition
             #todo:
+            # 0.5) check if there is enough space for moving the arm
             # 1) call calc_grasp_points AS
             # 2) call openrave trajectory AS
             # 3) call Arm AS (arm client already included in code)
             #grasp pose definition => simulation => execution
+
+
+            #0.5) check if there is enough space for moving the arm
+            if (self.check_free_space_for_arm_pickup_movement()) > 0:
+                print "===============>>>>>>>>>>>>>>>>>>> arm not able to move savely for picking up => picking up was stopped"
+                return 'preempted'
 
             # 1) call calc_grasppoints_action_server/client (calc_aS(self.pc_rcs)) and receive a grasp_representation in the format (string):
             # "(0)eval_val (1)gp1_x (2)gp1_y (3)gp1_z (4)gp2_x (5)gp2_y (6)gp2_z (7)ap_vec_x (8)ap_vec_y (9)ap_vec_z (10)gp_center_x (11)gp_center_y (12)gp_center_z (13)roll"
@@ -682,7 +697,42 @@ class DavidPickingUp(State):
 
         return 'succeeded'
 
-#===========
+
+    def check_free_space_for_arm_pickup_movement(self):
+        print "test if there is enough space for moving the arm for picking up an object"
+        #self.t = rospy.Time.now()
+        if self.pc_ccs == None:
+            print "======> check_free_space_for_arm_pickup_movement: no point cloud received!"
+            return -1
+        #self.pc_.header.stamp = self.t
+        rospy.wait_for_service('check_free_space')
+        try:
+            check_free_space = rospy.ServiceProxy('check_free_space', CheckFreeSpace)
+            input = CheckFreeSpace()
+            input.cloud = self.pc_ccs
+            input.frame_id_original = String(self.pc_ccs.header.frame_id)
+            print "input.frame_id_original: ", input.frame_id_original
+            input.frame_id_desired = String("base_link")
+            print "input.frame_id_desired: ",input.frame_id_desired
+            input.x1 = self.limit_x1
+            input.x2 = self.limit_x2
+            input.y1 = self.limit_y1
+            input.y2 = self.limit_y2
+            input.z1 = self.limit_z1
+            input.z2 = self.limit_z2
+            #resp1 = check_free_space(input)
+            resp1 = check_free_space(input.cloud,input.frame_id_original,input.frame_id_desired,input.x1,input.x2,input.y1,input.y2,input.z1,input.z2)
+            print "number of points in area with boarders \nx1: ", input.x1, "\tx2: ",input.x2,"\ny1: ",input.y1,"\ty2: ",input.y2,"\nz1: ",input.z1,"\tz2: ",input.z2,"\nnr_points: ",resp1.nr_points_in_area
+            #return resp1.nr_points_in_area
+        except rospy.ServiceException, e:
+            print "Service call failed: %s"%e
+            return -1
+            
+        return resp1.nr_points_in_area
+
+    
+    
+    
     def findobject(self, ud):
         print "===> pickup_import.py: DavidPickingUp.findobject()"
         pc_ccs = ud.cloud   #point cloud in camera coordinate system
