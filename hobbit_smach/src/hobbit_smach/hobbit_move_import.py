@@ -140,8 +140,7 @@ def get_undock_action():
 
 class SetObstacles(State):
     """
-    Publish the docking message to mira
-    topic: /docking_task
+
     """
     def __init__(self, active=True):
         State.__init__(

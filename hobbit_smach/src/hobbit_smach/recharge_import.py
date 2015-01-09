@@ -10,6 +10,7 @@ roslib.load_manifest(PKG)
 import rospy
 
 from smach import Sequence, State, StateMachine, Concurrence
+from smach_ros import ServiceState
 from uashh_smach.util import SleepState, WaitForMsgState
 # from uashh_smach.platform.move_base import HasMovedState
 from mira_msgs.msg import BatteryState
@@ -57,7 +58,6 @@ def undock_if_needed():
         outcomes=['succeeded', 'aborted', 'preempted'])
     with sm:
         StateMachine.add(
-            'CHARGE_CHECK',
             WaitForMsgState(
                 '/battery_state',
                 BatteryState,
@@ -96,15 +96,16 @@ def getRecharge():
             'LOG_RECHARGE',
             log.do_log_battery_state()
         )
-        Sequence.add(
-            'SAY_TIRED',
-            speech_output.emo_say_something(
-                emo='TIRED',
-                time=0,
-                text='T_CH_MovingToChargingStation'
-            )
-        )
+
         if not DEBUG:
+            Sequence.add(
+                'SAY_TIRED',
+                speech_output.emo_say_something(
+                    emo='TIRED',
+                    time=0,
+                    text='T_CH_MovingToChargingStation'
+                )
+            )
             Sequence.add(
                 'SET_NAV_GOAL',
                 hobbit_move.SetNavGoal(room='dock', place='dock')
@@ -166,7 +167,7 @@ def getEndRecharge():
 
     with seq:
         Sequence.add(
-            'UNDOCK',
+            'UNDOCK ',
             hobbit_move.get_undock()
         )
         #  Sequence.add(
@@ -187,7 +188,7 @@ def getEndRecharge():
     return seq
 
 
-def startDockProcedure():
+def startDockProcedureOld():
     seq = Sequence(
         outcomes=['succeeded', 'preempted', 'aborted'],
         connector_outcome='succeeded'
@@ -200,6 +201,9 @@ def startDockProcedure():
 
     sm = StateMachine(
         outcomes=['succeeded', 'aborted', 'preempted'])
+
+    def child_term_cb(outcome_map):
+            return True
 
     with seq:
         Sequence.add(
@@ -214,8 +218,18 @@ def startDockProcedure():
             transitions={'preempted': 'preempted',
                          'aborted': 'CHARGE_CHECK'})
 
-    def child_term_cb(outcome_map):
-            return True
+    seq = Sequence(
+        outcomes=['succeeded', 'preempted', 'aborted'],
+        connector_outcome='succeeded'
+    )
+
+    seq1 = Sequence(
+        outcomes=['succeeded', 'preempted', 'aborted'],
+        connector_outcome='succeeded'
+    )
+
+    sm = StateMachine(
+        outcomes=['succeeded', 'aborted', 'preempted'])
 
     def out_cb(outcome_map):
         print('CHECK: outcome_map')
@@ -239,6 +253,7 @@ def startDockProcedure():
             'CHARGE_CHECK',
             seq)
 
+
     with seq1:
         Sequence.add('START_DOCK', hobbit_move.get_dock_action())
         # Sequence.add('START_DOCK', hobbit_move.Dock())
@@ -250,8 +265,7 @@ def startDockProcedure():
         Sequence.add('RETRY', hobbit_move.get_undock_action())
         # Sequence.add('RETRY', hobbit_move.get_undock())
         Sequence.add('WAIT1', SleepState(duration=10))
-        Sequence.add('CHECK_1',
-                     cc,
+        Sequence.add('CHECK_1', cc,
                      transitions={'succeeded': 'aborted',
                                   'failed': 'START_DOCK'})
 
@@ -261,4 +275,83 @@ def startDockProcedure():
                                       'aborted': 'aborted'})
         # StateMachine.add('STOP', hobbit_move.Stop(),
         #                 transitions={'succeeded': 'aborted'})
+    return sm
+
+class FirstSecondThird(State):
+    """
+    Class for setting the result message and clean up persistent variables
+    """
+    def __init__(self):
+        State.__init__(
+            self,
+            outcomes=['first', 'second', 'third', 'aborted', 'preempted'],
+            input_keys=['counter'],
+            output_keys=['counter']
+        )
+
+    def execute(self, ud):
+        if ud.counter == 3:
+            ud.counter += 1
+            return 'first'
+        elif ud.counter == 2:
+            ud.counter += 1
+            return 'second'
+        elif ud.counter == 3:
+            return 'second'
+        else:
+            return 'aborted'
+
+
+def charge_response_cb(userdata, response):
+    print(response.response)
+    if response.response:
+        return 'succeeded'
+    else:
+        return 'aborted'
+
+
+def startDockProcedure():
+    sm = StateMachine(
+        outcomes=['succeeded', 'aborted', 'preempted'])
+
+    with sm:
+        StateMachine.add('START_DOCKING',
+                         hobbit_move.get_dock_action(),
+                         transitions={'succeeded': 'CHARGE_CHECK',
+                                      'aborted': 'FIRST_SECOND_CHECK',
+                                      'preempted': 'preempted'}
+                         )
+        StateMachine.add('CHARGE_CHECK',
+                         ServiceState('/hobbit/charge_check',
+                                      ChargeCheck,
+                                      response_cb=charge_response_cb
+                         ),
+                         transitions={'succeeded': 'succeeded',
+                                      'aborted': 'UNDOCK',
+                                      'preempted': 'preempted'}
+        )
+        StateMachine.add('UNDOCK',
+                         hobbit_move.get_undock_action(),
+                         transitions={'succeeded': 'START_DOCKING',
+                                      'aborted': 'START_DOCKING',
+                                      'preempted': 'preempted'})
+        StateMachine.add('FIRST_SECOND_CHECK',
+                         FirstSecondThird,
+                         transitions={'first': 'ROTATE_CCW',
+                                      'second': 'ROTATE_CW',
+                                      'third': 'aborted',
+                                      'preempted': 'preempted'}
+        )
+        StateMachine.add('ROTATE_CCW',
+                         hobbit_move.rotateRobot(angle=-10),
+                         transitions={'succeeded': 'START_DOCKING',
+                                      'aborted': 'ROTATE_CW',
+                                      'preempted': 'preempted'}
+                         )
+        StateMachine.add('ROTATE_CW',
+                         hobbit_move.rotateRobot(angle=10),
+                         transitions={'succeeded': 'START_DOCKING',
+                                      'aborted': 'aborted',
+                                      'preempted': 'preempted'}
+                         )
     return sm
