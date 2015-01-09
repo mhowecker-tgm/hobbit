@@ -41,6 +41,7 @@ class Trigger():
         self.limit_y2 = 1
         self.limit_z1 = 0
         self.limit_z2 = 1.5
+        self.cnt = 0
     
     #triggers the process for publishing 
     def start_shot(self, msg):
@@ -63,6 +64,8 @@ class Trigger():
     def setspacelimits_callback(self,msg):
         str = msg.data.split()
         print "str: ", str
+        self.cnt += 1
+        print "cnt: ", self.cnt
         self.limit_x1 = float(str[0])
         self.limit_x2 = float(str[1])
         self.limit_y1 = float(str[2])
