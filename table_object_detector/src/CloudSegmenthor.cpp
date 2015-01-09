@@ -2,7 +2,8 @@
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <std_msgs/String.h>
-#include "/opt/ros/hydro/include/ros/node_handle.h"
+#include <ros/node_handle.h>
+//#include "/opt/ros/hydro/include/ros/node_handle.h"
 // PCL specific includes
 #include <pcl/ros/conversions.h>
 #include <pcl/point_cloud.h>
