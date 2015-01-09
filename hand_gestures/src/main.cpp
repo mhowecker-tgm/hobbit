@@ -51,7 +51,7 @@ volatile int paused = 0;
 unsigned int runMaxSpeed=0;
 unsigned int colorWidth = 640 , colorHeight =480 , depthWidth = 640 , depthHeight = 480;
 
-struct calibrationHobbit calib={0};
+struct calibrationHT calib={0};
 
 //sensor_msgs::CameraInfo camInfo;
 
@@ -263,7 +263,7 @@ int main(int argc, char **argv)
      ros::ServiceServer toggleEmergencyService  = nh.advertiseService(name+"/toggleEmergency"    , toggleEmergency);
      ros::ServiceServer resumeService           = nh.advertiseService(name+"/pause"        , pause);
      ros::ServiceServer pauseService            = nh.advertiseService(name+"/resume"       , resume);
-     ros::ServiceServer benchmarkService           = nh.advertiseService(name+"/benchmark" , benchmark);
+     ros::ServiceServer benchmarkService        = nh.advertiseService(name+"/benchmark" , benchmark);
 
      ros::ServiceServer lookUpService          = nh.advertiseService(name+"/looking_up" , lookingUp);
      ros::ServiceServer lookCenterService      = nh.advertiseService(name+"/looking_center" , lookingCenter);
