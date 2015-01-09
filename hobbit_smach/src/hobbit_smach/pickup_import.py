@@ -642,7 +642,12 @@ class DavidPickingUp(State):
 
 
             #0.5) check if there is enough space for moving the arm
-            if (self.check_free_space_for_arm_pickup_movement()) > 0:
+            pnt_in_space = self.check_free_space_for_arm_pickup_movement()
+            print "=======================================================================================================>"
+            print "type result pnt_in_space: ", type(pnt_in_space)
+            print "pnt_in_space: ", pnt_in_space
+            print 
+            if (pnt_in_space > 0):
                 print "===============>>>>>>>>>>>>>>>>>>> arm not able to move savely for picking up => picking up was stopped"
                 return 'preempted'
 
