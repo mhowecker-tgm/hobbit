@@ -41,6 +41,7 @@ add_service_files(
   FILES
   AddObject.srv
   ClustersOnPlane.srv
+  ChargeCheck.srv
   GetCoordinates.srv
   GetName.srv
   GetNameOfRoom.srv
