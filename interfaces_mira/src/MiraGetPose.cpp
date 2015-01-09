@@ -21,10 +21,10 @@ void MiraGetPose::initialize() {
   //get docking pose from stations.xml file
 
    pugi::xml_document doc;
-   std::ifstream nameFile("/opt/ros/hobbit_hydro/src/interfaces_mira/resources/stations.xml");
+   std::ifstream nameFile("/opt/ros/hobbit_hydro/src/interfaces_mira/resources/stations.xml"); //FIXME
    pugi::xml_parse_result result = doc.load(nameFile);
 
-   if (!result) //FIXME, pass as argument
+   if (!result) 
    {
         std::cout << "Xml stations file missing!! " << std::endl;
         //assert(0);
@@ -88,17 +88,12 @@ void MiraGetPose::loc_pose_callback(mira::ChannelRead<mira::Pose2> data)
   pose_msg.header.stamp = pose_time;
   pose_msg.header.frame_id = "map";
 
-  //std::cout << "pose_x " << robotPose.x() << std::endl;
-  //std::cout << "pose_y " << robotPose.y() << std::endl;
-
-
   //pose
   pose_msg.pose.pose.position.x = robotPose.x(); 
   pose_msg.pose.pose.position.y = robotPose.y();
   pose_msg.pose.pose.position.z = 0;
 
-  pose_msg.pose.pose.orientation = tf::createQuaternionMsgFromYaw(robotPose.phi());
-  //std::cout << "mira orientation " << robotPose.phi() << std::endl; 
+  pose_msg.pose.pose.orientation = tf::createQuaternionMsgFromYaw(robotPose.phi()); 
 
   int cov_size = 36;
   for (int i=0; i<cov_size; i++)
@@ -108,7 +103,7 @@ void MiraGetPose::loc_pose_callback(mira::ChannelRead<mira::Pose2> data)
   }
 
 
-  //FIXME!! Provide covariance
+  //Provide covariance
   pose_msg.pose.covariance[0] = robotPose.cov(0,0); //robotPose.cov is a public member, the data type is  Eigen::Matrix
   pose_msg.pose.covariance[1] = robotPose.cov(0,1);
   pose_msg.pose.covariance[5] = robotPose.cov(0,2); //may not be needed
