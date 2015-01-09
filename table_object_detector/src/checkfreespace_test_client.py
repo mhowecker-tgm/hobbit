@@ -63,12 +63,12 @@ class Trigger():
     def setspacelimits_callback(self,msg):
         str = msg.data.split()
         print "str: ", str
-        self.limit_x1 = str[0]
-        self.limit_x2 = str[1]
-        self.limit_y1 = str[2]
-        self.limit_y2 = str[3]
-        self.limit_z1 = str[4]
-        self.limit_z2 = str[5]
+        self.limit_x1 = float(str[0])
+        self.limit_x2 = float(str[1])
+        self.limit_y1 = float(str[2])
+        self.limit_y2 = float(str[3])
+        self.limit_z1 = float(str[4])
+        self.limit_z2 = float(str[5])
         print "new space limit parameter values are set"
         
         
@@ -91,12 +91,12 @@ class Trigger():
 	    print "input.frame_id_original: ",input.frame_id_original
 	    input.frame_id_desired = String("base_link")
 	    print "input.frame_id_desired: ",input.frame_id_desired
-	    input.x1 = -0.5
-	    input.x2 = 10
-	    input.y1 = -1
-	    input.y2 = 10
-	    input.z1 = 0
-	    input.z2 = 2
+	    input.x1 = self.limit_x1
+	    input.x2 = self.limit_x2
+	    input.y1 = self.limit_y1
+	    input.y2 = self.limit_y2
+	    input.z1 = self.limit_z1
+	    input.z2 = self.limit_z2
 	    #resp1 = check_free_space(input)
 	    resp1 = check_free_space(input.cloud,input.frame_id_original,input.frame_id_desired,input.x1,input.x2,input.y1,input.y2,input.z1,input.z2)
 	    print "number of points in area with boarders \nx1: ", input.x1, "\tx2: ",input.x2,"\ny1: ",input.y1,"\ty2: ",input.y2,"\nz1: ",input.z1,"\tz2: ",input.z2,"\nnr_points: ",resp1.nr_points_in_area
