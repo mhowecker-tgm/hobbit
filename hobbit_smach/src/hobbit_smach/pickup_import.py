@@ -642,7 +642,7 @@ class DavidPickingUp(State):
 
 
             #0.5) check if there is enough space for moving the arm
-            pnt_in_space = self.check_free_space_for_arm_pickup_movement()
+            pnt_in_space = self.check_free_space_for_arm_pickup_movement(ud.cloud)
             print "=======================================================================================================>"
             print "type result pnt_in_space: ", type(pnt_in_space)
             print "pnt_in_space: ", pnt_in_space
@@ -703,10 +703,10 @@ class DavidPickingUp(State):
         return 'succeeded'
 
 
-    def check_free_space_for_arm_pickup_movement(self):
+    def check_free_space_for_arm_pickup_movement(self, obstacle_cloud):
         print "test if there is enough space for moving the arm for picking up an object"
         #self.t = rospy.Time.now()
-        if self.pc_ccs == None:
+        if obstacle_cloud == None:
             print "======> check_free_space_for_arm_pickup_movement: no point cloud received!"
             return -1
         #self.pc_.header.stamp = self.t
@@ -714,8 +714,8 @@ class DavidPickingUp(State):
         try:
             check_free_space = rospy.ServiceProxy('check_free_space', CheckFreeSpace)
             input = CheckFreeSpace()
-            input.cloud = self.pc_ccs
-            input.frame_id_original = String(self.pc_ccs.header.frame_id)
+            input.cloud = obstacle_cloud
+            input.frame_id_original = String(obstacle_cloud.header.frame_id)
             print "input.frame_id_original: ", input.frame_id_original
             input.frame_id_desired = String("base_link")
             print "input.frame_id_desired: ",input.frame_id_desired
