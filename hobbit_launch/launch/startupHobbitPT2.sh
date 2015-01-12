@@ -31,6 +31,10 @@ sleep $DELAY_BETWEEN_STEPS
 /opt/ros/hobbit_hydro/src/rgbd_acquisition/scripts/workAroundUSB.sh
 sleep $DELAY_BETWEEN_STEPS
 
+#set HobbitID
+/opt/ros/hobbit_hydro/set_hobbit_specific_params.sh
+sleep $DELAY_BETWEEN_STEPS
+
 #Trying to start basecam
 /opt/ros/hobbit_hydro/src/rgbd_acquisition/scripts/startBaseCameraPT2.sh
 #If someone would like to start it on his own he could use the following
@@ -104,6 +108,9 @@ sleep $DELAY_BETWEEN_STEPS
 #Switch Mira stuff to navigation mode ( default )
 cd /opt/ros/hobbit_hydro/src/hobbit_launch/launch
 ./switchMira.sh navigation
+
+sleep $DELAY_BETWEEN_STEPS
+roslaunch localization_monitor startup.launch&
 
 cd $STARTDIR
 
