@@ -77,12 +77,12 @@ class Trigger():
         
     #publishes pc for cam1
     def do_publish_cam1(self):
-        print "test check_free_space service"
+        print "test check_free_space service (or camera distance to wall)"
         self.t = rospy.Time.now()
         if self.pc_ == None:
 	    print "==> do_publish_cam1: no point cloud found"
             return
-        self.pc_.header.stamp = self.t
+        '''self.pc_.header.stamp = self.t
         #self.pc_pub.publish(self.pc_)
         rospy.wait_for_service('check_free_space')
     	try:
@@ -116,7 +116,7 @@ class Trigger():
    	input_cdist.cloud = self.pc_
 	resp_cdist = check_camera_distance_center(input_cdist.cloud)
 	print "resp_cdist",resp_cdist
-	'''
+	
    
 
 def main(args):       
