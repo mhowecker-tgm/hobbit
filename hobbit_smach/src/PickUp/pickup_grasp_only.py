@@ -111,7 +111,7 @@ def main():
         )
         StateMachine.add(
             'WAIT_FINISH_HEAD_TO_SEARCH',
-            SleepState(duration=7),
+            SleepState(duration=2),
             transitions={'succeeded': 'GRASP_OBJECT',
                          'preempted': 'LOG_ABORT'}
         )
