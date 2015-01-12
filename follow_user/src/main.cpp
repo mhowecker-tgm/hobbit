@@ -44,7 +44,7 @@ int key = 0;
 
 int recording=0;
 int recordedFrames=0;
-volatile int paused = 0;
+volatile int paused = 1; //Follow User starts paused from now on , after Paloma's request 12/01/15..
 unsigned int frameTimestamp =0;
 unsigned int runFullSpeed=0;
 unsigned int runMaxSpeed=0;
