@@ -1,3 +1,2 @@
-std_msgs/Empty request
 ---
-std_msgs/Bool response
+bool response
