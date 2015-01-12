@@ -12,8 +12,14 @@ from sensor_msgs.msg import *
 from geometry_msgs.msg import Quaternion
 from blue_owlpose.srv import *
 
-pitch = 0
-yaw = 0
+min_lr_angle_deg = -90
+max_lr_angle_deg = 90
+
+min_ud_angle_deg = -26
+max_ud_angle_deg = 66
+
+pitch = 0	#(wrongly defined as left/right movement)
+yaw = 0	#wrongly defined as up/down movement)
 roll = 0
 br = tf.TransformBroadcaster()
 #base_tf = "hobbit"
@@ -73,7 +79,59 @@ def set_head_orientation(msg):
 		herkulex.setAngles(yaw=-20, pitch=-90, roll=0, playtime=200)        
 		#br.sendTransform((0, 0, 0), (-0.20 ,-0.90, 0.0, 1), rospy.Time.now(), base_tf,head_tf)
 
+	try:
+		if (msg.data[0]) == "a":	#absolut values (in degree) for head servos
+			print "absolut values"
+			input = msg.data.split()
+			lr_angle = int(input[1])
+			ud_angle = int(input[2])
+			if ( self.angleLimitsOK(lr_angle, ud_angle) ):
+				herkulex.setAngles(yaw=ud_angle, pitch=lr_angle, roll=0, playtime=200)  
+			
+		if (msg.data[0]) in ("r", "l", "u", "d"):	#incremental head move
+			print "relative values"
+			lr_shift = 0
+			ud_shift = 0
+			currentAngles = herkulex.getAngles()
+			#guess that pitch (lr) is the first value that comes back
+			if msg.data[0] == "r":
+				lr_shift = -1	#default value for move head right
+				if (len(msg.data) > 1) and (int(msg.data[1]) > 0) and (int(msg.data[1]) < 10):
+					lr_shift = -int(msg.data[1])	
+			if msg.data[0] == "l":
+				lr_shift = 1	#default value for moving head left
+				if (len(msg.data) > 1) and (int(msg.data[1]) > 0) and (int(msg.data[1]) < 10):
+					lr_shift = int(msg.data[1])	
+					 
+			if msg.data[0] == "u":
+				ud_shift = -1	#default value for move head up
+				if (len(msg.data) > 1) and (int(msg.data[1]) > 0) and (int(msg.data[1]) < 10):
+					ud_shift = -int(msg.data[1])	
+			if msg.data[0] == "d":
+				ud_shift = 1	#default value for moving head left
+				if (len(msg.data) > 1) and (int(msg.data[1]) > 0) and (int(msg.data[1]) < 10):
+					ud_shift = int(msg.data[1])	
+					 				 
+			lr_angle = currentAngles[0] + lr_shift
+			ud_angle = currentAngles[1] + ud_shift
+			
+			if ( self.angleLimitsOK(lr_angle, ud_angle) ):
+				herkulex.setAngles(yaw=ud_angle, pitch=lr_angle, roll=0, playtime=200)  
+			
+	except:
+		print "===============================================> owlpose.py: ERROR during variable setting of HEAD"
+
 	rospy.sleep(0.5)
+	
+#checks if left/right and up/down angle are in limits
+def angleLimitsOK(lr_angle, ud_angle):
+	print "lr_angle: ", lr_angle
+	print "ud_angle: ", ud_angle
+	if (lr_angle >= min_lr_angle_deg) and (lr_angle <= max_lr_angle_deg) and (ud_angle >= min_ud_angle_deg) and (ud_angle <= max_ud_angle_deg):
+		return True
+	else:
+		return False
+	
 	
 def command(msg):
 	if msg.data == "restart":
