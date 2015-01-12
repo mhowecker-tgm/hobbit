@@ -14,8 +14,8 @@ from mira_msgs.msg import BatteryState
 
 def handle_charge_check(req):
     response = False
+    rospy.loginfo("Charge check called")
     if DEBUG:
-        print("Charge check called")
         return ChargeCheckResponse(response)
     for x in xrange(1, RETRY):
         rospy.sleep(1.0)
