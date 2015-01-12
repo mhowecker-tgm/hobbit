@@ -173,61 +173,7 @@ void cLocalizationMonitor::open(ros::NodeHandle & n)
 
         static_map = map_resp_.map;
         /////////////////////////////////////////////////////////////////////////////////////////////////
-        //create low resolution map copy
-        /////////////////////////////////////////////////////////////////////////////////////////////////
-/*        static_map_low_res.info.width = map_resp_.map.info.width*map_resp_.map.info.resolution/low_res;
-        static_map_low_res.info.height = map_resp_.map.info.height*map_resp_.map.info.resolution/low_res;
-        static_map_low_res.info.resolution = low_res;
-        static_map_low_res.info.origin = map_resp_.map.info.origin;
-        //Allocate space to hold the data
-        static_map_low_res.data.resize(static_map_low_res.info.width * static_map_low_res.info.height);	
-
-        static_map_low_res.info.map_load_time = ros::Time::now();
-        static_map_low_res.header.frame_id = frame_id;
-        static_map_low_res.header.stamp = ros::Time::now();
-        ROS_INFO("Created a %d X %d map @ %.3lf m/cell",
-        static_map_low_res.info.width, static_map_low_res.info.height, static_map_low_res.info.resolution);
-        //meta_data_message_ = static_map_low_res.info;
-        for(int i = 0; i < static_map_low_res.info.width; i++)
-        {
-	    for (int j = 0; j < static_map_low_res.info.height; j++)
-            {
-		 int index = occupancy_grid_utils::cellIndex(static_map_low_res.info, occupancy_grid_utils::Cell(i,j));
-		 static_map_low_res.data[index] = occupancy_grid_utils::UNKNOWN;
-	    }
-        }
-
-        for(int ind_i = 0; ind_i < static_map.info.width; ind_i++)
-        {
-	    for (int ind_j = 0; ind_j < static_map.info.height; ind_j++)
-	    {
-		 double global_x = static_map.info.origin.position.x + static_map.info.resolution*(ind_i + 0.5);
-		 double global_y = static_map.info.origin.position.y + static_map.info.resolution*(ind_j + 0.5);
-
-		 geometry_msgs::Point glob_point;
-		 glob_point.x = global_x;
-		 glob_point.y = global_y;
-		
-		 int st_index = occupancy_grid_utils::cellIndex(static_map.info, occupancy_grid_utils::Cell(ind_i,ind_j));
-		 if (static_map.data[st_index] == occupancy_grid_utils::OCCUPIED)
-		 {
-			 int low_res_index = occupancy_grid_utils::pointIndex(static_map_low_res.info,glob_point); 
-
-			 //if (st_index != low_res_index)
-			 {
-				 //std::cout << "st index " << st_index << std::endl;
-				 //std::cout << "low_res_index " << low_res_index << std::endl;
-
-			 }
-			
-			 if (static_map_low_res.data[low_res_index] != occupancy_grid_utils::OCCUPIED)
-				 static_map_low_res.data[low_res_index] = occupancy_grid_utils::OCCUPIED;
-
-		 }
-
-		
-	    }
-        }*/
+        //create dilated map copy to allow for some error
         /////////////////////////////////////////////////////////////////////////////////////////////////
         static_map_modified = static_map;
         std::vector<int> indices;
