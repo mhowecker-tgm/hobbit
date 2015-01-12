@@ -93,11 +93,15 @@ def set_head_orientation(msg):
 			lr_shift = 0
 			ud_shift = 0
 			currentAngles = herkulex.getAngles()
+			print "currentAngles:", currentAngles
 			#guess that pitch (lr) is the first value that comes back
 			if msg.data[0] == "r":
 				lr_shift = -1	#default value for move head right
+				print "1"
 				if (len(msg.data) > 1) and (int(msg.data[1]) > 0) and (int(msg.data[1]) < 10):
-					lr_shift = -int(msg.data[1])	
+					print "2"
+					lr_shift = -int(msg.data[1])
+					print "3"	
 			if msg.data[0] == "l":
 				lr_shift = 1	#default value for moving head left
 				if (len(msg.data) > 1) and (int(msg.data[1]) > 0) and (int(msg.data[1]) < 10):
@@ -112,11 +116,14 @@ def set_head_orientation(msg):
 				if (len(msg.data) > 1) and (int(msg.data[1]) > 0) and (int(msg.data[1]) < 10):
 					ud_shift = int(msg.data[1])	
 					 				 
+			print "4"
 			lr_angle = currentAngles[0] + lr_shift
 			ud_angle = currentAngles[1] + ud_shift
-			
+			print "5"
 			if ( self.angleLimitsOK(lr_angle, ud_angle) ):
+				print "6"
 				herkulex.setAngles(yaw=ud_angle, pitch=lr_angle, roll=0, playtime=200)  
+				print "7"
 			
 	except:
 		print "===============================================> owlpose.py: ERROR during variable setting of HEAD"
