@@ -14,6 +14,7 @@ from smach_ros import ServiceState
 from uashh_smach.util import SleepState, WaitForMsgState
 # from uashh_smach.platform.move_base import HasMovedState
 from mira_msgs.msg import BatteryState
+from hobbit_msgs.srv import ChargeCheck
 import hobbit_smach.hobbit_move_import as hobbit_move
 from hobbit_user_interaction import HobbitMMUI
 import hobbit_smach.speech_output_import as speech_output
@@ -336,7 +337,7 @@ def startDockProcedure():
                                       'aborted': 'START_DOCKING',
                                       'preempted': 'preempted'})
         StateMachine.add('FIRST_SECOND_CHECK',
-                         FirstSecondThird,
+                         FirstSecondThird(),
                          transitions={'first': 'ROTATE_CCW',
                                       'second': 'ROTATE_CW',
                                       'third': 'aborted',
