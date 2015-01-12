@@ -8,7 +8,7 @@ using namespace std;
 int main(int argc, char **argv)
 {
 
-  ros::init(argc, argv, "topScan");
+  ros::init(argc, argv, "localization_monitor");
   ros::NodeHandle n;
 
   cLocalizationMonitor myLocalizationMonitor(argc, argv);
