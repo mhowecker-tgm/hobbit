@@ -24,6 +24,14 @@
 		respawn="false">        
     	</node>
 
+    <node   name="pc_to_iv" 
+        pkg="table_object_detector" 
+        type="pc_to_iv" 
+        args= "" 
+        output="screen" 
+        respawn="true">        
+    </node>
+
 </launch>
 
 
