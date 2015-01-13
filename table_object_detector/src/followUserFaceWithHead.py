@@ -33,7 +33,7 @@ class CFollowUserHead():
             
         #turtle_vel = rospy.Publisher('turtle2/cmd_vel', geometry_msgs.msg.Twist,queue_size=1)
 
-        rate = rospy.Rate(1.0)
+        rate = rospy.Rate(10.0)
         while not rospy.is_shutdown():
             try:
                 (trans,rot) = self.listener.lookupTransform('/frame', '/head', rospy.Time(0))
@@ -48,9 +48,9 @@ class CFollowUserHead():
                 print "head should move left"
             #check up/down head position    
             if trans[1] > 0.2:
-                print "head should move up"
-            elif trans[1] < -0.2:
                 print "head should move down"
+            elif trans[1] < -0.2:
+                print "head should move up"
             
             rate.sleep()
 
