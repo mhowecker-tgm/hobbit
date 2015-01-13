@@ -23,6 +23,7 @@ class CFollowUserHead():
     def __init__(self, parent=None):
 
         self.listener = tf.TransformListener()
+        time.sleep(0.5)
         #Subscriber => change to tf subscription
         #ss_sub = rospy.Subscriber("/SS/doSingleShotTestCFS", String, self.start_shot, queue_size=1)
         #Publisher for (robot)head movement
