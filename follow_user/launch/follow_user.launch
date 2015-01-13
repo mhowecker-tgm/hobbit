@@ -6,6 +6,7 @@
       <param name="fromDepthTopicInfo" value="/basecam/depth/camera_info" /> 
       <param name="fromRGBTopic" value="/basecam/rgb/image_raw" /> 
       <param name="fromRGBTopicInfo" value="/basecam/rgb/camera_info" /> 
+      <param name="tfRoot" value="frame" /> 
  
     </node>   
 </launch>

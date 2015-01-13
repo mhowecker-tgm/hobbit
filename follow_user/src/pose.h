@@ -3,7 +3,9 @@
 
 
 #include <tf/transform_broadcaster.h>
-extern char tfRoot[512];
+
+#define TF_ROOT_NAME_SIZE 512
+extern char tfRoot[TF_ROOT_NAME_SIZE];
 
 
 int postPoseTransform(char * name , float x ,float y , float z);

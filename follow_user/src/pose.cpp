@@ -5,7 +5,7 @@
 #include "pose.h"
 
 
-char tfRoot[512]={"frame"};
+char tfRoot[TF_ROOT_NAME_SIZE]={"frame"};
 //#define tfRoot "frame"
 
 int postPoseTransform(char * name , float x ,float y , float z)

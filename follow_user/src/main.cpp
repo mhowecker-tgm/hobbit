@@ -28,6 +28,7 @@
 #include <image_transport/image_transport.h>
 
 #include "services.h"
+#include "pose.h"
 
 
 
@@ -185,12 +186,15 @@ int main(int argc, char **argv)
      std::string fromDepthTopicInfo;
      std::string fromRGBTopic;
      std::string fromRGBTopicInfo;
+     std::string tfRootStr;
 
 
      private_node_handle_.param("fromDepthTopic", fromDepthTopic, std::string( depthTopic ));
      private_node_handle_.param("fromDepthTopicInfo", fromDepthTopicInfo, std::string( depthTopicInfo ));
      private_node_handle_.param("fromRGBTopic", fromRGBTopic, std::string( rgbTopic ));
      private_node_handle_.param("fromRGBTopicInfo", fromRGBTopicInfo, std::string( rgbTopicInfo ));
+     private_node_handle_.param("tfRoot", tfRootStr, std::string( tfRoot ));
+     strncpy(tfRoot,tfRootStr.c_str(),TF_ROOT_NAME_SIZE); //Respect chosen TFRoot
      private_node_handle_.param("name", name, std::string("follow_user"));
      private_node_handle_.param("rate", rate, int(20));
      ros::Rate loop_rate_ultra_low(1); //  hz should be our target performance
@@ -214,6 +218,7 @@ int main(int argc, char **argv)
      std::cerr<<"follow_user , RGB Info "<<fromRGBTopicInfo<<" \n";
      std::cerr<<"follow_user , Depth feed "<<fromDepthTopic<<" \n";
      std::cerr<<"follow_user , Depth Info "<<fromDepthTopicInfo<<" \n";
+     std::cerr<<"follow_user , TF Root "<<tfRootStr<<" ( "<<tfRoot<<") \n";
      std::cerr<<"frame rate set to : "<<rate<<" \n\n\n\n";
 
 	 depth_img_sub = new message_filters::Subscriber<sensor_msgs::Image>(nh,fromDepthTopic,1);
