@@ -10,8 +10,9 @@
 #include <tf/transform_broadcaster.h>
 
 #include <string>
-
 #include <ctime>
+
+#include <mira_msgs/ResetMotorStop.h>
 
 using namespace mira;
 using namespace mira::navigation;
@@ -61,7 +62,8 @@ void MiraSendingGoals::initialize() {
   robot_->getMiraAuthority().subscribe<mira::maps::OccupancyGrid>("/navigation/MergedMap",   &MiraSendingGoals::local_map_callback, this); //FIXME, service?? 
   check_rotation_service = robot_->getRosNode().advertiseService("/check_rotation", &MiraSendingGoals::checkRotationStatus, this);
 
-  loc_status_client = robot_->getRosNode().serviceClient<hobbit_msgs::GetState>("get_loc_status");
+  loc_status_client = robot_->getRosNode().serviceClient<hobbit_msgs::GetState>("/get_loc_status");
+  reset_motor_client = robot_->getRosNode().serviceClient<mira_msgs::ResetMotorStop>("/reset_motorstop");
 
   current_loc_sub = robot_->getRosNode().subscribe<geometry_msgs::PoseWithCovarianceStamped>("/amcl_pose", 2, &MiraSendingGoals::loc_pose_callback, this);
 
@@ -444,14 +446,15 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
       {
 	std::cout << "preempt requested" << std::endl;
         
-	TaskPtr task(new Task());
+	
         //cancel the task
+ 	/*TaskPtr task(new Task());
         std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
         robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
 
         goal_status.data = "cancelled";
         std::cout << "Previous goal cancelled " << std::endl;
-        goal_status_pub.publish(goal_status);
+        goal_status_pub.publish(goal_status);*/
 
         if(as2_->isNewGoalAvailable())
 	{
@@ -466,8 +469,7 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
           }
 
           goal = new_goal.target_pose;
-	  //std::cout << "goal actionlib loop" << goal.pose.position.x << " y: " << goal.pose.position.y << " theta " << tf::getYaw(goal.pose.orientation)*180/M_PI<< std::endl;
-
+	  std::cout << "goal actionlib loop, x: " << goal.pose.position.x << " y: " << goal.pose.position.y << " theta " << tf::getYaw(goal.pose.orientation)*180/M_PI<< std::endl;
 
           //we have a new goal so make sure the planner is awake
           TaskPtr new_goal_task(new Task());
@@ -477,19 +479,34 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
 
 	  std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
 	  robot_->getMiraAuthority().callService<void>(navService, "setTask", new_goal_task);
+
+	  std::cout << "The new goal task has been set " << std::endl;
+
+	  /*mira_msgs::ResetMotorStop srv;
+	  if (!reset_motor_client.call(srv))
+	  {
+		ROS_DEBUG("Failed to call service reset motorstop");
+	  }*/
+	  //return;
           
 
         }
         else 
 	{
+	  //cancel the task
+	  std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
+          robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
 
+          goal_status.data = "cancelled";
+          std::cout << "Previous goal cancelled " << std::endl;
+          goal_status_pub.publish(goal_status);
           //notify the ActionServer that we've successfully preempted
           ROS_DEBUG_NAMED("interfaces_mira","preempting the current goal");
           as2_->setPreempted();
           std::cout << "goal preempted, preemt received" << std::endl;
 
            //we'll actually return from execute after preempting
-          return;
+           //return;
         }
      }
 
@@ -513,6 +530,7 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
      if (goal_status.data == "aborted")
      {
      	as2_->setAborted(move_base_msgs::MoveBaseResult(), "Aborting on goal, probably because the path is blocked");
+	std::cout << "goal aborted, probably because the path is blocked" << std::endl;
 	return;
      }
 

@@ -95,6 +95,7 @@ private:
 	void local_map_callback(mira::ChannelRead<mira::maps::OccupancyGrid> data);
 
 	ros::ServiceClient loc_status_client;
+	ros::ServiceClient reset_motor_client;
 
 	bool loc_check_active;
         void loc_pose_callback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg);
