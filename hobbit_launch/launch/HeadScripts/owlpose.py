@@ -94,7 +94,7 @@ def set_head_orientation(msg):
 			ud_shift = 0
 			currentAngles = herkulex.getAngles()
 			print "currentAngles:", currentAngles
-			#guess that pitch (lr) is the first value that comes back
+
 			if msg.data[0] == "r":
 				lr_shift = -1	#default value for move head right
 				if (len(msg.data) > 1) and (int(msg.data[1]) > 0) and (int(msg.data[1]) < 10):
@@ -112,6 +112,24 @@ def set_head_orientation(msg):
 				ud_shift = 1	#default value for moving head left
 				if (len(msg.data) > 1) and (int(msg.data[1]) > 0) and (int(msg.data[1]) < 10):
 					ud_shift = int(msg.data[1])	
+			if (len(msg.data) > 3):
+				if msg.data[3] == "r":
+					lr_shift = -1	#default value for move head right
+					if (int(msg.data[4]) > 0) and (int(msg.data[4]) < 10):
+						lr_shift = -int(msg.data[4])
+				if msg.data[3] == "l":
+					lr_shift = 1	#default value for moving head left
+					if (int(msg.data[4]) > 0) and (int(msg.data[4]) < 10):
+						lr_shift = int(msg.data[4])	
+					 
+				if msg.data[3] == "u":
+					ud_shift = -1	#default value for move head up
+					if (int(msg.data[4]) > 0) and (int(msg.data[4]) < 10):
+						ud_shift = -int(msg.data[4])	
+				if msg.data[3] == "d":
+					ud_shift = 1	#default value for moving head left
+					if (int(msg.data[4]) > 0) and (int(msg.data[4]) < 10):
+						ud_shift = int(msg.data[4])	
 					 				 
 			print "lr_shift: ", lr_shift
                         print "ud_shift: ", ud_shift
@@ -121,6 +139,7 @@ def set_head_orientation(msg):
 				print "6 set yaw=: ", ud_angle
                                 print "6 set pitch=: ", lr_angle
                                 herkulex.setAngles(yaw=ud_angle, pitch=lr_angle, roll=0, playtime=200)
+				rospy.sleep(2.0)
 			
 	except:
 		print "===============================================> owlpose.py: ERROR during variable setting of HEAD"
@@ -169,6 +188,7 @@ def init():
 	
 	#Subscriber for Movements:
 	rospy.Subscriber("/head/move", std_msgs.msg.String, set_head_orientation)
+	rospy.Subscriber("/head/move/incremental", std_msgs.msg.String, set_head_orientation, queue_size=1)
 	rospy.Subscriber("/head/cmd", std_msgs.msg.String, command)
 	
 	#Send geometry/tf constantly with 5hz
@@ -176,7 +196,6 @@ def init():
 	while not rospy.is_shutdown():
 		angles = herkulex.getAngles()
 		br.sendTransform( (0,0,0), tf.transformations.quaternion_from_euler(0, angles[1]/180.0*math.pi, angles[0]/180.0*math.pi), rospy.Time.now(), base_tf, head_tf)
-		#br.sendTransform((0, 0, 0), (0.0, angles[1]/100, angles[0]/100, 1), rospy.Time.now(), base_tf,head_tf)
 		r.sleep()
 
 def shutdown():
