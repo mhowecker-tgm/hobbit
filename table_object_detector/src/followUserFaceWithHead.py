@@ -34,8 +34,12 @@ class CFollowUserHead():
         #headMove_pub = rospy.Publisher('head/move', std_msgs.msg.String,queue_size=1)
 
         rate = rospy.Rate(1.0)
+        self.listener.waitForTransform("/frame", "/head", rospy.Time(), rospy.Duration(4.0))
+        
         while not rospy.is_shutdown():
             try:
+                now = rospy.Time.now()
+                self.listener.waitForTransform("/frame", "/head", now, rospy.Duration(4.0))
                 (trans,rot) = self.listener.lookupTransform('/frame', '/head', rospy.Time.now())#Time(0))
                 print "trans: ", trans
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
