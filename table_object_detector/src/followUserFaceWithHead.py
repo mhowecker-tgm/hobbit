@@ -26,7 +26,7 @@ class CFollowUserHead():
         #Subscriber => change to tf subscription
         #ss_sub = rospy.Subscriber("/SS/doSingleShotTestCFS", String, self.start_shot, queue_size=1)
         #Publisher for (robot)head movement
-        self.headMove_pub = rospy.Publisher("/head/move", String ,queue_size=1)
+        self.headMove_pub = rospy.Publisher("/head/move/incremental", String ,queue_size=1)
     
     #triggers the process for publishing 
     def follow_head_loop(self):
