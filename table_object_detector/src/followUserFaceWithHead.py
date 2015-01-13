@@ -34,8 +34,11 @@ class CFollowUserHead():
         #headMove_pub = rospy.Publisher('head/move', std_msgs.msg.String,queue_size=1)
 
         rate = rospy.Rate(1.0)
-        self.listener.waitForTransform("/frame", "/head", rospy.Time(), rospy.Duration(4.0))
-        
+        try:
+            self.listener.waitForTransform("/frame", "/head", rospy.Time(), rospy.Duration(4.0))
+        except:
+            print "initially no tf transform (/frame - /head) found"
+            
         while not rospy.is_shutdown():
             try:
                 now = rospy.Time.now()
