@@ -33,7 +33,7 @@ class CFollowUserHead():
             
         #headMove_pub = rospy.Publisher('head/move', std_msgs.msg.String,queue_size=1)
 
-        rate = rospy.Rate(2.0)
+        rate = rospy.Rate(1.0)
         while not rospy.is_shutdown():
             try:
                 (trans,rot) = self.listener.lookupTransform('/frame', '/head', rospy.Time(0))
@@ -41,24 +41,25 @@ class CFollowUserHead():
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
                 continue
 
-            strHeadMove = None
-            #check left/right head position
-            if trans[0] > 0.25:
-                print "head should move right"
-                strHeadMove = String("r5")
-            elif trans[0] < -0.25:
-                print "head should move left"
-                strHeadMove = String("l5")
+            strHeadMoveTmp = ""
             #check up/down head position    
-            if trans[1] > 0.2:
+            if trans[1] > 0.25:
                 print "head should move down"
-                strHeadMove = String("d8")
-            elif trans[1] < -0.2:
+                strHeadMoveTmp = "d9 "
+            elif trans[1] < -0.25:
                 print "head should move up"
-                strHeadMove = String("u5")
+                strHeadMoveTmp = "u9 "              #!!!!!!!!!! ignores this up/down movement if it should also go right or left!!!!!!!!!!!!!!
+            
+            #check left/right head position
+            if trans[0] > 0.3:
+                print "head should move right"
+                strHeadMoveTmp = strHeadMoveTmp + "r9"
+            elif trans[0] < -0.3:
+                print "head should move left"
+                strHeadMoveTmp = strHeadMoveTmp + "l9"
 
-            if (strHeadMove != None):       #head move should be executed
-                self.headMove_pub.publish(strHeadMove)
+            if (len(strHeadMoveTmp) > 0):       #head move should be executed
+                self.headMove_pub.publish(String(strHeadMoveTmp))
             
             rate.sleep()
 
