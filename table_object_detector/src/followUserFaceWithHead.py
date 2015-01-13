@@ -45,7 +45,7 @@ class CFollowUserHead():
                 self.listener.waitForTransform("/frame", "/head", now, rospy.Duration(4.0))
                 (trans,rot) = self.listener.lookupTransform('/frame', '/head', rospy.Time.now())#Time(0))
                 print "trans: ", trans
-            except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+            except (tf.Exception, tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
                 print "no tf transform (/frame - /head) found"
                 continue
 
