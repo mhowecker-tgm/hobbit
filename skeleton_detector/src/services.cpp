@@ -25,6 +25,7 @@
 #include <skeleton_detector/Skeleton3D.h>
 #include <skeleton_detector/SkeletonBBox.h>
 
+#include "hobbit_msgs/Fitness.h"
 
 #define USE_PERSON_AGGREGATOR 1
 
@@ -47,6 +48,9 @@ ros::Publisher joint3DBroadcaster;
 ros::Publisher jointBBoxBroadcaster;
 ros::Publisher personBroadcaster;
 ros::Publisher pointEventsBroadcaster;
+
+ros::Publisher  fitnessXPCBroadcaster;
+ros::Subscriber fitnessTabletSubscriber;
 
 #define divisor 1000
 //ros::Publisher gestureBroadcaster;
@@ -192,6 +196,52 @@ void broadcast2DBBox(struct skeletonHuman * skeletonFound)
 
   jointBBoxBroadcaster.publish(msg);
 }
+
+
+
+void broadcastNewRepetition(unsigned int frameNumber,struct exerciseData * exercise)
+{
+  hobbit_msgs::Fitness msg;
+  std::stringstream ss;
+  ss<<"C_EXERCISE_REPΕΤΙΤΙΟΝ";
+  msg.command=ss.str();
+
+  fitnessXPCBroadcaster.publish(msg);
+}
+
+
+void fitnessRecvMessage(const hobbit_msgs::Fitness & msg)
+{
+  //Test Trigger with rostopic pub /fitness_tablet hobbit_msgs/Fitness " { command: C_EXERCISE_STARTED , params: [  { name: '1' , value: 'STARTED' } ] } " -1
+  if (strcmp("C_EXERCISE_STARTED",msg.command.c_str())==0)
+  {
+    unsigned int isLeftHand=0;
+    unsigned int exerciseID =atoi(msg.params[0].name.c_str());
+    fprintf(stderr,"Started Exercise %u \n",exerciseID);
+
+    if ( (MORE_IS_LEFT_EXERCISE<exerciseID) && (exerciseID<LESS_IS_LEFT_EXERCISE) )
+    {
+      isLeftHand=1;
+    }
+
+    hobbitFitnessFunction_StartExercise(actualTimestamp,exerciseID,isLeftHand,5/*TODO*/);
+  }
+  else
+ //Test Trigger with rostopic pub /fitness_tablet hobbit_msgs/Fitness " { command: C_EXERCISE_STOPPED , params: [  { name: '1' , value: 'STOPPED' } ] } " -1
+  if (strcmp("C_EXERCISE_STOPPED",msg.command.c_str())==0)
+  {
+    fprintf(stderr,"Stopped Exercises\n");
+
+    hobbitFitnessFunction_StopExercise(actualTimestamp);
+   }
+  else
+  {
+    fprintf(stderr,"Unknown command arrived %s \n",msg.command.c_str());
+  }
+}
+
+
+
 
 
 void broadcastNewGesture(unsigned int frameNumber,struct handGesture * gesture)
@@ -425,11 +475,20 @@ int registerServices(ros::NodeHandle * nh,unsigned int width,unsigned int height
   gestureEventBroadcaster = nh->advertise <hobbit_msgs::Event> ("Event", 1000);
   hobbitUpperBodyTracker_RegisterGestureDetectedEvent((void *) &broadcastNewGesture);
 
+
+  hobbitFitnessFunction_RegisterExerciseRepetitionDetected((void *) &broadcastNewRepetition);
+  //hobbitFitnessFunction_RegisterExerciseRepetitionErrorDetected(void * callback)
+  //hobbitFitnessFunction_RegisterExerciseRepetitionBatchCompleted(void * callback)
+
+
   pointEventsBroadcaster = nh->advertise <skeleton_detector::PointEvents> ("pointEvents", 1000);
   personBroadcaster = nh->advertise <skeleton_detector::Person> (PERSON_TOPIC, divisor);
   joint2DBroadcaster = nh->advertise <skeleton_detector::Skeleton2D> ("joints2D", 1000);
   joint3DBroadcaster = nh->advertise <skeleton_detector::Skeleton3D> ("joints3D", 1000);
   jointBBoxBroadcaster = nh->advertise <skeleton_detector::SkeletonBBox> ("jointsBBox", 1000);
+
+  fitnessXPCBroadcaster = nh->advertise <hobbit_msgs::Fitness> ("fitness_xpc", 1000);
+  fitnessTabletSubscriber = nh->subscribe("fitness_tablet",1000,fitnessRecvMessage);
 
 }
 

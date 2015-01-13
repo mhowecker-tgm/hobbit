@@ -10,6 +10,21 @@ extern "C"
 #include "hobbitGestureDataStructures.h"
 #include "hobbitUpperBodyTrackerDataStructures.h"
 #include "hobbitCalibrationDataStructures.h"
+#include "hobbitExerciseDataStructures.h"
+
+
+/*Exercise Functions*/
+int hobbitFitnessFunction_StartExercise(unsigned int frameNumber,unsigned int excerciseNumber,unsigned int leftHand , unsigned int repetitions);
+int hobbitFitnessFunction_CheckExercise(unsigned int frameNumber);
+int hobbitFitnessFunction_StopExercise(unsigned int frameNumber);
+int hobbitFitnessFunction_RegisterExerciseRepetitionDetected(void * callback);
+int hobbitFitnessFunction_RegisterExerciseRepetitionErrorDetected(void * callback);
+int hobbitFitnessFunction_RegisterExerciseRepetitionBatchCompleted(void * callback);
+
+
+
+
+
 
 int hobbitUpperBodyTracker_useFaceDetector(int useFaceDetector);
 int hobbitUpperBodyTracker_useGestures(int useGestures);
