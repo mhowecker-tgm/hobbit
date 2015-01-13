@@ -26,14 +26,14 @@ class CFollowUserHead():
         #Subscriber => change to tf subscription
         #ss_sub = rospy.Subscriber("/SS/doSingleShotTestCFS", String, self.start_shot, queue_size=1)
         #Publisher for (robot)head movement
-        #self.pc_pub = rospy.Publisher("/head/move", String )
+        self.headMove_pub = rospy.Publisher("/head/move", String ,queue_size=1)
     
     #triggers the process for publishing 
     def follow_head_loop(self):
             
-        #turtle_vel = rospy.Publisher('turtle2/cmd_vel', geometry_msgs.msg.Twist,queue_size=1)
+        #headMove_pub = rospy.Publisher('head/move', std_msgs.msg.String,queue_size=1)
 
-        rate = rospy.Rate(5.0)
+        rate = rospy.Rate(2.0)
         while not rospy.is_shutdown():
             try:
                 (trans,rot) = self.listener.lookupTransform('/frame', '/head', rospy.Time(0))
@@ -41,16 +41,24 @@ class CFollowUserHead():
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
                 continue
 
+            strHeadMove = None
             #check left/right head position
             if trans[0] > 0.25:
                 print "head should move right"
+                strHeadMove = String("r2")
             elif trans[0] < -0.25:
                 print "head should move left"
+                strHeadMove = String("l2")
             #check up/down head position    
             if trans[1] > 0.2:
                 print "head should move down"
+                strHeadMove = String("d2")
             elif trans[1] < -0.2:
                 print "head should move up"
+                strHeadMove = String("u2")
+
+            if (strHeadMove != None):       #head move should be executed
+                self.headMove_pub.publish(strHeadMove)
             
             rate.sleep()
 
