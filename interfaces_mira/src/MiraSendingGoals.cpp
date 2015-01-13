@@ -87,6 +87,8 @@ void MiraSendingGoals::spin()
 bool MiraSendingGoals::user_nav_mode(mira_msgs::UserNavMode::Request &req, mira_msgs::UserNavMode::Response &res)
 {
 
+	std::cout << "user_mode_received " << std::endl;
+
 	mira::RPCFuture<void> r1 = robot_->getMiraAuthority().callService<void>("/navigation/laser/GridMapperLaser#builtin", std::string("setProperty"), std::string("MaxRange"), std::string("0.0"));
         r1.timedWait(mira::Duration::seconds(1));
         r1.get();
@@ -100,6 +102,8 @@ bool MiraSendingGoals::user_nav_mode(mira_msgs::UserNavMode::Request &req, mira_
 
 bool MiraSendingGoals::obs_nav_mode(mira_msgs::ObsNavMode::Request &req, mira_msgs::ObsNavMode::Response &res)
 {
+
+	std::cout << "obs_mode_received " << std::endl;
 
 	mira::RPCFuture<void> r1 = robot_->getMiraAuthority().callService<void>("/navigation/laser/GridMapperLaser#builtin", std::string("setProperty"), std::string("MaxRange"), std::string(max_range_value));
         r1.timedWait(mira::Duration::seconds(1));
@@ -494,12 +498,13 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
         else 
 	{
 	  //cancel the task
+	  TaskPtr task(new Task());
 	  std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
           robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
-
           goal_status.data = "cancelled";
           std::cout << "Previous goal cancelled " << std::endl;
           goal_status_pub.publish(goal_status);
+
           //notify the ActionServer that we've successfully preempted
           ROS_DEBUG_NAMED("interfaces_mira","preempting the current goal");
           as2_->setPreempted();
