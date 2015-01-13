@@ -155,6 +155,7 @@ int main(int argc, char** argv)
 	}
 	
 	stop = false;
+	new_goal = false;
 
 	goal_status.data = "idle";
 	
