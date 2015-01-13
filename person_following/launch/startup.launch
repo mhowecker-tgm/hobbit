@@ -1,0 +1,4 @@
+<launch>
+  <node pkg="person_following" type="person_following" name="person_following" output="screen"/>
+</launch>
+
