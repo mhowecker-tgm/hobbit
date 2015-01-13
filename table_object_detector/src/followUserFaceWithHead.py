@@ -45,17 +45,17 @@ class CFollowUserHead():
             #check left/right head position
             if trans[0] > 0.25:
                 print "head should move right"
-                strHeadMove = String("r2")
+                strHeadMove = String("r5")
             elif trans[0] < -0.25:
                 print "head should move left"
-                strHeadMove = String("l2")
+                strHeadMove = String("l5")
             #check up/down head position    
             if trans[1] > 0.2:
                 print "head should move down"
-                strHeadMove = String("d2")
+                strHeadMove = String("d8")
             elif trans[1] < -0.2:
                 print "head should move up"
-                strHeadMove = String("u2")
+                strHeadMove = String("u5")
 
             if (strHeadMove != None):       #head move should be executed
                 self.headMove_pub.publish(strHeadMove)
