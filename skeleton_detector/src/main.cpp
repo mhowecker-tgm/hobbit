@@ -175,6 +175,20 @@ bool resume(std_srvs::Empty::Request& request, std_srvs::Empty::Response& respon
 }
 
 
+bool startExercise(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    ROS_INFO("Skeleton Detector is now starting Exercise Batch");
+    hobbitFitnessFunction_StartExercise(frameTimestamp,2,1/*isLeftHand*/,5);
+    return true;
+}
+
+
+bool stopExercise(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    ROS_INFO("Skeleton Detector is now stopping Exercise Batch");
+    hobbitFitnessFunction_StopExercise(frameTimestamp);
+    return true;
+}
 
 #if USE_NONDEFAULT_CALIBRATIONS
 //RGBd Callback is called every time we get a new pair of frames , it is synchronized to the main thread
@@ -283,7 +297,7 @@ int main(int argc, char **argv)
      //We advertise the services we want accessible using "rosservice call *w/e*"
      ros::ServiceServer visualizeOnService      = nh.advertiseService(name+"/visualize_on" , visualizeOn);
      ros::ServiceServer visualizeOffService     = nh.advertiseService(name+"/visualize_off", visualizeOff);
-     ros::ServiceServer benchmarkService           = nh.advertiseService(name+"/benchmark" , benchmark);
+     ros::ServiceServer benchmarkService        = nh.advertiseService(name+"/benchmark" , benchmark);
      ros::ServiceServer terminateService        = nh.advertiseService(name+"/terminate"    , terminate);
      ros::ServiceServer resumeService           = nh.advertiseService(name+"/pause"        , pause);
      ros::ServiceServer dumpService             = nh.advertiseService(name+"/startDump"    , startDump);
@@ -294,6 +308,10 @@ int main(int argc, char **argv)
      ros::ServiceServer advancedService         = nh.advertiseService(name+"/advanced"     , advanced);
      ros::ServiceServer superService            = nh.advertiseService(name+"/super"        , super);
 
+
+
+    ros::ServiceServer  startExerciseService    = nh.advertiseService(name+"/startExercise"        , startExercise);
+    ros::ServiceServer  stopExerciseService     = nh.advertiseService(name+"/stopExercise"         , stopExercise);
      //Make our rostopic cmaera grabber
      message_filters::Synchronizer<RgbdSyncPolicy> *sync;
 

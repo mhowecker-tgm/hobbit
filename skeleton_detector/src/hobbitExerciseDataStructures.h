@@ -47,6 +47,9 @@ enum excerciseEnumerator
 };
 
 
+
+
+
 struct exerciseData
 {
     float x,y,z;
