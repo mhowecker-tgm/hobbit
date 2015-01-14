@@ -104,6 +104,7 @@ def command_cb(msg, ud):
             elif item[0] == 'emergency':
                 ud.parameters['active_task'] = index
                 ud.command = item[0]
+                ud.emergency = True
                 return True
             elif item[0] == 'away' or item[0] == 'sleep':
                 times = [1, 2, 4, 6, 12, 24]
@@ -183,6 +184,28 @@ def task_lo_cb(ud, goal):
     return goal
 
 
+class ResetEmergency(State):
+    """Initialize a few data structures
+    """
+    def __init__(self):
+        State.__init__(
+            self,
+            input_keys=['parameters', 'command', 'emergency'],
+            output_keys=['parameters', 'command', 'emergency'],
+            outcomes=['succeeded', 'preempted', 'aborted'])
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        rospy.loginfo('ResetActiveTask')
+        rospy.set_param('active_task', 100)
+        ud.parameters['active_task'] = 100
+        ud.command = ''
+        ud.emergency = False
+        return 'succeeded'
+
+
 class ResetActiveTask(State):
     """Initialize a few data structures
     """
@@ -238,7 +261,7 @@ class SelectTask(State):
     def __init__(self):
         State.__init__(
             self,
-            input_keys=['command', 'params', 'active_task', 'parameters'],
+            input_keys=['command', 'params', 'active_task', 'parameters', 'emergency'],
             outcomes=['emergency',
                       'recharge',
                       'reminder',
@@ -268,6 +291,8 @@ class SelectTask(State):
             self.service_preempt()
             return 'preempted'
         rospy.loginfo('Task Selection')
+        if ud.command == '':
+            return 'emergency'
         print(ud.command)
         if ud.command == 'IDLE':
             return 'none'
@@ -437,7 +462,7 @@ def main():
                 Event,
                 msg_cb=command_cb,
                 input_keys=['parameters', 'params', 'command', 'active_task'],
-                output_keys=['parameters', 'params', 'command', 'active_task']
+                output_keys=['parameters', 'params', 'command', 'active_task', 'emergency']
             )
         )
         Concurrence.add(
@@ -447,7 +472,7 @@ def main():
                 Command,
                 msg_cb=command_cb,
                 input_keys=['parameters', 'params', 'command', 'active_task'],
-                output_keys=['parameters', 'params', 'command', 'active_task']
+                output_keys=['parameters', 'params', 'command', 'active_task', 'emergency']
             )
         )
 
@@ -487,6 +512,7 @@ def main():
 
     with sm2:
         sm2.userdata.scenario = 'IDLE'
+        sm2.userdata.emergency = False
         StateMachine.add_auto(
             'LOG_TASK_STARTED',
             log.DoLogStart(),

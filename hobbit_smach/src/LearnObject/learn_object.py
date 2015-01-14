@@ -288,7 +288,7 @@ def main():
             transitions={'succeeded': 'CONFIRM_PUT_OBJECT_ON_TRAY',
                          'failed': 'SET_FAILURE',
                          'aborted': 'SET_FAILURE',
-                         'preempted': 'SET_FAILURE'}
+                         'preempted': 'LOG_PREEMPTED'}
         )
         # StateMachine.add(
         #     'MMUI_ASK_HELP_OBJECT',
@@ -515,7 +515,14 @@ def main():
         StateMachine.add(
             'LOG_PREEMPTED',
             log.DoLogPreempt(scenario='learn object'),
-            transitions={'succeeded': 'preempted'}
+            transitions={'succeeded': 'PREEMPT_MENU'}
+        )
+        StateMachine.add(
+            'PREEMPT_MENU',
+            HobbitMMUI.ShowMenu(menu='MAIN'),
+            transitions={'succeeded': 'preempted',
+                         'preempted': 'preempted',
+                         'failed': 'preempted'}
         )
 
     asw = ActionServerWrapper(
