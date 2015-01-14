@@ -87,9 +87,9 @@ void MiraSendingGoals::spin()
 bool MiraSendingGoals::user_nav_mode(mira_msgs::UserNavMode::Request &req, mira_msgs::UserNavMode::Response &res)
 {
 
-	std::cout << "user_mode_received " << std::endl;
+	std::cout << "user_mode_received, should only be used for small distances and simple motions " << std::endl;
 
-	mira::RPCFuture<void> r1 = robot_->getMiraAuthority().callService<void>("/navigation/laser/GridMapperLaser#builtin", std::string("setProperty"), std::string("MaxRange"), std::string("0.0"));
+	mira::RPCFuture<void> r1 = robot_->getMiraAuthority().callService<void>("/navigation/laser/GridMapperLaser#builtin", std::string("setProperty"), std::string("MaxRange"), std::string("0.1"));
         r1.timedWait(mira::Duration::seconds(1));
         r1.get();
 
