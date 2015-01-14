@@ -34,6 +34,7 @@ bool new_pose;
 void tracker_target_callback(const follow_user::TrackerTarget::ConstPtr& msg)
 {
 	current_target = (*msg);
+	new_pose = true;
         
 }
 
@@ -50,6 +51,9 @@ bool startFollowing(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &r
 	std_srvs::Empty srv;
         if (!resume_following_client.call(srv))
         	ROS_DEBUG("Failed to call service resume following");
+
+	goal_status.data = "started";
+	status_pub.publish(goal_status);
 	return true;
 }
 
@@ -60,6 +64,9 @@ bool stopFollowing(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &re
 	std_srvs::Empty srv;
         if (!pause_following_client.call(srv))
         	ROS_DEBUG("Failed to call service pause following");
+
+	goal_status.data = "stopped";
+	status_pub.publish(goal_status);
 	return true;
 }
 
@@ -68,24 +75,29 @@ void goalDoneCallback(const actionlib::SimpleClientGoalState &state, const move_
 	if(state.state_ == actionlib::SimpleClientGoalState::SUCCEEDED) 
 	{
 		goal_status.data = "reached";
+		status_pub.publish(goal_status);
 	}
 	if(state.state_ == actionlib::SimpleClientGoalState::ABORTED) 
 	{
 		goal_status.data = "aborted";
+		status_pub.publish(goal_status);
 	}
-	if(state.state_ == actionlib::SimpleClientGoalState::PREEMPTED) 
+	/*if(state.state_ == actionlib::SimpleClientGoalState::PREEMPTED) 
 	{
 		goal_status.data = "preempted";
+		status_pub.publish(goal_status);
 	}
 	if(state.state_ == actionlib::SimpleClientGoalState::RECALLED) 
 	{
 		goal_status.data = "recalled";
-	}
+		status_pub.publish(goal_status);
+	}*/
 }
 
 void goalActiveCallback()
 {
 	goal_status.data = "active";
+	status_pub.publish(goal_status);
 }
 
 void goalFeedbackCallback(const move_base_msgs::MoveBaseFeedbackConstPtr &feedback)
@@ -124,6 +136,10 @@ int main(int argc, char **argv)
 	double v_sum = 0;
 	double v_thres = 0.2; //threshold value to consider if the velocity is close to zero
 
+	new_pose = false;
+	int no_target_sum = 0;
+	int no_target_limit = 10;
+
 	// Tell the action client that we want to spin a thread by default
 	MoveBaseClient ac("mira_move_base", true);
 
@@ -139,54 +155,70 @@ int main(int argc, char **argv)
 	while (ros::ok())
 	{
 
-		status_pub.publish(goal_status);
-
 		if(following_active)
 		{
 
-			double current_x = current_pose.pose.pose.position.x;
-			double current_y = current_pose.pose.pose.position.y;
-			double current_theta = tf::getYaw(current_pose.pose.pose.orientation);
+			if (!new_pose)
+			{
+				no_target_sum++;
+				if (no_target_sum > no_target_limit) //no tracked target received for a while
+				{	
+					following_active = false;
+					goal_status.data = "target_lost";
+					status_pub.publish(goal_status);
+					no_target_sum = 0;
+					continue;
+				}
+			}
 
+			//tracked target received, reset the count
+			new_pose = false;
+			no_target_sum = 0;
+
+			//determine local target pose
 			double local_dir = atan2(-current_target.x,current_target.y + x_sensor);			
-
 			//since target reference system is: x right, y forward
 			// v = (vY, -vX)
 			double local_target_x = current_target.y + x_sensor - dis2target*cos(local_dir);
 			double local_target_y = -current_target.x - dis2target*sin(local_dir);
 
+			//determine global target coordinates
+			double current_x = current_pose.pose.pose.position.x;
+			double current_y = current_pose.pose.pose.position.y;
+			double current_theta = tf::getYaw(current_pose.pose.pose.orientation);
 			double target_x = current_x + local_target_x*cos(current_theta) - local_target_y*sin(current_theta);
 		        double target_y = current_y + local_target_x*sin(current_theta) + local_target_y*cos(current_theta);
-
+			//check if new target is not too close
 			if ( (target_x-current_target_x)*(target_x-current_target_x) + (target_y-current_target_y)*(target_y-current_target_y) > dis_thres)
 			{
 
 				std::cout << "target pose " << target_x << " " << target_y << std::endl;
-
+				//send the new target
 				move_base_msgs::MoveBaseGoal goal;
 				goal.target_pose.pose.position.x = target_x;
 				goal.target_pose.pose.position.y = target_y;
 				goal.target_pose.pose.orientation = tf::createQuaternionMsgFromYaw(atan2(-current_target.vX, current_target.vY));
 				ac.sendGoal(goal, boost::bind(&goalDoneCallback, _1, _2), boost::bind(&goalActiveCallback), boost::bind(&goalFeedbackCallback, _1)); 
-
+				//update current target
 				current_target_x = target_x;
-				current_target_y = target_y;
+				current_target_y = target_y; 
 
 			}
 
+			//check if the average velocity is close to zero
 			v_sum += current_target.vX*current_target.vX + current_target.vY*current_target.vY;
 			count++;
-
 			if (count == count_limit)
 			{
-				count = 0;
 				if (v_sum < v_thres*v_thres*count_limit)
-					following_active = false;	
-			}	
+				{	
+					following_active = false;
+					goal_status.data = "stopped";
+					status_pub.publish(goal_status);
+				}
 
-				
-	
-
+				count = 0;
+			}
 			
 		}
 
