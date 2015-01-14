@@ -31,6 +31,10 @@ ros::Publisher status_pub;
 
 bool new_pose;
 
+int count_num;
+int no_target_count;
+int no_new_goal_count;
+
 void tracker_target_callback(const follow_user::TrackerTarget::ConstPtr& msg)
 {
 	current_target = (*msg);
@@ -47,6 +51,10 @@ void loc_pose_callback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr&
 bool startFollowing(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res)
 {	
 	ROS_INFO("person_following request received");
+	count_num = 0;
+	no_target_count = 0;
+	no_new_goal_count = 0;
+
 	following_active = true;
 	std_srvs::Empty srv;
         if (!resume_following_client.call(srv))
@@ -74,6 +82,7 @@ void goalDoneCallback(const actionlib::SimpleClientGoalState &state, const move_
 {
 	if(state.state_ == actionlib::SimpleClientGoalState::SUCCEEDED) 
 	{
+		following_active = false;
 		goal_status.data = "reached";
 		status_pub.publish(goal_status);
 	}
@@ -96,8 +105,8 @@ void goalDoneCallback(const actionlib::SimpleClientGoalState &state, const move_
 
 void goalActiveCallback()
 {
-	goal_status.data = "active";
-	status_pub.publish(goal_status);
+	//goal_status.data = "active";
+	//status_pub.publish(goal_status);
 }
 
 void goalFeedbackCallback(const move_base_msgs::MoveBaseFeedbackConstPtr &feedback)
@@ -131,14 +140,18 @@ int main(int argc, char **argv)
 	double dis2target = 1.0; //distance to the user to be kept
 	double dis_thres = 0.2; //minimum distance between consecutive targets to be sent
 
-	int count = 0;
+	count_num = 0;
 	int count_limit = 10; //number of loops to check if the velocity is close to zero
 	double v_sum = 0;
 	double v_thres = 0.2; //threshold value to consider if the velocity is close to zero
 
 	new_pose = false;
-	int no_target_sum = 0;
-	int no_target_limit = 10;
+	no_target_count = 0;
+	int no_target_limit = 5000;
+
+	no_new_goal_count = 0;
+	int no_new_goal_limit = 10;
+	
 
 	// Tell the action client that we want to spin a thread by default
 	MoveBaseClient ac("mira_move_base", true);
@@ -160,20 +173,22 @@ int main(int argc, char **argv)
 
 			if (!new_pose)
 			{
-				no_target_sum++;
-				if (no_target_sum > no_target_limit) //no tracked target received for a while
+				no_target_count++;
+				//std::cout << "no_target_sum " << no_target_count << std::endl;
+				/*if (no_target_count > no_target_limit) //no tracked target received for a while
 				{	
 					following_active = false;
 					goal_status.data = "target_lost";
+					std::cout << "target lost *************************** " << std::endl;
 					status_pub.publish(goal_status);
-					no_target_sum = 0;
-					continue;
-				}
+					
+				}*/
+				//continue;
 			}
 
 			//tracked target received, reset the count
 			new_pose = false;
-			no_target_sum = 0;
+			no_target_count = 0;
 
 			//determine local target pose
 			double local_dir = atan2(-current_target.x,current_target.y + x_sensor);			
@@ -192,32 +207,44 @@ int main(int argc, char **argv)
 			if ( (target_x-current_target_x)*(target_x-current_target_x) + (target_y-current_target_y)*(target_y-current_target_y) > dis_thres)
 			{
 
-				std::cout << "target pose " << target_x << " " << target_y << std::endl;
+				//std::cout << "target pose " << target_x << " " << target_y << std::endl;
 				//send the new target
 				move_base_msgs::MoveBaseGoal goal;
 				goal.target_pose.pose.position.x = target_x;
 				goal.target_pose.pose.position.y = target_y;
-				goal.target_pose.pose.orientation = tf::createQuaternionMsgFromYaw(atan2(-current_target.vX, current_target.vY));
+				goal.target_pose.pose.orientation = tf::createQuaternionMsgFromYaw(atan2(target_y-current_y, target_x-current_x));
 				ac.sendGoal(goal, boost::bind(&goalDoneCallback, _1, _2), boost::bind(&goalActiveCallback), boost::bind(&goalFeedbackCallback, _1)); 
 				//update current target
 				current_target_x = target_x;
 				current_target_y = target_y; 
+				
+				
 
 			}
+			else no_new_goal_count++;
+			//check if new goals available recently
+			/*if (no_new_goal_count >= no_new_goal_limit)
+			{
+				following_active = false;
+				goal_status.data = "stopped";
+				status_pub.publish(goal_status);
+
+			}*/
 
 			//check if the average velocity is close to zero
 			v_sum += current_target.vX*current_target.vX + current_target.vY*current_target.vY;
-			count++;
-			if (count == count_limit)
+			count_num++;
+			if (count_num == count_limit)
 			{
-				if (v_sum < v_thres*v_thres*count_limit)
+				if (v_sum < v_thres*v_thres*count_limit )
 				{	
+					std::cout << "speed is low, stopping " << std::endl;
 					following_active = false;
 					goal_status.data = "stopped";
 					status_pub.publish(goal_status);
 				}
 
-				count = 0;
+				count_num = 0;
 			}
 			
 		}
