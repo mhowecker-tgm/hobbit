@@ -111,9 +111,18 @@ int main(int argc, char **argv)
 	status_pub  = n.advertise<std_msgs::String>("/following_status", 20);
 
 	following_active = false;
+
+	double current_target_x = current_pose.pose.pose.position.x;
+	double current_target_y = current_pose.pose.pose.position.y;
 	
-	float x_sensor = 0.135; //FIXME
-	float dis2target = 1.0;
+	double x_sensor = 0.135; //FIXME
+	double dis2target = 1.0; //distance to the user to be kept
+	double dis_thres = 0.2; //minimum distance between consecutive targets to be sent
+
+	int count = 0;
+	int count_limit = 10; //number of loops to check if the velocity is close to zero
+	double v_sum = 0;
+	double v_thres = 0.2; //threshold value to consider if the velocity is close to zero
 
 	// Tell the action client that we want to spin a thread by default
 	MoveBaseClient ac("mira_move_base", true);
@@ -140,25 +149,40 @@ int main(int argc, char **argv)
 			double current_theta = tf::getYaw(current_pose.pose.pose.orientation);
 
 			//since target reference system is: x right, y forward
-			double global_x = current_x + (current_target.y+x_sensor)*cos(current_theta) + current_target.x*sin(current_theta);
-		        double global_y = current_y + (current_target.y+x_sensor)*sin(current_theta) - current_target.x*cos(current_theta);
-
 			// v = (vY, -vX)
-			double target_x = global_x - dis2target * current_target.vY;
-			double target_y = global_y + dis2target * current_target.vX;
+			double local_target_x = current_target.y + x_sensor - dis2target * current_target.vY;
+			double local_target_y = -current_target.x + dis2target * current_target.vX;
 
-			//std::cout << "target pose " << target_x << " " << target_y << std::endl;
+			double target_x = current_x + local_target_x*cos(current_theta) - local_target_y*sin(current_theta);
+		        double target_y = current_y + local_target_x*sin(current_theta) + local_target_y*cos(current_theta);
 
-			move_base_msgs::MoveBaseGoal goal;
-			goal.target_pose.pose.position.x = target_x;
-			goal.target_pose.pose.position.y = target_y;
-			goal.target_pose.pose.orientation = tf::createQuaternionMsgFromYaw(atan2(-current_target.vX, current_target.vY));
-			ac.sendGoal(goal, boost::bind(&goalDoneCallback, _1, _2), boost::bind(&goalActiveCallback), boost::bind(&goalFeedbackCallback, _1));
+			if ( (target_x-current_x)*(target_x-current_x) + (target_y-current_y)*(target_y-current_y) > dis_thres)
+			{
+
+				std::cout << "target pose " << target_x << " " << target_y << std::endl;
+
+				move_base_msgs::MoveBaseGoal goal;
+				goal.target_pose.pose.position.x = target_x;
+				goal.target_pose.pose.position.y = target_y;
+				goal.target_pose.pose.orientation = tf::createQuaternionMsgFromYaw(atan2(-current_target.vX, current_target.vY));
+				ac.sendGoal(goal, boost::bind(&goalDoneCallback, _1, _2), boost::bind(&goalActiveCallback), boost::bind(&goalFeedbackCallback, _1)); 
+
+			}
+
+			v_sum += current_target.vX*current_target.vX + current_target.vY*current_target.vY;
+			count++;
+
+			if (count == count_limit)
+			{
+				count = 0;
+				if (v_sum < v_thres*v_thres*count_limit)
+					following_active = false;	
+			}	
+
+				
+	
 
 			
-
-
-
 		}
 
 		ros::spinOnce();
