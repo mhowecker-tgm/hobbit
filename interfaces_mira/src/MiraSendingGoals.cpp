@@ -69,6 +69,7 @@ void MiraSendingGoals::initialize() {
 
   discrete_motion_cmd_pub = robot_->getRosNode().advertise<std_msgs::String>("/discrete_motion_cmd", 20);
 
+  loc_check_pub = robot_->getRosNode().advertise<std_msgs::Bool>("/loc_check_state", 20);
 
 }
 
@@ -386,6 +387,11 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
 	        {
 	          ROS_DEBUG("Failed to call service get_loc_state");
 	        }
+
+		std_msgs::Bool loc_check_state;
+		loc_check_state.data = loc_ok;
+		loc_check_pub.publish(loc_check_state);		
+		
 		//check if rotation is safe //FIXME, service to get LocalMap, get outer circle...
 		if (!loc_ok)
 		{

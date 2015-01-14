@@ -21,6 +21,7 @@
 
 #include <hobbit_msgs/Pose2DStamped.h>
 #include <std_msgs/String.h>
+#include <std_msgs/Bool.h>
 
 #include <actionlib/server/simple_action_server.h>
 #include <interfaces_mira/MiraSendingGoalsAction.h>
@@ -101,6 +102,8 @@ private:
         void loc_pose_callback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg);
         ros::Subscriber current_loc_sub;
 	ros::Publisher discrete_motion_cmd_pub;
+
+	ros::Publisher loc_check_pub;
 
 };
 
