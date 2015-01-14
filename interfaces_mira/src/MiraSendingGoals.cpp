@@ -12,8 +12,6 @@
 #include <string>
 #include <ctime>
 
-#include <mira_msgs/ResetMotorStop.h>
-
 using namespace mira;
 using namespace mira::navigation;
 
@@ -63,7 +61,6 @@ void MiraSendingGoals::initialize() {
   check_rotation_service = robot_->getRosNode().advertiseService("/check_rotation", &MiraSendingGoals::checkRotationStatus, this);
 
   loc_status_client = robot_->getRosNode().serviceClient<hobbit_msgs::GetState>("/get_loc_status");
-  reset_motor_client = robot_->getRosNode().serviceClient<mira_msgs::ResetMotorStop>("/reset_motorstop");
 
   current_loc_sub = robot_->getRosNode().subscribe<geometry_msgs::PoseWithCovarianceStamped>("/amcl_pose", 2, &MiraSendingGoals::loc_pose_callback, this);
 
@@ -489,17 +486,12 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
 	  new_goal_task->addSubTask(mira::navigation::SubTaskPtr(new mira::navigation::OrientationTask(tf::getYaw(goal.pose.orientation), mira::deg2rad(10.0f))));
 
 	  std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
-	  robot_->getMiraAuthority().callService<void>(navService, "setTask", new_goal_task);
+	  //robot_->getMiraAuthority().callService<void>(navService, "setTask", new_goal_task);
+	  mira::Pose2 new_goal_target(goal.pose.position.x, goal.pose.position.y, tf::getYaw(goal.pose.orientation));
+	  robot_->getMiraAuthority().callService<void>(navService, "setGoal", new_goal_target, 0.1f, mira::deg2rad(10.0f));
 
-	  std::cout << "The new goal task has been set " << std::endl;
-
-	  /*mira_msgs::ResetMotorStop srv;
-	  if (!reset_motor_client.call(srv))
-	  {
-		ROS_DEBUG("Failed to call service reset motorstop");
-	  }*/
-	  //return;
-          
+	  //std::cout << "The new goal task has been set " << std::endl;
+         
 
         }
         else 
