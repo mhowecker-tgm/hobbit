@@ -622,6 +622,7 @@ def goToPoseSilent():
         Sequence.add(
             'HEAD_UP_AFTER_MOVEMENT',
             head_move.MoveTo(pose='center_center')
+        )
         # Sequence.add('ENABLE_GESTURES',
         #              service_disable.enable_gestures())
         Sequence.add(
