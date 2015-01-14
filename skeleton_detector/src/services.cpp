@@ -468,19 +468,25 @@ int registerServices(ros::NodeHandle * nh,unsigned int width,unsigned int height
   depthFrameCopy = (unsigned short * ) malloc(width*height*1*sizeof(unsigned short));
   if (depthFrameCopy==0) { fprintf(stderr,"Cannot make an intermidiate copy of depth frame \n"); }
 
+  fprintf(stderr,"Initializing Hobbit Upper Body Tracker\n");
   hobbitUpperBodyTracker_Initialize(width , height);
   hobbitUpperBodyTracker_RegisterSkeletonDetectedEvent((void *) &broadcastNewSkeleton);
   hobbitUpperBodyTracker_setFloor(51.46 , 622.97 , 1722.0 , 0.02 , -0.91 , -0.42); //default plane
   hobbitUpperBodyTracker_useGestures(1);
+
+  fprintf(stderr,"Registering Gesture callbacks..\n");
   gestureEventBroadcaster = nh->advertise <hobbit_msgs::Event> ("Event", 1000);
   hobbitUpperBodyTracker_RegisterGestureDetectedEvent((void *) &broadcastNewGesture);
 
 
+  fprintf(stderr,"Registering Exercise callbacks..\n");
   hobbitFitnessFunction_RegisterExerciseRepetitionDetected((void *) &broadcastNewRepetition);
   //hobbitFitnessFunction_RegisterExerciseRepetitionErrorDetected(void * callback)
   //hobbitFitnessFunction_RegisterExerciseRepetitionBatchCompleted(void * callback)
 
 
+
+  fprintf(stderr,"Advertising ROS Topics..\n");
   pointEventsBroadcaster = nh->advertise <skeleton_detector::PointEvents> ("pointEvents", 1000);
   personBroadcaster = nh->advertise <skeleton_detector::Person> (PERSON_TOPIC, divisor);
   joint2DBroadcaster = nh->advertise <skeleton_detector::Skeleton2D> ("joints2D", 1000);
@@ -490,6 +496,7 @@ int registerServices(ros::NodeHandle * nh,unsigned int width,unsigned int height
   fitnessXPCBroadcaster = nh->advertise <hobbit_msgs::Fitness> ("fitness_xpc", 1000);
   fitnessTabletSubscriber = nh->subscribe("fitness_tablet",1000,fitnessRecvMessage);
 
+  fprintf(stderr,"Done registering services..\n");
 }
 
 int stopServices()
