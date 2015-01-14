@@ -10,6 +10,7 @@ import math
 from hobbit_msgs.srv import SwitchVision, SwitchVisionRequest
 from std_msgs.msg import String
 from smach_ros import ServiceState
+from mira_msgs.srv import UserNavMode, ObsNavMode
 from nav_msgs.srv import GetPlan, GetPlanRequest
 from geometry_msgs.msg import PoseStamped, Point, Quaternion
 # from hobbit_smach.bcolors import bcolors
@@ -410,6 +411,16 @@ def get_detect_user():
             connector_outcomes=['succeeded', 'preempted', 'aborted']
         )
         smach.StateMachine.add(
+            'PREPARE_STOP',
+            ServiceState(
+                '/user_nav_mode',
+                UserNavMode
+            ),
+            transitions={'succeeded': 'MOVE_HEAD_UP',
+                         'preempted': 'CLEAN_UP',
+                         'aborted': 'MOVE_HEAD_UP'}
+        )
+        smach.StateMachine.add(
             'MOVE_HEAD_UP',
             head_move.MoveTo(pose='center_center'),
             transitions={'succeeded': 'WAIT',
@@ -426,7 +437,17 @@ def get_detect_user():
             detectUser(),
             transitions={'succeeded': 'SET_SUCCESS',
                          'preempted': 'preempted',
-                         'failed': 'PLAN_PATH'}
+                         'failed': 'PREPARE_MOVEMENT'}
+        )
+        smach.StateMachine.add(
+            'PREPARE_MOVEMENT',
+            ServiceState(
+                '/obs_nav_mode',
+                ObsNavMode
+            ),
+            transitions={'succeeded': 'PLAN_PATH',
+                         'preempted': 'CLEAN_UP',
+                         'aborted': 'PLAN_PATH'}
         )
         smach.StateMachine.add(
             'SET_SUCCESS',

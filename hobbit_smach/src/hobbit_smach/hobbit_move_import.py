@@ -22,7 +22,6 @@ from move_base_msgs.msg import MoveBaseAction
 from hobbit_msgs.msg import MiraDockingAction, MiraDockingGoal
 from std_msgs.msg import String
 from mira_msgs.msg import BatteryState
-from mira_msgs.srv import UserNavMode, ObsNavMode
 from hobbit_user_interaction import HobbitMMUI
 from uashh_smach.util import SleepState, WaitForMsgState
 from actionlib import SimpleActionClient
@@ -468,11 +467,6 @@ def goToPosition(frame='/map', room='None', place='dock'):
             'HEAD_UP_AFTER_MOVEMENT',
             head_move.MoveTo(pose='center_center')
         )
-        Sequence.add('PREPARE_STOP',
-                     ServiceState('/user_nav_mode',
-                                  UserNavMode
-                     )
-        )
         # Sequence.add('ENABLE_GESTURES',
         #              service_disable.enable_gestures())
         Sequence.add(
@@ -508,11 +502,6 @@ def prepareMovement():
     with seq:
         # Sequence.add('DISABLE_GESTURES',
         #              service_disable.disable_gestures())
-        Sequence.add('PREPARE_MOVEMENT',
-                     ServiceState('/obs_nav_mode',
-                                  ObsNavMode
-                     )
-        )
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
                      head_move.MoveTo(pose='down_center'))
         Sequence.add('WAIT', SleepState(duration=1))
@@ -566,11 +555,6 @@ def goToPose():
         Sequence.add(
             'HEAD_UP_AFTER_MOVEMENT',
             head_move.MoveTo(pose='center_center')
-        )
-        Sequence.add('PREPARE_STOP',
-                     ServiceState('/user_nav_mode',
-                                  UserNavMode
-                     )
         )
         # Sequence.add('ENABLE_GESTURES',
         #              service_disable.enable_gestures())
@@ -638,12 +622,6 @@ def goToPoseSilent():
         Sequence.add(
             'HEAD_UP_AFTER_MOVEMENT',
             head_move.MoveTo(pose='center_center')
-        )
-        Sequence.add('PREPARE_STOP',
-                     ServiceState('/user_nav_mode',
-                                  UserNavMode
-                     )
-        )
         # Sequence.add('ENABLE_GESTURES',
         #              service_disable.enable_gestures())
         Sequence.add(
