@@ -148,15 +148,17 @@ int main(int argc, char **argv)
 			double current_y = current_pose.pose.pose.position.y;
 			double current_theta = tf::getYaw(current_pose.pose.pose.orientation);
 
+			double local_dir = atan2(-current_target.x,current_target.y + x_sensor);			
+
 			//since target reference system is: x right, y forward
 			// v = (vY, -vX)
-			double local_target_x = current_target.y + x_sensor - dis2target * current_target.vY;
-			double local_target_y = -current_target.x + dis2target * current_target.vX;
+			double local_target_x = current_target.y + x_sensor - dis2target*cos(local_dir);
+			double local_target_y = -current_target.x - dis2target*sin(local_dir);
 
 			double target_x = current_x + local_target_x*cos(current_theta) - local_target_y*sin(current_theta);
 		        double target_y = current_y + local_target_x*sin(current_theta) + local_target_y*cos(current_theta);
 
-			if ( (target_x-current_x)*(target_x-current_x) + (target_y-current_y)*(target_y-current_y) > dis_thres)
+			if ( (target_x-current_target_x)*(target_x-current_target_x) + (target_y-current_target_y)*(target_y-current_target_y) > dis_thres)
 			{
 
 				std::cout << "target pose " << target_x << " " << target_y << std::endl;
@@ -166,6 +168,9 @@ int main(int argc, char **argv)
 				goal.target_pose.pose.position.y = target_y;
 				goal.target_pose.pose.orientation = tf::createQuaternionMsgFromYaw(atan2(-current_target.vX, current_target.vY));
 				ac.sendGoal(goal, boost::bind(&goalDoneCallback, _1, _2), boost::bind(&goalActiveCallback), boost::bind(&goalFeedbackCallback, _1)); 
+
+				current_target_x = target_x;
+				current_target_y = target_y;
 
 			}
 
