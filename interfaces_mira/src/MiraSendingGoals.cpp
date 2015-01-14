@@ -396,15 +396,16 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
 		if (!loc_ok)
 		{
 			// call service, remember obstacles
-			mira_msgs::UserNavMode srv_user;
-			user_nav_mode(srv_user.request, srv_user.response);
+			/*mira_msgs::UserNavMode srv_user;
+			user_nav_mode(srv_user.request, srv_user.response);*/
 
 			//cancel the task
 			TaskPtr task(new Task());
 			std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
 			robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
 
-			if (isRotationSafe())
+			//if (isRotationSafe())
+			if (false)
 			{
 				// rotate
 				std_msgs::String rotate_cmd;
@@ -443,8 +444,8 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
 			}
 
 			// call service, forget obstacles
-			mira_msgs::ObsNavMode srv_obs;
-			obs_nav_mode(srv_obs.request, srv_obs.response);
+			/*mira_msgs::ObsNavMode srv_obs;
+			obs_nav_mode(srv_obs.request, srv_obs.response);*/
 
 			std::cout << "The robot is lost and rotation is not safe " << std::endl;
 			// TODO notify that the robot is lost, stop navigation?? !!!! //TODO TODO TODO
