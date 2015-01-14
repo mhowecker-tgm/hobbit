@@ -32,7 +32,7 @@ ros::Publisher status_pub;
 bool new_pose;
 
 int count_num;
-int no_target_count;
+//int no_target_count;
 int no_new_goal_count;
 
 void tracker_target_callback(const follow_user::TrackerTarget::ConstPtr& msg)
@@ -52,7 +52,7 @@ bool startFollowing(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &r
 {	
 	ROS_INFO("person_following request received");
 	count_num = 0;
-	no_target_count = 0;
+	//no_target_count = 0;
 	no_new_goal_count = 0;
 
 	following_active = true;
@@ -146,8 +146,8 @@ int main(int argc, char **argv)
 	double v_thres = 0.2; //threshold value to consider if the velocity is close to zero
 
 	new_pose = false;
-	no_target_count = 0;
-	int no_target_limit = 5000;
+	//no_target_count = 0;
+	//int no_target_limit = 5000;
 
 	no_new_goal_count = 0;
 	int no_new_goal_limit = 10;
@@ -171,29 +171,28 @@ int main(int argc, char **argv)
 		if(following_active)
 		{
 
-			if (!new_pose)
+			/*if (!new_pose)
 			{
 				no_target_count++;
 				//std::cout << "no_target_sum " << no_target_count << std::endl;
-				/*if (no_target_count > no_target_limit) //no tracked target received for a while
+				if (no_target_count > no_target_limit) //no tracked target received for a while
 				{	
 					following_active = false;
 					goal_status.data = "target_lost";
 					std::cout << "target lost *************************** " << std::endl;
 					status_pub.publish(goal_status);
 					
-				}*/
+				}
 				//continue;
-			}
+			}*/
 
 			//tracked target received, reset the count
-			new_pose = false;
-			no_target_count = 0;
+			//new_pose = false;
+			//no_target_count = 0; */
 
 			//determine local target pose
 			double local_dir = atan2(-current_target.x,current_target.y + x_sensor);			
 			//since target reference system is: x right, y forward
-			// v = (vY, -vX)
 			double local_target_x = current_target.y + x_sensor - dis2target*cos(local_dir);
 			double local_target_y = -current_target.x - dis2target*sin(local_dir);
 
