@@ -210,8 +210,8 @@ void rgbdCallback(const sensor_msgs::Image::ConstPtr rgb_img_msg,
   //A new pair of frames has arrived , copy and convert them so that they are ready
  cv_bridge::CvImageConstPtr orig_rgb_img;
  cv_bridge::CvImageConstPtr orig_depth_img;
- orig_rgb_img = cv_bridge::toCvShare(rgb_img_msg, "rgb8");
- orig_depth_img = cv_bridge::toCvShare(depth_img_msg, sensor_msgs::image_encodings::TYPE_16UC1);
+ orig_rgb_img = cv_bridge::toCvCopy(rgb_img_msg, "rgb8");
+ orig_depth_img = cv_bridge::toCvCopy(depth_img_msg, sensor_msgs::image_encodings::TYPE_16UC1);
 
           if (recording) { ++recordedFrames; }
           if (recordedFrames>MAX_RECORDED_FRAMES)

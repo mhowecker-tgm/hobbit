@@ -206,6 +206,34 @@ void broadcastNewRepetition(unsigned int frameNumber,struct exerciseData * exerc
   ss<<"C_EXERCISE_REPΕΤΙΤΙΟΝ";
   msg.command=ss.str();
 
+  msg.params.resize(1);
+  ss<<""<<exercise->repetitionNumber;
+  msg.params[0].name==ss.str();
+
+  ss<<"SUCCESS";
+  msg.params[0].value==ss.str();
+
+
+  fitnessXPCBroadcaster.publish(msg);
+}
+
+
+
+void broadcastNewRepetitionError(unsigned int frameNumber,struct exerciseData * exercise)
+{
+  hobbit_msgs::Fitness msg;
+  std::stringstream ss;
+  ss<<"C_EXERCISE_REPΕΤΙΤΙΟΝ";
+  msg.command=ss.str();
+
+  msg.params.resize(1);
+  ss<<"";
+  msg.params[0].name==ss.str();
+
+  ss<<"ARM_WRONG";
+  msg.params[0].value==ss.str();
+
+
   fitnessXPCBroadcaster.publish(msg);
 }
 
@@ -217,6 +245,7 @@ void fitnessRecvMessage(const hobbit_msgs::Fitness & msg)
   {
     unsigned int isLeftHand=0;
     unsigned int exerciseID =atoi(msg.params[0].name.c_str());
+    unsigned int exerciseRepetitions =atoi(msg.params[0].value.c_str());
     fprintf(stderr,"Started Exercise %u \n",exerciseID);
 
     if ( (MORE_IS_LEFT_EXERCISE<exerciseID) && (exerciseID<LESS_IS_LEFT_EXERCISE) )
@@ -224,7 +253,7 @@ void fitnessRecvMessage(const hobbit_msgs::Fitness & msg)
       isLeftHand=1;
     }
 
-    hobbitFitnessFunction_StartExercise(actualTimestamp,exerciseID,isLeftHand,5/*TODO*/);
+    hobbitFitnessFunction_StartExercise(actualTimestamp,exerciseID,isLeftHand,exerciseRepetitions);
   }
   else
  //Test Trigger with rostopic pub /fitness_tablet hobbit_msgs/Fitness " { command: C_EXERCISE_STOPPED , params: [  { name: '1' , value: 'STOPPED' } ] } " -1
@@ -481,7 +510,7 @@ int registerServices(ros::NodeHandle * nh,unsigned int width,unsigned int height
 
   fprintf(stderr,"Registering Exercise callbacks..\n");
   hobbitFitnessFunction_RegisterExerciseRepetitionDetected((void *) &broadcastNewRepetition);
-  //hobbitFitnessFunction_RegisterExerciseRepetitionErrorDetected(void * callback)
+  hobbitFitnessFunction_RegisterExerciseRepetitionErrorDetected((void *) &broadcastNewRepetitionError);
   //hobbitFitnessFunction_RegisterExerciseRepetitionBatchCompleted(void * callback)
 
 

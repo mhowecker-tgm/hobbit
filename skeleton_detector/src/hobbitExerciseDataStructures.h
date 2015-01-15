@@ -58,11 +58,12 @@ struct exerciseData
 
     unsigned int iterations;
     unsigned int resetFrameID;
-    char errorReason[512];
+    char errorReason[1024];
 
     unsigned int frameNumber;
     unsigned int excerciseNumber;
     unsigned int repetitionNumber;
+    unsigned int monotonicRepetitionNumber;
 };
 
 

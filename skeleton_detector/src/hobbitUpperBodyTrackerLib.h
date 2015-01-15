@@ -28,6 +28,8 @@ int hobbitFitnessFunction_RegisterExerciseRepetitionBatchCompleted(void * callba
 
 int hobbitUpperBodyTracker_useFaceDetector(int useFaceDetector);
 int hobbitUpperBodyTracker_useGestures(int useGestures);
+int hobbitUpperBodyTracker_useGesturesWithoutABody(int useGestures);
+
 int hobbitUpperBodyTracker_setFloor(float floorX,float floorY,float floorZ,float floorNormalX,float floorNormalY,float floorNormalZ);
 
 int hobbitUpperBodyTracker_setSamplingFrameSize(unsigned int width,unsigned int height);
