@@ -32,7 +32,6 @@ ros::Publisher status_pub;
 bool new_pose;
 
 int count_num;
-//int no_target_count;
 int no_new_goal_count;
 
 void tracker_target_callback(const follow_user::TrackerTarget::ConstPtr& msg)
@@ -52,7 +51,6 @@ bool startFollowing(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &r
 {	
 	ROS_INFO("person_following request received");
 	count_num = 0;
-	//no_target_count = 0;
 	no_new_goal_count = 0;
 
 	following_active = true;
@@ -133,8 +131,8 @@ int main(int argc, char **argv)
 
 	following_active = false;
 
-	double current_target_x = current_pose.pose.pose.position.x;
-	double current_target_y = current_pose.pose.pose.position.y;
+	double previous_target_x = current_pose.pose.pose.position.x;
+	double previous_target_y = current_pose.pose.pose.position.y;
 	
 	double x_sensor = 0.135; //FIXME
 	double dis2target = 1.0; //distance to the user to be kept
@@ -146,11 +144,6 @@ int main(int argc, char **argv)
 	double v_thres = 0.2; //threshold value to consider if the velocity is close to zero
 
 	new_pose = false;
-	//no_target_count = 0;
-	//int no_target_limit = 5000;
-
-	no_new_goal_count = 0;
-	int no_new_goal_limit = 10;
 	
 
 	// Tell the action client that we want to spin a thread by default
@@ -171,25 +164,6 @@ int main(int argc, char **argv)
 		if(following_active)
 		{
 
-			/*if (!new_pose)
-			{
-				no_target_count++;
-				//std::cout << "no_target_sum " << no_target_count << std::endl;
-				if (no_target_count > no_target_limit) //no tracked target received for a while
-				{	
-					following_active = false;
-					goal_status.data = "target_lost";
-					std::cout << "target lost *************************** " << std::endl;
-					status_pub.publish(goal_status);
-					
-				}
-				//continue;
-			}*/
-
-			//tracked target received, reset the count
-			//new_pose = false;
-			//no_target_count = 0; */
-
 			//determine local target pose
 			double local_dir = atan2(-current_target.x,current_target.y + x_sensor);			
 			//since target reference system is: x right, y forward
@@ -202,8 +176,8 @@ int main(int argc, char **argv)
 			double current_theta = tf::getYaw(current_pose.pose.pose.orientation);
 			double target_x = current_x + local_target_x*cos(current_theta) - local_target_y*sin(current_theta);
 		        double target_y = current_y + local_target_x*sin(current_theta) + local_target_y*cos(current_theta);
-			//check if new target is not too close
-			if ( (target_x-current_target_x)*(target_x-current_target_x) + (target_y-current_target_y)*(target_y-current_target_y) > dis_thres)
+			//check if new target is not too close to the previous one
+			if ( (target_x-previous_target_x)*(target_x-previous_target_x) + (target_y-previous_target_y)*(target_y-previous_target_y) > dis_thres)
 			{
 
 				//std::cout << "target pose " << target_x << " " << target_y << std::endl;
@@ -214,21 +188,13 @@ int main(int argc, char **argv)
 				goal.target_pose.pose.orientation = tf::createQuaternionMsgFromYaw(atan2(target_y-current_y, target_x-current_x));
 				ac.sendGoal(goal, boost::bind(&goalDoneCallback, _1, _2), boost::bind(&goalActiveCallback), boost::bind(&goalFeedbackCallback, _1)); 
 				//update current target
-				current_target_x = target_x;
-				current_target_y = target_y; 
+				previous_target_x = target_x;
+				previous_target_y = target_y; 
 				
 				
 
 			}
 			else no_new_goal_count++;
-			//check if new goals available recently
-			/*if (no_new_goal_count >= no_new_goal_limit)
-			{
-				following_active = false;
-				goal_status.data = "stopped";
-				status_pub.publish(goal_status);
-
-			}*/
 
 			//check if the average velocity is close to zero
 			v_sum += current_target.vX*current_target.vX + current_target.vY*current_target.vY;
