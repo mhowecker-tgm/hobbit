@@ -207,23 +207,14 @@ void broadcastNewRepetition(unsigned int frameNumber,struct exerciseData * exerc
   msg.command=ss.str();
 
   hobbit_msgs::Parameter p;
-  ss<<exercise->repetitionNumber;
+  ss.str("");
+  ss<<exercise->monotonicRepetitionNumber;
   p.name=ss.str();
   p.value="SUCCESS";
   msg.params.push_back(p);
 
-/*
-  msg.params.resize(1);
-  ss<<""<<exercise->repetitionNumber;
-  msg.params[0].name==ss.str();
-
-  ss<<"SUCCESS";
-  msg.params[0].value==ss.str();
-*/
-
   fitnessXPCBroadcaster.publish(msg);
 }
-
 
 
 void broadcastNewRepetitionError(unsigned int frameNumber,struct exerciseData * exercise)
@@ -233,13 +224,10 @@ void broadcastNewRepetitionError(unsigned int frameNumber,struct exerciseData * 
   ss<<"C_EXERCISE_REPΕΤΙΤΙΟΝ";
   msg.command=ss.str();
 
-  msg.params.resize(1);
-  ss<<"";
-  msg.params[0].name==ss.str();
-
-  ss<<"ARM_WRONG";
-  msg.params[0].value==ss.str();
-
+  hobbit_msgs::Parameter p;
+  p.name="";
+  p.value="ARM_WRONG";
+  msg.params.push_back(p);
 
   fitnessXPCBroadcaster.publish(msg);
 }
