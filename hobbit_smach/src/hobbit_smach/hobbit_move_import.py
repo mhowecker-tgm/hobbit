@@ -15,6 +15,7 @@ import math
 
 from smach import State, Sequence, StateMachine
 from smach_ros import ServiceState, SimpleActionState
+from mira_msgs.srv import UserNavMode, ObsNavMode
 from hobbit_msgs.srv import GetCoordinates, GetCoordinatesRequest, GetName, \
     SwitchVision, SwitchVisionRequest
 from move_base_msgs.msg import MoveBaseAction
@@ -39,7 +40,16 @@ def switch_vision_cb(ud, response):
     else:
         return 'aborted'
 
-
+smach.StateMachine.add(
+            'PREPARE_MOVEMENT',
+            ServiceState(
+                '/obs_nav_mode',
+                ObsNavMode
+            ),
+            transitions={'succeeded': 'PLAN_PATH',
+                         'preempted': 'CLEAN_UP',
+                         'aborted': 'PLAN_PATH'}
+        )
 def battery_cb(msg, ud):
     print('Received battery_state message')
     rospy.sleep(2.0)
@@ -451,15 +461,35 @@ def goToPosition(frame='/map', room='None', place='dock'):
                 response_cb=switch_vision_cb
             )
         )
+        Sequence.add(
+            'PREPARE_MOVEMENT',
+            ServiceState(
+                '/obs_nav_mode',
+                ObsNavMode
+            )
+        )
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
                      head_move.MoveTo(pose='down_center'))
-        Sequence.add('WAIT', SleepState(duration=1))
+        Sequence.Sequence.add(
+            'PREPARE_MOVEMENT',
+            ServiceState(
+                '/obs_nav_mode',
+                ObsNavMode
+            )
+        )add('WAIT', SleepState(duration=1))
         Sequence.add('ACTIVATE_OBSTACLES',
                      SetObstacles(active=True))
         Sequence.add('SET_NAV_GOAL', SetNavigationGoal(room, place))
         Sequence.add(
             'CHECK_ARM',
             arm_move.CheckArmAtHomePos()
+        )
+        Sequence.add(
+            'PREPARE_STOP',
+            ServiceState(
+                '/user_nav_mode',
+                UserNavMode
+            )
         )
         if not DEBUG:
             Sequence.add('MOVE_HOBBIT', move_base.MoveBaseState(frame))
@@ -505,9 +535,22 @@ def prepareMovement():
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
                      head_move.MoveTo(pose='down_center'))
         Sequence.add('WAIT', SleepState(duration=1))
+        Sequence.add(
+            'PREPARE_MOVEMENT',
+            ServiceState(
+                '/obs_nav_mode',
+                ObsNavMode
+            )
+        )
         Sequence.add('ACTIVATE_OBSTACLES',
                      SetObstacles(active=True))
-    return seq
+    return sSequence.add(
+            'PREPARE_MOVEMENT',
+            ServiceState(
+                '/obs_nav_mode',
+                ObsNavMode
+            )
+        )eq
 
 
 def goToPose():
@@ -542,6 +585,13 @@ def goToPose():
                 response_cb=switch_vision_cb
             )
         )
+        Sequence.add(
+            'PREPARE_MOVEMENT',
+            ServiceState(
+                '/obs_nav_mode',
+                ObsNavMode
+            )
+        )
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
                      head_move.MoveTo(pose='down_center'))
         Sequence.add('WAIT', SleepState(duration=1))
@@ -552,6 +602,13 @@ def goToPose():
                          remapping={'x': 'x',
                                     'y': 'y',
                                     'yaw': 'yaw'})
+        Sequence.add(
+            'PREPARE_STOP',
+            ServiceState(
+                '/user_nav_mode',
+                UserNavMode
+            )
+        )
         Sequence.add(
             'HEAD_UP_AFTER_MOVEMENT',
             head_move.MoveTo(pose='center_center')
