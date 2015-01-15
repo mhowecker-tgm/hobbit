@@ -175,6 +175,21 @@ bool resume(std_srvs::Empty::Request& request, std_srvs::Empty::Response& respon
 }
 
 
+bool pauseBodylessGestures(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    ROS_INFO("Skeleton Detector is now filtering bodyless gestures");
+    hobbitUpperBodyTracker_useGesturesWithoutABody(0);
+    return true;
+}
+
+bool resumeBodylessGestures(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    ROS_INFO("Skeleton Detector is now publishing bodyless gestures");
+    hobbitUpperBodyTracker_useGesturesWithoutABody(1);
+    return true;
+}
+
+
 bool startExercise(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
     ROS_INFO("Skeleton Detector is now starting Exercise Batch");
@@ -309,9 +324,11 @@ int main(int argc, char **argv)
      ros::ServiceServer superService            = nh.advertiseService(name+"/super"        , super);
 
 
+     ros::ServiceServer pauseBodylessGesturesService = nh.advertiseService(name+"/pauseBodylessGestures" , pauseBodylessGestures);
+     ros::ServiceServer resumeBodylessGesturesService= nh.advertiseService(name+"/resumeBodylessGestures", resumeBodylessGestures);
 
-    ros::ServiceServer  startExerciseService    = nh.advertiseService(name+"/startExercise"        , startExercise);
-    ros::ServiceServer  stopExerciseService     = nh.advertiseService(name+"/stopExercise"         , stopExercise);
+     ros::ServiceServer  startExerciseService    = nh.advertiseService(name+"/startExercise"        , startExercise);
+     ros::ServiceServer  stopExerciseService     = nh.advertiseService(name+"/stopExercise"         , stopExercise);
      //Make our rostopic cmaera grabber
      message_filters::Synchronizer<RgbdSyncPolicy> *sync;
 

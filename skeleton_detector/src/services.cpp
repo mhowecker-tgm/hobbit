@@ -206,13 +206,20 @@ void broadcastNewRepetition(unsigned int frameNumber,struct exerciseData * exerc
   ss<<"C_EXERCISE_REPΕΤΙΤΙΟΝ";
   msg.command=ss.str();
 
+  hobbit_msgs::Parameter p;
+  ss<<exercise->repetitionNumber;
+  p.name=ss.str();
+  p.value="SUCCESS";
+  msg.params.push_back(p);
+
+/*
   msg.params.resize(1);
   ss<<""<<exercise->repetitionNumber;
   msg.params[0].name==ss.str();
 
   ss<<"SUCCESS";
   msg.params[0].value==ss.str();
-
+*/
 
   fitnessXPCBroadcaster.publish(msg);
 }
@@ -502,6 +509,7 @@ int registerServices(ros::NodeHandle * nh,unsigned int width,unsigned int height
   hobbitUpperBodyTracker_RegisterSkeletonDetectedEvent((void *) &broadcastNewSkeleton);
   hobbitUpperBodyTracker_setFloor(51.46 , 622.97 , 1722.0 , 0.02 , -0.91 , -0.42); //default plane
   hobbitUpperBodyTracker_useGestures(1);
+  hobbitUpperBodyTracker_useGesturesWithoutABody(1);
 
   fprintf(stderr,"Registering Gesture callbacks..\n");
   gestureEventBroadcaster = nh->advertise <hobbit_msgs::Event> ("Event", 1000);
