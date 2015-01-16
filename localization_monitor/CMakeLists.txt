@@ -4,7 +4,7 @@ project(localization_monitor)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp sensor_msgs std_msgs tf Eigen map_server occupancy_grid_utils hobbit_msgs)
+find_package(catkin REQUIRED COMPONENTS roscpp sensor_msgs std_msgs tf eigen map_server occupancy_grid_utils hobbit_msgs)
 
 
 ###################################
