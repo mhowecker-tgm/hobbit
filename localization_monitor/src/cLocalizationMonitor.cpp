@@ -346,7 +346,7 @@ void cLocalizationMonitor::Run(void)
 	 loc_state.data = loc_ok;
 	 locStatePublisher.publish(loc_state);
 
-	 mapTestPublisher.publish(static_map_modified); //for visualization purposes
+	 //mapTestPublisher.publish(static_map_modified); //for visualization purposes
 
 	 //mapTestPublisher.publish(static_map_low_res); //for visualization purposes
 
