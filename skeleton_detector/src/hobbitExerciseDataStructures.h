@@ -25,6 +25,28 @@ static const char * exerciseNames[] =
 };
 
 
+static const char * exercisePrefix[] =
+{
+ "",  
+ "",
+ "LEFT_ARMPUMP",
+ "LEFT_MONOFLAP",
+ "LEFT_ELBOWBEND",
+  "" ,
+  //-----------------------
+  "",
+  "RIGHT_ARMPUMP",
+  "RIGHT_MONOFLAP",
+  "RIGHT_ELBOWBEND",
+  "" ,
+  //-----------------------
+  "",
+  "DUALFLAP",
+  "DUALELBOWBEND",
+  "DUALELBOWBEND", 
+  ""
+};
+
 enum excerciseEnumerator
 {
   NO_EXERCISE_ACTIVE = 0 ,
