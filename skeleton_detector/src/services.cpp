@@ -203,7 +203,7 @@ void broadcastNewRepetition(unsigned int frameNumber,struct exerciseData * exerc
 {
   hobbit_msgs::Fitness msg;
   std::stringstream ss;
-  ss<<"C_EXERCISE_REPΕΤΙΤΙΟΝ";
+  ss<<"C_EXERCISE_REPETITION";
   msg.command=ss.str();
 
   hobbit_msgs::Parameter p;
