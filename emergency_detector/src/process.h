@@ -20,6 +20,21 @@ extern unsigned int tempTimestamp;
 
 
 
+extern  int maximumFrameDifferenceForTemperatureToBeRelevant;
+
+extern  int minimumAllowedHolePercentage;
+extern  int maximumAllowedHolePercentage;
+
+extern double minHumanTemperature;
+extern double maxHumanTemperature;
+
+extern  int tempZoneWidth;
+extern  int tempZoneHeight;
+
+extern  int minScoreTrigger;
+extern  int maxScoreTrigger;
+
+
 int setHobbitEMode();
 
 int increasePlane();

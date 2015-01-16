@@ -45,8 +45,6 @@ struct fallState
    struct floatTriplet bboxLast,bboxDelta,bboxCurrent,bboxAverage;
    struct floatTriplet posLast,posDelta,posCurrent,posAverage;
 
-
-
    unsigned int skeletonVelocity;
    unsigned int jointsTimestamp;
    unsigned int lastJointsTimestamp;
@@ -57,7 +55,6 @@ struct fallState
 
    struct floatTriplet currentJoint3D[MAX_NUMBER_OF_2D_JOINTS];
    struct floatTriplet lastJoint3D[MAX_NUMBER_OF_2D_JOINTS];
-
 };
 
 int logSkeletonState(struct fallState * fs,unsigned int mode3D);

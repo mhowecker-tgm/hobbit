@@ -375,6 +375,20 @@ int main(int argc, char **argv)
      private_node_handle_.param("fromDepthTopicInfo", fromDepthTopicInfo, std::string("/headcam/depth_registered/camera_info"));
      private_node_handle_.param("fromRGBTopic", fromRGBTopic, std::string("headcam/rgb/image_rect_color"));
      private_node_handle_.param("fromRGBTopicInfo", fromRGBTopicInfo, std::string("/headcam/rgb/camera_info"));
+
+
+     private_node_handle_.param("maximumFrameDifferenceForTemperatureToBeRelevant", maximumFrameDifferenceForTemperatureToBeRelevant ,  10 );
+     private_node_handle_.param("minimumAllowedHolePercentage", minimumAllowedHolePercentage ,  15 );
+     private_node_handle_.param("maximumAllowedHolePercentage", maximumAllowedHolePercentage ,  75 );
+     private_node_handle_.param("minHumanTemperature", minHumanTemperature , double (31.5) );
+     private_node_handle_.param("maxHumanTemperature", maxHumanTemperature , double (37.0) );
+     private_node_handle_.param("tempZoneWidth", tempZoneWidth ,  300 );
+     private_node_handle_.param("tempZoneHeight", tempZoneHeight ,  200 );
+     private_node_handle_.param("minScoreTrigger", minScoreTrigger ,  1600 );
+     private_node_handle_.param("maxScoreTrigger", maxScoreTrigger ,  2000 );
+
+     std::cerr<<"Human Temperature Range set to "<<minHumanTemperature<<" up to "<<maxHumanTemperature<<"\n";
+
      private_node_handle_.param("name", name, std::string("emergency_detector"));
      private_node_handle_.param("rate", rate , int(DEFAULT_FRAME_RATE)); //11 should me optimal  less for a little less CPU Usage
      ros::Rate loop_rate(rate); //  hz should be our target performance

@@ -32,19 +32,21 @@ struct SegmentationFeaturesDepth segConfDepth={0};
 unsigned int combinationMode=COMBINE_AND;
 
 
-unsigned int maximumFrameDifferenceForTemperatureToBeRelevant=10;
+//The following values are set by the launch file , so change them there..
+ int maximumFrameDifferenceForTemperatureToBeRelevant=10;
 
-unsigned int minimumAllowedHolePercentage = 15;
-unsigned int maximumAllowedHolePercentage = 75;
+ int minimumAllowedHolePercentage = 15;
+ int maximumAllowedHolePercentage = 75;
 
-float minHumanTemperature = 31.5;
-float maxHumanTemperature = 37.0;
+double minHumanTemperature = 31.5;
+double maxHumanTemperature = 37.0;
 
-unsigned int tempZoneWidth = 300;
-unsigned int tempZoneHeight = 200;
+ int tempZoneWidth = 300;
+ int tempZoneHeight = 200;
 
-unsigned int minScoreTrigger = 1600;
-unsigned int maxScoreTrigger = 2000;
+ int minScoreTrigger = 1600;
+ int maxScoreTrigger = 2000;
+ //-----------------------------------------------------------------------
 
 unsigned int doCVOutput=0;
 unsigned int emergencyDetected=0;
