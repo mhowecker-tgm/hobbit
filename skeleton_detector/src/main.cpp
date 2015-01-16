@@ -190,12 +190,36 @@ bool resumeBodylessGestures(std_srvs::Empty::Request& request, std_srvs::Empty::
 }
 
 
-bool startExercise(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+bool startLeftFlapExercise(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
     ROS_INFO("Skeleton Detector is now starting Exercise Batch");
-    hobbitFitnessFunction_StartExercise(frameTimestamp,2,1/*isLeftHand*/,5);
+    hobbitFitnessFunction_StartExercise(frameTimestamp,LEFT_FLAP_EXERCISE,1/*isLeftHand*/,5);
     return true;
 }
+
+bool startRightFlapExercise(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    ROS_INFO("Skeleton Detector is now starting Exercise Batch");
+    hobbitFitnessFunction_StartExercise(frameTimestamp,RIGHT_FLAP_EXERCISE,0/*isLeftHand*/,5);
+    return true;
+}
+
+
+bool startLeftArmPumpExercise(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    ROS_INFO("Skeleton Detector is now starting Exercise Batch");
+    hobbitFitnessFunction_StartExercise(frameTimestamp,LEFT_ARM_PUMP_EXERCISE,1/*isLeftHand*/,5);
+    return true;
+}
+
+bool startRightArmPumpExercise(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    ROS_INFO("Skeleton Detector is now starting Exercise Batch");
+    hobbitFitnessFunction_StartExercise(frameTimestamp,RIGHT_ARM_PUMP_EXERCISE,1/*isLeftHand*/,5);
+    return true;
+}
+
+
 
 
 bool stopExercise(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
@@ -327,8 +351,11 @@ int main(int argc, char **argv)
      ros::ServiceServer pauseBodylessGesturesService = nh.advertiseService(name+"/pauseBodylessGestures" , pauseBodylessGestures);
      ros::ServiceServer resumeBodylessGesturesService= nh.advertiseService(name+"/resumeBodylessGestures", resumeBodylessGestures);
 
-     ros::ServiceServer  startExerciseService    = nh.advertiseService(name+"/startExercise"        , startExercise);
-     ros::ServiceServer  stopExerciseService     = nh.advertiseService(name+"/stopExercise"         , stopExercise);
+     ros::ServiceServer  startExercise0LService    = nh.advertiseService(name+"/startLeftArmPumpExercise"        , startLeftArmPumpExercise);
+     ros::ServiceServer  startExercise0RService    = nh.advertiseService(name+"/startRightArmPumpExercise"       , startRightArmPumpExercise);
+     ros::ServiceServer  startExercise1LService    = nh.advertiseService(name+"/startLeftFlapExercise"        , startLeftFlapExercise);
+     ros::ServiceServer  startExercise1RService    = nh.advertiseService(name+"/startRightFlapExercise"       , startRightFlapExercise);
+     ros::ServiceServer  stopExerciseService       = nh.advertiseService(name+"/stopExercise"         , stopExercise);
      //Make our rostopic cmaera grabber
      message_filters::Synchronizer<RgbdSyncPolicy> *sync;
 
