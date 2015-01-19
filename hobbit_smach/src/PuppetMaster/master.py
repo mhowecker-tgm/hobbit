@@ -571,7 +571,7 @@ def main():
                          'preempted': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
-        StateMachine.add_auto(
+        StateMachine.add(
             'EMERGENCY',
             SimpleActionState(
                 'emergency_user',
@@ -581,7 +581,9 @@ def main():
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
-            connector_outcomes=['succeeded', 'aborted', 'preempted']
+            transitions={'succeeded': 'RESET_ACTIVE_TASK',
+                         'preempted': 'RESET_ACTIVE_TASK',
+                         'aborted': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'CLEAR_FLOOR',
