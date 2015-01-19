@@ -36,6 +36,8 @@
 
 #include "geometry_msgs/PoseWithCovarianceStamped.h"
 
+#include "std_srvs/Empty.h"
+
 #define COST_LIMIT 127
 
 
@@ -103,6 +105,9 @@ private:
 	ros::Publisher discrete_motion_cmd_pub;
 
 	ros::Publisher loc_check_pub;
+
+	ros::ServiceServer cancel_goal_service;
+	bool cancelGoal(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res);
 
 };
 

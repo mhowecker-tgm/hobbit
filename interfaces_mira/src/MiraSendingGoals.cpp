@@ -68,6 +68,8 @@ void MiraSendingGoals::initialize() {
 
   loc_check_pub = robot_->getRosNode().advertise<std_msgs::Bool>("/loc_check_state", 20);
 
+  cancel_goal_service = robot_->getRosNode().advertiseService("/cancel_goal", &MiraSendingGoals::cancelGoal, this);
+
 }
 
 void MiraSendingGoals::spin() 
@@ -195,6 +197,20 @@ void MiraSendingGoals::stop_request_callback(const std_msgs::String::ConstPtr& m
 
 }
 
+bool MiraSendingGoals::cancelGoal(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res)
+{
+	ROS_INFO("cancel goal request received");
+	TaskPtr task(new Task());
+	//cancel the task
+	std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
+  	robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
+
+	goal_status.data = "aborted";
+	std::cout << "Goal cancelled " << std::endl;
+	goal_status_pub.publish(goal_status);	
+	
+}
+
 void MiraSendingGoals::executeCb(const interfaces_mira::MiraSendingGoalsGoalConstPtr& goal_pose)
 {
 
@@ -295,7 +311,7 @@ void MiraSendingGoals::executeCb(const interfaces_mira::MiraSendingGoalsGoalCons
   
      if (goal_status.data == "aborted")
      {
-     	as2_->setAborted(move_base_msgs::MoveBaseResult(), "Aborting on goal, probably because the path is blocked");
+     	as2_->setAborted(move_base_msgs::MoveBaseResult(), "Aborting on goal, probably because the path is blocked or it was cancelled");
 	return;
      }
 
