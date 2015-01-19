@@ -73,6 +73,7 @@ add_action_files(
   GeneralHobbit.action
   MiraDocking.action
   MiraSendingGoals.action
+  FollowMe.action
 )
 
 generate_messages(DEPENDENCIES std_msgs sensor_msgs actionlib geometry_msgs)
