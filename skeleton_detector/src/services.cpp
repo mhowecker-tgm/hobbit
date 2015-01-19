@@ -260,18 +260,6 @@ void fitnessRecvMessage(const hobbit_msgs::Fitness & msg)
     unsigned int exerciseID =atoi(msg.params[0].name.c_str());
     unsigned int exerciseRepetitions=atoi(msg.params[0].value.c_str());
 
-    char buffer[512]={0};
-    snprintf(buffer,512,msg.params[0].name.c_str());
-    char *seperator= strchr(buffer,':');
-
-    if (seperator!=0)
-    {
-       *seperator=0;
-       exerciseID=atoi(buffer);
-       exerciseRepetitions=atoi(seperator+1);
-    }
-
-
     ROS_INFO("Skeleton Detector is now starting exercise , command received from tablet");
     fprintf(stderr,"Started Exercise %u (%s) , %u repetitions\n",exerciseID,exercisePrefix[exerciseID],exerciseRepetitions);
 
