@@ -235,6 +235,13 @@ int main(int argc, char **argv)
 
      registerServices(&nh,640,480);
 
+
+     if (paused)
+     {
+        std::cerr<<"Please note that follow user has started in a paused state..!\n";
+        std::cerr<<"Use `rosservice call /follow_user/resume` to resume :)\n";
+     }
+
 	  while ( ( key!='q' ) && (ros::ok()) )
 		{
           ros::spinOnce();
