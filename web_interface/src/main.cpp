@@ -892,9 +892,8 @@ void * store_new_configuration_callback(struct AmmServer_DynamicRequest  * rqst)
   unsigned int fullSetOperation = 0;
   unsigned int genderIsMale=0;
   int i=0;
-  //rqst->content[pageLength]=0; //Clear content
+  //rqst->content[pageLength]=0; //Clear content , this is wrong.. the configuration file is smaller !
 
-  fprintf(stderr," step 0\n");
   if  ( rqst->GET_request != 0 )
     {
       if ( strlen(rqst->GET_request)>0 )
@@ -908,7 +907,6 @@ void * store_new_configuration_callback(struct AmmServer_DynamicRequest  * rqst)
        }
     }
 
-  fprintf(stderr," step 1\n");
   if  ( rqst->GET_request != 0 )
     {
       if ( strlen(rqst->GET_request)>0 )
@@ -992,7 +990,6 @@ void * store_new_configuration_callback(struct AmmServer_DynamicRequest  * rqst)
           }
         }
      }
-  fprintf(stderr," step 2\n");
 
 
 //Save rosparameters set
@@ -1007,7 +1004,6 @@ if (signalNamesChanged)
   execute((char*) "signalNameUpdate",(char*) "no_parameter");
 }
 
-  fprintf(stderr," step 3\n");
 
 if (successfullStore)
      {
