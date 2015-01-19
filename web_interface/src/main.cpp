@@ -344,11 +344,11 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
    addServiceCheck(statusControl , (char*) "RGBDAcquisition"      , (char*)  "rgbd" );
    addScreenCheck (statusControl , (char*) "Base Camera"          , (char*)  "basecam" );
    addServiceCheck(statusControl , (char*)  "Skeleton Detector"   , (char*)  "skeleton" );
-   //addServiceCheck(statusControl , (char*)  "Hand Gestures"       , (char*)  "hand" ); -- Hand Gestures are deprecated 
-   addServiceCheck(statusControl , (char*)  "Face Detection"      , (char*)  "face_det" );
+   //addServiceCheck(statusControl , (char*)  "Hand Gestures"       , (char*)  "hand" ); -- Hand Gestures are deprecated
+   //addServiceCheck(statusControl , (char*)  "Face Detection"      , (char*)  "face_det" ); -- Face Detection is deprecated
    addServiceCheck(statusControl , (char*)  "Person Aggregator"   , (char*)  "person_aggre" );
    addServiceCheck(statusControl , (char*)  "Emergency Detection" , (char*)  "emergency" );
-   addServiceCheck(statusControl , (char*)  "Fitness Function"    , (char*)  "fitness" );
+   //addServiceCheck(statusControl , (char*)  "Fitness Function"    , (char*)  "fitness" ); -- Face Detection is deprecated
    addServiceCheck(statusControl , (char*)  "Mira Center"         , (char*)  "mira" );
    addServiceCheck(statusControl , (char*)  "Joystick"            , (char*)  "joy" );
   strcat(statusControl, (char*) "</table></center>");
@@ -676,6 +676,7 @@ void execute(char * command,char * param)
     if (strcmp(param,"vsWhereIsUserPointing")==0)  {  rosservice_call(cR,cRLen,(char *) "/vision_system/seeWhereUserIsPointing");   } else
     if (strcmp(param,"vsNavigating")==0)           {  rosservice_call(cR,cRLen,(char *) "/vision_system/navigating");   } else
     if (strcmp(param,"vsIdle")==0)                 {  rosservice_call(cR,cRLen,(char *) "/vision_system/idle");   } else
+    if (strcmp(param,"vsScan3DObject")==0)         {  rosservice_call(cR,cRLen,(char *) "/vision_system/scan3DObject");   } else
 
 
     if (strcmp(param,"forthSKStartVisualization")==0)     {  rosservice_call(cR,cRLen,(char *) "/skeleton_detector/visualize_on");        } else
@@ -704,6 +705,11 @@ void execute(char * command,char * param)
     if (strcmp(param,"aggregatorRaw")==0)             {  rosservice_call(cR,cRLen,(char *) "/person_aggregator/raw");         } else
     if (strcmp(param,"aggregatorPause")==0)           {  rosservice_call(cR,cRLen,(char *) "/person_aggregator/pause");   } else
     if (strcmp(param,"aggregatorResume")==0)          {  rosservice_call(cR,cRLen,(char *) "/person_aggregator/resume");  } else
+
+    if (strcmp(param,"followUserPause")==0)              {  rosservice_call(cR,cRLen,(char *) "/follow_user/pause");    } else
+    if (strcmp(param,"followUserResume")==0)             {  rosservice_call(cR,cRLen,(char *) "/follow_user/resume");   } else
+    if (strcmp(param,"followUserStartVisualization")==0) {  rosservice_call(cR,cRLen,(char *) "/follow_user/visualize_on");    } else
+    if (strcmp(param,"followUserStopVisualization")==0)  {  rosservice_call(cR,cRLen,(char *) "/follow_user/visualize_off");   } else
 
     if (strcmp(param,"faceTrigger")==0)      {  rosservice_call(cR,cRLen,(char *) "/face_detection/trigger");  } else
     if (strcmp(param,"facePause")==0)        {  rosservice_call(cR,cRLen,(char *) "/face_detection/pause");    } else

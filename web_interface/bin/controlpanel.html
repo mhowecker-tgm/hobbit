@@ -288,7 +288,20 @@
                     <option value="webintfEnableBattery">Enable Battery Information</option> 
                     <option value="webintfDisableBattery">Disable Battery Information</option>  
                  </optgroup> 
-                              
+                 
+                 
+                 <optgroup label="Vision System/User Detection Policy" >
+                    <option value="vsPause">Pause Entire User Detection</option> 
+                    <option value="vsResume">Resume Entire User Detection</option>  
+                    <option value="vsFollowUser">Configure for Follow User</option>  
+                    <option value="vsLocateUser">Configure for Locate User</option>  
+                    <option value="vsFitnessFunction">Configure for Fitness Function</option>
+                    <option value="vsWhereIsUserPointing">Configure for Seeing User Pointing </option>
+                    <option value="vsNavigating">Configure for Navigation </option>        
+                    <option value="vsIdle">Configure for Idle </option>               
+                 </optgroup> 
+                  
+                  
                  <optgroup label="Nite Skeleton Tracker" >
                     <option value="niteTrigger">Trigger Nite Person Message</option> 
                     <option value="nitePause">Pause Nite Tracking</option> 
@@ -309,7 +322,14 @@
                     <option value ="stopRecording">Stop Recording</option>
                     <option value ="clearRecording">Clear All Recordings</option> 
                  </optgroup>       
-                                  
+                                
+                 <optgroup label="Follow User" >
+                    <option value="followUserStartVisualization">Start Visualizing Emergency Detector</option> 
+                    <option value="followUserStopVisualization">Stop Visualizing Emergency Detector</option>
+                    <option value="followUserPause">Pause Face Detector</option> 
+                    <option value="followUserResume">Resume Face Detector</option>
+                 </optgroup>   
+                   
                  <optgroup label="Emergency Detector" >
                     <option value="emergencyStartVisualization">Start Visualizing Emergency Detector</option> 
                     <option value="emergencyStopVisualization">Stop Visualizing Emergency Detector</option>
@@ -318,6 +338,12 @@
                     <option value="emergencyResume">Resume Emergency Detector</option>
                  </optgroup>
                       
+                 <optgroup label="Face Detector" >
+                    <option value="faceTrigger">Trigger Face Detector</option> 
+                    <option value="facePause">Pause Face Detector</option> 
+                    <option value="faceResume">Resume Face Detector</option>
+                 </optgroup>   
+                 
                  <optgroup label="Gesture Detector" >
                     <option value="gestureStartVisualization">Start Visualizing Gesture Detector</option> 
                     <option value="gestureStopVisualization">Stop Visualizing Gesture Detector</option>
@@ -330,12 +356,6 @@
                     <option value="aggregatorRaw">Set Person Messages to Raw Mode</option> 
                     <option value="aggregatorPause">Pause Person Aggregator</option> 
                     <option value="aggregatorResume">Resume Person Aggregator</option>
-                 </optgroup>   
-                 
-                 <optgroup label="Face Detector" >
-                    <option value="faceTrigger">Trigger Face Detector</option> 
-                    <option value="facePause">Pause Face Detector</option> 
-                    <option value="faceResume">Resume Face Detector</option>
                  </optgroup>   
                  
                  <optgroup label="Fitness Function" >
