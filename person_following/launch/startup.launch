@@ -1,4 +1,12 @@
 <launch>
-  <node pkg="person_following" type="person_following" name="person_following" output="screen"/>
+  <node pkg="person_following" type="person_following" name="person_following" output="screen">
+
+  	<param name="x_sensor" value="0.135"/>
+  	<param name="dis2target" value="1.0"/>
+	<param name="dis_thres" value="0.2"/>
+  	<param name="v_thres" value="0.2"/>
+	<param name="it_limit" value="10.0"/>
+
+  </node>
 </launch>
 

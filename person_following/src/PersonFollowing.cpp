@@ -134,14 +134,24 @@ int main(int argc, char **argv)
 	double previous_target_x = current_pose.pose.pose.position.x;
 	double previous_target_y = current_pose.pose.pose.position.y;
 	
-	double x_sensor = 0.135; //FIXME
+	/*double x_sensor = 0.135; //FIXME
 	double dis2target = 1.0; //distance to the user to be kept
-	double dis_thres = 0.2; //minimum distance between consecutive targets to be sent
+	double dis_thres = 0.2; //minimum distance between consecutive targets to be sent*/
+
+	/*int it_limit = 10; //number of loops to check if the velocity is close to zero
+	double v_thres = 0.2; //threshold value to consider if the velocity is close to zero */
+
+	double x_sensor, dis2target, dis_thres, v_thres, it_limit;
+
+	n.param("x_sensor", x_sensor, 0.135);
+	n.param("dis2target", dis2target, 1.0);
+	n.param("dis_thres", dis_thres, 0.2);
+	n.param("v_thres", v_thres, 0.2);
+	n.param("it_limit", it_limit, 10.0);
+        
 
 	count_num = 0;
-	int count_limit = 10; //number of loops to check if the velocity is close to zero
 	double v_sum = 0;
-	double v_thres = 0.2; //threshold value to consider if the velocity is close to zero
 
 	new_pose = false;
 	
@@ -199,9 +209,9 @@ int main(int argc, char **argv)
 			//check if the average velocity is close to zero
 			v_sum += current_target.vX*current_target.vX + current_target.vY*current_target.vY;
 			count_num++;
-			if (count_num == count_limit)
+			if (count_num == it_limit)
 			{
-				if (v_sum < v_thres*v_thres*count_limit )
+				if (v_sum < v_thres*v_thres*it_limit )
 				{	
 					std::cout << "speed is low, stopping " << std::endl;
 					following_active = false;
