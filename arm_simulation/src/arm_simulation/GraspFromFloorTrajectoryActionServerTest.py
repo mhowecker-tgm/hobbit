@@ -63,11 +63,11 @@ class GraspTrajectoryActionServerFromFloor():
 
     #gp_pnt_fixed = [0.32, -0.34, 0.15]   # grasp pre-point coordinates
     grasp_area_param = 5                 #this parameter defines how big the area is where grasps should be possible: value of 5 means that the gripper has 10cm (50cm/5=10cm) space in each direction
-    grasp_xy_variation_param = 25        #defines how much offset grasp-x-y-position can have to get valid grasp (trajectory): value of 25 <=> 2 cm offset in each direction (50cm/25=2cm)
+    grasp_xy_variation_param = 250        #defines how much offset grasp-x-y-position can have to get valid grasp (trajectory): value of 25 <=> 2 cm offset in each direction (50cm/25=2cm)
     max_traj_diff_rad = 40*pi/180        # maximal joint difference between two trajectory points in rad  => now: 40 degrees tolerated per joint between pos:graspfromfloor and calculated trajectory
     max_obj_height = 20		 #max height of object (grasp point z-value) and also the height the lowest gripper part is away from floor in pre-grasp-position
     gripper_go_further_down_blind_grasp = 6    # amount the gripper goes further down the the gp_z value (now: without collision check)
-    gripper_floor_safetey_buffer_cm = 3
+    gripper_floor_safetey_buffer_cm = 0
 
     #set up the environment
     #@openravepy.with_destroy
@@ -126,7 +126,7 @@ class GraspTrajectoryActionServerFromFloor():
 	#define steps for trajectory
         stepsize=0.01
         maxsteps = min(self.max_obj_height-self.gripper_floor_safetey_buffer_cm, self.max_obj_height-round(gp_z_cm)+self.gripper_go_further_down_blind_grasp - self.gripper_floor_safetey_buffer_cm)  #!!!!!!!!!!!!!! delete this (safety buffer)
-        minsteps = 2 #maxsteps #self.max_obj_height-round(gp_z_cm)+self.gripper_go_further_down_blind_grasp - self.gripper_floor_safetey_buffer_cm  #!!!!!!!!!!!!!! delete this (safety buffer)
+        minsteps = maxsteps #self.max_obj_height-round(gp_z_cm)+self.gripper_go_further_down_blind_grasp - self.gripper_floor_safetey_buffer_cm  #!!!!!!!!!!!!!! delete this (safety buffer)
         print "maxsteps: ", maxsteps
         print "max_obj_height: ", self.max_obj_height
         print "round(gp_z_cm)",round(gp_z_cm)
@@ -146,64 +146,84 @@ class GraspTrajectoryActionServerFromFloor():
         print Tee[2,3]
 
         print 'checking for existence of trajectories for grasping from floor'
-
-        while True:
-            with self.env:
-                print "failedattempt: ", failedattempt
-                direction = array([0,0,-1])    #this direction defines approach direction
-        
-                if failedattempt > 1:    #if variation is needed to get possible grasp trajectory
-                    Tee[0:2,3] = self.gp_pnt_xy + (random.rand(2)-0.5)/self.grasp_xy_variation_param    #vary position to get possible solution
-
-                h = self.env.drawlinelist(array([Tee[0:3,3],Tee[0:3,3]+direction*maxsteps*stepsize]),1)
-            try:
-                trajdata_str = self.basemanip.MoveHandStraight(direction=direction,starteematrix=Tee,stepsize=stepsize,minsteps=minsteps,maxsteps=maxsteps,outputtraj=True)
-                #print "result MoveHandStraight: ",trajdata_str
-                trajdata = RaveCreateTrajectory(self.env,'').deserialize(trajdata_str)
-                num_waypoints = trajdata.GetNumWaypoints()
-                
-                tra1 = trajdata.GetWaypoint(0)[0:6]*180.0/math.pi
-                tra2 = trajdata.GetWaypoint(num_waypoints/2)[0:6]*180.0/math.pi
-                tra3 =  trajdata.GetWaypoint(num_waypoints-1)[0:6]*180.0/math.pi
-                
-                if self.checkTrajectoryOk(PosStart, trajdata.GetWaypoint(0)[0:6]) and self.checkTrajectoryOk(trajdata.GetWaypoint(0)[0:6], trajdata.GetWaypoint(num_waypoints/2)[0:6]):  # tajectory is accepted 
-                    # write command (for ArmActionServer) and the first, the one in the middle and the last waypoint of the trajectory into the trajectory_string variable traj_str
-                    traj_str = "SetExecuteGrasp " + numpy.array_str(tra1).strip("[]") + numpy.array_str(tra2).strip("[]") + numpy.array_str(tra3).strip("[]")
-                    print "traj_str: \n", traj_str
-                    #print "trajdata.GetNumWaypoints(): ",trajdata.GetNumWaypoints()
+        #n=60
+        #for testing purpose:
+        ymin = -55 # in cm
+        ymax = -45 #in cm
+        xmin = 8 #in cm
+        xmax = 12 # in cm
+        wh = 3 #number repetitions
+        max_fails = 100
+        failurecnt = [[[0 for k in xrange(wh)] for j in xrange(ymax-ymin)] for i in xrange(xmax-xmin)]
+        for x in range(xmin,xmax):#while True:
+            print "=>x: ", x
+            for y in range(ymin,ymax):
+                print "=>y: ", y
+                for t in range(wh):
+                    xy_cur = (float(x)/100,float(y)/100)
+                    Tee[0:2,3] = xy_cur
+                    #print Tee[2,3]
+                    failedattempt = 0
+                    while True:
+                        with self.env:
+                            print "failedattempt: ", failedattempt
+                            direction = array([0,0,-1])    #this direction defines approach direction
                     
-                    params = (direction,Tee)
-                    print '%d failed attemps before found'%failedattempt#,repr(params)
-                    print "trajectory found. press enter"
-                    h = self.env.drawlinelist(array([Tee[0:3,3],Tee[0:3,3]+direction*maxsteps*stepsize]),4,[0,0,1])
-                    self.robot.WaitForController(0)
-                    
-                    if (EXECUTE_ARM_MOVEMENT):
-                        raw_input("press enter to send trajectory to arm_action_server and physically execute the grasp action")
-                        #EXECUTE arm movement for grasping from floor
-                        if (self.ArmClient.SetMoveToPreGraspFromFloorPos()):
-                            print "Arm was moved to PreGraspFromFloorPos"
-                        
-                        if (self.ArmClient.GetArmAtPreGraspFromFloorPos()):
-                            self.ArmClient.arm_action_client(String(traj_str))    #should execute the whole grasp trajectory from pregrapsfromflorpos
-                            print "the arm is moved for grasping!! tatatata"
-                        else:
-                            print " ================> ARM NOT IN PREGRASPFROMFLOOR POSITION - IDIOT! "
-                        
-                        break    #exit trajectory calculation
-                else:
-                    print "=============================================================================> trajectory was not accepted because to much movement necessary"
-                    failedattempt += 1
+                            if failedattempt > 1:    #if variation is needed to get possible grasp trajectory
+                                xy_cur = (float(x)/100,float(y)/100)
+                                #Tee[0:2,3] = self.gp_pnt_xy + (random.rand(2)-0.5)/self.grasp_xy_variation_param    #vary position to get possible solution
+                                Tee[0:2,3] = xy_cur + (random.rand(2)-0.5)/self.grasp_xy_variation_param    #vary position to get possible solution
+            
+                            h = self.env.drawlinelist(array([Tee[0:3,3],Tee[0:3,3]+direction*maxsteps*stepsize]),1)
+                            try:
+                                trajdata_str = self.basemanip.MoveHandStraight(direction=direction,starteematrix=Tee,stepsize=stepsize,minsteps=minsteps,maxsteps=maxsteps,outputtraj=True)
+                                #print "result MoveHandStraight: ",trajdata_str
+                                trajdata = RaveCreateTrajectory(self.env,'').deserialize(trajdata_str)
+                                num_waypoints = trajdata.GetNumWaypoints()
+                                
+                                tra1 = trajdata.GetWaypoint(0)[0:6]*180.0/math.pi
+                                tra2 = trajdata.GetWaypoint(num_waypoints/2)[0:6]*180.0/math.pi
+                                tra3 =  trajdata.GetWaypoint(num_waypoints-1)[0:6]*180.0/math.pi
+                                
+                                if self.checkTrajectoryOk(PosStart, trajdata.GetWaypoint(0)[0:6]) and self.checkTrajectoryOk(trajdata.GetWaypoint(0)[0:6], trajdata.GetWaypoint(num_waypoints/2)[0:6]):  # tajectory is accepted 
+                                    # write command (for ArmActionServer) and the first, the one in the middle and the last waypoint of the trajectory into the trajectory_string variable traj_str
+                                    traj_str = "SetExecuteGrasp " + numpy.array_str(tra1).strip("[]") + numpy.array_str(tra2).strip("[]") + numpy.array_str(tra3).strip("[]")
+                                    print "traj_str: \n", traj_str
+                                    #print "trajdata.GetNumWaypoints(): ",trajdata.GetNumWaypoints()
+                                    
+                                    params = (direction,Tee)
+                                    print '%d failed attemps before found'%failedattempt#,repr(params)
+                                    print "trajectory found. press enter"
+                                    h = self.env.drawlinelist(array([Tee[0:3,3],Tee[0:3,3]+direction*maxsteps*stepsize]),4,[0,0,1])
+                                    self.robot.WaitForController(0)
+                                    failurecnt[x-xmin][y-ymin][t] = failedattempt
+                                    break 
+                 
+                                else:
+                                    print "==============================================================> trajectory was not accepted because to much movement necessary"
+                                    failedattempt += 1
+                            
+                            except:    
+                            #except planning_error,e:
+                                print "=> Plan. failed"
+                                failedattempt += 1
+                            
+                            print "=============================================================>: ", failedattempt % max_fails/6
+                            if failedattempt % max_fails/6 == 0:    #after a number of tries (100) the tilt direction is relaxed
+                                #failurecnt[x-xmin][y-ymin][t] = failedattempt
+                                #break
+                                grasp_tilt_variation_param += 0.05
+                                print "===> New grasp_tilt_variation_param: ", grasp_tilt_variation_param
+                                self.robot.SetJointValues(PosStart)
+                                Tee = dot(self.ikmodel.manip.GetTransform(),matrixFromAxisAngle(random.rand(3)-0.5,grasp_tilt_variation_param*0.2*random.rand())) 
+                        #succeeded = False
                 
-            except planning_error,e:
-                failedattempt += 1
-
-            if failedattempt % 100 == 0:    #after a number of tries (100) the tilt direction is relaxed
-                grasp_tilt_variation_param += 0.05
-                print "===> New grasp_tilt_variation_param: ", grasp_tilt_variation_param
-                self.robot.SetJointValues(PosStart)
-                Tee = dot(self.ikmodel.manip.GetTransform(),matrixFromAxisAngle(random.rand(3)-0.5,grasp_tilt_variation_param*0.2*random.rand())) 
-            #succeeded = False
+        print " ====================================================RESULT========================================================"
+        for x in range(xmax-xmin):#while True:
+          print "x = ", x
+          for y in range(ymax-ymin):
+            print "x,y = ", x+xmin, "", y+ymin,": ", failurecnt[x][y]
+                
 
     #tests if for two trajectory waypoints tra1 and tra2 the maximal joint difference (each joint is compared) is lower then the treshold self.max_traj_diff_rad
     def checkTrajectoryOk(self, tra1, tra2):
