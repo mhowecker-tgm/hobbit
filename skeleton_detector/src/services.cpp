@@ -258,8 +258,22 @@ void fitnessRecvMessage(const hobbit_msgs::Fitness & msg)
   {
     unsigned int isLeftHand=0;
     unsigned int exerciseID =atoi(msg.params[0].name.c_str());
-    unsigned int exerciseRepetitions =atoi(msg.params[0].value.c_str());
-    fprintf(stderr,"Started Exercise %u \n",exerciseID);
+    unsigned int exerciseRepetitions=atoi(msg.params[0].value.c_str());
+
+    char buffer[512]={0};
+    snprintf(buffer,512,msg.params[0].name.c_str());
+    char *seperator= strchr(buffer,':');
+
+    if (seperator!=0)
+    {
+       *seperator=0;
+       exerciseID=atoi(buffer);
+       exerciseRepetitions=atoi(seperator+1);
+    }
+
+
+    ROS_INFO("Skeleton Detector is now starting exercise , command received from tablet");
+    fprintf(stderr,"Started Exercise %u (%s) , %u repetitions\n",exerciseID,exercisePrefix[exerciseID],exerciseRepetitions);
 
     if ( (MORE_IS_LEFT_EXERCISE<exerciseID) && (exerciseID<LESS_IS_LEFT_EXERCISE) )
     {
@@ -272,12 +286,14 @@ void fitnessRecvMessage(const hobbit_msgs::Fitness & msg)
  //Test Trigger with rostopic pub /fitness_tablet hobbit_msgs/Fitness " { command: C_EXERCISE_STOPPED , params: [  { name: '1' , value: 'STOPPED' } ] } " -1
   if (strcmp("C_EXERCISE_STOPPED",msg.command.c_str())==0)
   {
+    ROS_INFO("Skeleton Detector is now stopping an Exercise , command received from tablet");
     fprintf(stderr,"Stopped Exercises\n");
 
     hobbitFitnessFunction_StopExercise(actualTimestamp);
    }
   else
   {
+    ROS_INFO("Received non-understandable command from tablet..!");
     fprintf(stderr,"Unknown command arrived %s \n",msg.command.c_str());
   }
 }
@@ -536,8 +552,8 @@ int registerServices(ros::NodeHandle * nh,unsigned int width,unsigned int height
   joint3DBroadcaster = nh->advertise <skeleton_detector::Skeleton3D> ("joints3D", 1000);
   jointBBoxBroadcaster = nh->advertise <skeleton_detector::SkeletonBBox> ("jointsBBox", 1000);
 
-  fitnessXPCBroadcaster = nh->advertise <hobbit_msgs::Fitness> ("fitness_xpc", 1000);
-  fitnessTabletSubscriber = nh->subscribe("fitness_tablet",1000,fitnessRecvMessage);
+  fitnessXPCBroadcaster = nh->advertise <hobbit_msgs::Fitness> ("fitness_tablet", 1000);
+  fitnessTabletSubscriber = nh->subscribe("fitness_xpc",1000,fitnessRecvMessage);
 
   fprintf(stderr,"Done registering services..\n");
 }
