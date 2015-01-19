@@ -892,7 +892,6 @@ void * store_new_configuration_callback(struct AmmServer_DynamicRequest  * rqst)
   unsigned int fullSetOperation = 0;
   unsigned int genderIsMale=0;
   int i=0;
-  //rqst->content[pageLength]=0; //Clear content , this is wrong.. the configuration file is smaller !
 
   if  ( rqst->GET_request != 0 )
     {
