@@ -40,16 +40,6 @@ def switch_vision_cb(ud, response):
     else:
         return 'aborted'
 
-smach.StateMachine.add(
-            'PREPARE_MOVEMENT',
-            ServiceState(
-                '/obs_nav_mode',
-                ObsNavMode
-            ),
-            transitions={'succeeded': 'PLAN_PATH',
-                         'preempted': 'CLEAN_UP',
-                         'aborted': 'PLAN_PATH'}
-        )
 def battery_cb(msg, ud):
     print('Received battery_state message')
     rospy.sleep(2.0)
@@ -470,13 +460,7 @@ def goToPosition(frame='/map', room='None', place='dock'):
         )
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
                      head_move.MoveTo(pose='down_center'))
-        Sequence.Sequence.add(
-            'PREPARE_MOVEMENT',
-            ServiceState(
-                '/obs_nav_mode',
-                ObsNavMode
-            )
-        )add('WAIT', SleepState(duration=1))
+        Sequence.add('WAIT', SleepState(duration=1))
         Sequence.add('ACTIVATE_OBSTACLES',
                      SetObstacles(active=True))
         Sequence.add('SET_NAV_GOAL', SetNavigationGoal(room, place))
@@ -544,13 +528,7 @@ def prepareMovement():
         )
         Sequence.add('ACTIVATE_OBSTACLES',
                      SetObstacles(active=True))
-    return sSequence.add(
-            'PREPARE_MOVEMENT',
-            ServiceState(
-                '/obs_nav_mode',
-                ObsNavMode
-            )
-        )eq
+    return seq
 
 
 def goToPose():
