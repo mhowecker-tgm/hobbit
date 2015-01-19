@@ -92,9 +92,9 @@ bool terminate(std_srvs::Empty::Request& request, std_srvs::Empty::Response& res
 bool startDump(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
     ROS_INFO("Enabling Dump to files");
-    hobbitUpperBodyTracker_setDumpToFiles(1);
     recording=1;
     recordedFrames=0;
+    hobbitUpperBodyTracker_setDumpToFiles(1);
 
     return true;
 }
@@ -106,9 +106,10 @@ int stopDumpInternal()
     recording=0;
     recordedFrames=0;
 
+    ROS_INFO("Packaging Dataset , this might take a while..");
     int i=system("./packageRecord.sh");
-    if (i==0) { fprintf(stderr,"Success packaging..!\n"); } else
-              { fprintf(stderr,"Error packaging..!\n"); }
+    if (i==0) { ROS_INFO("Success packaging..!\n"); } else
+              { ROS_INFO("Error packaging..!\n"); }
 
   return (i==0);
 }
