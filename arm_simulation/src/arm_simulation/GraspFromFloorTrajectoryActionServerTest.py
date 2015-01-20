@@ -65,7 +65,7 @@ class GraspTrajectoryActionServerFromFloor():
     grasp_area_param = 5                 #this parameter defines how big the area is where grasps should be possible: value of 5 means that the gripper has 10cm (50cm/5=10cm) space in each direction
     grasp_xy_variation_param = 250        #defines how much offset grasp-x-y-position can have to get valid grasp (trajectory): value of 25 <=> 2 cm offset in each direction (50cm/25=2cm)
     max_traj_diff_rad = 40*pi/180        # maximal joint difference between two trajectory points in rad  => now: 40 degrees tolerated per joint between pos:graspfromfloor and calculated trajectory
-    max_obj_height = 20		 #max height of object (grasp point z-value) and also the height the lowest gripper part is away from floor in pre-grasp-position
+    max_obj_height = 18		 #max height of object (grasp point z-value) and also the height the lowest gripper part is away from floor in pre-grasp-position
     gripper_go_further_down_blind_grasp = 6    # amount the gripper goes further down the the gp_z value (now: without collision check)
     gripper_floor_safetey_buffer_cm = 0
 
@@ -87,7 +87,7 @@ class GraspTrajectoryActionServerFromFloor():
         sceneName = '/opt/ros/hobbit_hydro/src/arm_simulation/data/Hobbit.env.xml'           
         self.env = Environment()
         #self.env.SetDebugLevel(DebugLevel.Debug)
-        #self.env.SetViewer('qtcoin')    #turn off/on visualization in openrave
+        self.env.SetViewer('qtcoin')    #turn off/on visualization in openrave
         self.env.Load(sceneName)
         arm_client = ArmActionClient()
         self.ArmClient = ArmActionClient() #new!!! (21.10.2014) create instance of arm action client to send command to arm
@@ -148,11 +148,11 @@ class GraspTrajectoryActionServerFromFloor():
         print 'checking for existence of trajectories for grasping from floor'
         #n=60
         #for testing purpose:
-        ymin = -55 # in cm
-        ymax = -40 #in cm
-        xmin = -10 #in cm
+        ymin = -54 # in cm
+        ymax = -44 #in cm
+        xmin = 0 #in cm
         xmax = 20 # in cm
-        wh = 10 #number repetitions
+        wh = 2 #number repetitions
         max_fails = 50
         failurecnt = [[[0 for k in xrange(wh)] for j in xrange(ymax-ymin)] for i in xrange(xmax-xmin)]
         #with self.env:

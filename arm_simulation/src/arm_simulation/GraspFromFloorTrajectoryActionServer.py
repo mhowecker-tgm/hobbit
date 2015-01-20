@@ -63,9 +63,9 @@ class GraspTrajectoryActionServerFromFloor():
 
     #gp_pnt_fixed = [0.32, -0.34, 0.15]   # grasp pre-point coordinates
     grasp_area_param = 5                 #this parameter defines how big the area is where grasps should be possible: value of 5 means that the gripper has 10cm (50cm/5=10cm) space in each direction
-    grasp_xy_variation_param = 25        #defines how much offset grasp-x-y-position can have to get valid grasp (trajectory): value of 25 <=> 2 cm offset in each direction (50cm/25=2cm)
+    grasp_xy_variation_param = 250        #defines how much offset grasp-x-y-position can have to get valid grasp (trajectory): value of 25 <=> 2 cm offset in each direction (50cm/25=2cm)
     max_traj_diff_rad = 40*pi/180        # maximal joint difference between two trajectory points in rad  => now: 40 degrees tolerated per joint between pos:graspfromfloor and calculated trajectory
-    max_obj_height = 20		 #max height of object (grasp point z-value) and also the height the lowest gripper part is away from floor in pre-grasp-position
+    max_obj_height = 18		 #max height of object (grasp point z-value) and also the height the lowest gripper part is away from floor in pre-grasp-position
     gripper_go_further_down_blind_grasp = 6    # amount the gripper goes further down the the gp_z value (now: without collision check)
     gripper_floor_safetey_buffer_cm = 3
 
@@ -127,6 +127,8 @@ class GraspTrajectoryActionServerFromFloor():
         stepsize=0.01
         maxsteps = min(self.max_obj_height-self.gripper_floor_safetey_buffer_cm, self.max_obj_height-round(gp_z_cm)+self.gripper_go_further_down_blind_grasp - self.gripper_floor_safetey_buffer_cm)  #!!!!!!!!!!!!!! delete this (safety buffer)
         minsteps = 2 #maxsteps #self.max_obj_height-round(gp_z_cm)+self.gripper_go_further_down_blind_grasp - self.gripper_floor_safetey_buffer_cm  #!!!!!!!!!!!!!! delete this (safety buffer)
+        max_fails = 200
+        iter_before_relaxing_dir = 30	#after this number of iterations the param grasp_tilt_variation_param is incremented
         print "maxsteps: ", maxsteps
         print "max_obj_height: ", self.max_obj_height
         print "round(gp_z_cm)",round(gp_z_cm)
@@ -148,7 +150,7 @@ class GraspTrajectoryActionServerFromFloor():
         print 'checking for existence of trajectories for grasping from floor'
 
         while True:
-            with self.env:
+            with self.env:		#potential source of problem!!!!!!!
                 print "failedattempt: ", failedattempt
                 direction = array([0,0,-1])    #this direction defines approach direction
         
@@ -187,10 +189,13 @@ class GraspTrajectoryActionServerFromFloor():
                         if (self.ArmClient.GetArmAtPreGraspFromFloorPos()):
                             self.ArmClient.arm_action_client(String(traj_str))    #should execute the whole grasp trajectory from pregrapsfromflorpos
                             print "the arm is moved for grasping!! tatatata"
+                            self._feedback.feedback.data = str("The arm executes the grasping action.")
+                            return True #exit function
                         else:
+                            self._feedback.feedback.data = str("The arm was not brought to the pre-grasp position as expected, grasping failed.")
                             print " ================> ARM NOT IN PREGRASPFROMFLOOR POSITION - IDIOT! "
-                        
-                        break    #exit trajectory calculation
+                            return False #exit function
+                            
                 else:
                     print "=============================================================================> trajectory was not accepted because to much movement necessary"
                     failedattempt += 1
@@ -198,12 +203,15 @@ class GraspTrajectoryActionServerFromFloor():
             except planning_error,e:
                 failedattempt += 1
 
-            if failedattempt % 100 == 0:    #after a number of tries (100) the tilt direction is relaxed
+            if failedattempt % iter_before_relaxing_dir == 0:    #after a number of tries (100) the tilt direction is relaxed
                 grasp_tilt_variation_param += 0.05
                 print "===> New grasp_tilt_variation_param: ", grasp_tilt_variation_param
                 self.robot.SetJointValues(PosStart)
                 Tee = dot(self.ikmodel.manip.GetTransform(),matrixFromAxisAngle(random.rand(3)-0.5,grasp_tilt_variation_param*0.2*random.rand())) 
-            #succeeded = False
+            
+            if (failedattempt >= max_fails):
+                self._feedback.feedback.data = str("The number of tries to get valid grasp was exceeded!")
+                return False
 
     #tests if for two trajectory waypoints tra1 and tra2 the maximal joint difference (each joint is compared) is lower then the treshold self.max_traj_diff_rad
     def checkTrajectoryOk(self, tra1, tra2):
@@ -242,7 +250,7 @@ class GraspTrajectoryActionServerFromFloor():
         print "New grasp position (x and y value): ", self.gp_pnt_xy
         
         #get trajectory (execution of trajectory via ArmServer is included here)
-        self.getTrajForGraspFromFloor(gp_z_cm, roll)
+        res = self.getTrajForGraspFromFloor(gp_z_cm, roll)
     
         #publish feedback
         self._as.publish_feedback(self._feedback)
