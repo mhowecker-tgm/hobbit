@@ -32,10 +32,10 @@ class CFollowUserHead():
     #activate/deacativate node function
     def activate(self, msg):
         print "followUserFaceWithHead:  msg in: ", msg.data
-        if (msg.data in ("TRUE", "true", "True", "1", "on", "ON", "On")):
+        if (msg.data in ("an", "TRUE", "true", "True", "1", "on", "ON", "On")):
             print "node was activated"
             self.node_active = True
-        elif (msg.data in ("FALSE", "false", "False", "0", "off", "OFF", "Off")):
+        elif (msg.data in ("aus", "FALSE", "false", "False", "0", "off", "OFF", "Off")):
             print "node was deactivated"
             self.node_active = False
         
