@@ -416,11 +416,11 @@ int considerSkeletonPointing(unsigned int frameNumber,struct skeletonHuman * ske
                              );
 
 
-  if ( (distanceLeft<MAXIMUM_DISTANCE_FOR_POINTING) && (distanceRight<MAXIMUM_DISTANCE_FOR_POINTING) ) { fprintf(stderr,"Cutting off pointing "); return 0; }
-
-
-
-
+  if ( (distanceLeft<MAXIMUM_DISTANCE_FOR_POINTING) && (distanceRight<MAXIMUM_DISTANCE_FOR_POINTING) )
+    {
+     fprintf(stderr,YELLOW "Hands not far away from torso for pointing \n" NORMAL);
+     return 0;
+    }
 
 
   int doHand=1; //1 = right , 2 =left
