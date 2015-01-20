@@ -91,7 +91,7 @@ def main(args):
 
     followHead = CFollowUserHead()
     #followHead.follow_head_loop()
-    #rospy.spin()
+    rospy.spin()
     
 if __name__ == "__main__":        
     main(sys.argv)
