@@ -32,7 +32,7 @@ called for execution of the trajectory.
 
 PKG = 'hobbit_smach'
 #PKG = 'arm_simulation'
-EXECUTE_ARM_MOVEMENT = False
+EXECUTE_ARM_MOVEMENT = True
 
 import roslib
 roslib.load_manifest(PKG)
