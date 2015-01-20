@@ -614,7 +614,7 @@ class DavidPickingUp(State):
         self.rec = TD()
         self.restrictfind = True
         self.calc_graspoints_client = CalcGrasppointsActionClient()
-        #define limits for checking free space for grasping
+        #define limits for checking free space for grasping (ccs)
         self.limit_x1 = -0.5
         self.limit_x2 = 0.4
         self.limit_y1 = -1
@@ -656,8 +656,10 @@ class DavidPickingUp(State):
             gp_representation = self.calc_graspoints_client.calc_grasppoints_action_client(self.pc_ccs)#ud.cloud)#self.pc_rcs) #ud.cloud) 12.12.2014
             print "gp_representation: ", gp_representation
             print type(gp_representation)
+            if (int(gp_representation[0:2]) < 15):
+                print "GRASP EVALUATION WAS TO BAD FOR RELIABLE GRASPING - stop grasping"
+                return 'preempted'
             # 2) call GraspFromFloorTrajectoryActionServer/Client to receive a trajectory (that will be later directly executed) by calling the ArmActionServer/client
-            #daviddavid
             grasp_traj_ac = arm_simulation.GraspTrajectoryActionClient.GraspTrajectoryActionClient()
             print "=================================================>",grasp_traj_ac
             #calculate grasp grajectory (way points)
