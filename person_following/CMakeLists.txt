@@ -35,7 +35,7 @@ include_directories(
 
 
 ## Declare a cpp executable
-add_executable(person_following src/PersonFollowing.cpp)
+add_executable(person_following src/cPersonFollowing.cpp src/PersonFollowing.cpp)
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
  add_dependencies(person_following hobbit_msgs_generate_messages_cpp)
