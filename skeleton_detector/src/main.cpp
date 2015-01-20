@@ -45,7 +45,6 @@ int key = 0;
 
 int recording=0;
 int recordedFrames=0;
-volatile int paused = 0;
 unsigned int frameTimestamp =0;
 unsigned int runFullSpeed=0;
 unsigned int runMaxSpeed=0;

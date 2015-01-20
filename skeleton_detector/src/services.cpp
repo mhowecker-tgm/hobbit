@@ -55,6 +55,7 @@ ros::Subscriber fitnessTabletSubscriber;
 #define divisor 1000
 //ros::Publisher gestureBroadcaster;
 
+volatile int paused = 0;
 unsigned char dontPublishSkeletons=0;
 unsigned char dontPublishPointEvents=0;
 unsigned char dontPublishPersons=0;
@@ -256,6 +257,18 @@ void fitnessRecvMessage(const hobbit_msgs::Fitness & msg)
   //Test Trigger with rostopic pub /fitness_tablet hobbit_msgs/Fitness " { command: C_EXERCISE_STARTED , params: [  { name: '1' , value: 'STARTED' } ] } " -1
   if (strcmp("C_EXERCISE_STARTED",msg.command.c_str())==0)
   {
+    if (paused)
+    {
+     ROS_INFO("Forcing Unpause of Node to start exercise tracking , this shouldn't be needed ");
+     paused=0;
+    }
+
+   if (processingMode==PROCESSING_MODE_SIMPLE_PERSON_DETECTOR)
+   {
+     ROS_INFO("Forcing processing mode to include hands to start exercise tracking , this shouldn't be needed ");
+     processingMode=PROCESSING_MODE_UPPER_GESTURE_BODY_TRACKER;
+   }
+
     unsigned int isLeftHand=0;
     unsigned int exerciseID =atoi(msg.params[0].name.c_str());
     unsigned int exerciseRepetitions=atoi(msg.params[0].value.c_str());

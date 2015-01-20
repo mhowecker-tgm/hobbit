@@ -9,6 +9,7 @@
 extern unsigned char dontPublishSkeletons;
 extern unsigned char dontPublishPointEvents;
 extern unsigned int processingMode;
+extern volatile int paused;
 
 extern unsigned int actualTimestamp;
 
