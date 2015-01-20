@@ -25,6 +25,7 @@
 #include <skeleton_detector/Skeleton3D.h>
 #include <skeleton_detector/SkeletonBBox.h>
 
+#include "hobbit_msgs/SwitchVision.h"
 #include "hobbit_msgs/Fitness.h"
 
 #define USE_PERSON_AGGREGATOR 1
@@ -52,6 +53,8 @@ ros::Publisher pointEventsBroadcaster;
 ros::Publisher  fitnessXPCBroadcaster;
 ros::Subscriber fitnessTabletSubscriber;
 
+ros::ServiceServer askForUserDistance;
+
 #define divisor 1000
 //ros::Publisher gestureBroadcaster;
 
@@ -62,9 +65,15 @@ unsigned char dontPublishPersons=0;
 
 unsigned int processingMode = PROCESSING_MODE_UPPER_GESTURE_BODY_TRACKER;//PROCESSING_MODE_SIMPLE_PERSON_DETECTOR;
 
+unsigned int lastFrameTimestamp=0;
 unsigned int actualTimestamp=0;
 unsigned int actualInFieldOfView=0;
 float actualX=0.0,actualY=0.0,actualZ=0.0,actualTheta=0.0,actualConfidence=0.51;
+
+
+unsigned int maximumTimeToRememberProximity= 35; //This is the number of frames after which we should not respond about proximity
+unsigned int timestampIsSkeletonCloseEnoughForInteraction=0;
+unsigned int isSkeletonCloseEnoughForInteractionInt=0;
 
 unsigned char * colorFrameCopy=0;   unsigned int colorCopyWidth = 0; unsigned int colorCopyHeight = 0;
 unsigned short * depthFrameCopy =0; unsigned int depthCopyWidth = 0; unsigned int depthCopyHeight = 0;
@@ -111,6 +120,31 @@ float simpPow(float base,unsigned int exp)
         retres*=base;
     }
     return retres;
+}
+
+
+bool isSkeletonCloseEnoughForInteraction(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs::SwitchVision::Response & response  )
+{
+    unsigned int messageTriggerTimeDifference = (lastFrameTimestamp-timestampIsSkeletonCloseEnoughForInteraction);
+    fprintf(stderr,"\nisSkeletonCloseEnoughForInteraction( result is %u , after %u frames )\n",isSkeletonCloseEnoughForInteractionInt,messageTriggerTimeDifference);
+
+    if (isSkeletonCloseEnoughForInteractionInt)
+         {
+          ROS_INFO("Skeleton Detector was asked whether a human is near the tablet , Positive Answer");
+
+           if (messageTriggerTimeDifference > maximumTimeToRememberProximity)
+           {
+             ROS_INFO("Please note that the skeleton is currently not visible , so the positive answer may be not the ideal one..!");
+           }
+
+          response.result=true;
+         } else
+         {
+          ROS_INFO("Skeleton Detector was asked whether a human is near the tablet , Negative Answer");
+          response.result=false;
+         }
+
+    return true;
 }
 
 
@@ -393,9 +427,21 @@ int considerSkeletonBeeingCloseEnoughForInteraction(unsigned int frameNumber,str
 {
   float distance=distance3D(0,0,0,skeletonFound->joint[HUMAN_SKELETON_HEAD].x,skeletonFound->joint[HUMAN_SKELETON_HEAD].y,skeletonFound->joint[HUMAN_SKELETON_HEAD].z);
 
-  if (distance<1000) { fprintf(stderr,GREEN "Distance is : %0.2f , it is deemed close enough for interaction\n" NORMAL , distance); } else
-  if (distance<1200) { fprintf(stderr,YELLOW "Distance is : %0.2f , it is deemed moderately close\n" NORMAL , distance); } else
-                    { fprintf(stderr,RED "Distance is : %0.2f , it is deemed far \n" NORMAL , distance); }
+  if (distance<1000)   {
+                        fprintf(stderr,GREEN "Distance is : %0.2f , it is deemed close enough for interaction\n" NORMAL , distance);
+                        isSkeletonCloseEnoughForInteractionInt=1;
+                        timestampIsSkeletonCloseEnoughForInteraction=frameNumber;
+                       } else
+  if (distance<1200)   {
+                        fprintf(stderr,YELLOW "Distance is : %0.2f , it is deemed moderately close\n" NORMAL , distance);
+                        isSkeletonCloseEnoughForInteractionInt=0;
+                        timestampIsSkeletonCloseEnoughForInteraction=frameNumber;
+                       } else
+                      {
+                        fprintf(stderr,RED "Distance is : %0.2f , it is deemed far \n" NORMAL , distance);
+                        isSkeletonCloseEnoughForInteractionInt=0;
+                        timestampIsSkeletonCloseEnoughForInteraction=frameNumber;
+                      }
 
   return 1;
 }
@@ -541,6 +587,9 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
                                                processingMode ,
                                                frameTimestamp );
 
+
+  lastFrameTimestamp=frameTimestamp;
+
  // fprintf(stderr," survived \n");
 
 
@@ -582,6 +631,8 @@ int registerServices(ros::NodeHandle * nh,unsigned int width,unsigned int height
   joint2DBroadcaster = nh->advertise <skeleton_detector::Skeleton2D> ("joints2D", 1000);
   joint3DBroadcaster = nh->advertise <skeleton_detector::Skeleton3D> ("joints3D", 1000);
   jointBBoxBroadcaster = nh->advertise <skeleton_detector::SkeletonBBox> ("jointsBBox", 1000);
+
+  askForUserDistance = nh->advertiseService("/skeleton_detector/isSkeletonCloseEnoughForInteraction", isSkeletonCloseEnoughForInteraction);
 
   fitnessXPCBroadcaster = nh->advertise <hobbit_msgs::Fitness> ("fitness_tablet", 1000);
   fitnessTabletSubscriber = nh->subscribe("fitness_xpc",1000,fitnessRecvMessage);
