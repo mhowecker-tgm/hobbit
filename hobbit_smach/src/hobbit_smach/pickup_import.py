@@ -633,15 +633,15 @@ class DavidPickingUp(State):
 
             print "DavidPickingUp.execute: findobject was successful"
             #self.pc_rcs is available () => calc_grasp_points.cpp (AS) and get back grasp pose definition
-            #todo:
-            # 0.5) check if there is enough space for moving the arm
-            # 1) call calc_grasp_points AS
-            # 2) call openrave trajectory AS
-            # 3) call Arm AS (arm client already included in code)
+            #overview:
+            # 1) check if there is enough space for moving the arm
+            # 2) call calc_grasp_points AS
+            # 3) call openrave trajectory AS
+            # 4) call Arm AS (arm client already included in code)
             #grasp pose definition => simulation => execution
 
 
-            #0.5) check if there is enough space for moving the arm
+            #1) check if there is enough space for moving the arm
             pnt_in_space = self.check_free_space_for_arm_pickup_movement(ud.cloud)
             print "=======================================================================================================>"
             print "type result pnt_in_space: ", type(pnt_in_space)
@@ -651,60 +651,26 @@ class DavidPickingUp(State):
                 print "===============>>>>>>>>>>>>>>>>>>> arm not able to move savely for picking up => picking up was stopped"
                 return 'preempted'
 
-            # 1) call calc_grasppoints_action_server/client (calc_aS(self.pc_rcs)) and receive a grasp_representation in the format (string):
+            # 2) call calc_grasppoints_action_server/client (calc_aS(self.pc_rcs)) and receive a grasp_representation in the format (string):
             # "(0)eval_val (1)gp1_x (2)gp1_y (3)gp1_z (4)gp2_x (5)gp2_y (6)gp2_z (7)ap_vec_x (8)ap_vec_y (9)ap_vec_z (10)gp_center_x (11)gp_center_y (12)gp_center_z (13)roll"
             gp_representation = self.calc_graspoints_client.calc_grasppoints_action_client(self.pc_ccs)#ud.cloud)#self.pc_rcs) #ud.cloud) 12.12.2014
             print "gp_representation: ", gp_representation
-            print type(gp_representation)
             gp_pres_str = str(gp_representation.result.data)
-            print "gp_pres_str: ",gp_pres_str
             gp_eval = int(gp_pres_str[0:2])
-            print "gp_eval: ", gp_eval
             if (gp_eval < 15):
                 print "GRASP EVALUATION WAS TO BAD FOR RELIABLE GRASPING - stop grasping"
                 return 'preempted'
-            # 2) call GraspFromFloorTrajectoryActionServer/Client to receive a trajectory (that will be later directly executed) by calling the ArmActionServer/client
+            # 3) (and 4)) call GraspFromFloorTrajectoryActionServer/Client to receive a trajectory (that will be directly executed) by calling the ArmActionServer/client
             grasp_traj_ac = arm_simulation.GraspTrajectoryActionClient.GraspTrajectoryActionClient()
             print "=================================================>",grasp_traj_ac
             #calculate grasp grajectory (way points)
             cmd = gp_representation.result #String ("81 0.04 -0.45 0.127266 0.04 -0.51 0.127266 0 0 1 0.04 -0.48 0.127266 0") #input (=> = output from calc_grasppoints_svm_action_server)
             res = grasp_traj_ac.grasp_trajectory_action_client(cmd)
-            
             print "result of trajectory calculation:           ", res
             
-            #move object to tray
+            #move object to tray and move arm back to home position
             res = self.arm_client.arm_action_client(String ("SetMoveToTrayPos"))
-            
-            
-            """ arm makes fix grasping-from-floor-movement (old)
-            #OPEN GRIPPER
-            res = self.arm_client.arm_action_client(String ("SetOpenGripper"))
-            #clear buffer
-            res = self.arm_client.SetClearPosBuffer()
-            #PositionsForInterpolation(armactionserver) Intermediate Floor GraspPOS4 (= Grasp at floor)
-            cmd = String ("SetPositionsForInterpolation 78 55 78 150 90 4")
-            res = self.arm_client.arm_action_client(cmd)
-            #PositionsForInterpolationReady
-            cmd = String ("SetPositionsForInterpolationReady")
-            res = self.arm_client.arm_action_client(cmd)
-        	#    raw_input("press key to move arm after position interpolation")
-            cmd = String("SetStartInterpolation")
-            res = self.arm_client.arm_action_client(cmd)
-        	#CLOSE GRIPPER
-            cmd = String ("SetCloseGripper")
-            res = self.arm_client.arm_action_client(cmd)
-        	#clear buffer
-            res = self.arm_client.SetClearPosBuffer()
-        	#PositionsForInterpolation(armactionserver) POS1=PreGraspFromFloor
-            cmd = String ("SetPositionsForInterpolation 69.7 43.4 86.3 134.3 107.6 4")
-            res = self.arm_client.arm_action_client(cmd)
-        	#PositionsForInterpolationReady (armactionserver)")
-            cmd = String ("SetPositionsForInterpolationReady")
-            res = self.arm_client.arm_action_client(cmd)
-        	#raw_input("press key to move arm after position interpolation")
-            cmd = String("SetStartInterpolation")
-            res = self.arm_client.arm_action_client(cmd)
-            """
+           
 
         return 'succeeded'
 
