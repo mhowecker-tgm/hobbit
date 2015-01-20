@@ -87,7 +87,7 @@ class GraspTrajectoryActionServerFromFloor():
         sceneName = '/opt/ros/hobbit_hydro/src/arm_simulation/data/Hobbit.env.xml'           
         self.env = Environment()
         #self.env.SetDebugLevel(DebugLevel.Debug)
-        self.env.SetViewer('qtcoin')    #turn off/on visualization in openrave
+        #self.env.SetViewer('qtcoin')    #turn off/on visualization in openrave
         self.env.Load(sceneName)
         arm_client = ArmActionClient()
         self.ArmClient = ArmActionClient() #new!!! (21.10.2014) create instance of arm action client to send command to arm
@@ -149,12 +149,13 @@ class GraspTrajectoryActionServerFromFloor():
         #n=60
         #for testing purpose:
         ymin = -55 # in cm
-        ymax = -45 #in cm
-        xmin = 8 #in cm
-        xmax = 12 # in cm
-        wh = 3 #number repetitions
-        max_fails = 100
+        ymax = -40 #in cm
+        xmin = -10 #in cm
+        xmax = 20 # in cm
+        wh = 10 #number repetitions
+        max_fails = 50
         failurecnt = [[[0 for k in xrange(wh)] for j in xrange(ymax-ymin)] for i in xrange(xmax-xmin)]
+        #with self.env:
         for x in range(xmin,xmax):#while True:
             print "=>x: ", x
             for y in range(ymin,ymax):
@@ -165,62 +166,63 @@ class GraspTrajectoryActionServerFromFloor():
                     #print Tee[2,3]
                     failedattempt = 0
                     while True:
-                        with self.env:
-                            print "failedattempt: ", failedattempt
-                            direction = array([0,0,-1])    #this direction defines approach direction
-                    
-                            if failedattempt > 1:    #if variation is needed to get possible grasp trajectory
-                                xy_cur = (float(x)/100,float(y)/100)
-                                #Tee[0:2,3] = self.gp_pnt_xy + (random.rand(2)-0.5)/self.grasp_xy_variation_param    #vary position to get possible solution
-                                Tee[0:2,3] = xy_cur + (random.rand(2)-0.5)/self.grasp_xy_variation_param    #vary position to get possible solution
-            
-                            h = self.env.drawlinelist(array([Tee[0:3,3],Tee[0:3,3]+direction*maxsteps*stepsize]),1)
-                            try:
-                                trajdata_str = self.basemanip.MoveHandStraight(direction=direction,starteematrix=Tee,stepsize=stepsize,minsteps=minsteps,maxsteps=maxsteps,outputtraj=True)
-                                #print "result MoveHandStraight: ",trajdata_str
-                                trajdata = RaveCreateTrajectory(self.env,'').deserialize(trajdata_str)
-                                num_waypoints = trajdata.GetNumWaypoints()
-                                
-                                tra1 = trajdata.GetWaypoint(0)[0:6]*180.0/math.pi
-                                tra2 = trajdata.GetWaypoint(num_waypoints/2)[0:6]*180.0/math.pi
-                                tra3 =  trajdata.GetWaypoint(num_waypoints-1)[0:6]*180.0/math.pi
-                                
-                                if self.checkTrajectoryOk(PosStart, trajdata.GetWaypoint(0)[0:6]) and self.checkTrajectoryOk(trajdata.GetWaypoint(0)[0:6], trajdata.GetWaypoint(num_waypoints/2)[0:6]):  # tajectory is accepted 
-                                    # write command (for ArmActionServer) and the first, the one in the middle and the last waypoint of the trajectory into the trajectory_string variable traj_str
-                                    traj_str = "SetExecuteGrasp " + numpy.array_str(tra1).strip("[]") + numpy.array_str(tra2).strip("[]") + numpy.array_str(tra3).strip("[]")
-                                    print "traj_str: \n", traj_str
-                                    #print "trajdata.GetNumWaypoints(): ",trajdata.GetNumWaypoints()
-                                    
-                                    params = (direction,Tee)
-                                    print '%d failed attemps before found'%failedattempt#,repr(params)
-                                    print "trajectory found. press enter"
-                                    h = self.env.drawlinelist(array([Tee[0:3,3],Tee[0:3,3]+direction*maxsteps*stepsize]),4,[0,0,1])
-                                    self.robot.WaitForController(0)
-                                    failurecnt[x-xmin][y-ymin][t] = failedattempt
-                                    break 
-                 
-                                else:
-                                    print "==============================================================> trajectory was not accepted because to much movement necessary"
-                                    failedattempt += 1
+                    #with self.env:
+                        print "failedattempt: ", failedattempt
+                        direction = array([0,0,-1])    #this direction defines approach direction
+                
+                        if failedattempt > 1:    #if variation is needed to get possible grasp trajectory
+                            xy_cur = (float(x)/100,float(y)/100)
+                            #Tee[0:2,3] = self.gp_pnt_xy + (random.rand(2)-0.5)/self.grasp_xy_variation_param    #vary position to get possible solution
+                            Tee[0:2,3] = xy_cur + (random.rand(2)-0.5)/self.grasp_xy_variation_param    #vary position to get possible solution
+        
+                        h = self.env.drawlinelist(array([Tee[0:3,3],Tee[0:3,3]+direction*maxsteps*stepsize]),1)
+                        try:
+                            trajdata_str = self.basemanip.MoveHandStraight(direction=direction,starteematrix=Tee,stepsize=stepsize,minsteps=minsteps,maxsteps=maxsteps,outputtraj=True)
+                            #print "result MoveHandStraight: ",trajdata_str
+                            trajdata = RaveCreateTrajectory(self.env,'').deserialize(trajdata_str)
+                            num_waypoints = trajdata.GetNumWaypoints()
                             
-                            except:    
-                            #except planning_error,e:
-                                print "=> Plan. failed"
+                            tra1 = trajdata.GetWaypoint(0)[0:6]*180.0/math.pi
+                            tra2 = trajdata.GetWaypoint(num_waypoints/2)[0:6]*180.0/math.pi
+                            tra3 =  trajdata.GetWaypoint(num_waypoints-1)[0:6]*180.0/math.pi
+                            
+                            if self.checkTrajectoryOk(PosStart, trajdata.GetWaypoint(0)[0:6]) and self.checkTrajectoryOk(trajdata.GetWaypoint(0)[0:6], trajdata.GetWaypoint(num_waypoints/2)[0:6]):  # tajectory is accepted 
+                                # write command (for ArmActionServer) and the first, the one in the middle and the last waypoint of the trajectory into the trajectory_string variable traj_str
+                                traj_str = "SetExecuteGrasp " + numpy.array_str(tra1).strip("[]") + numpy.array_str(tra2).strip("[]") + numpy.array_str(tra3).strip("[]")
+                                print "traj_str: \n", traj_str
+                                #print "trajdata.GetNumWaypoints(): ",trajdata.GetNumWaypoints()
+                                
+                                params = (direction,Tee)
+                                print '%d failed attemps before found'%failedattempt#,repr(params)
+                                print "trajectory found. press enter"
+                                h = self.env.drawlinelist(array([Tee[0:3,3],Tee[0:3,3]+direction*maxsteps*stepsize]),4,[0,0,1])
+                                self.robot.WaitForController(0)
+                                failurecnt[x-xmin][y-ymin][t] = failedattempt
+                                break 
+             
+                            else:
+                                print "==============================================================> trajectory was not accepted because to much movement necessary"
                                 failedattempt += 1
-                            
-                            print "=============================================================>: ", failedattempt % max_fails/6
-                            if failedattempt % max_fails/6 == 0:    #after a number of tries (100) the tilt direction is relaxed
-                                #failurecnt[x-xmin][y-ymin][t] = failedattempt
-                                #break
-                                grasp_tilt_variation_param += 0.05
-                                print "===> New grasp_tilt_variation_param: ", grasp_tilt_variation_param
-                                self.robot.SetJointValues(PosStart)
-                                Tee = dot(self.ikmodel.manip.GetTransform(),matrixFromAxisAngle(random.rand(3)-0.5,grasp_tilt_variation_param*0.2*random.rand())) 
-                        #succeeded = False
+                        
+                        except:    
+                        #except planning_error,e:
+                            print "=> Plan. failed"
+                            failedattempt += 1
+                        
+                        print "=============================================================>: ", failedattempt % (max_fails/6)
+                        if failedattempt % (max_fails/6) == 0:    #after a number of tries (100) the tilt direction is relaxed
+                            if failedattempt >= max_fails:
+                                failurecnt[x-xmin][y-ymin][t] = failedattempt
+                                break
+                            grasp_tilt_variation_param += 0.04
+                            print "===> New grasp_tilt_variation_param: ", grasp_tilt_variation_param
+                            self.robot.SetJointValues(PosStart)
+                            Tee = dot(self.ikmodel.manip.GetTransform(),matrixFromAxisAngle(random.rand(3)-0.5,grasp_tilt_variation_param*0.2*random.rand())) 
+                    #succeeded = False
                 
         print " ====================================================RESULT========================================================"
         for x in range(xmax-xmin):#while True:
-          print "x = ", x
+          print "x = ", x+xmin
           for y in range(ymax-ymin):
             print "x,y = ", x+xmin, "", y+ymin,": ", failurecnt[x][y]
                 
