@@ -150,14 +150,14 @@ class GraspTrajectoryActionServerFromFloor():
         print 'checking for existence of trajectories for grasping from floor'
 
         while True:
-            with self.env:		#potential source of problem!!!!!!!
-                print "failedattempt: ", failedattempt
-                direction = array([0,0,-1])    #this direction defines approach direction
-        
-                if failedattempt > 1:    #if variation is needed to get possible grasp trajectory
-                    Tee[0:2,3] = self.gp_pnt_xy + (random.rand(2)-0.5)/self.grasp_xy_variation_param    #vary position to get possible solution
+            #with self.env:		#potential source of problem!!!!!!!
+            print "failedattempt: ", failedattempt
+            direction = array([0,0,-1])    #this direction defines approach direction
+    
+            if failedattempt > 1:    #if variation is needed to get possible grasp trajectory
+                Tee[0:2,3] = self.gp_pnt_xy + (random.rand(2)-0.5)/self.grasp_xy_variation_param    #vary position to get possible solution
 
-                h = self.env.drawlinelist(array([Tee[0:3,3],Tee[0:3,3]+direction*maxsteps*stepsize]),1)
+            h = self.env.drawlinelist(array([Tee[0:3,3],Tee[0:3,3]+direction*maxsteps*stepsize]),1)
             try:
                 trajdata_str = self.basemanip.MoveHandStraight(direction=direction,starteematrix=Tee,stepsize=stepsize,minsteps=minsteps,maxsteps=maxsteps,outputtraj=True)
                 #print "result MoveHandStraight: ",trajdata_str
