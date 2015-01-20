@@ -782,6 +782,8 @@ void execute(char * command,char * param)
                                       joystickExecute(0.0,0.0);
                                       rostopic_pub(cR,cRLen,(char *) "/DiscreteMotionCmd",(char *) "std_msgs/String",(char *) "\"data: 'Stop'\"");
                                     }
+
+    fprintf(stderr,"Body Emmits %s Command\n",cR);
   }
    else
   if (strcmp(command,"bring")==0)
@@ -1038,7 +1040,6 @@ void * prepare_form_content_callback(struct AmmServer_DynamicRequest  * rqst)
             if ( _GET(default_server,rqst,(char*)"node",bufferCommand,256) )  { execute((char*)"node",bufferCommand);  } else
             if ( _GET(default_server,rqst,(char*)"camera",bufferCommand,256) )  { execute((char*)"camera",bufferCommand);  } else
             if ( _GET(default_server,rqst,(char*)"head",bufferCommand,256) )  { execute((char*)"head",bufferCommand);  } else
-            if ( _GET(default_server,rqst,(char*)"body",bufferCommand,256) )  { execute((char*)"body",bufferCommand);  } else
             if ( _GET(default_server,rqst,(char*)"hand",bufferCommand,256) )  { execute((char*)"hand",bufferCommand);  } else
             if ( _GET(default_server,rqst,(char*)"emotion",bufferCommand,256) )  { execute((char*)"emotion",bufferCommand);  } else
             if ( _GET(default_server,rqst,(char*)"body",bufferCommand,256) )
