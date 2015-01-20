@@ -347,6 +347,9 @@ int main(int argc, char **argv)
      ros::ServiceServer advancedService         = nh.advertiseService(name+"/advanced"     , advanced);
      ros::ServiceServer superService            = nh.advertiseService(name+"/super"        , super);
 
+     ros::ServiceServer nearService         = nh.advertiseService(name+"/near"         , simple);
+     ros::ServiceServer farService            = nh.advertiseService(name+"/far"          , super);
+
 
      ros::ServiceServer pauseBodylessGesturesService = nh.advertiseService(name+"/pauseBodylessGestures" , pauseBodylessGestures);
      ros::ServiceServer resumeBodylessGesturesService= nh.advertiseService(name+"/resumeBodylessGestures", resumeBodylessGestures);
