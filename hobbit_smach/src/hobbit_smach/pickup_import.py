@@ -656,7 +656,9 @@ class DavidPickingUp(State):
             gp_representation = self.calc_graspoints_client.calc_grasppoints_action_client(self.pc_ccs)#ud.cloud)#self.pc_rcs) #ud.cloud) 12.12.2014
             print "gp_representation: ", gp_representation
             print type(gp_representation)
-            if (int(gp_representation.result[0:2]) < 15):
+            gp_pres_String = gp_representation.result
+            gp_eval = int(gp_pres_String[0:2])
+            if (gp_eval < 15):
                 print "GRASP EVALUATION WAS TO BAD FOR RELIABLE GRASPING - stop grasping"
                 return 'preempted'
             # 2) call GraspFromFloorTrajectoryActionServer/Client to receive a trajectory (that will be later directly executed) by calling the ArmActionServer/client
