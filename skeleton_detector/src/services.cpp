@@ -376,6 +376,30 @@ void broadcastPointing(unsigned int frameNumber ,struct skeletonPointing * skele
 }
 
 
+
+float distance3D(float p1X , float p1Y  , float p1Z ,  float p2X , float p2Y , float p2Z)
+{
+  float vect_x = p1X - p2X;
+  float vect_y = p1Y - p2Y;
+  float vect_z = p1Z - p2Z;
+  float len = sqrt( vect_x*vect_x + vect_y*vect_y + vect_z*vect_z);
+  if(len == 0) len = 1.0f;
+return len;
+}
+
+
+
+int considerSkeletonBeeingCloseEnoughForInteraction(unsigned int frameNumber,struct skeletonHuman * skeletonFound)
+{
+  float distance=distance3D(0,0,0,skeletonFound->joint[HUMAN_SKELETON_HEAD].x,skeletonFound->joint[HUMAN_SKELETON_HEAD].y,skeletonFound->joint[HUMAN_SKELETON_HEAD].z);
+
+  if (distance<1000) { fprintf(stderr,GREEN "Distance is : %0.2f , it is deemed close enough for interaction\n" NORMAL , distance); } else
+  if (distance<1200) { fprintf(stderr,YELLOW "Distance is : %0.2f , it is deemed moderately close\n" NORMAL , distance); } else
+                    { fprintf(stderr,RED "Distance is : %0.2f , it is deemed far \n" NORMAL , distance); }
+
+  return 1;
+}
+
 int considerSkeletonPointing(unsigned int frameNumber,struct skeletonHuman * skeletonFound)
 {
   struct skeletonPointing skelPF={0};
@@ -482,6 +506,12 @@ void broadcastNewSkeleton(unsigned int frameNumber,unsigned int skeletonID , str
       broadcastNewPerson();
 
       considerSkeletonPointing(frameNumber,skeletonFound);
+
+      if (considerSkeletonBeeingCloseEnoughForInteraction(frameNumber,skeletonFound))
+      {
+        /*Broadcast something here maybe..!*/
+      }
+
 
       if (processingMode != PROCESSING_MODE_SIMPLE_PERSON_DETECTOR)
                                     { broadcast2DJoints(skeletonFound); } // We only produce 2d Joints when we have hands ( i.e. when not using simple person detector )
