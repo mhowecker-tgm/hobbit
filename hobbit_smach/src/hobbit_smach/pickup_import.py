@@ -657,7 +657,7 @@ class DavidPickingUp(State):
             print "gp_representation: ", gp_representation
             print type(gp_representation)
             gp_pres_str = str(gp_representation.result.data)
-            gp_eval = int(gp_pres_str[0:2])
+            gp_eval = int(gp_pres_str[6:8])
             if (gp_eval < 15):
                 print "GRASP EVALUATION WAS TO BAD FOR RELIABLE GRASPING - stop grasping"
                 return 'preempted'
