@@ -771,16 +771,16 @@ void execute(char * command,char * param)
   if (strcmp(command,"body")==0)
   {
     if (strcmp(param,"reset")==0)   { rosservice_call(cR,cRLen,(char *) "/reset_motorstop");  } else
-    if (strcmp(param,"360")==0)     { rostopic_pub(cR,cRLen,(char *) "/DiscreteMotionCmd",(char *) "std_msgs/String",(char *) "\"data: 'Turn 360'\"");   } else
-    if (strcmp(param,"360ccw")==0)  { rostopic_pub(cR,cRLen,(char *) "/DiscreteMotionCmd",(char *) "std_msgs/String",(char *) "\"data: 'Turn 360'\"");   } else
-    if (strcmp(param,"360cw")==0)   { rostopic_pub(cR,cRLen,(char *) "/DiscreteMotionCmd",(char *) "std_msgs/String",(char *) "\"data: 'Turn -360'\"");  } else
-    if (strcmp(param,"right")==0)   { rostopic_pub(cR,cRLen,(char *) "/DiscreteMotionCmd",(char *) "std_msgs/String",(char *) "\"data: 'Turn -30'\"");   } else
-    if (strcmp(param,"left")==0)    { rostopic_pub(cR,cRLen,(char *) "/DiscreteMotionCmd",(char *) "std_msgs/String",(char *) "\"data: 'Turn 30'\"");    } else
-    if (strcmp(param,"forward")==0) { rostopic_pub(cR,cRLen,(char *) "/DiscreteMotionCmd",(char *) "std_msgs/String",(char *) "\"data: 'Move 0.30'\"");  } else
-    if (strcmp(param,"back")==0)    { rostopic_pub(cR,cRLen,(char *) "/DiscreteMotionCmd",(char *) "std_msgs/String",(char *) "\"data: 'Move -0.30'\"");  }else
+    if (strcmp(param,"360")==0)     { rostopic_pub(cR,cRLen,(char *) "/DiscreteMotionCmd",(char *) "std_msgs/String",(char *) "\\\"data: 'Turn 360'\\\"");   } else
+    if (strcmp(param,"360ccw")==0)  { rostopic_pub(cR,cRLen,(char *) "/DiscreteMotionCmd",(char *) "std_msgs/String",(char *) "\\\"data: 'Turn 360'\\\"");   } else
+    if (strcmp(param,"360cw")==0)   { rostopic_pub(cR,cRLen,(char *) "/DiscreteMotionCmd",(char *) "std_msgs/String",(char *) "\\\"data: 'Turn -360'\\\"");  } else
+    if (strcmp(param,"right")==0)   { rostopic_pub(cR,cRLen,(char *) "/DiscreteMotionCmd",(char *) "std_msgs/String",(char *) "\\\"data: 'Turn -30'\\\"");   } else
+    if (strcmp(param,"left")==0)    { rostopic_pub(cR,cRLen,(char *) "/DiscreteMotionCmd",(char *) "std_msgs/String",(char *) "\\\"data: 'Turn 30'\\\"");    } else
+    if (strcmp(param,"forward")==0) { rostopic_pub(cR,cRLen,(char *) "/DiscreteMotionCmd",(char *) "std_msgs/String",(char *) "\\\"data: 'Move 0.30'\\\"");  } else
+    if (strcmp(param,"back")==0)    { rostopic_pub(cR,cRLen,(char *) "/DiscreteMotionCmd",(char *) "std_msgs/String",(char *) "\\\"data: 'Move -0.30'\\\"");  }else
     if (strcmp(param,"stop")==0)    {
                                       joystickExecute(0.0,0.0);
-                                      rostopic_pub(cR,cRLen,(char *) "/DiscreteMotionCmd",(char *) "std_msgs/String",(char *) "\"data: 'Stop'\"");
+                                      rostopic_pub(cR,cRLen,(char *) "/DiscreteMotionCmd",(char *) "std_msgs/String",(char *) "\\\"data: 'Stop'\"");
                                     }
 
     fprintf(stderr,"Body Emmits %s Command\n",cR);
