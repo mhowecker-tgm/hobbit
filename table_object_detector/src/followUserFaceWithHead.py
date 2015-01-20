@@ -90,7 +90,7 @@ def main(args):
     rospy.init_node('follow_user_head_node', anonymous=False)
 
     followHead = CFollowUserHead()
-    #followHead.follow_head_loop()
+    followHead.follow_head_loop()
     rospy.spin()
     
 if __name__ == "__main__":        
