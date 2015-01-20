@@ -492,8 +492,8 @@ void joystickExecute(float x , float y )
    AmmServer_Warning("Joystick(%0.2f,%0.2f)\n",x,y);
 
    char commandToRun[MAX_COMMAND_SIZE]={0};
-    snprintf(commandToRun,MAX_COMMAND_SIZE,
-           "rostopic pub /joy sensor_msgs/Joy \"{ axes: [ %0.2f , %0.2f , 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ] , buttons: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }\" -1&"
+    snprintf(commandToRun,MAX_COMMAND_SIZE,                              //        Please note that 1 is needed to emulate joystick move trigger
+           "rostopic pub /joy sensor_msgs/Joy \"{ axes: [ %0.2f, %0.2f, 0.0, 0.0, 0.0, 0.0 ] , buttons: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0] }\" -1&"
             ,x,y
            );
 
