@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 PKG = 'hobbit_smach'
-NAME = 'follow_me'
+NAME = 'follow_me_simple'
 DEBUGfollow_me = False
 MMUI_IS_DOING_IT = True
 
@@ -10,17 +10,14 @@ import roslib
 roslib.load_manifest(PKG)
 import rospy
 import smach
-import hobbit_smach.hobbit_move_import as hobbit_move
 import hobbit_smach.speech_output_import as speech_output
 
 from smach import Concurrence
 from std_msgs.msg import String
-from hobbit_msgs.msg import GeneralHobbitAction
-from hobbit_msgs.srv import GetCoordinates
 from smach_ros import ActionServerWrapper, IntrospectionServer
-from smach import StateMachine, State, Sequence
-from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
+from smach import StateMachine, State, Sequence, MonitorState
 from uashh_smach.util import SleepState
+from follow_user.msg import Person as FollowPerson
 
 
 #!/usr/bin/python
@@ -70,6 +67,45 @@ def main():
         outcomes=['succeeded', 'aborted', 'preempted'],
         input_keys=['command'],
         output_keys=['result'])
+
+    cc = Concurrence(
+        outcomes=['succeeded', 'preempted', 'aborted'],
+        default_outcome='aborted',
+        child_termination_cb=child_term_cb,
+        outcome_cb=out_cb
+    )
+
+
+    def child_term_cb(outcome_map):
+        if outcome_map['DETECTION'] == 'succeeded':
+            return True
+
+
+    def msg_cb(ud, msg):
+        print('person (x,y,z) {}, {}, {}'.format(msg.pose.x, msg.pose.y, msg.pose.z))
+        if msg.pose.x  and msg.pose.y and msg,pose.z:
+            return False
+
+
+    def out_cb(outcome_map):
+        if outcome_map['DETECTION'] == 'succeeded':
+            return 'succeeded'
+
+    with cc:
+        Concurrence.add(
+            'GET_USER',
+            MonitorState(
+                '/follow_user/persons',
+                FollowPerson,
+                cond_cb=msg_cb
+            ),
+            remapping={'invalid': 'aborted',
+                       'valid': 'succeeded'}
+        )
+        Concurrence.add(
+            'TIMER',
+            SleepState(10)
+        )
 
     with fm_sm:
         StateMachine.add(
@@ -123,7 +159,6 @@ def main():
             transitions={'succeeded': 'LOG_SUCCESS',
                          'canceled': 'LOG_ABORTED'}
         )
-
         Sequence.add('MMUI_MAIN_MENU', HobbitMMUI.ShowMenu(menu='MAIN'))
 
         StateMachine.add(
@@ -142,12 +177,12 @@ def main():
             transitions={'succeeded': 'aborted'}
         )
     asw = ActionServerWrapper(
-        'follow_me', GeneralHobbitAction, fm_sm,
+        'follow_me_simple', GeneralHobbitAction, fm_sm,
         ['succeeded'], ['aborted'], ['preempted'],
         result_slots_map={'result': 'result'},
         goal_slots_map={'command': 'command'})
     sis = IntrospectionServer(
-        'smach_server', fm_sm, '/HOBBIT/follow_me_sm_ROOT')
+        'smach_server', fm_sm, '/HOBBIT/follow_me_simple_sm_ROOT')
     sis.start()
     asw.run_server()
     rospy.spin()
