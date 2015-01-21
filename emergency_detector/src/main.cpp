@@ -15,6 +15,7 @@
 #include <message_filters/sync_policies/approximate_time.h>
 #include <message_filters/time_synchronizer.h>
 
+#include <tf/transform_listener.h>
 
 #include <cv_bridge/cv_bridge.h>
  #include <opencv2/imgproc/imgproc_c.h>
@@ -309,6 +310,21 @@ void joints3DReceived(const emergency_detector::Skeleton3D & msg)
 }
 
 
+int updateHeadPosition()
+{
+ tf::TransformListener listener;
+ tf::StampedTransform transformS;
+ try
+     {
+      listener.lookupTransform("/turtle2", "/turtle1",ros::Time(0), transformS);
+     }
+ catch (tf::TransformException &ex)
+      {
+       ROS_ERROR("%s",ex.what());
+       ros::Duration(1.0).sleep();
+      }
+ return 1;
+}
 
 
 //RGBd Callback is called every time we get a new pair of frames , it is synchronized to the main thread
@@ -456,6 +472,8 @@ int main(int argc, char **argv)
                   if (personDetected)   { broadcastNewPerson(); }
 
                   if (frameTimestamp%20) { fprintf(stderr,"."); }
+
+                  //updateHeadPosition();
 		 }
 
 

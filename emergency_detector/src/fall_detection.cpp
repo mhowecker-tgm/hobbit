@@ -32,7 +32,7 @@ int isSkeletonFallenAndFar(struct fallState * fs)
   unsigned int i=0;
   unsigned int height=6660;
 
-  if (fs->headLookingDirection==HEAD_LOOKING_CENTER) { height=350; } else
+  if (fs->headLookingDirection==HEAD_LOOKING_CENTER) { height=330; /*350*/ } else
   if (fs->headLookingDirection==HEAD_LOOKING_DOWN)   { height=200; }
 
   unsigned int lowPoints = 0;

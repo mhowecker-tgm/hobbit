@@ -32,8 +32,10 @@ struct SegmentationFeaturesDepth segConfDepth={0};
 unsigned int combinationMode=COMBINE_AND;
 
 
+unsigned int useTemperatureSensorForLiveFallDetection=0;
+
 //The following values are set by the launch file , so change them there..
- int maximumFrameDifferenceForTemperatureToBeRelevant=10;
+ int maximumFrameDifferenceForTemperatureToBeRelevant=20;
 
  int minimumAllowedHolePercentage = 15;
  int maximumAllowedHolePercentage = 75;
@@ -121,7 +123,7 @@ int detectHighContrastUnusableRGB(unsigned char * rgbFrame , unsigned int width 
        )
     {
      ++highContrastPixels;
-     if ( highContrastPixels>targetHighContrastPixels) { fprintf(stderr,"Bad View with %0.2f high contrast points \n",(float) (100*highContrastPixels)/(width*height)); return 1; }
+     if ( highContrastPixels>targetHighContrastPixels) { fprintf(stderr,"Bad View with %0.2f + high contrast points \n",(float) (100*highContrastPixels)/(width*height)); return 1; }
     }
   }
   fprintf(stderr,"Good View with %0.2f high contrast points \n",(float) (100*highContrastPixels)/(width*height));
@@ -221,7 +223,11 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
      }
 
 
-   if ( temperatureSensorSensesHuman( temperatureObjectDetected ,  tempTimestamp , frameTimestamp) )
+   if  (
+          ( temperatureSensorSensesHuman( temperatureObjectDetected ,  tempTimestamp , frameTimestamp) )
+           ||
+          (!useTemperatureSensorForLiveFallDetection) //If we dont want to use temperature check just check using skeleton..!
+        )
    {
     if (userHasFallen(&fallDetectionContext,frameTimestamp))
         {
@@ -349,13 +355,18 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
           line(bgrMat,ur,ptIn1 , colorEmergency , 2 , 8 , 0);
           line(bgrMat,dl,ptIn2 , colorEmergency , 2 , 8 , 0);
         } else
-        if (fallDetectionContext.headLookingDirection!=HEAD_LOOKING_DOWN)
-           { putText(bgrMat , "Head Not Looking Down" , txtPosition , fontUsed , 0.7 , color , 2 , 8 ); }
+        //======================================================================================================
+        if (fallDetectionContext.headLookingDirection==HEAD_LOOKING_CENTER)
+             { putText(bgrMat , "Horizontal Only Live Fall" , txtPosition , fontUsed , 0.7 , color , 2 , 8 ); }
             else
         if (segmentedRGB==0)
-           { putText(bgrMat , "Low Temp / Power Save" , txtPosition , fontUsed , 0.7 , color , 2 , 8 ); }
+             { putText(bgrMat , "Low Temp / Power Save" , txtPosition , fontUsed , 0.7 , color , 2 , 8 ); }
             else
-           { putText(bgrMat , "Scanning for emergency .." , txtPosition , fontUsed , 0.7 , color , 2 , 8 ); }
+        if (fallDetectionContext.headLookingDirection!=HEAD_LOOKING_DOWN)
+             { putText(bgrMat , "Head Not Looking Down" , txtPosition , fontUsed , 0.7 , color , 2 , 8 ); }
+            else
+             { putText(bgrMat , "Scanning for fallen user.." , txtPosition , fontUsed , 0.7 , color , 2 , 8 ); }
+        //======================================================================================================
         txtPosition.y += 24; snprintf(rectVal,123,"Score : %u",depthAvg);
         putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , color , 2 , 8 );
         txtPosition.y += 24; snprintf(rectVal,123,"Temperature : %0.2f C",temperatureObjectDetected);
