@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+from distance_to_obstacle.srv._distance_to_obstacle import distance_to_obstacle
 
 PKG = 'hobbit_smach'
 NAME = 'pickup_import'
@@ -76,25 +77,27 @@ class DavidLookForObject(State):
             input_keys=['cloud', 'goal_position_x', 'goal_position_y', 'goal_position_yaw'],
             output_keys=['goal_position_x', 'goal_position_y', 'goal_position_yaw']
         )
-	self.listener = tf.TransformListener()
-	self.pubClust = rospy.Publisher("/objectclusters", PointCloud2)
-	self.rec = TD()
+        self.listener = tf.TransformListener()
+        self.pubClust = rospy.Publisher("/objectclusters", PointCloud2)
+        self.rec = TD()
         self.restrictfind = False
         self.robotDistFromGraspPntForGrasping = 0.43
         self.robotOffsetRotationForGrasping = 0.06+math.pi/2.0
+        self.graspable_center_of_cluster_wcs = None
+        self.min_obj_to_mapboarder_distance = 0.30 #object has to be at least self.min_obj_to_mapboarder_distance cm away from next boarder in navigation map
 
     def findobject(self, ud):
-	print "===> pickup_import.py: DavidLookForObject.findobject()"
+        print "===> pickup_import.py: DavidLookForObject.findobject()"
         #random.seed(rospy.get_time())
         pointcloud = ud.cloud
-	clusters = self.rec.findObjectsOnFloor(pointcloud, [0,0,0,0])
+        clusters = self.rec.findObjectsOnFloor(pointcloud, [0,0,0,0])
         print "number of object clusters on floor found: ", len(clusters)
 
         for cluster in clusters:
             self.pc = cluster
-	    print " ==============> publish cluster"
-	    #self.pubClust.publish(cluster)
-	    #self.pubClust.publish(pointcloud)					#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! new 31.7.2014
+            print " ==============> publish cluster"
+            #self.pubClust.publish(cluster)
+            #self.pubClust.publish(pointcloud)					#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! new 31.7.2014
             if self.isGraspableObject():
                     self.pubClust.publish(cluster)
                     #self.showMMUI_Info("T_CF_I_FOUND_OBJECT_ON_FLOOR","1")
@@ -104,10 +107,29 @@ class DavidLookForObject(State):
         print "findobect(): no graspable object found"
         return False
 
-
-
+    def isObjectAwayFromMapBoarders(self):
+        rospy.wait_for_service('distance_to_obstacle')
+        try:
+            distance_to_obstacle_service = rospy.ServiceProxy('distance_to_obstacle', distance_to_obstacle)
+            input = distance_to_obstacle()  #data type for this service
+            #input.p = self.graspable_center_of_cluster_wcs
+            response = distance_to_obstacle_service(self.graspable_center_of_cluster_wcs)
+            print "object distance to map boarder: ", response.d
+            dist = response.d
+            if (dist > self.min_obj_to_mapboarder_distance):
+                print "isObjectAwayFromMapBoarder: object is far enough from map boarders"
+                return True
+            else:
+                print "object is to near to map obstacle! pick up aborted "
+                return False
+            
+        except rospy.ServiceException, e:
+            print "Service call distance_to_obstacle failed: %s"%e
+            return False
+                                
+                        
     def execute(self, ud):
-	print "===> pickup_import.py: DavidLookForObject.execute()"
+        print "===> pickup_import.py: DavidLookForObject.execute()"
         if self.preempt_requested():
             return 'preempted'
         # TODO: David please put the pose calculations in here
@@ -116,32 +138,36 @@ class DavidLookForObject(State):
         # The head will already be looking down to the floor.
 
 
-
         if self.findobject(ud):
             
-            (robot_x, robot_y, robot_yaw) = util.get_current_robot_position(frame='/map')
-            posRobot = [robot_x, robot_y] #Bajo, please fill in
-	    print "actual robot position: ", posRobot
-	    print "graspable center of cluster: ", self.graspable_center_of_cluster_wcs  #center of graspable point cluster
-            robotApproachDir = [self.graspable_center_of_cluster_wcs.point.x - posRobot[0], self.graspable_center_of_cluster_wcs.point.y - posRobot[1]]
-            robotApproachDir = [robotApproachDir[0]/numpy.linalg.norm(robotApproachDir), robotApproachDir[1]/numpy.linalg.norm(robotApproachDir)]       #normalized
-	    print "normalized robot approach direction: ", robotApproachDir
-
-
-            ud.goal_position_x = self.graspable_center_of_cluster_wcs.point.x - self.robotDistFromGraspPntForGrasping * robotApproachDir[0]
-            ud.goal_position_y = self.graspable_center_of_cluster_wcs.point.y - self.robotDistFromGraspPntForGrasping * robotApproachDir[1]
-            ud.goal_position_yaw = math.atan2(robotApproachDir[1],robotApproachDir[0]) + self.robotOffsetRotationForGrasping #can be negative!  180/math.pi*math.atan2(y,x) = angle in degree of vector (x,y)
-	    print "robotDistFromGraspPntForGrasping: ", self.robotDistFromGraspPntForGrasping
-	    print "robotOffsetRotationForGrasping: ", self.robotOffsetRotationForGrasping
-	    print "robot goal position:"
-	    print "ud.goal_position_x:   ", ud.goal_position_x
-	    print "ud.goal_position_y:   ", ud.goal_position_y
-	    print "ud.goal_position_yaw:   ", ud.goal_position_yaw
-
-
-            return 'succeeded'
+            if self.isObjectAwayFromMapBoarders():
+            
+            
+                (robot_x, robot_y, robot_yaw) = util.get_current_robot_position(frame='/map')
+                posRobot = [robot_x, robot_y] #Bajo, please fill in
+                print "actual robot position: ", posRobot
+                print "graspable center of cluster: ", self.graspable_center_of_cluster_wcs  #center of graspable point cluster
+                robotApproachDir = [self.graspable_center_of_cluster_wcs.point.x - posRobot[0], self.graspable_center_of_cluster_wcs.point.y - posRobot[1]]
+                robotApproachDir = [robotApproachDir[0]/numpy.linalg.norm(robotApproachDir), robotApproachDir[1]/numpy.linalg.norm(robotApproachDir)]       #normalized
+                print "normalized robot approach direction: ", robotApproachDir
+    
+    
+                ud.goal_position_x = self.graspable_center_of_cluster_wcs.point.x - self.robotDistFromGraspPntForGrasping * robotApproachDir[0]
+                ud.goal_position_y = self.graspable_center_of_cluster_wcs.point.y - self.robotDistFromGraspPntForGrasping * robotApproachDir[1]
+                ud.goal_position_yaw = math.atan2(robotApproachDir[1],robotApproachDir[0]) + self.robotOffsetRotationForGrasping #can be negative!  180/math.pi*math.atan2(y,x) = angle in degree of vector (x,y)
+                print "robotDistFromGraspPntForGrasping: ", self.robotDistFromGraspPntForGrasping
+                print "robotOffsetRotationForGrasping: ", self.robotOffsetRotationForGrasping
+                print "robot goal position:"
+                print "ud.goal_position_x:   ", ud.goal_position_x
+                print "ud.goal_position_y:   ", ud.goal_position_y
+                print "ud.goal_position_yaw:   ", ud.goal_position_yaw
+    
+    
+                return 'succeeded'
+            else:
+                return 'failed' #object to near to map boarder
         else:
-            return 'failed'
+            return 'failed' #object not found
 
 
 
@@ -179,7 +205,9 @@ class DavidLookForObject(State):
         isgraspable = self.ispossibleobject(pnt_rcs)
         if isgraspable:
             self.pc_rcs = self.transformPointCloud('/base_link',self.pc)
-        self.graspable_center_of_cluster_wcs = pnt_wcs
+            self.graspable_center_of_cluster_wcs = pnt_wcs
+        
+        
         return isgraspable
 
 
@@ -289,7 +317,7 @@ class DavidLookForObject(State):
 
 
     def getRollForPointCloud(self):
-	print "===> pickup_import.py: DavidLookForObject.getRollForPointCloud()"
+        print "===> pickup_import.py: DavidLookForObject.getRollForPointCloud()"
         #finds and return good roll angle (assuming its good to grasp where object is slim)
         # returned angle has to be added to cf_pregrasp and cf_finalgrasp
         print "start of getRollForPointCloud"
