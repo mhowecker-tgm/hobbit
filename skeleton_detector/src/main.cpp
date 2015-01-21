@@ -131,13 +131,18 @@ bool benchmark(std_srvs::Empty::Request& request, std_srvs::Empty::Response& res
     return true;
 }
 
+int triggerAttentionInternal()
+{
+  fprintf(stderr,YELLOW "Giving more CPU time to the skeleton node..!\n" NORMAL);
+  actualTimestamp=frameTimestamp;
+}
+
 
 
 bool attention(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
     ROS_INFO("Skeleton Detector : Heightened Attention..!");
-    //processingMode=PROCESSING_MODE_TREE_GRID_BODY_TRACKER;
-    actualTimestamp=frameTimestamp;
+    triggerAttentionInternal();
     return true;
 }
 
@@ -153,6 +158,7 @@ bool simple(std_srvs::Empty::Request& request, std_srvs::Empty::Response& respon
 {
     ROS_INFO("Skeleton Detector : Simple Mode on");
     processingMode=PROCESSING_MODE_SIMPLE_PERSON_DETECTOR;
+    triggerAttentionInternal(); // On switches between modes , give more CPU time [ switches happen for a reason typically ]
     return true;
 }
 
@@ -161,6 +167,7 @@ bool advanced(std_srvs::Empty::Request& request, std_srvs::Empty::Response& resp
     ROS_INFO("Skeleton Detector : Advanced Mode , we go to Super Mode instead ");
     //processingMode=PROCESSING_MODE_TREE_GRID_BODY_TRACKER;
     processingMode=PROCESSING_MODE_UPPER_GESTURE_BODY_TRACKER;
+    triggerAttentionInternal(); // On switches between modes , give more CPU time [ switches happen for a reason typically ]
     return true;
 }
 
@@ -168,6 +175,7 @@ bool super(std_srvs::Empty::Request& request, std_srvs::Empty::Response& respons
 {
     ROS_INFO("Skeleton Detector : Super New Mode on");
     processingMode=PROCESSING_MODE_UPPER_GESTURE_BODY_TRACKER;
+    triggerAttentionInternal(); // On switches between modes , give more CPU time [ switches happen for a reason typically ]
     return true;
 }
 
@@ -183,6 +191,7 @@ bool resume(std_srvs::Empty::Request& request, std_srvs::Empty::Response& respon
 {
     ROS_INFO("Skeleton Detector is now resuming");
     paused =0;
+    triggerAttentionInternal(); // On switches between modes , give more CPU time [ switches happen for a reason typically ]
     return true;
 }
 
