@@ -299,8 +299,12 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
   time_t t = time(NULL);
   struct tm tm = *localtime(&t);
 
-  char temperatureState[MAX_COMMAND_SIZE]={0};
-  getBackCommandLine((char*) "timeout 1 sensors | grep temp3 | cut -d ' ' -f9", temperatureState , MAX_COMMAND_SIZE );
+  char temperatureStateMotherboard[MAX_COMMAND_SIZE]={0};
+  getBackCommandLine((char*) "timeout 1 sensors | grep temp3 | cut -d ' ' -f9", temperatureStateMotherboard , MAX_COMMAND_SIZE );
+
+
+  char temperatureStateCPU[MAX_COMMAND_SIZE]={0};
+  getBackCommandLine((char*) "timeout 1 sensors | grep Physical | cut -d ' ' -f9", temperatureStateCPU , MAX_COMMAND_SIZE );
 
   char batteryState[MAX_COMMAND_SIZE]={0};
   char chargingState[MAX_COMMAND_SIZE]={0};
@@ -364,13 +368,14 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
                 </center>\
                 CPU usage : %s \n<br> \
                 CPU temp : %s \n<br> \
+                M/B temp : %s \n<br> \
                 Battery is : %s \n<br> \
                 Charging : %s<br>\
                 <br>\
                  %s <br>\
                </body>\
              </html>",
-             tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900,   tm.tm_hour, tm.tm_min, tm.tm_sec,cpuUsage,temperatureState,batteryState,chargingState,statusControl);
+             tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900,   tm.tm_hour, tm.tm_min, tm.tm_sec,cpuUsage,temperatureStateCPU,temperatureStateMotherboard,batteryState,chargingState,statusControl);
 
   rqst->contentSize=strlen(rqst->content);
   return 0;
