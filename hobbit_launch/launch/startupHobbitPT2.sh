@@ -112,6 +112,20 @@ cd /opt/ros/hobbit_hydro/src/hobbit_launch/launch
 sleep $DELAY_BETWEEN_STEPS
 roslaunch localization_monitor startup.launch&
 
+sleep $DELAY_BETWEEN_STEPS
+# Start distance_to_obstacle calculation
+roslaunch distance_to_obstacle distance_to_obstacle.launch&
+
+sleep $DELAY_BETWEEN_STEPS
+#start action server node for calculating grasps (with HAF)
+cd /opt/ros/hobbit_hydro/src/calc_grasppoints_svm
+rosrun calc_grasppoints_svm calc_grasppoints_action_server&
+
+sleep $DELAY_BETWEEN_STEPS
+cd /opt/ros/hobbit_hydro/src/top_scan_points/launch
+roslaunch startup.launch&
+
+
 cd $STARTDIR
 
 exit 0
