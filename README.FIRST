@@ -10,6 +10,8 @@ SETUP HOBBIT WORKSPACE FOR PT2
 - checkout code and make a catkin workspace for hobbit PT2 (I have it at /opt/ros/):
   In order to install openni2 camera drivers etc ( needed for RGBDAcquisition node ) and in order for the openni2 camera service 
   >> sudo apt-get install ros-hydro-openni2-camera ros-hydro-openni2-launch imagemagick
+- install ROS joystick module
+  >> sudo apt-get install ros-hydro-joy
 - install cmake modules, ccmake and dependencies for FAAT
   >> sudo apt-get install ros-hydro-cmake-modules cmake-curses-gui libsuitesparse-dev libglew-dev
 - install python pip and python crontab
