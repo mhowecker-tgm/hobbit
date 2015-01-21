@@ -46,6 +46,8 @@ int key = 0;
 int recording=0;
 int recordedFrames=0;
 unsigned int frameTimestamp =0;
+
+unsigned int framesForHeightenedAttention=30;
 unsigned int runFullSpeed=0;
 unsigned int runMaxSpeed=0;
 unsigned int colorWidth = 640 , colorHeight =480 , depthWidth = 640 , depthHeight = 480;
@@ -126,6 +128,16 @@ bool benchmark(std_srvs::Empty::Request& request, std_srvs::Empty::Response& res
 {
     ROS_INFO("Skeleton Detector : Benchmark Mode on , will consume a LOT of CPU");
     runMaxSpeed=1;
+    return true;
+}
+
+
+
+bool attention(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    ROS_INFO("Skeleton Detector : Heightened Attention..!");
+    //processingMode=PROCESSING_MODE_TREE_GRID_BODY_TRACKER;
+    actualTimestamp=frameTimestamp;
     return true;
 }
 
@@ -337,6 +349,7 @@ int main(int argc, char **argv)
      ros::ServiceServer visualizeOnService      = nh.advertiseService(name+"/visualize_on" , visualizeOn);
      ros::ServiceServer visualizeOffService     = nh.advertiseService(name+"/visualize_off", visualizeOff);
      ros::ServiceServer benchmarkService        = nh.advertiseService(name+"/benchmark" , benchmark);
+     ros::ServiceServer attentionService        = nh.advertiseService(name+"/attention" , attention);
      ros::ServiceServer terminateService        = nh.advertiseService(name+"/terminate"    , terminate);
      ros::ServiceServer resumeService           = nh.advertiseService(name+"/pause"        , pause);
      ros::ServiceServer dumpService             = nh.advertiseService(name+"/startDump"    , startDump);
@@ -402,7 +415,7 @@ int main(int argc, char **argv)
                 } else
             if (processingMode==PROCESSING_MODE_UPPER_GESTURE_BODY_TRACKER)
             {
-              if ( lastDetectedFrame < 20 )
+              if ( lastDetectedFrame < framesForHeightenedAttention )
                          {  loop_rate_fast.sleep();       /*Face Detector Not using a lot of CPU , so let's go fast*/ } else
                          {  loop_rate_ultra_low.sleep();  /*Face Detector using a lot of CPU , so let's go slow */    }
             } else
