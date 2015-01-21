@@ -133,7 +133,7 @@ bool benchmark(std_srvs::Empty::Request& request, std_srvs::Empty::Response& res
 
 int triggerAttentionInternal()
 {
-  fprintf(stderr,YELLOW "Giving more CPU time to the skeleton node..!\n" NORMAL);
+  fprintf(stderr,"Giving more CPU time to the skeleton node..!\n");
   actualTimestamp=frameTimestamp;
 }
 
