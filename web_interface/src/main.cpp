@@ -304,7 +304,7 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
 
 
   char temperatureStateCPU[MAX_COMMAND_SIZE]={0};
-  getBackCommandLine((char*) "timeout 1 sensors | grep Physical | cut -d ' ' -f9", temperatureStateCPU , MAX_COMMAND_SIZE );
+  getBackCommandLine((char*) "timeout 1 sensors | grep Physical | cut -d ' ' -f5", temperatureStateCPU , MAX_COMMAND_SIZE );
 
   char batteryState[MAX_COMMAND_SIZE]={0};
   char chargingState[MAX_COMMAND_SIZE]={0};
