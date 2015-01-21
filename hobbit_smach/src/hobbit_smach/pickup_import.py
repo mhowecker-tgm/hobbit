@@ -896,7 +896,7 @@ class DavidPickingUp(State):
             y_min = -0.55
             y_max = -0.23
             z_min = 0.01
-            z_max = 0.20    #only that high because of buggy camera
+            z_max = 0.18    #only that high because of buggy camera
 
         #print "pnt.point.x: ", pnt.point.x
         if (pnt.point.x > x_min and pnt.point.x < x_max and pnt.point.y > y_min and pnt.point.y < y_max and pnt.point.z > z_min and pnt.point.z < z_max):
