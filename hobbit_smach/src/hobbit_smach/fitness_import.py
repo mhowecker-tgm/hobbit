@@ -35,8 +35,6 @@ class Init(State):
             output_keys=['social_role', 'object_name'])
 
     def execute(self, ud):
-        ud.object_name = ud.parameters[0]
-
         if rospy.has_param('/hobbit/social_role'):
             ud.social_role = rospy.get_param('/hobbit/social_role')
         if ud.command.data == 'cancel':
@@ -98,10 +96,10 @@ def get_do_fitness():
     sm.userdata.detection = False
 
     with sm:
-        StateMachine.add(
+        StateMachine.add(SWITCH_VISION_TO_FITNESS
             'INIT',
             Init(),
-            transitions={'succeeded': 'MOVE_BASE',
+            transitions={'succeeded': 'SWITCH_VISION_TO_FITNESS',
                          'canceled': 'LOG_ABORTED'}
         )
         # TODO: implement ConfirmPlace with roomname in the question

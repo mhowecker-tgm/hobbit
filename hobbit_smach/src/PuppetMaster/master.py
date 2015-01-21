@@ -273,6 +273,7 @@ class SelectTask(State):
                       'clear_floor',
                       'pickup',
                       'follow',
+                      'fitness',
                       'learn_object',
                       'bring_object',
                       'goto',
@@ -533,6 +534,7 @@ def main():
                          'sleep': 'SLEEP',
                          'pickup': 'PICKUP',
                          'follow': 'FOLLOW',
+                         'fitness': 'FITNESS',
                          'learn_object': 'LEARN_OBJECT',
                          'bring_object': 'BRING_OBJECT',
                          'goto': 'GOTO',
@@ -589,6 +591,20 @@ def main():
             'CLEAR_FLOOR',
             FakeForAllWithoutRunningActionSever(name='CLEAR_FLOOR'),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
+                         'aborted': 'RESET_ACTIVE_TASK'}
+        )
+        StateMachine.add(
+            'FITNESS',
+            SimpleActionState(
+                'fitness',
+                GeneralHobbitAction,
+                goal_cb=patrol_cb,
+                input_keys=['parameters', 'params'],
+                preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
+                server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
+            ),
+            transitions={'succeeded': 'RESET_ACTIVE_TASK',
+                         'preempted': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
