@@ -164,8 +164,8 @@ public:
 		this->pubInputPCROS = nh_.advertise<sensor_msgs::PointCloud2>( "/calc_gp_as_inputpcROS", 1);
 		this->pubInputPCPCL = nh_.advertise<sensor_msgs::PointCloud2>( "/calc_gp_as_inputpcPCL", 1);
 		box_position_set = true;
-		this->box_center_x = 0.03;
-		this->box_center_y = -0.45;
+		this->box_center_x = 0.07;
+		this->box_center_y = -0.49;
 		outputpath_full = "/tmp/features.txt";
 		return_only_best_gp = true;
 		graspval_th = 70;					//treshold if grasp hypothesis should be returned (in function - so programm internal) (for top result of one loop run)
