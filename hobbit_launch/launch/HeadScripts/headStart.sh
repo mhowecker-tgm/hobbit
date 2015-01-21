@@ -47,12 +47,12 @@ MAX_RETRIES=20
 SLEEP_TIME_IN_SECONDS_BETWEEN_RETRIES=1
 i=1
 
-ISRGBDUP=`rostopic list | grep /head/cmd`
-while [ -z "$ISRGBDUP" ]
+ISHEADUP=`rostopic list | grep /head/cmd`
+while [ -z "$ISHEADUP" ]
 do
- echo "Head Motor node not started yet , try to wait for it $i/$MAX_RETRIES ( $ISRGBDUP )"
+ echo "Head Motor node not started yet , try to wait for it $i/$MAX_RETRIES ( $ISHEADUP )"
  sleep $SLEEP_TIME_IN_SECONDS_BETWEEN_RETRIES
- ISRGBDUP=`rostopic list | grep /basecam/rgb/image_rect_color/compressed`
+ ISHEADUP=`rostopic list | grep /head/cmd`
  ((i++))
  if [ $i -gt $MAX_RETRIES ]
  then 
@@ -65,7 +65,9 @@ rostopic pub /head/cmd std_msgs/String "startup" -1
 
 echo "Starting blue_temperature"
 #screen -d -m -S "blue_temperature" /bin/bash -c "source /home/pi/.bashrc && source /home/pi/ros/setup.bash && rosrun blue_temperature blue_temperature"
-rosrun blue_temperature blue_temperature&
+
+# Blue temperature does not work on hobbitpt2c 
+#rosrun blue_temperature blue_temperature&
 
 
 echo "Waiting so that we still get output on the screen session of xpc"
