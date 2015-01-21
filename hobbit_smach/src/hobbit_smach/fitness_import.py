@@ -96,7 +96,7 @@ def get_do_fitness():
     sm.userdata.detection = False
 
     with sm:
-        StateMachine.add(SWITCH_VISION_TO_FITNESS
+        StateMachine.add(
             'INIT',
             Init(),
             transitions={'succeeded': 'SWITCH_VISION_TO_FITNESS',

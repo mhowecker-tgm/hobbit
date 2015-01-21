@@ -18,8 +18,6 @@ def start_action():
     client.wait_for_server()
     print "connected to server"
     par = []
-    par.append(String('mug'))
-    # object_name=String('mug')
     goal = hobbit_msgs.msg.GeneralHobbitGoal(
         command=String('fitness'),
         previous_state=String('call_hobbit'),

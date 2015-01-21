@@ -44,7 +44,8 @@ commands = [
     ['surprise', 'C_SURPRISE'],
     ['reward', 'C_REWARD', 'G_REWARD'],
     ['social_role', 'E_SOCIALROLE'],
-    ['master_reset', 'C_MASTER_RESET']
+    ['master_reset', 'C_MASTER_RESET'],
+    ['fitness', 'B_FITNESS']
     ]
 
 

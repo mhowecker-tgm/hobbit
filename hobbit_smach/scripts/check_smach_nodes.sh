@@ -8,7 +8,7 @@
 nodes=( "place_handler" "learn_object" "goto" "emergency_user"
 "emergency_bathroom" "battery_monitor" "recharge" "sos_monitor"
 "follow_me" "pickup" "away" "master" "arm_action_server" 
-"bring_object" )
+"bring_object" "fitness" )
 
 values=`rosnode list`
 for i in "${nodes[@]}"
