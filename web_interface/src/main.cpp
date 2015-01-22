@@ -749,6 +749,7 @@ void execute(char * command,char * param)
     if (strcmp(param,"up_left")==0)       { rostopic_pub(cR,cRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"up_left\"");        } else
     if (strcmp(param,"center_right")==0)  { rostopic_pub(cR,cRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"center_right\"");   } else
     if (strcmp(param,"center_center")==0) { rostopic_pub(cR,cRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"center_center\"");  } else
+    if (strcmp(param,"littledown_center")==0) { rostopic_pub(cR,cRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"littledown_center\"");  } else
     if (strcmp(param,"center_left")==0)   { rostopic_pub(cR,cRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"center_left\"");    } else
     if (strcmp(param,"down_right")==0)    { rostopic_pub(cR,cRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"down_right\"");     } else
     if (strcmp(param,"down_center")==0)   { rostopic_pub(cR,cRLen,(char *) "/head/move",(char *) "std_msgs/String",(char *) "\"down_center\"");    } else
