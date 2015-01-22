@@ -68,10 +68,13 @@ message_filters::Subscriber<sensor_msgs::CameraInfo> *depth_cam_info_sub;
 
 typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image> RgbdSyncPolicy;
 
+unsigned int lastEmergencyDetectionTimestamp=0;
+unsigned int emergencyDetectionCooldown=150; //This should be time , not frames
+
 
 bool first=false;
 int key = 0;
-unsigned int frameTimestamp=0;
+unsigned int frameTimestamp=emergencyDetectionCooldown+1; //not 0 so we can immediately trigger
 ros::NodeHandle * nhPtr=0;
 unsigned int paused=0;
 unsigned int dontPublishPersons=0;
@@ -106,6 +109,13 @@ void broadcastEmergency(unsigned int frameNumber)
 {
   if ( (!emergencyDetected) ) { return ; }
 
+
+  if ( frameNumber > lastEmergencyDetectionTimestamp  + emergencyDetectionCooldown )
+  {
+    fprintf(stderr,"Throttling Emergency Event \n");
+  }
+
+
   //emergencyDetected=0;
   //fprintf(stderr,"emergencyDetection broadcasting disabled , just for a little while more\n");
   //return ;
@@ -127,6 +137,8 @@ void broadcastEmergency(unsigned int frameNumber)
     evt.params.resize(0);
     fprintf(stderr,"Publishing a new Emergency Event ( %u ) \n",emergencyDetected);
     gestureEventBroadcaster.publish(evt);
+
+    lastEmergencyDetectionTimestamp=frameNumber;
 
     //No longer at an emergency state
     emergencyDetected=0;
