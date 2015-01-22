@@ -39,6 +39,14 @@ echo "Starting blue_eyes"
 #screen -d -m -S "blue_eyes" /bin/bash -c "source /home/pi/.bashrc && source /home/pi/ros/setup.bash && rosrun blue_eyes blue_eyes.py"
 rosrun blue_eyes blue_eyes.py&
 
+
+echo "Starting blue_temperature"
+#screen -d -m -S "blue_temperature" /bin/bash -c "source /home/pi/.bashrc && source /home/pi/ros/setup.bash && rosrun blue_temperature blue_temperature"
+
+# Blue temperature does not work on hobbitpt2c 
+rosrun blue_temperature blue_temperature&
+
+
 echo "Starting blue_pose"
 #screen -d -m -S "blue_pose" /bin/bash -c "source /home/pi/.bashrc && source /home/pi/ros/setup.bash && rosrun blue_owlpose owlpose.py"
 rosrun blue_owlpose owlpose.py&
@@ -63,11 +71,6 @@ done
 
 rostopic pub /head/cmd std_msgs/String "startup" -1
 
-echo "Starting blue_temperature"
-#screen -d -m -S "blue_temperature" /bin/bash -c "source /home/pi/.bashrc && source /home/pi/ros/setup.bash && rosrun blue_temperature blue_temperature"
-
-# Blue temperature does not work on hobbitpt2c 
-#rosrun blue_temperature blue_temperature&
 
 
 echo "Waiting so that we still get output on the screen session of xpc"
