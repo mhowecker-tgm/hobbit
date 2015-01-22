@@ -28,7 +28,7 @@ include_directories(${PCL_INCLUDE_DIRS}
 
 message(STATUS ${FAAT_PCL_INCLUDE_DIRS})
 message(STATUS ${FAAT_PCL_LIBRARIES})
-set(FAAT_PCL_LIBRARIES FAAT_PCL_3d_rec_frameworkrd FAAT_PCL_utilsrd FAAT_PCL_recognitionrd FAAT_PCL_utilsrd siftpprd siftgpurd boost_regex)
+set(FAAT_PCL_LIBRARIES FAAT_PCL_3d_rec_framework FAAT_PCL_utils FAAT_PCL_recognition FAAT_PCL_utils siftpp siftgpu boost_regex)
 #eventually use this:
 #set(FAAT_PCL_LIBRARIES FAAT_PCL_3d_rec_framework FAAT_PCL_utils FAAT_PCL_recognition FAAT_PCL_utils siftpp siftgpu boost_regex)
 
