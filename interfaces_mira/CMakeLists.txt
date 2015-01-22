@@ -90,8 +90,8 @@ include_directories(include
   ${catkin_INCLUDE_DIRS}
   ${MIRA_ROOT_DIR}/toolboxes/RobotDataTypes/include
   ${MIRA_ROOT_DIR}/toolboxes/Navigation/include
-  ${MIRA_ROOT_DIR}/toolboxes/Mapping/include #previous versions
-  #${MIRA_ROOT_DIR}/../mira-commercial/toolboxes/Mapping/include #different from previous versions of Mira
+  #${MIRA_ROOT_DIR}/toolboxes/Mapping/include #previous versions
+  ${MIRA_ROOT_DIR}/../mira-commercial/toolboxes/Mapping/include #different from previous versions of Mira
 
 )
 
