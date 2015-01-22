@@ -470,7 +470,9 @@ int main(int argc, char **argv)
      #endif
 
 
-     fallDetectionContext.headLookingDirection=HEAD_UNKNOWN_DIRECTION;
+     fallDetectionContext.headLookingDirection=HEAD_UNKNOWN_DIRECTION; //
+
+    fallDetectionContext.headLookingDirection=HEAD_LOOKING_CENTER; //TODO : for now ..
      fallDetectionContext.lastJointsTimestamp=100000;
      initializeProcess();
 
