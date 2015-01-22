@@ -35,6 +35,7 @@
 #include <maps/OccupancyGrid.h>
 
 #include "geometry_msgs/PoseWithCovarianceStamped.h"
+#include "hobbit_msgs/GetOccupancyGrid.h"
 
 #include "std_srvs/Empty.h"
 
@@ -108,6 +109,9 @@ private:
 
 	ros::ServiceServer cancel_goal_service;
 	bool cancelGoal(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res);
+
+	ros::ServiceServer local_map_service;
+	bool getLocalMap(std_srvs::Empty::Request  &req, hobbit_msgs::GetOccupancyGrid::Response &res);
 
 };
 

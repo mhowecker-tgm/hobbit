@@ -70,6 +70,8 @@ void MiraSendingGoals::initialize() {
 
   cancel_goal_service = robot_->getRosNode().advertiseService("/cancel_goal", &MiraSendingGoals::cancelGoal, this);
 
+  local_map_service = robot_->getRosNode().advertiseService("/get_local_map", &MiraSendingGoals::getLocalMap, this);
+
 }
 
 void MiraSendingGoals::spin() 
@@ -569,6 +571,41 @@ void MiraSendingGoals::local_map_callback(mira::ChannelRead<mira::maps::Occupanc
 	local_map = (*data);
   
 }
+
+bool MiraSendingGoals::getLocalMap(std_srvs::Empty::Request  &req, hobbit_msgs::GetOccupancyGrid::Response &res)
+{
+	
+	nav_msgs::OccupancyGrid local_grid;
+	
+	local_grid.info.resolution =local_map.getCellSize();
+	local_grid.info.width = local_map.width();
+	local_grid.info.height = local_map.height();
+
+	mira::Point2i grid_point(0,0);
+	mira::Point2f rel_point = local_map.map2world(grid_point);
+	const mira::Pose2 global_origin = robot_->getMiraAuthority().getTransform<mira::Pose2>("/robot/OdometryFrame", "/maps/MapFrame", Time::now()) * mira::Pose2(rel_point(0), rel_point(1), 0.0f);
+
+	local_grid.info.origin.position.x = global_origin.x();
+	local_grid.info.origin.position.y =global_origin.y();
+	local_grid.info.origin.orientation =tf::createQuaternionMsgFromYaw(global_origin.phi());
+
+	local_grid.data.resize(local_grid.info.width*local_grid.info.height);
+	int index = 0;
+	for (int i=0; i<local_grid.info.width; i++)
+	{
+		for (int j=0; j< local_grid.info.height; j++)
+		{
+			local_grid.data[index] = local_map.data()[index];
+			index++;
+		}
+	}
+
+
+	res.occupancy_grid = local_grid;
+	
+	return true;
+}
+
 
 bool MiraSendingGoals::checkRotationStatus(hobbit_msgs::GetState::Request  &req, hobbit_msgs::GetState::Response &res)
 {
