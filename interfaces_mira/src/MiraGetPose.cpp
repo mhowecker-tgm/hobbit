@@ -52,9 +52,9 @@ void MiraGetPose::initialize() {
    std::cout << "docking_y " << docking_pose.y() << std::endl;
    std::cout << "docking_theta " << docking_pose.phi() *180/M_PI << std::endl;*/
 
-   docking_pose.cov(0,1) = 0.05*0.05;
+   docking_pose.cov(0,0) = 0.05*0.05;
+   docking_pose.cov(0,1) = 0;
    docking_pose.cov(0,2) = 0;
-   docking_pose.cov(0,3) = 0;
    docking_pose.cov(1,0) = 0;
    docking_pose.cov(1,1) = 0.05*0.05;
    docking_pose.cov(1,2) = 0;
