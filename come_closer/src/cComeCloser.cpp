@@ -75,18 +75,26 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 
 	const nav_msgs::OccupancyGrid const_local_grid = local_grid;
 
+	std::cout << "origin_x " << local_grid.info.origin.position.x << std::endl;
+	std::cout << "origin_y " << local_grid.info.origin.position.y << std::endl;
+	std::cout << "orientation " << tf::getYaw(local_grid.info.origin.orientation)*180/M_PI << std::endl;
+
 	geometry_msgs::Pose sensor_pose;
 	double current_orientation = tf::getYaw(currentPose.pose.pose.orientation);
 	sensor_pose.position.x = currentPose.pose.pose.position.x + x_sensor*cos(current_orientation);
 	sensor_pose.position.y = currentPose.pose.pose.position.y + x_sensor*sin(current_orientation);
 	sensor_pose.orientation = currentPose.pose.pose.orientation;
+
+	std::cout << "sensor_x " << sensor_pose.position.x << std::endl;
+	std::cout << "sensor_y " << sensor_pose.position.y << std::endl;
+	std::cout << "sensor_orientation " << tf::getYaw(sensor_pose.orientation)*180/M_PI << std::endl;
 	
 
 	sensor_msgs::LaserScan scanner_info;
 	scanner_info.angle_min = -M_PI/2;
 	scanner_info.angle_max = M_PI/2;
 	scanner_info.angle_increment = 5*M_PI/360; //FIXME add params
-	scanner_info.range_max = 3;
+	scanner_info.range_max = 1;
 
 	const geometry_msgs::Pose sensor_pose_ = sensor_pose;
 	const sensor_msgs::LaserScan scanner_info_ = scanner_info;
