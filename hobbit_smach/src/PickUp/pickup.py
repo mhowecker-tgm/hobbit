@@ -322,7 +322,7 @@ def main():
         # df 30.7.2014
         StateMachine.add(
             'WAIT_FINISH_HEAD_TO_SEARCH',
-            SleepState(duration=10),
+            SleepState(duration=5),
             transitions={'succeeded': 'GET_POINT_CLOUD',
                          'preempted': 'LOG_PREEMPT'}
             )
