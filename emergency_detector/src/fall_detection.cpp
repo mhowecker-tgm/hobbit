@@ -7,6 +7,7 @@ struct fallState fallDetectionContext={0};
 
 int isSkeletonWrong(struct fallState * fs)
 {
+  int i=0;
   float totalDist=0;
   float thisDist=0;
   signed int dX,dY;

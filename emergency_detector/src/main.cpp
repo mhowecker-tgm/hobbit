@@ -314,6 +314,7 @@ void joints3DReceived(const emergency_detector::Skeleton3D & msg)
 int updateHeadPosition()
 {
  if (!useTFTree) { return 0; }
+
  tf::TransformListener listener;
  tf::StampedTransform transformS;
  try
