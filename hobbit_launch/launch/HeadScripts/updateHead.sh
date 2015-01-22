@@ -16,17 +16,8 @@ echo "Trying to force refresh"
 nc6 192.168.2.199 8084
 echo "Done.."
 
-#scp owlpose.py herkulex.py pi@192.168.2.199:/home/pi/workspace/blue_owlpose/scripts
 
-
-#cd /opt/ros/hobbit_hydro/src/hobbit_launch/launch/HeadScripts/
-#scp headStart.sh pi@192.168.2.199:/home/pi/headStart.sh 
-#scp headKickStarter.sh pi@192.168.2.199:/home/pi/headKickStarter.sh 
-#scp systemCommandsPi.c pi@192.168.2.199:/home/pi/systemCommandsPi.c
-#scp systemCommandsPi.c pi@192.168.2.199:/home/pi/systemCommandsPi.c
-#scp activateHeadAutoStart.sh pi@192.168.2.199:/home/pi/activateHeadAutoStart.sh
-#scp owlpose.py pi@192.168.2.199:/home/pi/workspace/blue_owlpose/scripts/owlpose.py
-#scp herkulex.py pi@192.168.2.199:/home/pi/workspace/blue_owlpose/scripts/herkulex.py
-
+#This is maybe not a good idea , no idea what version of the files is the most recent..
+#scp owlpose.py herkulex.py pi@192.168.2.199:/home_org/pi/workspace/blue_owlpose/scripts  
 
 exit 0
