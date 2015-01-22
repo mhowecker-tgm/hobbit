@@ -681,7 +681,8 @@ void execute(char * command,char * param)
     if (strcmp(param,"vsWhereIsUserPointing")==0)  {  rosservice_call(cR,cRLen,(char *) "/vision_system/seeWhereUserIsPointing");   } else
     if (strcmp(param,"vsNavigating")==0)           {  rosservice_call(cR,cRLen,(char *) "/vision_system/navigating");   } else
     if (strcmp(param,"vsIdle")==0)                 {  rosservice_call(cR,cRLen,(char *) "/vision_system/idle");   } else
-    if (strcmp(param,"vsScan3DObject")==0)         {  rosservice_call(cR,cRLen,(char *) "/vision_system/scan3DObject");   } else
+    if (strcmp(param,"vsStartScanning3DObject")==0)  {  rosservice_call(cR,cRLen,(char *) "/vision_system/scan3DObject");      } else
+    if (strcmp(param,"vsStopScanning3DObject")==0)   {  rosservice_call(cR,cRLen,(char *) "/vision_system/pauseEverything");   } else
 
 
     if (strcmp(param,"forthSKStartVisualization")==0)     {  rosservice_call(cR,cRLen,(char *) "/skeleton_detector/visualize_on");        } else
