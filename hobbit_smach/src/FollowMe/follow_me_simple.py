@@ -6,33 +6,20 @@ NAME = 'follow_me_simple'
 DEBUGfollow_me = False
 MMUI_IS_DOING_IT = True
 
-import roslib
-roslib.load_manifest(PKG)
 import rospy
 import smach
 import hobbit_smach.speech_output_import as speech_output
 
-from smach import Concurrence
 from std_msgs.msg import String
 from smach_ros import ActionServerWrapper, IntrospectionServer
-from smach import StateMachine, State, Sequence, MonitorState
 from uashh_smach.util import SleepState
 from follow_user.msg import Person as FollowPerson
 
 
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-
-PKG = 'hobbit_smach'
-NAME = 'locate_user'
-
-import roslib
-roslib.load_manifest(PKG)
 import rospy
-from smach import StateMachine
+from smach import StateMachine, Concurrence, Sequence, MonitorState
 from smach_ros import IntrospectionServer, ActionServerWrapper
-from hobbit_msgs.msg import GeneralHobbitAction
-import hobbit_smach.locate_user_simple_import as locate_user
+from hobbit_msgs.msg import GeneralHobbitAction, FollowMeAction
 import hobbit_smach.logging_import as log
 
 
@@ -133,11 +120,14 @@ def main():
             transitions={'succeeded': 'FOLLOW',
                          'canceled': 'LOG_ABORTED'}
         )
+        follow_goal=FollowMeGoal()
+        follow_goal.command='start'
         StateMachine.add(
             'FOLLOW',
             SimpleActionState(
                 'follow_navigation',
-                GeneralHobbitAction,
+                FollowMeAction,
+                goal=follow_goal
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
