@@ -75,6 +75,7 @@ unsigned int frameTimestamp=0;
 ros::NodeHandle * nhPtr=0;
 unsigned int paused=0;
 unsigned int dontPublishPersons=0;
+unsigned int useTFTree=1;
 unsigned int fakeTemperatureActivated=0;
 
 
@@ -312,16 +313,18 @@ void joints3DReceived(const emergency_detector::Skeleton3D & msg)
 
 int updateHeadPosition()
 {
+ if (!useTFTree) { return 0; }
  tf::TransformListener listener;
  tf::StampedTransform transformS;
  try
      {
-      listener.lookupTransform("/turtle2", "/turtle1",ros::Time(0), transformS);
+      listener.lookupTransform("/map", "/frame",ros::Time(0), transformS);
+      fprintf(stderr,"Head At %0.2f %0.2f %0.2f \n" ,  transformS.getOrigin().x() ,  transformS.getOrigin().y() ,  transformS.getOrigin().z());
      }
  catch (tf::TransformException &ex)
       {
        ROS_ERROR("%s",ex.what());
-       ros::Duration(1.0).sleep();
+       //ros::Duration(1.0).sleep();
       }
  return 1;
 }
@@ -473,7 +476,7 @@ int main(int argc, char **argv)
 
                   if (frameTimestamp%20) { fprintf(stderr,"."); }
 
-                  //updateHeadPosition();
+                  updateHeadPosition();
 		 }
 
 
