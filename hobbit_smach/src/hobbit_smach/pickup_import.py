@@ -113,7 +113,7 @@ class DavidLookForObject(State):
             distance_to_obstacle_service = rospy.ServiceProxy('distance_to_obstacle', distance_to_obstacle)
             input = distance_to_obstacle()  #data type for this service
             #input.p = self.graspable_center_of_cluster_wcs
-            response = distance_to_obstacle_service(self.graspable_center_of_cluster_wcs)
+            response = distance_to_obstacle_service(self.graspable_center_of_cluster_wcs.point)
             print "object distance to map boarder: ", response.d
             dist = response.d
             if (dist > self.min_obj_to_mapboarder_distance):
