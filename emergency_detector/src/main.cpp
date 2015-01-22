@@ -75,7 +75,7 @@ unsigned int frameTimestamp=0;
 ros::NodeHandle * nhPtr=0;
 unsigned int paused=0;
 unsigned int dontPublishPersons=0;
-unsigned int useTFTree=1;
+unsigned int useTFTree=0;
 unsigned int fakeTemperatureActivated=0;
 
 
