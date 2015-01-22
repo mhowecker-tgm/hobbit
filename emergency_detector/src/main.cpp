@@ -106,9 +106,9 @@ void broadcastEmergency(unsigned int frameNumber)
 {
   if ( (!emergencyDetected) ) { return ; }
 
-  emergencyDetected=0;
-  fprintf(stderr,"emergencyDetection broadcasting disabled , just for a little while more\n");
-  return ;
+  //emergencyDetected=0;
+  //fprintf(stderr,"emergencyDetection broadcasting disabled , just for a little while more\n");
+  //return ;
 
   #if BROADCAST_HOBBIT
     hobbit_msgs::Event evt;
