@@ -8,7 +8,7 @@
 <node name="battery_monitor" pkg="hobbit_smach" type="battery_monitor.py" output="log" />
 <node name="recharge" pkg="hobbit_smach" type="recharge.py" output="log" />
 <node name="sos_monitor" pkg="hobbit_smach" type="sos_monitor.py" output="log" />
-<node name="follow_me" pkg="hobbit_smach" type="follow_me.py" output="log" />
+<node name="follow_me_simple" pkg="hobbit_smach" type="follow_me_simple.py" output="log" />
 <node name="fitness" pkg="hobbit_smach" type="fitness.py" output="log" />
 <node name="pickup" pkg="hobbit_smach" type="pickup.py" output="log" />
 <rosparam file="/opt/ros/hobbit_hydro/src/hobbit_params.yaml" command="load"/>

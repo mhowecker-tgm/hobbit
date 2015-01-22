@@ -698,7 +698,7 @@ def main():
         StateMachine.add(
             'FOLLOW',
             SimpleActionState(
-                'follow',
+                'follow_me_simple',
                 GeneralHobbitAction,
                 goal_cb=follow_cb,
                 input_keys=['parameters', 'params'],
