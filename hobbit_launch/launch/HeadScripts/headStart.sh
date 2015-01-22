@@ -25,8 +25,7 @@ echo "ROS WORKSPACE IS $ROS_WORKSPACE"
 echo "ROS HOSTNAME IS $ROS_HOSTNAME"
 
 
-
-
+ 
 env 
 echo "We are user"
 whoami
@@ -41,9 +40,7 @@ rosrun blue_eyes blue_eyes.py&
 
 
 echo "Starting blue_temperature"
-#screen -d -m -S "blue_temperature" /bin/bash -c "source /home/pi/.bashrc && source /home/pi/ros/setup.bash && rosrun blue_temperature blue_temperature"
-
-# Blue temperature does not work on hobbitpt2c 
+#screen -d -m -S "blue_temperature" /bin/bash -c "source /home/pi/.bashrc && source /home/pi/ros/setup.bash && rosrun blue_temperature blue_temperature" 
 rosrun blue_temperature blue_temperature&
 
 
@@ -51,10 +48,13 @@ echo "Starting blue_pose"
 #screen -d -m -S "blue_pose" /bin/bash -c "source /home/pi/.bashrc && source /home/pi/ros/setup.bash && rosrun blue_owlpose owlpose.py"
 rosrun blue_owlpose owlpose.py&
 
+
+
+#we need to wait for the /head/cmd topic to become availiable to bring head 
+#to the center_center position..!
 MAX_RETRIES=20
 SLEEP_TIME_IN_SECONDS_BETWEEN_RETRIES=1
-i=1
-
+i=1 
 ISHEADUP=`rostopic list | grep /head/cmd`
 while [ -z "$ISHEADUP" ]
 do
@@ -69,6 +69,7 @@ do
  fi
 done
 
+#Head is up , lets start it up
 rostopic pub /head/cmd std_msgs/String "startup" -1
 
 
