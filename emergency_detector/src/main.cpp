@@ -113,6 +113,7 @@ void broadcastEmergency(unsigned int frameNumber)
   if ( frameNumber > lastEmergencyDetectionTimestamp  + emergencyDetectionCooldown )
   {
     fprintf(stderr,"Throttling Emergency Event \n");
+    return ;
   }
 
 
