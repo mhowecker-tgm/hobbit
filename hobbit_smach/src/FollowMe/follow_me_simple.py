@@ -5,6 +5,8 @@ PKG = 'hobbit_smach'
 NAME = 'follow_me_simple'
 DEBUGfollow_me = False
 MMUI_IS_DOING_IT = True
+PREEMPT_TIMEOUT = 5
+SERVER_TIMEOUT = 5
 
 import rospy
 import smach
@@ -14,12 +16,13 @@ from std_msgs.msg import String
 from smach_ros import ActionServerWrapper, IntrospectionServer
 from uashh_smach.util import SleepState
 from follow_user.msg import Person as FollowPerson
+from hobbit_user_interaction import HobbitMMUI
 
 
 import rospy
-from smach import StateMachine, Concurrence, Sequence, MonitorState
-from smach_ros import IntrospectionServer, ActionServerWrapper
-from hobbit_msgs.msg import GeneralHobbitAction, FollowMeAction
+from smach import StateMachine, Concurrence, Sequence
+from smach_ros import IntrospectionServer, ActionServerWrapper, MonitorState, SimpleActionState
+from hobbit_msgs.msg import GeneralHobbitAction, FollowMeAction, FollowMeGoal
 import hobbit_smach.logging_import as log
 
 
@@ -55,6 +58,14 @@ def main():
         input_keys=['command'],
         output_keys=['result'])
 
+    def child_term_cb(outcome_map):
+        if outcome_map['DETECTION'] == 'succeeded':
+            return True
+
+    def out_cb(outcome_map):
+        if outcome_map['DETECTION'] == 'succeeded':
+            return 'succeeded'
+
     cc = Concurrence(
         outcomes=['succeeded', 'preempted', 'aborted'],
         default_outcome='aborted',
@@ -63,20 +74,11 @@ def main():
     )
 
 
-    def child_term_cb(outcome_map):
-        if outcome_map['DETECTION'] == 'succeeded':
-            return True
-
-
     def msg_cb(ud, msg):
         print('person (x,y,z) {}, {}, {}'.format(msg.pose.x, msg.pose.y, msg.pose.z))
-        if msg.pose.x  and msg.pose.y and msg,pose.z:
+        if msg.pose.x: 
             return False
 
-
-    def out_cb(outcome_map):
-        if outcome_map['DETECTION'] == 'succeeded':
-            return 'succeeded'
 
     with cc:
         Concurrence.add(
@@ -106,19 +108,20 @@ def main():
             speech_output.sayText(
                 info="Please stand in front of me so i can follow you."),
             transitions={'succeeded': 'GET_USER',
-                         'canceled': 'LOG_ABORTED'}
-        )StateMachine.add(
+                         'failed': 'LOG_ABORTED'}
+        )
+        StateMachine.add(
             'GET_USER',
             cc,
             transitions={'succeeded': 'SAY_FOUND_YOU',
-                         'canceled': 'SAY_CANT_SEE'}
+                         'aborted': 'SAY_CANT_SEE'}
         )
         StateMachine.add(
             'SAY_FOUND_YOU',
             speech_output.sayText(
                 info="Found you. Will start following you."),
             transitions={'succeeded': 'FOLLOW',
-                         'canceled': 'LOG_ABORTED'}
+                         'failed': 'LOG_ABORTED'}
         )
         follow_goal=FollowMeGoal()
         follow_goal.command='start'
@@ -127,7 +130,7 @@ def main():
             SimpleActionState(
                 'follow_navigation',
                 FollowMeAction,
-                goal=follow_goal
+                goal=follow_goal,
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
@@ -140,16 +143,16 @@ def main():
             speech_output.sayText(
                 info="I did not see you and will stay here."),
             transitions={'succeeded': 'LOG_ABORTED',
-                         'canceled': 'LOG_ABORTED'}
+                         'failed': 'LOG_ABORTED'}
         )
         StateMachine.add(
             'SAY_STOP',
             speech_output.sayText(
                 info="I will stop moving now."),
             transitions={'succeeded': 'LOG_SUCCESS',
-                         'canceled': 'LOG_ABORTED'}
+                         'failed': 'LOG_ABORTED'}
         )
-        Sequence.add('MMUI_MAIN_MENU', HobbitMMUI.ShowMenu(menu='MAIN'))
+        #Sequence.add('MMUI_MAIN_MENU', HobbitMMUI.ShowMenu(menu='MAIN'))
 
         StateMachine.add(
             'LOG_SUCCESS',
