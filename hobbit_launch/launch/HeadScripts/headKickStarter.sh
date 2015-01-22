@@ -6,6 +6,7 @@ source /home/pi/.bashrc
 ./waitForShutdown.sh&
 ./checkStatus.sh&
 ./waitForRefresh.sh&
+./waitForReadWrite.sh&
 
 while true; do
  nc6 -l -p 8080 -e "./headStart.sh"
