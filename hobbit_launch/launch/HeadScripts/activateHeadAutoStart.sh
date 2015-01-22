@@ -2,6 +2,16 @@
 
 PI_HOME_DIR="/home/pi"
 
+if [ -d "/home_org/pi" ] 
+   then
+     echo "It appears we are running on a non writeable rpi.." 
+     echo "Making it writeable"
+     sudo mount -o remount,rw /
+     PI_HOME_DIR="/home_org/pi"
+fi
+echo "Directory for writing is set to : $PI_HOME_DIR"
+
+
 
 echo "Making sudo-enabled ntpdate commands"
 gcc systemCommandsPi.c -s -o systemCommandsPi
@@ -19,7 +29,6 @@ echo "Making Scripts Executable"
 chmod +x $PI_HOME_DIR/headStart.sh
 chmod +x $PI_HOME_DIR/headKickStarter.sh
 chmod +x $PI_HOME_DIR/headSyncTime.sh
-chmod +x $PI_HOME_DIR/runSystemCommandPi.sh
 chmod +x $PI_HOME_DIR/checkStatus.sh
 chmod +x $PI_HOME_DIR/waitForShutdown.sh
 chmod +x $PI_HOME_DIR/waitForRefresh.sh
