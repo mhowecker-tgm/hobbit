@@ -111,7 +111,7 @@ private:
 	bool cancelGoal(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res);
 
 	ros::ServiceServer local_map_service;
-	bool getLocalMap(std_srvs::Empty::Request  &req, hobbit_msgs::GetOccupancyGrid::Response &res);
+	bool getLocalMap(hobbit_msgs::GetOccupancyGrid::Request  &req, hobbit_msgs::GetOccupancyGrid::Response &res);
 
 };
 

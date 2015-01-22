@@ -12,6 +12,8 @@
 #include <string>
 #include <ctime>
 
+#include "occupancy_grid_utils/coordinate_conversions.h"
+
 using namespace mira;
 using namespace mira::navigation;
 
@@ -572,7 +574,7 @@ void MiraSendingGoals::local_map_callback(mira::ChannelRead<mira::maps::Occupanc
   
 }
 
-bool MiraSendingGoals::getLocalMap(std_srvs::Empty::Request  &req, hobbit_msgs::GetOccupancyGrid::Response &res)
+bool MiraSendingGoals::getLocalMap(hobbit_msgs::GetOccupancyGrid::Request  &req, hobbit_msgs::GetOccupancyGrid::Response &res)
 {
 	
 	nav_msgs::OccupancyGrid local_grid;
@@ -595,7 +597,13 @@ bool MiraSendingGoals::getLocalMap(std_srvs::Empty::Request  &req, hobbit_msgs::
 	{
 		for (int j=0; j< local_grid.info.height; j++)
 		{
-			local_grid.data[index] = local_map.data()[index];
+
+			if (local_map.data()[index] > 127)
+				local_grid.data[index] = occupancy_grid_utils::OCCUPIED;
+			else if (local_map.data()[index] < 127)
+				local_map.data()[index] = occupancy_grid_utils::UNOCCUPIED;
+			else local_map.data()[index] = occupancy_grid_utils::UNKNOWN;
+
 			index++;
 		}
 	}

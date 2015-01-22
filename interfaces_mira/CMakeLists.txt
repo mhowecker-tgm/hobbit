@@ -6,7 +6,7 @@ set(actionlibs_msgs_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../build)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp std_msgs sensor_msgs tf nav_msgs actionlib_msgs dynamic_reconfigure pugixml)
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs sensor_msgs tf nav_msgs actionlib_msgs dynamic_reconfigure pugixml occupancy_grid_utils)
 
 
 # include cmake file for MIRA
