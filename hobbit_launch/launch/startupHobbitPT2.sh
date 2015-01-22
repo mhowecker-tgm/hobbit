@@ -48,14 +48,16 @@ sleep $DELAY_BETWEEN_STEPS
 chmod +x /opt/ros/hobbit_hydro/src/web_interface/scripts/startWebInterface.sh
 /opt/ros/hobbit_hydro/src/web_interface/scripts/startWebInterface.sh&
 
+
+#Start Head ( and bring it to level )
+/opt/ros/hobbit_hydro/src/hobbit_launch/launch/startupBlueDanubeHead.sh&
+
 #Start up vision acquisition etc
 /opt/ros/hobbit_hydro/src/rgbd_acquisition/scripts/startFORTHStuffPT2.sh
 #In case someone would like to startup the top camera without our integrated node he could do it like following
 #roslaunch openni2_launch openni2.launch camera:=headcam depth_registration:=true device_id:="#1"&
 sleep $DELAY_BETWEEN_STEPS
 
-#Start Head ( and bring it to level )
-/opt/ros/hobbit_hydro/src/hobbit_launch/launch/startupBlueDanubeHead.sh&
 
 
 # Start the virtual laser
