@@ -388,7 +388,7 @@ void broadcastPointing(unsigned int frameNumber ,struct skeletonPointing * skele
   }
 
   //David Wants to Flip Y
-  signed int YFlipper = -1;
+  signed int YFlipper = 1; // We dont want to flip ? -1;
 
   skeleton_detector::PointEvents msg;
   msg.x = skeletonPointingFound->pointStart.x;
