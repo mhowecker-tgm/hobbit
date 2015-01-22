@@ -10,7 +10,7 @@ echo "Done.."
 
 
 cd /opt/ros/hobbit_hydro/src/hobbit_launch/launch/HeadScripts/
-scp headStart.sh headKickStarter.sh runSystemCommandPi.sh waitForShutdown.sh waitForRefresh.sh systemCommandsPi.c checkStatus.sh activateHeadAutoStart.sh headSyncTime.sh pi@192.168.2.199:/home_org/pi
+scp headStart.sh headKickStarter.sh runSystemCommandPi.sh waitForReadWrite.sh waitForShutdown.sh waitForRefresh.sh systemCommandsPi.c checkStatus.sh activateHeadAutoStart.sh headSyncTime.sh pi@192.168.2.199:/home_org/pi
 
 echo "Trying to force refresh"
 nc6 192.168.2.199 8084
