@@ -197,6 +197,22 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
   //If we are looking Center then we might detect a person..!
   if (fallDetectionContext.headLookingDirection==HEAD_LOOKING_CENTER)
   {
+
+   if  (
+          ( temperatureSensorSensesHuman( temperatureObjectDetected ,  tempTimestamp , frameTimestamp) )
+           ||
+          (!useTemperatureSensorForLiveFallDetection) //If we dont want to use temperature check just check using skeleton..!
+        )
+   {
+    if (userHasFallen(&fallDetectionContext,frameTimestamp))
+        {
+          fprintf(stderr,MAGENTA "\n\n  Live Falling User Detected , EMERGENCY \n\n" NORMAL);
+          emergencyDetected=1;
+        }
+
+   }
+
+
      //Contemplate about emitting a Person message ( not an emergency )
      if ( temperatureSensorSensesHuman( temperatureObjectDetected ,  tempTimestamp , frameTimestamp) )
      {
@@ -225,19 +241,6 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
      }
 
 
-   if  (
-          ( temperatureSensorSensesHuman( temperatureObjectDetected ,  tempTimestamp , frameTimestamp) )
-           ||
-          (!useTemperatureSensorForLiveFallDetection) //If we dont want to use temperature check just check using skeleton..!
-        )
-   {
-    if (userHasFallen(&fallDetectionContext,frameTimestamp))
-        {
-          fprintf(stderr,MAGENTA "\n\n  Live Falling User Detected , EMERGENCY \n\n" NORMAL);
-          emergencyDetected=1;
-        }
-
-   }
   }
 
 

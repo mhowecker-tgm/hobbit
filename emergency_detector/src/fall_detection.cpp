@@ -7,18 +7,9 @@ struct fallState fallDetectionContext={0};
 
 int isSkeletonWrong(struct fallState * fs)
 {
-  //If we are standing we have at least 1 particle high on the Y axis of the frame..!
-  unsigned int i=0;
-  unsigned int height=0;
-
-  if (fs->headLookingDirection==HEAD_LOOKING_CENTER) { height=200; } else
-  if (fs->headLookingDirection==HEAD_LOOKING_DOWN)   { height=100; }
-
   float totalDist=0;
   float thisDist=0;
   signed int dX,dY;
-
-
    for (i=0; i<fs->numberOfJoints; i++)
    {
 
@@ -32,8 +23,7 @@ int isSkeletonWrong(struct fallState * fs)
      }
    }
 
-
-   fprintf(stderr,"Skeleton Size is %0.2f \n",totalDist);
+   fprintf(stderr,"Skeleton Spread is %0.2f \n",totalDist);
   return 0;
 }
 
