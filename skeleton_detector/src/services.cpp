@@ -449,17 +449,17 @@ int considerSkeletonBeeingCloseEnoughForInteraction(unsigned int frameNumber,str
   float distance=distance3D(0,0,0,skeletonFound->joint[HUMAN_SKELETON_HEAD].x,skeletonFound->joint[HUMAN_SKELETON_HEAD].y,skeletonFound->joint[HUMAN_SKELETON_HEAD].z);
 
   if (distance<1000)   {
-                        fprintf(stderr,GREEN "Distance is : %0.2f , it is deemed really close\n" NORMAL , distance);
+                        fprintf(stderr,GREEN "Distance is : %0.2f mm , it is deemed really close\n" NORMAL , distance);
                         isSkeletonCloseEnoughForInteractionInt=1;
                         timestampIsSkeletonCloseEnoughForInteraction=frameNumber;
                        } else
   if (distance<1200)   {
-                        fprintf(stderr,YELLOW "Distance is : %0.2f , it is deemed marginally close\n" NORMAL , distance);
+                        fprintf(stderr,YELLOW "Distance is : %0.2f mm , it is deemed marginally close\n" NORMAL , distance);
                         isSkeletonCloseEnoughForInteractionInt=1;
                         timestampIsSkeletonCloseEnoughForInteraction=frameNumber;
                        } else
                       {
-                        fprintf(stderr,RED "Distance is : %0.2f , it is deemed far \n" NORMAL , distance);
+                        fprintf(stderr,RED "Distance is : %0.2f mm , it is deemed far \n" NORMAL , distance);
                         isSkeletonCloseEnoughForInteractionInt=0;
                         timestampIsSkeletonCloseEnoughForInteraction=frameNumber;
                       }
