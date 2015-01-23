@@ -32,6 +32,8 @@ sleep $DELAY_BETWEEN_STEPS
 sleep $DELAY_BETWEEN_STEPS
 
 #set HobbitID
+echo "This hobbit is $hobbit_id"
+rosparam set hobbit_id "$hobbit_id"
 /opt/ros/hobbit_hydro/set_hobbit_specific_params.sh
 sleep $DELAY_BETWEEN_STEPS
 
