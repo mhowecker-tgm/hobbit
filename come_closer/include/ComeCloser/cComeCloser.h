@@ -48,6 +48,16 @@ private:
 
 	ros::Publisher laserPublisher; //FIXME, only for initial testing
 
+	ros::Subscriber motion_state_sub;
+	void motion_state_callback(const std_msgs::String::ConstPtr& msg);
+	std_msgs::String current_motion_state;
+
+	bool started_rotation;
+	bool finished_rotation;
+	bool started_movement;
+	bool finished_movement;
+	
+
  
 
 };

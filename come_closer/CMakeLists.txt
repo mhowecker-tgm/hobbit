@@ -4,7 +4,7 @@ project(come_closer)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp sensor_msgs std_msgs tf hobbit_msgs occupancy_grid_utils)
+find_package(catkin REQUIRED COMPONENTS roscpp sensor_msgs std_msgs tf hobbit_msgs occupancy_grid_utils nav_msgs)
 
 
 ###################################
@@ -19,7 +19,7 @@ find_package(catkin REQUIRED COMPONENTS roscpp sensor_msgs std_msgs tf hobbit_ms
 catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES test
-  CATKIN_DEPENDS roscpp 
+  CATKIN_DEPENDS roscpp nav_msgs
 )
 
 ###########
