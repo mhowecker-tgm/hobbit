@@ -23,7 +23,7 @@ import hobbit_smach.social_role_import as social_role
 import hobbit_smach.end_interaction_import as end_interaction
 import hobbit_smach.logging_import as log
 import uashh_smach.util as util
-from hobbit_user_interaction import HobbitMMUI
+from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 from hobbit_smach.bcolors import bcolors
 
 
@@ -793,9 +793,18 @@ def main():
         StateMachine.add(
             'RESET_ACTIVE_TASK',
             ResetActiveTask(),
-            transitions={'succeeded': 'succeeded',
+            transitions={'succeeded': 'EMOTION',
                          'preempted': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
+        )
+        StateMachine.add(
+            'EMOTION',
+            HobbitEmotions.ShowEmotions(
+                emotion=emo,
+                emo_time=time),
+            transitions={'succeeded': 'succeeded',
+                         'preempted': 'succeeded',
+                         'aborted': 'succeeded'}
         )
         if MUC_ENABLED:
             StateMachine.add(
