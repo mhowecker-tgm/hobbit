@@ -333,7 +333,8 @@ int updateHeadPosition()
  tf::StampedTransform transformS;
  try
      {
-      listener.lookupTransform("/map", "/frame",ros::Time(0), transformS);
+      //using /headcam_rgb_optical_frame and /base_link: , thanks David :)
+      listener.lookupTransform("/headcam_rgb_optical_frame", "/base_link",ros::Time(0), transformS);
       fprintf(stderr,"Head At %0.2f %0.2f %0.2f \n" ,  transformS.getOrigin().x() ,  transformS.getOrigin().y() ,  transformS.getOrigin().z());
      }
  catch (tf::TransformException &ex)
