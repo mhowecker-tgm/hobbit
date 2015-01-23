@@ -7,7 +7,7 @@ from mira_msgs.msg import BatteryState
 
 LIMIT = 1
 NAME = 'battery_monitor'
-VOLT_LIMIT = 26.0
+VOLT_LIMIT = 24.5
 
 
 def talker(level):
