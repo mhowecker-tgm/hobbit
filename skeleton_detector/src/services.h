@@ -11,7 +11,11 @@ extern unsigned char dontPublishPointEvents;
 extern unsigned int processingMode;
 extern volatile int paused;
 
+
+extern unsigned int frameTimestamp;
 extern unsigned int actualTimestamp;
+
+int triggerAttentionInternal();
 
 int registerServices(ros::NodeHandle * nh,unsigned int width,unsigned int height);
 int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int colorWidth , unsigned int colorHeight ,

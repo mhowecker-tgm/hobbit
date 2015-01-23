@@ -65,6 +65,9 @@ unsigned char dontPublishPersons=0;
 
 unsigned int processingMode = PROCESSING_MODE_UPPER_GESTURE_BODY_TRACKER;//PROCESSING_MODE_SIMPLE_PERSON_DETECTOR;
 
+
+unsigned int frameTimestamp =0;
+
 unsigned int lastFrameTimestamp=0;
 unsigned int actualTimestamp=0;
 unsigned int actualInFieldOfView=0;
@@ -77,6 +80,17 @@ unsigned int isSkeletonCloseEnoughForInteractionInt=0;
 
 unsigned char * colorFrameCopy=0;   unsigned int colorCopyWidth = 0; unsigned int colorCopyHeight = 0;
 unsigned short * depthFrameCopy =0; unsigned int depthCopyWidth = 0; unsigned int depthCopyHeight = 0;
+
+
+
+
+int triggerAttentionInternal()
+{
+  fprintf(stderr,"Giving more CPU time to the skeleton node..!\n");
+  actualTimestamp=frameTimestamp;
+}
+
+
 
 
 int reallocateCopySpaceIfNeccessary(
@@ -307,15 +321,22 @@ void fitnessRecvMessage(const hobbit_msgs::Fitness & msg)
     unsigned int exerciseID =atoi(msg.params[0].name.c_str());
     unsigned int exerciseRepetitions=atoi(msg.params[0].value.c_str());
 
-    ROS_INFO("Skeleton Detector is now starting exercise , command received from tablet");
-    fprintf(stderr,"Started Exercise %u (%s) , %u repetitions\n",exerciseID,exercisePrefix[exerciseID],exerciseRepetitions);
-
-    if ( (MORE_IS_LEFT_EXERCISE<exerciseID) && (exerciseID<LESS_IS_LEFT_EXERCISE) )
+    if ( (exerciseID==0) && (exerciseRepetitions==0) )
     {
-      isLeftHand=1;
-    }
+     triggerAttentionInternal();
+     ROS_INFO("We are not starting any exercise yet we just woke up ");
+    }  else
+    {
+     ROS_INFO("Skeleton Detector is now starting exercise , command received from tablet");
+     fprintf(stderr,"Started Exercise %u (%s) , %u repetitions\n",exerciseID,exercisePrefix[exerciseID],exerciseRepetitions);
 
-    hobbitFitnessFunction_StartExercise(actualTimestamp,exerciseID,isLeftHand,exerciseRepetitions);
+     if ( (MORE_IS_LEFT_EXERCISE<exerciseID) && (exerciseID<LESS_IS_LEFT_EXERCISE) )
+     {
+      isLeftHand=1;
+     }
+
+     hobbitFitnessFunction_StartExercise(actualTimestamp,exerciseID,isLeftHand,exerciseRepetitions);
+    }
   }
   else
  //Test Trigger with rostopic pub /fitness_tablet hobbit_msgs/Fitness " { command: C_EXERCISE_STOPPED , params: [  { name: '1' , value: 'STOPPED' } ] } " -1

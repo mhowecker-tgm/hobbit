@@ -45,7 +45,6 @@ int key = 0;
 
 int recording=0;
 int recordedFrames=0;
-unsigned int frameTimestamp =0;
 
 unsigned int framesForHeightenedAttention=30;
 unsigned int runFullSpeed=0;
@@ -130,13 +129,6 @@ bool benchmark(std_srvs::Empty::Request& request, std_srvs::Empty::Response& res
     runMaxSpeed=1;
     return true;
 }
-
-int triggerAttentionInternal()
-{
-  fprintf(stderr,"Giving more CPU time to the skeleton node..!\n");
-  actualTimestamp=frameTimestamp;
-}
-
 
 
 bool attention(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
