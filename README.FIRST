@@ -55,6 +55,12 @@ SETUP HOBBIT WORKSPACE FOR PT2
 
   catkin_make uses suboptimal settings for compiling by default (debug mode), use optimized settings for release using:
   >> catkin_make -DCMAKE_BUILD_TYPE=Release
+ 
+ 
+  You need to declare the hobbit id on ~/.bashrc by appending a line like
+  #set HobbitID
+  export hobbit_id="PT2x"
+  where x is a,b,c,d,e.. etc
 
 
   Finally to enable auto-start scripts , and set-up several things that need super user powers (i.e. restarting the XPC through webinterface , etc  )
