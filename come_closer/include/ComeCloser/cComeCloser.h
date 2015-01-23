@@ -33,6 +33,7 @@ public:
 	double margin;
 	double front_dis;
 	double x_sensor;
+	double time_limit_secs;
 
 private:
 

@@ -75,7 +75,7 @@ void cComeCloser::motion_state_callback(const std_msgs::String::ConstPtr& msg)
   if (finished_rotation && current_motion_state.data == "Moving")
 	started_movement = true;
   if (started_movement && current_motion_state.data == "Idle")
-	finished_moving = true;
+	finished_movement = true;
 
 
 }
@@ -169,6 +169,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 		s << "Turn " << angle2turn*180/M_PI;
 		rotate_cmd.data = s.str();
 		discrete_motion_cmd_pub.publish(rotate_cmd);
+		std::cout << "rotation command sent " << std::endl;
 
 	}
 	
@@ -221,7 +222,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 
 		clock_t end = clock();
 		double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-		if (elapsed_secs_target >= time_limit_secs)
+		if (elapsed_secs >= time_limit_secs)
 		{
 			
 			as_->setAborted(hobbit_msgs::GeneralHobbitResult(), "aborted, it's taking too long, something went wrong?");
