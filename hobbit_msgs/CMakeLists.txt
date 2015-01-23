@@ -58,6 +58,7 @@ add_service_files(
   UpdateObject.srv
   GetState.srv
   GetOccupancyGrid.srv
+  GetOccupancyState.srv
 )
 
 add_action_files(

@@ -1,0 +1,3 @@
+geometry_msgs/Point local_point
+---
+bool is_occupied
