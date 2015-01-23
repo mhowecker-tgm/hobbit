@@ -73,6 +73,8 @@ void cLocalizationMonitor::open(ros::NodeHandle & n)
 
         reset_loc_client = n.serviceClient<std_srvs::Empty>("/reset_loc"); 
 
+	get_occupancy_state_service = n.advertiseService("/get_occupancy_state", &cLocalizationMonitor::getOccupancyState, this);
+
 /////////////////////////////////////////////////////////////////////////////////////////////////
 	//load static global map, we don't want to run the map server
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -329,6 +331,38 @@ bool cLocalizationMonitor::getLocStatus(hobbit_msgs::GetState::Request  &req, ho
 	//res.state = scan_ok;
 
 	ROS_INFO("sending back loc_state response");
+        std::cout << "********************* " << std::endl;
+
+
+	return true;
+
+}
+
+bool cLocalizationMonitor::getOccupancyState(hobbit_msgs::GetOccupancyState::Request  &req, hobbit_msgs::GetOccupancyState::Response &res)
+{
+	
+	ROS_INFO("occupancy_state request received");
+
+	geometry_msgs::Point local_point = req.local_point;
+
+	double current_x = current_pose.pose.pose.position.x;
+	double current_y = current_pose.pose.pose.position.y;
+	double current_theta = tf::getYaw(current_pose.pose.pose.orientation);
+
+	double global_x = current_x + local_point.x*cos(current_theta) - local_point.y*sin(current_theta);
+	double global_y = current_y + local_point.x*sin(current_theta) + local_point.y*cos(current_theta);
+		
+	geometry_msgs::Point glob_point;
+	glob_point.x = global_x;
+	glob_point.y = global_y;
+	int index = occupancy_grid_utils::pointIndex(static_map.info,glob_point);
+
+	if (static_map.data[index] == occupancy_grid_utils::OCCUPIED)
+		res.is_occupied = true;
+	else 
+		res.is_occupied = false;
+
+	ROS_INFO("sending back occupancy_state response");
         std::cout << "********************* " << std::endl;
 
 

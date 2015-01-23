@@ -17,6 +17,8 @@
 
 #include "std_srvs/Empty.h"
 
+#include "hobbit_msgs/GetOccupancyState.h"
+
 class cLocalizationMonitor
 {
 public:
@@ -81,6 +83,9 @@ private:
   ros::Subscriber batterySubs;
 
   ros::ServiceClient reset_loc_client;
+
+  ros::ServiceServer get_occupancy_state_service;
+  bool getOccupancyState(hobbit_msgs::GetOccupancyState::Request  &rq, hobbit_msgs::GetOccupancyState::Response &res);
 
 };
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
