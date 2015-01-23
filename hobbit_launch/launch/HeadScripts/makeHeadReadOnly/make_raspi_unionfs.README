@@ -1,0 +1,73 @@
+The script make_raspi_unionfs.sh modifies the Raspberry's file system such that
+the SD card is mounted read-only and a RAM disk is mounted on top of that to
+allow temporary writes to log files etc.
+
+Michael Zillich, Sept 2014  zillich@acin.tuwien.ac.at
+
+The script follows the steps provided in:
+http://raspberrycenter.de/forum/umruestung-raspberry-pi-read-only-root-filesystem
+and English version:
+http://blog.pi3g.com/2014/04/make-raspbian-system-read-only/
+
+IMPORTANT: Only run this script ONCE on a vanilla raspi. Do not run repeatedly.
+
+
+Follow these steps:
+
+1. Copy make_raspi_unionfs.tgz to the Raspberry's /tmp directory. Not to
+somewhere in the home directory, because after the script has been executed
+you won't be able to delete the file (the SD is read-only then).
+E.g. remotely via ssh:
+  scp make_raspi_unionfs.tgz someuser@yourraspi:/tmp
+
+2. Unpack make_raspi_unionfs.tgz to /tmp on the Raspberry
+  ssh someuser@yourraspi
+  someuser@yourraspi> cd /tmp
+  someuser@yourraspi> tar xzf make_raspi_unionfs.tgz
+  someuser@yourraspi> cd make_raspi_unionfs
+
+3. Run the script as root
+  someuser@yourraspi> sudo ./make_raspi_unionfs.sh
+
+4. Running the script will take a few seconds. After that, reboot the system.
+
+5. After completion and reboot df -h should show something like:
+
+  rootfs          3,6G    1,9G  1,6G   56% /
+  /dev/root       3,6G    1,9G  1,6G   56% /
+  devtmpfs        212M       0  212M    0% /dev
+  tmpfs            44M    556K   44M    2% /run
+  tmpfs           5,0M       0  5,0M    0% /run/lock
+  tmpfs            88M       0   88M    0% /run/shm
+  /dev/mmcblk0p1   56M     19M   38M   34% /boot
+  ramdisk         220M       0  220M    0% /etc_rw
+  unionfs-fuse    3,8G    3,6G  220M   95% /etc
+  ramdisk         220M    232K  219M    1% /var_rw
+  unionfs-fuse    3,8G    3,6G  219M   95% /var
+  ramdisk         220M    232K  219M    1% /home_rw
+  unionfs-fuse    3,8G    3,6G  219M   95% /home
+  none            220M    4,0K  220M    1% /tmp
+
+   and mount should show something like:
+
+  /dev/root on / type ext4 (ro,noatime,data=ordered)
+  devtmpfs on /dev type devtmpfs (rw,relatime,size=215824k,nr_inodes=53956,mode=755)
+  tmpfs on /run type tmpfs (rw,nosuid,noexec,relatime,size=44820k,mode=755)
+  tmpfs on /run/lock type tmpfs (rw,nosuid,nodev,noexec,relatime,size=5120k)
+  proc on /proc type proc (rw,nosuid,nodev,noexec,relatime)
+  sysfs on /sys type sysfs (rw,nosuid,nodev,noexec,relatime)
+  tmpfs on /run/shm type tmpfs (rw,nosuid,nodev,noexec,relatime,size=89620k)
+  devpts on /dev/pts type devpts (rw,nosuid,noexec,relatime,gid=5,mode=620)
+  /dev/mmcblk0p1 on /boot type vfat (ro,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=ascii,shortname=mixed,errors=remount-ro)
+  ramdisk on /etc_rw type tmpfs (rw,relatime)
+  unionfs-fuse on /etc type fuse.unionfs-fuse (rw,relatime,user_id=0,group_id=0,default_permissions,allow_other)
+  fusectl on /sys/fs/fuse/connections type fusectl (rw,relatime)
+  ramdisk on /var_rw type tmpfs (rw,relatime)
+  unionfs-fuse on /var type fuse.unionfs-fuse (rw,relatime,user_id=0,group_id=0,default_permissions,allow_other)
+  ramdisk on /home_rw type tmpfs (rw,relatime)
+  unionfs-fuse on /home type fuse.unionfs-fuse (rw,relatime,user_id=0,group_id=0,default_permissions,allow_other)
+  none on /tmp type tmpfs (rw,relatime)
+
+6. If later on you need to write to the actual SD card again:
+  someuser@yourraspi> sudo mount -o remount,rw /
+
