@@ -43,7 +43,6 @@ include(CMakeLists.mira)
 add_action_files(
   DIRECTORY action
   FILES MiraSendingGoals.action MiraDocking.action
-  MiraDocking.action
 )
 
 ## Generate added messages and services with any dependencies listed here
@@ -74,7 +73,7 @@ include_directories(cfg/cpp)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
    INCLUDE_DIRS include
-   CATKIN_DEPENDS actionlib_msgs pugixml
+   CATKIN_DEPENDS actionlib_msgs pugixml nav_msgs
 # LIBRARIES scitos
 # CATKIN_DEPENDS geometry_msgs roscpp std_msgs
 # DEPENDS system_lib
