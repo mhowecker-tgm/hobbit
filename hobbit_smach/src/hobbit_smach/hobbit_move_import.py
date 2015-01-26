@@ -273,6 +273,10 @@ def get_full_stop():
             'STOP_ALL_MOVEMENT',
             Stop()
         )
+        Sequence.add(
+            'HEAD_CENTER',
+            head_move.MoveTo(pose='center_center')
+        )
     return seq
 
 
@@ -434,7 +438,8 @@ def goToPosition(frame='/map', room='None', place='dock'):
         Sequence.add(
             'MMUI_SAY_IAmComing',
             speech_output.sayText(info='T_CA_IAmComing'),
-            transitions={'failed': 'aborted'}
+            transitions={'failed': 'HEAD_UP'}
+            #transitions={'failed': 'aborted'}
         )
         Sequence.add(
             'UNDOCK_IF_NEEDED',
@@ -476,7 +481,11 @@ def goToPosition(frame='/map', room='None', place='dock'):
             )
         )
         if not DEBUG:
-            Sequence.add('MOVE_HOBBIT', move_base.MoveBaseState(frame))
+            Sequence.add(
+                'MOVE_HOBBIT',
+                move_base.MoveBaseState(frame),
+                transitions={'aborted': 'HEAD_UP'}
+            )
         Sequence.add(
             'HEAD_UP_AFTER_MOVEMENT',
             head_move.MoveTo(pose='center_center')
@@ -498,7 +507,13 @@ def goToPosition(frame='/map', room='None', place='dock'):
         Sequence.add(
             'SHOW_MENU_MAIN',
             HobbitMMUI.ShowMenu(menu='MAIN'),
-            transitions={'failed': 'aborted'}
+            transitions={'failed': 'HEAD_UP',
+                         'succeeded': 'succeeded'}
+        )
+        Sequence.add(
+            'HEAD_UP',
+            head_move.MoveTo(pose='center_center'),
+            transitions={'succeeded': 'aborted'}
         )
     return seq
 
@@ -548,7 +563,8 @@ def goToPose():
         Sequence.add(
             'MMUI_SAY_IAmComing',
             speech_output.sayText(info='T_CA_IAmComing'),
-            transitions={'failed': 'aborted'}
+            #transitions={'failed': 'aborted'}
+            transitions={'failed': 'HEAD_UP'}
         )
         Sequence.add(
             'UNDOCK_IF_NEEDED',
@@ -579,7 +595,9 @@ def goToPose():
             Sequence.add('MOVE_BASE_GOAL', move_base.MoveBaseState(frame),
                          remapping={'x': 'x',
                                     'y': 'y',
-                                    'yaw': 'yaw'})
+                                    'yaw': 'yaw'},
+                         transitions={'aborted': 'HEAD_UP'}
+            )
         Sequence.add(
             'PREPARE_STOP',
             ServiceState(
@@ -608,7 +626,13 @@ def goToPose():
         Sequence.add(
             'SHOW_MENU_MAIN',
             HobbitMMUI.ShowMenu(menu='MAIN'),
-            transitions={'failed': 'aborted'}
+            transitions={'failed': 'HEAD_UP',
+                         'succeeded': 'succeeded'}
+        )
+        Sequence.add(
+            'HEAD_UP',
+            head_move.MoveTo(pose='center_center'),
+            transitions={'succeeded': 'aborted'}
         )
     return seq
 
@@ -629,7 +653,8 @@ def goToPoseSilent():
         Sequence.add(
             'MMUI_SAY_IAmComing',
             speech_output.sayText(info='T_CA_IAmComing'),
-            transitions={'failed': 'aborted'}
+            #transitions={'failed': 'aborted'}
+            transitions={'failed': 'HEAD_UP'}
         )
         Sequence.add(
             'UNDOCK_IF_NEEDED',
@@ -653,7 +678,9 @@ def goToPoseSilent():
             Sequence.add('MOVE_BASE_GOAL', move_base.MoveBaseState(frame),
                          remapping={'x': 'x',
                                     'y': 'y',
-                                    'yaw': 'yaw'})
+                                    'yaw': 'yaw'},
+                         transitions={'aborted': 'HEAD_UP'}
+            )
         Sequence.add(
             'HEAD_UP_AFTER_MOVEMENT',
             head_move.MoveTo(pose='center_center')
@@ -663,7 +690,13 @@ def goToPoseSilent():
         Sequence.add(
             'SHOW_MENU_MAIN',
             HobbitMMUI.ShowMenu(menu='MAIN'),
-            transitions={'failed': 'aborted'}
+            transitions={'failed': 'HEAD_UP',
+                         'succeeded': 'succeeded'}
+        )
+        Sequence.add(
+            'HEAD_UP',
+            head_move.MoveTo(pose='center_center'),
+            transitions={'succeeded': 'aborted'}
         )
     return seq
 
