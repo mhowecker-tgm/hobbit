@@ -32,6 +32,8 @@ void MiraSendingGoals::initialize() {
   goal_pose_subscriber = robot_->getRosNode().subscribe(GOAL_POSE, 1000, &MiraSendingGoals::goal_pose_callback, this);
   stop_sub = robot_->getRosNode().subscribe(STOP_REQUEST, 2, &MiraSendingGoals::stop_request_callback, this);
 
+  bumper_subs = robot_->getRosNode().subscribe("/bumper", 2, &MiraSendingGoals::bumper_callback, this);
+
   goal_status_pub = robot_->getRosNode().advertise<std_msgs::String>(GOAL_STATUS, 20);
 
   robot_->getMiraAuthority().subscribe<std::string>("/navigation/PilotEvent", &MiraSendingGoals::goal_status_channel_callback, this);
@@ -189,14 +191,7 @@ void MiraSendingGoals::stop_request_callback(const std_msgs::String::ConstPtr& m
 {
 	if (msg->data.compare("stop") || msg->data.compare("Stop") || msg->data.compare("STOP"))
 	{
-		TaskPtr task(new Task());
-		//cancel the task
-		std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
-  		robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
-
-		goal_status.data = "cancelled";
-		std::cout << "Goal cancelled " << std::endl;
-		goal_status_pub.publish(goal_status);
+		cancelGoal();
 	}
 
 }
@@ -204,6 +199,13 @@ void MiraSendingGoals::stop_request_callback(const std_msgs::String::ConstPtr& m
 bool MiraSendingGoals::cancelGoal(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res)
 {
 	ROS_INFO("cancel goal request received");
+	cancelGoal();
+	
+}
+
+void MiraSendingGoals::cancelGoal()
+{
+
 	TaskPtr task(new Task());
 	//cancel the task
 	std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
@@ -212,8 +214,19 @@ bool MiraSendingGoals::cancelGoal(std_srvs::Empty::Request  &req, std_srvs::Empt
 	goal_status.data = "aborted";
 	std::cout << "Goal cancelled " << std::endl;
 	goal_status_pub.publish(goal_status);	
-	
+
 }
+
+void MiraSendingGoals::bumper_callback(const std_msgs::Bool::ConstPtr& msg)
+{
+	if (msg->data) //bumper was hit
+	{
+		cancelGoal();
+	}
+
+}
+
+
 
 void MiraSendingGoals::executeCb(const interfaces_mira::MiraSendingGoalsGoalConstPtr& goal_pose)
 {

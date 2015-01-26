@@ -56,6 +56,8 @@ public:
 
         void goal_status_channel_callback(mira::ChannelRead<std::string> data);
 
+	void bumper_callback(const std_msgs::Bool::ConstPtr& msg);
+
 	actionlib::SimpleActionServer<interfaces_mira::MiraSendingGoalsAction>* as_; 
 	actionlib::SimpleActionServer<move_base_msgs::MoveBaseAction>* as2_; 
 
@@ -112,6 +114,10 @@ private:
 
 	ros::ServiceServer local_map_service;
 	bool getLocalMap(hobbit_msgs::GetOccupancyGrid::Request  &req, hobbit_msgs::GetOccupancyGrid::Response &res);
+
+	void cancelGoal();
+
+	ros::Subscriber bumper_subs;
 
 };
 
