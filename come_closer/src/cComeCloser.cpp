@@ -155,7 +155,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 
 	std::cout << "min_dis " << min_dis << std::endl;
 
-	double dis2move = min_dis-x_sensor-front_dis-margin;
+	double dis2move = min_dis + x_sensor-front_dis-margin;
 	
 	double sensor_orientation = tf::getYaw(sensor_pose.orientation);  //should be relative
 	double angle2turn = angles::shortest_angular_distance(0, orientation);
