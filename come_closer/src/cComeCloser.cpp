@@ -193,6 +193,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 
 		if (finished_rotation)
 		{
+			sleep(5);
 			std_msgs::String move_cmd;
 			std::ostringstream s;
 			s << "Move " << dis2move;
