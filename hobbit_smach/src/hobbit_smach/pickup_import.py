@@ -677,7 +677,7 @@ class DavidPickingUp(State):
             print 
             if (pnt_in_space > 0):
                 print "===============>>>>>>>>>>>>>>>>>>> arm not able to move savely for picking up => picking up was stopped"
-                return 'preempted' #'failed_no_space_to_move_arm'
+                return 'failed_no_space_to_move_arm'
 
             # 2) call calc_grasppoints_action_server/client (calc_aS(self.pc_rcs)) and receive a grasp_representation in the format (string):
             # "(0)eval_val (1)gp1_x (2)gp1_y (3)gp1_z (4)gp2_x (5)gp2_y (6)gp2_z (7)ap_vec_x (8)ap_vec_y (9)ap_vec_z (10)gp_center_x (11)gp_center_y (12)gp_center_z (13)roll"
@@ -685,9 +685,9 @@ class DavidPickingUp(State):
             print "gp_representation: ", gp_representation
             gp_pres_str = str(gp_representation.result.data)
             gp_eval = int(gp_pres_str[0:2])
-            if (gp_eval < 15):
+            if (gp_eval < 8):
                 print "GRASP EVALUATION WAS TO BAD FOR RELIABLE GRASPING - stop grasping"
-                return 'preempted' # 'failed_no_sufficient_grasp_detected'
+                return 'failed_no_sufficient_grasp_detected'
             # 3) (and 4)) call GraspFromFloorTrajectoryActionServer/Client to receive a trajectory (that will be directly executed) by calling the ArmActionServer/client
             grasp_traj_ac = arm_simulation.GraspTrajectoryActionClient.GraspTrajectoryActionClient()
             print "=================================================>",grasp_traj_ac
@@ -698,7 +698,8 @@ class DavidPickingUp(State):
             
             #move object to tray and move arm back to home position
             # => no done via logic in pickup.py  res = self.arm_client.arm_action_client(String ("SetMoveToTrayPos"))
-           
+        else:
+            return 'failed_no_suitable_object_found'   
 
         return 'succeeded'
 
