@@ -263,7 +263,7 @@ void CCalc_Grasppoints::loop_control(pcl::PointCloud<pcl::PointXYZ> pcl_cloud_in
 		for (int roll = 0; roll < ROLL_MAX_DEGREE/ROLL_STEPS_DEGREE; roll++)	// roll loop
 		{
 		    // feedback:		    (3.12.2014)
-		    feedback_.feedback.data = this->topval_gp_overall;	//shows best gp so far
+		    feedback_.feedback.data = "this->topval_gp_overall";	//shows best gp so far
 
 		    if (as_.isPreemptRequested() || !ros::ok() || success == false)
 		         {
