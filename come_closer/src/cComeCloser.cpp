@@ -132,7 +132,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 	scanner_info.angle_min = -M_PI/2;
 	scanner_info.angle_max = M_PI/2;
 	scanner_info.angle_increment = 5*M_PI/360; //FIXME add params
-	scanner_info.range_max = 1;
+	scanner_info.range_max = 1.5;
 
 	const geometry_msgs::Pose sensor_pose_ = sensor_pose;
 	const sensor_msgs::LaserScan scanner_info_ = scanner_info;
@@ -169,13 +169,17 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 		s << "Turn " << angle2turn*180/M_PI;
 		rotate_cmd.data = s.str();
 		discrete_motion_cmd_pub.publish(rotate_cmd);
+
+		std::cout << "distance2move " << dis2move << std::endl;
+		std::cout << "angle2turn " << angle2turn << std::endl;
+
 		std::cout << "rotation command sent " << std::endl;
 
 	}
 	
 	else
 	{
-		as_->setAborted(hobbit_msgs::GeneralHobbitResult(), "aborted, user is already too close");
+		as_->setAborted(hobbit_msgs::GeneralHobbitResult(), "aborted, too close");
 		std::cout << "aborted, too close" << std::endl; 
 		return;
 
