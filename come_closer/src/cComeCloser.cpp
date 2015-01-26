@@ -67,7 +67,6 @@ void cComeCloser::motion_state_callback(const std_msgs::String::ConstPtr& msg)
 
   if (!started_rotation && current_motion_state.data == "Turning")
   	started_rotation = true;
-
   if (started_rotation && current_motion_state.data == "Idle")
 	finished_rotation = true;
   if (finished_rotation && current_motion_state.data == "Moving")
@@ -165,19 +164,28 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 
 	if (dis2move > 0)
 	{
+				
+		std::cout << "angle2turn " << angle2turn * 180/M_PI << std::endl;
+		std::cout << "distance2move " << dis2move << std::endl;
 
 		//first rotate to face detected user
-		std_msgs::String rotate_cmd;
-		std::ostringstream s;
-		s << "Turn " << angle2turn*180/M_PI;
-		rotate_cmd.data = s.str();
 
-		discrete_motion_cmd_pub.publish(rotate_cmd);
+		if (fabs(angle2turn) < 25*M_PI/180)
+		{
+			std::cout << "rotation is too small " << std::endl;
+			finished_rotation = true;
+		}
+		else
+		{
+			std_msgs::String rotate_cmd;
+			std::ostringstream s;
+			s << "Turn " << angle2turn*180/M_PI;
+			rotate_cmd.data = s.str();
 
-		std::cout << "distance2move " << dis2move << std::endl;
-		std::cout << "angle2turn " << angle2turn * 180/M_PI << std::endl;
+			discrete_motion_cmd_pub.publish(rotate_cmd);
 
-		std::cout << "rotation command sent " << std::endl;
+			std::cout << "rotation command sent " << std::endl;
+		}
 
 	}
 	
@@ -199,7 +207,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 
 		//laserPublisher.publish(scan);  //FIXME, to be removed, only for visualization purposes
 
-		if (finished_rotation)
+		if (finished_rotation && !started_movement)
 		{
 			sleep(5);
 			std_msgs::String move_cmd;
