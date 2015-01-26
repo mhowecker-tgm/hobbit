@@ -20,15 +20,13 @@ cComeCloser::cComeCloser(int argc, char **argv) : init_argc(argc), init_argv(arg
 	nh.param("time_limit_secs", time_limit_secs, 60.0);
 
 	ros::NodeHandle n;
-	discrete_motion_cmd_pub = n.advertise<std_msgs::String>("/discrete_motion_cmd", 20);
+	discrete_motion_cmd_pub = n.advertise<std_msgs::String>("/DiscreteMotionCmd", 20);
 
 	get_local_map_client = n.serviceClient<hobbit_msgs::GetOccupancyGrid>("/get_local_map");
 
 	current_loc_sub = n.subscribe<geometry_msgs::PoseWithCovarianceStamped>("/amcl_pose", 2, &cComeCloser::loc_pose_callback, this);
 
 	laserPublisher = n.advertise<sensor_msgs::LaserScan>("loc_scan", 1); //only for debugging!! //FIXME!!!!!
-
-	discrete_motion_cmd_pub = n.advertise<std_msgs::String>("/discrete_motion_cmd", 20);
 
 	motion_state_sub = n.subscribe<std_msgs::String>("/DiscreteMotionState", 2, &cComeCloser::motion_state_callback, this);
 
@@ -146,7 +144,8 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 		
 		//project point onto user direction
 
-		double projected_dis = fabs(scan->ranges[i]*cos(angles::shortest_angular_distance(orientation, ang)));
+		//double projected_dis = fabs(scan->ranges[i]*cos(angles::shortest_angular_distance(orientation, ang)));
+		double projected_dis = scan->ranges[i];
 		if (projected_dis < min_dis)
 			min_dis = projected_dis;
 
@@ -155,10 +154,14 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 
 	}
 
-	double dis2move = min_dis+x_sensor-front_dis-margin;
+	std::cout << "min_dis " << min_dis << std::endl;
+
+	double dis2move = min_dis-x_sensor-front_dis-margin;
 	
-	double sensor_orientation = tf::getYaw(sensor_pose.orientation);
-	double angle2turn = angles::shortest_angular_distance(sensor_orientation, orientation);
+	double sensor_orientation = tf::getYaw(sensor_pose.orientation);  //should be relative
+	double angle2turn = angles::shortest_angular_distance(0, orientation);
+
+	std::cout << "orientation " << orientation*180/M_PI << std::endl;
 
 	if (dis2move > 0)
 	{
@@ -168,10 +171,11 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 		std::ostringstream s;
 		s << "Turn " << angle2turn*180/M_PI;
 		rotate_cmd.data = s.str();
+
 		discrete_motion_cmd_pub.publish(rotate_cmd);
 
 		std::cout << "distance2move " << dis2move << std::endl;
-		std::cout << "angle2turn " << angle2turn << std::endl;
+		std::cout << "angle2turn " << angle2turn * 180/M_PI << std::endl;
 
 		std::cout << "rotation command sent " << std::endl;
 
