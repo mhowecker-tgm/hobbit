@@ -113,7 +113,7 @@ def getRecharge():
             )
             Sequence.add(
                 'MOVE_TO_DOCK',
-                hobbit_move.goToPose())
+                hobbit_move.goToPoseSilent())
             Sequence.add(
                 'DOCKING',
                 startDockProcedure())
