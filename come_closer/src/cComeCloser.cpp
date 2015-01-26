@@ -34,13 +34,6 @@ cComeCloser::cComeCloser(int argc, char **argv) : init_argc(argc), init_argv(arg
 
 	current_motion_state.data = "Idle";
 
-	started_rotation = false;
-	finished_rotation = false;
-	started_movement = false;
-	finished_movement = false;
-	
-
-
 }
 
 cComeCloser::~cComeCloser()
@@ -86,6 +79,11 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 	{
 		return;
 	}
+
+	started_rotation = false;
+	finished_rotation = false;
+	started_movement = false;
+	finished_movement = false;
 
 	hobbit_msgs::GetOccupancyGrid srv;
 	
