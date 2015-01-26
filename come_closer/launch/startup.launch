@@ -3,7 +3,7 @@
 
   	<param name="margin" value="0.05"/>
 	<param name="front_dis" value="0.18"/>
-	<param name="x_sensor" value="0.22"/>
+	<param name="x_sensor" value="0.135"/>
 	<param name="time_limit_secs" value="120.0"/>
 
   </node>
