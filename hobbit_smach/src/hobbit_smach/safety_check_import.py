@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from smach import StateMachine
-from hobbit_user_interaction import HobbitMMUI
+from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 import hobbit_smach.logging_import as log
 import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.sos_call_import as sos_call
@@ -224,15 +224,32 @@ def get_safety_check():
                          'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add_auto(
-            'HAPPY_SAY',
-            speech_output.emo_say_something(
-                emo='HAPPY',
-                time=4,
-                text='T_SC_CHECKFINISHED'
-            ),
+            'T_SC_CHECKFINISHED',
+            HobbitMMUI.ConfirmOk(text='T_SC_CHECKFINISHED'),
             connector_outcomes=['succeeded', 'aborted'],
+            transitions={'timeout': 'T_SC_CHECKFINISHED',
+                         '3times': 'USER_NOT_RESPONDING',
+                         'preempted': 'LOG_PREEMPT'}
+        )
+        StateMachine.add_auto(
+            'HAPPY_SAY',
+            HobbitEmotions.ShowEmotions(
+                emotion='HAPPY',
+                emo_time=4
+            ),
+            connector_outcomes=['succeeded', 'failed'],
             transitions={'preempted': 'LOG_PREEMPT'}
         )
+        # StateMachine.add_auto(
+        #     'HAPPY_SAY',
+        #     speech_output.emo_say_something(
+        #         emo='HAPPY',
+        #         time=4,
+        #         text='T_SC_CHECKFINISHED'
+        #     ),
+        #     connector_outcomes=['succeeded', 'aborted'],
+        #     transitions={'preempted': 'LOG_PREEMPT'}
+        # )
         StateMachine.add(
             'LOG_SUCCESS',
             log.DoLogSuccess(scenario='safety check'),
