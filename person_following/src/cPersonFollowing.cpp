@@ -62,6 +62,8 @@ void cPersonFollowing::init()
 	new_pose = false;
 	new_target = false;	
 
+	response = false;
+
 	previous_target_x = current_pose.pose.pose.position.x;
 	previous_target_y = current_pose.pose.pose.position.y;
 
@@ -129,6 +131,7 @@ bool cPersonFollowing::stopFollowing(std_srvs::Empty::Request  &req, std_srvs::E
 
 void cPersonFollowing::goalDoneCallback(const actionlib::SimpleClientGoalState &state, const move_base_msgs::MoveBaseResultConstPtr &result)
 {
+
 	if(state.state_ == actionlib::SimpleClientGoalState::SUCCEEDED) 
 	{
 		following_active = false;
@@ -151,6 +154,9 @@ void cPersonFollowing::goalDoneCallback(const actionlib::SimpleClientGoalState &
 		status_pub.publish(goal_status);
 	}
 
+	if (goal_status.data != "goal_sent" && !response)
+		response = true;
+
 	std::cout << "goal state " << state.state_ << std::endl;
 
 }
@@ -168,6 +174,8 @@ void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 
 	clock_t begin;
 	clock_t begin_target;
+
+	clock_t begin_feedback;
 
 	// Tell the action client that we want to spin a thread by default
 	MoveBaseClient ac("mira_move_base", true);
@@ -254,6 +262,10 @@ void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 				previous_target_y = target_y; 
 				
 				new_pose = true;
+
+				goal_status.data = "goal_sent";
+				response = false;
+				begin_feedback = clock();
 				
 
 			}
@@ -335,6 +347,19 @@ void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 			as_->setPreempted();
 			std::cout << "preempted " << std::endl; 
 			return;
+		}
+
+		if (goal_status.data == "goal_sent" && !response)
+		{
+
+			clock_t end_feedback = clock();
+			double elapsed_secs_feedback = double(end_feedback - begin_feedback) / CLOCKS_PER_SEC;
+			if (elapsed_secs_feedback > time_limit_secs)
+			{
+				as_->setAborted(hobbit_msgs::FollowMeResult(), "Following aborted, no response from Mira");
+				std::cout << "aborted, no response " << std::endl; 
+				return;
+			}
 		}
 
 		//FIXME, check all possible status	

@@ -79,7 +79,7 @@ private:
 	double previous_target_x;
 	double previous_target_y;
 
-
+	bool response;
  
 
 };
