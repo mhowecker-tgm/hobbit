@@ -14,6 +14,7 @@ cPersonFollowing::cPersonFollowing(int argc, char **argv) : init_argc(argc), ini
 	nh.param("v_thres", v_thres, 0.2);
 	//nh.param("it_limit", it_limit, 10.0);
 	nh.param("time_limit_secs", time_limit_secs, 20.0);
+	nh.param("time_limit_no_feedback_secs", time_limit_no_feedback_secs, 20.0);
 
 	ros::NodeHandle n;
 	user_pose_sub = n.subscribe<follow_user::TrackerTarget>("/trackedTargets", 2, &cPersonFollowing::tracker_target_callback, this);
@@ -354,7 +355,7 @@ void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 
 			clock_t end_feedback = clock();
 			double elapsed_secs_feedback = double(end_feedback - begin_feedback) / CLOCKS_PER_SEC;
-			if (elapsed_secs_feedback > time_limit_secs)
+			if (elapsed_secs_feedback > time_limit_no_feedback_secs)
 			{
 				as_->setAborted(hobbit_msgs::FollowMeResult(), "Following aborted, no response from Mira");
 				std::cout << "aborted, no response " << std::endl; 
