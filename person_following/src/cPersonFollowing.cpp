@@ -247,7 +247,7 @@ void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 
 			//std::cout << "target pose " << target_x << " " << target_y << std::endl;
 			//check if new target is not too close to the previous one
-			if ( (target_x-previous_target_x)*(target_x-previous_target_x) + (target_y-previous_target_y)*(target_y-previous_target_y) > dis_thres)
+			if ( (target_x-previous_target_x)*(target_x-previous_target_x) + (target_y-previous_target_y)*(target_y-previous_target_y) > dis_thres && local_target_x >0)
 			{
 
 				//std::cout << "target pose " << target_x << " " << target_y << std::endl;
