@@ -4,6 +4,8 @@
 PKG = 'hobbit_smach'
 PROJECT = 'Hobbit'
 NAME = 'pickup_object'
+LASTPNTDIR = None #last saved pointing direction
+MAXPNTDIRDIF = 0.1 # maximal difference between two pointing directions
 
 import roslib
 roslib.load_manifest(PKG)
@@ -59,8 +61,26 @@ class bcolors:
 def pointevents_cb(ud, msg):
     print('pointevents_cb')
     print(msg)
+    
+    if LASTPNTDIR is None:
+        LASTPNTDIR = msg
+        print "pointevents_cp: first iteration (no direction for comparison)"
+        return True
+    if (diff_pointing_directions(msg) > MAXPNTDIRDIF):
+        print "difference between two consecutive pointing directions bigger than threshold: ", diff_pointing_directions(msg)
+        LASTPNTDIR = msg
+        return True
+    if (msg.vectorY < 0.0):
+        print "Pointing direction is upwards, direction NOT ACCEPTED. Will try again."
+        LASTPNTDIR = msg
+        return True
+    
     ud.pointing_msg = msg
-    return False
+    LASTPNTDIR = None   # a pointing direction was found, hence the last pointing direction is set back for the next action
+    return False    
+
+def diff_pointing_directions(dir_new):
+    return abs(LASTPNTDIR.vectorX - dir_new.vectorX) + abs(LASTPNTDIR.vectorY - dir_new.vectorY) + abs(LASTPNTDIR.vectorZ - dir_new.vectorZ)
 
 
 #def point_cloud_cb(msg, ud):
@@ -270,7 +290,8 @@ def main():
                 output_keys=['pointing_msg']
             ),
             transitions={'valid': 'POINTING_COUNTER',
-                         'invalid': 'START_LOOKING',
+                         #'invalid': 'START_LOOKING',   df 27.1.2015 uncomment again and delete next line !!!!!!!!!!!!!!!!!!!!!!1
+                         'invalid': 'LOG_PREEMPT',
                          'preempted': 'LOG_PREEMPT'}
         )
         # StateMachine.add(
