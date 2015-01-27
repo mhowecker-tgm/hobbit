@@ -800,8 +800,8 @@ def main():
         StateMachine.add(
             'EMOTION',
             HobbitEmotions.ShowEmotions(
-                emotion=emo,
-                emo_time=time),
+                emotion='NEUTRAL',
+                emo_time=0),
             transitions={'succeeded': 'succeeded',
                          'preempted': 'succeeded',
                          'aborted': 'succeeded'}
