@@ -92,7 +92,7 @@ void MiraRobotDrive::discrete_motion_cmd_callback(const std_msgs::String::ConstP
 	if (MotionValue < 0) sign = -1;
 
 	float x_speed = sign*0.1; //FIXME
-	float vMax = 0.1; //FIXME
+	float vMax = 0.2; //FIXME //A value of 0.1 does not allow to move more than 50 cm
         float t= MotionValue/x_speed;
 
         // send the command
@@ -121,7 +121,7 @@ void MiraRobotDrive::discrete_motion_cmd_callback(const std_msgs::String::ConstP
 	int sign = 1;
 	if (MotionValue < 0) sign = -1;
 
-	float rot_speed = sign*25*M_PI/180; //FIXME
+	float rot_speed = sign*15*M_PI/180; //FIXME
 	float vMax = 0.1; //FIXME
         float t= MotionValue*M_PI/(180*rot_speed);
 
