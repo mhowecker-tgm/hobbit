@@ -154,6 +154,13 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 
 	}
 
+	if (!min_dis < scanner_info.range_max)
+	{
+		as_->setAborted(hobbit_msgs::GeneralHobbitResult(), "aborted, no detection");
+		std::cout << "aborted, no detection" << std::endl; 
+		return;
+	}
+
 	std::cout << "min_dis " << min_dis << std::endl;
 
 	double dis2move = min_dis + x_sensor-front_dis-margin;
