@@ -59,8 +59,9 @@ class bcolors:
 
 #def pointevents_cb(msg, ud):
 def pointevents_cb(ud, msg):
+    global LASTPNTDIR
     print('pointevents_cb')
-    print(msg)
+    print (msg)
     
     if LASTPNTDIR is None:
         LASTPNTDIR = msg
