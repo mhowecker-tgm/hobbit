@@ -19,6 +19,8 @@ cComeCloser::cComeCloser(int argc, char **argv) : init_argc(argc), init_argv(arg
 	nh.param("x_sensor", x_sensor, 0.135);
 	nh.param("time_limit_secs", time_limit_secs, 60.0);
 
+	nh.param("ang_margin", ang_margin, 22.0); //minimum value to consider a minimum width of 40 cm from a maximum distance of 1.0m
+
 	ros::NodeHandle n;
 	discrete_motion_cmd_pub = n.advertise<std_msgs::String>("/DiscreteMotionCmd", 20);
 
@@ -136,9 +138,10 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 	double ang = scan->angle_min;
 	double min_dis = scanner_info.range_max; 
 
-	for (int i=0; i<scan->ranges.size();i++)
+	int init_index = ((angles::shortest_angular_distance(ang, orientation)-ang_margin)/scan->angle_increment) +1;
+	int end_index = ((angles::shortest_angular_distance(ang, orientation)+ang_margin)/scan->angle_increment) +1;
+	for (int i=init_index; i<=end_index;i++)
 	{
-		
 		//project point onto user direction
 
 		//double projected_dis = fabs(scan->ranges[i]*cos(angles::shortest_angular_distance(orientation, ang)));
@@ -166,9 +169,9 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 		std::cout << "angle2turn " << angle2turn * 180/M_PI << std::endl;
 		std::cout << "distance2move " << dis2move << std::endl;
 
-		//first rotate to face detected user
+		//first rotate to face detected user (should already be quite close to current orientation...)
 
-		if (fabs(angle2turn) < 25*M_PI/180)
+		if (fabs(angle2turn) < 15*M_PI/180)
 		{
 			std::cout << "rotation is too small " << std::endl;
 			finished_rotation = true;

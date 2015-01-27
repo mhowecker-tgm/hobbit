@@ -5,6 +5,7 @@
 	<param name="front_dis" value="0.18"/>
 	<param name="x_sensor" value="0.135"/>
 	<param name="time_limit_secs" value="120.0"/>
+	<param name="ang_margin" value="22"/>
 
   </node>
 </launch>
