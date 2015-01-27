@@ -78,6 +78,7 @@ def pointevents_cb(ud, msg):
 
     
     ud.pointing_msg = msg
+    print "a valid pointing direction was found and accepted!"
     LASTPNTDIR = None   # a pointing direction was found, hence the last pointing direction is set back for the next action
     return False    
 
