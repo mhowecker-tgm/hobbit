@@ -240,6 +240,11 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 		if(as_->isPreemptRequested())
       		{
 			std::cout << "preempt requested" << std::endl;
+
+			std_msgs::String stop_cmd;
+			stop_cmd.data = "Stop";
+			discrete_motion_cmd_pub.publish(stop_cmd);
+
 			as_->setPreempted();
 			return;
 
