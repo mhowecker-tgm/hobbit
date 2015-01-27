@@ -20,6 +20,7 @@ import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.head_move_import as head_move
 import hobbit_smach.hobbit_move_import as hobbit_move
 import hobbit_smach.arm_move_import as arm_move
+import hobbit_smach.speech_output_import as speech_output
 import math, struct
 from testdetector import TD
 import tf
@@ -632,7 +633,10 @@ class DavidPickingUp(State):
     def __init__(self):
         State.__init__(
             self,
-            outcomes=['succeeded', 'failed', 'preempted'],
+            outcomes=['succeeded', 'failed', 'preempted',
+                      'failed_no_suitable_object_found',
+                      'failed_no_sufficient_grasp_detected',
+                      'failed_no_space_to_move_arm'],
             input_keys=['cloud']
         )
         self.arm_client = ArmActionClient()
@@ -1309,7 +1313,31 @@ def getPickupSeq():
             DavidPickingUp(),
             transitions={'succeeded': 'succeeded',
                          'preempted': 'preempted',
-                         'failed': 'failed'}
+                         'failed': 'failed',
+                         'failed_no_suitable_object_found': 'OBJECT',
+                         'failed_no_sufficient_grasp_detected': 'GRASP',
+                         'failed_no_space_to_move_arm': 'ARM'}
+        )
+        StateMachine.add(
+            'ARM',
+            speech_output.emo_say_something(text='There was not enough space to safely move my arm.'),
+            transitions={'succeeded': 'failed',
+                         'preempted': 'preempted',
+                         'aborted': 'failed',}
+        )
+        StateMachine.add(
+            'OBJECT',
+            speech_output.emo_say_something(text='No suitable object was detected.'),
+            transitions={'succeeded': 'failed',
+                         'preempted': 'preempted',
+                         'aborted': 'failed',}
+        )
+        StateMachine.add(
+            'GRASP',
+            speech_output.emo_say_something(text='I could not calulate a sufficient grasp for the object.'),
+            transitions={'succeeded': 'failed',
+                         'preempted': 'preempted',
+                         'aborted': 'failed',}
         )
         return sm
         #return seq

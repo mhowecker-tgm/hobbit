@@ -429,10 +429,7 @@ def main():
             #pickup.DavidPickingUp(),
             transitions={'succeeded': 'CHECK_GRASP',
                          'preempted': 'LOG_PREEMPT',
-                         'failed': 'EMO_SAY_DID_NOT_PICKUP',
-                         'failed_no_space_to_move_arm': 'EMO_SAY_DID_NOT_PICKUP',
-                         'failed_no_sufficient_grasp_detected': 'EMO_SAY_DID_NOT_PICKUP',
-                         'failed_no_suitable_object_found': 'EMO_SAY_DID_NOT_PICKUP'
+                         'failed': 'EMO_SAY_DID_NOT_PICKUP'
                         }
                          
         #================> NEW 10.12.2014  ENDE                         
