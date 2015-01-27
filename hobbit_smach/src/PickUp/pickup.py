@@ -67,14 +67,15 @@ def pointevents_cb(ud, msg):
         LASTPNTDIR = msg
         print "pointevents_cp: first iteration (no direction for comparison)"
         return True
-    if (diff_pointing_directions(msg) > MAXPNTDIRDIF):
-        print "difference between two consecutive pointing directions bigger than threshold: ", diff_pointing_directions(msg)
-        LASTPNTDIR = msg
-        return True
     if (msg.vectorY < 0.0):
         print "Pointing direction is upwards, direction NOT ACCEPTED. Will try again."
         LASTPNTDIR = msg
         return True
+    if (diff_pointing_directions(msg) > MAXPNTDIRDIF):
+        print "difference between two consecutive pointing directions bigger than threshold: ", diff_pointing_directions(msg)
+        LASTPNTDIR = msg
+        return True
+
     
     ud.pointing_msg = msg
     LASTPNTDIR = None   # a pointing direction was found, hence the last pointing direction is set back for the next action
