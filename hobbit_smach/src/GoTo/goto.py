@@ -19,6 +19,7 @@ from hobbit_msgs.srv import GetCoordinates
 from smach_ros import ActionServerWrapper, IntrospectionServer
 from smach import StateMachine, State, Sequence
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
+from uashh_smach.util import SleepState
 import hobbit_smach.head_move_import as head_move
 import hobbit_smach.logging_import as log
 
@@ -379,6 +380,10 @@ def main():
                 'MMUI_SAY_WayBlocked',
                 HobbitMMUI.ShowInfo(info='T_GT_WayBlocked'))
                 #speech_output.sayText(info='Way blocked'))
+            Sequence.add(
+                'WAIT',
+                SleepState(duration=5)
+            )
             Sequence.add(
                 'SHOW_MENU_MAIN',
                 HobbitMMUI.ShowMenu(menu='MAIN'),

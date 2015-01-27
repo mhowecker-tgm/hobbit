@@ -9,9 +9,9 @@
 
 
 PKG = 'hobbit_msgs'
-import roslib
+#import roslib
 import sys
-roslib.load_manifest(PKG)
+#roslib.load_manifest(PKG)
 import rospy
 from hobbit_msgs.msg import Command, Status
 from std_msgs.msg import String, Header
