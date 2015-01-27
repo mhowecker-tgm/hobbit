@@ -140,7 +140,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 
 	int init_index = ((angles::shortest_angular_distance(ang, orientation)-ang_margin)/scan->angle_increment) +1;
 	int end_index = ((angles::shortest_angular_distance(ang, orientation)+ang_margin)/scan->angle_increment) +1;
-	for (int i=init_index; i<=end_index;i++)
+	for (int i=init_index; i<=end_index && i<scan->ranges.size(); i++)
 	{
 		//project point onto user direction
 
