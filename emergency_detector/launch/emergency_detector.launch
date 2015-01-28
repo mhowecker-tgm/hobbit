@@ -2,10 +2,15 @@
     <node name="emergency_detector" pkg="emergency_detector" type="run_it.sh" required="true">
       <param name="name" value="emergency_detector" /> 
 
-      <param name="fromDepthTopic" value="/headcam/depth_registered/image_rect" /> 
-      <param name="fromDepthTopicInfo" value="/headcam/depth_registered/camera_info" /> 
-      <param name="fromRGBTopic" value="headcam/rgb/image_rect_color" /> 
-      <param name="fromRGBTopicInfo" value="/headcam/rgb/camera_info" /> 
+      <param name="fromTopDepthTopic" value="/headcam/depth_registered/image_rect" /> 
+      <param name="fromTopDepthTopicInfo" value="/headcam/depth_registered/camera_info" /> 
+      <param name="fromTopRGBTopic" value="headcam/rgb/image_rect_color" /> 
+      <param name="fromTopRGBTopicInfo" value="/headcam/rgb/camera_info" /> 
+
+      <param name="fromBottomDepthTopic" value="/basecam/depth/image" /> 
+      <param name="fromBottomDepthTopicInfo" value="/basecam/depth/camera_info" /> 
+      <param name="fromBottomRGBTopic" value="basecam/rgb/image_raw" /> 
+      <param name="fromBottomRGBTopicInfo" value="/basecam/rgb/camera_info" /> 
 
       <param name="minHumanTemperature" value="31.4" /> 
       <param name="maxHumanTemperature" value="37.1" /> 
