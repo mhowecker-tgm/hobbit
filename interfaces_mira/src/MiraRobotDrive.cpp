@@ -146,6 +146,12 @@ void MiraRobotDrive::discrete_motion_cmd_callback(const std_msgs::String::ConstP
 	mira::RPCFuture<void> r = robot_->getMiraAuthority().callService<void>("/robot/Robot", std::string("emergencyStop"));
         r.timedWait(mira::Duration::seconds(1));
         r.get();
+
+	sleep(1);
+	// reset motorstop
+  	mira::RPCFuture<void> r2 = robot_->getMiraAuthority().callService<void>("/robot/Robot", std::string("resetMotorStop"));
+  	r2.timedWait(mira::Duration::seconds(1));
+  	r2.get();
   }	
 
 // ***** Unsupported command *****
