@@ -144,16 +144,12 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 
 
 
-	std::cout << "ang init " << (angles::shortest_angular_distance(ang, orientation)-ang_margin*M_PI/180) * 180/M_PI << std::endl;
+	/*std::cout << "ang init " << (angles::shortest_angular_distance(ang, orientation)-ang_margin*M_PI/180) * 180/M_PI << std::endl;
 	std::cout << "ang end " << (angles::shortest_angular_distance(ang, orientation)+ang_margin*M_PI/180) * 180/M_PI << std::endl;
 
-	std::cout << "scan_angle_inc " << scan->angle_increment * 180/M_PI << std::endl;
-
 	std::cout << "init_ind " << init_index << std::endl;
-	std::cout << "end_ind " << end_index << std::endl;
+	std::cout << "end_ind " << end_index << std::endl;*/
 
-
-	std::cout << "ranges size " << scan->ranges.size() << std::endl;
 	for (int i=init_index; i<=end_index && i<scan->ranges.size(); i++)
 	{
 		//project point onto user direction
@@ -184,8 +180,6 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 	
 	double sensor_orientation = tf::getYaw(sensor_pose.orientation);  //should be relative
 	double angle2turn = angles::shortest_angular_distance(0, orientation);
-
-	std::cout << "orientation " << orientation*180/M_PI << std::endl;
 
 	if (dis2move > 0)
 	{
@@ -234,7 +228,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 
 		if (finished_rotation && !started_movement && !movement_cmd_sent)
 		{
-			sleep(5);
+			sleep(2);
 			std_msgs::String move_cmd;
 			std::ostringstream s;
 			s << "Move " << dis2move;
