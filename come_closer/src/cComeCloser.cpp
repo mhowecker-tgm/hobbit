@@ -128,7 +128,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 	sensor_msgs::LaserScan scanner_info;
 	scanner_info.angle_min = -M_PI/2;
 	scanner_info.angle_max = M_PI/2;
-	scanner_info.angle_increment = 5*M_PI/360; //FIXME add params
+	scanner_info.angle_increment = 5*M_PI/180; //FIXME add params
 	scanner_info.range_max = 1.5;
 
 	const geometry_msgs::Pose sensor_pose_ = sensor_pose;
@@ -138,8 +138,20 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 	double ang = scan->angle_min;
 	double min_dis = scanner_info.range_max; 
 
-	int init_index = ((angles::shortest_angular_distance(ang, orientation)-ang_margin)/scan->angle_increment) +1;
-	int end_index = ((angles::shortest_angular_distance(ang, orientation)+ang_margin)/scan->angle_increment) +1;
+	int init_index = ((angles::shortest_angular_distance(ang, orientation)-ang_margin*M_PI/180)/scan->angle_increment) +1;
+	int end_index = ((angles::shortest_angular_distance(ang, orientation)+ang_margin*M_PI/180)/scan->angle_increment) +1;
+
+
+
+	std::cout << "ang init " << (angles::shortest_angular_distance(ang, orientation)-ang_margin*M_PI/180) * 180/M_PI << std::endl;
+	std::cout << "ang end " << (angles::shortest_angular_distance(ang, orientation)+ang_margin*M_PI/180) * 180/M_PI << std::endl;
+
+	std::cout << "scan_angle_inc " << scan->angle_increment * 180/M_PI << std::endl;
+
+	std::cout << "init_ind " << init_index << std::endl;
+	std::cout << "end_ind " << end_index << std::endl;
+
+
 	for (int i=init_index; i<=end_index && i<scan->ranges.size(); i++)
 	{
 		//project point onto user direction
