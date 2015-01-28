@@ -12,7 +12,8 @@ from hobbit_msgs.msg import GeneralHobbitAction, GeneralHobbitGoal
 
 def start_action():
     print "start client"
-    client = actionlib.SimpleActionClient('pickup_object_grasp_only', GeneralHobbitAction)
+    #client = actionlib.SimpleActionClient('pickup_object_grasp_only', GeneralHobbitAction)
+    client = actionlib.SimpleActionClient('pickup', GeneralHobbitAction)
     client.wait_for_server()
     print "connected to server"
     goal = GeneralHobbitGoal(

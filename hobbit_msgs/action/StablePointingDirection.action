@@ -1,0 +1,8 @@
+# Define the input command (defines how many seconds it is searched for a pointing direction)
+std_msgs/Int32 command
+---
+# Define the result, if succeeded (pointing direction)
+rgbd_acquisition/PointEvents result
+---
+# Define a feedback message
+std_msgs/String feedback
