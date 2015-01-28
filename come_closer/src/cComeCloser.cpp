@@ -136,11 +136,11 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 	const sensor_msgs::LaserScan scanner_info_ = scanner_info;
 	sensor_msgs::LaserScanPtr scan = occupancy_grid_utils::simulateRangeScan(const_local_grid, sensor_pose_, scanner_info_, false);
 
-	double ang = scan->angle_min;
+	double init_ang = scan->angle_min;
 	double min_dis = scanner_info.range_max; 
 
-	int init_index = ((angles::shortest_angular_distance(ang, orientation)-ang_margin*M_PI/180)/scan->angle_increment) +1;
-	int end_index = ((angles::shortest_angular_distance(ang, orientation)+ang_margin*M_PI/180)/scan->angle_increment) +1;
+	int init_index = ((angles::shortest_angular_distance(init_ang, orientation)-ang_margin*M_PI/180)/scan->angle_increment) +1;
+	int end_index = ((angles::shortest_angular_distance(init_ang, orientation)+ang_margin*M_PI/180)/scan->angle_increment) +1;
 
 
 
@@ -153,16 +153,14 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 	for (int i=init_index; i<=end_index && i<scan->ranges.size(); i++)
 	{
 		//project point onto user direction
+		double ang = scan->angle_min + (i-1)*scan->angle_increment;
 
-		//double projected_dis = fabs(scan->ranges[i]*cos(angles::shortest_angular_distance(orientation, ang)));
-		double projected_dis = scan->ranges[i];
+		double projected_dis = fabs(scan->ranges[i]*cos(angles::shortest_angular_distance(orientation, ang)));
+		//double projected_dis = scan->ranges[i];
 		if (projected_dis < min_dis)
 		{
 			min_dis = projected_dis;
-			//std::cout << "min_dis " << min_dis << std::endl;
 		}
-
-		ang+=scan->angle_increment;
 
 
 	}
