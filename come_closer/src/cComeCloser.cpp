@@ -86,6 +86,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 	finished_rotation = false;
 	started_movement = false;
 	finished_movement = false;
+	movement_cmd_sent = false;
 
 	hobbit_msgs::GetOccupancyGrid srv;
 	
@@ -128,7 +129,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 	sensor_msgs::LaserScan scanner_info;
 	scanner_info.angle_min = -M_PI/2;
 	scanner_info.angle_max = M_PI/2;
-	scanner_info.angle_increment = 5*M_PI/180; //FIXME add params
+	scanner_info.angle_increment = 1*M_PI/180; //FIXME add params
 	scanner_info.range_max = 1.5;
 
 	const geometry_msgs::Pose sensor_pose_ = sensor_pose;
@@ -152,6 +153,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 	std::cout << "end_ind " << end_index << std::endl;
 
 
+	std::cout << "ranges size " << scan->ranges.size() << std::endl;
 	for (int i=init_index; i<=end_index && i<scan->ranges.size(); i++)
 	{
 		//project point onto user direction
@@ -159,14 +161,17 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 		//double projected_dis = fabs(scan->ranges[i]*cos(angles::shortest_angular_distance(orientation, ang)));
 		double projected_dis = scan->ranges[i];
 		if (projected_dis < min_dis)
+		{
 			min_dis = projected_dis;
+			//std::cout << "min_dis " << min_dis << std::endl;
+		}
 
 		ang+=scan->angle_increment;
 
 
 	}
 
-	if (!min_dis < scanner_info.range_max)
+	if (!(min_dis < scanner_info.range_max))
 	{
 		as_->setAborted(hobbit_msgs::GeneralHobbitResult(), "aborted, no detection"); //FIXME, should it move anyway?
 		std::cout << "aborted, no detection" << std::endl; 
@@ -227,7 +232,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 
 		//laserPublisher.publish(scan);  //FIXME, to be removed, only for visualization purposes
 
-		if (finished_rotation && !started_movement)
+		if (finished_rotation && !started_movement && !movement_cmd_sent)
 		{
 			sleep(5);
 			std_msgs::String move_cmd;
@@ -235,6 +240,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 			s << "Move " << dis2move;
 			move_cmd.data = s.str();
 			discrete_motion_cmd_pub.publish(move_cmd);
+			movement_cmd_sent = true;
 			std::cout << "finished rotation, sending move command" << std::endl;
 
 		}

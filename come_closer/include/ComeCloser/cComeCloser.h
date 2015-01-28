@@ -59,6 +59,8 @@ private:
 	bool finished_movement;
 	
 	double ang_margin;
+
+	bool movement_cmd_sent;
  
 
 };
