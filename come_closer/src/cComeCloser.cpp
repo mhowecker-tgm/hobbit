@@ -94,6 +94,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
         {
           //ROS_INFO("Sum: %ld", (long int)srv.response.sum);
 	   local_grid = srv.response.occupancy_grid; //we should get the latest map, with the remembered obstacles
+	   std::cout << "********************* " << std::endl;
 	   std::cout << "local_grid received " << std::endl;
         }
         else
