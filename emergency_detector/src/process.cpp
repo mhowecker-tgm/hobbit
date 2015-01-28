@@ -175,6 +175,12 @@ unsigned int temperatureSensorSensesHuman(unsigned int tempDetected , unsigned i
 }
 
 
+unsigned int mapSaysThatWhatWeAreLookingAtShouldBeFreespace(float x,float y,float z , unsigned int frameTimestamp)
+{
+   fprintf(stderr,"mapSaysThatWhatWeAreLookingAtShouldBeFreespace() not implemented yet\n");
+  return 1;
+}
+
 
 
 int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int colorWidth , unsigned int colorHeight ,
@@ -411,6 +417,18 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
 
  return emergencyDetected;
 }
+
+
+
+
+int runServicesBottomThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int colorWidth , unsigned int colorHeight ,
+                                           unsigned short * depthFrame  , unsigned int depthWidth , unsigned int depthHeight ,
+                                           void * calib ,
+                                           unsigned int frameTimestamp )
+{
+
+}
+
 
 
 void initializeProcess()

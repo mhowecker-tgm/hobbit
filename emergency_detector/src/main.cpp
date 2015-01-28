@@ -61,10 +61,30 @@ ros::Publisher personBroadcaster;
 int rate=DEFAULT_FRAME_RATE;
 
 
-message_filters::Subscriber<sensor_msgs::Image> *rgb_img_sub;
-message_filters::Subscriber<sensor_msgs::CameraInfo> *rgb_cam_info_sub;
-message_filters::Subscriber<sensor_msgs::Image> *depth_img_sub;
-message_filters::Subscriber<sensor_msgs::CameraInfo> *depth_cam_info_sub;
+float MinMaxHumanTemperatures[]= {
+                                    30.8 , 36.0 , //Hobbit A , last tested 23/1/15
+                                    29.9 , 36.0 , //Hobbit B , last tested 23/1/15
+                                    30.8 , 36.0 , //Hobbit C , todo when I get back to crete
+                                    30.8 , 36.0 , //Hobbit D , N/A
+                                    30.8 , 36.0 , //Hobbit E
+                                    30.8 , 36.0   //Hobbit F , N/A
+                                 };
+
+
+
+
+
+
+message_filters::Subscriber<sensor_msgs::Image> *rgb_img_sub_top;
+message_filters::Subscriber<sensor_msgs::CameraInfo> *rgb_cam_info_sub_top;
+message_filters::Subscriber<sensor_msgs::Image> *depth_img_sub_top;
+message_filters::Subscriber<sensor_msgs::CameraInfo> *depth_cam_info_sub_top;
+
+
+message_filters::Subscriber<sensor_msgs::Image> *rgb_img_sub_bottom;
+message_filters::Subscriber<sensor_msgs::CameraInfo> *rgb_cam_info_sub_bottom;
+message_filters::Subscriber<sensor_msgs::Image> *depth_img_sub_bottom;
+message_filters::Subscriber<sensor_msgs::CameraInfo> *depth_cam_info_sub_bottom;
 
 typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image> RgbdSyncPolicy;
 
@@ -345,7 +365,7 @@ int updateHeadPosition()
  return 1;
 }
 
-
+/*
 //RGBd Callback is called every time we get a new pair of frames , it is synchronized to the main thread
 void rgbdCallbackNoCalibration(const sensor_msgs::Image::ConstPtr rgb_img_msg,
                                  const sensor_msgs::Image::ConstPtr depth_img_msg  )
@@ -383,6 +403,102 @@ void rgbdCallbackNoCalibration(const sensor_msgs::Image::ConstPtr rgb_img_msg,
  ++frameTimestamp;
 return;
 }
+*/
+
+
+
+
+
+
+//RGBd Callback is called every time we get a new pair of frames , it is synchronized to the main thread
+void rgbdCallbackNoCalibrationBoth(unsigned int cameraID,
+                                   const sensor_msgs::Image::ConstPtr rgb_img_msg,
+                                   const sensor_msgs::Image::ConstPtr depth_img_msg )
+{
+ if (paused) { return; } //If we are paused spend no time with new input
+ //Using Intrinsic camera matrix for the raw (distorted) input images.
+
+ unsigned int colorWidth = rgb_img_msg->width;   unsigned int colorHeight = rgb_img_msg->height;
+ unsigned int depthWidth = depth_img_msg->width; unsigned int depthHeight = depth_img_msg->height;
+ int i=0;
+
+ cv_bridge::CvImageConstPtr orig_rgb_img;
+ cv_bridge::CvImageConstPtr orig_depth_img;
+ orig_rgb_img = cv_bridge::toCvShare(rgb_img_msg, "rgb8");
+
+ if (depth_img_msg->encoding.compare("32FC1")==0)
+ {
+  orig_depth_img = cv_bridge::toCvShare(depth_img_msg, depth_img_msg->encoding);
+  cv::Mat depth32FC1 = cv::Mat(depthHeight,depthWidth,CV_32FC1,orig_depth_img->image.data,4*depthWidth);
+
+  cv::Mat depth16UC1;
+  double scalefactor=1000; //Using meters , so go to millimeters
+  depth32FC1.convertTo(depth16UC1 , CV_16UC1, scalefactor);
+   //----------------------------------
+    switch (cameraID)
+    {
+       case 0 :
+          runServicesThatNeedColorAndDepth((unsigned char*) orig_rgb_img->image.data, colorWidth , colorHeight ,
+                                           (unsigned short*) depth16UC1.data ,  depthWidth , depthHeight ,
+                                           /*&calib*/ 0, frameTimestamp );
+       break;
+       case 1 :
+          runServicesBottomThatNeedColorAndDepth((unsigned char*) orig_rgb_img->image.data, colorWidth , colorHeight ,
+                                                 (unsigned short*) depth16UC1.data ,  depthWidth , depthHeight ,
+                                                 /*&calib*/ 0, frameTimestamp );
+       break;
+       default :
+        fprintf(stderr,"rgbdCallbackNoCalibrationBoth called with unknown camera ID\n");
+       break;
+    };
+   //----------------------------------
+ } else
+ {
+  //Our grabber uses millimeters , maybe I should change this
+  //----------------------------------
+  orig_depth_img = cv_bridge::toCvShare(depth_img_msg, sensor_msgs::image_encodings::TYPE_16UC1);
+  //----------------------------------
+    switch (cameraID)
+    {
+       case 0 :
+          runServicesThatNeedColorAndDepth((unsigned char*) orig_rgb_img->image.data, colorWidth , colorHeight ,
+                                           (unsigned short*) orig_depth_img->image.data ,  depthWidth , depthHeight ,
+                                           /*&calib*/ 0, frameTimestamp );
+            break;
+       case 1 :
+          runServicesBottomThatNeedColorAndDepth((unsigned char*) orig_rgb_img->image.data, colorWidth , colorHeight ,
+                                                 (unsigned short*) orig_depth_img->image.data ,  depthWidth , depthHeight ,
+                                                /*&calib*/ 0, frameTimestamp);
+       break;
+       default :
+        fprintf(stderr,"rgbdCallbackNoCalibrationBoth called with unknown camera ID\n");
+       break;
+    };
+
+  //----------------------------------
+ }
+ ++frameTimestamp;
+ //After running (at least) once it is not a first run any more!
+ first = false;
+ return;
+}
+
+
+
+
+void rgbdCallbackTop(const sensor_msgs::Image::ConstPtr rgb_img_msg,
+                        const sensor_msgs::Image::ConstPtr depth_img_msg )
+{
+ rgbdCallbackNoCalibrationBoth(0,rgb_img_msg,depth_img_msg);
+}
+
+void rgbdCallbackBottom(const sensor_msgs::Image::ConstPtr rgb_img_msg,
+                        const sensor_msgs::Image::ConstPtr depth_img_msg )
+{
+ rgbdCallbackNoCalibrationBoth(1,rgb_img_msg,depth_img_msg);
+}
+
+
 
 int main(int argc, char **argv)
 {
@@ -400,16 +516,18 @@ int main(int argc, char **argv)
      ros::NodeHandle private_node_handle_("~");
 
      std::string name;
-     std::string fromDepthTopic;
-     std::string fromDepthTopicInfo;
-     std::string fromRGBTopic;
-     std::string fromRGBTopicInfo;
+     std::string fromTopDepthTopic , fromTopDepthTopicInfo , fromTopRGBTopic , fromTopRGBTopicInfo;
+     std::string fromBottomDepthTopic , fromBottomDepthTopicInfo , fromBottomRGBTopic , fromBottomRGBTopicInfo;
 
+     private_node_handle_.param("fromTopDepthTopic", fromTopDepthTopic, std::string("/headcam/depth_registered/image_rect"));
+     private_node_handle_.param("fromTopDepthTopicInfo", fromTopDepthTopicInfo, std::string("/headcam/depth_registered/camera_info"));
+     private_node_handle_.param("fromTopRGBTopic", fromTopRGBTopic, std::string("headcam/rgb/image_rect_color"));
+     private_node_handle_.param("fromTopRGBTopicInfo", fromTopRGBTopicInfo, std::string("/headcam/rgb/camera_info"));
 
-     private_node_handle_.param("fromDepthTopic", fromDepthTopic, std::string("/headcam/depth_registered/image_rect"));
-     private_node_handle_.param("fromDepthTopicInfo", fromDepthTopicInfo, std::string("/headcam/depth_registered/camera_info"));
-     private_node_handle_.param("fromRGBTopic", fromRGBTopic, std::string("headcam/rgb/image_rect_color"));
-     private_node_handle_.param("fromRGBTopicInfo", fromRGBTopicInfo, std::string("/headcam/rgb/camera_info"));
+     private_node_handle_.param("fromBottomDepthTopic", fromBottomDepthTopic, std::string("/basecam/depth_registered/image_rect"));
+     private_node_handle_.param("fromBottomDepthTopicInfo", fromBottomDepthTopicInfo, std::string("/basecam/depth_registered/camera_info"));
+     private_node_handle_.param("fromBottomRGBTopic", fromBottomRGBTopic, std::string("basecam/rgb/image_rect_color"));
+     private_node_handle_.param("fromBottomRGBTopicInfo", fromBottomRGBTopicInfo, std::string("/basecam/rgb/camera_info"));
 
 
      private_node_handle_.param("maximumFrameDifferenceForTemperatureToBeRelevant", maximumFrameDifferenceForTemperatureToBeRelevant ,  10 );
@@ -451,16 +569,25 @@ int main(int argc, char **argv)
 
 
      //Make our rostopic camera grabber
-     message_filters::Synchronizer<RgbdSyncPolicy> *sync;
+     message_filters::Synchronizer<RgbdSyncPolicy> *syncTop;
 
-	 depth_img_sub = new message_filters::Subscriber<sensor_msgs::Image>(nh,fromDepthTopic,1);
-	 depth_cam_info_sub = new message_filters::Subscriber<sensor_msgs::CameraInfo>(nh,fromDepthTopicInfo,1);
+	 depth_img_sub_top = new message_filters::Subscriber<sensor_msgs::Image>(nh,fromTopDepthTopic,1);
+	 depth_cam_info_sub_top = new message_filters::Subscriber<sensor_msgs::CameraInfo>(nh,fromTopDepthTopicInfo,1);
 
-	 rgb_img_sub = new  message_filters::Subscriber<sensor_msgs::Image>(nh,fromRGBTopic, 1);
-	 rgb_cam_info_sub = new message_filters::Subscriber<sensor_msgs::CameraInfo>(nh,fromRGBTopicInfo,1);
+	 rgb_img_sub_top = new  message_filters::Subscriber<sensor_msgs::Image>(nh,fromTopRGBTopic, 1);
+	 rgb_cam_info_sub_top = new message_filters::Subscriber<sensor_msgs::CameraInfo>(nh,fromTopRGBTopicInfo,1);
 
-     sync = new message_filters::Synchronizer<RgbdSyncPolicy>(RgbdSyncPolicy(rate), *rgb_img_sub, *depth_img_sub); //*rgb_cam_info_sub,
-	 sync->registerCallback(rgbdCallbackNoCalibration);
+     syncTop = new message_filters::Synchronizer<RgbdSyncPolicy>(RgbdSyncPolicy(rate), *rgb_img_sub_top, *depth_img_sub_top); //*rgb_cam_info_sub,
+	 syncTop->registerCallback(rgbdCallbackTop);
+
+
+	 message_filters::Synchronizer<RgbdSyncPolicy> *syncBottom;
+	 depth_img_sub_bottom = new message_filters::Subscriber<sensor_msgs::Image>(nh,fromBottomDepthTopic,1);
+	 rgb_img_sub_bottom = new  message_filters::Subscriber<sensor_msgs::Image>(nh,fromBottomRGBTopic, 1);
+     syncBottom = new message_filters::Synchronizer<RgbdSyncPolicy>(RgbdSyncPolicy(rate), *rgb_img_sub_bottom, *depth_img_sub_bottom); //*rgb_cam_info_sub,
+	 syncBottom->registerCallback(rgbdCallbackBottom);
+
+
 
      ros::Subscriber sub2D = nh.subscribe("joints2D",1000,joints2DReceived);
      ros::Subscriber sub3D = nh.subscribe("joints3D",1000,joints3DReceived);
@@ -499,11 +626,16 @@ int main(int argc, char **argv)
 
 
 
-	   delete depth_img_sub;
-	   delete depth_cam_info_sub;
-	   delete rgb_img_sub;
-	   delete rgb_cam_info_sub;
-	   delete sync;
+	   delete depth_img_sub_top;
+	   delete depth_cam_info_sub_top;
+	   delete rgb_img_sub_top;
+	   delete rgb_cam_info_sub_top;
+
+	   delete depth_img_sub_bottom;
+	   delete rgb_img_sub_bottom;
+
+	   delete syncTop;
+	   delete syncBottom;
 	}
 	catch(std::exception &e) { ROS_ERROR("Exception: %s", e.what()); return 1; }
 	catch(...)               { ROS_ERROR("Unknown Error"); return 1; }

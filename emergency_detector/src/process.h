@@ -53,6 +53,12 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
                                           unsigned int frameTimestamp );
 
 
+
+int runServicesBottomThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int colorWidth , unsigned int colorHeight ,
+                                           unsigned short * depthFrame  , unsigned int depthWidth , unsigned int depthHeight ,
+                                           void * calib ,
+                                           unsigned int frameTimestamp );
+
 void initializeProcess();
 
 #ifdef __cplusplus
