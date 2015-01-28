@@ -168,7 +168,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 
 	if (!min_dis < scanner_info.range_max)
 	{
-		as_->setAborted(hobbit_msgs::GeneralHobbitResult(), "aborted, no detection");
+		as_->setAborted(hobbit_msgs::GeneralHobbitResult(), "aborted, no detection"); //FIXME, should it move anyway?
 		std::cout << "aborted, no detection" << std::endl; 
 		return;
 	}
