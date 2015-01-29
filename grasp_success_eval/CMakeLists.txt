@@ -49,6 +49,7 @@ add_definitions(${PCL_DEFINITIONS})
 
 ## Declare a cpp executable
 add_executable(graspSuccessEval src/graspSuccessEval.cpp)
+add_executable(graspSuccessEvalServer src/graspSuccessEvalServer.cpp)
 
 ## Specify libraries to link a library or executable target against
 #target_link_libraries(checkGrasping
@@ -64,3 +65,9 @@ target_link_libraries(graspSuccessEval
  checkGrasping
 )
 
+target_link_libraries(graspSuccessEvalServer
+ ${catkin_LIBRARIES}
+ ${PCL_LIBRARIES}
+ ${OpenCV_LIBRARIES}
+ checkGrasping
+)
