@@ -283,7 +283,7 @@ def main():
             ),
             connector_outcomes=['succeeded', 'preempted', 'aborted']
         )
-        smach.StateMachine,add_auto(
+        smach.StateMachine.add_auto(
             'SAY_LOOK',
             speech_output.sayText(info='Please point to the object that you want me to pick up.')
         )
