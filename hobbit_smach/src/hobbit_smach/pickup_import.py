@@ -33,6 +33,7 @@ from geometry_msgs.msg import Pose
 from hobbit_smach.ArmActionClient import ArmActionClient
 import actionlib
 import hobbit_msgs.msg
+from hobbit_msgs.srv import *
 import arm_simulation.GraspTrajectoryActionClient # as grasptraj #
 #from arm_simulation import GraspTrajectoryActionClient
 from table_object_detector.srv import *
@@ -931,13 +932,27 @@ class DavidCheckGrasp(State):
     def __init__(self):
         State.__init__(
             self,
-            outcomes=['succeeded', 'aborted', 'preempted']
+            outcomes=['succeeded', 'aborted', 'preempted'],
+            input_keys=['cloud']
         )
 
     def execute(self, ud):
         if self.preempt_requested():
             return 'preempted'
         # TODO: David please add the check of the grasping in here => Esters code (call service)
+
+        rospy.wait_for_service('grasp_success_check')
+    try:
+        grasp_success_check_fct = rospy.ServiceProxy('grasp_success_check', GraspSuccessCheck)
+        resp1 = grasp_success_check_fct(x, y)
+        print "result of grasp success evaluation: ", resp1.result
+        if ( resp1.result == True):
+            return 'succeeded'
+        else:
+            return 'aborted'
+    except rospy.ServiceException, e:
+        print "Service call failed: %s"%e
+        #use ud.cloud and esthers code to receive succeeded/aborted
 
         return 'succeeded'
 

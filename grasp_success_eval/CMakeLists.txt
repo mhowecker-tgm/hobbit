@@ -43,19 +43,19 @@ link_directories(${PCL_LIBRARY_DIRS} src)
 add_definitions(${PCL_DEFINITIONS})
 
 ## Declare a cpp library
-add_library(checkGrasping
-   src/checkGrasping.cpp
-)
+#add_library(checkGrasping
+#   src/checkGrasping.cpp
+#)
 
 ## Declare a cpp executable
 add_executable(graspSuccessEval src/graspSuccessEval.cpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(checkGrasping
- ${catkin_LIBRARIES}
- ${PCL_LIBRARIES}
- ${OpenCV_LIBRARIES}
-)
+#target_link_libraries(checkGrasping
+# ${catkin_LIBRARIES}
+# ${PCL_LIBRARIES}
+# ${OpenCV_LIBRARIES}
+#)
 
 target_link_libraries(graspSuccessEval
  ${catkin_LIBRARIES}

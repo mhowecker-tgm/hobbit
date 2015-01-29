@@ -264,87 +264,6 @@ def main():
 
     with pickup_sm:
         StateMachine.add(
-            'SET_HEAD',
-            head_move.MoveTo(pose='center_center'),
-            transitions={'succeeded': 'INIT',
-                         'preempted': 'LOG_PREEMPT'}
-        )
-        StateMachine.add(
-            'INIT',
-            Init(),
-            transitions={'succeeded': 'SWITCH_VISION',
-                         'canceled': 'CLEAN_UP'}
-        )
-        StateMachine.add_auto(
-            'SWITCH_VISION',
-            ServiceState(
-                '/vision_system/seeWhereUserIsPointing',
-                SwitchVision,
-                request=SwitchVisionRequest(dummyInput=True),
-                response_cb=switch_vision_cb
-
-            ),
-            connector_outcomes=['succeeded', 'preempted', 'aborted']
-        )
-        smach.StateMachine.add_auto(
-            'SAY_LOOK',
-            speech_output.sayText(info='Please point to the object that you want me to pick up.'),
-            connector_outcomes=['succeeded', 'preempted', 'failed']
-        )
-        # smach.StateMachine.add(
-        #     'GET_POINTING_DIRECTION',
-        #     MonitorState(
-        #         '/pointEvents',
-        #         PointEvents,
-        #         cond_cb=pointevents_cb,
-        #         max_checks=20,
-        #         output_keys=['pointing_msg']
-        #     ),
-        #     transitions={'valid': 'POINTING_COUNTER',
-        #                  'invalid': 'START_LOOKING',   #df 27.1.2015 uncomment again and delete next line !!!!!!!!!!!!!!!!!!!!!!1
-        #                  #'invalid': 'LOG_PREEMPT',
-        #                  'preempted': 'LOG_PREEMPT'}
-        # )
-        StateMachine.add(
-            'GET_POINTING_DIRECTION',
-            WaitForMsgState(
-                '/pointEvents',
-                PointEvents,
-                msg_cb=point_other_state_cb,
-                timeout=15,
-                output_keys=['pointing_msg']
-            ),
-            transitions={'succeeded': 'START_LOOKING',
-                         'aborted': 'POINTING_COUNTER',
-                         'preempted': 'LOG_PREEMPT'}
-        )
-        StateMachine.add(
-            'POINTING_COUNTER',
-            PointingCounter(),
-            transitions={'first': 'POINTING_NOT_DETECTED_1',
-                         'second': 'POINTING_NOT_DETECTED_2'}
-        )
-        StateMachine.add(
-            'POINTING_NOT_DETECTED_1',
-            pickup.sayPointingGestureNotDetected1(),
-            transitions={'yes': 'GET_POINTING_DIRECTION',
-                         'no': 'POINTING_NOT_DETECTED_2',
-                         'preempted': 'LOG_PREEMPT',
-                         'failed': 'POINTING_NOT_DETECTED_2'}
-        )
-        StateMachine.add(
-            'POINTING_NOT_DETECTED_2',
-            pickup.sayPointingGestureNotDetected2(),
-            transitions={'succeeded': 'aborted',
-                         'failed': 'aborted'}
-        )
-        StateMachine.add(
-            'START_LOOKING',
-            pickup.getStartLooking(),
-            transitions={'succeeded': 'HEAD_TO_SEARCH',
-                         'failed': 'EMO_SAY_OBJECT_NOT_DETECTED'}
-        )
-        StateMachine.add(
             'HEAD_TO_SEARCH',
             head_move.MoveTo(pose='to_grasp'),  # wait=True <=> df
             transitions={'succeeded': 'WAIT_FINISH_HEAD_TO_SEARCH', # df
@@ -354,118 +273,11 @@ def main():
         # df 30.7.2014
         StateMachine.add(
             'WAIT_FINISH_HEAD_TO_SEARCH',
-            SleepState(duration=5),
-            transitions={'succeeded': 'GET_POINT_CLOUD',
+            SleepState(duration=3),
+            transitions={'succeeded': 'SAY_CHECK_GRASP',
                          'preempted': 'LOG_PREEMPT'}
             )
         # df END
-        smach.StateMachine.add(
-            'GET_POINT_CLOUD',
-            MonitorState(
-                '/headcam/depth_registered/points',
-                PointCloud2,
-                cond_cb=point_cloud_cb,
-                max_checks=20,
-                output_keys=['cloud']
-            ),
-            transitions={'valid': 'GET_POINT_CLOUD',
-                         'invalid': 'LOOK_FOR_OBJECT',
-                         'preempted': 'LOG_PREEMPT'}
-        )
-        StateMachine.add(
-            'LOOK_FOR_OBJECT',
-            pickup.DavidLookForObject(),
-            transitions={'succeeded': 'EMO_SAY_OBJECT_FOUND',
-                         'failed': 'EMO_SAY_OBJECT_NOT_DETECTED',
-                         'preempted': 'LOG_PREEMPT'}
-        )
-        StateMachine.add(
-            'EMO_SAY_OBJECT_NOT_DETECTED',
-            pickup.sayObjectNotDetected1(),
-            transitions={'yes': 'GET_POINTING_DIRECTION',
-                         'no': 'POINTING_NOT_DETECTED_2',
-                         'preempted': 'LOG_PREEMPT',
-                         'failed': 'POINTING_NOT_DETECTED_2'}
-        )
-        StateMachine.add(
-            'EMO_SAY_OBJECT_FOUND',
-            pickup.sayObjectFoundRepositioning(),
-            transitions={'succeeded': 'MOVE_TO_GRASP_POSE',
-                         'failed': 'MOVE_TO_GRASP_POSE'}
-        )
-        StateMachine.add(
-            'MOVE_TO_GRASP_POSE',
-            hobbit_move.goToPoseSilent(),
-            transitions={'succeeded': 'SAY_PICKING_UP',
-                         'aborted': 'MOVE_COUNTER',
-                         'preempted': 'LOG_PREEMPT'},
-            remapping={'x': 'goal_position_x',
-                       'y': 'goal_position_y',
-                       'yaw': 'goal_position_yaw'}
-        )
-        StateMachine.add(
-            'MOVE_COUNTER',
-            MoveCounter(),
-            transitions={'first': 'EMO_SAY_UNABLE_TO_GRASP',
-                         'second': 'EMO_SAY_TRY_TO_REMOVE_OBJECT'}
-        )
-        StateMachine.add(
-            'EMO_SAY_UNABLE_TO_GRASP',
-            pickup.sayUnableToGraspObject(),
-            transitions={'yes': 'MOVE_TO_GRASP_POSE',
-                         'no': 'EMO_SAY_TRY_TO_REMOVE_OBJECT',
-                         'failed': 'EMO_SAY_TRY_TO_REMOVE_OBJECT',
-                         'preempted': 'LOG_PREEMPT'}
-        )
-        StateMachine.add(
-            'EMO_SAY_TRY_TO_REMOVE_OBJECT',
-            pickup.sayTryToRemoveObject(),
-            transitions={'succeeded': 'aborted',
-                         'failed': 'aborted',
-                         'preempted': 'LOG_PREEMPT'}
-        )
-        StateMachine.add(
-            'SAY_PICKING_UP',
-            speech_output.sayText(info='T_PU_PickingUpObject'),
-            transitions={'succeeded': 'GET_POINT_CLOUD_FOR_GRASP',
-                         'failed': 'EMO_SAY_DID_NOT_PICKUP',
-                         'preempted': 'LOG_PREEMPT'}
-        )
-        
-        #================> NEW 10.12.2014
-        smach.StateMachine.add(
-            'GET_POINT_CLOUD_FOR_GRASP',
-            MonitorState(
-                '/headcam/depth_registered/points',
-                PointCloud2,
-                cond_cb=point_cloud_cb,
-                max_checks=20,
-                output_keys=['cloud']
-            ),
-            transitions={'valid': 'GET_POINT_CLOUD_FOR_GRASP',
-                         'invalid': 'GRASP_OBJECT',
-                         'preempted': 'LOG_PREEMPT'}
-        )        
-        
-        # currently not used
-        #smach.StateMachine.add(
-        #    'MOVE_ARM_TO_PRE_GRASP_POSITION',
-        #    arm_move.goToPreGraspPosition(),
-        #    transitions={'succeeded': 'GRASP_OBJECT', 
-        #                 'preempted': 'LOG_PREEMPT',
-        #                 'failed': 'MOVE_ARM_TO_PRE_GRASP_POSITION'}    # better failure handling appreciated
-        #)       
-        StateMachine.add(
-            'GRASP_OBJECT',
-            pickup.getPickupSeq(), #
-            #pickup.DavidPickingUp(),
-            transitions={'succeeded': 'CHECK_GRASP',
-                         'preempted': 'LOG_PREEMPT',
-                         'failed': 'EMO_SAY_DID_NOT_PICKUP'
-                        }
-                         
-        #================> NEW 10.12.2014  ENDE                         
-        )
         StateMachine.add(
             'SAY_CHECK_GRASP',
             speech_output.sayText(info='T_PU_CheckingGrasp'),
@@ -494,8 +306,8 @@ def main():
         StateMachine.add(
             'CHECK_GRASP',
             pickup.DavidCheckGrasp(),
-            transitions={'succeeded': 'END_PICKUP_SEQ',
-                         'aborted': 'COUNTER_GRASP_CHECK'}
+            transitions={'succeeded': 'aborted',
+                         'aborted': 'aborted'}
         )
         StateMachine.add(
             'COUNTER_GRASP_CHECK',

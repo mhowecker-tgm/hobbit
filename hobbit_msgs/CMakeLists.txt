@@ -59,6 +59,7 @@ add_service_files(
   GetState.srv
   GetOccupancyGrid.srv
   GetOccupancyState.srv
+  GraspSuccessCheck.srv
 )
 
 add_action_files(
