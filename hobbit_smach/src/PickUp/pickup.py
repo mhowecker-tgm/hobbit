@@ -12,7 +12,7 @@ roslib.load_manifest(PKG)
 import rospy
 import smach
 import uashh_smach.util as util
-from uashh_smach.util import SleepState  # df 30.7.2014
+from uashh_smach.util import SleepState, WaitForMsgState  # df 30.7.2014
 # import tf
 # import math
 from smach import StateMachine
@@ -56,6 +56,9 @@ class bcolors:
         self.FAIL = ''
         self.ENDC = ''
 
+def point_other_state_cb(msg, ud):
+    ret = pointevents_cb(ud, msg)
+    return not ret
 
 #def pointevents_cb(msg, ud):
 def pointevents_cb(ud, msg):
@@ -288,33 +291,33 @@ def main():
             speech_output.sayText(info='Please point to the object that you want me to pick up.'),
             connector_outcomes=['succeeded', 'preempted', 'failed']
         )
-        smach.StateMachine.add(
-            'GET_POINTING_DIRECTION',
-            MonitorState(
-                '/pointEvents',
-                PointEvents,
-                cond_cb=pointevents_cb,
-                max_checks=20,
-                output_keys=['pointing_msg']
-            ),
-            transitions={'valid': 'POINTING_COUNTER',
-                         'invalid': 'START_LOOKING',   #df 27.1.2015 uncomment again and delete next line !!!!!!!!!!!!!!!!!!!!!!1
-                         #'invalid': 'LOG_PREEMPT',
-                         'preempted': 'LOG_PREEMPT'}
-        )
-        # StateMachine.add(
+        # smach.StateMachine.add(
         #     'GET_POINTING_DIRECTION',
-        #     WaitForMsgState(
+        #     MonitorState(
         #         '/pointEvents',
         #         PointEvents,
-        #         msg_cb=pointevents_cb,
-        #         timeout=15,
+        #         cond_cb=pointevents_cb,
+        #         max_checks=20,
         #         output_keys=['pointing_msg']
-        #         ),
-        #     transitions={'succeeded': 'START_LOOKING',
-        #                  'aborted': 'POINTING_COUNTER',
+        #     ),
+        #     transitions={'valid': 'POINTING_COUNTER',
+        #                  'invalid': 'START_LOOKING',   #df 27.1.2015 uncomment again and delete next line !!!!!!!!!!!!!!!!!!!!!!1
+        #                  #'invalid': 'LOG_PREEMPT',
         #                  'preempted': 'LOG_PREEMPT'}
         # )
+        StateMachine.add(
+            'GET_POINTING_DIRECTION',
+            WaitForMsgState(
+                '/pointEvents',
+                PointEvents,
+                msg_cb=point_other_state_cb,
+                timeout=15,
+                output_keys=['pointing_msg']
+            ),
+            transitions={'succeeded': 'START_LOOKING',
+                         'aborted': 'POINTING_COUNTER',
+                         'preempted': 'LOG_PREEMPT'}
+        )
         StateMachine.add(
             'POINTING_COUNTER',
             PointingCounter(),
