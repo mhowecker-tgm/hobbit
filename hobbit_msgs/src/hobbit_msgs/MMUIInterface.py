@@ -40,7 +40,7 @@ class MMUIInterface:
         print "##",msg.command,"##"
 
 
-    def showMMUI_Info(self, text, wait="1", prm="", prm2="", prm3="", audio=""):
+    def showMMUI_Info(self, text, wait="0", prm="", prm2="", prm3="", audio=""):
         print(prm)
         parr = []
         p = Parameter('type', 'D_PLAIN')
