@@ -804,7 +804,7 @@ def main():
                 emo_time=0),
             transitions={'succeeded': 'succeeded',
                          'preempted': 'succeeded',
-                         'aborted': 'succeeded'}
+                         'failed': 'succeeded'}
         )
         if MUC_ENABLED:
             StateMachine.add(
