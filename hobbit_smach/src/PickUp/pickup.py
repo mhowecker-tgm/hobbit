@@ -5,7 +5,7 @@ PKG = 'hobbit_smach'
 PROJECT = 'Hobbit'
 NAME = 'pickup_object'
 LASTPNTDIR = None #last saved pointing direction
-MAXPNTDIRDIF = 0.1 # maximal difference between two pointing directions
+MAXPNTDIRDIF = 20.0 # maximal difference between two pointing directions
 
 import roslib
 roslib.load_manifest(PKG)
@@ -297,8 +297,8 @@ def main():
                 output_keys=['pointing_msg']
             ),
             transitions={'valid': 'POINTING_COUNTER',
-                         #'invalid': 'START_LOOKING',   df 27.1.2015 uncomment again and delete next line !!!!!!!!!!!!!!!!!!!!!!1
-                         'invalid': 'LOG_PREEMPT',
+                         'invalid': 'START_LOOKING',   #df 27.1.2015 uncomment again and delete next line !!!!!!!!!!!!!!!!!!!!!!1
+                         #'invalid': 'LOG_PREEMPT',
                          'preempted': 'LOG_PREEMPT'}
         )
         # StateMachine.add(
