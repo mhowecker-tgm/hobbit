@@ -274,7 +274,7 @@ def main():
         StateMachine.add(
             'WAIT_FINISH_HEAD_TO_SEARCH',
             SleepState(duration=3),
-            transitions={'succeeded': 'SAY_CHECK_GRASP',
+            transitions={'succeeded': 'GET_POINT_CLOUD_FOR_GRASPCHECK',
                          'preempted': 'LOG_PREEMPT'}
             )
         # df END
