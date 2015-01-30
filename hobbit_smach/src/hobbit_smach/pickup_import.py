@@ -942,18 +942,19 @@ class DavidCheckGrasp(State):
         # TODO: David please add the check of the grasping in here => Esters code (call service)
 
         rospy.wait_for_service('grasp_success_check')
-    try:
-        grasp_success_check_fct = rospy.ServiceProxy('grasp_success_check', GraspSuccessCheck)
-        resp1 = grasp_success_check_fct(ud.cloud)
-        print "result of grasp success evaluation: ", resp1.result
-        if ( resp1.result == True):
+        try:
+            grasp_success_check_fct = rospy.ServiceProxy('grasp_success_check', GraspSuccessCheck)
+            resp1 = grasp_success_check_fct(ud.cloud)
+            print "result of grasp success evaluation: ", resp1.result
+            if ( resp1.result == True ):
+                return 'succeeded'
+            else:
+                return 'aborted'
+        except rospy.ServiceException, e:
+            print "Service call failed: %s"%e
+            #use ud.cloud and esthers code to receive succeeded/aborted
+    
             return 'succeeded'
-        else:
-            return 'aborted'
-    except rospy.ServiceException, e:
-        print "Service call failed: %s"%e
-        #use ud.cloud and esthers code to receive succeeded/aborted
-
         return 'succeeded'
 
 
