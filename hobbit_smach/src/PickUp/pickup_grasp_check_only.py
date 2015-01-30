@@ -267,7 +267,7 @@ def main():
             'HEAD_TO_SEARCH',
             head_move.MoveTo(pose='to_grasp'),  # wait=True <=> df
             transitions={'succeeded': 'WAIT_FINISH_HEAD_TO_SEARCH', # df
-                         'aborted': 'EMO_SAY_OBJECT_NOT_DETECTED',
+                         'aborted': 'LOG_PREEMPT',
                          'preempted': 'LOG_PREEMPT'}
         )
         # df 30.7.2014
