@@ -318,7 +318,7 @@ def main():
         StateMachine.add(
             'EMO_SAY_DID_NOT_PICKUP',
             pickup.sayDidNotPickupObject1(),
-            transitions={'succeeded': 'SAY_PICKING_UP',
+            transitions={'succeeded': 'aborted',
                          'failed': 'aborted'}
         )
         StateMachine.add(
