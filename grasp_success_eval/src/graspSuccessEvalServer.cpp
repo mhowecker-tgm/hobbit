@@ -101,19 +101,14 @@ bool procesaDepthImg(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg) {
 }
 
 
-bool check_grasp_get_result(const hobbit_msgs::GraspSuccessCheck::Request  &req, hobbit_msgs::GraspSuccessCheck::Response &res)
+bool check_grasp_get_result(hobbit_msgs::GraspSuccessCheck::Request  &req, hobbit_msgs::GraspSuccessCheck::Response &res)
 {
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr msg (new pcl::PointCloud<pcl::PointXYZRGB>);
 
-  pcl::fromROSMsg(req->input_pc, msg);
+  pcl::fromROSMsg(req.input_pc, *msg);
   pcl::PointCloud<pcl::PointXYZRGB> pcl_msg;
-  bool tmp;
-  hobbit_msgs::GraspSuccessCheck::Request neu;
-  printf(req.input_pc);
 
-  tmp = procesaDepthImg(req.input_pc);
-  //ROS_INFO("sending back response: [%d]", (int)res.result);
-  //res.result = ;
+  res.result.data = procesaDepthImg(msg);
   return true;
 }
 

@@ -944,7 +944,7 @@ class DavidCheckGrasp(State):
         rospy.wait_for_service('grasp_success_check')
     try:
         grasp_success_check_fct = rospy.ServiceProxy('grasp_success_check', GraspSuccessCheck)
-        resp1 = grasp_success_check_fct(x, y)
+        resp1 = grasp_success_check_fct(ud.cloud)
         print "result of grasp success evaluation: ", resp1.result
         if ( resp1.result == True):
             return 'succeeded'

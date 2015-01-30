@@ -1,4 +1,4 @@
 # Given the RGG-D point cloud of the gripper with or without object
 sensor_msgs/PointCloud2 input_pc
 ---
-std_msgs/String result
+std_msgs/Bool result
