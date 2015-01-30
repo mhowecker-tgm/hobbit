@@ -103,6 +103,7 @@ bool procesaDepthImg(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg) {
 
 bool check_grasp_get_result(hobbit_msgs::GraspSuccessCheck::Request  &req, hobbit_msgs::GraspSuccessCheck::Response &res)
 {
+  ROS_INFO("check_grasp_get_result: check request was sent");
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr msg (new pcl::PointCloud<pcl::PointXYZRGB>);
 
   pcl::fromROSMsg(req.input_pc, *msg);
