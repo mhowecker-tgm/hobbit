@@ -6,11 +6,14 @@
 
 
 #include <ros/ros.h>
+#include "ros/package.h"
+#include "ros/ros.h"
 
 //Include for publishing and subscribing to images
 #include <cv_bridge/cv_bridge.h>
 
 #include <std_msgs/String.h>
+#include <std_msgs/Bool.h>
 #include <sstream>
 
 #include <sensor_msgs/image_encodings.h>
@@ -40,6 +43,8 @@
 #include <cmath>
 #include <limits>
 
+#include <hobbit_msgs/GraspSuccessCheck.h>
+
 #include "checkGrasping.h"
 
 using namespace cv;
@@ -57,17 +62,6 @@ int objeto = -2; // Variable representing the evaluation result
                  //     -1: the gripper is open
                  //      0: no object grasped
                  //      1: object grasped
-
-
-
-bool check_grasp_get_result(hobbit_msgs::GraspSuccessCheck::Request  &req,
-							hobbit_msgs::GraspSuccessCheck::Response &res)
-{
-  res.result = procesaDepthImg(req.input_pc);
-  ROS_INFO("sending back response: [%d]", (int)res.result);
-  return true;
-}
-
 
 
 
@@ -94,17 +88,37 @@ bool procesaDepthImg(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg) {
 
 	objeto = -1;
     objeto = checkGraspTask (cloud);
-    printf("checkGraspTask return value: [%d]\n", (int)objeto);
+    ROS_INFO("checkGraspTask return value: [%d]\n", (int)objeto);
     
     if (objeto == 1)
     {
-    	return true
+    	return true;
     } else {
-    	return false
+    	return false;
     }
 
 
 }
+
+
+bool check_grasp_get_result(const hobbit_msgs::GraspSuccessCheck::Request  &req, hobbit_msgs::GraspSuccessCheck::Response &res)
+{
+  pcl::PointCloud<pcl::PointXYZRGB>::Ptr msg (new pcl::PointCloud<pcl::PointXYZRGB>);
+
+  pcl::fromROSMsg(req->input_pc, msg);
+  pcl::PointCloud<pcl::PointXYZRGB> pcl_msg;
+  bool tmp;
+  hobbit_msgs::GraspSuccessCheck::Request neu;
+  printf(req.input_pc);
+
+  tmp = procesaDepthImg(req.input_pc);
+  //ROS_INFO("sending back response: [%d]", (int)res.result);
+  //res.result = ;
+  return true;
+}
+
+
+
 
 int main (int argc, char** argv) {
 	// ROS Initialization

@@ -5,14 +5,26 @@ project(grasp_success_eval)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  actionlib
   roscpp
   std_msgs
   cv_bridge
+  hobbit_msgs
 )
 
 ## System dependencies are found with CMake's conventions
 find_package(PCL REQUIRED)
 find_package(OpenCV REQUIRED)
+
+
+## Generate added messages and services with any dependencies listed here
+ generate_messages(
+   DEPENDENCIES
+   hobbit_msgs
+   std_msgs
+ )
+
+
 
 ###################################
 ## catkin specific configuration ##
@@ -24,6 +36,7 @@ find_package(OpenCV REQUIRED)
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
+  CATKIN_DEPENDS hobbit_msgs std_msgs
 )
 
 ###########
