@@ -9,7 +9,7 @@ SERVER_TIMEOUT = 5
 
 import rospy
 from std_msgs.msg import String
-from smach_ros import SimpleActionState,
+from smach_ros import SimpleActionState
 from smach import Sequence, State, StateMachine, Concurrence
 from uashh_smach.util import SleepState, WaitForMsgState
 # from uashh_smach.platform.move_base import HasMovedState
@@ -19,12 +19,13 @@ from hobbit_user_interaction import HobbitMMUI
 import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.logging_import as log
 from hobbit_msgs.msg import GeneralHobbitAction, GeneralHobbitGoal
+from rgbd_acquisition.msg import Person
 
 
 def closer_cb(ud, goal):
     params=[]
-    params.append(ud.x)
-    params.append(ud.y)
+    params.append(str(ud.person_z/1000))
+    params.append(str(ud.person_x/1000))
     goal = GeneralHobbitGoal(
         command=String('start'),
         parameters=params
@@ -153,6 +154,14 @@ def getRecharge():
 #     return seq
 #
 #
+
+def person_cb(msg, ud):
+    print(msg)
+    ud.person_x = msg.x
+    ud.person_z = msg.z
+    return True
+
+
 def call_hobbit():
     """
     First check if Hobbit is charging and in the docking station,
@@ -197,14 +206,27 @@ def call_hobbit():
                          'aborted': 'LOG_ABORT',
                          'preempted': 'LOG_PREEMPT'}
         )
-        # TODO: Get data from person detection, store it in userdata
+        StateMachine.add(
+            'GET_PERSON',
+            WaitForMsgState(
+                '/Person',
+                Person,
+                msg_cb=person_cb,
+                timeout=15,
+                output_keys=['user_pose']
+            ),
+            transitions={'succeeded': 'CLOSER',
+                         'aborted': 'LOG_ABORT',
+                         'preempted': 'LOG_PREEMPT'}
+        )
         # TODO: logic as defined during integration week in January 2015
         StateMachine.add(
             'CLOSER',
             SimpleActionState(
                 'come_closer',
                 GeneralHobbitAction,
-                goal_cb=closer_cb(),
+                goal_cb=closer_cb,
+                input_keys=['person_z', 'person_x'],
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
