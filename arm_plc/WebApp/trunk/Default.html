@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Robot Arm Web App</title>
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
+    <meta charset="utf-8" />
+    
+    <link rel="shortcut icon" href="WebApp/Design/Img/RobotArm_CMD.png" />
+    
+    <link rel="Stylesheet" type="text/css" href="WebApp/Design/Render.css" />
+    <link rel="Stylesheet" type="text/css" href="WebApp/Design/Global.css" />
+    <link rel="Stylesheet" type="text/css" href="WebApp/Design/RenderRTL.css" />
+    <link rel="Stylesheet" type="text/css" href="WebApp/Design/Firefox.css" />
+    <link rel="Stylesheet" type="text/css" href="WebApp/Design/base.css" />
+    
+    <script type="text/javascript" src="WebApp/Action/TcAdsWebService.js"></script>
+    <script type="text/javascript" src="WebApp/Action/Logic.js"></script>
+    <script type="text/javascript" src="WebApp/Action/ReadWritePLC.js"></script>
+    
+</head>
+
+
+<body>
+    <div id="WebApp">
+
+
+        <!--
+        <div id="loader" class="iItem" style="padding:10px 5px;font-weight:bold;font-size:12px;text-align:center;">
+        	<div style="font-size:20px">
+        		<a href="#" style="display:block;border-width: 0 12px;line-height:45px;-webkit-border-image: url(WebApp/Design/Img/button-b-black.png) 0 12 0 12;margin:10px;color:white;text-decoration:none;text-align:center;text-shadow:#000 1px -1px 0;font-weight:bold">Test</a>
+        		<a href="#" style="display:block;border-width: 0 12px;line-height:45px;-webkit-border-image: url(WebApp/Design/Img/button-b-white.png) 0 12 0 12;margin:10px;color:black;text-decoration:none;text-align:center;text-shadow:#fff 1px 1px 0;font-weight:bold">Test</a>
+        		<a href="#" style="display:block;border-width: 0 12px;line-height:45px;-webkit-border-image: url(WebApp/Design/Img/button-b-red.png) 0 12 0 12;margin:10px;color:white;text-decoration:none;text-align:center;text-shadow:rgba(0,0,0,0.2) 1px -1px 0;font-weight:bold">Test</a>
+        	</div>
+        </div>
+        -->
+
+
+
+        <div id="iHeader">
+        <!--
+        	<div class="iItem" id="tab1">
+        		<div class="iTab">
+        			<ul id="list">
+        				<li><a href="#">Simple</a></li>
+        				<li><a href="#">Image</a></li>
+        				<li><a href="Layer/async-tab.xml" rev="async"><span>Async</span></a></li>
+        			</ul>
+        		</div>
+        		<a href="#" class="iBAction iRightButton" onclick="return tabs(0)"><img src="WebApp/Design/Img/less.png" alt="Hide" /></a>
+        	</div>
+        -->
+        	<a href="#" id="waBackButton">Back</a>
+        	<a href="#" id="waHomeButton">Home</a>
+        	<a href="#" onclick="return WA.HideBar()"><span id="waHeadTitle">Main Menu</span></a>
+        </div>
+
+
+
+
+        <div id="iGroup">
+
+            <div class="iLayer" id="waHome" title="Main Menu">
+        		<div class="iMenu">
+        			<h1>Robot Arm Control</h1>
+        			<ul class="iArrow">
+        				<li><a href="#_Commands"><img src="WebApp/Design/Img/next.png"/>Commands</a></li>
+        				<li><a href="#_ActualArmStates"><img src="WebApp/Design/Img/next.png"/>Actual States</a></li>
+        			</ul>
+                    
+                    <ul>
+                        <h2>Actual Arm Positions</h2>
+                        <li><span id="_ActPos1"></span>Joint 1 [DEG]</li>
+                        <li><span id="_ActPos2"></span>Joint 2 [DEG]</li>
+                        <li><span id="_ActPos3"></span>Joint 3 [DEG]</li>
+                        <li><span id="_ActPos4"></span>Joint 4 [DEG]</li>
+                        <li><span id="_ActPos5"></span>Joint 5 [DEG]</li>
+                        <li><span id="_ActPos6"></span>Joint 6 [DEG]</li>
+        			</ul>        			
+        		</div>
+        	</div>
+
+
+            <div class="iLayer" id="waCommands" title="Commands">
+        		<div class="iMenu">
+                    <ul class="iArrow">
+                        <h2>Reference</h2>
+                        <li><a href="#_Reference"><img src="WebApp/Design/Img/next.png"/>Reference</a></li>
+                        <li><a href="#_MoveSingelAxis"><img src="WebApp/Design/Img/next.png"/>Move Single Axes</a></li>
+                    </ul>
+                    
+        			<ul>
+        			    <h2>Move To Predefined Positions</h2>
+        			    <li>
+                            <a href="javascript:void(0)" onclick="BtnWriteClicked('SetMoveToHomePos');">
+                                <span id="__AtHomePos"></span><img id="_picAtHomePos"/>
+                                Move To Home Position
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)" onclick="BtnWriteClicked('SetMoveToLearningPos');">
+                                <span id="__AtLearningPos"></span><img id="_picAtLearningPos"/>
+                                Move To Learning Position
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)" onclick="BtnWriteClicked('SetStoreTurntable');">
+                                <span id="__AtTurntablePos"></span><img id="_picAtTurntablePos"/>
+                                Store Turntable
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)" onclick="BtnWriteClicked('SetMoveToPreGraspFromFloor');">
+                                <span id="__AtPreGraspFloor"></span><img id="_picAtPreGraspFloor"/>
+                                Move To Pre Grasp From Floor
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)" onclick="BtnWriteClicked('SetMoveToPreGraspFromTable');">
+                                <span id="__AtPreGraspTable"></span><img id="_picAtPreGraspTable"/>
+                                Move To Pre Grasp From Table
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)" onclick="BtnWriteClicked('SetMoveToTray');">
+                                <span id="__AtTrayPos"></span><img id="_picAtTrayPos"/>
+                                Move to Tray
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)" onclick="BtnWriteClicked('SetTurnTurntableCW');">
+                                <span id="__AtCWPos"></span><img id="_picAtCWPos"/>
+                                Turn Turntable Clockwise
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)" onclick="BtnWriteClicked('SetTurnTurntableCCW');">
+                                <span id="__AtCCWPos"></span><img id="_picAtCCWPos"/>
+                                Turn Turntable Counter Clockwise
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)" onclick="BtnWriteClicked('SetMoveToCandlePos');">
+                                <span id="__AtCandlePos"></span><img id="_picAtCandlePos"/>
+                                Move to Candle position
+                            </a>
+                        </li>
+                    </ul>
+                    
+                    
+                    <ul class="iMenu">
+                        <h2>Arm Control Commands</h2>
+                        <p>
+                            <span class="iPush iBWarn" style="width:100%" onclick="BtnWriteClicked('SetStopArm')">Stop Arm</span>
+                            <span class="iPush iBClassic" style="width:100%" onclick="BtnWriteClicked('SetReset')">Reset Arm</span>
+                        </p>
+                            <!--  
+                            <a href="javascript:void(0)" onclick="BtnWriteClicked('SetStopArm');">
+                                <span id="_picStopArm"></span><img src="WebApp/Design/Img/button-blue.png"/>
+                                Stop Arm
+                            </a>
+                            -->
+            
+                            <!--  
+                            <a href="javascript:void(0)" onclick="BtnWriteClicked('SetReset');"><img src="WebApp/Design/Img/button-blue.png"/>
+                                Reset Arm
+                            </a>
+                            -->
+            
+                    </ul>
+                    <ul class="iMenu">
+                        <li>
+                            <a href="javascript:void(0)" onclick="BtnWriteClicked('SetOpenGripper');">
+                                <span id="__GripperOpen"></span><img id="_picGripperOpen"/>
+                                Open Gripper
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)" onclick="BtnWriteClicked('SetCloseGripper');">
+                                <span id="__GripperClosed"></span><img id="_picGripperClosed"/>
+                                Close Gripper
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)" onclick="BtnWriteClicked('SetEnableAllAxis');">
+                                <span id="__ArmEnabled"></span><img id="_picArmEnabled"/>
+                                Enable Arm
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)" onclick="BtnWriteClicked('SetDisableAllAxis');">
+                                <span id="__ArmDisabled"></span><img id="_picArmDisabled"/>
+                                Disable Arm
+                            </a>
+                        </li>                
+                        <li>
+                            <a href="javascript:void(0)" onclick="BtnWriteClicked('SetClearPosBuffer');"><img src="WebApp/Design/Img/button-blue.png"/>
+                                Clear Position Buffer
+                            </a>
+                        </li>
+                        
+        			</ul>
+        			
+        			<ul class="iMenu">
+        			    <h3>Legend</h3>
+                        <li>
+                            <a><img src="WebAPP/Design/Img/True.png"/>
+                                Command Executed    
+                            </a>
+                            <a><img src="WebAPP/Design/Img/Moving.png"/>
+                                Arm Is Moving
+                            </a>
+                            <a><img src="WebApp/Design/Img/Stopped.png"/>
+                                Arm Has Stopped
+                            </a>
+                            <a><img src="WebAPP/Design/Img/Error.png"/>
+                                Arm Has Error
+                            </a>
+                        </li>
+                    </ul>
+                    
+        			<ul class="iMenu">
+        			    <h3>ADS Log Write</h3>
+                        <li><a id="div_log_write"></a></li>
+                    </ul>
+        		
+                </div>
+        	</div>
+
+
+
+
+
+            <div class="iLayer" id="waReference" title="Arm Reference">
+
+                <div class="iBlock">
+    		        <h1>Referencing Info</h1>
+    		        <p>To start an arm reference, the arm has to be on the positive side of its reference switches, e.g. start from Home Position. Additionally the "Home Reference Switch 4" and "Home Reference Switch" 6 have to be true, otherwise the reference won't start! </p>
+        	    </div>
+
+
+                <div class="iMenu">
+                    <ul>
+                        <p>
+                            <span class="iPush iBClassic" style="width:100%" onclick="BtnWriteClicked('SetStartAllAxisRef')">Start Arm Reference</span>
+                            <span class="iPush iBWarn" style="width:100%" onclick="BtnWriteClicked('SetStopArm')">Stop Arm</span>
+                        </p>
+                    </ul>
+                </div>
+                <div class="iMenu">
+                    
+                    <ul>
+                        <h2>Reference Switches</h2>
+                        <li><span id="_HomeRefAxis1"></span>Home Reference Switch 1</li>
+                        <li><span id="_HomeRefAxis2"></span>Home Reference Switch 2</li>
+                        <li><span id="_HomeRefAxis3"></span>Home Reference Switch 3</li>
+                        <li><span id="_HomeRefAxis4"></span>Home Reference Switch 4</li>
+                        <li><span id="_HomeRefAxis5"></span>Home Reference Switch 5</li>
+                        <li><span id="_HomeRefAxis6"></span>Home Reference Switch 6</li>
+                    </ul>
+                </div>
+
+                <div class="iMenu">
+                    <ul>
+                        <li><span id="__StartArmReference"></span><img id="_picArmHomed"/>Reference Status</li>
+                        <!--
+                        <a href="javascript:void(0)" onclick="BtnWriteClicked('SetEnableAllAxis');">
+                            <span id="__StartArmReference"></span><img id="_picArmHomed"/>
+                            Reference Status
+                        </a>
+                        -->
+                    </ul>
+
+                </div>
+
+            </div>
+            
+            
+            
+
+
+            <div class="iLayer" id="waMoveSingelAxis" title="Move Singel Axis">
+                <div class="iBlock">
+                    <h1>Move Single Axis</h1>
+    		        <p>To start a singel axis move, choose the axis and positive or negative direction. ATTENTION: A single axis move is possible without referenced arm. Therefore be carefull when moving to maximum or minimum limits!</p>
+                </div>
+                
+                <div class="iMenu">
+    		        <ul>
+        		        <li>
+        		            <h2>Axis 1</h2>
+                            <a href="javascript:void(0)" class="iPush iBClassic" style="width:50%" onclick="BtnWriteClicked('Axis1Positive')">Move Axis 1 +</a>
+                            <a href="javascript:void(0)" class="iPush iBCancel" style="width:50%" onclick="BtnWriteClicked('Axis1Negative')">Move Axis 1 -</a>
+                        </li>
+                        <li>
+                            <h2>Axis 2</h2>
+                            <a href="javascript:void(0)" class="iPush iBClassic" style="width:50%" onclick="BtnWriteClicked('Axis2Positive')">Move Axis 2 +</a>
+                            <a href="javascript:void(0)" class="iPush iBCancel" style="width:50%" onclick="BtnWriteClicked('Axis2Negative')">Move Axis 2 -</a>
+                        </li>
+                        <li>
+                            <h2>Axis 3</h2>
+                            <a href="javascript:void(0)" class="iPush iBClassic" style="width:50%" onclick="BtnWriteClicked('Axis3Positive')">Move Axis 3 +</a>
+                            <a href="javascript:void(0)" class="iPush iBCancel" style="width:50%" onclick="BtnWriteClicked('Axis3Negative')">Move Axis 3 -</a>
+                        </li>
+                        <li>
+                            <h2>Axis 4</h2>
+                            <a href="javascript:void(0)" class="iPush iBClassic" style="width:50%" onclick="BtnWriteClicked('Axis4Positive')">Move Axis 4 +</a>
+                            <a href="javascript:void(0)" class="iPush iBCancel" style="width:50%" onclick="BtnWriteClicked('Axis4Negative')">Move Axis 4 -</a>
+                        </li>
+                        <li>
+                            <h2>Axis 5</h2>
+                            <a href="javascript:void(0)" class="iPush iBClassic" style="width:50%" onclick="BtnWriteClicked('Axis5Positive')">Move Axis 5 +</a>
+                            <a href="javascript:void(0)" class="iPush iBCancel" style="width:50%" onclick="BtnWriteClicked('Axis5Negative')">Move Axis 5 -</a>
+                        </li>
+                        <li>
+                            <h2>Axis 6</h2>
+                            <a href="javascript:void(0)" class="iPush iBClassic" style="width:50%" onclick="BtnWriteClicked('Axis6Positive')">Move Axis 6 +</a>
+                            <a href="javascript:void(0)" class="iPush iBCancel" style="width:50%" onclick="BtnWriteClicked('Axis6Negative')">Move Axis 6 -</a>
+                        </li>
+                        
+                    </ul>
+                    
+    		        <div class="iMenu">
+                        <p>
+                            <span class="iPush iBWarn" style="width:100%" onclick="BtnWriteClicked('SetStopArm')">Stop Arm</span>
+                            
+                        </p>
+                        <p>
+                            <span class="iPush iBClassic" style="width:100%" onclick="BtnWriteClicked('SetAllPosToZero')">Set All Positions to Zero</span>
+                        </p>
+                    </div>
+                    
+                    <div class="iMenu">
+                        
+                        <ul>
+                            <h2>Reference Switches</h2>
+                            <li><span id="__HomeRefAxis1"></span>Home Reference Switch 1</li>
+                            <li><span id="__HomeRefAxis2"></span>Home Reference Switch 2</li>
+                            <li><span id="__HomeRefAxis3"></span>Home Reference Switch 3</li>
+                            <li><span id="__HomeRefAxis4"></span>Home Reference Switch 4</li>
+                            <li><span id="__HomeRefAxis5"></span>Home Reference Switch 5</li>
+                            <li><span id="__HomeRefAxis6"></span>Home Reference Switch 6</li>
+                        </ul>
+                    </div>
+                    <!--  
+                    <p>
+						<input type="button" class="iPush iBClassic" value="Move Axis 1 +" style="width:50%" />
+						<span class="iPush iBWarn" style="width:100%">Red Button</span>
+						<a href="javascript:void(0)" class="iPush iBCancel" style="width:100%">Black Button</a>
+					</p>
+					-->
+        	    </div>
+            </div>
+
+
+
+            
+
+
+
+
+
+            <div class="iLayer" id="waActualArmStates" title="Actual Arm States">
+        		<div class="iMenu">
+        		    
+        		    <ul class="iArrow">
+        		        <h2>States</h2>
+                        <li><a href="#_PositionStates"><img src="WebApp/Design/Img/next.png"/>Position States</a></li>
+                        <li><a href="#_ArmStates"><img src="WebApp/Design/Img/next.png"/>Arm States</a></li>
+                    </ul>
+                    
+                    <ul>
+                        <h2>Others</h2>
+                        <li><span id="_SOSButton"></span>
+                            SOS Button Pressed
+                        </li>
+                        <li><span id="_AdsState"></span>PLC State</li>
+                    </ul>
+                    
+        			<ul>
+        			    <h3>ADS Log</h3>
+        		        <li><a id="div_log"></a></li>
+                    </ul>
+        	    </div>
+        	</div>
+        	
+        	
+        	
+        	
+        	
+            <div class="iLayer" id="waPositionStates" title="Position States">
+        		<div class="iMenu">	
+                	
+        			<ul>
+        			    <h2>General Position States</h2>
+        				<li><span id="_ArmInPosArea"></span>Arm In Position Area</li>
+        				<li><span id="_ArmInTargetPos"></span>Arm In Target Position</li>
+        				<li><span id="_ArmSoftLimitMax"></span>Arm SoftLimit Switch Max</li>
+        				<li><span id="_ArmSoftLimitMin"></span>Arm SoftLimit Switch Min</li>
+        		    </ul>
+        		    
+        		    <ul>
+        		        <h2>Predefined Arm Position States</h2>
+                        <li><span id="_AtHomePos"></span>At Home Position</li>
+                        <li><span id="_AtLearningPos"></span>At Learning Position</li>
+                        <li><span id="_AtPreGraspFloor"></span>At Pre Grasp Floor Position</li>
+						<li><span id="_AtPreGraspTable"></span>At Pre Grasp Table Position</li>
+                        <li><span id="_AtTrayPos"></span>At Tray Position</li>
+                        <li><span id="_AtTurntablePos"></span>At Turntable Position</li>
+                        <li><span id="_AtCCWPos"></span>At CCW Position</li>
+                        <li><span id="_AtCWPos"></span>At CW Position</li> 
+                        <li><span id="_AtCandlePos"></span>At Candle Position</li>       
+                    </ul>
+        		</div>
+        	</div>
+        	
+        	
+        	
+        	
+        	
+        	<div class="iLayer" id="waArmStates" title="Arm States">
+        		<div class="iMenu">
+        		    
+        		    <ul>
+        		        <h2>Gerneral States</h2>
+        				<li><span id="_ArmHasError"></span>Arm Has Error</li>
+        				<li><span id="_ArmIsDisabled"></span>Arm Is Disabled</li>
+        				<li><span id="_ArmHomed"></span>Arm Homed</li>
+        				<li><span id="_ArmIsMoving"></span>Arm Is Moving</li>
+        				<li><span id="_ArmStopped"></span>Arm Stopped</li>
+        			</ul>
+        			
+        			<ul>
+        			    <h2>Gripper State</h2>
+        				<li><span id="_GripperIsClosed"></span>Gripper is Closed</li>
+        			</ul>
+        			
+        		</div>
+
+        	</div>
+
+		  </div>
+
+	</div>
+</body>
+</html>
