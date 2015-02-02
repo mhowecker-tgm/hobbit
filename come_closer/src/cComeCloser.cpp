@@ -180,7 +180,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 	double sensor_orientation = tf::getYaw(sensor_pose.orientation);  //should be relative
 	double angle2turn = angles::shortest_angular_distance(0, orientation);
 
-	if (dis2move > 0)
+	if (dis2move >= 0.1) //FIXME
 	{
 				
 		std::cout << "angle2turn " << angle2turn * 180/M_PI << std::endl;
@@ -188,7 +188,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 
 		//first rotate to face detected user (should already be quite close to current orientation...)
 
-		if (fabs(angle2turn) < 15*M_PI/180)
+		if (fabs(angle2turn) < 15*M_PI/180) //FIXME
 		{
 			std::cout << "rotation is too small " << std::endl;
 			finished_rotation = true;
