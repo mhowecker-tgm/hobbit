@@ -14,6 +14,8 @@
 
 #include "occupancy_grid_utils/coordinate_conversions.h"
 
+#include <mira_msgs/ResetMotorStop.h>
+
 using namespace mira;
 using namespace mira::navigation;
 
@@ -75,6 +77,9 @@ void MiraSendingGoals::initialize() {
   cancel_goal_service = robot_->getRosNode().advertiseService("/cancel_goal", &MiraSendingGoals::cancelGoal, this);
 
   local_map_service = robot_->getRosNode().advertiseService("/get_local_map", &MiraSendingGoals::getLocalMap, this);
+
+  event_sub = robot_->getRosNode().subscribe("/Event", 2, &MiraSendingGoals::event_callback, this);
+  reset_motorstop_client = robot_->getRosNode().serviceClient<mira_msgs::ResetMotorStop>("/reset_motorstop");
 
 }
 
@@ -222,6 +227,21 @@ void MiraSendingGoals::bumper_callback(const std_msgs::Bool::ConstPtr& msg)
 	if (msg->data) //bumper was hit
 	{
 		cancelGoal();
+	}
+
+}
+
+void MiraSendingGoals::event_callback(const hobbit_msgs::Event::ConstPtr& msg)
+{
+	if (msg->event.compare("E_RELEASEBUTTON"))
+	{
+		//call service 
+		mira_msgs::ResetMotorStop srv;
+	        if (!reset_motorstop_client.call(srv))
+	        {
+	          ROS_DEBUG("Failed to call service reset_motorstop");
+	        }
+		
 	}
 
 }
