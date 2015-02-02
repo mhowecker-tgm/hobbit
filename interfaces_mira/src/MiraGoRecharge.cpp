@@ -222,6 +222,11 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 
 				std::cout << "Docking on received" << std::endl;
 
+				mira::RPCFuture<void> r1 = robot_->getMiraAuthority().callService<void>("/robot/Robot#builtin", std::string("setProperty"), std::string("MainControlUnit.Force"), std::string("20"));
+        			r1.timedWait(mira::Duration::seconds(1));
+        			r1.get();
+
+
 				// Get docking service
 				auto providers = robot_->getMiraAuthority().queryServicesForInterface("IDockingProcess");
 				if(providers.empty()) 
@@ -289,6 +294,11 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 
 		if (status.data.compare("docked") == 0)
 		{
+
+			mira::RPCFuture<void> r2 = robot_->getMiraAuthority().callService<void>("/robot/Robot#builtin", std::string("setProperty"), std::string("MainControlUnit.Force"), std::string("60"));
+        		r2.timedWait(mira::Duration::seconds(1));
+        		r2.get();			
+	
 			std::cout << "task succeeded, robot recharging " << std::endl;
 			as_->setSucceeded(interfaces_mira::MiraDockingResult(), "Task succeeded, robot stoppped moving forwards");
 			status_updated = false;
@@ -305,6 +315,11 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 
 		if (status.data.compare("template_not_found") == 0)
 		{
+
+			mira::RPCFuture<void> r2 = robot_->getMiraAuthority().callService<void>("/robot/Robot#builtin", std::string("setProperty"), std::string("MainControlUnit.Force"), std::string("60"));
+        		r2.timedWait(mira::Duration::seconds(1));
+        		r2.get();
+
 			//std::cout << "task preempted, template not found " << std::endl;
 			//as_->setPreempted();
 			std::cout << "task aborted, template not foundd " << std::endl;
@@ -315,6 +330,10 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 
 		if (status.data.compare("failure") == 0)
 		{
+			mira::RPCFuture<void> r2 = robot_->getMiraAuthority().callService<void>("/robot/Robot#builtin", std::string("setProperty"), std::string("MainControlUnit.Force"), std::string("60"));
+        		r2.timedWait(mira::Duration::seconds(1));
+        		r2.get();
+
 			std::cout << "task aborted, failure " << std::endl;
 			as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting because task failed");
 			status_updated = false;
