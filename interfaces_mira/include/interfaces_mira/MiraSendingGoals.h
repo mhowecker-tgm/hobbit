@@ -39,6 +39,8 @@
 
 #include "std_srvs/Empty.h"
 
+#include "hobbit_msgs/Event.h"
+
 #define COST_LIMIT 127
 
 
@@ -118,6 +120,10 @@ private:
 	void cancelGoal();
 
 	ros::Subscriber bumper_subs;
+
+	ros::Subscriber event_sub;
+	void event_callback(const hobbit_msgs::Event::ConstPtr& msg);
+	ros::ServiceClient reset_motorstop_client;
 
 };
 
