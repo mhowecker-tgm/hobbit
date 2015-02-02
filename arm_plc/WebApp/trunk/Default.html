@@ -1,17 +1,15 @@
-<!DOCTYPE html>
-<html>
-<head>
+<html dir="ltr"><head>
     <title>Robot Arm Web App</title>
-    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
-    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+    <meta charset="utf-8">
     
-    <link rel="shortcut icon" href="WebApp/Design/Img/RobotArm_CMD.png" />
+    <link rel="shortcut icon" href="WebApp/Design/Img/RobotArm_CMD.png">
     
-    <link rel="Stylesheet" type="text/css" href="WebApp/Design/Render.css" />
-    <link rel="Stylesheet" type="text/css" href="WebApp/Design/Global.css" />
-    <link rel="Stylesheet" type="text/css" href="WebApp/Design/RenderRTL.css" />
-    <link rel="Stylesheet" type="text/css" href="WebApp/Design/Firefox.css" />
-    <link rel="Stylesheet" type="text/css" href="WebApp/Design/base.css" />
+    <link rel="Stylesheet" type="text/css" href="WebApp/Design/Render.css">
+    <link rel="Stylesheet" type="text/css" href="WebApp/Design/Global.css">
+    <link rel="Stylesheet" type="text/css" href="WebApp/Design/RenderRTL.css">
+    <link rel="Stylesheet" type="text/css" href="WebApp/Design/Firefox.css">
+    <link rel="Stylesheet" type="text/css" href="WebApp/Design/base.css">
     
     <script type="text/javascript" src="WebApp/Action/TcAdsWebService.js"></script>
     <script type="text/javascript" src="WebApp/Action/Logic.js"></script>
@@ -20,7 +18,7 @@
 </head>
 
 
-<body>
+<body contenteditable="true">
     <div id="WebApp">
 
 
@@ -54,7 +52,10 @@
         	<a href="#" onclick="return WA.HideBar()"><span id="waHeadTitle">Main Menu</span></a>
         </div>
 
-
+        <div id="ComErr">
+            <p align="center" style="color: red; font-weight: bold; font-size: 30">Communication ERROR</p>
+            <p align="center"><img src="webApp/design/img/NoComm.png" /></p>
+        </div>
 
 
         <div id="iGroup">
@@ -63,8 +64,8 @@
         		<div class="iMenu">
         			<h1>Robot Arm Control</h1>
         			<ul class="iArrow">
-        				<li><a href="#_Commands"><img src="WebApp/Design/Img/next.png"/>Commands</a></li>
-        				<li><a href="#_ActualArmStates"><img src="WebApp/Design/Img/next.png"/>Actual States</a></li>
+        				<li><a href="#_Commands"><img src="WebApp/Design/Img/next.png">Commands</a></li>
+        				<li><a href="#_ActualArmStates"><img src="WebApp/Design/Img/next.png">Actual States</a></li>
         			</ul>
                     
                     <ul>
@@ -84,63 +85,63 @@
         		<div class="iMenu">
                     <ul class="iArrow">
                         <h2>Reference</h2>
-                        <li><a href="#_Reference"><img src="WebApp/Design/Img/next.png"/>Reference</a></li>
-                        <li><a href="#_MoveSingelAxis"><img src="WebApp/Design/Img/next.png"/>Move Single Axes</a></li>
+                        <li><a href="#_Reference"><img src="WebApp/Design/Img/next.png">Reference</a></li>
+                        <li><a href="#_MoveSingelAxis"><img src="WebApp/Design/Img/next.png">Move Single Axes</a></li>
                     </ul>
                     
         			<ul>
         			    <h2>Move To Predefined Positions</h2>
         			    <li>
                             <a href="javascript:void(0)" onclick="BtnWriteClicked('SetMoveToHomePos');">
-                                <span id="__AtHomePos"></span><img id="_picAtHomePos"/>
+                                <span id="__AtHomePos"></span><img id="_picAtHomePos">
                                 Move To Home Position
                             </a>
                         </li>
                         <li>
                             <a href="javascript:void(0)" onclick="BtnWriteClicked('SetMoveToLearningPos');">
-                                <span id="__AtLearningPos"></span><img id="_picAtLearningPos"/>
+                                <span id="__AtLearningPos"></span><img id="_picAtLearningPos">
                                 Move To Learning Position
                             </a>
                         </li>
                         <li>
                             <a href="javascript:void(0)" onclick="BtnWriteClicked('SetStoreTurntable');">
-                                <span id="__AtTurntablePos"></span><img id="_picAtTurntablePos"/>
+                                <span id="__AtTurntablePos"></span><img id="_picAtTurntablePos">
                                 Store Turntable
                             </a>
                         </li>
                         <li>
                             <a href="javascript:void(0)" onclick="BtnWriteClicked('SetMoveToPreGraspFromFloor');">
-                                <span id="__AtPreGraspFloor"></span><img id="_picAtPreGraspFloor"/>
+                                <span id="__AtPreGraspFloor"></span><img id="_picAtPreGraspFloor">
                                 Move To Pre Grasp From Floor
                             </a>
                         </li>
                         <li>
                             <a href="javascript:void(0)" onclick="BtnWriteClicked('SetMoveToPreGraspFromTable');">
-                                <span id="__AtPreGraspTable"></span><img id="_picAtPreGraspTable"/>
+                                <span id="__AtPreGraspTable"></span><img id="_picAtPreGraspTable">
                                 Move To Pre Grasp From Table
                             </a>
                         </li>
                         <li>
                             <a href="javascript:void(0)" onclick="BtnWriteClicked('SetMoveToTray');">
-                                <span id="__AtTrayPos"></span><img id="_picAtTrayPos"/>
+                                <span id="__AtTrayPos"></span><img id="_picAtTrayPos">
                                 Move to Tray
                             </a>
                         </li>
                         <li>
                             <a href="javascript:void(0)" onclick="BtnWriteClicked('SetTurnTurntableCW');">
-                                <span id="__AtCWPos"></span><img id="_picAtCWPos"/>
+                                <span id="__AtCWPos"></span><img id="_picAtCWPos">
                                 Turn Turntable Clockwise
                             </a>
                         </li>
                         <li>
                             <a href="javascript:void(0)" onclick="BtnWriteClicked('SetTurnTurntableCCW');">
-                                <span id="__AtCCWPos"></span><img id="_picAtCCWPos"/>
+                                <span id="__AtCCWPos"></span><img id="_picAtCCWPos">
                                 Turn Turntable Counter Clockwise
                             </a>
                         </li>
                         <li>
                             <a href="javascript:void(0)" onclick="BtnWriteClicked('SetMoveToCandlePos');">
-                                <span id="__AtCandlePos"></span><img id="_picAtCandlePos"/>
+                                <span id="__AtCandlePos"></span><img id="_picAtCandlePos">
                                 Move to Candle position
                             </a>
                         </li>
@@ -170,30 +171,30 @@
                     <ul class="iMenu">
                         <li>
                             <a href="javascript:void(0)" onclick="BtnWriteClicked('SetOpenGripper');">
-                                <span id="__GripperOpen"></span><img id="_picGripperOpen"/>
+                                <span id="__GripperOpen"></span><img id="_picGripperOpen">
                                 Open Gripper
                             </a>
                         </li>
                         <li>
                             <a href="javascript:void(0)" onclick="BtnWriteClicked('SetCloseGripper');">
-                                <span id="__GripperClosed"></span><img id="_picGripperClosed"/>
+                                <span id="__GripperClosed"></span><img id="_picGripperClosed">
                                 Close Gripper
                             </a>
                         </li>
                         <li>
                             <a href="javascript:void(0)" onclick="BtnWriteClicked('SetEnableAllAxis');">
-                                <span id="__ArmEnabled"></span><img id="_picArmEnabled"/>
+                                <span id="__ArmEnabled"></span><img id="_picArmEnabled">
                                 Enable Arm
                             </a>
                         </li>
                         <li>
                             <a href="javascript:void(0)" onclick="BtnWriteClicked('SetDisableAllAxis');">
-                                <span id="__ArmDisabled"></span><img id="_picArmDisabled"/>
+                                <span id="__ArmDisabled"></span><img id="_picArmDisabled">
                                 Disable Arm
                             </a>
                         </li>                
                         <li>
-                            <a href="javascript:void(0)" onclick="BtnWriteClicked('SetClearPosBuffer');"><img src="WebApp/Design/Img/button-blue.png"/>
+                            <a href="javascript:void(0)" onclick="BtnWriteClicked('SetClearPosBuffer');"><img src="WebApp/Design/Img/button-blue.png">
                                 Clear Position Buffer
                             </a>
                         </li>
@@ -203,16 +204,16 @@
         			<ul class="iMenu">
         			    <h3>Legend</h3>
                         <li>
-                            <a><img src="WebAPP/Design/Img/True.png"/>
+                            <a><img src="WebAPP/Design/Img/True.png">
                                 Command Executed    
                             </a>
-                            <a><img src="WebAPP/Design/Img/Moving.png"/>
+                            <a><img src="WebAPP/Design/Img/Moving.png">
                                 Arm Is Moving
                             </a>
-                            <a><img src="WebApp/Design/Img/Stopped.png"/>
+                            <a><img src="WebApp/Design/Img/Stopped.png">
                                 Arm Has Stopped
                             </a>
-                            <a><img src="WebAPP/Design/Img/Error.png"/>
+                            <a><img src="WebAPP/Design/Img/Error.png">
                                 Arm Has Error
                             </a>
                         </li>
@@ -246,6 +247,24 @@
                         </p>
                     </ul>
                 </div>
+                
+                <div class="iMenu" id="_ReferencingDialog">
+                    
+                    <ul>
+                        <h2 id="_RefDialogCaption">Referencing Joint x: Where is Joint standing?</h2>
+                        <li>
+                            <table style="width: 100%">
+                                <tr>
+                                    <td style="width: 33%"><span style="width: 100%" class="iPush iBClassic" id="_JointPositive" onclick="BtnDialogResultClicked('.stReferenceDialog.bPositive')">Joint positive</span></td>
+                                    <td style="width: 33%"><span style="width: 100%" class="iPush iBClassic" id="_JointNegative" onclick="BtnDialogResultClicked('.stReferenceDialog.bNegative')">Joint negative</span></td>
+                                    <td style="width: 33%"><span id="_ReferenceJoint" alt="picture of joint" width="100%"/></td>
+                                </tr>
+                            </table>
+                        </li>
+                        
+                    </ul>
+                </div>
+                
                 <div class="iMenu">
                     
                     <ul>
@@ -261,7 +280,7 @@
 
                 <div class="iMenu">
                     <ul>
-                        <li><span id="__StartArmReference"></span><img id="_picArmHomed"/>Reference Status</li>
+                        <li><span id="__StartArmReference"></span><img id="_picArmHomed">Reference Status</li>
                         <!--
                         <a href="javascript:void(0)" onclick="BtnWriteClicked('SetEnableAllAxis');">
                             <span id="__StartArmReference"></span><img id="_picArmHomed"/>
@@ -364,8 +383,8 @@
         		    
         		    <ul class="iArrow">
         		        <h2>States</h2>
-                        <li><a href="#_PositionStates"><img src="WebApp/Design/Img/next.png"/>Position States</a></li>
-                        <li><a href="#_ArmStates"><img src="WebApp/Design/Img/next.png"/>Arm States</a></li>
+                        <li><a href="#_PositionStates"><img src="WebApp/Design/Img/next.png">Position States</a></li>
+                        <li><a href="#_ArmStates"><img src="WebApp/Design/Img/next.png">Arm States</a></li>
                     </ul>
                     
                     <ul>
@@ -441,5 +460,6 @@
 		  </div>
 
 	</div>
-</body>
-</html>
+
+
+</body></html>

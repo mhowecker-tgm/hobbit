@@ -2,15 +2,15 @@
 
     var NETID = ""; // Empty string for local machine;
     var PORT = "801"; // PLC Runtime
+    //var SERVICE_URL = "http://localhost/RobotArmWebApp/TcAdsWebService.dll"; // HTTP path to the TcAdsWebService;
     var SERVICE_URL = "http://192.168.2.190/RobotArmWebApp/TcAdsWebService.dll"; // HTTP path to the TcAdsWebService;
 
     var client = new TcAdsWebService.Client(SERVICE_URL, null, null);
 
-    var general_timeout = 750;
+    var general_timeout = 500;
 
     var readLoopID1 = null;
     var readLoopID2 = null;
-	var retryCounter = 0;
     
     var readLoopDelay = 500;
 
@@ -45,7 +45,7 @@
         // Actual Position:
         ".stCommands.GetActualPos",
 
-        // Emergency Button: (Öffner)
+        // Emergency Button: (ï¿½ffner)
         ".bEmergencyButton",
         
         // Home Reference Switches
@@ -54,10 +54,14 @@
         ".bHomeRefAxis3",
         ".bHomeRefAxis4",
         ".bHomeRefAxis5",
-        ".bHomeRefAxis6"
+        ".bHomeRefAxis6",
+        
+        //referende Dialog
+        ".stReferenceDialog.bActive",
+        ".stReferenceDialog.nJoint"
     ];
     
-    var SizeOfReadValues =  26*1 + 6*8; // 16 BOOL + 6 LREAL Values
+    var SizeOfReadValues =  27*1 + 6*8 + 1*2; // 28 BOOL + 6 LREAL Values + 1 INT Value
         
     
     var handlesVarNamesWrite = [
@@ -95,7 +99,7 @@
         ".stCommands.SetJogMoveNegAxis5",
         ".stCommands.SetJogMovePosAxis6",
         ".stCommands.SetJogMoveNegAxis6",
-		".stCommands.SetMoveToCandlePos",
+	".stCommands.SetMoveToCandlePos",
     ];
 
     // Symbo handle variables;
@@ -125,12 +129,14 @@
     // Emergency Button:
     var hEmergency = null;
     // Reference Switches:
-    var hHomeRefAxis1 = null
-    var hHomeRefAxis2 = null
-    var hHomeRefAxis3 = null
-    var hHomeRefAxis4 = null
-    var hHomeRefAxis5 = null
-    var hHomeRefAxis6 = null
+    var hHomeRefAxis1 = null;
+    var hHomeRefAxis2 = null;
+    var hHomeRefAxis3 = null;
+    var hHomeRefAxis4 = null;
+    var hHomeRefAxis5 = null;
+    var hHomeRefAxis6 = null;
+    var hReferenceDialogActive = null;
+    var hReferenceDialogNumber = null;    
     // Commands
     var handlesWrite = [];
 
@@ -155,32 +161,27 @@
     var bAtPreGraspTable = null;
     var bAtCCWPos = null;
     var bAtCWPos = null;
-	var bAtCandlePos = null;
+    var bAtCandlePos = null;
     var fActPos = [];
     var bSOSButton = null;
-    var bHomeRefAxis1 = null
-    var bHomeRefAxis2 = null
-    var bHomeRefAxis3 = null
-    var bHomeRefAxis4 = null
-    var bHomeRefAxis5 = null
-    var bHomeRefAxis6 = null
+    var bHomeRefAxis1 = null;
+    var bHomeRefAxis2 = null;
+    var bHomeRefAxis3 = null;
+    var bHomeRefAxis4 = null;
+    var bHomeRefAxis5 = null;
+    var bHomeRefAxis6 = null;
+    var bReferenceDialogActive = null;
+    var nJointNo = null;
 
     // Base64 encoded binary data strings for write requests;
     var switchTrueBase64 = null;
     var switchFalseBase64 = null;
 
     var handlesVarNamesLength = (handlesVarNamesRead.length + handlesVarNamesWrite.length);
+    var retryCounter;
 
     // Occurs if the window has loaded;
     window.onload = (function () {
-                        
-        // Send the list-read-write command to the TcAdsWebService by use of the readwrite function of the TcAdsWebService.Client object;
-        EstablishConnection();
-            
-        readLoopID2 = window.setInterval(ReadLoop2, readLoopDelay);
-    });
-
-    var EstablishConnection = (function () {    
 
         // Create sumcommando for reading twincat symbol handles by symbol name;
         var handleswriter = new TcAdsWebService.DataWriter();
@@ -209,7 +210,7 @@
         for (var i = 0; i < handlesVarNamesWrite.length; i++) {
             handleswriter.writeString(handlesVarNamesWrite[i]);
         }
-	
+                        
         // Send the list-read-write command to the TcAdsWebService by use of the readwrite function of the TcAdsWebService.Client object;
         client.readwrite(
             NETID,
@@ -223,7 +224,11 @@
             general_timeout,
             RequestHandlesTimeoutCallback,
             true);
+            
+        readLoopID2 = window.setInterval(ReadLoop2, readLoopDelay);
     });
+
+
 
     // Occurs if the readwrite for the sumcommando has finished;
     var RequestHandlesCallback = (function (e, s) {
@@ -249,7 +254,7 @@
             document.getElementById("_AtPreGraspTable").innerHTML = message;
             document.getElementById("_AtCCWPos").innerHTML = message;
             document.getElementById("_AtCWPos").innerHTML = message;
-			document.getElementById("_AtCandlePos").innerHTML = message;
+            document.getElementById("_AtCandlePos").innerHTML = message;
             document.getElementById("_ActPos1").innerHTML = message;
             document.getElementById("_ActPos2").innerHTML = message;
             document.getElementById("_ActPos3").innerHTML = message;
@@ -317,6 +322,8 @@
             hHomeRefAxis4 = reader.readDWORD();
             hHomeRefAxis5 = reader.readDWORD();
             hHomeRefAxis6 = reader.readDWORD();
+            hReferenceDialogActive = reader.readDWORD();
+            hReferenceDialogNumber = reader.readDWORD();
             // Commands
             for (var i = 0; i < handlesVarNamesWrite.length; i++) {
                 handlesWrite[i] = reader.readDWORD();        
@@ -456,6 +463,14 @@
             readSymbolValuesWriter.writeDINT(TcAdsWebService.TcAdsReservedIndexGroups.SymbolValueByHandle); // IndexGroup
             readSymbolValuesWriter.writeDINT(hHomeRefAxis6); // IndexOffset = The target handle
             readSymbolValuesWriter.writeDINT(1); // size to read
+            
+            readSymbolValuesWriter.writeDINT(TcAdsWebService.TcAdsReservedIndexGroups.SymbolValueByHandle); // IndexGroup
+            readSymbolValuesWriter.writeDINT(hReferenceDialogActive); // IndexOffset = The target handle
+            readSymbolValuesWriter.writeDINT(1); // size to read
+                        
+            readSymbolValuesWriter.writeDINT(TcAdsWebService.TcAdsReservedIndexGroups.SymbolValueByHandle); // IndexGroup
+            readSymbolValuesWriter.writeDINT(hReferenceDialogNumber); // IndexOffset = The target handle
+            readSymbolValuesWriter.writeDINT(2); // size to read
                                     
             // Get Base64 encoded data from TcAdsWebService.DataWriter;
             readSymbolValuesData = readSymbolValuesWriter.getBase64EncodedData();
@@ -481,16 +496,16 @@
     // Occurs if the readwrite for the sumcommando to request symbol handles runs into timeout;
     var RequestHandlesTimeoutCallback = (function () {
         // HANDLE TIMEOUT HERE;
-	    var delay=500;//500 milliseconds
-	    setTimeout(function(){
-		//retry after 500ms (for maximum 3 times)
-	        document.getElementById("div_log").innerHTML = "Request handles timeout!";
-		if (retryCounter<3)
-		{
-			retryCounter++;
-			EstablishConnection();
-		}
-	    },delay); 
+        var delay=500; //500milliseconds
+        setTimeout(function(){
+            //retry after delay (for maximum 10 times)
+            document.getElementById("div_log").innerHTML = "Request handles timeout!";
+            if (retryCounter<10)
+            {
+                retryCounter++;
+                EstablishConnection();
+            }
+        }, delay);
     });
 
     // Interval callback for cyclic reading;
@@ -547,25 +562,32 @@
             switch (AdsStateNum) {
                 case (AdsStates.RESET):
                     document.getElementById("_AdsState").innerHTML = "RESET";
+                    document.getElementById("ComErr").style.display= 'block'; 
                     break;
                 case (AdsStates.INIT):
                     document.getElementById("_AdsState").innerHTML = "INIT";
+                    document.getElementById("ComErr").style.display= 'block'; 
                     break;
                 case (AdsStates.START):
                     document.getElementById("_AdsState").innerHTML = "START";
+                    document.getElementById("ComErr").style.display= 'none';
                     break;
                 case (AdsStates.RUN):
                     document.getElementById("_AdsState").innerHTML = "RUN";
+                    document.getElementById("ComErr").style.display= 'none';
                     break;
                 case (AdsStates.STOP):
                     document.getElementById("_AdsState").innerHTML = "STOP";
+                    document.getElementById("ComErr").style.display= 'block'; 
                     break;
                 case (AdsStates.CONFIG):
                     document.getElementById("_AdsState").innerHTML = "CONFIG";
+                    document.getElementById("ComErr").style.display= 'block'; 
                     break;  
             }
             
-        } else {
+        } else {                    
+            document.getElementById("ComErr").style.display= 'block'; 
 
             if (e.error.getTypeString() == "TcAdsWebService.ResquestError") {
                 // HANDLE TcAdsWebService.ResquestError HERE;
@@ -662,10 +684,10 @@
 
             //  ".stCommands.ArmState.AT_CW_POS"
             bAtCWPos = reader.readBOOL();
-			
-			//  ".stCommands.ArmState.AT_CANDLE_POS"
-			bAtCandlePos = reader.readBOOL();
 
+            //  ".stCommands.ArmState.AT_CANDLE_POS"
+            bAtCandlePos = reader.readBOOL();
+            
             //  ".stCommands.GetActPos"            
             for (var i = 0; i < 6; i++) {
                 fActPos[i]=reader.readLREAL();    
@@ -689,6 +711,10 @@
             bHomeRefAxis4 = reader.readBOOL();
             bHomeRefAxis5 = reader.readBOOL();
             bHomeRefAxis6 = reader.readBOOL();
+            
+            //  ".stReferenceDialog.bActive"
+            bReferenceDialogActive = reader.readBOOL();
+            nJointNo = reader.readINT();
 
             // Variables for Picture location:
             var PicMoving = "<img src='WebApp/Design/Img/Moving.png'>";
@@ -700,6 +726,12 @@
             var PicFalse = "<img src='WebApp/Design/Img/False.png'>";              
             var PicButtonRed = "WebApp/Design/Img/button-red.png";
             var PicButtonBlue = "WebApp/Design/Img/button-blue.png";
+            var PicJoint1 = "<img src='WebApp/Design/img/Joint1.png' width='100%'>";
+            var PicJoint2 = "<img src='WebApp/Design/img/Joint2.png' width='100%'>";
+            var PicJoint3 = "<img src='WebApp/Design/img/Joint3.png' width='100%'>";
+            var PicJoint4 = "<img src='WebApp/Design/img/Joint4.png' width='100%'>";
+            var PicJoint5 = "<img src='WebApp/Design/img/Joint5.png' width='100%'>";
+            var PicJoint6 = "<img src='WebApp/Design/img/Joint6.png' width='100%'>";
             
             // Write data to the "Actual Arm States" interface;
             if (bArmInPosArea) {
@@ -1084,6 +1116,40 @@
                 document.getElementById("_picGripperOpen").src=PicButtonRed;
             }
             
+            if (bReferenceDialogActive)
+            {
+                document.getElementById("_ReferencingDialog").style.display= 'block';  
+                var caption = "Referencing Joint " + nJointNo + ": which side is it standing?";               
+                document.getElementById("_RefDialogCaption").innerHTML = caption;
+                switch(nJointNo)
+                {
+                    
+                    case 1:
+                        document.getElementById("_ReferenceJoint").innerHTML = PicJoint1;
+                        break;                        
+                    case 2:                        
+                        document.getElementById("_ReferenceJoint").innerHTML = PicJoint2;
+                        break;
+                    case 3:
+                        document.getElementById("_ReferenceJoint").innerHTML = PicJoint3;
+                        break;
+                    case 4:
+                        document.getElementById("_ReferenceJoint").innerHTML = PicJoint4;
+                        break;
+                    case 5:
+                        document.getElementById("_ReferenceJoint").innerHTML = PicJoint5;
+                        break;
+                    case 6:
+                        document.getElementById("_ReferenceJoint").innerHTML = PicJoint6;
+                        break;
+                        
+                }
+            }
+            else
+            {
+                document.getElementById("_ReferencingDialog").style.display= 'none';
+            }
+            
             
             
             
@@ -1231,6 +1297,107 @@
                 true);    
         }
             
+    });
+    
+    BtnDialogResultClicked = (function(varname)
+    {        
+        var _varname = varname;
+        
+        //set command we want to write
+        var dataWriter = new TcAdsWebService.DataWriter();
+        dataWriter.writeBOOL(true);
+        var buffer = dataWriter.getBase64EncodedData();
+        
+        var handleWriter = new TcAdsWebService.DataWriter();        
+        handleWriter.writeDINT(TcAdsWebService.TcAdsReservedIndexGroups.SymbolHandleByName);
+        handleWriter.writeDINT(0);
+        handleWriter.writeDINT(4); // Expected size; A handle has a size of 4 byte;
+        handleWriter.writeDINT(_varname.length); // The length of the symbol name string;
+        handleWriter.writeString(_varname);
+        
+        var handleBuffer = handleWriter.getBase64EncodedData();
+                             
+        // Send the list-read-write command to the TcAdsWebService by use of the readwrite function of the TcAdsWebService.Client object;
+        var response =  client.readwrite(
+            NETID,
+            PORT,
+            0xF082, 	// IndexGroup = ADS list-read-write command; Used to request handles for twincat symbols;
+            1, // IndexOffset = Count of requested symbol handles;
+            (4) + (8), // Length of requested data + 4 byte errorcode and 4 byte length per twincat symbol;
+            handleBuffer,
+            null, //callback
+            null,
+            null, //timeout
+            null, //timeout callback
+            false);
+            
+        if (!response.hasError)    
+        {
+            var err = response.reader.readDWORD();
+            var len = response.reader.readDWORD();
+            var handle = response.reader.readDWORD();
+            
+            if (err == 0)
+            {
+                //window.alert(handle);
+
+                if (handle != null)
+                {
+                    //write value
+                    client.write(
+                        NETID,
+                        PORT,
+                        0x0000F005, // 0xF005 = Call Write by Handle Commando
+                        handle, // IndexOffset = Count of requested variables.
+                        //1+4, // Length of requested data + 4 byte errorcode per variable.
+                        buffer,
+                        null, //callback
+                        null,
+                        null, //timeout
+                        null, //timeout callback
+                        false);          
+                        
+                    var releaseWriter = new TcAdsWebService.DataWriter();        
+                    releaseWriter.writeDINT(TcAdsWebService.TcAdsReservedIndexGroups.SymbolReleaseHandle);
+                    releaseWriter.writeDINT(0);
+                    releaseWriter.writeDINT(4); // Expected size; A handle has a size of 4 byte;
+                    releaseWriter.writeDINT(handle);                       
+                        
+                    //release handle
+                    var releaseResp =  client.readwrite(
+                        NETID,
+                        PORT,
+                        0xF081, 	// IndexGroup = ADS list-read-write command; Used to request handles for twincat symbols;
+                        1, // IndexOffset = Count of requested symbol handles;
+                        (4), // 4 byte errorcode;
+                        releaseWriter.getBase64EncodedData(),
+                        null, //callback
+                        null,
+                        null, //timeout
+                        null, //timeout callback
+                        false);    
+                }     
+            }
+            else 
+                window.alert("Error: " + err);
+        }
+        else
+        {            
+            if (response.error.getTypeString() == "TcAdsWebService.ResquestError") {
+                // HANDLE TcAdsWebService.ResquestError HERE;
+                window.alert(response.error.statusText + " ErrorCode: " + response.error.status);
+                //document.getElementById("div_log").innerHTML = "Error: StatusText = " + e.error.statusText + " Status: " + e.error.status;
+            }
+            else if (response.error.getTypeString() == "TcAdsWebService.Error") {
+                // HANDLE TcAdsWebService.Error HERE;
+                window.alert(response.error.errorMessage + " ErrorCode: " + response.error.errorCode);
+                //document.getElementById("div_log").innerHTML = "Error: ErrorMessage = " + e.error.errorMessage + " ErrorCode: " + e.error.errorCode;
+            }
+            else
+                window.alert("something went wrong");
+        }
+        
+        
     });
 
     var WriteCallback = (function(e,s){
