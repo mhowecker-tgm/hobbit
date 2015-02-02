@@ -41,6 +41,8 @@ alias dfb="sudo gedit ~/.bashrc"
 alias dfbs="source ~/.bashrc"
 #trigger single shot of point cloud from headcamera (table_object_detector/src/trigger.py)
 alias trig="rostopic pub /SS/doSingleShot std_msgs/String "asdf" -1"
+#short for catkin make in release mode
+alias dfcatkinmakerelease="catkin_make -DCMAKE_BUILD_TYPE=Release"
 
 # Call hobbit to one of the call buttons
 alias call1="rostopic pub -1 /Event hobbit_msgs/Event '{header: auto, event: E_CALLHOBBIT, confidence: 0.8, params: [{name: 'place', value: 'CALL1'}, {name: sensor, value: 'CALL1'}]}'"
