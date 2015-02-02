@@ -35,6 +35,8 @@ public:
 	double x_sensor;
 	double time_limit_secs;
 
+	double x_offset;
+
 private:
 
 	ros::Publisher discrete_motion_cmd_pub;

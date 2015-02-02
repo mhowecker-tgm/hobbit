@@ -21,6 +21,8 @@ cComeCloser::cComeCloser(int argc, char **argv) : init_argc(argc), init_argv(arg
 
 	nh.param("ang_margin", ang_margin, 22.0); //minimum value to consider a minimum width of 40 cm from a maximum distance of 1.0m
 
+	nh.param("x_offset", x_offset, -0.24);
+
 	ros::NodeHandle n;
 	discrete_motion_cmd_pub = n.advertise<std_msgs::String>("/DiscreteMotionCmd", 20);
 
@@ -102,8 +104,10 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
            ROS_DEBUG("Failed to call service get_local_map");
         }
 
-	float user_rel_x = atof (goal->parameters[0].data.c_str());
-	float user_rel_y = atof (goal->parameters[1].data.c_str());
+	float user_rel_x = atof (goal->parameters[0].data.c_str())+x_offset; // parameters[0] must provide person_msg.z/1000
+	float user_rel_y = atof (goal->parameters[1].data.c_str()); // parameters[0] must provide -person_msg.x/1000
+
+	std::cout << "user_relative_position " << user_rel_x << " " << user_rel_y << std::endl;
 	double orientation = atan2(user_rel_y, user_rel_x);
 
 
@@ -140,10 +144,16 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 	double init_ang = scan->angle_min;
 	double min_dis = scanner_info.range_max; 
 
+	if (angles::shortest_angular_distance(init_ang, orientation) < 0)
+	{
+		std::cout << "user pose out of field of view, aborting " << std::endl;
+		as_->setAborted(hobbit_msgs::GeneralHobbitResult(), "aborted, user pose out of fov");
+		return;
+
+	}
+
 	int init_index = ((angles::shortest_angular_distance(init_ang, orientation)-ang_margin*M_PI/180)/scan->angle_increment) +1;
 	int end_index = ((angles::shortest_angular_distance(init_ang, orientation)+ang_margin*M_PI/180)/scan->angle_increment) +1;
-
-
 
 	/*std::cout << "ang init " << (angles::shortest_angular_distance(ang, orientation)-ang_margin*M_PI/180) * 180/M_PI << std::endl;
 	std::cout << "ang end " << (angles::shortest_angular_distance(ang, orientation)+ang_margin*M_PI/180) * 180/M_PI << std::endl;
@@ -186,7 +196,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 		std::cout << "angle2turn " << angle2turn * 180/M_PI << std::endl;
 		std::cout << "distance2move " << dis2move << std::endl;
 
-		//first rotate to face detected user (should already be quite close to current orientation...)
+		//first rotate to face the detected user (should already be quite close to current orientation...)
 
 		if (fabs(angle2turn) < 15*M_PI/180) //FIXME
 		{
@@ -272,8 +282,6 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 
 		}
 
-
-		//FIXME, check all possible status	
 
 	}
 
