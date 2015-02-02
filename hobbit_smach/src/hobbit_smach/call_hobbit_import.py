@@ -4,11 +4,12 @@
 PKG = 'hobbit_smach'
 NAME = 'call_hobbit'
 DEBUG = False
+PREEMPT_TIMEOUT = 5
+SERVER_TIMEOUT = 5
 
-import roslib
-roslib.load_manifest(PKG)
 import rospy
-
+from std_msgs.msg import String
+from smach_ros import SimpleActionState,
 from smach import Sequence, State, StateMachine, Concurrence
 from uashh_smach.util import SleepState, WaitForMsgState
 # from uashh_smach.platform.move_base import HasMovedState
@@ -17,7 +18,18 @@ import hobbit_smach.hobbit_move_import as hobbit_move
 from hobbit_user_interaction import HobbitMMUI
 import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.logging_import as log
+from hobbit_msgs.msg import GeneralHobbitAction, GeneralHobbitGoal
 
+
+def closer_cb(ud, goal):
+    params=[]
+    params.append(ud.x)
+    params.append(ud.y)
+    goal = GeneralHobbitGoal(
+        command=String('start'),
+        parameters=params
+    )
+    return goal
 
 def battery_cb(msg, ud):
     print('Received battery_state message')
@@ -181,9 +193,24 @@ def call_hobbit():
         StateMachine.add(
             'MOVE_TO_GOAL',
             hobbit_move.goToPose(),
-            transitions={'succeeded': 'LOG_SUCCESS',
+            transitions={'succeeded': 'CLOSER',
                          'aborted': 'LOG_ABORT',
                          'preempted': 'LOG_PREEMPT'}
+        )
+        # TODO: Get data from person detection, store it in userdata
+        # TODO: logic as defined during integration week in January 2015
+        StateMachine.add(
+            'CLOSER',
+            SimpleActionState(
+                'come_closer',
+                GeneralHobbitAction,
+                goal_cb=closer_cb(),
+                preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
+                server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
+            ),
+            transitions={'succeeded': 'LOG_SUCCESS',
+                         'preempted': 'LOG_PREEMPT',
+                         'aborted': 'LOG_ABORT'}
         )
         StateMachine.add(
             'LOG_PREEMPT',
