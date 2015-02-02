@@ -672,6 +672,7 @@ class DavidPickingUp(State):
             # 3) call openrave trajectory AS
             # 4) call Arm AS (arm client already included in code)
             #grasp pose definition => simulation => execution
+            # 5) check if still objects are on the floor (<=> check if grasping was successfull, asuming there was only one object)
 
 
             #1) check if there is enough space for moving the arm
@@ -701,6 +702,7 @@ class DavidPickingUp(State):
             res = grasp_traj_ac.grasp_trajectory_action_client(cmd)
             print "result of trajectory calculation:           ", res
             
+                        
             #move object to tray and move arm back to home position
             # => no done via logic in pickup.py  res = self.arm_client.arm_action_client(String ("SetMoveToTrayPos"))
         else:
@@ -710,7 +712,7 @@ class DavidPickingUp(State):
 
 
 
-    def check_free_space_for_arm_pickup_movement(self, obstacle_cloud):
+    def check_free_space_for_arm_pickup_movement(self, obstacle_cloud, x1=None, x2=None, y1=None, y2=None, z1=None, z2=None):
         print "test if there is enough space for moving the arm for picking up an object"
         #self.t = rospy.Time.now()
         if obstacle_cloud == None:
@@ -726,12 +728,20 @@ class DavidPickingUp(State):
             print "input.frame_id_original: ", input.frame_id_original
             input.frame_id_desired = String("base_link")
             print "input.frame_id_desired: ",input.frame_id_desired
-            input.x1 = self.limit_x1
-            input.x2 = self.limit_x2
-            input.y1 = self.limit_y1
-            input.y2 = self.limit_y2
-            input.z1 = self.limit_z1
-            input.z2 = self.limit_z2
+            if (z2 is None):
+                input.x1 = self.limit_x1
+                input.x2 = self.limit_x2
+                input.y1 = self.limit_y1
+                input.y2 = self.limit_y2
+                input.z1 = self.limit_z1
+                input.z2 = self.limit_z2
+            else:
+                input.x1=x1
+                input.x2=x2
+                input.y1=y1
+                input.y2=y2
+                input.z1=z1
+                input.z2=z2
             #resp1 = check_free_space(input)
             resp1 = check_free_space(input.cloud,input.frame_id_original,input.frame_id_desired,input.x1,input.x2,input.y1,input.y2,input.z1,input.z2)
             print "number of points in area with boarders \nx1: ", input.x1, "\tx2: ",input.x2,"\ny1: ",input.y1,"\ty2: ",input.y2,"\nz1: ",input.z1,"\tz2: ",input.z2,"\nnr_points: ",resp1.nr_points_in_area
@@ -928,6 +938,7 @@ class DavidCheckGrasp(State):
     This state has to check if the grasping was successful or not.
     Return 'succeeded' if it was, 'aborted' if it was not.
     Returns 'preempted' on request.
+    to many hardcoded values
     """
     def __init__(self):
         State.__init__(
@@ -935,8 +946,28 @@ class DavidCheckGrasp(State):
             outcomes=['succeeded', 'aborted', 'preempted'],
             input_keys=['cloud']
         )
-
+        self.limit_x1 = 0.0
+        self.limit_x2 = 0.15
+        self.limit_y1 = -0.44
+        self.limit_y2 = -0.55
+        self.limit_z1 = 0.03
+        self.limit_z2 = 0.15
+        
     def execute(self, ud):
+        if self.preempt_requested():
+            return 'preempted'
+        # TODO: David please add the check of the grasping in here => Esters code (call service)
+
+        pnt_in_space = self.check_free_space_for_arm_pickup_movement(ud.cloud)
+        print "=======> DavidCheckGrasp: number of points found in grasping area: ", pnt_in_space
+        if (pnt_in_space > 20):
+            return 'aborted'    #aborted <=> point found, hence an object still on floor => (assumed that) object grasping failed
+        else:
+            return 'succeeded'  #succedded <=> no object on floor (in grasping area) => (assumed that) object grasping succeeded
+            
+
+    ''' not used due to bad performance (not reliable enough)
+    def execute_ester(self, ud):
         if self.preempt_requested():
             return 'preempted'
         # TODO: David please add the check of the grasping in here => Esters code (call service)
@@ -956,6 +987,48 @@ class DavidCheckGrasp(State):
     
             return 'succeeded'
         return 'succeeded'
+    '''
+
+    # next function is defened for 2 clases => REDUNDANTLY!!
+    def check_free_space_for_arm_pickup_movement(self, obstacle_cloud, x1=None, x2=None, y1=None, y2=None, z1=None, z2=None):
+        print "test if there is still an obejct on the floor (in the grasping area)"
+        #self.t = rospy.Time.now()
+        if obstacle_cloud == None:
+            print "======> DavidCheckGrasp: check_free_space_for_arm_pickup_movement: no point cloud received! "
+            return -1
+        #self.pc_.header.stamp = self.t
+        rospy.wait_for_service('check_free_space')
+        try:
+            check_free_space = rospy.ServiceProxy('check_free_space', CheckFreeSpace)
+            input = CheckFreeSpace()
+            input.cloud = obstacle_cloud
+            input.frame_id_original = String(obstacle_cloud.header.frame_id)
+            print "input.frame_id_original: ", input.frame_id_original
+            input.frame_id_desired = String("base_link")
+            print "input.frame_id_desired: ",input.frame_id_desired
+            if (z2 is None):
+                input.x1 = self.limit_x1
+                input.x2 = self.limit_x2
+                input.y1 = self.limit_y1
+                input.y2 = self.limit_y2
+                input.z1 = self.limit_z1
+                input.z2 = self.limit_z2
+            else:
+                input.x1=x1
+                input.x2=x2
+                input.y1=y1
+                input.y2=y2
+                input.z1=z1
+                input.z2=z2
+            #resp1 = check_free_space(input)
+            resp1 = check_free_space(input.cloud,input.frame_id_original,input.frame_id_desired,input.x1,input.x2,input.y1,input.y2,input.z1,input.z2)
+            print "number of points in area with boarders \nx1: ", input.x1, "\tx2: ",input.x2,"\ny1: ",input.y1,"\ty2: ",input.y2,"\nz1: ",input.z1,"\tz2: ",input.z2,"\nnr_points: ",resp1.nr_points_in_area
+            #return resp1.nr_points_in_area
+        except rospy.ServiceException, e:
+            print "Service call failed: %s"%e
+            return -1
+            
+        return resp1.nr_points_in_area
 
 
 def child_term_cb(outcome_map):
