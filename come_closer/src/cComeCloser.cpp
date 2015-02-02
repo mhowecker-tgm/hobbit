@@ -104,7 +104,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
            ROS_DEBUG("Failed to call service get_local_map");
         }
 
-	float user_rel_x = atof (goal->parameters[0].data.c_str())+x_offset; // parameters[0] must provide person_msg.z/1000
+	float user_rel_x = atof (goal->parameters[0].data.c_str());//+x_offset; // parameters[0] must provide person_msg.z/1000
 	float user_rel_y = atof (goal->parameters[1].data.c_str()); // parameters[0] must provide -person_msg.x/1000
 
 	std::cout << "user_relative_position " << user_rel_x << " " << user_rel_y << std::endl;
