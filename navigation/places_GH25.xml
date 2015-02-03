@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <rooms>
   <room>
-    <name>Office</name>
+    <name>office</name>
     <vertices>
       <vertex y="-3.360001" x="-5.727999"/>
       <vertex y="1.819998" x="-6.615999"/>
@@ -20,7 +20,7 @@
         <type>searchable</type>
         <pose y="1.159" x="-1.834" theta="-1.491"/>
         <objects>
-          <object name="Häferl" probability="0.25"/>
+          <object name="Häferl" probability="4146499.62035"/>
         </objects>
       </place>
       <place>
@@ -28,15 +28,15 @@
         <type>searchable</type>
         <pose y="0.527" x="-0.908" theta="-3.029"/>
         <objects>
-          <object name="Häferl" probability="0.25"/>
+          <object name="Häferl" probability="0.000141745382666"/>
         </objects>
       </place>
       <place>
         <name>workshop_desk</name>
         <type>searchable</type>
-        <pose y="0.684" x="-0.159" theta="0.1302"/>
+        <pose y="-0.684" x="-0.159" theta="0.1302"/>
         <objects>
-          <object name="Häferl" probability="0.25"/>
+          <object name="Häferl" probability="0.000141745382666"/>
         </objects>
       </place>
     </places>
@@ -63,6 +63,12 @@
         <objects/>
       </place>
       <place>
+        <name>bathroom</name>
+        <type>call_button_2</type>
+        <pose y="6.0" x="3.5" theta="0.0"/>
+        <objects/>
+      </place>
+      <place>
         <name>side_entrance</name>
         <type>goTo</type>
         <pose y="3.0" x="3.5" theta="-1.57"/>
@@ -71,7 +77,19 @@
       <place>
         <name>call4</name>
         <type>call_button_4</type>
-        <pose y="-0.34563" x="3.5393" theta="-3.0929"/>
+        <pose y="1.0" x="3.5393" theta="-3.0929"/>
+        <objects/>
+      </place>
+      <place>
+        <name>fitness</name>
+        <type>fitness</type>
+        <pose y="1.0" x="3.8" theta="-3.0929"/>
+        <objects/>
+      </place>
+      <place>
+        <name>bench</name>
+        <type>goTo</type>
+        <pose y="1.0" x="3.8" theta="-3.0929"/>
         <objects/>
       </place>
     </places>
@@ -102,7 +120,7 @@
         <type>searchable</type>
         <pose y="5.098" x="-0.198" theta="1.5782"/>
         <objects>
-          <object name="Häferl" probability="0.25"/>
+          <object name="Häferl" probability="0.000141745382666"/>
         </objects>
       </place>
       <place>
