@@ -959,7 +959,8 @@ class DavidCheckGrasp(State):
         # TODO: David please add the check of the grasping in here => Esters code (call service)
 
         pnt_in_space = self.check_free_space_for_arm_pickup_movement(ud.cloud)
-        print "=======> DavidCheckGrasp: number of points found in grasping area: ", pnt_in_space
+        print "=======> DavidCheckGrasp: number of points found in grasping area: ", pnt_in_space.data
+        print "=======> DavidCheckGrasp: number of points found in grasping area: ", pnt_in_space.nr_points_in_area
         if (pnt_in_space > 20):
             return 'aborted'    #aborted <=> point found, hence an object still on floor => (assumed that) object grasping failed
         else:
