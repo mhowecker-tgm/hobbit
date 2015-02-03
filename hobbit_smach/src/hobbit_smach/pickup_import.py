@@ -951,7 +951,7 @@ class DavidCheckGrasp(State):
         self.limit_y1 = -0.44
         self.limit_y2 = -0.55
         self.limit_z1 = 0.03
-        self.limit_z2 = 0.15
+        self.limit_z2 = 3.15
         
     def execute(self, ud):
         if self.preempt_requested():
@@ -959,8 +959,7 @@ class DavidCheckGrasp(State):
         # TODO: David please add the check of the grasping in here => Esters code (call service)
 
         pnt_in_space = self.check_free_space_for_arm_pickup_movement(ud.cloud)
-        print "=======> DavidCheckGrasp: number of points found in grasping area: ", pnt_in_space.data
-        print "=======> DavidCheckGrasp: number of points found in grasping area: ", pnt_in_space.nr_points_in_area
+        print "=======> DavidCheckGrasp: number of points found in grasping area: ", pnt_in_space
         if (pnt_in_space > 20):
             return 'aborted'    #aborted <=> point found, hence an object still on floor => (assumed that) object grasping failed
         else:
