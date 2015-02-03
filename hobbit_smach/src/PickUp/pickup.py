@@ -311,7 +311,7 @@ def main():
                 '/pointEvents',
                 PointEvents,
                 msg_cb=point_other_state_cb,
-                timeout=15,
+                timeout=15000,
                 output_keys=['pointing_msg']
             ),
             transitions={'succeeded': 'START_LOOKING',
