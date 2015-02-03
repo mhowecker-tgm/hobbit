@@ -11,6 +11,8 @@ extern "C"
 extern unsigned int doCVOutput;
 extern unsigned int emergencyDetected;
 extern unsigned int personDetected;
+extern unsigned int autoPlaneSegmentation;
+
 
 
 extern float temperatureX,temperatureY,temperatureZ;

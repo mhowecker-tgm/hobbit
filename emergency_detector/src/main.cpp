@@ -240,6 +240,13 @@ bool visualizeOff(std_srvs::Empty::Request& request, std_srvs::Empty::Response& 
     return true;
 }
 
+
+bool autoPlaneSegmentation(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    autoPlaneSegmentation=1;
+}
+
+
 bool fakeTemperature(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
     if (fakeTemperatureActivated) { fakeTemperatureActivated=0; } else
@@ -556,6 +563,7 @@ int main(int argc, char **argv)
      ros::ServiceServer stopGestureRecognitionService     = nh.advertiseService(name+"/terminate", terminate);
      ros::ServiceServer triggerGestureRecognitionService     = nh.advertiseService(name+"/trigger", trigger);
      ros::ServiceServer fakeTemperatureGestureRecognitionService     = nh.advertiseService(name+"/fakeTemperature", fakeTemperature);
+     ros::ServiceServer autoPlaneSegmentationService     = nh.advertiseService(name+"/autoPlaneSegmentation", autoPlaneSegmentation);
 
      ros::ServiceServer lookUpService          = nh.advertiseService(name+"/looking_up" , lookingUp);
      ros::ServiceServer lookCenterService      = nh.advertiseService(name+"/looking_center" , lookingCenter);

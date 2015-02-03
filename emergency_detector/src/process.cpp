@@ -53,6 +53,7 @@ double maxHumanTemperature = 37.0;
 unsigned int doCVOutput=0;
 unsigned int emergencyDetected=0;
 unsigned int personDetected=0;
+unsigned int autoPlaneSegmentation=0;
 
 float temperatureAmbientDetected=0.0; //<- YODO : default value should be 0
 float temperatureObjectDetected=0.0; //<- YODO : default value should be 0
@@ -178,6 +179,22 @@ unsigned int temperatureSensorSensesHuman(unsigned int tempDetected , unsigned i
 unsigned int mapSaysThatWhatWeAreLookingAtShouldBeFreespace(float x,float y,float z , unsigned int frameTimestamp)
 {
    fprintf(stderr,"mapSaysThatWhatWeAreLookingAtShouldBeFreespace() not implemented yet\n");
+   /*
+
+    Paloma :
+So, the current implementation is like this:
+
+/get_occupancy_state
+
+bool cLocalizationMonitor::getOccupancyState(hobbit_msgs::GetOccupancyState::Request  &req, hobbit_msgs::GetOccupancyState::Response &res)
+
+You can take a look at the GetOccupancyState service in hobbit_msgs, but it is basically what we talked about.
+
+If you want me to change the name or something or have any problems or whatever let me know, ok?
+
+
+   */
+
   return 1;
 }
 
@@ -260,6 +277,10 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
          segmentedRGB = copyRGB(colorFrame ,colorWidth , colorHeight);
          segmentedDepth = copyDepth(depthFrame ,depthWidth , depthHeight);
         //fprintf(stderr,"Copied rgb/depth\n");
+         if (autoPlaneSegmentation) { segConfDepth.autoPlaneSegmentation=1; autoPlaneSegmentation=0;
+                                      ROS_INFO("Emergency Detector doing auto plane segmentation.."); } else
+                                    { segConfDepth.autoPlaneSegmentation=0; }
+
 
         fprintf(stderr,"Segmenting 2 frames sized  %ux%u and %ux%u \n",colorWidth , colorHeight,depthWidth , depthHeight);
         segmentRGBAndDepthFrame (
