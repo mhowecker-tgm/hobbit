@@ -946,8 +946,9 @@ class DavidCheckGrasp(State):
             outcomes=['succeeded', 'aborted', 'preempted'],
             input_keys=['cloud']
         )
+        self.pubClust = rospy.Publisher("/pickup/checkgraspclusters", PointCloud2)
         self.limit_x1 = 0.0
-        self.limit_x2 = 10.15
+        self.limit_x2 = 0.15
         self.limit_y1 = -10.44
         self.limit_y2 = -0.55
         self.limit_z1 = 0.03
@@ -958,6 +959,7 @@ class DavidCheckGrasp(State):
             return 'preempted'
         # TODO: David please add the check of the grasping in here => Esters code (call service)
 
+        self.pubClust.publish(ud.cloud)
         pnt_in_space = self.check_free_space_for_arm_pickup_movement(ud.cloud)
         print "=======> DavidCheckGrasp: number of points found in grasping area: ", pnt_in_space
         if (pnt_in_space > 20):
