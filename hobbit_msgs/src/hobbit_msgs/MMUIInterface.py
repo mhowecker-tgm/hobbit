@@ -40,7 +40,7 @@ class MMUIInterface:
         print "##",msg.command,"##"
 
 
-    def showMMUI_Info(self, text, wait="0", prm="", prm2="", prm3="", audio=""):
+    def showMMUI_Info(self, text, wait="1", prm="", prm2="", prm3="", audio=""):
         print(prm)
         parr = []
         p = Parameter('type', 'D_PLAIN')
@@ -51,8 +51,8 @@ class MMUIInterface:
         parr.append(p)
         p = Parameter('Timeout', '15')
         parr.append(p)
-        #p = Parameter('Repetitions', '3')
-        #parr.append(p)
+        p = Parameter('Repetitions', '1')
+        parr.append(p)
         p = Parameter('wait', wait)
         parr.append(p)
         if prm != "":
