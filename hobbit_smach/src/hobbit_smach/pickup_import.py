@@ -947,8 +947,8 @@ class DavidCheckGrasp(State):
             input_keys=['cloud']
         )
         self.limit_x1 = 0.0
-        self.limit_x2 = 0.15
-        self.limit_y1 = -0.44
+        self.limit_x2 = 10.15
+        self.limit_y1 = -10.44
         self.limit_y2 = -0.55
         self.limit_z1 = 0.03
         self.limit_z2 = 3.15
