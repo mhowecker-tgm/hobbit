@@ -166,27 +166,27 @@ def getEndRecharge():
         #  )
     return seq1
 
-    with seq:
-        Sequence.add(
-            'UNDOCK ',
-            hobbit_move.get_undock()
-        )
-        #  Sequence.add(
-        #      'SOUND',
-        #      speech_output.playMoveOut()
-        #  )
-        Sequence.add(
-            'WAIT_FOR_MIRA',
-            SleepState(duration=30)
-        )
-        Sequence.add(
-            'SET_NAV_GOAL_DOCK',
-            hobbit_move.SetNavGoal(room='dock', place='dock')
-        )
-        Sequence.add(
-            'MOVE_AWAY_FROM_DOCK',
-            hobbit_move.goToPose())
-    return seq
+    # with seq:
+    #     Sequence.add(
+    #         'UNDOCK ',
+    #         hobbit_move.get_undock()
+    #     )
+    #     #  Sequence.add(
+    #     #      'SOUND',
+    #     #      speech_output.playMoveOut()
+    #     #  )
+    #     Sequence.add(
+    #         'WAIT_FOR_MIRA',
+    #         SleepState(duration=30)
+    #     )
+    #     Sequence.add(
+    #         'SET_NAV_GOAL_DOCK',
+    #         hobbit_move.SetNavGoal(room='dock', place='dock')
+    #     )
+    #     Sequence.add(
+    #         'MOVE_AWAY_FROM_DOCK',
+    #         hobbit_move.goToPose())
+    # return seq
 
 
 def startDockProcedureOld():
