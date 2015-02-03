@@ -22,7 +22,7 @@ int main (int argc, char **argv)
   goal.command.data = "start";
   goal.parameters.resize(2);
   goal.parameters[0].data = "0.4";
-  goal.parameters[1].data = "0.4";
+  goal.parameters[1].data = "0";
   ac.sendGoal(goal); 
 
   //wait for the action to return
