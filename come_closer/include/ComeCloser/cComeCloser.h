@@ -16,6 +16,8 @@
 
 #include <ctime>
 
+#include "hobbit_msgs/Event.h"
+
 class cComeCloser
 {
 public:
@@ -64,6 +66,9 @@ private:
 
 	bool movement_cmd_sent;
  
+	ros::Subscriber event_sub;
+	void event_callback(const hobbit_msgs::Event::ConstPtr& msg);
+	ros::ServiceClient reset_motorstop_client;
 
 };
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

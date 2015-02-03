@@ -6,6 +6,9 @@
 #include "angles/angles.h"
 
 #include <string>
+
+#include <mira_msgs/ResetMotorStop.h>
+
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Constructor. Initialises member attributes and allocates resources.
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -37,6 +40,9 @@ cComeCloser::cComeCloser(int argc, char **argv) : init_argc(argc), init_argv(arg
         as_->start();
 
 	current_motion_state.data = "Idle";
+
+	event_sub = n.subscribe("/Event", 2, &cComeCloser::event_callback, this);
+  	reset_motorstop_client = n.serviceClient<mira_msgs::ResetMotorStop>("/reset_motorstop");
 
 }
 
@@ -190,7 +196,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 	double sensor_orientation = tf::getYaw(sensor_pose.orientation);  //should be relative
 	double angle2turn = angles::shortest_angular_distance(0, orientation);
 
-	if (dis2move >= 0.1) //FIXME
+	if (dis2move >= 0.1) //FIXME add param
 	{
 				
 		std::cout << "angle2turn " << angle2turn * 180/M_PI << std::endl;
@@ -198,7 +204,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 
 		//first rotate to face the detected user (should already be quite close to current orientation...)
 
-		if (fabs(angle2turn) < 15*M_PI/180) //FIXME
+		if (fabs(angle2turn) < 15*M_PI/180) //FIXME add param
 		{
 			std::cout << "rotation is too small " << std::endl;
 			finished_rotation = true;
@@ -291,6 +297,20 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 
 }
 
+void cComeCloser::event_callback(const hobbit_msgs::Event::ConstPtr& msg)
+{
+	if (msg->event.compare("E_RELEASEBUTTON"))
+	{
+		std::cout << "Release button pressed" << std::endl;
+		//call service 
+		mira_msgs::ResetMotorStop srv;
+	        if (!reset_motorstop_client.call(srv))
+	        {
+	          ROS_DEBUG("Failed to call service reset_motorstop");
+	        }
+		
+	}
 
+}
 
 
