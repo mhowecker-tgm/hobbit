@@ -26,6 +26,9 @@ cComeCloser::cComeCloser(int argc, char **argv) : init_argc(argc), init_argv(arg
 
 	nh.param("x_offset", x_offset, -0.24);
 
+	nh.param("dis_thres", dis_thres, 0.1);
+	nh.param("ang_thres", ang_thres, 15.0);
+
 	ros::NodeHandle n;
 	discrete_motion_cmd_pub = n.advertise<std_msgs::String>("/DiscreteMotionCmd", 20);
 
@@ -196,7 +199,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 	double sensor_orientation = tf::getYaw(sensor_pose.orientation);  //should be relative
 	double angle2turn = angles::shortest_angular_distance(0, orientation);
 
-	if (dis2move >= 0.1) //FIXME add param
+	if (dis2move >= dis_thres) 
 	{
 				
 		std::cout << "angle2turn " << angle2turn * 180/M_PI << std::endl;
@@ -204,7 +207,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 
 		//first rotate to face the detected user (should already be quite close to current orientation...)
 
-		if (fabs(angle2turn) < 15*M_PI/180) //FIXME add param
+		if (fabs(angle2turn) < ang_thres*M_PI/180) 
 		{
 			std::cout << "rotation is too small " << std::endl;
 			finished_rotation = true;

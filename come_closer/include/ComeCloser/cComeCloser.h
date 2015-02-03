@@ -70,6 +70,9 @@ private:
 	void event_callback(const hobbit_msgs::Event::ConstPtr& msg);
 	ros::ServiceClient reset_motorstop_client;
 
+	double dis_thres;
+	double ang_thres;
+
 };
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #endif
