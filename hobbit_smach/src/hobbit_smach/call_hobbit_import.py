@@ -25,7 +25,7 @@ from rgbd_acquisition.msg import Person
 def closer_cb(ud, goal):
     params=[]
     params.append(String(str(ud.person_z/1000)))
-    params.append(String(str(ud.person_x/1000)))
+    params.append(String(str(-ud.person_x/1000)))
     goal = GeneralHobbitGoal(
         command=String('start'),
         parameters=params
