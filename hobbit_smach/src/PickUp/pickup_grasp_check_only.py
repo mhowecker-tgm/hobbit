@@ -273,7 +273,7 @@ def main():
         # df 30.7.2014
         StateMachine.add(
             'WAIT_FINISH_HEAD_TO_SEARCH',
-            SleepState(duration=0.1),
+            SleepState(duration=3.0),
             transitions={'succeeded': 'GET_POINT_CLOUD_FOR_GRASPCHECK',
                          'preempted': 'LOG_PREEMPT'}
             )
