@@ -68,6 +68,9 @@ roslaunch startup.launch&
 sleep $DELAY_BETWEEN_STEPS
 
 # Start AAL service
+ROBOTNUMBER=$( printf '%d' "'${hobbit_id:3:1}" ); let "ROBOTNUMBER -= 96"; echo "copy params$ROBOTNUMBER for PT2$ROBOTNAME"
+cd /opt/ros/hobbit_hydro/src/aal_service/launch
+cp params"$ROBOTNUMBER".yaml params.yaml
 roslaunch aal_service startup.launch&
 
 # Load Hobbit PT2 parameters
