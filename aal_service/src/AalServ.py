@@ -37,6 +37,7 @@ import socket
 
 port = 8108
 callactivityset = {}
+releaseset = {}
 activityset = {}
 placeset = {}
 actuatorset = {}
@@ -153,6 +154,14 @@ class Srv(LineReceiver):
                 setparam("USER.Action.Time",t)
                 setparam("USER.Action.Place", self.place)
 
+          #=== check sensor.type RELEASE
+          if self.key in releaseset.keys(): #it is an release related sensor
+             self.sensor=releaseset[self.key]
+             if self.sensor and (self.value == "SWITCH=1"):
+                print "-got RELEASE sensor-", "\x1B[31m"+self.sensor+"\x1B[0m"
+                self.puberelease_event(self.place,self.sensor)
+
+
           #=== check sensor.type ACTIVITY
           if self.key in activityset.keys(): #it is an activity related sensor
              self.sensor=activityset[self.key]
@@ -252,6 +261,20 @@ class Srv(LineReceiver):
         #print "sensor connected"
         self.setRawMode()
 
+    #=== place a RELEASE event
+    def puberelease_event(self,place,sensor):
+        print "pub e_releasebutton"
+        e = Event()
+        e.header = Header()
+        e.event = "E_RELEASEBUTTON"
+        e.sessionID = '0'
+        e.confidence = 1.0
+        p=Parameter("place",place)
+        e.params.append(p)
+        p=Parameter("sensor",sensor)
+        e.params.append(p)
+        pubE.publish(e)
+
     #=== place a CALL event
     def pubecall_event(self,place,sensor):
         print "pub e_callhobbit"
@@ -317,6 +340,8 @@ if __name__ == '__main__':
         resp=getparam(attr)
         place=resp
         print "ENV.Sensor."+sensor, bus, node, type, place
+        if "RELEASE" in type and len(place) and len(node) and len(bus):
+          releaseset[key] = sensor
         if "CALL" in type and len(place) and len(node) and len(bus):
           callactivityset[key] = sensor
         if "ACTIVITY" in type and len(place) and len(node) and len(bus):
@@ -331,6 +356,9 @@ if __name__ == '__main__':
    print "ACTIVITYSENSORS:"
    for sensor in activityset.keys():
         print "   ", sensor,activityset[sensor],placeset[sensor]
+   print "RELEASESENSORS:"
+   for sensor in releaseset.keys():
+        print "   ", sensor,releaseset[sensor]
    print "NAMESENSORS:"
    for sensor in nameset.keys():
         print "   ", sensor,nameset[sensor]
