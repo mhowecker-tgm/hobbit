@@ -28,12 +28,15 @@ class Init(State):
             self,
             outcomes=['succeeded', 'canceled'],
             input_keys=['command'], output_keys=['social_role'])
-        self.pub_head = rospy.Publisher('HeadMove', String)
-        self.pub_obstacle = rospy.Publisher('/headcam/active', String)
+#        self.pub_head = rospy.Publisher('HeadMove', String)
+        self.init = None
 
     def execute(self, ud):
-        self.pub_head.publish('down')
-        self.pub_obstacle.publish('active')
+        if not self.init:
+            self.init = True
+            self.pub_head = rospy.Publisher('HeadMove', String)
+            rospy.sleep( 1.0 )
+ #       self.pub_head.publish('down')
         if rospy.has_param('/hobbit/social_role'):
             ud.social_role = rospy.get_param('/hobbit/social_role')
         return 'succeeded'
@@ -84,9 +87,14 @@ class CleanUp(State):
             input_keys=['command'],
             output_keys=['result', 'command']
         )
-        self.pub_face = rospy.Publisher('/Hobbit/Emoticon', String)
+        #self.pub_face = rospy.Publisher('/Hobbit/Emoticon', String)
+        self.init = None
 
     def execute(self, ud):
+        if not self.init:
+            self.init = True
+            self.pub_face = rospy.Publisher('/Hobbit/Emoticon', String)
+            rospy.sleep( 1.0 )
         self.pub_face.publish('EMO_SAD')
         ud.result = String('')
         return 'succeeded'
@@ -103,10 +111,17 @@ class SetSuccess(State):
             outcomes=['succeeded', 'preempted'],
             output_keys=['result']
         )
-        self.pub = rospy.Publisher('/DiscreteMotionCmd', String)
-        self.pub_face = rospy.Publisher('/Hobbit/Emoticon', String)
+        self.init = None
+        #self.pub = rospy.Publisher('/DiscreteMotionCmd', String)
+        #self.pub_face = rospy.Publisher('/Hobbit/Emoticon', String)
 
     def execute(self, ud):
+        if not self.init:
+            self.init = True
+            self.pub = rospy.Publisher('/DiscreteMotionCmd', String)
+            self.pub_face = rospy.Publisher('/Hobbit/Emoticon', String)
+            rospy.sleep( 1.0 )
+
         self.pub_face.publish('EMO_HAPPY')
         self.pub.publish('Stop')
         if self.preempt_requested():
@@ -128,10 +143,15 @@ class SetFailure(State):
             outcomes=['succeeded', 'preempted'],
             output_keys=['result']
         )
-        self.pub = rospy.Publisher('/DiscreteMotionCmd', String)
-        self.pub_face = rospy.Publisher('/Hobbit/Emoticon', String)
+        self.init = None
+
 
     def execute(self, ud):
+        if not self.init:
+            self.init = True
+            self.pub = rospy.Publisher('/DiscreteMotionCmd', String)
+            self.pub_face = rospy.Publisher('/Hobbit/Emoticon', String)
+            rospy.sleep( 1.0 )
         self.pub_face.publish('EMO_SAD')
         self.pub.publish('Stop')
         if self.preempt_requested():
