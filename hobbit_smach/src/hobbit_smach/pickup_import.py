@@ -947,10 +947,10 @@ class DavidCheckGrasp(State):
             input_keys=['cloud']
         )
         self.pubClust = rospy.Publisher("/pickup/checkgraspclusters", PointCloud2)
-        self.limit_x1 = -10.0
-        self.limit_x2 = 1.15
-        self.limit_y1 = -0.44
-        self.limit_y2 = -1.55
+        self.limit_x1 = 0.02
+        self.limit_x2 = 0.15
+        self.limit_y1 = -0.55
+        self.limit_y2 = -0.44
         self.limit_z1 = 0.03
         self.limit_z2 = 0.15
         
