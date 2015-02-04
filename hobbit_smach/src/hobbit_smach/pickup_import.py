@@ -141,33 +141,29 @@ class DavidLookForObject(State):
 
 
         if self.findobject(ud):
+            #object was found, is graspable (has correct dimension is is not near to fixed obstacle such as a wall)
             
-            if self.isObjectAwayFromMapBoarders():
-            
-            
-                (robot_x, robot_y, robot_yaw) = util.get_current_robot_position(frame='/map')
-                posRobot = [robot_x, robot_y] #Bajo, please fill in
-                print "actual robot position: ", posRobot
-                print "graspable center of cluster: ", self.graspable_center_of_cluster_wcs  #center of graspable point cluster
-                robotApproachDir = [self.graspable_center_of_cluster_wcs.point.x - posRobot[0], self.graspable_center_of_cluster_wcs.point.y - posRobot[1]]
-                robotApproachDir = [robotApproachDir[0]/numpy.linalg.norm(robotApproachDir), robotApproachDir[1]/numpy.linalg.norm(robotApproachDir)]       #normalized
-                print "normalized robot approach direction: ", robotApproachDir
-    
-    
-                ud.goal_position_x = self.graspable_center_of_cluster_wcs.point.x - self.robotDistFromGraspPntForGrasping * robotApproachDir[0]
-                ud.goal_position_y = self.graspable_center_of_cluster_wcs.point.y - self.robotDistFromGraspPntForGrasping * robotApproachDir[1]
-                ud.goal_position_yaw = math.atan2(robotApproachDir[1],robotApproachDir[0]) + self.robotOffsetRotationForGrasping #can be negative!  180/math.pi*math.atan2(y,x) = angle in degree of vector (x,y)
-                print "robotDistFromGraspPntForGrasping: ", self.robotDistFromGraspPntForGrasping
-                print "robotOffsetRotationForGrasping: ", self.robotOffsetRotationForGrasping
-                print "robot goal position:"
-                print "ud.goal_position_x:   ", ud.goal_position_x
-                print "ud.goal_position_y:   ", ud.goal_position_y
-                print "ud.goal_position_yaw:   ", ud.goal_position_yaw
-    
-    
-                return 'succeeded'
-            else:
-                return 'failed' #object to near to map boarder
+            (robot_x, robot_y, robot_yaw) = util.get_current_robot_position(frame='/map')
+            posRobot = [robot_x, robot_y] #Bajo, please fill in
+            print "actual robot position: ", posRobot
+            print "graspable center of cluster: ", self.graspable_center_of_cluster_wcs  #center of graspable point cluster
+            robotApproachDir = [self.graspable_center_of_cluster_wcs.point.x - posRobot[0], self.graspable_center_of_cluster_wcs.point.y - posRobot[1]]
+            robotApproachDir = [robotApproachDir[0]/numpy.linalg.norm(robotApproachDir), robotApproachDir[1]/numpy.linalg.norm(robotApproachDir)]       #normalized
+            print "normalized robot approach direction: ", robotApproachDir
+
+
+            ud.goal_position_x = self.graspable_center_of_cluster_wcs.point.x - self.robotDistFromGraspPntForGrasping * robotApproachDir[0]
+            ud.goal_position_y = self.graspable_center_of_cluster_wcs.point.y - self.robotDistFromGraspPntForGrasping * robotApproachDir[1]
+            ud.goal_position_yaw = math.atan2(robotApproachDir[1],robotApproachDir[0]) + self.robotOffsetRotationForGrasping #can be negative!  180/math.pi*math.atan2(y,x) = angle in degree of vector (x,y)
+            print "robotDistFromGraspPntForGrasping: ", self.robotDistFromGraspPntForGrasping
+            print "robotOffsetRotationForGrasping: ", self.robotOffsetRotationForGrasping
+            print "robot goal position:"
+            print "ud.goal_position_x:   ", ud.goal_position_x
+            print "ud.goal_position_y:   ", ud.goal_position_y
+            print "ud.goal_position_yaw:   ", ud.goal_position_yaw
+
+
+            return 'succeeded'
         else:
             return 'failed' #object not found
 
@@ -208,6 +204,11 @@ class DavidLookForObject(State):
         if isgraspable:
             self.pc_rcs = self.transformPointCloud('/base_link',self.pc)
             self.graspable_center_of_cluster_wcs = pnt_wcs
+            if self.isObjectAwayFromMapBoarders():
+                return True
+            else:
+                return False #object to near to map boarder
+
         
         
         return isgraspable
