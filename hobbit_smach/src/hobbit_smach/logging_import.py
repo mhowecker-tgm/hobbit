@@ -7,6 +7,7 @@ from smach import State, Sequence
 from hobbit_msgs.msg import Event, Parameter
 from uashh_smach.util import WaitForMsgState
 from mira_msgs.msg import BatteryState
+from std_msgs.msg import String
 
 
 class DoLog(State):

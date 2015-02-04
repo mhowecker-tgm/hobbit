@@ -17,9 +17,8 @@ from smach_ros import ActionServerWrapper, IntrospectionServer
 from uashh_smach.util import SleepState, WaitForMsgState
 from follow_user.msg import Person as FollowPerson
 from hobbit_user_interaction import HobbitMMUI
+import head_move_import as head_move
 
-
-import rospy
 from smach import StateMachine, Concurrence, Sequence
 from smach_ros import IntrospectionServer, ActionServerWrapper, MonitorState, SimpleActionState
 from hobbit_msgs.msg import GeneralHobbitAction, FollowMeAction, FollowMeGoal
@@ -77,11 +76,10 @@ def main():
     )
 
 
-    def msg_cb(ud, msg):
+    def msg_cb(msg, ud):
         print('person (x,y,z) {}, {}, {}'.format(msg.x, msg.y, msg.z))
         rospy.loginfo('person (x,y,z) {}, {}, {}'.format(msg.x, msg.y, msg.z))
         if msg.x: 
-            #return False
             return True
 
 
@@ -112,7 +110,8 @@ def main():
         StateMachine.add(
             'SAY_START',
             speech_output.sayText(
-                info="Please stand in front of me so i can follow you."),
+                info='Bitte stell dich vor mich.'),
+                #info="Please stand in front of me so i can follow you."),
             transitions={'succeeded': 'GET_USER',
                          'failed': 'LOG_ABORTED'}
         )
@@ -120,10 +119,11 @@ def main():
             'GET_USER',
             #cc,
             WaitForMsgState(
-                '/follow_user/persons',
+                '/emergency_detector/persons',
+                #'/follow_user/persons',
                 FollowPerson,
-                cond_cb=msg_cb,
-                timeout=10
+                msg_cb=msg_cb,
+                timeout=25
             ),
             transitions={'succeeded': 'SAY_FOUND_YOU',
                          'aborted': 'SAY_CANT_SEE'}
@@ -131,9 +131,16 @@ def main():
         StateMachine.add(
             'SAY_FOUND_YOU',
             speech_output.sayText(
-                info="Found you. Will start following you."),
-            transitions={'succeeded': 'FOLLOW',
+                info="Ich habe dich gefunden werde dir jetzt folgen."),
+                #info="Found you. Will start following you."),
+            transitions={'succeeded': 'HEAD_DOWN',
                          'failed': 'LOG_ABORTED'}
+        )
+        StateMachine.add(
+            'HEAD_DOWN',
+            head_move.MoveTo(pose='down_center'),
+            transitions={'succeeded': 'FOLLOW',
+                         'aborted': 'LOG_ABORTED'}
         )
         follow_goal=FollowMeGoal()
         follow_goal.command='start'
@@ -146,21 +153,43 @@ def main():
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
-            transitions={'succeeded': 'SAY_STOP',
+            transitions={'succeeded': 'HEAD_UP',
                          'preempted': 'LOG_PREEMPT',
-                         'aborted': 'LOG_ABORTED'}
+                         'aborted': 'HEAD_UP1'}
         )
         StateMachine.add(
             'SAY_CANT_SEE',
             speech_output.sayText(
-                info="I did not see you and will stay here."),
+                info="Ich konnte dich nicht erkennen und bleibe deshalb hier stehen."),
+                #info="I did not see you and will stay here."),
             transitions={'succeeded': 'LOG_ABORTED',
                          'failed': 'LOG_ABORTED'}
         )
         StateMachine.add(
+            'HEAD_UP',
+            head_move.MoveTo(pose='center_center'),
+            transitions={'succeeded': 'SAY_STOP',
+                         'aborted': 'SAY_STOP'}
+        )
+        StateMachine.add(
+            'HEAD_UP1',
+            head_move.MoveTo(pose='center_center'),
+            transitions={'succeeded': 'SAY_STOP1',
+                         'aborted': 'SAY_STOP1'}
+        )
+        StateMachine.add(
             'SAY_STOP',
             speech_output.sayText(
-                info="I will stop moving now."),
+                info="Ich bleibe jetzt stehen."),
+                #info="I will stop moving now."),
+            transitions={'succeeded': 'LOG_SUCCESS',
+                         'failed': 'LOG_ABORTED'}
+        )
+        StateMachine.add(
+            'SAY_STOP1',
+            speech_output.sayText(
+                info="Ich sehe dich nicht mehr und bleibe deshalb hier stehen."),
+                #info="I will stop moving now."),
             transitions={'succeeded': 'LOG_SUCCESS',
                          'failed': 'LOG_ABORTED'}
         )

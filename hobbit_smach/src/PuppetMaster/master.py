@@ -710,9 +710,16 @@ def main():
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
+            transitions={'succeeded': 'MAIN_MENU',
+                         'preempted': 'MAIN_MENU',
+                         'aborted': 'MAIN_MENU'}
+        )
+        StateMachine.add(
+            'MAIN_MENU',
+            HobbitMMUI.ShowMenu(menu='MAIN'),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'preempted': 'RESET_ACTIVE_TASK',
-                         'aborted': 'RESET_ACTIVE_TASK'}
+                         'failed': 'RESET_ACTIVE_TASK'}
         )
         if MUC_ENABLED:
             StateMachine.add_auto(
@@ -724,12 +731,6 @@ def main():
                 'REWARD',
                 social_role.get_reward(),
                 connector_outcomes=['succeeded', 'aborted'])
-        StateMachine.add(
-            'MAIN_MENU',
-            HobbitMMUI.ShowMenu(menu='MAIN'),
-            transitions={'succeeded': 'RESET_ACTIVE_TASK',
-                         'failed': 'RESET_ACTIVE_TASK'}
-        )
         StateMachine.add(
             'BRING_OBJECT',
             FakeForAllWithoutRunningActionSever(name='BRING_OBJECT'),
