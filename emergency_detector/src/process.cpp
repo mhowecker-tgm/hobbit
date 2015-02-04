@@ -53,7 +53,7 @@ double maxHumanTemperature = 37.0;
 unsigned int doCVOutput=0;
 unsigned int emergencyDetected=0;
 unsigned int personDetected=0;
-unsigned int autoPlaneSegmentation=0;
+unsigned int autoPlaneSegmentationFlag=0;
 
 float temperatureAmbientDetected=0.0; //<- YODO : default value should be 0
 float temperatureObjectDetected=0.0; //<- YODO : default value should be 0
@@ -277,9 +277,10 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
          segmentedRGB = copyRGB(colorFrame ,colorWidth , colorHeight);
          segmentedDepth = copyDepth(depthFrame ,depthWidth , depthHeight);
         //fprintf(stderr,"Copied rgb/depth\n");
-         if (autoPlaneSegmentation) { segConfDepth.autoPlaneSegmentation=1; autoPlaneSegmentation=0;
-                                      ROS_INFO("Emergency Detector doing auto plane segmentation.."); } else
-                                    { segConfDepth.autoPlaneSegmentation=0; }
+         if (autoPlaneSegmentationFlag) { segConfDepth.autoPlaneSegmentation=1; autoPlaneSegmentationFlag=0;
+                                           fprintf(stderr,RED "Emergency Detector doing auto plane segmentation.." NORMAL);
+                                        } else
+                                        { segConfDepth.autoPlaneSegmentation=0; }
 
 
         fprintf(stderr,"Segmenting 2 frames sized  %ux%u and %ux%u \n",colorWidth , colorHeight,depthWidth , depthHeight);

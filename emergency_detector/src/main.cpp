@@ -243,7 +243,7 @@ bool visualizeOff(std_srvs::Empty::Request& request, std_srvs::Empty::Response& 
 
 bool autoPlaneSegmentation(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    autoPlaneSegmentation=1;
+    autoPlaneSegmentationFlag=1;
 }
 
 
