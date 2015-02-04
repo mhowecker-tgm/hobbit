@@ -143,7 +143,7 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 
 		std::cout << "Docking on received" << std::endl;
 
-		mira::RPCFuture<void> r1 = robot_->getMiraAuthority().callService<void>("/robot/Robot#builtin", std::string("setProperty"), std::string("MainControlUnit.Force"), std::string("20"));
+		mira::RPCFuture<void> r1 = robot_->getMiraAuthority().callService<void>("/robot/Robot#builtin", std::string("setProperty"), std::string("MainControlUnit.Force"), std::string("30"));
         	r1.timedWait(mira::Duration::seconds(1));
         	r1.get();
 
