@@ -131,6 +131,9 @@ sleep $DELAY_BETWEEN_STEPS
 cd /opt/ros/hobbit_hydro/src/top_scan_points/launch
 roslaunch startup.launch&
 
+sleep $DELAY_BETWEEN_STEPS
+roslaunch person_following startup.launch&
+
 
 cd $STARTDIR
 
