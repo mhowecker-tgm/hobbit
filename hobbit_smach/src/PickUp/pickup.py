@@ -291,33 +291,32 @@ def main():
             speech_output.sayText(info='Please point to the object that you want me to pick up.'),
             connector_outcomes=['succeeded', 'preempted', 'failed']
         )
-        # smach.StateMachine.add(
-        #     'GET_POINTING_DIRECTION',
-        #     MonitorState(
-        #         '/pointEvents',
-        #         PointEvents,
-        #         cond_cb=pointevents_cb,
-        #         max_checks=20,
-        #         output_keys=['pointing_msg']
-        #     ),
-        #     transitions={'valid': 'POINTING_COUNTER',
-        #                  'invalid': 'START_LOOKING',   #df 27.1.2015 uncomment again and delete next line !!!!!!!!!!!!!!!!!!!!!!1
-        #                  #'invalid': 'LOG_PREEMPT',
-        #                  'preempted': 'LOG_PREEMPT'}
-        # )
-        StateMachine.add(
-            'GET_POINTING_DIRECTION',
-            WaitForMsgState(
-                '/pointEvents',
-                PointEvents,
-                msg_cb=point_other_state_cb,
-                timeout=15000,
-                output_keys=['pointing_msg']
-            ),
-            transitions={'succeeded': 'START_LOOKING',
-                         'aborted': 'POINTING_COUNTER',
-                         'preempted': 'LOG_PREEMPT'}
-        )
+        smach.StateMachine.add(
+             'GET_POINTING_DIRECTION',
+             MonitorState(
+                 '/pointEvents',
+                 PointEvents,
+                 cond_cb=pointevents_cb,
+                 max_checks=20,
+                 output_keys=['pointing_msg']
+             ),
+             transitions={'valid': 'POINTING_COUNTER',
+                          'invalid': 'START_LOOKING',   
+                          'preempted': 'LOG_PREEMPT'}
+         )
+        #StateMachine.add(
+        #    'GET_POINTING_DIRECTION',
+        #    WaitForMsgState(
+        #        '/pointEvents',
+        #        PointEvents,
+        #        msg_cb=point_other_state_cb,
+        #        timeout=15,
+        #        output_keys=['pointing_msg']
+        #    ),
+        #    transitions={'succeeded': 'START_LOOKING',
+        #                 'aborted': 'POINTING_COUNTER',
+        #                 'preempted': 'LOG_PREEMPT'}
+        #)
         StateMachine.add(
             'POINTING_COUNTER',
             PointingCounter(),
