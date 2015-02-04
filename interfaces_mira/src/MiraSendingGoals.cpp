@@ -190,7 +190,7 @@ void MiraSendingGoals::goal_pose_callback(const hobbit_msgs::Pose2DStamped::Cons
 
 void MiraSendingGoals::stop_request_callback(const std_msgs::String::ConstPtr& msg)
 {
-	if (msg->data.compare("stop") || msg->data.compare("Stop") || msg->data.compare("STOP"))
+	if (msg->data.compare("stop")==0 || msg->data.compare("Stop")==0 || msg->data.compare("STOP")==0)
 	{
 		cancelGoal();
 	}
