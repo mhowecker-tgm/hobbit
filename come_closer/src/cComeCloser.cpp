@@ -304,8 +304,7 @@ void cComeCloser::event_callback(const hobbit_msgs::Event::ConstPtr& msg)
 {
 	if (msg->event.compare("E_RELEASEBUTTON")==0)
 	{
-		std::cout << "msg " << msg->event << std::endl;
-		std::cout << "Release button pressed" << std::endl;
+		//std::cout << "Release button pressed" << std::endl;
 		//call service 
 		mira_msgs::ResetMotorStop srv;
 	        if (!reset_motorstop_client.call(srv))
