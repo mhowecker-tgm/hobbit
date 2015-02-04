@@ -60,9 +60,9 @@ def main():
 
     def child_term_cb(outcome_map):
         print(outcome_map)
-        return True
-        #if outcome_map['GET_USER'] == 'succeeded':
-            #return True
+        #return True
+        if outcome_map['GET_USER'] == 'succeeded':
+            return True
 
     def out_cb(outcome_map):
         return 'succeeded'
@@ -79,6 +79,7 @@ def main():
 
     def msg_cb(ud, msg):
         print('person (x,y,z) {}, {}, {}'.format(msg.x, msg.y, msg.z))
+        rospy.loginfo('person (x,y,z) {}, {}, {}'.format(msg.x, msg.y, msg.z))
         if msg.x: 
             return False
 
