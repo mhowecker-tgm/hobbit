@@ -32,7 +32,7 @@ then
  roslaunch gmapping_hobbit.launch&
 
  sleep $DELAY_BETWEEN_STEPS
- rosrun rviz rviz
+ rosrun rviz rviz&
 
 elif [ "$1" == "learning" ]
 then
