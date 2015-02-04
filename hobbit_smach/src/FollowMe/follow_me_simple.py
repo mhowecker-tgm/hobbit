@@ -59,11 +59,14 @@ def main():
         output_keys=['result'])
 
     def child_term_cb(outcome_map):
-        if outcome_map['DETECTION'] == 'succeeded':
-            return True
+        print(outcome_map)
+        return True
+        #if outcome_map['GET_USER'] == 'succeeded':
+            #return True
 
     def out_cb(outcome_map):
-        if outcome_map['DETECTION'] == 'succeeded':
+        return 'succeeded'
+        if outcome_map['GET_USER'] == 'invalid':
             return 'succeeded'
 
     cc = Concurrence(
@@ -75,8 +78,8 @@ def main():
 
 
     def msg_cb(ud, msg):
-        print('person (x,y,z) {}, {}, {}'.format(msg.pose.x, msg.pose.y, msg.pose.z))
-        if msg.pose.x: 
+        print('person (x,y,z) {}, {}, {}'.format(msg.x, msg.y, msg.z))
+        if msg.x: 
             return False
 
 
@@ -96,6 +99,7 @@ def main():
             SleepState(10)
         )
 
+    fm_sm.userdata.result = 'ok_test'
     with fm_sm:
         StateMachine.add(
             'INIT',
@@ -128,7 +132,7 @@ def main():
         StateMachine.add(
             'FOLLOW',
             SimpleActionState(
-                'follow_navigation',
+                'person_following',
                 FollowMeAction,
                 goal=follow_goal,
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),

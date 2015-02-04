@@ -82,7 +82,12 @@ def command_cb(msg, ud):
 
     night = IsItNight(ud)
     active_task = ud.parameters['active_task']
+    first = True
     for index, item in enumerate(commands):
+        if first and active_task < 100:
+            rospy.loginfo('CURRENTLY RUNNING TASK LEVEL: '+ str(active_task)+' '+commands[active_task][0]+' or similar')
+            speech_output.sayText(info=commands[active_task][0])
+            first = False
         if input_ce in item:
             if item[0] == 'master_reset':
                     rospy.loginfo('Master RESET activated')
@@ -359,13 +364,13 @@ def patrol_cb(ud, goal):
 
 
 def follow_cb(ud, goal):
-    room, place = ud.params[0].value.lower().split(' ')
-    if not room or not place:
-        room = 'corridor'
-        place = 'default'
+    #room, place = ud.params[0].value.lower().split(' ')
+    #if not room or not place:
+    #    room = 'corridor'
+    #    place = 'default'
     par = []
-    par.append(String(room))
-    par.append(String(place))
+    #par.append(String(room))
+    #par.append(String(place))
     goal = GeneralHobbitGoal(command=String('follow'),
                              previous_state=String('previous_task'),
                              parameters=par)

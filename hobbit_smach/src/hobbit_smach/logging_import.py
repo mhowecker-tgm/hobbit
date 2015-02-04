@@ -89,7 +89,7 @@ class DoLogSuccess(State):
         State.__init__(
             self,
             outcomes=['succeeded'],
-            output_keys=['result']
+            output_keys=['result'],
             input_keys=['scenario', 'data', 'command'] if
             (scenario is not None) else []
         )
