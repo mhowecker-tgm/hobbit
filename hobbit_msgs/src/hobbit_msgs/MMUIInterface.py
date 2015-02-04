@@ -80,7 +80,7 @@ class MMUIInterface:
         parr.append(p)
         p = Parameter('Repetitions', '3')
         parr.append(p)
-        p = Parameter('Timeout', "15")
+        p = Parameter('Timeout', "30")
         parr.append(p)
         if prm != "":
             p = Parameter('parameter', prm)

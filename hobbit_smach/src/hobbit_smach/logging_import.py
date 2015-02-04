@@ -89,6 +89,7 @@ class DoLogSuccess(State):
         State.__init__(
             self,
             outcomes=['succeeded'],
+            output_keys=['result']
             input_keys=['scenario', 'data', 'command'] if
             (scenario is not None) else []
         )
@@ -109,6 +110,7 @@ class DoLogSuccess(State):
         params.append(par)
         message.params = params
         self.pubEvent.publish(message)
+        ud.result = String('success')
         return 'succeeded'
 
 

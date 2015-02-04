@@ -172,7 +172,7 @@ def main():
     asw = ActionServerWrapper(
         'follow_me_simple', GeneralHobbitAction, fm_sm,
         ['succeeded'], ['aborted'], ['preempted'],
-        result_slots_map={'result': 'result'},
+        #result_slots_map={'result': 'result'},
         goal_slots_map={'command': 'command'})
     sis = IntrospectionServer(
         'smach_server', fm_sm, '/HOBBIT/follow_me_simple_sm_ROOT')

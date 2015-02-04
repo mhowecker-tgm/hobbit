@@ -53,12 +53,17 @@ class CleanUp(State):
             outcomes=['succeeded'],
             input_keys=['command', 'visited_places'],
             output_keys=['result', 'command', 'visited_places'])
-        self.pub_face = rospy.Publisher(
-            '/Hobbit/Emoticon',
-            String,
-            queue_size=50)
+        self.init = None
+
 
     def execute(self, ud):
+        if not self.init:
+            self.init = True
+            self.pub_face = rospy.Publisher(
+                '/Hobbit/Emoticon',
+                String,
+                queue_size=50)
+            rospy.sleep( 1.0 )
         self.pub_face.publish('EMO_SAD')
         ud.visited_places = []
         ud.result = String('object not detected')
