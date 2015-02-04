@@ -3,6 +3,8 @@
 	<var MCFFile="../maps/current_map/mcf.xml" />
 	<include file="${findpkg SCITOSConfigs}/etc/SCITOS-application.xml" />
 
+	<parameter name="/robot/Robot.Modules.MainControlUnit.PersistentFreerun">true</parameter>
+
 	<!-- Here we patch in the kinect as the laser to use for localization -->
 	<namespace name="localization">
 		<parameter name="Poseidon.Sensors[?].item{mira::localization::RangeScanSensor}">
