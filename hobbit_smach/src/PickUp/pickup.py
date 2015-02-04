@@ -395,13 +395,27 @@ def main():
         StateMachine.add(
             'MOVE_TO_GRASP_POSE',
             hobbit_move.goToPoseSilent(),
-            transitions={'succeeded': 'SAY_PICKING_UP',
+            transitions={'succeeded': 'HEAD_TO_GRASP_POSITION',
                          'aborted': 'MOVE_COUNTER',
                          'preempted': 'LOG_PREEMPT'},
             remapping={'x': 'goal_position_x',
                        'y': 'goal_position_y',
                        'yaw': 'goal_position_yaw'}
         )
+        StateMachine.add(
+            'HEAD_TO_GRASP_POSITION',
+            head_move.MoveTo(pose='to_grasp'),
+            transitions={'succeeded': 'WAIT_FINISH_HEAD_TO_GRASP_POSITION', # df
+                         'aborted': 'EMO_SAY_OBJECT_NOT_DETECTED',
+                         'preempted': 'LOG_PREEMPT'}
+        )
+        # df 30.7.2014
+        StateMachine.add(
+            'WAIT_FINISH_HEAD_TO_GRASP_POSITION',
+            SleepState(duration=5),
+            transitions={'succeeded': 'SAY_PICKING_UP',
+                         'preempted': 'LOG_PREEMPT'}
+            )
         StateMachine.add(
             'MOVE_COUNTER',
             MoveCounter(),
