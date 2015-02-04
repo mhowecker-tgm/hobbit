@@ -219,6 +219,7 @@ void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 					{
 						//the user has been lost for a while, so the following behaviour is stopped
 						std::cout << "no target for a while, stopping " << std::endl;
+						std::cout << "aborted " << std::endl;
 						stopFollowing();
 						as_->setAborted(hobbit_msgs::FollowMeResult(), "Follow-me aborted, no target was detected at all"); //
 						return;
