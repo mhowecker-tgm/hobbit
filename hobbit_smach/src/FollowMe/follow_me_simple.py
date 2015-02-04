@@ -14,7 +14,7 @@ import hobbit_smach.speech_output_import as speech_output
 
 from std_msgs.msg import String
 from smach_ros import ActionServerWrapper, IntrospectionServer
-from uashh_smach.util import SleepState
+from uashh_smach.util import SleepState, WaitForMsgState
 from follow_user.msg import Person as FollowPerson
 from hobbit_user_interaction import HobbitMMUI
 
@@ -81,7 +81,8 @@ def main():
         print('person (x,y,z) {}, {}, {}'.format(msg.x, msg.y, msg.z))
         rospy.loginfo('person (x,y,z) {}, {}, {}'.format(msg.x, msg.y, msg.z))
         if msg.x: 
-            return False
+            #return False
+            return True
 
 
     with cc:
@@ -117,7 +118,13 @@ def main():
         )
         StateMachine.add(
             'GET_USER',
-            cc,
+            #cc,
+            WaitForMsgState(
+                '/follow_user/persons',
+                FollowPerson,
+                cond_cb=msg_cb,
+                timeout=10
+            ),
             transitions={'succeeded': 'SAY_FOUND_YOU',
                          'aborted': 'SAY_CANT_SEE'}
         )
