@@ -7,7 +7,7 @@
 	<param name="max_lim" value="3.0"/>
 	<param name="min_valid_points" value="20"/>
 
-  	<param name="time_limit_secs" value="0.1"/>
+  	<param name="dis_thres" value="1.5"/>
 	<param name="rate_thres" value="0.6"/>	
 
   </node>

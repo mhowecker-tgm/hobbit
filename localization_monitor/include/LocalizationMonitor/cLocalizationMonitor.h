@@ -40,6 +40,7 @@ private:
   ros::Publisher locStatePublisher;
 
   geometry_msgs::PoseWithCovarianceStamped current_pose;
+  geometry_msgs::PoseWithCovarianceStamped prev_pose;
 
   int init_argc;
   char **init_argv;
@@ -87,12 +88,12 @@ private:
   ros::ServiceServer get_occupancy_state_service;
   bool getOccupancyState(hobbit_msgs::GetOccupancyState::Request  &rq, hobbit_msgs::GetOccupancyState::Response &res);
 
-  bool timeout_started;
   int ok_count;
   int not_ok_count;
-  clock_t begin;
-  double time_limit_secs;
   double rate_thres;
+
+  double dis_covered_sq;
+  double dis_thres;
 
   bool initial_current_pose_received;
 

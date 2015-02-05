@@ -29,8 +29,6 @@ cLocalizationMonitor::cLocalizationMonitor(int argc, char **argv) : init_argc(ar
 
 	is_charging = false;
 
-	timeout_started = false;
-
 	initial_current_pose_received = false;
 
 	ros::NodeHandle nh("~");
@@ -40,8 +38,11 @@ cLocalizationMonitor::cLocalizationMonitor(int argc, char **argv) : init_argc(ar
 	nh.param("max_lim", max_lim, 3.0); //large measurements are more noisy, do not consider
 	nh.param("min_valid_points", min_valid_points, 20); 
 
-	nh.param("time_limit_secs", time_limit_secs, 600.0); //default 10 min
+	nh.param("dis_thres", dis_thres, 1.5);
 	nh.param("rate_thres", rate_thres, 0.6); 
+
+	ok_count = 0;
+        not_ok_count = 0;
 
 
 }
@@ -383,36 +384,26 @@ void cLocalizationMonitor::Run(void)
 
 	 if (!initial_current_pose_received) return;
 
-	 if (!timeout_started)
+	bool scan_ok = checkScan();
+	bool uncertainty_ok = checkUncertainty();
+	if (uncertainty_ok && scan_ok)
+		ok_count ++;
+	else
+		not_ok_count++;
+
+	dis_covered_sq = (current_pose.pose.pose.position.x-prev_pose.pose.pose.position.x)*(current_pose.pose.pose.position.x-prev_pose.pose.pose.position.x) + (current_pose.pose.pose.position.y-prev_pose.pose.pose.position.y)*(current_pose.pose.pose.position.y-prev_pose.pose.pose.position.y);
+
+	//std::cout << "dis_cov_sq " << dis_covered_sq << std::endl;
+
+	 if (dis_covered_sq > dis_thres*dis_thres)
 	 {
-		begin = clock();
-		timeout_started = true;
+		double rate = (double)ok_count/(ok_count+not_ok_count);
+		std::cout << "loc_ok_rate " << rate << std::endl; 
+		loc_ok = (rate > rate_thres); //default 60%
 		ok_count = 0;
 		not_ok_count = 0;
-	 }
-
-	 if (timeout_started)
-	 {
-
-		bool scan_ok = checkScan();
-		bool uncertainty_ok = checkUncertainty();
-		if (uncertainty_ok && scan_ok)
-			ok_count ++;
-		else
-			not_ok_count++;
+		prev_pose = current_pose;
 		
-		clock_t end = clock();
-		double elapsed_secs = ((double)(end - begin))/CLOCKS_PER_SEC;
-		//std::cout << "elapsed seconds " << elapsed_secs << std::endl;
-		if (elapsed_secs >= time_limit_secs) //the timeout has been reached
-		{
-			timeout_started = false;
-			std::cout << "ok_count " << ok_count << std::endl;
-			std::cout << "not_ok_count " << not_ok_count << std::endl;
-			double rate = (double)ok_count/(ok_count+not_ok_count);
-			std::cout << "loc_ok_rate " << rate << std::endl; 
-			loc_ok = (rate > rate_thres); //default 60%
-		}
 	 }
 
 	 std_msgs::Bool loc_state;
@@ -430,7 +421,11 @@ void cLocalizationMonitor::Run(void)
 void cLocalizationMonitor::loc_pose_callback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg)
 {
   current_pose = (*msg);
-  initial_current_pose_received = true;
+  if (!initial_current_pose_received)
+  {
+	prev_pose = current_pose;
+  	initial_current_pose_received = true;
+  }
 
         
 }
