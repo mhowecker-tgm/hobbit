@@ -94,6 +94,8 @@ private:
   double time_limit_secs;
   double rate_thres;
 
+  bool initial_current_pose_received;
+
 };
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #endif

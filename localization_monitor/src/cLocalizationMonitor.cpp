@@ -15,6 +15,8 @@
 
 #include <occupancy_grid_utils/coordinate_conversions.h>
 
+#include <ctime>
+
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Constructor. Initialises member attributes and allocates resources.
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -28,6 +30,8 @@ cLocalizationMonitor::cLocalizationMonitor(int argc, char **argv) : init_argc(ar
 	is_charging = false;
 
 	timeout_started = false;
+
+	initial_current_pose_received = false;
 
 	ros::NodeHandle nh("~");
 	nh.param("uncertainty_thres", uncertainty_thres, 0.15);
@@ -283,7 +287,7 @@ bool cLocalizationMonitor::checkScan()
 	if (valid_points < min_valid_points) return true; //open space, we cannot tell if the robot is lost yet
 
 	double rel_score = score/valid_points;
-	std::cout << "rel_score " << rel_score << std::endl;
+	//std::cout << "rel_score " << rel_score << std::endl;
 	if (rel_score > score_thres)
 		return true;
 	else 
@@ -311,7 +315,7 @@ bool cLocalizationMonitor::checkUncertainty()
           double sq_area_estimate = std::real(eigenvalues(0))*std::real(eigenvalues(1)); //the eigenvalues of the covariance must be real and non-negative
 
 	  double axes_prod = uncertainty_thres*uncertainty_thres;
-	  std::cout << " sq_area_estimate " << sq_area_estimate << " thres " << axes_prod*axes_prod << std::endl;
+	  //std::cout << " sq_area_estimate " << sq_area_estimate << " thres " << axes_prod*axes_prod << std::endl;
           if (sq_area_estimate < axes_prod*axes_prod)
 	     return true;
   	  else 
@@ -377,6 +381,8 @@ bool cLocalizationMonitor::getOccupancyState(hobbit_msgs::GetOccupancyState::Req
 void cLocalizationMonitor::Run(void)
 {
 
+	 if (!initial_current_pose_received) return;
+
 	 if (!timeout_started)
 	 {
 		begin = clock();
@@ -396,11 +402,14 @@ void cLocalizationMonitor::Run(void)
 			not_ok_count++;
 		
 		clock_t end = clock();
-		double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+		double elapsed_secs = ((double)(end - begin))/CLOCKS_PER_SEC;
+		//std::cout << "elapsed seconds " << elapsed_secs << std::endl;
 		if (elapsed_secs >= time_limit_secs) //the timeout has been reached
 		{
 			timeout_started = false;
-			double rate = ok_count/(ok_count+not_ok_count);
+			std::cout << "ok_count " << ok_count << std::endl;
+			std::cout << "not_ok_count " << not_ok_count << std::endl;
+			double rate = (double)ok_count/(ok_count+not_ok_count);
 			std::cout << "loc_ok_rate " << rate << std::endl; 
 			loc_ok = (rate > rate_thres); //default 60%
 		}
@@ -421,6 +430,7 @@ void cLocalizationMonitor::Run(void)
 void cLocalizationMonitor::loc_pose_callback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg)
 {
   current_pose = (*msg);
+  initial_current_pose_received = true;
 
         
 }
