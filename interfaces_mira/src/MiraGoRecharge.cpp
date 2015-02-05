@@ -77,7 +77,7 @@ void MiraGoRecharge::docking_task_callback(const std_msgs::String::ConstPtr& msg
 
 	//if (msg->data.compare("docking_station") || msg->data.compare("DockingStation") || msg->data.compare("Recharge") || msg->data.compare("recharge"))
 
-	/*std::cout << "data " << msg->data << std::endl;
+	std::cout << "data " << msg->data << std::endl;
 	
 	if (msg->data.compare("docking_on") == 0)
 	{
@@ -124,7 +124,7 @@ void MiraGoRecharge::docking_task_callback(const std_msgs::String::ConstPtr& msg
 
 		rpcFuture.get();
 
-	}*/
+	}
 
 }
 
