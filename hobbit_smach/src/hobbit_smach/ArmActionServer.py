@@ -378,12 +378,14 @@ class ArmActionServerROS(object):
             
             self._result.result = self.CheckTargetPos(feedback, self.ArmClient.GetArmInTargetPos, 60)  # wait until arm has reached its initial pre-grasp position
             #=======================================================        =======================================================
-        #dddd
         elif cmd == 'SetMoveToCheckGraspFromFloorPosition':
             #move arm MANUALLY (fixed values ->DANGEROUS!!!) to pregraspfromfloor position
             feedback = self.ArmClient.SetAbsolutePos(63.69,31.39,96.31,122.2,67.79,0) #(90, 0, 50, 0, 110, 0)
             print "start moving arm to check-if-grasp-from-floor-was-successful-position MANUALLY (hard coded joint values)"
-            print self.ArmClient.SetStartMove(5.0)   #(10) #10 Grad/Sec
+            print self.ArmClient.SetStartMove(10.0)   #(10) #10 Grad/Sec
+            while not self.ArmClient.GetArmInTargetPos():
+                print "SetMoveToCheckGraspFromFloorPosition(): wait that arm has reached target position"
+                rospy.sleep(0.2)
             self._result.result = self.CheckTargetPos(feedback, self.ArmClient.GetArmInTargetPos, 60)  # wait until arm has reached its initial pre-grasp position
                    
         elif cmd == 'SetMoveToPreGraspFromFloorPosManually':
@@ -391,6 +393,11 @@ class ArmActionServerROS(object):
             feedback = self.ArmClient.SetAbsolutePos(69.71,31.39,96.31,122.2,109.74,0) #(90, 0, 50, 0, 110, 0)
             print "start moving arm to pre-grasp-from-floor-position MANUALLY (hard coded joint values)"
             print self.ArmClient.SetStartMove(5.0)   #(10) #10 Grad/Sec
+            while not self.ArmClient.GetArmAtPreGraspFromFloorPos():
+                print "SetMoveToPreGraspFromFloorPosManually(): wait that arm has reached target position"
+                rospy.sleep(0.2)          
+            
+            
             self._result.result = self.CheckTargetPos(feedback, self.ArmClient.GetArmInTargetPos, 60)  # wait until arm has reached its initial pre-grasp position
             
     
