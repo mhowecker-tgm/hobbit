@@ -192,6 +192,7 @@ void MiraSendingGoals::stop_request_callback(const std_msgs::String::ConstPtr& m
 {
 	if (msg->data.compare("stop")==0 || msg->data.compare("Stop")==0 || msg->data.compare("STOP")==0)
 	{
+		std::cout << "stop command received " << std::endl;
 		cancelGoal();
 	}
 
@@ -222,6 +223,7 @@ void MiraSendingGoals::bumper_callback(const std_msgs::Bool::ConstPtr& msg)
 {
 	if (msg->data) //bumper was hit
 	{
+		std::cout << "bumper was hit, cancelling goal " << std::endl;
 		cancelGoal();
 	}
 
