@@ -73,6 +73,8 @@ private:
 	double dis_thres;
 	double ang_thres;
 
+	double range_max;
+
 };
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #endif

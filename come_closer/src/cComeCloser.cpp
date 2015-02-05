@@ -29,6 +29,8 @@ cComeCloser::cComeCloser(int argc, char **argv) : init_argc(argc), init_argv(arg
 	nh.param("dis_thres", dis_thres, 0.1);
 	nh.param("ang_thres", ang_thres, 15.0);
 
+	nh.param("range_max", range_max, 1.5);
+
 	ros::NodeHandle n;
 	discrete_motion_cmd_pub = n.advertise<std_msgs::String>("/DiscreteMotionCmd", 20);
 
@@ -146,7 +148,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 	scanner_info.angle_min = -M_PI/2;
 	scanner_info.angle_max = M_PI/2;
 	scanner_info.angle_increment = 1*M_PI/180; //FIXME add params
-	scanner_info.range_max = 1.5;
+	scanner_info.range_max = range_max;
 
 	const geometry_msgs::Pose sensor_pose_ = sensor_pose;
 	const sensor_msgs::LaserScan scanner_info_ = scanner_info;
