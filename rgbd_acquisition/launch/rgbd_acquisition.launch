@@ -25,6 +25,7 @@
       <param name="camera" value="$(arg camera)" />
       <param name="deviceID" value="$(arg deviceID)" /> 
       <param name="frame" value="$(arg frame)" /> 
+      <param name="rate" value="30" /> 
       <param name="useSkeleton" value="0" />  
     </node>  
 
