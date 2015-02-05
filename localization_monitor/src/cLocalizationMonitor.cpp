@@ -29,7 +29,7 @@ cLocalizationMonitor::cLocalizationMonitor(int argc, char **argv) : init_argc(ar
 
 	timeout_started = false;
 
-	ros::NodeHandle nh;
+	ros::NodeHandle nh("~");
 	nh.param("uncertainty_thres", uncertainty_thres, 0.15);
 	nh.param("score_thres", score_thres, 0.3); //consider lowering this threshold to account for changes in the environment, compromise needed 
 	nh.param("inflation_thres", inflation_thres, 0.2); //dilate static map to allow for some error 
