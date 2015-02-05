@@ -21,21 +21,24 @@
 cLocalizationMonitor::cLocalizationMonitor(int argc, char **argv) : init_argc(argc), init_argv(argv)
 {
 	loc_ok = true;
-	uncertainty_thres = 0.15;
-
-	high_uncertainty = false;
-	matching_ok = true;
-
-	score_thres = 0.3;  //consider lowering this threshold to account for changes in the environment, compromise needed 
-
-	thres = 0.2;
-        max_lim = 3;
-	min_valid_points = 20; //FIXME
 
 	check_cov = true;
 	check_scan = true;
 
 	is_charging = false;
+
+	timeout_started = false;
+
+	ros::NodeHandle nh;
+	nh.param("uncertainty_thres", uncertainty_thres, 0.15);
+	nh.param("score_thres", score_thres, 0.3); //consider lowering this threshold to account for changes in the environment, compromise needed 
+	nh.param("inflation_thres", inflation_thres, 0.2); //dilate static map to allow for some error 
+	nh.param("max_lim", max_lim, 3.0); //large measurements are more noisy, do not consider
+	nh.param("min_valid_points", min_valid_points, 20); 
+
+	nh.param("time_limit_secs", time_limit_secs, 600.0); //default 10 min
+	nh.param("rate_thres", rate_thres, 0.6); 
+
 
 
 }
@@ -186,7 +189,7 @@ void cLocalizationMonitor::open(ros::NodeHandle & n)
 		 int st_index = occupancy_grid_utils::cellIndex(static_map.info, occupancy_grid_utils::Cell(ind_i,ind_j));
 		 if (static_map.data[st_index] == occupancy_grid_utils::OCCUPIED)
 		 {
-			 int d = thres/static_map.info.resolution;
+			 int d = inflation_thres/static_map.info.resolution;
 			 for (int k=ind_i-d; k<=ind_i+d; k++)
 				 for (int l=ind_j-d; l<=ind_j+d; l++)
 				 {       
@@ -375,7 +378,35 @@ bool cLocalizationMonitor::getOccupancyState(hobbit_msgs::GetOccupancyState::Req
 void cLocalizationMonitor::Run(void)
 {
 
-	 loc_ok = (!high_uncertainty && matching_ok);
+	 if (!timeout_started)
+	 {
+		begin = clock();
+		timeout_started = true;
+		ok_count = 0;
+		not_ok_count = 0;
+	 }
+
+	 if (timeout_started)
+	 {
+
+		bool scan_ok = checkScan();
+		bool uncertainty_ok = checkUncertainty();
+		if (uncertainty_ok && scan_ok)
+			ok_count ++;
+		else
+			not_ok_count++;
+		
+		clock_t end = clock();
+		double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+		if (elapsed_secs >= time_limit_secs) //the timeout has been reached
+		{
+			timeout_started = false;
+			double rate = ok_count/(ok_count+not_ok_count);
+			std::cout << "loc_ok_rate " << rate << std::endl; 
+			loc_ok = (rate > rate_thres); //default 60%
+		}
+	 }
+
 	 std_msgs::Bool loc_state;
 	 loc_state.data = loc_ok;
 	 locStatePublisher.publish(loc_state);

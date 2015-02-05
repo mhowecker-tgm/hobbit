@@ -45,8 +45,6 @@ private:
   char **init_argv;
 
   bool loc_ok;
-  bool high_uncertainty;
-  bool matching_ok;
 
   double uncertainty_thres;
 
@@ -60,7 +58,7 @@ private:
   ros::Publisher mapTestPublisher;
 
   nav_msgs::OccupancyGrid static_map_modified;
-  double thres;
+  double inflation_thres;
 
 //services
   ros::ServiceServer get_loc_status_service;
@@ -86,6 +84,13 @@ private:
 
   ros::ServiceServer get_occupancy_state_service;
   bool getOccupancyState(hobbit_msgs::GetOccupancyState::Request  &rq, hobbit_msgs::GetOccupancyState::Response &res);
+
+  bool timeout_started;
+  int ok_count;
+  int not_ok_count;
+  clock_t begin;
+  double time_limit_secs;
+  double rate_thres;
 
 };
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
