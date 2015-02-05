@@ -45,6 +45,8 @@ private:
   char **init_argv;
 
   bool loc_ok;
+  bool high_uncertainty;
+  bool matching_ok;
 
   double uncertainty_thres;
 
