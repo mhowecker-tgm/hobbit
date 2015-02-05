@@ -16,7 +16,7 @@ cComeCloser::cComeCloser(int argc, char **argv) : init_argc(argc), init_argv(arg
 {
 	as_ = new actionlib::SimpleActionServer<hobbit_msgs::GeneralHobbitAction>(ros::NodeHandle(), "come_closer", boost::bind(&cComeCloser::executeCb, this, _1), false);
 
-	ros::NodeHandle nh;
+	ros::NodeHandle nh("~");
 	nh.param("margin", margin, 0.05);
 	nh.param("front_dis", front_dis, 0.18);
 	nh.param("x_sensor", x_sensor, 0.135);
