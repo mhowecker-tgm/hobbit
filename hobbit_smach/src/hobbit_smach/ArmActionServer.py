@@ -318,7 +318,7 @@ class ArmActionServerROS(object):
             #MOVE ARM to Position above grasp Position
             feedback = self.ArmClient.SetAbsolutePos(float(input[1]),float(input[2]),float(input[3]),float(input[4]),float(input[5]),float(input[6])) #(90, 0, 50, 0, 110, 0)
             print self.ArmClient.SetStartMove(10.0)   #(10) #10 Grad/Sec
-            while not self.ArmClient.GetArmHasStopped():
+            while not self.ArmClient.GetArmInTargetPos():
                 print "SetExecuteGrasp(): wait that arm stops when moving to first trajectory point"
                 rospy.sleep(0.2)
             #MOVE ARM TO GRASP POSITION
@@ -338,7 +338,7 @@ class ArmActionServerROS(object):
             print "ArmActionServer, feedback: ", self._feedback.feedback.data
             self._as.publish_feedback(self._feedback)
             self._result.result = self.CheckTargetPos(feedback, self.ArmClient.GetArmInTargetPos, 60)  # wait until arm has reached final grasp position
-            while not self.ArmClient.GetArmHasStopped():
+            while not self.ArmClient.GetArmInTargetPos():
                 print "SetExecuteGrasp(): wait that arm stops when moving to final grasp position"
                 rospy.sleep(0.2)
             #close gripper
@@ -366,13 +366,13 @@ class ArmActionServerROS(object):
             self._feedback.feedback.data = str(feedback)
             print "ArmActionServer, feedback: ", self._feedback.feedback.data
             self._as.publish_feedback(self._feedback)
-            while not self.ArmClient.GetArmHasStopped():
+            while not self.ArmClient.GetArmInTargetPos():
                 print "SetExecuteGrasp(): wait that arm stops when moving to first trajectory point of calculated trajectory (moving back the hand)"
                 rospy.sleep(0.2)
             #move arm MANUALLY (fixed values ->DANGEROUS!!!) to pregraspfromfloor position
             feedback = self.ArmClient.SetAbsolutePos(69.71,31.39,96.31,122.2,109.74,0) #(90, 0, 50, 0, 110, 0)
             print self.ArmClient.SetStartMove(4.0)   #(10) #10 Grad/Sec
-            while not self.ArmClient.GetArmHasStopped():
+            while not self.ArmClient.GetArmInTargetPos():
                 print "SetExecuteGrasp(): wait that arm stops (is in final position) when moving back to pre-grasp-from-floor position"
                 rospy.sleep(0.2)
             
