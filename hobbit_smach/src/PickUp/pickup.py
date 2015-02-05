@@ -489,7 +489,7 @@ def main():
         
         StateMachine.add(
             'MOVE_ARM_TO_CHECK_GRASP_POSITION',   #position where gripper is not blocking view to floor where object was lying
-            dummy = arm_move.goToCheckGraspPosition(),
+            arm_move.goToCheckGraspPosition(),
             transitions={'succeeded': 'GET_POINT_CLOUD_FOR_GRASPCHECK', 
                          'preempted': 'LOG_PREEMPT',
                          'failed': 'MOVE_ARM_TO_CHECK_GRASP_POSITION'}    # better failure handling appreciated
@@ -519,7 +519,7 @@ def main():
 
         StateMachine.add(
             'CHECK_GRASP',
-            dummy = pickup.DavidCheckGrasp(),
+            pickup.DavidCheckGrasp(),
             transitions={'succeeded': 'END_PICKUP_SEQ',
                          'aborted': 'COUNTER_GRASP_CHECK'}  #aborted <=> check result: no object grasped
         )
