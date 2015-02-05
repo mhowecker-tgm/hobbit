@@ -7,7 +7,7 @@ cPersonFollowing::cPersonFollowing(int argc, char **argv) : init_argc(argc), ini
 {
 	as_ = new actionlib::SimpleActionServer<hobbit_msgs::FollowMeAction>(ros::NodeHandle(), "person_following", boost::bind(&cPersonFollowing::executeCb, this, _1), false);
 
-	ros::NodeHandle nh;
+	ros::NodeHandle nh("~");
 	nh.param("x_sensor", x_sensor, 0.135);
 	nh.param("dis2target", dis2target, 1.0);
 	nh.param("dis_thres", dis_thres, 0.2);
