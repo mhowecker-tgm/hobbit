@@ -377,12 +377,40 @@ bool cLocalizationMonitor::getOccupancyState(hobbit_msgs::GetOccupancyState::Req
 void cLocalizationMonitor::Run(void)
 {
 
-	 loc_ok = (!high_uncertainty && matching_ok);
+	 if (!timeout_started)
+	 {
+		begin = clock();
+		timeout_started = true;
+		ok_count = 0;
+		not_ok_count = 0;
+	 }
+
+	 if (timeout_started)
+	 {
+
+		bool scan_ok = checkScan();
+		bool uncertainty_ok = checkUncertainty();
+		if (uncertainty_ok && scan_ok)
+			ok_count ++;
+		else
+			not_ok_count++;
+		
+		clock_t end = clock();
+		double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+		if (elapsed_secs >= time_limit_secs) //the timeout has been reached
+		{
+			timeout_started = false;
+			double rate = ok_count/(ok_count+not_ok_count);
+			std::cout << "loc_ok_rate " << rate << std::endl; 
+			loc_ok = (rate > rate_thres); //default 60%
+		}
+	 }
+
 	 std_msgs::Bool loc_state;
 	 loc_state.data = loc_ok;
 	 locStatePublisher.publish(loc_state);
 
-	 mapTestPublisher.publish(static_map_modified); //for visualization purposes
+	 //mapTestPublisher.publish(static_map_modified); //for visualization purposes
 
 	 //mapTestPublisher.publish(static_map_low_res); //for visualization purposes
 
