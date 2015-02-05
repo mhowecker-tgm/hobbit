@@ -88,6 +88,8 @@ void cComeCloser::motion_state_callback(const std_msgs::String::ConstPtr& msg)
 void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 {
 
+	std::cout << "come_closer callback " << std::endl;
+
 	if (goal->command.data != "start")
 	{
 		return;
