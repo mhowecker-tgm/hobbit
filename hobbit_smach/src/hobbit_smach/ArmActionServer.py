@@ -318,8 +318,9 @@ class ArmActionServerROS(object):
             #MOVE ARM to Position above grasp Position
             feedback = self.ArmClient.SetAbsolutePos(float(input[1]),float(input[2]),float(input[3]),float(input[4]),float(input[5]),float(input[6])) #(90, 0, 50, 0, 110, 0)
             print self.ArmClient.SetStartMove(10.0)   #(10) #10 Grad/Sec
-            print "sleep 1 second"
-            rospy.sleep(1)
+            while not self.ArmClient.GetArmHasStopped():
+                print "SetExecuteGrasp(): wait that arm stops when moving to first trajectory point"
+                rospy.sleep(0.2)
             #MOVE ARM TO GRASP POSITION
             #set waypoints for moving arm to target position
             for x in range(0, nr_wp):
@@ -337,15 +338,17 @@ class ArmActionServerROS(object):
             print "ArmActionServer, feedback: ", self._feedback.feedback.data
             self._as.publish_feedback(self._feedback)
             self._result.result = self.CheckTargetPos(feedback, self.ArmClient.GetArmInTargetPos, 60)  # wait until arm has reached final grasp position
-    
+            while not self.ArmClient.GetArmHasStopped():
+                print "SetExecuteGrasp(): wait that arm stops when moving to final grasp position"
+                rospy.sleep(0.2)
             #close gripper
             feedback = self.ArmClient.SetCloseGripper()
             self._feedback.feedback.data = str(feedback)
             print "ArmActionServer, feedback for closing gripper: ", self._feedback.feedback.data  
             self._result.result = self.CheckTargetPos(feedback, self.ArmClient.GetGripperIsClosed, 10)
             
-            print "wait 4 seconds"
-            rospy.sleep(4)  #wait <=================================================================== waiting!!!!!!
+            print "wait 3 seconds"
+            rospy.sleep(3)  #wait <=================================================================== waiting!!!!!!
             
             # MOVE ARM BACK (reverted trajectory)
             # set waypoints for moving arm to target position
@@ -363,12 +366,15 @@ class ArmActionServerROS(object):
             self._feedback.feedback.data = str(feedback)
             print "ArmActionServer, feedback: ", self._feedback.feedback.data
             self._as.publish_feedback(self._feedback)
+            while not self.ArmClient.GetArmHasStopped():
+                print "SetExecuteGrasp(): wait that arm stops when moving to first trajectory point of calculated trajectory (moving back the hand)"
+                rospy.sleep(0.2)
             #move arm MANUALLY (fixed values ->DANGEROUS!!!) to pregraspfromfloor position
-            print "sleep 5 seconds before arm moves MANUALLY (fixed values ->DANGEROUS!!!) to pregraspfromfloor position"
-            rospy.sleep(5)
             feedback = self.ArmClient.SetAbsolutePos(69.71,31.39,96.31,122.2,109.74,0) #(90, 0, 50, 0, 110, 0)
             print self.ArmClient.SetStartMove(4.0)   #(10) #10 Grad/Sec
-            
+            while not self.ArmClient.GetArmHasStopped():
+                print "SetExecuteGrasp(): wait that arm stops (is in final position) when moving back to pre-grasp-from-floor position"
+                rospy.sleep(0.2)
             
             self._result.result = self.CheckTargetPos(feedback, self.ArmClient.GetArmInTargetPos, 60)  # wait until arm has reached its initial pre-grasp position
             #=======================================================        =======================================================

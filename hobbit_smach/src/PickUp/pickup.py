@@ -489,7 +489,7 @@ def main():
         
         StateMachine.add(
             'MOVE_ARM_TO_CHECK_GRASP_POSITION',   #position where gripper is not blocking view to floor where object was lying
-            arm_move.goToCheckGraspPosition(),
+            dummy = arm_move.goToCheckGraspPosition(),
             transitions={'succeeded': 'GET_POINT_CLOUD_FOR_GRASPCHECK', 
                          'preempted': 'LOG_PREEMPT',
                          'failed': 'MOVE_ARM_TO_CHECK_GRASP_POSITION'}    # better failure handling appreciated
@@ -505,14 +505,22 @@ def main():
                 output_keys=['cloud']
             ),
             transitions={'valid': 'GET_POINT_CLOUD_FOR_GRASPCHECK',
-                         'invalid': 'CHECK_GRASP',
+                         'invalid': 'MOVE_ARM_TO_PRE_GRASP_POSITION_MANUALLY',
                          'preempted': 'LOG_PREEMPT'}
         )        
-        # df end
+        #df new 5.2.2015
+        StateMachine.add(
+            'MOVE_ARM_TO_PRE_GRASP_POSITION_MANUALLY',   #position where gripper is not blocking view to floor where object was lying
+            arm_move.goToPreGraspPositionManually(),
+            transitions={'succeeded': 'CHECK_GRASP', 
+                         'preempted': 'LOG_PREEMPT',
+                         'failed': 'MOVE_ARM_TO_PRE_GRASP_POSITION_MANUALLY'}    # better failure handling appreciated
+        )
+
         StateMachine.add(
             'CHECK_GRASP',
-            pickup.DavidCheckGrasp(),
-            transitions={'succeeded': 'MOVE_ARM_TO_PRE_GRASP_POSITION_MANUALLY',
+            dummy = pickup.DavidCheckGrasp(),
+            transitions={'succeeded': 'END_PICKUP_SEQ',
                          'aborted': 'COUNTER_GRASP_CHECK'}  #aborted <=> check result: no object grasped
         )
         StateMachine.add(
@@ -541,14 +549,9 @@ def main():
             transitions={'succeeded': 'aborted',
                          'failed': 'aborted'}
         )
-        #df new 5.2.2015
-        StateMachine.add(
-            'MOVE_ARM_TO_PRE_GRASP_POSITION_MANUALLY',   #position where gripper is not blocking view to floor where object was lying
-            arm_move.goToPreGraspPositionManually(),
-            transitions={'succeeded': 'END_PICKUP_SEQ', 
-                         'preempted': 'LOG_PREEMPT',
-                         'failed': 'MOVE_ARM_TO_PRE_GRASP_POSITION_MANUALLY'}    # better failure handling appreciated
-        )
+
+        
+        
         StateMachine.add(
             'END_PICKUP_SEQ',
             pickup.getEndPickupSeq(),
