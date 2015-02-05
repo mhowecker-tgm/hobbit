@@ -89,15 +89,15 @@ class DavidLookForObject(State):
         self.min_obj_to_mapboarder_distance = 0.30 #object has to be at least self.min_obj_to_mapboarder_distance cm away from next boarder in navigation map
 
     def findobject(self, ud):
-        print "===> pickup_import.py: DavidLookForObject.findobject()"
+        print "===> pickup_import.py: DavidLookForObject.findobject() started"
         #random.seed(rospy.get_time())
         pointcloud = ud.cloud
         clusters = self.rec.findObjectsOnFloor(pointcloud, [0,0,0,0])
-        print "number of object clusters on floor found: ", len(clusters)
+        print "===> pickup_import.py: findobect():number of object clusters on floor found: ", len(clusters)
 
         for cluster in clusters:
             self.pc = cluster
-            print " ==============> publish cluster"
+            print "===> pickup_import.py: findobect(): publish potential cluster on topic /pickup/objectclusters"
             #self.pubClust.publish(cluster)
             #self.pubClust.publish(pointcloud)					#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! new 31.7.2014
             if self.isGraspableObject():
@@ -106,7 +106,7 @@ class DavidLookForObject(State):
                     #print "findobject(): cluster saved and published"
                     return True
 
-        print "findobect(): no graspable object found"
+        print "===> pickup_import.py: findobect(): no graspable object found"
         return False
 
     def isObjectAwayFromMapBoarders(self):
@@ -116,22 +116,22 @@ class DavidLookForObject(State):
             input = distance_to_obstacle()  #data type for this service
             #input.p = self.graspable_center_of_cluster_wcs
             response = distance_to_obstacle_service(self.graspable_center_of_cluster_wcs.point)
-            print "object distance to map boarder: ", response.d
+            print "===> pickup_import.py: isObjectAwayFromMapBoarders(): object distance to map boarder: ", response.d
             dist = response.d
             if (dist > self.min_obj_to_mapboarder_distance):
-                print "isObjectAwayFromMapBoarder: object is far enough from map boarders"
+                print "===> pickup_import.py: isObjectAwayFromMapBoarder(): object is far enough from map boarders."
                 return True
             else:
-                print "object is to near to map obstacle! pick up aborted "
+                print "===> pickup_import.py: isObjectAwayFromMapBoarder(): object is to near to map obstacle! OBJECT DENIED"
                 return False
             
         except rospy.ServiceException, e:
-            print "Service call distance_to_obstacle failed: %s"%e
+            print "===> pickup_import.py: isObjectAwayFromMapBoarder(): Service call distance_to_obstacle failed: %s"%e
             return False
                                 
                         
     def execute(self, ud):
-        print "===> pickup_import.py: DavidLookForObject.execute()"
+        print "===> pickup_import.py: DavidLookForObject.execute() started"
         if self.preempt_requested():
             return 'preempted'
         # TODO: David please put the pose calculations in here
@@ -145,19 +145,19 @@ class DavidLookForObject(State):
             
             (robot_x, robot_y, robot_yaw) = util.get_current_robot_position(frame='/map')
             posRobot = [robot_x, robot_y] #Bajo, please fill in
-            print "actual robot position: ", posRobot
-            print "graspable center of cluster: ", self.graspable_center_of_cluster_wcs  #center of graspable point cluster
+            print "===> pickup_import.py: DavidLookForObject.execute(): actual robot position: ", posRobot
+            print "===> pickup_import.py: DavidLookForObject.execute(): graspable center of cluster: ", self.graspable_center_of_cluster_wcs  #center of graspable point cluster
             robotApproachDir = [self.graspable_center_of_cluster_wcs.point.x - posRobot[0], self.graspable_center_of_cluster_wcs.point.y - posRobot[1]]
             robotApproachDir = [robotApproachDir[0]/numpy.linalg.norm(robotApproachDir), robotApproachDir[1]/numpy.linalg.norm(robotApproachDir)]       #normalized
-            print "normalized robot approach direction: ", robotApproachDir
+            print "===> pickup_import.py: DavidLookForObject.execute(): normalized robot approach direction: ", robotApproachDir
 
 
             ud.goal_position_x = self.graspable_center_of_cluster_wcs.point.x - self.robotDistFromGraspPntForGrasping * robotApproachDir[0]
             ud.goal_position_y = self.graspable_center_of_cluster_wcs.point.y - self.robotDistFromGraspPntForGrasping * robotApproachDir[1]
             ud.goal_position_yaw = math.atan2(robotApproachDir[1],robotApproachDir[0]) + self.robotOffsetRotationForGrasping #can be negative!  180/math.pi*math.atan2(y,x) = angle in degree of vector (x,y)
-            print "robotDistFromGraspPntForGrasping: ", self.robotDistFromGraspPntForGrasping
-            print "robotOffsetRotationForGrasping: ", self.robotOffsetRotationForGrasping
-            print "robot goal position:"
+            print "===> pickup_import.py: DavidLookForObject.execute(): robotDistFromGraspPntForGrasping: ", self.robotDistFromGraspPntForGrasping
+            print "===> pickup_import.py: DavidLookForObject.execute(): robotOffsetRotationForGrasping: ", self.robotOffsetRotationForGrasping
+            print "===> pickup_import.py: DavidLookForObject.execute(): robot goal position:"
             print "ud.goal_position_x:   ", ud.goal_position_x
             print "ud.goal_position_y:   ", ud.goal_position_y
             print "ud.goal_position_yaw:   ", ud.goal_position_yaw
@@ -172,7 +172,7 @@ class DavidLookForObject(State):
 
     #checks if object is suitable for grasping for camera center/down (later extension e.g. check distance to wall)
     def isGraspableObject(self):
-        print "\n ===> F(): isGraspableObject start"
+        print "\n ===> pickup_import.py: isGraspableObject() started"
 
         print "trying to get tf transform"
         while True:
@@ -181,12 +181,12 @@ class DavidLookForObject(State):
                 print trans,rot
                 break
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
-                print "- isGraspableObject(): tf transform /headcam_rgb_optical_frame to /map not found"
+                print "===> pickup_import.py: isGraspableObject(): tf transform /headcam_rgb_optical_frame to /map not found"
                 rospy.sleep(1)
                 continue
 
         m = self.getCenterOfCluster()
-        print "center of cluster", m
+        print "===> center of cluster", m
         p = PointStamped()
         p.header.frame_id = '/headcam_rgb_optical_frame'
         p.point.x = m[0]
@@ -197,8 +197,8 @@ class DavidLookForObject(State):
         pnt_rcs = self.listener.transformPoint('/base_link', p)     #center of cluster in robot coordinate system
 
         #print "============== center of cluster in camera coordinate system: ", p
-        print "============== center of cluster in rcs:                    : ", pnt_rcs
-        print "============== center of cluster in wcs:                    : ", pnt_wcs
+        print "===> center of cluster in rcs:                    : ", pnt_rcs
+        print "===> center of cluster in wcs:                    : ", pnt_wcs
 
         isgraspable = self.ispossibleobject(pnt_rcs)
         if isgraspable:
@@ -224,7 +224,7 @@ class DavidLookForObject(State):
 
         Transforms a geometry_msgs PoseStamped message to frame target_frame, returns a new PoseStamped message.
         """
-	print "===> pickup_import.py: DavidLookForObject.transformPointCloud()"
+        print "===> pickup_import.py: DavidLookForObject.transformPointCloud()"
         r = PointCloud()
         r.header.stamp = rospy.Time.now() #point_cloud.header.stamp
         r.header.frame_id = target_frame
@@ -244,10 +244,10 @@ class DavidLookForObject(State):
                 t = rospy.Time(0)
                 point_cloud.header.stamp = t
                 (trans,rot) = self.listener.lookupTransform('/headcam_rgb_optical_frame', target_frame, rospy.Time(0))
-                print trans,rot
+                #print trans,rot
                 break
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
-                print "isGraspableObject(): tf transform /headcam_rgb_optical_frame to ", target_frame," not found"
+                print "===> isGraspableObject() => transformPointCloud(): tf transform /headcam_rgb_optical_frame to ", target_frame," not found"
                 rospy.sleep(1)
                 continue
         mat44 = self.listener.asMatrix(target_frame, point_cloud.header)
@@ -264,7 +264,7 @@ class DavidLookForObject(State):
 
 
     def ispossibleobject(self, pnt):    #pnt is in rcs
-        print "===> pickup_import.py: DavidLookForObject.ispossibleobject()"
+        print "===> pickup_import.py: DavidLookForObject.ispossibleobject() started"
         #criteria for valid objects
         x_min = -0.5
         x_max = 1.0
@@ -284,10 +284,10 @@ class DavidLookForObject(State):
         #print "pnt.point.x: ", pnt.point.x
         #print "pnt.point.x *2: ", 2*pnt.point.x
         if (pnt.point.x > x_min and pnt.point.x < x_max and pnt.point.y > y_min and pnt.point.y < y_max and pnt.point.z > z_min and pnt.point.z < z_max):
-            print "ispossibleobject(): object ACCEPTED"
+            print "===> ispossibleobject(): object ACCEPTED"
             return True
         else:
-            print "ispossibleobject(): object DENIED (x,y,z coordinates of center of cluster not in acceptable range)"
+            print "===> ispossibleobject(): object DENIED (x,y,z coordinates of center of cluster not in acceptable range)"
             return False
 
 
@@ -320,10 +320,9 @@ class DavidLookForObject(State):
 
 
     def getRollForPointCloud(self):
-        print "===> pickup_import.py: DavidLookForObject.getRollForPointCloud()"
+        print "===> pickup_import.py: DavidLookForObject.getRollForPointCloud() started"
         #finds and return good roll angle (assuming its good to grasp where object is slim)
         # returned angle has to be added to cf_pregrasp and cf_finalgrasp
-        print "start of getRollForPointCloud"
         bestrollangle = 0
         mindiff_x = 1000
         alpha = 15*numpy.pi/180 #rad rotation angle (per step) (mathematical pos. direction)
@@ -413,7 +412,7 @@ class DavidLookingPose(State):
     def execute(self, ud):
         if self.preempt_requested():
             return 'preempted'
-        print(ud.pointing_msg)
+        print "===> DavidLookingPose.execute: pointing message received: ",ud.pointing_msg
         # TODO: David please put the pose calculations in here
 
 
@@ -429,9 +428,9 @@ class DavidLookingPose(State):
         p.point.x = self.pointingDirCCS[0]
         p.point.y = self.pointingDirCCS[1]
         p.point.z = self.pointingDirCCS[2]
-	print "===================================================> p.point.x:", p.point.x
+        print "===> DavidLookingPose.execute: p.point.x:", p.point.x
         pspWCS = self.listener.transformPoint('/map', p) #pspWCS: PointingStartPoint of the pointing gesture, i.e. the position of the shoulder in WCS (world coordinate system)
-        print "shoulder coordinates in world coordinate system: ", pspWCS
+        print "===> DavidLookingPose.execute: shoulder coordinates in world coordinate system: ", pspWCS
         #calculate pointing vector in world coordinate system
         target_frame = "/map"
         pvecWCS = (0,0,0)
@@ -449,15 +448,15 @@ class DavidLookingPose(State):
                 pvec = (self.pointingDirCCS[3],self.pointingDirCCS[4],self.pointingDirCCS[5])
 		pvec = (pvec[0]/numpy.linalg.norm(pvec),pvec[1]/numpy.linalg.norm(pvec),pvec[2]/numpy.linalg.norm(pvec))  #normalize
 		pvecWCS = numpy.dot(pvec,rot)
-		print "======================================================="
-		print "pvec (CCS, normalized): ", pvec # (CCS)
+		#print "======================================================="
+		print "===> DavidLookingPose.execute: Pointing Vector in CCS (normalized): ", pvec # (CCS)
 		#print "roation matrix: ", rot
-		print "Pointing Vector in WCS: ", pvecWCS
+		print "===> DavidLookingPose.execute: Pointing Vector in WCS: ", pvecWCS
 
 
                 break
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
-                print "savePointingDirection(), calc pvec in RCS: tf transform /headcam_rgb_optical_frame to ", target_frame," not found"
+                print "===> DavidLookingPose.execute: savePointingDirection(), calc pvec in RCS: tf transform /headcam_rgb_optical_frame to ", target_frame," not found"
                 rospy.sleep(0.1)
                 continue
 
@@ -471,7 +470,7 @@ class DavidLookingPose(State):
 
 
 	#publish marker for visualizing the pointing point on floor
-	print "========================> now the point on floor is published as marker "
+	print "===> DavidLookingPose.execute: now the point on floor is published as marker "
 	obj_markerArray = MarkerArray()
 
 	pose = Pose()
@@ -524,7 +523,7 @@ class DavidLookingPose(State):
 	self.obj_marker.publish(obj_markerArray)
 
 
-	print "grasp point on floor: X:  ", gpOnFloor[0], "   Y:  ", gpOnFloor[1], "   Z:  ", gpOnFloor[2]
+	print "===> grasp point on floor: X:  ", gpOnFloor[0], "   Y:  ", gpOnFloor[1], "   Z:  ", gpOnFloor[2]
         robotApproachDir = [gpOnFloor[0] - posRobot[0], gpOnFloor[1] - posRobot[1]]
         robotApproachDir = [robotApproachDir[0]/numpy.linalg.norm(robotApproachDir), robotApproachDir[1]/numpy.linalg.norm(robotApproachDir)]       #normalized
 
@@ -544,8 +543,8 @@ class DavidLookingPose(State):
 
         k = -pspWCS.point.z/pvecWCS[2]
         if k < 0:
-            print "ERROR, pointing direction must be downwards!!"
-            print "k = ", k
+            print "===> calcIntersectionPointingDirWithFloor(): ERROR, pointing direction must be downwards!!"
+            print "===> calcIntersectionPointingDirWithFloor(): k = ", k
             return None
         gpOnFloor = [pspWCS.point.x+k*pvecWCS[0],pspWCS.point.y+k*pvecWCS[1],0]
         return gpOnFloor
@@ -591,15 +590,16 @@ class CalcGrasppointsActionClient():
     # use this method with a String cmd to send goal to the ArmActionServer and return its result value
     def calc_grasppoints_action_client(self, cmd):
 
-        print "type of cmd: ", type(cmd)
+        print "===> CalcGrasppointsActionClient() started"
+        #print "type of cmd: ", type(cmd)
         # Waits until the action server has started up and started
         # listening for goals.
-        print "CalcGrasppointsActionClient: wait_for_server()"
+        print "===> CalcGrasppointsActionClient(): wait_for_server()"
         self.calc_grasppoints_client.wait_for_server()
-        print "server found!"
+        print "===> CalcGrasppointsActionClient(): server found!"
 
 
-        print "CalcGrasppointsActionClient: create goal"
+        print "===> CalcGrasppointsActionClient(): create goal"
         # Creates a goal to send to the action server.
         goal = hobbit_msgs.msg.CalcGraspPointsServerGoal(input_pc=cmd)
 
@@ -607,21 +607,21 @@ class CalcGrasppointsActionClient():
         # Sends the goal to the action server.
         self.calc_grasppoints_client.send_goal(goal, feedback_cb=self.feedback_cb)
 
-        print "wait for result"
+        print "CalcGrasppointsActionClient(): wait for result"
         # Waits for the server to finish performing the action.
         self.calc_grasppoints_client.wait_for_result()
 
 
         # Prints out the result of executing the action
         returnval = self.calc_grasppoints_client.get_result()  #
-        print "returnval from calc_grasppoints: ", returnval
+        print "===> CalcGrasppointsActionClient(): returnval from calc_grasppoints: ", returnval
         return returnval
 
     def feedback_cb(self, feedback):
-        print "feedback_cb executed!"
+        print "===> CalcGrasppointsActionClient(): feedback_cb executed!"
         #print "feedback type: ", (type) (feedback)
         self.last_feedback = feedback
-        print "==========> feedback: ", self.last_feedback
+        print "===> CalcGrasppointsActionClient(): feedback: ", self.last_feedback
 
 
 
@@ -665,7 +665,7 @@ class DavidPickingUp(State):
 
         if self.findobject(ud):
 
-            print "DavidPickingUp.execute: findobject was successful"
+            print "===> DavidPickingUp.execute: findobject was successful"
             #self.pc_rcs is available () => calc_grasp_points.cpp (AS) and get back grasp pose definition
             #overview:
             # 1) check if there is enough space for moving the arm
@@ -679,30 +679,27 @@ class DavidPickingUp(State):
             #1) check if there is enough space for moving the arm
             pnt_in_space = self.check_free_space_for_arm_pickup_movement(ud.cloud)
             print "=======================================================================================================>"
-            print "type result pnt_in_space: ", type(pnt_in_space)
-            print "pnt_in_space: ", pnt_in_space
-            print 
+            print "===> DavidPickingUp.execute: check_free_space_for_arm_pickup_movement: pnt_in_space: ", pnt_in_space
             if (pnt_in_space > 0):
-                print "===============>>>>>>>>>>>>>>>>>>> arm not able to move savely for picking up => picking up was stopped"
+                print "===> DavidPickingUp.execute: arm not able to move savely for picking up => PICKING UP WAS STOPPED"
                 return 'failed_no_space_to_move_arm'
 
             # 2) call calc_grasppoints_action_server/client (calc_aS(self.pc_rcs)) and receive a grasp_representation in the format (string):
             # "(0)eval_val (1)gp1_x (2)gp1_y (3)gp1_z (4)gp2_x (5)gp2_y (6)gp2_z (7)ap_vec_x (8)ap_vec_y (9)ap_vec_z (10)gp_center_x (11)gp_center_y (12)gp_center_z (13)roll"
             gp_representation = self.calc_graspoints_client.calc_grasppoints_action_client(self.pc_ccs)#ud.cloud)#self.pc_rcs) #ud.cloud) 12.12.2014
-            print "gp_representation: ", gp_representation
+            print "===> DavidPickingUp.execute: gp_representation: ", gp_representation
             gp_pres_str = str(gp_representation.result.data)
             gp_eval = int(gp_pres_str[0:2])
             if (gp_eval < 8):
-                print "GRASP EVALUATION WAS TO BAD FOR RELIABLE GRASPING - stop grasping"
+                print "===> DavidPickingUp.execute: GRASP EVALUATION WAS TO BAD FOR RELIABLE GRASPING - GRASPING STOPPED"
                 return 'failed_no_sufficient_grasp_detected'
             # 3) (and 4)) call GraspFromFloorTrajectoryActionServer/Client to receive a trajectory (that will be directly executed) by calling the ArmActionServer/client
             grasp_traj_ac = arm_simulation.GraspTrajectoryActionClient.GraspTrajectoryActionClient()
-            print "=================================================>",grasp_traj_ac
+            print "===> DavidPickingUp.execute: grasp trajectory action client generated: ",grasp_traj_ac
             #calculate grasp grajectory (way points)
             cmd = gp_representation.result #String ("81 0.04 -0.45 0.127266 0.04 -0.51 0.127266 0 0 1 0.04 -0.48 0.127266 0") #input (=> = output from calc_grasppoints_svm_action_server)
             res = grasp_traj_ac.grasp_trajectory_action_client(cmd)
-            print "result of trajectory calculation:           ", res
-            
+            print "===> DavidPickingUp.execute: result of trajectory calculation: ", res
                         
             #move object to tray and move arm back to home position
             # => no done via logic in pickup.py  res = self.arm_client.arm_action_client(String ("SetMoveToTrayPos"))
@@ -717,7 +714,7 @@ class DavidPickingUp(State):
         print "test if there is enough space for moving the arm for picking up an object"
         #self.t = rospy.Time.now()
         if obstacle_cloud == None:
-            print "======> check_free_space_for_arm_pickup_movement: no point cloud received!"
+            print "===> check_free_space_for_arm_pickup_movement(): check_free_space_for_arm_pickup_movement: no point cloud received!"
             return -1
         #self.pc_.header.stamp = self.t
         rospy.wait_for_service('check_free_space')
@@ -726,9 +723,9 @@ class DavidPickingUp(State):
             input = CheckFreeSpace()
             input.cloud = obstacle_cloud
             input.frame_id_original = String(obstacle_cloud.header.frame_id)
-            print "input.frame_id_original: ", input.frame_id_original
+            print "===> check_free_space_for_arm_pickup_movement(): input.frame_id_original: ", input.frame_id_original
             input.frame_id_desired = String("base_link")
-            print "input.frame_id_desired: ",input.frame_id_desired
+            print "===> check_free_space_for_arm_pickup_movement(): input.frame_id_desired: ",input.frame_id_desired
             if (z2 is None):
                 input.x1 = self.limit_x1
                 input.x2 = self.limit_x2
@@ -745,7 +742,7 @@ class DavidPickingUp(State):
                 input.z2=z2
             #resp1 = check_free_space(input)
             resp1 = check_free_space(input.cloud,input.frame_id_original,input.frame_id_desired,input.x1,input.x2,input.y1,input.y2,input.z1,input.z2)
-            print "number of points in area with boarders \nx1: ", input.x1, "\tx2: ",input.x2,"\ny1: ",input.y1,"\ty2: ",input.y2,"\nz1: ",input.z1,"\tz2: ",input.z2,"\nnr_points: ",resp1.nr_points_in_area
+            print "===> check_free_space_for_arm_pickup_movement(): number of points in area with boarders \nx1: ", input.x1, "\tx2: ",input.x2,"\ny1: ",input.y1,"\ty2: ",input.y2,"\nz1: ",input.z1,"\tz2: ",input.z2,"\nnr_points: ",resp1.nr_points_in_area
             #return resp1.nr_points_in_area
         except rospy.ServiceException, e:
             print "Service call failed: %s"%e
@@ -757,34 +754,34 @@ class DavidPickingUp(State):
     
     
     def findobject(self, ud):
-        print "===> pickup_import.py: DavidPickingUp.findobject()"
+        print "===> pickup_import.py: DavidPickingUp.findobject() started"
         pc_ccs = ud.cloud   #point cloud in camera coordinate system
         #raw_input(" ==============> publish cluster that findObjectsOnFloor is receiving from pickup_import.py")
         self.pubClust.publish(ud.cloud)
         clusters = self.rec.findObjectsOnFloor(pc_ccs, [0,0,0,0]) #before: pointcloud instead of pc_ccs
-        print "number of object clusters on floor found: ", len(clusters)
+        print "===> pickup_import.py: DavidPickingUp.findobject(): number of object clusters on floor found: ", len(clusters)
 
         for cluster in clusters:
             self.pc = cluster
-            print " ==============> publish cluster"
+            print "===> pickup_import.py: DavidPickingUp.findobject(): publish cluster"
             self.pubClust.publish(cluster)
             if self.isGraspableObject():
                 self.pubGraspableObjectCCS.publish(cluster)
                 return True
 
-        print "findobect(): no graspable object found"
+        print "===> pickup_import.py: DavidPickingUp.findobject(): NO GRASPABLE OBJECT FOUND"
         return False
 
 
     #checks if object is suitable for grasping
     def isGraspableObject(self):
-        print "\n ===> F(): DavidPickingUp.isGraspableObject() start (pickup_import.py)"
+        print "\n ===> pickup_import.py: DavidPickingUp.isGraspableObject() started"
 
-        print "trying to get tf transform"
+        print "===> pickup_import.py: DavidPickingUp.isGraspableObject(): trying to get tf transform"
         while True:
             try:
                 (trans,rot) = self.listener.lookupTransform('/headcam_rgb_optical_frame', '/base_link', rospy.Time(0))
-                print trans,rot
+                #print trans,rot
                 break
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
                 print "- isGraspableObject(): tf transform /headcam_rgb_optical_frame to /base_link not found"
@@ -792,7 +789,7 @@ class DavidPickingUp(State):
                 continue
 
         m = self.getCenterOfCluster()
-        print "center of cluster", m
+        print "===> pickup_import.py: DavidPickingUp.isGraspableObject(): center of cluster", m
         p = PointStamped()
         p.header.frame_id = '/headcam_rgb_optical_frame'
         p.point.x = m[0]
@@ -802,7 +799,7 @@ class DavidPickingUp(State):
         pnt_rcs = self.listener.transformPoint('/base_link', p)     #center of cluster in robot coordinate system
 
         #print "============== center of cluster in camera coordinate system: ", p
-        print "============== center of cluster in rcs:                    : ", pnt_rcs
+        print "===> pickup_import.py: DavidPickingUp.isGraspableObject(): center of cluster in RCS:                    : ", pnt_rcs
 
         isgraspable = self.ispossibleobject(pnt_rcs)
         if isgraspable:
@@ -812,7 +809,7 @@ class DavidPickingUp(State):
 
 
     def getCenterOfCluster(self):
-        print "===> pickup_import.py: DavidPickingUp.getCenterOfCluster()"
+        print "===> pickup_import.py: DavidPickingUp.getCenterOfCluster() started"
         #extract points from PointCloud2 in python....
         fmt = self._get_struct_fmt(self.pc)
         narr = list()
@@ -824,7 +821,7 @@ class DavidPickingUp(State):
             
 
         df = narr.__len__(); #length of point cloud
-        print "===> pickup_import.py: DavidPickingUp.getCenterOfCluster() LENGTH OF POINTCLOUD:", df
+        print "===> pickup_import.py: DavidPickingUp.getCenterOfCluster(): LENGTH OF POINTCLOUD:", df
         a = numpy.asarray(narr)
         pcmean = numpy.mean(a, axis=0)
         amin = numpy.min(a, axis=0)
@@ -843,7 +840,7 @@ class DavidPickingUp(State):
 
         Transforms a geometry_msgs PoseStamped message to frame target_frame, returns a new PoseStamped message.
         """
-        print "===> pickup_import.py: DavidLookForObject.transformPointCloud()"
+        print "===> pickup_import.py: DavidLookForObject.transformPointCloud() started"
         r = PointCloud()
         r.header.stamp = rospy.Time.now() #point_cloud.header.stamp
         r.header.frame_id = target_frame
@@ -863,10 +860,10 @@ class DavidPickingUp(State):
                 t = rospy.Time(0)
                 point_cloud.header.stamp = t
                 (trans,rot) = self.listener.lookupTransform('/frame', target_frame, rospy.Time(0))   #12.12.2014: /headcam_rgb_optical_frame => /frame => FORTH changed it!
-                print trans,rot
+                #print trans,rot
                 break
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
-                print "isGraspableObject(): tf transform /frame to ", target_frame," not found"
+                print "===> pickup_import.py: DavidLookForObject.transformPointCloud(): tf transform /frame to ", target_frame," not found"
                 rospy.sleep(1)
                 continue
         mat44 = self.listener.asMatrix(target_frame, point_cloud.header)
@@ -899,7 +896,7 @@ class DavidPickingUp(State):
         return fmt
 
     def ispossibleobject(self, pnt):    #pnt is in rcs
-        print "===> pickup_import.py: DavidPickingUp.ispossibleobject()"
+        print "===> pickup_import.py: DavidPickingUp.ispossibleobject() started"
         #criteria for valid objects  => has to me more accurate!
         x_min = -0.5
         x_max = 1.0
@@ -918,17 +915,17 @@ class DavidPickingUp(State):
 
         #print "pnt.point.x: ", pnt.point.x
         if (pnt.point.x > x_min and pnt.point.x < x_max and pnt.point.y > y_min and pnt.point.y < y_max and pnt.point.z > z_min and pnt.point.z < z_max):
-            print "ispossibleobject(): object ACCEPTED"
+            print "===> pickup_import.py: DavidPickingUp.ispossibleobject(): OBJECT ACCEPTED"
             return True
         else:
-            print "ispossibleobject(): object DENIED (x,y,z coordinates of center of cluster not in acceptable range)"
+            print "===> pickup_import.py: DavidPickingUp.ispossibleobject(): object DENIED (x,y,z coordinates of center of cluster not in acceptable range)"
             return False
 
 
 
 
 def point_cloud_cb(ud, msg):
-    print('point cloud received')
+    print('===> point cloud received')
     ud.cloud = msg
     return False
 
@@ -962,7 +959,7 @@ class DavidCheckGrasp(State):
 
         self.pubClust.publish(ud.cloud)
         pnt_in_space = self.check_free_space_for_arm_pickup_movement(ud.cloud)
-        print "=======> DavidCheckGrasp: number of points found in grasping area: ", pnt_in_space
+        print "===> DavidCheckGrasp.execute: number of points found in grasping area: ", pnt_in_space
         if (pnt_in_space > 20):
             return 'aborted'    #aborted <=> point found, hence an object still on floor => (assumed that) object grasping failed
         else:
@@ -997,7 +994,7 @@ class DavidCheckGrasp(State):
         print "test if there is still an obejct on the floor (in the grasping area)"
         #self.t = rospy.Time.now()
         if obstacle_cloud == None:
-            print "======> DavidCheckGrasp: check_free_space_for_arm_pickup_movement: no point cloud received! "
+            print "===> DavidCheckGrasp: check_free_space_for_arm_pickup_movement: no point cloud received! "
             return -1
         #self.pc_.header.stamp = self.t
         rospy.wait_for_service('check_free_space')
@@ -1006,9 +1003,9 @@ class DavidCheckGrasp(State):
             input = CheckFreeSpace()
             input.cloud = obstacle_cloud
             input.frame_id_original = String(obstacle_cloud.header.frame_id)
-            print "input.frame_id_original: ", input.frame_id_original
+            print "===> DavidCheckGrasp: check_free_space_for_arm_pickup_movement: input.frame_id_original: ", input.frame_id_original
             input.frame_id_desired = String("base_link")
-            print "input.frame_id_desired: ",input.frame_id_desired
+            print "===> DavidCheckGrasp: check_free_space_for_arm_pickup_movement: input.frame_id_desired: ",input.frame_id_desired
             if (z2 is None):
                 input.x1 = self.limit_x1
                 input.x2 = self.limit_x2
@@ -1025,10 +1022,10 @@ class DavidCheckGrasp(State):
                 input.z2=z2
             #resp1 = check_free_space(input)
             resp1 = check_free_space(input.cloud,input.frame_id_original,input.frame_id_desired,input.x1,input.x2,input.y1,input.y2,input.z1,input.z2)
-            print "number of points in area with boarders \nx1: ", input.x1, "\tx2: ",input.x2,"\ny1: ",input.y1,"\ty2: ",input.y2,"\nz1: ",input.z1,"\tz2: ",input.z2,"\nnr_points: ",resp1.nr_points_in_area
+            print "===> DavidCheckGrasp: check_free_space_for_arm_pickup_movement: number of points in area with boarders \nx1: ", input.x1, "\tx2: ",input.x2,"\ny1: ",input.y1,"\ty2: ",input.y2,"\nz1: ",input.z1,"\tz2: ",input.z2,"\nnr_points: ",resp1.nr_points_in_area
             #return resp1.nr_points_in_area
         except rospy.ServiceException, e:
-            print "Service call failed: %s"%e
+            print "===> DavidCheckGrasp: check_free_space_for_arm_pickup_movement: Service call failed: %s"%e
             return -1
             
         return resp1.nr_points_in_area

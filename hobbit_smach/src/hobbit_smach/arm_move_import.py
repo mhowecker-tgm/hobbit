@@ -236,6 +236,12 @@ class SetArmPosition(State):
         elif self.position == 'store':
             status = arm_client.SetStoreTurntable()
             return 'succeeded'
+        elif self.position == 'graspfromfloorcheck': #df new 5.2.2015
+            status = arm_client.SetMoveToCheckGraspFromFloorPosition()
+            return 'succeeded'
+        elif self.position == 'pregraspfromfloormanually': #df new 5.2.2015
+            status = arm_client.SetMoveToPreGraspFromFloorPosManually()
+            return 'succeeded'
         else:
             return 'failed'
 	#df: next lines would have been unreachable anyway
@@ -264,6 +270,47 @@ def goToPreGraspPosition():
         Sequence.add('CHECK_ARM_IS_NOT_MOVING', CheckArmIsNotMoving(),
                      transitions={'failed': 'CHECK_ARM_IS_NOT_MOVING'})
     return seq
+
+#df new 5.2.2015
+def goToPreGraspPositionManually(): #move via joint values, directly from whatever position the arm is currently in
+    """
+    Return a SMACH Sequence that will move the arm to pregrasp position with fixed joint values (directly from current arm position).
+    """
+
+    seq = Sequence(
+        outcomes=['succeeded', 'preempted', 'failed'],
+        connector_outcome='succeeded'
+    )
+
+    with seq:
+        Sequence.add('MOVE_ARM_TO_PREGRASP_POSE_MANUALLY',
+                     SetArmPosition(position='pregraspfromfloormanually'))
+        Sequence.add('CHECK_ARM_IS_NOT_MOVING', CheckArmIsNotMoving(),
+                     transitions={'failed': 'CHECK_ARM_IS_NOT_MOVING'})
+    return seq
+
+
+#df new 5.2.2015
+def goToCheckGraspPosition():
+    """
+    Return a SMACH Sequence that will move the arm to check grasp position. (arm not blocking view of robot)
+    """
+
+    seq = Sequence(
+        outcomes=['succeeded', 'preempted', 'failed'],
+        connector_outcome='succeeded'
+    )
+
+    with seq:
+        Sequence.add('MOVE_ARM_TO_CHECK_GRASP_POSE',
+                     SetArmPosition(position='graspfromfloorcheck'))
+        Sequence.add('CHECK_ARM_IS_NOT_MOVING', CheckArmIsNotMoving(),
+                     transitions={'failed': 'CHECK_ARM_IS_NOT_MOVING'})
+    return seq
+
+
+
+
 
 
 def goToTrayPosition():

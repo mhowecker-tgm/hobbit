@@ -114,6 +114,17 @@ class ArmActionClient():
         result = self.arm_action_client(String('SetMoveToPreGraspFromFloorPos'))
         return result.result.data
     
+    #as    df new 5.2.2015 start
+    def SetMoveToCheckGraspFromFloorPosition(self):
+        result = self.arm_action_client(String('SetMoveToCheckGraspFromFloorPosition'))
+        return result.result.data
+    
+    def SetMoveToPreGraspFromFloorPosManually(self):
+        result = self.arm_action_client(String('SetMoveToPreGraspFromFloorPosManually'))
+        return result.result.data
+        #df new 5.2.2015 end
+    
+    
     #as
     def SetMoveToPreGraspFromTablePos(self):
         result = self.arm_action_client(String('SetMoveToPreGraspFromTablePos'))

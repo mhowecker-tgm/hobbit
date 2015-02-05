@@ -318,8 +318,8 @@ class ArmActionServerROS(object):
             #MOVE ARM to Position above grasp Position
             feedback = self.ArmClient.SetAbsolutePos(float(input[1]),float(input[2]),float(input[3]),float(input[4]),float(input[5]),float(input[6])) #(90, 0, 50, 0, 110, 0)
             print self.ArmClient.SetStartMove(10.0)   #(10) #10 Grad/Sec
-            print "sleep 10 seconds"
-            rospy.sleep(10)
+            print "sleep 1 second"
+            rospy.sleep(1)
             #MOVE ARM TO GRASP POSITION
             #set waypoints for moving arm to target position
             for x in range(0, nr_wp):
@@ -372,8 +372,20 @@ class ArmActionServerROS(object):
             
             self._result.result = self.CheckTargetPos(feedback, self.ArmClient.GetArmInTargetPos, 60)  # wait until arm has reached its initial pre-grasp position
             #=======================================================        =======================================================
-            
-            
+        #dddd
+        elif cmd == 'SetMoveToCheckGraspFromFloorPosition':
+            #move arm MANUALLY (fixed values ->DANGEROUS!!!) to pregraspfromfloor position
+            feedback = self.ArmClient.SetAbsolutePos(63.69,31.39,96.31,122.2,67.79,0) #(90, 0, 50, 0, 110, 0)
+            print "start moving arm to check-if-grasp-from-floor-was-successful-position MANUALLY (hard coded joint values)"
+            print self.ArmClient.SetStartMove(5.0)   #(10) #10 Grad/Sec
+            self._result.result = self.CheckTargetPos(feedback, self.ArmClient.GetArmInTargetPos, 60)  # wait until arm has reached its initial pre-grasp position
+                   
+        elif cmd == 'SetMoveToPreGraspFromFloorPosManually':
+            #move arm MANUALLY (fixed values ->DANGEROUS!!!) to pregraspfromfloor position
+            feedback = self.ArmClient.SetAbsolutePos(69.71,31.39,96.31,122.2,109.74,0) #(90, 0, 50, 0, 110, 0)
+            print "start moving arm to pre-grasp-from-floor-position MANUALLY (hard coded joint values)"
+            print self.ArmClient.SetStartMove(5.0)   #(10) #10 Grad/Sec
+            self._result.result = self.CheckTargetPos(feedback, self.ArmClient.GetArmInTargetPos, 60)  # wait until arm has reached its initial pre-grasp position
             
     
         elif cmd == 'help':
@@ -456,6 +468,10 @@ class ArmActionServerROS(object):
             print self.ArmClient.SetMoveToPreGraspFromFloorPos()
         elif cmd == 'SetStoreTurntable':
             print self.ArmClient.SetStoreTurntable()
+        elif cmd == 'SetMoveToCheckGraspFromFloorPosition': #df 5.2.2015
+            print self.ArmClient.SetMoveToCheckGraspFromFloorPosition()
+        elif cmd == 'SetMoveToPreGraspFromFloorPosManually':
+            print self.ArmClient.SetMoveToPreGraspFromFloorPosManually()
         elif cmd == 'SetTurnTurntableCW':
             print self.ArmClient.SetTurnTurntableCW()
         elif cmd == 'SetTurnTurntableCCW':
@@ -531,6 +547,8 @@ class ArmActionServerROS(object):
         print 'SetMoveToTrayPos'
         print 'SetMoveToPreGraspFromFloorPos'
         print 'SetStoreTurntable'
+        print 'SetMoveToCheckGraspFromFloorPosition'
+        print 'SetMoveToPreGraspFromFloorPosManually'
         print 'SetTurnTurntableCW'
         print 'SetTurnTurntableCCW'
         print 'SetStartArmReference'

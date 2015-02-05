@@ -472,7 +472,7 @@ def main():
             'GRASP_OBJECT',
             pickup.getPickupSeq(), #
             #pickup.DavidPickingUp(),
-            transitions={'succeeded': 'CHECK_GRASP',
+            transitions={'succeeded': 'SAY_CHECK_GRASP',
                          'preempted': 'LOG_PREEMPT',
                          'failed': 'EMO_SAY_DID_NOT_PICKUP'
                         }
@@ -482,11 +482,18 @@ def main():
         StateMachine.add(
             'SAY_CHECK_GRASP',
             speech_output.sayText(info='T_PU_CheckingGrasp'),
-            transitions={'succeeded': 'GET_POINT_CLOUD_FOR_GRASPCHECK',
+            transitions={'succeeded': 'MOVE_ARM_TO_CHECK_GRASP_POSITION',
                          'failed': 'EMO_SAY_DID_NOT_PICKUP'}
         )
         
         
+        StateMachine.add(
+            'MOVE_ARM_TO_CHECK_GRASP_POSITION',   #position where gripper is not blocking view to floor where object was lying
+            arm_move.goToCheckGraspPosition(),
+            transitions={'succeeded': 'GET_POINT_CLOUD_FOR_GRASPCHECK', 
+                         'preempted': 'LOG_PREEMPT',
+                         'failed': 'MOVE_ARM_TO_CHECK_GRASP_POSITION'}    # better failure handling appreciated
+        )
         #================> NEW 29.1.2015 df
         smach.StateMachine.add(
             'GET_POINT_CLOUD_FOR_GRASPCHECK',
@@ -502,13 +509,11 @@ def main():
                          'preempted': 'LOG_PREEMPT'}
         )        
         # df end
-        
-        
         StateMachine.add(
             'CHECK_GRASP',
             pickup.DavidCheckGrasp(),
-            transitions={'succeeded': 'END_PICKUP_SEQ',
-                         'aborted': 'COUNTER_GRASP_CHECK'}
+            transitions={'succeeded': 'MOVE_ARM_TO_PRE_GRASP_POSITION_MANUALLY',
+                         'aborted': 'COUNTER_GRASP_CHECK'}  #aborted <=> check result: no object grasped
         )
         StateMachine.add(
             'COUNTER_GRASP_CHECK',
@@ -519,14 +524,30 @@ def main():
         StateMachine.add(
             'EMO_SAY_DID_NOT_PICKUP',
             pickup.sayDidNotPickupObject1(),
-            transitions={'succeeded': 'SAY_PICKING_UP',
+            transitions={'succeeded': 'MOVE_ARM_TO_HOME_POSITION',
                          'failed': 'aborted'}
+        )
+        #df new 5.2.2015
+        StateMachine.add(
+            'MOVE_ARM_TO_HOME_POSITION',  #VIA TRAY POSITION because maybe the checkgrasp result was wrong!
+            arm_move.goToTrayPosition(),
+            transitions={'succeeded': 'SAY_PICKING_UP', 
+                         'preempted': 'LOG_PREEMPT',
+                         'failed': 'MOVE_ARM_TO_HOME_POSITION'}    # better failure handling appreciated
         )
         StateMachine.add(
             'EMO_SAY_DID_NOT_PICKUP_2',
             pickup.sayDidNotPickupObject2(),
             transitions={'succeeded': 'aborted',
                          'failed': 'aborted'}
+        )
+        #df new 5.2.2015
+        StateMachine.add(
+            'MOVE_ARM_TO_PRE_GRASP_POSITION_MANUALLY',   #position where gripper is not blocking view to floor where object was lying
+            arm_move.goToPreGraspPositionManually(),
+            transitions={'succeeded': 'END_PICKUP_SEQ', 
+                         'preempted': 'LOG_PREEMPT',
+                         'failed': 'MOVE_ARM_TO_PRE_GRASP_POSITION_MANUALLY'}    # better failure handling appreciated
         )
         StateMachine.add(
             'END_PICKUP_SEQ',
