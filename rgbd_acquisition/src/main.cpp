@@ -434,6 +434,9 @@ int main(int argc, char **argv)
                     case HIGH_FRAMERATE   :   high_loop_rate.sleep();    break;
                     case MEDIUM_FRAMERATE :   medium_loop_rate.sleep();  break;
                     case LOW_FRAMERATE    :   low_loop_rate.sleep();     break;
+                    default :
+                           low_loop_rate.sleep();
+                    break;
                   }
 
 
