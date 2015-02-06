@@ -407,6 +407,7 @@ void cLocalizationMonitor::Run(void)
 	 //if (dis_covered_sq_check > dis_thres_check*dis_thres_check)
 	 if (check)
 	 {
+		//if (!(ok_count+not_ok_count)) return; //should never happen
 		double rate = (double)ok_count/(ok_count+not_ok_count);
 		std::cout << "loc_ok_rate " << rate << std::endl; 
 		loc_ok = (rate > rate_thres); //default 60%
@@ -466,17 +467,12 @@ void cLocalizationMonitor::battery_state_callback(const mira_msgs::BatteryState:
 {
   bool charging = (*msg).charging;
 
-  /*std::cout << "*********************" << std::endl;
-  std::cout << "is_charging " << is_charging << std::endl;
-  std::cout << "charging " << charging << std::endl;*/
-
   if (!is_charging && charging)
   {
 	// reset localization
 	 std_srvs::Empty srv;
 	 if (reset_loc_client.call(srv))
 	 {
-	          //ROS_INFO("Sum: %ld", (long int)srv.response.sum);
 		  std::cout << "Localization reset at docking station " << std::endl;
 	 }
 	 else
