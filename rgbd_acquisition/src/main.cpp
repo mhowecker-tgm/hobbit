@@ -58,8 +58,57 @@ ros::Publisher pubRGBInfo;
 ros::Publisher pubDepthInfo;
 
 
+
+enum FRAMERATE_STATES
+{
+    STOPPED_FRAMERATE = 0 ,
+    LOW_FRAMERATE,
+    MEDIUM_FRAMERATE,
+    HIGH_FRAMERATE
+};
+
+unsigned int framerateState=HIGH_FRAMERATE;
+
+
+
+
+
+
 //----------------------------------------------------------
 //Advertised Service switches
+
+bool setStoppedFramerate(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    framerateState=STOPPED_FRAMERATE;
+    return true;
+}
+
+bool setLowFramerate(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    framerateState=LOW_FRAMERATE;
+    return true;
+}
+
+bool setMediumFramerate(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    framerateState=MEDIUM_FRAMERATE;
+    return true;
+}
+
+bool setHighFramerate(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    framerateState=HIGH_FRAMERATE;
+    return true;
+}
+
+
+
+
+
+
+
+
+
 bool visualizeOn(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
     switchDrawOutTo(1);
@@ -249,7 +298,11 @@ void loopEvent()
   //We spin from this thread to keep thread synchronization problems at bay
   ros::spinOnce();
   externalAcquisitionCallback(); //<- this also passes the new frames to skeleton / face detection
-  publishImages();
+
+  if (framerateState!=STOPPED_FRAMERATE)
+   {
+      publishImages();
+   }
 
    // if we got a depth and rgb frames , lets go
    key=getKeyPressed(); //Post our geometry to ROS
@@ -280,7 +333,7 @@ int main(int argc, char **argv)
      std::string name;
      std::string camera;
      std::string frame;
-     int rate;
+     int highRate,midRate,lowRate;
 
      ros::NodeHandle private_node_handle_("~");
      private_node_handle_.param("useSkeleton", useSkeleton, int(0));
@@ -289,7 +342,9 @@ int main(int argc, char **argv)
      private_node_handle_.param("name", name, std::string("rgbd_acquisition"));
      private_node_handle_.param("camera", camera, std::string("camera"));
      private_node_handle_.param("frame", frame, std::string("frame"));
-     private_node_handle_.param("rate", rate, int(30));
+     private_node_handle_.param("highRate", highRate, int(30));
+     private_node_handle_.param("midRate", midRate, int(15));
+     private_node_handle_.param("lowRate", lowRate, int(5));
      private_node_handle_.param("deviceID", from, std::string(""));
      private_node_handle_.param("virtual_baseline", virtual_baseline, 0.0);
 
@@ -308,7 +363,9 @@ int main(int argc, char **argv)
      std::cout<<"Name : "<<name<<std::endl;
      std::cout<<"Camera : "<<camera<<std::endl;
      std::cout<<"Frame : "<<frame<<std::endl;
-     std::cout<<"Rate : "<<rate<<std::endl;
+     std::cout<<"High Rate : "<<highrate<<std::endl;
+     std::cout<<"Mid Rate : "<<midrate<<std::endl;
+     std::cout<<"Low Rate : "<<lowrate<<std::endl;
      std::cout<<"virtual_baseline : "<<virtual_baseline<<std::endl;
      std::cout<<"Device_id : "<<from<<" length "<<from.length()<<"  devID : "<<devID<<std::endl;
      std::cout<<"useSkeleton : "<<useSkeleton<<std::endl;
@@ -316,7 +373,10 @@ int main(int argc, char **argv)
      std::cout<<"--------------------------------------------------"<<std::endl;
 
 
-     ros::Rate loop_rate(rate); //  hz should be our target performance
+     ros::Rate high_loop_rate(highRate); //  hz should be our target performance
+     ros::Rate medium_loop_rate(midRate); //  hz should be our target performance
+     ros::Rate low_loop_rate(lowRate); //  hz should be our target performance
+     framerateState=HIGH_FRAMERATE;
 
      //We advertise the services we want accessible using "rosservice call *w/e*"
      ros::ServiceServer visualizeOnService      = nh.advertiseService(name+"/visualize_on", visualizeOn);
@@ -328,6 +388,13 @@ int main(int argc, char **argv)
      ros::ServiceServer pausePointingService    = nh.advertiseService(name+"/pause_pointing_gesture_messages", pausePointingMessages);
      ros::ServiceServer resumePointingService   = nh.advertiseService(name+"/resume_pointing_gesture_messages", resumePointingMessages);
      ros::ServiceServer setQualityService       = nh.advertiseService(name+"/setQuality", setQuality);
+
+     //Framerate switches
+     ros::ServiceServer setStoppedFramerateService   = nh.advertiseService(name+"/setStoppedFramerate", setStoppedFramerate);
+     ros::ServiceServer setLowFramerateService       = nh.advertiseService(name+"/setLowFramerate", setLowFramerate);
+     ros::ServiceServer setMediumFramerateService    = nh.advertiseService(name+"/setMediumFramerate", setMediumFramerate);
+     ros::ServiceServer setNormalFramerateService    = nh.advertiseService(name+"/setNormalFramerate", setNormalFramerate);
+     ros::ServiceServer setHighFramerateService      = nh.advertiseService(name+"/setHighFramerateService", setHighFramerateService);
 
 
      //Output RGB Image
@@ -361,7 +428,15 @@ int main(int argc, char **argv)
 	  while ( ( key!='q' ) && (ros::ok()) )
 		{
                   loopEvent(); //<- this keeps our ros node messages handled up until synergies take control of the main thread
-                  loop_rate.sleep();
+
+                  switch (framerateState)
+                  {
+                    case HIGH_FRAMERATE   :   high_loop_rate.sleep();    break;
+                    case MEDIUM_FRAMERATE :   medium_loop_rate.sleep();  break;
+                    case LOW_FRAMERATE    :   low_loop_rate.sleep();     break;
+                  }
+
+
 		}
 
       switchDrawOutTo(0);
