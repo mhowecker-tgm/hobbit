@@ -31,7 +31,9 @@
       <param name="deviceID" value="$(arg deviceID)" /> 
       <param name="virtual_baseline" value="$(arg virtual_baseline)" />   
       <param name="frame" value="$(arg frame)" /> 
-      <param name="rate" value="30" /> 
+      <param name="highRate" value="30" /> 
+      <param name="midRate" value="15" /> 
+      <param name="lowRate" value="5" /> 
       <param name="useSkeleton" value="0" />  
     </node>  
 
