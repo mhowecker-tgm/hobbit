@@ -413,7 +413,7 @@ def main():
         StateMachine.add(
             'WAIT_FINISH_HEAD_TO_GRASP_POSITION',
             SleepState(duration=5),
-            transitions={'succeeded': 'SAY_PICKING_UP',
+            transitions={'succeeded': 'GET_POINT_CLOUD_FOR_GRASP',
                          'preempted': 'LOG_PREEMPT'}
             )
         StateMachine.add(
@@ -437,7 +437,7 @@ def main():
                          'failed': 'aborted',
                          'preempted': 'LOG_PREEMPT'}
         )
-        StateMachine.add(
+        StateMachine.add(   #not used anymore!! df: 6.2.2015, done in pickup_import
             'SAY_PICKING_UP',
             speech_output.sayText(info='T_PU_PickingUpObject'),
             transitions={'succeeded': 'GET_POINT_CLOUD_FOR_GRASP',

@@ -37,6 +37,7 @@ from hobbit_msgs.srv import *
 import arm_simulation.GraspTrajectoryActionClient # as grasptraj #
 #from arm_simulation import GraspTrajectoryActionClient
 from table_object_detector.srv import *
+from hobbit_msgs import MMUIInterface as MMUI
 
 _DATATYPES = {}
 _DATATYPES[PointField.INT8]    = ('b', 1)
@@ -83,7 +84,7 @@ class DavidLookForObject(State):
         self.pubClust = rospy.Publisher("/objectclusters", PointCloud2)
         self.rec = TD()
         self.restrictfind = False
-        self.robotDistFromGraspPntForGrasping = 0.43
+        self.robotDistFromGraspPntForGrasping = 0.46
         self.robotOffsetRotationForGrasping = 0.06+math.pi/2.0
         self.graspable_center_of_cluster_wcs = None
         self.min_obj_to_mapboarder_distance = 0.30 #object has to be at least self.min_obj_to_mapboarder_distance cm away from next boarder in navigation map
@@ -659,6 +660,7 @@ class DavidPickingUp(State):
 
     def execute(self, ud):
         print "===> pickup_import.py: DavidPickingUp.execute()"
+        mmui = MMUI.MMUIInterface()
         if self.preempt_requested():
             return 'preempted'
         # TODO: David please add the grasping in here
@@ -698,7 +700,12 @@ class DavidPickingUp(State):
             print "===> DavidPickingUp.execute: grasp trajectory action client generated: ",grasp_traj_ac
             #calculate grasp grajectory (way points)
             cmd = gp_representation.result #String ("81 0.04 -0.45 0.127266 0.04 -0.51 0.127266 0 0 1 0.04 -0.48 0.127266 0") #input (=> = output from calc_grasppoints_svm_action_server)
+            #df new 6.2.2015: 
+            resp = mmui.showMMUI_Info(text='T_PU_PickingUpObject')
             res = grasp_traj_ac.grasp_trajectory_action_client(cmd)
+
+            # TODO: test needed if res was valid/ok
+            
             print "===> DavidPickingUp.execute: result of trajectory calculation: ", res
                         
             #move object to tray and move arm back to home position
