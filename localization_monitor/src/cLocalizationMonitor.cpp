@@ -402,7 +402,7 @@ void cLocalizationMonitor::Run(void)
 		prev_pose = current_pose;	
 	 }
 
-	 dis_covered_sq_check = (current_pose.pose.pose.position.x-prev_pose_check.pose.pose.position.x)*(current_pose.pose.pose.position.x-prev_pose_check.pose.pose.position.x) + (current_pose.pose.pose.position.y-prev_pose_check.pose.pose.position.y)*(current_pose.pose.pose.position.y-prev_pose_check.pose.pose.position.y);
+	 //dis_covered_sq_check = (current_pose.pose.pose.position.x-prev_pose_check.pose.pose.position.x)*(current_pose.pose.pose.position.x-prev_pose_check.pose.pose.position.x) + (current_pose.pose.pose.position.y-prev_pose_check.pose.pose.position.y)*(current_pose.pose.pose.position.y-prev_pose_check.pose.pose.position.y);
 
 	 //if (dis_covered_sq_check > dis_thres_check*dis_thres_check)
 	 if (check)
