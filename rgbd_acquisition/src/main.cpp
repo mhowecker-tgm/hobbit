@@ -363,9 +363,9 @@ int main(int argc, char **argv)
      std::cout<<"Name : "<<name<<std::endl;
      std::cout<<"Camera : "<<camera<<std::endl;
      std::cout<<"Frame : "<<frame<<std::endl;
-     std::cout<<"High Rate : "<<highrate<<std::endl;
-     std::cout<<"Mid Rate : "<<midrate<<std::endl;
-     std::cout<<"Low Rate : "<<lowrate<<std::endl;
+     std::cout<<"High Rate : "<<highRate<<std::endl;
+     std::cout<<"Mid Rate : "<<midRate<<std::endl;
+     std::cout<<"Low Rate : "<<lowRate<<std::endl;
      std::cout<<"virtual_baseline : "<<virtual_baseline<<std::endl;
      std::cout<<"Device_id : "<<from<<" length "<<from.length()<<"  devID : "<<devID<<std::endl;
      std::cout<<"useSkeleton : "<<useSkeleton<<std::endl;
@@ -393,8 +393,8 @@ int main(int argc, char **argv)
      ros::ServiceServer setStoppedFramerateService   = nh.advertiseService(name+"/setStoppedFramerate", setStoppedFramerate);
      ros::ServiceServer setLowFramerateService       = nh.advertiseService(name+"/setLowFramerate", setLowFramerate);
      ros::ServiceServer setMediumFramerateService    = nh.advertiseService(name+"/setMediumFramerate", setMediumFramerate);
-     ros::ServiceServer setNormalFramerateService    = nh.advertiseService(name+"/setNormalFramerate", setNormalFramerate);
-     ros::ServiceServer setHighFramerateService      = nh.advertiseService(name+"/setHighFramerateService", setHighFramerateService);
+     ros::ServiceServer setNormalFramerateService    = nh.advertiseService(name+"/setNormalFramerate", setMediumFramerate);
+     ros::ServiceServer setHighFramerateService      = nh.advertiseService(name+"/setHighFramerate", setHighFramerate);
 
 
      //Output RGB Image
