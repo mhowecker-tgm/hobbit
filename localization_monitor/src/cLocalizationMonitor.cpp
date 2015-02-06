@@ -407,7 +407,7 @@ void cLocalizationMonitor::Run(void)
 	 //if (dis_covered_sq_check > dis_thres_check*dis_thres_check)
 	 if (check)
 	 {
-		//if (!(ok_count+not_ok_count)) return; //should never happen
+		if (!(ok_count+not_ok_count)) return; //should never happen, but just in case
 		double rate = (double)ok_count/(ok_count+not_ok_count);
 		std::cout << "loc_ok_rate " << rate << std::endl; 
 		loc_ok = (rate > rate_thres); //default 60%
