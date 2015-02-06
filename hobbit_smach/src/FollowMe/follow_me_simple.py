@@ -87,8 +87,8 @@ def main():
         Concurrence.add(
             'GET_USER',
             MonitorState(
-                '/follow_user/persons',
-                FollowPerson,
+                '/follow_user/trackedTargets',
+                TrackerTarget,
                 cond_cb=msg_cb
             ),
             remapping={'invalid': 'aborted',
