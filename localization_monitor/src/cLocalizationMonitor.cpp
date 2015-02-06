@@ -15,7 +15,7 @@
 
 #include <occupancy_grid_utils/coordinate_conversions.h>
 
-#include <ctime>
+#include "angles/angles.h"
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Constructor. Initialises member attributes and allocates resources.
@@ -30,6 +30,7 @@ cLocalizationMonitor::cLocalizationMonitor(int argc, char **argv) : init_argc(ar
 	is_charging = false;
 
 	initial_current_pose_received = false;
+	initial_mileage_received = false;
 
 	ros::NodeHandle nh("~");
 	nh.param("uncertainty_thres", uncertainty_thres, 0.15);
@@ -38,11 +39,10 @@ cLocalizationMonitor::cLocalizationMonitor(int argc, char **argv) : init_argc(ar
 	nh.param("max_lim", max_lim, 3.0); //large measurements are more noisy, do not consider
 	nh.param("min_valid_points", min_valid_points, 20); 
 
-	nh.param("dis_thres", dis_thres, 1.5);
+	nh.param("dis_thres", dis_thres, 0.2);
+	nh.param("ang_thres", ang_thres, 15.0);
+	nh.param("dis_thres_check", dis_thres_check, 1.5);
 	nh.param("rate_thres", rate_thres, 0.6); 
-
-	ok_count = 0;
-        not_ok_count = 0;
 
 
 }
@@ -69,6 +69,8 @@ void cLocalizationMonitor::open(ros::NodeHandle & n)
         current_loc_sub = n.subscribe<geometry_msgs::PoseWithCovarianceStamped>("/amcl_pose", 2, &cLocalizationMonitor::loc_pose_callback, this);
 
         laserSubs = n.subscribe<sensor_msgs::LaserScan>("loc_scan", 1, &cLocalizationMonitor::loc_scan_callback, this); 
+
+	mileage_sub = n.subscribe<std_msgs::Float32>("/mileage", 2, &cLocalizationMonitor::mileage_callback, this);
 	
 	locStatePublisher = n.advertise<std_msgs::Bool>("loc_ok", 1); 
 
@@ -384,25 +386,34 @@ void cLocalizationMonitor::Run(void)
 
 	 if (!initial_current_pose_received) return;
 
-	bool scan_ok = checkScan();
-	bool uncertainty_ok = checkUncertainty();
-	if (uncertainty_ok && scan_ok)
-		ok_count ++;
-	else
-		not_ok_count++;
-
 	dis_covered_sq = (current_pose.pose.pose.position.x-prev_pose.pose.pose.position.x)*(current_pose.pose.pose.position.x-prev_pose.pose.pose.position.x) + (current_pose.pose.pose.position.y-prev_pose.pose.pose.position.y)*(current_pose.pose.pose.position.y-prev_pose.pose.pose.position.y);
 
-	//std::cout << "dis_cov_sq " << dis_covered_sq << std::endl;
+	 double current_orientation = tf::getYaw(current_pose.pose.pose.orientation);
+	 double prev_orientation = tf::getYaw(prev_pose.pose.pose.orientation);
 
-	 if (dis_covered_sq > dis_thres*dis_thres)
+	 if (dis_covered_sq > dis_thres*dis_thres || fabs(angles::shortest_angular_distance(prev_orientation, current_orientation)) > ang_thres * M_PI/180)
+	 {
+		bool scan_ok = checkScan();
+		bool uncertainty_ok = checkUncertainty();
+		if (uncertainty_ok && scan_ok)
+			ok_count ++;
+		else
+			not_ok_count++;
+		prev_pose = current_pose;	
+	 }
+
+	 dis_covered_sq_check = (current_pose.pose.pose.position.x-prev_pose_check.pose.pose.position.x)*(current_pose.pose.pose.position.x-prev_pose_check.pose.pose.position.x) + (current_pose.pose.pose.position.y-prev_pose_check.pose.pose.position.y)*(current_pose.pose.pose.position.y-prev_pose_check.pose.pose.position.y);
+
+	 //if (dis_covered_sq_check > dis_thres_check*dis_thres_check)
+	 if (check)
 	 {
 		double rate = (double)ok_count/(ok_count+not_ok_count);
 		std::cout << "loc_ok_rate " << rate << std::endl; 
 		loc_ok = (rate > rate_thres); //default 60%
 		ok_count = 0;
 		not_ok_count = 0;
-		prev_pose = current_pose;
+		prev_pose_check = current_pose;
+		check = false;
 		
 	 }
 
@@ -424,10 +435,31 @@ void cLocalizationMonitor::loc_pose_callback(const geometry_msgs::PoseWithCovari
   if (!initial_current_pose_received)
   {
 	prev_pose = current_pose;
+	prev_pose_check = current_pose;
+	ok_count = 0;
+	not_ok_count = 0;
   	initial_current_pose_received = true;
   }
 
         
+}
+
+void cLocalizationMonitor::mileage_callback(const std_msgs::Float32::ConstPtr& msg)
+{
+
+   float mileage = msg->data;
+   if (!initial_mileage_received)
+   {
+	prev_mileage = mileage;
+	check = false;
+	initial_mileage_received = true;
+   }	
+   if (mileage - prev_mileage > dis_thres_check)
+   {
+	prev_mileage = mileage;
+	check = true;
+   }
+
 }
 
 void cLocalizationMonitor::battery_state_callback(const mira_msgs::BatteryState::ConstPtr& msg)
@@ -455,9 +487,6 @@ void cLocalizationMonitor::battery_state_callback(const mira_msgs::BatteryState:
   }
 
   is_charging = charging;
-
-  
-
-        
+    
 }
 

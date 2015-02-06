@@ -19,6 +19,8 @@
 
 #include "hobbit_msgs/GetOccupancyState.h"
 
+#include "std_msgs/Float32.h"
+
 class cLocalizationMonitor
 {
 public:
@@ -29,6 +31,7 @@ public:
   void Run(void);
   void loc_pose_callback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg);
   void loc_scan_callback(const sensor_msgs::LaserScan::ConstPtr& msg);
+  void mileage_callback(const std_msgs::Float32::ConstPtr& msg);
   void open(ros::NodeHandle & n);
 
 private:
@@ -37,10 +40,13 @@ private:
 
   ros::Subscriber laserSubs;
 
+  ros::Subscriber mileage_sub;
+
   ros::Publisher locStatePublisher;
 
   geometry_msgs::PoseWithCovarianceStamped current_pose;
   geometry_msgs::PoseWithCovarianceStamped prev_pose;
+  geometry_msgs::PoseWithCovarianceStamped prev_pose_check;
 
   int init_argc;
   char **init_argv;
@@ -94,8 +100,15 @@ private:
 
   double dis_covered_sq;
   double dis_thres;
+  double ang_thres;
+  double dis_covered_sq_check;
+  double dis_thres_check;
 
   bool initial_current_pose_received;
+
+  float prev_mileage;
+  bool initial_mileage_received;
+  bool check;
 
 };
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
