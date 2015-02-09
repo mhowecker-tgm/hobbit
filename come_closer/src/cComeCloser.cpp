@@ -306,7 +306,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 
 }
 
-void cComeCloser::stop()
+void cComeCloser::stop() //It would be better to have this in a different node, but for now let's keep it here
 {
 	//std::cout << "stop command received " << std::endl;
 
