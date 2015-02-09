@@ -75,6 +75,8 @@ private:
 
 	double range_max;
 
+	ros::ServiceClient emergency_stop_client;
+
 };
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #endif

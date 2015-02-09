@@ -8,6 +8,7 @@
 #include <string>
 
 #include <mira_msgs/ResetMotorStop.h>
+#include <mira_msgs/EmergencyStop.h>
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Constructor. Initialises member attributes and allocates resources.
@@ -47,6 +48,7 @@ cComeCloser::cComeCloser(int argc, char **argv) : init_argc(argc), init_argv(arg
 	current_motion_state.data = "Idle";
 
 	event_sub = n.subscribe("/Event", 2, &cComeCloser::event_callback, this);
+	reset_motorstop_client = n.serviceClient<mira_msgs::ResetMotorStop>("/emergency_stop");
   	reset_motorstop_client = n.serviceClient<mira_msgs::ResetMotorStop>("/reset_motorstop");
 
 }
@@ -275,9 +277,23 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
       		{
 			std::cout << "preempt requested" << std::endl;
 
-			std_msgs::String stop_cmd;
+			// This will not work, concurrency
+			/*std_msgs::String stop_cmd;
 			stop_cmd.data = "Stop";
-			discrete_motion_cmd_pub.publish(stop_cmd);
+			discrete_motion_cmd_pub.publish(stop_cmd);*/
+			
+			mira_msgs::EmergencyStop srv;
+	        	if (!emergency_stop_client.call(srv))
+	        	{
+	          		ROS_DEBUG("Failed to call service emergency_stop");
+	        	}
+			
+
+			mira_msgs::ResetMotorStop srv2;
+	        	if (!reset_motorstop_client.call(srv2))
+	        	{
+	          		ROS_DEBUG("Failed to call service reset_motorstop");
+	        	}
 
 			as_->setPreempted();
 			return;
