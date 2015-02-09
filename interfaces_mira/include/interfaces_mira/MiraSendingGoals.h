@@ -90,9 +90,6 @@ private:
 	double dis_covered_sq;
 	double dis_thres;
 
-	geometry_msgs::PoseWithCovarianceStamped currentPose;
-	geometry_msgs::PoseWithCovarianceStamped prevPose;
-
 	ros::ServiceServer check_rotation_service;
 	bool checkRotationStatus(hobbit_msgs::GetState::Request  &req, hobbit_msgs::GetState::Response &res);
 
@@ -104,11 +101,10 @@ private:
 	ros::ServiceClient loc_status_client;
 
 	bool loc_check_active;
-        void loc_pose_callback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg);
-        ros::Subscriber current_loc_sub;
+        ros::Subscriber loc_status_sub;
 	ros::Publisher discrete_motion_cmd_pub;
 
-	ros::Publisher loc_check_pub;
+	//ros::Publisher loc_check_pub;
 
 	ros::ServiceServer cancel_goal_service;
 	bool cancelGoal(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res);
@@ -121,6 +117,9 @@ private:
 	ros::Subscriber bumper_subs;
 
 	bool is_bumper_pressed;
+
+	bool loc_status;
+	void loc_status_callback(const std_msgs::Bool::ConstPtr& msg);
 
 };
 

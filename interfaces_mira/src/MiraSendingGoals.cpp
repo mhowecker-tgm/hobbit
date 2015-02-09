@@ -27,6 +27,8 @@ MiraSendingGoals::MiraSendingGoals() : MiraRobotModule(std::string ("SendingGoal
 	outer_dis = 0.55;
 
 	is_bumper_pressed = false;
+
+	loc_status = true;
 }
 
 void MiraSendingGoals::initialize() {
@@ -68,11 +70,11 @@ void MiraSendingGoals::initialize() {
 
   loc_status_client = robot_->getRosNode().serviceClient<hobbit_msgs::GetState>("/get_loc_status");
 
-  current_loc_sub = robot_->getRosNode().subscribe<geometry_msgs::PoseWithCovarianceStamped>("/amcl_pose", 2, &MiraSendingGoals::loc_pose_callback, this);
+  loc_status_sub = robot_->getRosNode().subscribe<std_msgs::Bool>("/loc_ok", 2, &MiraSendingGoals::loc_status_callback, this);
 
   discrete_motion_cmd_pub = robot_->getRosNode().advertise<std_msgs::String>("/discrete_motion_cmd", 20);
 
-  loc_check_pub = robot_->getRosNode().advertise<std_msgs::Bool>("/loc_check_state", 20);
+  //loc_check_pub = robot_->getRosNode().advertise<std_msgs::Bool>("/loc_check_state", 20);
 
   cancel_goal_service = robot_->getRosNode().advertiseService("/cancel_goal", &MiraSendingGoals::cancelGoal, this);
 
@@ -409,25 +411,10 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
     while(n.ok())
     {
 
-        dis_covered_sq = (currentPose.pose.pose.position.x-prevPose.pose.pose.position.x)*(currentPose.pose.pose.position.x-prevPose.pose.pose.position.x) + (currentPose.pose.pose.position.y-prevPose.pose.pose.position.y)*(currentPose.pose.pose.position.y-prevPose.pose.pose.position.y);
-	if(loc_check_active && dis_covered_sq > dis_thres*dis_thres)
+	if(loc_check_active)
 	{
-		//call service 
-		hobbit_msgs::GetState srv;
-		bool loc_ok = true;
-	        if (loc_status_client.call(srv))
-	        {
-	          //ROS_INFO("Sum: %ld", (long int)srv.response.sum);
-		  loc_ok = srv.response.state;
-	        }
-	        else
-	        {
-	          ROS_DEBUG("Failed to call service get_loc_state");
-	        }
-
-		std_msgs::Bool loc_check_state;
-		loc_check_state.data = loc_ok;
-		loc_check_pub.publish(loc_check_state);		
+		
+		bool loc_ok = loc_status;	
 		
 		//check if rotation is safe //FIXME, service to get LocalMap, get outer circle...
 		if (!loc_ok)
@@ -441,12 +428,11 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
 			std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
 			robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
 
-			//if (isRotationSafe())
-			if (false)
+			if (isRotationSafe())
 			{
 				// rotate
 				std_msgs::String rotate_cmd;
-				rotate_cmd.data = "Turn 360";
+				rotate_cmd.data = "Turn 180";
 		  		discrete_motion_cmd_pub.publish(rotate_cmd);
 				//wait until rotation is finished and the drive mode is back to normal (0)
 				double time_limit = 30;
@@ -460,21 +446,24 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
 				} 
 				//sleep (1);
 
-				//check localization again
+				//call service 
+				hobbit_msgs::GetState srv;
 				if (loc_status_client.call(srv))
-	        		{
-	          			//ROS_INFO("Sum: %ld", (long int)srv.response.sum);
-		  			loc_ok = srv.response.state;
-	        		}
+				{
+				  //ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+				  loc_ok = srv.response.state;
+				}
+				else
+				{
+				  ROS_DEBUG("Failed to call service get_loc_state");
+				}
 
 				//resend the goal
 				if (loc_ok)
 				{
-					//reset dis covered
-					prevPose = currentPose;
 					//resend the goal
 					robot_->getMiraAuthority().callService<void>(navService, "setTask", goal_task);
-
+					loc_status = true;
 					continue;
 				}
 
@@ -484,7 +473,7 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
 			/*mira_msgs::ObsNavMode srv_obs;
 			obs_nav_mode(srv_obs.request, srv_obs.response);*/
 
-			std::cout << "The robot is lost and rotation is not safe " << std::endl;
+			std::cout << "The robot is lost!!!!!!! " << std::endl;  //and it has already rotated or cannot rotate
 			// TODO notify that the robot is lost, stop navigation?? !!!! //TODO TODO TODO
 		}
       }
@@ -706,9 +695,9 @@ bool MiraSendingGoals::isRotationSafe()
 	return true;
 }
 
-void MiraSendingGoals::loc_pose_callback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg)
+void MiraSendingGoals::loc_status_callback(const std_msgs::Bool::ConstPtr& msg)
 {
-  currentPose = (*msg);  
+    loc_status = msg->data;
 }
 
 
