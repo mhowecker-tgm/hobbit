@@ -234,6 +234,10 @@ def call_hobbit():
                          'preempted': 'LOG_PREEMPT',
                          'aborted': 'LOG_ABORT'}
         )
+        # TODO: anounce that Hobbit has arrived
+        # TODO: wait for 'come close' gesture 30seconds
+        # TODO: move 10 cm straight ahead
+        # TODO: loop this things twice or thrice
         StateMachine.add(
             'LOG_PREEMPT',
             log.DoLogPreempt(scenario='Call Hobbit'),
