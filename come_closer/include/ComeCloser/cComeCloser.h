@@ -68,7 +68,6 @@ private:
  
 	ros::Subscriber event_sub;
 	void event_callback(const hobbit_msgs::Event::ConstPtr& msg);
-	ros::ServiceClient reset_motorstop_client;
 
 	double dis_thres;
 	double ang_thres;
@@ -76,6 +75,11 @@ private:
 	double range_max;
 
 	ros::ServiceClient emergency_stop_client;
+	ros::ServiceClient reset_motorstop_client;
+
+	void stop();
+	ros::Subscriber stop_sub;
+	void stop_callback(const std_msgs::String::ConstPtr& msg);
 
 };
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

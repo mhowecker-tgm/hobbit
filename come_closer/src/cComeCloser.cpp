@@ -48,8 +48,10 @@ cComeCloser::cComeCloser(int argc, char **argv) : init_argc(argc), init_argv(arg
 	current_motion_state.data = "Idle";
 
 	event_sub = n.subscribe("/Event", 2, &cComeCloser::event_callback, this);
-	reset_motorstop_client = n.serviceClient<mira_msgs::ResetMotorStop>("/emergency_stop");
+	emergency_stop_client = n.serviceClient<mira_msgs::EmergencyStop>("/emergency_stop");
   	reset_motorstop_client = n.serviceClient<mira_msgs::ResetMotorStop>("/reset_motorstop");
+
+	stop_sub = n.subscribe("/stop_request", 2, &cComeCloser::stop_callback, this);
 
 }
 
@@ -276,24 +278,8 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 		if(as_->isPreemptRequested())
       		{
 			std::cout << "preempt requested" << std::endl;
-
-			// This will not work, concurrency
-			/*std_msgs::String stop_cmd;
-			stop_cmd.data = "Stop";
-			discrete_motion_cmd_pub.publish(stop_cmd);*/
 			
-			mira_msgs::EmergencyStop srv;
-	        	if (!emergency_stop_client.call(srv))
-	        	{
-	          		ROS_DEBUG("Failed to call service emergency_stop");
-	        	}
-			
-
-			mira_msgs::ResetMotorStop srv2;
-	        	if (!reset_motorstop_client.call(srv2))
-	        	{
-	          		ROS_DEBUG("Failed to call service reset_motorstop");
-	        	}
+			stop();
 
 			as_->setPreempted();
 			return;
@@ -317,6 +303,41 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 	//if the node is killed then we'll abort and return
         as_->setAborted(hobbit_msgs::GeneralHobbitResult(), "Aborting on the goal because the node has been killed");
         return;
+
+}
+
+void cComeCloser::stop()
+{
+	//std::cout << "stop command received " << std::endl;
+
+	//check if movement
+	if(current_motion_state.data == "Turning" || current_motion_state.data == "Moving")
+	{
+
+		mira_msgs::EmergencyStop srv;
+		if (!emergency_stop_client.call(srv))
+		{
+		  ROS_DEBUG("Failed to call service stop_request");
+		}
+
+		sleep(3);
+
+		mira_msgs::ResetMotorStop srv2;
+		if (!reset_motorstop_client.call(srv2))
+		{
+		  ROS_DEBUG("Failed to call service reset_motorstop");
+		}
+	}
+
+
+}
+
+void cComeCloser::stop_callback(const std_msgs::String::ConstPtr& msg)
+{
+	if (msg->data.compare("stop")==0 || msg->data.compare("Stop")==0 || msg->data.compare("STOP")==0)
+	{
+		stop();
+	}
 
 }
 
