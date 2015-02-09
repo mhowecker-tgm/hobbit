@@ -15,7 +15,7 @@ import math
 
 from smach import State, Sequence, StateMachine
 from smach_ros import ServiceState, SimpleActionState
-from mira_msgs.srv import UserNavMode, ObsNavMode
+from mira_msgs.srv import UserNavMode, ObsNavMode, EmergencyStop
 from hobbit_msgs.srv import GetCoordinates, GetCoordinatesRequest, GetName, \
     SwitchVision, SwitchVisionRequest
 from move_base_msgs.msg import MoveBaseAction
@@ -249,10 +249,16 @@ class Stop(State):
         if client.wait_for_server(timeout=rospy.Duration(3)):
             client.cancel_all_goals()
             rospy.loginfo('FINISH FULL STOP')
-            return 'succeeded'
         else:
             rospy.loginfo('Failed to reach actionserver@FULL STOP')
-        return 'aborted'
+        rospy.wait_for_service('emergency_stop', timeout=1)
+        try:
+            em_stop = rospy.ServiceProxy('emergency_stop', EmergencyStop)
+            resp1 = em_stop()
+            return 'succeeded'
+        except rospy.ServiceException, e:
+            print "Service call failed: %s"%e
+            return 'aborted'
 
 
 def get_full_stop():
