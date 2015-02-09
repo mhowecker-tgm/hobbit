@@ -722,15 +722,21 @@ def main():
                          'failed': 'RESET_ACTIVE_TASK'}
         )
         if MUC_ENABLED:
-            StateMachine.add_auto(
+            StateMachine.add(
                 'REWARD',
                 social_role.get_reward_muc(),
-                connector_outcomes=['succeeded', 'aborted'])
+                transitions={'succeeded': 'MAIN_MENU',
+                         'preempted': 'MAIN_MENU',
+                         'aborted': 'MAIN_MENU'}
+            )
         else:
-            StateMachine.add_auto(
+            StateMachine.add(
                 'REWARD',
                 social_role.get_reward(),
-                connector_outcomes=['succeeded', 'aborted'])
+                transitions={'succeeded': 'MAIN_MENU',
+                         'preempted': 'MAIN_MENU',
+                         'aborted': 'MAIN_MENU'}
+            )
         StateMachine.add(
             'BRING_OBJECT',
             FakeForAllWithoutRunningActionSever(name='BRING_OBJECT'),
