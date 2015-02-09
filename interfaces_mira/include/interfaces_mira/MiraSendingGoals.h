@@ -7,9 +7,8 @@
 #ifndef MIRASENDINGGOALS_H
 #define MIRASENDINGGOALS_H
 
-#define GOAL_POSE "goal_pose"
-#define GOAL_STATUS "goal_status"
-#define STOP_REQUEST "stop_request"
+//#define GOAL_POSE "goal_pose"
+//#define GOAL_STATUS "goal_status"
 
 //#include <fw/Framework.h>
 
@@ -54,7 +53,7 @@ public:
 
 	void goal_pose_callback(const hobbit_msgs::Pose2DStamped::ConstPtr& goal_pose);
 
-        void stop_request_callback(const std_msgs::String::ConstPtr& msg);
+        //void stop_request_callback(const std_msgs::String::ConstPtr& msg);
 
         void goal_status_channel_callback(mira::ChannelRead<std::string> data);
 
@@ -67,7 +66,7 @@ private:
         MiraSendingGoals();
 
 	ros::Subscriber goal_pose_subscriber;
-	ros::Subscriber stop_sub;
+	//ros::Subscriber stop_sub;
 
 	ros::Publisher goal_status_pub;
 
@@ -120,10 +119,6 @@ private:
 	void cancelGoal();
 
 	ros::Subscriber bumper_subs;
-
-	ros::Subscriber event_sub;
-	void event_callback(const hobbit_msgs::Event::ConstPtr& msg);
-	ros::ServiceClient reset_motorstop_client;
 
 };
 

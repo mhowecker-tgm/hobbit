@@ -29,12 +29,12 @@ MiraSendingGoals::MiraSendingGoals() : MiraRobotModule(std::string ("SendingGoal
 
 void MiraSendingGoals::initialize() {
         
-  goal_pose_subscriber = robot_->getRosNode().subscribe(GOAL_POSE, 1000, &MiraSendingGoals::goal_pose_callback, this);
-  stop_sub = robot_->getRosNode().subscribe(STOP_REQUEST, 2, &MiraSendingGoals::stop_request_callback, this);
+  goal_pose_subscriber = robot_->getRosNode().subscribe("/goal_pose", 1000, &MiraSendingGoals::goal_pose_callback, this);
+  //stop_sub = robot_->getRosNode().subscribe("/stop_request", 2, &MiraSendingGoals::stop_request_callback, this);
 
   bumper_subs = robot_->getRosNode().subscribe("/bumper", 2, &MiraSendingGoals::bumper_callback, this);
 
-  goal_status_pub = robot_->getRosNode().advertise<std_msgs::String>(GOAL_STATUS, 20);
+  goal_status_pub = robot_->getRosNode().advertise<std_msgs::String>("/goal_status", 20);
 
   robot_->getMiraAuthority().subscribe<std::string>("/navigation/PilotEvent", &MiraSendingGoals::goal_status_channel_callback, this);
 
@@ -188,7 +188,7 @@ void MiraSendingGoals::goal_pose_callback(const hobbit_msgs::Pose2DStamped::Cons
 
 }
 
-void MiraSendingGoals::stop_request_callback(const std_msgs::String::ConstPtr& msg)
+/*void MiraSendingGoals::stop_request_callback(const std_msgs::String::ConstPtr& msg)
 {
 	if (msg->data.compare("stop")==0 || msg->data.compare("Stop")==0 || msg->data.compare("STOP")==0)
 	{
@@ -196,7 +196,7 @@ void MiraSendingGoals::stop_request_callback(const std_msgs::String::ConstPtr& m
 		cancelGoal();
 	}
 
-}
+}*/
 
 bool MiraSendingGoals::cancelGoal(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res)
 {
@@ -546,7 +546,7 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
           std::cout << "goal preempted, preemt received" << std::endl;
 
            //we'll actually return from execute after preempting
-           //return;
+           return;
         }
      }
 
