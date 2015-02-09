@@ -120,6 +120,8 @@ private:
 
 	ros::Subscriber bumper_subs;
 
+	bool is_bumper_pressed;
+
 };
 
 

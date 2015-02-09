@@ -25,6 +25,8 @@ MiraSendingGoals::MiraSendingGoals() : MiraRobotModule(std::string ("SendingGoal
 	loc_check_active = false;
 
 	outer_dis = 0.55;
+
+	is_bumper_pressed = false;
 }
 
 void MiraSendingGoals::initialize() {
@@ -221,11 +223,13 @@ void MiraSendingGoals::cancelGoal()
 
 void MiraSendingGoals::bumper_callback(const std_msgs::Bool::ConstPtr& msg)
 {
-	if (msg->data) //bumper was hit
+	if (msg->data && !is_bumper_pressed) //bumper was hit
 	{
 		std::cout << "bumper was hit, cancelling goal " << std::endl;
 		cancelGoal();
 	}
+
+	is_bumper_pressed = msg->data;
 
 }
 
