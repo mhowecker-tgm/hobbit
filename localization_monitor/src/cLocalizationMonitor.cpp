@@ -67,13 +67,10 @@ cLocalizationMonitor::~cLocalizationMonitor()
 void cLocalizationMonitor::open(ros::NodeHandle & n)
 {
         current_loc_sub = n.subscribe<geometry_msgs::PoseWithCovarianceStamped>("/amcl_pose", 2, &cLocalizationMonitor::loc_pose_callback, this);
-
         laserSubs = n.subscribe<sensor_msgs::LaserScan>("loc_scan", 1, &cLocalizationMonitor::loc_scan_callback, this); 
-
 	mileage_sub = n.subscribe<std_msgs::Float32>("/mileage", 2, &cLocalizationMonitor::mileage_callback, this);
 	
 	locStatePublisher = n.advertise<std_msgs::Bool>("loc_ok", 1); 
-
 	mapTestPublisher = n.advertise<nav_msgs::OccupancyGrid>("map_test", 1); 
 
 	get_loc_status_service = n.advertiseService("/get_loc_status", &cLocalizationMonitor::getLocStatus, this);
@@ -329,6 +326,7 @@ bool cLocalizationMonitor::checkUncertainty()
 bool cLocalizationMonitor::getLocStatus(hobbit_msgs::GetState::Request  &req, hobbit_msgs::GetState::Response &res)
 {
 	
+	std::cout << "********************* " << std::endl;
 	ROS_INFO("loc_state request received");
 
 	bool scan_ok = checkScan();
@@ -415,12 +413,12 @@ void cLocalizationMonitor::Run(void)
 		not_ok_count = 0;
 		prev_pose_check = current_pose;
 		check = false;
+
+		std_msgs::Bool loc_state;
+	 	loc_state.data = loc_ok;
+	 	locStatePublisher.publish(loc_state);
 		
 	 }
-
-	 std_msgs::Bool loc_state;
-	 loc_state.data = loc_ok;
-	 locStatePublisher.publish(loc_state);
 
 	 //mapTestPublisher.publish(static_map_modified); //for visualization purposes
 
