@@ -72,7 +72,7 @@ void MiraSendingGoals::initialize() {
 
   loc_status_sub = robot_->getRosNode().subscribe<std_msgs::Bool>("/loc_ok", 2, &MiraSendingGoals::loc_status_callback, this);
 
-  discrete_motion_cmd_pub = robot_->getRosNode().advertise<std_msgs::String>("/discrete_motion_cmd", 20);
+  discrete_motion_cmd_pub = robot_->getRosNode().advertise<std_msgs::String>("/DiscreteMotionCmd", 20);
 
   //loc_check_pub = robot_->getRosNode().advertise<std_msgs::Bool>("/loc_check_state", 20);
 
@@ -428,8 +428,11 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
 			std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
 			robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
 
+			std::cout << "loc not ok, cancelled task " << std::endl;
+
 			if (isRotationSafe())
 			{
+				std::cout << "rotation seems to be fine " << std::endl;
 				// rotate
 				std_msgs::String rotate_cmd;
 				rotate_cmd.data = "Turn 180";
