@@ -13,6 +13,8 @@
   	<param name="dis_thres_check" value="3.5"/> #distance to be covered between localization checks
 	<param name="rate_thres" value="0.5"/>	#rate of succesful localization results between localization checks
 
+	<param name="apply_action" value="false"/>
+
   </node>
 </launch>
 

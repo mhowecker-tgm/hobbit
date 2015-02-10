@@ -17,6 +17,10 @@
 
 #include "angles/angles.h"
 
+#include <hobbit_msgs/GeneralHobbitAction.h>
+#include <actionlib/client/simple_action_client.h>
+#include <actionlib/client/terminal_state.h>
+
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Constructor. Initialises member attributes and allocates resources.
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -43,6 +47,8 @@ cLocalizationMonitor::cLocalizationMonitor(int argc, char **argv) : init_argc(ar
 	nh.param("ang_thres", ang_thres, 15.0);
 	nh.param("dis_thres_check", dis_thres_check, 1.5);
 	nh.param("rate_thres", rate_thres, 0.6); 
+
+	nh.param("apply_action", apply_action, false); 
 
 
 }
@@ -80,6 +86,7 @@ void cLocalizationMonitor::open(ros::NodeHandle & n)
         reset_loc_client = n.serviceClient<std_srvs::Empty>("/reset_loc"); 
 
 	get_occupancy_state_service = n.advertiseService("/get_occupancy_state", &cLocalizationMonitor::getOccupancyState, this);
+	 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 	//load static global map, we don't want to run the map server
@@ -400,15 +407,12 @@ void cLocalizationMonitor::Run(void)
 		prev_pose = current_pose;	
 	 }
 
-	 //dis_covered_sq_check = (current_pose.pose.pose.position.x-prev_pose_check.pose.pose.position.x)*(current_pose.pose.pose.position.x-prev_pose_check.pose.pose.position.x) + (current_pose.pose.pose.position.y-prev_pose_check.pose.pose.position.y)*(current_pose.pose.pose.position.y-prev_pose_check.pose.pose.position.y);
-
-	 //if (dis_covered_sq_check > dis_thres_check*dis_thres_check)
-	 if (check)
+	 if (check) //based on mileage
 	 {
 		if (!(ok_count+not_ok_count)) return; //should never happen, but just in case
 		double rate = (double)ok_count/(ok_count+not_ok_count);
 		std::cout << "loc_ok_rate " << rate << std::endl; 
-		loc_ok = (rate > rate_thres); //default 60%
+		loc_ok = (rate > rate_thres); //default 50%
 		ok_count = 0;
 		not_ok_count = 0;
 		prev_pose_check = current_pose;
@@ -417,6 +421,52 @@ void cLocalizationMonitor::Run(void)
 		std_msgs::Bool loc_state;
 	 	loc_state.data = loc_ok;
 	 	locStatePublisher.publish(loc_state);
+
+		if (!loc_ok && apply_action)
+		{
+			 // create action client
+  			actionlib::SimpleActionClient<hobbit_msgs::GeneralHobbitAction> ac("localization_recovery", true);
+
+  			ROS_INFO("Waiting for action server to start.");
+  			// wait for the action server to start
+  			ac.waitForServer(); //will wait for infinite time
+
+  			ROS_INFO("Action server started, sending goal.");
+  			// send a goal to the action
+  			hobbit_msgs::GeneralHobbitGoal goal;
+  			goal.command.data = "start";
+  			ac.sendGoal(goal); 
+
+  			//wait for the action, rotation should take less than a minute
+  			bool finished_before_timeout = ac.waitForResult(ros::Duration(60.0));
+
+			if (finished_before_timeout)
+			{
+				actionlib::SimpleClientGoalState state = ac.getState();
+			    	if (state.toString().c_str() == "SUCCEEDED")
+				{
+					std::cout << "recovery action finished " << std::endl;
+					//check current localization
+					bool scan_ok = checkScan();
+					bool uncertainty_ok = checkUncertainty();
+
+					if (uncertainty_ok && scan_ok)
+					{
+						std::cout << "localization recovery succeeded " << std::endl;
+						//send goal again
+						return;
+					}
+					else
+						std::cout << "localization recovery did not succeed " << std::endl;
+				}
+				
+			}
+			else
+			    ROS_INFO("Rotation did not finish before the time out.");
+
+			std::cout << "The robot is lost!!!!!!! Recovery did not succeed " << std::endl;
+			//TODO publish notification
+		}
 		
 	 }
 
@@ -483,4 +533,7 @@ void cLocalizationMonitor::battery_state_callback(const mira_msgs::BatteryState:
   is_charging = charging;
     
 }
+
+
+
 

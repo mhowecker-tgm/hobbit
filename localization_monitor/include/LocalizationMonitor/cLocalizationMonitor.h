@@ -20,6 +20,7 @@
 #include "hobbit_msgs/GetOccupancyState.h"
 
 #include "std_msgs/Float32.h"
+#include <std_msgs/String.h>
 
 class cLocalizationMonitor
 {
@@ -109,6 +110,10 @@ private:
   float prev_mileage;
   bool initial_mileage_received;
   bool check;
+
+  bool apply_action;
+
+ 
 
 };
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
