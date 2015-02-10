@@ -1,0 +1,5 @@
+<launch>
+  <node pkg="localization_recovery" type="localization_recovery" name="localization_recovery" output="screen">
+  </node>
+</launch>
+
