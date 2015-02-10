@@ -376,7 +376,7 @@ int main(int argc, char **argv)
      ros::Rate high_loop_rate(highRate); //  hz should be our target performance
      ros::Rate medium_loop_rate(midRate); //  hz should be our target performance
      ros::Rate low_loop_rate(lowRate); //  hz should be our target performance
-     framerateState=HIGH_FRAMERATE;
+     framerateState=MEDIUM_FRAMERATE; //By default we go to medium!
 
      //We advertise the services we want accessible using "rosservice call *w/e*"
      ros::ServiceServer visualizeOnService      = nh.advertiseService(name+"/visualize_on", visualizeOn);
