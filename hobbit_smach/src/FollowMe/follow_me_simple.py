@@ -16,6 +16,7 @@ from std_msgs.msg import String
 from smach_ros import ActionServerWrapper, IntrospectionServer
 from uashh_smach.util import SleepState, WaitForMsgState
 from follow_user.msg import Person as FollowPerson
+from follow_user.msg import TrackerTarget
 from hobbit_user_interaction import HobbitMMUI
 import head_move_import as head_move
 
