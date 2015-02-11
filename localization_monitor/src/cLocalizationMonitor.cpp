@@ -18,8 +18,10 @@
 #include "angles/angles.h"
 
 #include <hobbit_msgs/GeneralHobbitAction.h>
-#include <actionlib/client/simple_action_client.h>
+
 #include <actionlib/client/terminal_state.h>
+
+#include "hobbit_msgs/GetPose.h"
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Constructor. Initialises member attributes and allocates resources.
@@ -86,6 +88,25 @@ void cLocalizationMonitor::open(ros::NodeHandle & n)
         reset_loc_client = n.serviceClient<std_srvs::Empty>("/reset_loc"); 
 
 	get_occupancy_state_service = n.advertiseService("/get_occupancy_state", &cLocalizationMonitor::getOccupancyState, this);
+
+	get_last_goal_client = n.serviceClient<hobbit_msgs::GetPose>("/get_last_goal"); 
+
+	log_output.open("/opt/ros/hobbit_hydro/src/localization_monitor/localization_log.txt",std::ios::out);
+        log_output << "Localization monitor "  << std::endl;
+
+	time_t rawtime;
+  	struct tm * timeinfo;
+  	char buffer[80];
+
+  	time (&rawtime);
+  	timeinfo = localtime(&rawtime);
+
+  	strftime(buffer,80,"%d-%m-%Y %I:%M:%S",timeinfo);
+  	std::string str(buffer);
+
+	log_output << str  << std::endl;
+	log_output << "scan_score "<< '\t' << "sq_area " << '\t' << "ok_rate " << '\t' << "rotation " << '\t' << "recovered " << std::endl;
+	log_output << "********************************************************************************* "  << std::endl;
 	 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -291,10 +312,17 @@ bool cLocalizationMonitor::checkScan()
 
 	}
 
-	if (valid_points < min_valid_points) return true; //open space, we cannot tell if the robot is lost yet
+	log_output << std::endl;
+	if (valid_points < min_valid_points) 
+	{
+		log_output << double(-1)   << '\t';
+		return true; //open space, we cannot tell if the robot is lost yet
+	}
 
 	double rel_score = score/valid_points;
 	//std::cout << "rel_score " << rel_score << std::endl;
+	
+	log_output << rel_score   << '\t';
 	if (rel_score > score_thres)
 		return true;
 	else 
@@ -323,6 +351,9 @@ bool cLocalizationMonitor::checkUncertainty()
 
 	  double axes_prod = uncertainty_thres*uncertainty_thres;
 	  //std::cout << " sq_area_estimate " << sq_area_estimate << " thres " << axes_prod*axes_prod << std::endl;
+	  
+	  log_output << sq_area_estimate << '\t';
+	
           if (sq_area_estimate < axes_prod*axes_prod)
 	     return true;
   	  else 
@@ -412,6 +443,7 @@ void cLocalizationMonitor::Run(void)
 		if (!(ok_count+not_ok_count)) return; //should never happen, but just in case
 		double rate = (double)ok_count/(ok_count+not_ok_count);
 		std::cout << "loc_ok_rate " << rate << std::endl; 
+		log_output << rate << '\t';
 		loc_ok = (rate > rate_thres); //default 50%
 		ok_count = 0;
 		not_ok_count = 0;
@@ -422,7 +454,7 @@ void cLocalizationMonitor::Run(void)
 	 	loc_state.data = loc_ok;
 	 	locStatePublisher.publish(loc_state);
 
-		if (!loc_ok && apply_action)
+		if (!loc_ok && apply_action) //TODO: && !following
 		{
 			 // create action client
   			actionlib::SimpleActionClient<hobbit_msgs::GeneralHobbitAction> ac("localization_recovery", true);
@@ -447,21 +479,51 @@ void cLocalizationMonitor::Run(void)
 			    	if (state.toString() == "SUCCEEDED")
 				{
 					std::cout << "recovery action finished " << std::endl;
+					log_output << 1 << '\t';
 					//check current localization
 					bool scan_ok = checkScan();
 					bool uncertainty_ok = checkUncertainty();
 					std::cout << "scan_ok " << scan_ok << std::endl;
 					std::cout << "uncertainty_ok " << uncertainty_ok << std::endl;
 
+					log_output << '\t' << '\t' << '\t';
 					if (uncertainty_ok && scan_ok)
 					{
 						std::cout << "localization recovery succeeded " << std::endl;
-						//send goal again
-						return;
+						log_output << 1;
+
+						//get last goal
+						hobbit_msgs::GetPose srv;
+						move_base_msgs::MoveBaseGoal goal;
+						if (get_last_goal_client.call(srv))
+						{
+							goal.target_pose = srv.response.pose;
+
+							//send goal again
+							MoveBaseClient ac("mira_move_base", true);
+
+							// Wait for the action server to come up
+							ROS_INFO("Waiting for the action server to come online...");
+							if(!ac.waitForServer(ros::Duration(5.0)))
+							{
+								ROS_FATAL("action server not running?");
+								ROS_BREAK();
+							}
+
+							ac.sendGoal(goal);
+							//TODO notify
+							return;
+
+							
+						}
+
 					}
 					else
-						std::cout << "localization recovery did not succeed " << std::endl;
-				}
+					{
+						log_output << 2;
+						std::cout << "localization recovery did not succeed " << std::endl;				}
+
+				 }
 				
 			}
 			else

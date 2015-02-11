@@ -22,6 +22,12 @@
 #include "std_msgs/Float32.h"
 #include <std_msgs/String.h>
 
+#include <fstream>
+
+#include <actionlib/client/simple_action_client.h>
+#include <move_base_msgs/MoveBaseAction.h>
+
+typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
 class cLocalizationMonitor
 {
 public:
@@ -112,6 +118,10 @@ private:
   bool check;
 
   bool apply_action;
+ 
+  ros::ServiceClient get_last_goal_client;
+
+  std::ofstream log_output;
 
  
 
