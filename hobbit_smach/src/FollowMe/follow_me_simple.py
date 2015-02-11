@@ -105,13 +105,13 @@ def main():
         StateMachine.add(
             'INIT',
             Init(),
-            transitions={'succeeded': 'SAY_START',
+            transitions={'succeeded': 'ENABLE_TRACKING',
                          'canceled': 'LOG_ABORTED'}
         )
         StateMachine.add_auto(
             'ENABLE_TRACKING',
             ServiceState(
-                'follow_user/resume',
+                '/follow_user/resume',
                 Empty
             ),
             connector_outcomes=['succeeded', 'aborted']
