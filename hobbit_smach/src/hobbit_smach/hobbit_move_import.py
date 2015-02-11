@@ -465,13 +465,6 @@ def goToPosition(frame='/map', room='None', place='dock'):
         )
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
                      head_move.MoveTo(pose='down_center'))
-        Sequence.add(
-            'PREPARE_STOP',
-            ServiceState(
-                '/user_nav_mode',
-                UserNavMode
-            )
-        )
         Sequence.add('WAIT', SleepState(duration=1))
         Sequence.add('ACTIVATE_OBSTACLES',
                      SetObstacles(active=True))
