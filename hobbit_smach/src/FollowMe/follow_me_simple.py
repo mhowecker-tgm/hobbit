@@ -11,15 +11,15 @@ SERVER_TIMEOUT = 5
 import rospy
 import smach
 import hobbit_smach.speech_output_import as speech_output
-
+from smach_ros import ServiceState
 from std_msgs.msg import String
+from std_srvs.srv import Empty
 from smach_ros import ActionServerWrapper, IntrospectionServer
 from uashh_smach.util import SleepState, WaitForMsgState
 from follow_user.msg import Person as FollowPerson
 from follow_user.msg import TrackerTarget
 from hobbit_user_interaction import HobbitMMUI
-import head_move_import as head_move
-
+import hobbit_smach.head_move_import as head_move
 from smach import StateMachine, Concurrence, Sequence
 from smach_ros import IntrospectionServer, ActionServerWrapper, MonitorState, SimpleActionState
 from hobbit_msgs.msg import GeneralHobbitAction, FollowMeAction, FollowMeGoal
@@ -107,6 +107,14 @@ def main():
             Init(),
             transitions={'succeeded': 'SAY_START',
                          'canceled': 'LOG_ABORTED'}
+        )
+        StateMachine.add_auto(
+            'ENABLE_TRACKING',
+            ServiceState(
+                'follow_user/resume',
+                Empty
+            ),
+            connector_outcomes=['succeeded', 'aborted']
         )
         StateMachine.add(
             'SAY_START',
