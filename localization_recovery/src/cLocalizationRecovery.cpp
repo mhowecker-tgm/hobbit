@@ -34,6 +34,8 @@ cLocalizationRecovery::cLocalizationRecovery(int argc, char **argv) : init_argc(
 	discrete_motion_cmd_pub = n.advertise<std_msgs::String>("/DiscreteMotionCmd", 20);
 	motion_state_sub = n.subscribe<std_msgs::String>("/DiscreteMotionState", 2, &cLocalizationRecovery::motion_state_callback, this);
 
+	is_goal_active_client = n.serviceClient<hobbit_msgs::GetState>("/is_goal_active");
+
 }
 
 cLocalizationRecovery::~cLocalizationRecovery()
@@ -76,7 +78,17 @@ void cLocalizationRecovery::executeCb(const hobbit_msgs::GeneralHobbitGoalConstP
 	finished_rotation = false;
 
 	//if no current goal abort, do not do anything
-	// TODO TODO TODO
+	hobbit_msgs::GetState goal_active_srv;
+	if (is_goal_active_client.call(goal_active_srv))
+	{
+		if(!goal_active_srv.response.state) return;
+	}
+	else
+	{
+		ROS_DEBUG("Failed to call service is_goal_active");
+		return;
+		
+	}
 
 	//cancel current goal
 	std_srvs::Empty srv;

@@ -39,6 +39,8 @@ private:
 
 	int numb;
 
+	ros::ServiceClient is_goal_active_client;
+
 
 };
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
