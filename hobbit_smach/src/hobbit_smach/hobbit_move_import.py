@@ -465,6 +465,13 @@ def goToPosition(frame='/map', room='None', place='dock'):
         )
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
                      head_move.MoveTo(pose='down_center'))
+        Sequence.add(
+            'PREPARE_STOP',
+            ServiceState(
+                '/user_nav_mode',
+                UserNavMode
+            )
+        )
         Sequence.add('WAIT', SleepState(duration=1))
         Sequence.add('ACTIVATE_OBSTACLES',
                      SetObstacles(active=True))
@@ -669,6 +676,13 @@ def goToPoseSilent():
                 response_cb=switch_vision_cb
             )
         )
+        Sequence.add(
+            'PREPARE_MOVEMENT',
+            ServiceState(
+                '/obs_nav_mode',
+                ObsNavMode
+            )
+        )
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
                      head_move.MoveTo(pose='down_center'))
         Sequence.add('WAIT', SleepState(duration=1))
@@ -681,6 +695,13 @@ def goToPoseSilent():
                                     'yaw': 'yaw'},
                          transitions={'aborted': 'HEAD_UP'}
             )
+        Sequence.add(
+            'PREPARE_STOP',
+            ServiceState(
+                '/user_nav_mode',
+                UserNavMode
+            )
+        )
         Sequence.add(
             'HEAD_UP_AFTER_MOVEMENT',
             head_move.MoveTo(pose='center_center')
