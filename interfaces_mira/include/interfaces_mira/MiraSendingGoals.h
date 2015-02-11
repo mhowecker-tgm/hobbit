@@ -37,6 +37,7 @@
 #include "hobbit_msgs/GetOccupancyGrid.h"
 
 #include "std_srvs/Empty.h"
+#include "hobbit_msgs/GetPose.h"
 
 #define COST_LIMIT 127
 
@@ -112,7 +113,9 @@ private:
 	ros::ServiceServer is_goal_active_srv;
 	bool isGoalActive(hobbit_msgs::GetState::Request  &req, hobbit_msgs::GetState::Response &res);
 
-
+	geometry_msgs::PoseStamped last_goal;
+	ros::ServiceServer get_last_goal_srv;
+	bool getLastGoal(hobbit_msgs::GetPose::Request  &req, hobbit_msgs::GetPose::Response &res);
 
 };
 
