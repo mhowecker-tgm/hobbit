@@ -111,6 +111,7 @@ def command_cb(msg, ud):
                 ud.parameters['active_task'] = index
                 ud.command = item[0]
                 ud.emergency = True
+                rospy.loginfo('ud.command: '+ str(ud.command))
                 return True
             elif item[0] == 'away' or item[0] == 'sleep':
                 times = [1, 2, 4, 6, 12, 24]
@@ -268,6 +269,7 @@ class SelectTask(State):
         State.__init__(
             self,
             input_keys=['command', 'params', 'active_task', 'parameters', 'emergency'],
+            output_keys=['command'],
             outcomes=['emergency',
                       'recharge',
                       'reminder',
@@ -298,12 +300,15 @@ class SelectTask(State):
             self.service_preempt()
             return 'preempted'
         rospy.loginfo('Task Selection')
+        rospy.loginfo('Select Task: ud.command: '+ str(ud.command))
         if ud.command == '':
             return 'emergency'
         print(ud.command)
         if ud.command == 'IDLE':
             return 'none'
-        return ud.command
+        ret = ud.command
+        ud.command = ''
+        return ret
 
 
 class FakeForAllWithoutRunningActionSever(State):
@@ -712,7 +717,7 @@ def main():
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
             transitions={'succeeded': 'MAIN_MENU',
-                         'preempted': 'SELECT_TASK',
+                         'preempted': 'succeeded',
                          'aborted': 'MAIN_MENU'}
         )
         StateMachine.add(
