@@ -637,6 +637,7 @@ class DavidPickingUp(State):
         State.__init__(
             self,
             outcomes=['succeeded', 'failed', 'preempted',
+                      'failed_no_trajectory_for_grasping_found',
                       'failed_no_suitable_object_found',
                       'failed_no_sufficient_grasp_detected',
                       'failed_no_space_to_move_arm'],
@@ -703,10 +704,17 @@ class DavidPickingUp(State):
             #df new 6.2.2015: 
             resp = mmui.showMMUI_Info(text='T_PU_PickingUpObject')
             res = grasp_traj_ac.grasp_trajectory_action_client(cmd)
-
+            print "pickup_import.py: DavidPickingUp -> execute: res of grasp_traj_ac.grasp_trajectory_action_client(cmd): ", res
+            print "pickup_import.py: DavidPickingUp -> execute: res.result.data of grasp_traj_ac.grasp_trajectory_action_client(cmd): ", res.result.data
             # TODO: test needed if res was valid/ok
             
+            raw_input("==================================================================> check if res is really true")
             print "===> DavidPickingUp.execute: result of trajectory calculation: ", res
+            
+            if res.result.data:
+                pass    #trajectory was found and object was grasped
+            else:
+                return 'failed_no_trajectory_for_grasping_found'
                         
             #move object to tray and move arm back to home position
             # => no done via logic in pickup.py  res = self.arm_client.arm_action_client(String ("SetMoveToTrayPos"))
@@ -1379,7 +1387,7 @@ def getPickupSeq():
     #    connector_outcome='succeeded'
     #)
     sm = StateMachine(
-        outcomes=['succeeded', 'preempted', 'failed']
+        outcomes=['succeeded', 'preempted', 'failed', 'failed_arm_not_moved']
     )
 
     #with seq:
@@ -1411,9 +1419,17 @@ def getPickupSeq():
             transitions={'succeeded': 'succeeded',
                          'preempted': 'preempted',
                          'failed': 'failed',
+                         'failed_no_trajectory_for_grasping_found': 'TRAJECTORY',   #df new 11.2.2015
                          'failed_no_suitable_object_found': 'OBJECT',
                          'failed_no_sufficient_grasp_detected': 'GRASP',
                          'failed_no_space_to_move_arm': 'ARM'}
+        )
+        StateMachine.add(
+            'TRAJECTORY',
+            speech_output.emo_say_something(text='There was no trajectory for the arm found for grasping the object.'),
+            transitions={'succeeded': 'failed_arm_not_moved',
+                         'preempted': 'preempted',
+                         'aborted': 'failed',}
         )
         StateMachine.add(
             'ARM',

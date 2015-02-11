@@ -270,6 +270,12 @@ def main():
                          'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
+            'SET_HEAD_SKIP_VISION_STATES',
+            head_move.MoveTo(pose='center_center'),
+            transitions={'succeeded': 'SAY_LOOK',
+                         'preempted': 'LOG_PREEMPT'}
+        )
+        StateMachine.add(
             'INIT',
             Init(),
             transitions={'succeeded': 'SWITCH_VISION',
@@ -381,7 +387,7 @@ def main():
         StateMachine.add(
             'EMO_SAY_OBJECT_NOT_DETECTED',
             pickup.sayObjectNotDetected1(),
-            transitions={'yes': 'GET_POINTING_DIRECTION',
+            transitions={'yes': 'SET_HEAD_SKIP_VISION_STATES', 
                          'no': 'POINTING_NOT_DETECTED_2',
                          'preempted': 'LOG_PREEMPT',
                          'failed': 'POINTING_NOT_DETECTED_2'}
@@ -474,7 +480,8 @@ def main():
             #pickup.DavidPickingUp(),
             transitions={'succeeded': 'SAY_CHECK_GRASP',
                          'preempted': 'LOG_PREEMPT',
-                         'failed': 'EMO_SAY_DID_NOT_PICKUP'
+                         'failed': 'EMO_SAY_DID_NOT_PICKUP',
+                         'failed_arm_not_moved': 'SAY_PICKING_UP' #not moved away from home position
                         }
                          
         #================> NEW 10.12.2014  ENDE                         
@@ -516,7 +523,6 @@ def main():
                          'preempted': 'LOG_PREEMPT',
                          'failed': 'MOVE_ARM_TO_PRE_GRASP_POSITION_MANUALLY'}    # better failure handling appreciated
         )
-
         StateMachine.add(
             'CHECK_GRASP',
             pickup.DavidCheckGrasp(),

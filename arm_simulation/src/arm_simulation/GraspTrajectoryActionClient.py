@@ -50,7 +50,8 @@ class GraspTrajectoryActionClient():
         # Prints out the result of executing the action
         returnval = self.client.get_result()  # 
         print "cmd: ", cmd
-        #print "ArmActionClient.py: class ArmActionClient: function arm_action_client (=> sends/receives actionlib data from/to server): returnval.result.data: ", returnval.result.data
+        print "ArmActionClient.py: class ArmActionClient: function arm_action_client (=> sends/receives actionlib data from/to server): returnval.result.data: ", returnval.result.data
+        print "ArmActionClient.py: class ArmActionClient: function arm_action_client (=> sends/receives actionlib data from/to server): returnval: ", returnval
         return returnval
         
     def feedback_cb(self, feedback):

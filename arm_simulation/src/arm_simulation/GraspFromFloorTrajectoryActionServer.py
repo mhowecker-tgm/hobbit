@@ -229,7 +229,7 @@ class GraspTrajectoryActionServerFromFloor():
  
      # commands triggered by call of ActionServer
     def execute_cb(self, goal):
-        self._result.result = Bool(False) #default value for result
+
         #get command from goal
         strdata = str(goal.command.data)
         print "\n input (definition for grasp) for GraspTrajectoryActionServer (command) received: >> ", strdata
@@ -240,7 +240,7 @@ class GraspTrajectoryActionServerFromFloor():
         self._feedback.feedback.data = str("feedback bla bla")
         print "GraspTrajectoryActionServer, feedback: ", self._feedback.feedback.data
         
-        self._result.result = Bool(True)
+        
   
         print "type: "
         print type(input[10])
@@ -250,7 +250,12 @@ class GraspTrajectoryActionServerFromFloor():
         print "New grasp position (x and y value): ", self.gp_pnt_xy
         
         #get trajectory (execution of trajectory via ArmServer is included here)
-        res = self.getTrajForGraspFromFloor(gp_z_cm, roll)
+        res = self.getTrajForGraspFromFloor(gp_z_cm, roll) 
+        print "GraspFromFloorGrajectoryActionServer.py -> execute_cb(): res of self.getTrajForGraspFromFloor(): ", res
+        if res:
+            self._result.result = Bool(True) #value for result if trajectory was found
+        else:
+            self._result.result = Bool(False) #value for result if trajectory was not found
     
         #publish feedback
         self._as.publish_feedback(self._feedback)
