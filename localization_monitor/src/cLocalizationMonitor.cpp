@@ -443,12 +443,15 @@ void cLocalizationMonitor::Run(void)
 			if (finished_before_timeout)
 			{
 				actionlib::SimpleClientGoalState state = ac.getState();
-			    	if (state.toString().c_str() == "SUCCEEDED")
+				 ROS_INFO("Action finished: %s",state.toString().c_str());
+			    	if (state.toString() == "SUCCEEDED")
 				{
 					std::cout << "recovery action finished " << std::endl;
 					//check current localization
 					bool scan_ok = checkScan();
 					bool uncertainty_ok = checkUncertainty();
+					std::cout << "scan_ok " << scan_ok << std::endl;
+					std::cout << "uncertainty_ok " << uncertainty_ok << std::endl;
 
 					if (uncertainty_ok && scan_ok)
 					{
