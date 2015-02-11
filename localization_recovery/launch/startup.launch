@@ -1,5 +1,8 @@
 <launch>
   <node pkg="localization_recovery" type="localization_recovery" name="localization_recovery" output="screen">
+  
+  <param name="numb" value="2"/>  #number of 180° rotations to be applied
+
   </node>
 </launch>
 

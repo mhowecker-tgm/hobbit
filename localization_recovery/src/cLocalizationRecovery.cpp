@@ -85,7 +85,7 @@ void cLocalizationRecovery::executeCb(const hobbit_msgs::GeneralHobbitGoalConstP
 	  ROS_DEBUG("Failed to call service cancel_goal");
 	}
 
-	sleep(1);
+	sleep(3);
 
 	//check if rotation is safe
 	bool rotation_is_safe = false;
@@ -135,7 +135,7 @@ void cLocalizationRecovery::executeCb(const hobbit_msgs::GeneralHobbitGoalConstP
 			{
 				started_rotation = false;
 				finished_rotation = false;
-				sleep(2);
+				//sleep(2);
 
 				std_msgs::String rotate_cmd;
 				rotate_cmd.data = "Turn 180";
