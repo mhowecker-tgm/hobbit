@@ -44,10 +44,6 @@ then
  rosnode kill interfaces_node&
  sleep $DELAY_BETWEEN_STEPS
  rosnode kill slam_gmapping&
- 
- sleep $DELAY_BETWEEN_STEPS
- cd /opt/ros/hobbit_hydro/src/interfaces_mira/launch
- roslaunch startup.launch&
 
  sleep $DELAY_BETWEEN_STEPS
  cd /opt/ros/hobbit_hydro/src/interfaces_mira/resources
@@ -56,6 +52,11 @@ then
  sleep $DELAY_BETWEEN_STEPS
  cd /opt/ros/hobbit_hydro/src/interfaces_mira/resources
  miracenter mira_vis_config.xml&
+
+ sleep $DELAY_BETWEEN_STEPS
+sleep $DELAY_BETWEEN_STEPS
+ cd /opt/ros/hobbit_hydro/src/interfaces_mira/launch
+ roslaunch startup.launch&
   
  sleep $DELAY_BETWEEN_STEPS
  cd /opt/ros/hobbit_hydro/src/places_interpretation/launch
