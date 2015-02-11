@@ -108,6 +108,11 @@ private:
 
 	bool is_bumper_pressed;
 
+	bool is_goal_active;
+	ros::ServiceServer is_goal_active_srv;
+	bool isGoalActive(hobbit_msgs::GetState::Request  &req, hobbit_msgs::GetState::Response &res);
+
+
 
 };
 

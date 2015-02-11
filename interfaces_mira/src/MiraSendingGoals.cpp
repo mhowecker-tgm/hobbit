@@ -23,6 +23,7 @@ MiraSendingGoals::MiraSendingGoals() : MiraRobotModule(std::string ("SendingGoal
 	outer_dis = 0.55;
 
 	is_bumper_pressed = false;
+	is_goal_active = false;
 
 }
 
@@ -68,6 +69,8 @@ void MiraSendingGoals::initialize() {
   cancel_goal_service = robot_->getRosNode().advertiseService("/cancel_goal", &MiraSendingGoals::cancelGoal, this);
 
   local_map_service = robot_->getRosNode().advertiseService("/get_local_map", &MiraSendingGoals::getLocalMap, this);
+
+   is_goal_active_srv = robot_->getRosNode().advertiseService("/is_goal_active", &MiraSendingGoals::isGoalActive, this);
 
 
 }
@@ -382,6 +385,8 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
       return;
     }
 
+    is_goal_active = true;
+
     geometry_msgs::PoseStamped goal = goal_pose->target_pose; //should be in global reference frame already!!
     goal_status.data = "idle";
     goal_status_pub.publish(goal_status);
@@ -424,6 +429,7 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
           if(!isQuaternionValid(new_goal.target_pose.pose.orientation))
 	  {
             as2_->setAborted(move_base_msgs::MoveBaseResult(), "Aborting on goal because it was sent with an invalid quaternion");
+	    is_goal_active = false;
             return;
           }
 
@@ -461,6 +467,7 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
           std::cout << "goal preempted, preemt received" << std::endl;
 
            //we'll actually return from execute after preempting
+	   is_goal_active = false;
            return;
         }
      }
@@ -472,6 +479,7 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
      {
 	//std::cout << "done " << std::endl;
 	as2_->setSucceeded(move_base_msgs::MoveBaseResult(), "Goal reached.");
+	is_goal_active = false;
         return;
      }
 
@@ -479,6 +487,7 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
      {
 	as2_->setPreempted();
 	std::cout << "goal preempted, path temporarily lost" << std::endl;
+	is_goal_active = false;
 	return;
      }
 
@@ -486,6 +495,7 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
      {
 	as2_->setPreempted();
 	std::cout << "goal canceled, by request" << std::endl;
+	is_goal_active = false;
 	return;
      }
   
@@ -493,12 +503,14 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
      {
      	as2_->setAborted(move_base_msgs::MoveBaseResult(), "Aborting on goal, probably because the path is blocked");
 	std::cout << "goal aborted, probably because the path is blocked" << std::endl;
+	is_goal_active = false;
 	return;
      }
 
    }
 
    //if the node is killed then we'll abort and return
+    is_goal_active = false;
     as2_->setAborted(move_base_msgs::MoveBaseResult(), "Aborting on the goal because the node has been killed");
     return;
 
@@ -624,6 +636,15 @@ bool MiraSendingGoals::isRotationSafe()
 	return true;
 }
 
+bool MiraSendingGoals::isGoalActive(hobbit_msgs::GetState::Request  &req, hobbit_msgs::GetState::Response &res)
+{
+	
+	//ROS_INFO("is_goal_active request received");
 
+	res.state = (is_goal_active);
+
+	return true;
+
+}
 
 
