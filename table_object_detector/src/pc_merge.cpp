@@ -81,7 +81,7 @@ bool CPCMerge::check_free_space(table_object_detector::CheckFreeSpace::Request  
   
   //df 11.2.2015
   pc_cfs_old_cs.publish(pcl_cloud_check_free_space_old_cs);
-
+  pc_check_free_space_new_cs = pcl_cloud_check_free_space_old_cs;
 
   pcl_ros::transformPointCloud(req.frame_id_desired.data.c_str(), pcl_cloud_check_free_space_old_cs, pc_check_free_space_new_cs, tf_listener);
 
