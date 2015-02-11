@@ -80,11 +80,14 @@ void cLocalizationRecovery::executeCb(const hobbit_msgs::GeneralHobbitGoalConstP
 
 	//if no current goal abort
 	hobbit_msgs::GetState goal_active_srv;
-	if (is_goal_active_client.call(goal_active_srv))
+	std::cout << "calling service " << std::endl;
+	/*if (is_goal_active_client.call(goal_active_srv))
 	{
+		std::cout << "state " << goal_active_srv.response.state << std::endl;
 		if(!goal_active_srv.response.state) 
 		{
-			
+			std::cout << "no current goal " << std::endl;
+			as_->setAborted(hobbit_msgs::GeneralHobbitResult(), "aborted");
 			return;
 		}
 	}
@@ -94,7 +97,7 @@ void cLocalizationRecovery::executeCb(const hobbit_msgs::GeneralHobbitGoalConstP
 		ROS_DEBUG("Failed to call service is_goal_active");
 		return;
 		
-	}
+	}*/
 
 	//cancel current goal
 	std_srvs::Empty srv;
