@@ -84,6 +84,8 @@ public:
 	ros::Publisher pc_merged_pub;
 	ros::Publisher nr_segmented_pc_pub;
 	ros::Publisher pc_for_basketdet_pub;
+	ros::Publisher pc_cfs_old_cs; //df 11.2.2015
+	ros::Publisher pc_cfs_new_cs; //df 11.2.2015
 	ros::Publisher pc_from_check_free_space_pub;
 	ros::Publisher pc_for_basketdet_cam1_pub;		//in camera coordinate system, basket points eliminated
 	ros::Publisher position_highestpoint_pub;

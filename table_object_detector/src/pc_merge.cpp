@@ -48,6 +48,11 @@ CPCMerge::CPCMerge(ros::NodeHandle nh_)
   service_check_free_space = nh.advertiseService("check_free_space", &CPCMerge::check_free_space, this);
   service_check_camera_distance_center = nh.advertiseService("check_camera_distance_center", &CPCMerge::check_camera_distance_center, this);
 
+  //df dddd new 11.2.2015 for debugging:
+  pc_cfs_old_cs = nh.advertise<pcl::PointCloud<pcl::PointXYZ> >("/df_pc_in_for_cfs_pcmerge_old_cs",1); //pc in for cfs
+  pc_cfs_new_cs = nh.advertise<pcl::PointCloud<pcl::PointXYZ> >("/df_pc_in_for_cfs_pcmerge_new_cs",1); //pc in for cfs
+
+
   //define subscriber
   pc_cam1_sub = nh.subscribe("/SS/headcam/depth_registered/points",1, &CPCMerge::pc_cam1_callback, this);
 }
@@ -74,8 +79,14 @@ bool CPCMerge::check_free_space(table_object_detector::CheckFreeSpace::Request  
   pcl::PointCloud<pcl::PointXYZ> pcl_cloud_check_free_space_old_cs;
   pcl::fromROSMsg(req.cloud, pcl_cloud_check_free_space_old_cs); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!
   
+  //df 11.2.2015
+  pc_cfs_old_cs.publish(pcl_cloud_check_free_space_old_cs);
+
 
   pcl_ros::transformPointCloud(req.frame_id_desired.data.c_str(), pcl_cloud_check_free_space_old_cs, pc_check_free_space_new_cs, tf_listener);
+
+  //df 11.2.2015
+  pc_cfs_new_cs.publish(pc_check_free_space_new_cs);
 
   pcl::PointCloud<pcl::PointXYZ> pcl_cloud_merged;  //needed zwischenstep?
   pcl_cloud_merged = pc_check_free_space_new_cs;
