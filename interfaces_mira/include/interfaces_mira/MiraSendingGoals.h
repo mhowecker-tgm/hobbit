@@ -38,8 +38,6 @@
 
 #include "std_srvs/Empty.h"
 
-#include "hobbit_msgs/Event.h"
-
 #define COST_LIMIT 127
 
 
@@ -87,8 +85,6 @@ private:
 	std::string decay_value;
 	std::string max_range_value;
 
-	double dis_covered_sq;
-	double dis_thres;
 
 	ros::ServiceServer check_rotation_service;
 	bool checkRotationStatus(hobbit_msgs::GetState::Request  &req, hobbit_msgs::GetState::Response &res);
@@ -97,12 +93,6 @@ private:
 	double outer_dis;
 	mira::maps::OccupancyGrid local_map;
 	void local_map_callback(mira::ChannelRead<mira::maps::OccupancyGrid> data);
-
-	ros::ServiceClient loc_status_client;
-
-	bool loc_check_active;
-        ros::Subscriber loc_status_sub;
-	ros::Publisher discrete_motion_cmd_pub;
 
 	//ros::Publisher loc_check_pub;
 
@@ -118,8 +108,6 @@ private:
 
 	bool is_bumper_pressed;
 
-	bool loc_status;
-	void loc_status_callback(const std_msgs::Bool::ConstPtr& msg);
 
 };
 

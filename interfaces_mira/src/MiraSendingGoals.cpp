@@ -19,16 +19,11 @@ using namespace mira::navigation;
 
 MiraSendingGoals::MiraSendingGoals() : MiraRobotModule(std::string ("SendingGoal")), as_(NULL) 
 {
-	dis_covered_sq = 0;
-	dis_thres = 3;
-
-	loc_check_active = false;
 
 	outer_dis = 0.55;
 
 	is_bumper_pressed = false;
 
-	loc_status = true;
 }
 
 void MiraSendingGoals::initialize() {
@@ -67,12 +62,6 @@ void MiraSendingGoals::initialize() {
 
   robot_->getMiraAuthority().subscribe<mira::maps::OccupancyGrid>("/navigation/MergedMap",   &MiraSendingGoals::local_map_callback, this); //FIXME, service?? 
   check_rotation_service = robot_->getRosNode().advertiseService("/check_rotation", &MiraSendingGoals::checkRotationStatus, this);
-
-  loc_status_client = robot_->getRosNode().serviceClient<hobbit_msgs::GetState>("/get_loc_status");
-
-  loc_status_sub = robot_->getRosNode().subscribe<std_msgs::Bool>("/loc_ok", 2, &MiraSendingGoals::loc_status_callback, this);
-
-  discrete_motion_cmd_pub = robot_->getRosNode().advertise<std_msgs::String>("/DiscreteMotionCmd", 20);
 
   //loc_check_pub = robot_->getRosNode().advertise<std_msgs::Bool>("/loc_check_state", 20);
 
@@ -217,7 +206,7 @@ void MiraSendingGoals::cancelGoal()
 	std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
   	robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
 
-	goal_status.data = "aborted";
+	goal_status.data = "canceled";
 	std::cout << "Goal cancelled " << std::endl;
 	goal_status_pub.publish(goal_status);	
 
@@ -411,76 +400,6 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
     while(n.ok())
     {
 
-	if(loc_check_active)
-	{
-		
-		bool loc_ok = loc_status;	
-		
-		//check if rotation is safe //FIXME, service to get LocalMap, get outer circle...
-		if (!loc_ok)
-		{
-			// call service, remember obstacles
-			/*mira_msgs::UserNavMode srv_user;
-			user_nav_mode(srv_user.request, srv_user.response);*/
-
-			//cancel the task
-			TaskPtr task(new Task());
-			std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
-			robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
-
-			std::cout << "loc not ok, cancelled task " << std::endl;
-
-			if (isRotationSafe())
-			{
-				std::cout << "rotation seems to be fine " << std::endl;
-				// rotate
-				std_msgs::String rotate_cmd;
-				rotate_cmd.data = "Turn 180";
-		  		discrete_motion_cmd_pub.publish(rotate_cmd);
-				//wait until rotation is finished and the drive mode is back to normal (0)
-				double time_limit = 30;
-				clock_t begin = clock();
-				double elapsed_secs = 0;
-				//TODO, check current and initial orientation?
-				while (std::stoi(get_mira_param_("MainControlUnit.DriveMode")) && elapsed_secs < time_limit) //FIXME?
-				{
-					clock_t end = clock();
-		  			elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-				} 
-				//sleep (1);
-
-				//call service 
-				hobbit_msgs::GetState srv;
-				if (loc_status_client.call(srv))
-				{
-				  //ROS_INFO("Sum: %ld", (long int)srv.response.sum);
-				  loc_ok = srv.response.state;
-				}
-				else
-				{
-				  ROS_DEBUG("Failed to call service get_loc_state");
-				}
-
-				//resend the goal
-				if (loc_ok)
-				{
-					//resend the goal
-					robot_->getMiraAuthority().callService<void>(navService, "setTask", goal_task);
-					loc_status = true;
-					continue;
-				}
-
-			}
-
-			// call service, forget obstacles
-			/*mira_msgs::ObsNavMode srv_obs;
-			obs_nav_mode(srv_obs.request, srv_obs.response);*/
-
-			std::cout << "The robot is lost!!!!!!! " << std::endl;  //and it has already rotated or cannot rotate
-			// TODO notify that the robot is lost, stop navigation?? !!!! //TODO TODO TODO
-		}
-      }
-
       //std::cout << "actionlib server executeCb ok" << std::endl;
       if(as2_->isPreemptRequested())
       {
@@ -560,6 +479,13 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
      {
 	as2_->setPreempted();
 	std::cout << "goal preempted, path temporarily lost" << std::endl;
+	return;
+     }
+
+     if (goal_status.data == "canceled")
+     {
+	as2_->setPreempted();
+	std::cout << "goal canceled, by request" << std::endl;
 	return;
      }
   
@@ -698,10 +624,6 @@ bool MiraSendingGoals::isRotationSafe()
 	return true;
 }
 
-void MiraSendingGoals::loc_status_callback(const std_msgs::Bool::ConstPtr& msg)
-{
-    loc_status = msg->data;
-}
 
 
 
