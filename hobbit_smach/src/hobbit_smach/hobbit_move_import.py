@@ -622,6 +622,11 @@ def goToPose():
         # Sequence.add('ENABLE_GESTURES',
         #              service_disable.enable_gestures())
         Sequence.add(
+            'MMUI_SAY_ReachedPlace',
+            speech_output.sayText(info='T_GT_ReachedMyDestination2'),
+            transitions={'failed': 'aborted'}
+        )
+        Sequence.add(
             'SHOW_MENU_MAIN',
             HobbitMMUI.ShowMenu(menu='MAIN'),
             transitions={'failed': 'HEAD_UP',
