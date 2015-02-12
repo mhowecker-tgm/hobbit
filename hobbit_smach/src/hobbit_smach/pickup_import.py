@@ -706,10 +706,6 @@ class DavidPickingUp(State):
             res = grasp_traj_ac.grasp_trajectory_action_client(cmd)
             print "pickup_import.py: DavidPickingUp -> execute: res of grasp_traj_ac.grasp_trajectory_action_client(cmd): ", res
             print "pickup_import.py: DavidPickingUp -> execute: res.result.data of grasp_traj_ac.grasp_trajectory_action_client(cmd): ", res.result.data
-            # TODO: test needed if res was valid/ok
-            
-            raw_input("==================================================================> check if res is really true")
-            print "===> DavidPickingUp.execute: result of trajectory calculation: ", res
             
             if res.result.data:
                 pass    #trajectory was found and object was grasped
