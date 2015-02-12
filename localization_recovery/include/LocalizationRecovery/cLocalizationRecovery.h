@@ -24,7 +24,8 @@ public:
 	void executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal);
 
 private:
-
+	int numb;
+	ros::ServiceClient check_goal_client;
 	ros::ServiceClient cancel_goal_client;
   	ros::ServiceClient check_rotation_client;
   	ros::Publisher discrete_motion_cmd_pub;
@@ -36,10 +37,7 @@ private:
 
 	ros::ServiceClient emergency_stop_client;
 	ros::ServiceClient reset_motorstop_client;
-
-	int numb;
-
-	ros::ServiceClient is_goal_active_client;
+	//int numb;
 
 
 };

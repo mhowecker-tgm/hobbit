@@ -25,6 +25,8 @@ cLocalizationRecovery::cLocalizationRecovery(int argc, char **argv) : init_argc(
 
 	current_motion_state.data = "Idle";
 
+	check_goal_client = n.serviceClient<hobbit_msgs::GetState>("/is_goal_active");
+
 	emergency_stop_client = n.serviceClient<mira_msgs::EmergencyStop>("/emergency_stop");
   	reset_motorstop_client = n.serviceClient<mira_msgs::ResetMotorStop>("/reset_motorstop");
 
@@ -34,7 +36,8 @@ cLocalizationRecovery::cLocalizationRecovery(int argc, char **argv) : init_argc(
 	discrete_motion_cmd_pub = n.advertise<std_msgs::String>("/DiscreteMotionCmd", 20);
 	motion_state_sub = n.subscribe<std_msgs::String>("/DiscreteMotionState", 2, &cLocalizationRecovery::motion_state_callback, this);
 
-	is_goal_active_client = n.serviceClient<hobbit_msgs::GetState>("/is_goal_active");
+	std::cout << "numb " << numb << std::endl;
+
 
 }
 
@@ -58,7 +61,7 @@ void cLocalizationRecovery::motion_state_callback(const std_msgs::String::ConstP
 
   if (!started_rotation && current_motion_state.data == "Turning")
   	started_rotation = true;
-  if (started_rotation && current_motion_state.data == "Idle")
+  else if (started_rotation && current_motion_state.data == "Idle")
 	finished_rotation = true;
 }
 
@@ -79,13 +82,12 @@ void cLocalizationRecovery::executeCb(const hobbit_msgs::GeneralHobbitGoalConstP
 	finished_rotation = false;
 
 	//if no current goal abort
-	hobbit_msgs::GetState goal_active_srv;
-	std::cout << "calling service " << std::endl;
-	//is_goal_active_client.call(goal_active_srv);
-	/*if (is_goal_active_client.call(goal_active_srv))
+	hobbit_msgs::GetState my_srv;
+	std::cout << "calling service!!!!!!!! " << std::endl;
+	//check_goal_client.call(my_srv);
+	if (check_goal_client.call(my_srv))
 	{
-		std::cout << "state " << goal_active_srv.response.state << std::endl;
-		if(!goal_active_srv.response.state) 
+		if(!my_srv.response.state) 
 		{
 			std::cout << "no current goal " << std::endl;
 			as_->setAborted(hobbit_msgs::GeneralHobbitResult(), "aborted");
@@ -98,9 +100,10 @@ void cLocalizationRecovery::executeCb(const hobbit_msgs::GeneralHobbitGoalConstP
 		ROS_DEBUG("Failed to call service is_goal_active");
 		return;
 		
-	}*/
+	}
 
 	//cancel current goal
+	std::cout << "cancel goal " << std::endl;
 	std_srvs::Empty srv;
 	if (!cancel_goal_client.call(srv))
 	{
@@ -111,6 +114,8 @@ void cLocalizationRecovery::executeCb(const hobbit_msgs::GeneralHobbitGoalConstP
 
 	sleep(3);
 
+	std::cout << "check rotation " << std::endl;
+
 	//check if rotation is safe
 	bool rotation_is_safe = false;
 
@@ -118,6 +123,7 @@ void cLocalizationRecovery::executeCb(const hobbit_msgs::GeneralHobbitGoalConstP
 	if (check_rotation_client.call(get_state_srv))
 	{
 		rotation_is_safe = get_state_srv.response.state;
+		std::cout << "rot is safe " << rotation_is_safe << std::endl;
 	}
 	else
 	{
@@ -144,6 +150,8 @@ void cLocalizationRecovery::executeCb(const hobbit_msgs::GeneralHobbitGoalConstP
 
 	int rot_numb = 0;
 
+	//std::cout << "numb " << numb << std::endl;
+
 
 	///////////////////////////////////////////////////////////////////////////////////////
 	ros::NodeHandle n;
@@ -154,6 +162,7 @@ void cLocalizationRecovery::executeCb(const hobbit_msgs::GeneralHobbitGoalConstP
 		{
 			rot_numb++;
 			std::cout << "finished rotation " << rot_numb << std::endl;
+			//std::cout << "numb " << numb << std::endl;
 
 			if (rot_numb < numb)
 			{
@@ -170,7 +179,7 @@ void cLocalizationRecovery::executeCb(const hobbit_msgs::GeneralHobbitGoalConstP
 			{
 				//discrete motion finished
 				as_->setSucceeded(hobbit_msgs::GeneralHobbitResult(), "succeded");
-				std::cout << "rotation finished, succeeded " << std::endl; 
+				std::cout << "rotation finished, succeeded " << numb << std::endl; 
 				return;
 
 			}
