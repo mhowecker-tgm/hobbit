@@ -78,8 +78,8 @@ def main():
 
 
     def msg_cb(msg, ud):
-        print('person (x,y,z) {}, {}, {}'.format(msg.x, msg.y, msg.z))
-        rospy.loginfo('person (x,y,z) {}, {}, {}'.format(msg.x, msg.y, msg.z))
+        print('person (x,y) {}, {}'.format(msg.x, msg.y))
+        rospy.loginfo('person (x,y) {}, {}'.format(msg.x, msg.y))
         if msg.x: 
             return True
 
@@ -128,9 +128,8 @@ def main():
             'GET_USER',
             #cc,
             WaitForMsgState(
-                '/emergency_detector/persons',
-                #'/follow_user/persons',
-                FollowPerson,
+                '/trackedTargets',
+                TrackerTarget,
                 msg_cb=msg_cb,
                 timeout=25
             ),
