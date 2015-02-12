@@ -324,14 +324,14 @@ bool cLocalizationMonitor::checkScan()
 	log_output << std::endl;
 	if (valid_points < min_valid_points) 
 	{
-		log_output << double(-1)   << '\t';
+		log_output << std::setprecision(4) << std::fixed << double(-1)   << '\t';
 		return true; //open space, we cannot tell if the robot is lost yet
 	}
 
 	double rel_score = score/valid_points;
 	//std::cout << "rel_score " << rel_score << std::endl;
 	
-	log_output << rel_score   << '\t';
+	log_output << std::setprecision(5) << std::fixed << rel_score   << '\t';
 	if (rel_score > score_thres)
 		return true;
 	else 
@@ -361,7 +361,7 @@ bool cLocalizationMonitor::checkUncertainty()
 	  double axes_prod = uncertainty_thres*uncertainty_thres;
 	  //std::cout << " sq_area_estimate " << sq_area_estimate << " thres " << axes_prod*axes_prod << std::endl;
 	  
-	  log_output << sq_area_estimate << '\t';
+	  log_output << std::setprecision(9) << std::fixed << sq_area_estimate << '\t';
 	
           if (sq_area_estimate < axes_prod*axes_prod)
 	     return true;
@@ -452,7 +452,7 @@ void cLocalizationMonitor::Run(void)
 		if (!(ok_count+not_ok_count)) return; //should never happen, but just in case
 		double rate = (double)ok_count/(ok_count+not_ok_count);
 		std::cout << "loc_ok_rate " << rate << std::endl; 
-		log_output << rate << '\t';
+		log_output << std::setprecision(4) << std::fixed << rate << '\t';
 		loc_ok = (rate > rate_thres); //default 50%
 		ok_count = 0;
 		not_ok_count = 0;
