@@ -81,6 +81,9 @@ private:
 	double previous_target_y;
 
 	bool response;
+
+	ros::ServiceClient deactivate_recovery_client;
+	ros::ServiceClient activate_recovery_client;
  
 
 };

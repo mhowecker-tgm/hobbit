@@ -30,6 +30,9 @@ cPersonFollowing::cPersonFollowing(int argc, char **argv) : init_argc(argc), ini
 
 	status_pub  = n.advertise<std_msgs::String>("/following_status", 20);
 
+	deactivate_recovery_client = n.serviceClient<std_srvs::Empty>("deactivate_recovery");
+	activate_recovery_client = n.serviceClient<std_srvs::Empty>("activate_recovery");
+
 	following_active = false;
 
 	init();
@@ -99,6 +102,11 @@ bool cPersonFollowing::startFollowing()
 
 	goal_status.data = "started";
 	status_pub.publish(goal_status);
+
+	std_srvs::Empty srv2;
+	if (!deactivate_recovery_client.call(srv2))
+		ROS_DEBUG("Failed to call service deactivate recovery"); //This would be a problem
+
 	return true;
 
 }
@@ -119,6 +127,12 @@ bool cPersonFollowing::stopFollowing()
 
 	goal_status.data = "stopped";
 	status_pub.publish(goal_status);
+
+
+	std_srvs::Empty srv2;
+	if (!activate_recovery_client.call(srv2))
+		ROS_DEBUG("Failed to call service activate recovery"); 
+
 	return true;
 
 }
