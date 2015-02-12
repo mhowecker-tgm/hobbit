@@ -64,8 +64,8 @@ bool CPCMerge::check_free_space(table_object_detector::CheckFreeSpace::Request  
   m.lock();
   ROS_INFO("pc_merge.cpp: check_free_space: point cloud received");
   //search for tf transform for pc for the 2 given input and output tf-frames
-  ros::Time now = ros::Time::now();
-  bool foundTransform = tf_listener.waitForTransform(req.frame_id_desired.data.c_str(), req.frame_id_original.data.c_str(), now, ros::Duration(13.0));
+  ros::Time now = req.cloud.header.stamp; //ros::Time::now();
+  bool foundTransform = tf_listener.waitForTransform(req.frame_id_desired.data.c_str(), req.frame_id_original.data.c_str(), now, ros::Duration(5.0));
   if (!foundTransform)
   {
 	ROS_WARN("check_free_space: No transform for point cloud found");
