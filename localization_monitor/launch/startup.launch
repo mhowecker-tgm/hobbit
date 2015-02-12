@@ -1,7 +1,7 @@
 <launch>
   <node pkg="localization_monitor" type="localization_monitor" name="localization_monitor" output="screen">
 
-	<param name="uncertainty_thres" value="0.15"/>
+	<param name="uncertainty_thres" value="0.2"/>
 	<param name="score_thres" value="0.5"/> #depends on dynamic nature of the environment
 	<param name="inflation_thres" value="0.2"/> #depends on accepted localization accuracy
 	<param name="max_lim" value="3.0"/> #sensor maximum range with acceptable accuracy

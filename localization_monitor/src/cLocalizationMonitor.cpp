@@ -515,18 +515,12 @@ void cLocalizationMonitor::Run(void)
 							ROS_INFO("Waiting for the action server to come online...");
 							if(!ac.waitForServer(ros::Duration(5.0)))
 							{
-								ROS_FATAL("action server not running?");
-								ROS_BREAK();
+								ROS_INFO("action server not running?");
 							}
 
 							ac.sendGoal(goal);
 							//TODO notify
-							//cancel current goTo task
-							std_srvs::Empty srv;
-							cancel_goal_client.call(srv);
 							return;
-
-							
 						}
 
 					}
@@ -543,6 +537,10 @@ void cLocalizationMonitor::Run(void)
 
 			std::cout << "The robot is lost!!!!!!! Recovery did not succeed " << std::endl;
 			//TODO publish notification
+			//cancel current goTo task
+			std_srvs::Empty srv;
+			cancel_goal_client.call(srv);
+			return;
 		}
 		
 	 }
