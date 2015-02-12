@@ -120,6 +120,8 @@ private:
 	ros::ServiceServer cancel_mira_goal_service;
 	bool cancelMiraGoal(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res);
 
+	bool cancel_received;
+
 };
 
 

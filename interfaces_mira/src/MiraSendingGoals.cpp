@@ -227,6 +227,7 @@ bool MiraSendingGoals::cancelMiraGoal(std_srvs::Empty::Request  &req, std_srvs::
 	std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
   	robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
 
+	cancel_received = true;
 	goal_status.data = "internal_cancel";
 	goal_status_pub.publish(goal_status);	
 	
@@ -396,6 +397,8 @@ bool MiraSendingGoals::isQuaternionValid(const geometry_msgs::Quaternion& q)  //
 void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& goal_pose)
 {
 
+    cancel_received = false;
+
     if(!isQuaternionValid(goal_pose->target_pose.pose.orientation))
     {
       as2_->setAborted(move_base_msgs::MoveBaseResult(), "Aborting on goal because it was sent with an invalid quaternion");
@@ -483,7 +486,7 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
      }
 
      bool done = false;
-     if (goal_status.data == "reached") done=true;
+     if (goal_status.data == "reached" && !cancel_received) done=true;
 
      if(done)
      {
