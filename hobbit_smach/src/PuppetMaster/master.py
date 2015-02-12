@@ -6,8 +6,6 @@ PREEMPT_TIMEOUT = 5
 SERVER_TIMEOUT = 5
 MUC_ENABLED = True
 
-import roslib
-roslib.load_manifest(PKG)
 import rospy
 from datetime import datetime, time
 from smach_ros import SimpleActionState, IntrospectionServer
@@ -305,8 +303,8 @@ class SelectTask(State):
             self.service_preempt()
             return 'preempted'
         rospy.loginfo('Task Selection')
-        #if ud.command == '':
-        #    return 'emergency'
+        if ud.command == '':
+            return 'none'
         print(ud.command)
         if ud.command == 'IDLE':
             return 'none'
