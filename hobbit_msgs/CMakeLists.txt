@@ -60,6 +60,7 @@ add_service_files(
   GetOccupancyGrid.srv
   GetOccupancyState.srv
   GraspSuccessCheck.srv
+  GetPose.srv
 )
 
 add_action_files(
