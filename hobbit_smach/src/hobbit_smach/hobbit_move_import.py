@@ -473,13 +473,6 @@ def goToPosition(frame='/map', room='None', place='dock'):
             'CHECK_ARM',
             arm_move.CheckArmAtHomePos()
         )
-        Sequence.add(
-            'PREPARE_STOP',
-            ServiceState(
-                '/user_nav_mode',
-                UserNavMode
-            )
-        )
         if not DEBUG:
             Sequence.add(
                 'MOVE_HOBBIT',
@@ -529,7 +522,8 @@ def goToPosition(frame='/map', room='None', place='dock'):
         Sequence.add(
             'SHOW_MENU_MAIN_1',
             HobbitMMUI.ShowMenu(menu='MAIN'),
-            transitions={'succeeded': 'aborted'}
+            transitions={'succeeded': 'aborted',
+                         'failed': 'aborted'}
         )
     return seq
 
@@ -647,7 +641,8 @@ def goToPose():
         Sequence.add(
             'SHOW_MENU_MAIN_1',
             HobbitMMUI.ShowMenu(menu='MAIN'),
-            transitions={'succeeded': 'aborted'}
+            transitions={'succeeded': 'aborted',
+                         'failed': 'aborted'}
         )
     return seq
 
@@ -736,7 +731,8 @@ def goToPoseSilent():
         Sequence.add(
             'SHOW_MENU_MAIN_1',
             HobbitMMUI.ShowMenu(menu='MAIN'),
-            transitions={'succeeded': 'aborted'}
+            transitions={'succeeded': 'aborted',
+                         'failed': 'aborted'}
         )
     return seq
 
