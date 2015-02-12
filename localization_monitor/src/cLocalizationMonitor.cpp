@@ -91,6 +91,15 @@ void cLocalizationMonitor::open(ros::NodeHandle & n)
 
 	get_last_goal_client = n.serviceClient<hobbit_msgs::GetPose>("/get_last_goal"); 
 
+	cancel_goal_client = n.serviceClient<std_srvs::Empty>("/cancel_goal");
+
+	activate_recovery_service = n.advertiseService("/activate_recovery", &cLocalizationMonitor::activateRecovery, this);
+
+	deactivate_recovery_service = n.advertiseService("/deactivate_recovery", &cLocalizationMonitor::activateRecovery, this);
+	
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+	// logging
 	log_output.open("/opt/ros/hobbit_hydro/src/localization_monitor/localization_log.txt",std::ios::out);
         log_output << "Localization monitor "  << std::endl;
 
@@ -454,7 +463,7 @@ void cLocalizationMonitor::Run(void)
 	 	loc_state.data = loc_ok;
 	 	locStatePublisher.publish(loc_state);
 
-		if (!loc_ok && apply_action) //TODO: && !following
+		if (!loc_ok && apply_action)
 		{
 			 // create action client
   			actionlib::SimpleActionClient<hobbit_msgs::GeneralHobbitAction> ac("localization_recovery", true);
@@ -486,7 +495,7 @@ void cLocalizationMonitor::Run(void)
 					std::cout << "scan_ok " << scan_ok << std::endl;
 					std::cout << "uncertainty_ok " << uncertainty_ok << std::endl;
 
-					log_output << '\t' << '\t' << '\t';
+					log_output << '\t' << '\t';
 					if (uncertainty_ok && scan_ok)
 					{
 						std::cout << "localization recovery succeeded " << std::endl;
@@ -512,6 +521,9 @@ void cLocalizationMonitor::Run(void)
 
 							ac.sendGoal(goal);
 							//TODO notify
+							//cancel current goTo task
+							std_srvs::Empty srv;
+							cancel_goal_client.call(srv);
 							return;
 
 							
@@ -520,7 +532,7 @@ void cLocalizationMonitor::Run(void)
 					}
 					else
 					{
-						log_output << 2;
+						log_output << 0;
 						std::cout << "localization recovery did not succeed " << std::endl;				}
 
 				 }
@@ -599,6 +611,16 @@ void cLocalizationMonitor::battery_state_callback(const mira_msgs::BatteryState:
     
 }
 
+bool cLocalizationMonitor::activateRecovery(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res)
+{
+	apply_action = true;
+	return true;
+}
 
+bool cLocalizationMonitor::deactivateRecovery(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res)
+{
+	apply_action = false;
+	return false;
+}
 
 
