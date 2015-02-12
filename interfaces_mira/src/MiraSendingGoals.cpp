@@ -74,6 +74,8 @@ void MiraSendingGoals::initialize() {
 
    get_last_goal_srv = robot_->getRosNode().advertiseService("/get_last_goal", &MiraSendingGoals::getLastGoal, this);
 
+   cancel_mira_goal_service = robot_->getRosNode().advertiseService("/cancel_mira_goal", &MiraSendingGoals::cancelMiraGoal, this);
+
 
 }
 
@@ -215,6 +217,19 @@ void MiraSendingGoals::cancelGoal()
 	std::cout << "Goal cancelled " << std::endl;
 	goal_status_pub.publish(goal_status);	
 
+}
+
+bool MiraSendingGoals::cancelMiraGoal(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res)
+{
+	ROS_INFO("cancel Mira goal request received");
+
+	TaskPtr task(new Task());
+	std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
+  	robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
+
+	goal_status.data = "internal_cancel";
+	goal_status_pub.publish(goal_status);	
+	
 }
 
 void MiraSendingGoals::bumper_callback(const std_msgs::Bool::ConstPtr& msg)
@@ -413,16 +428,6 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
       if(as2_->isPreemptRequested())
       {
 	std::cout << "preempt requested" << std::endl;
-        
-	
-        //cancel the task
- 	/*TaskPtr task(new Task());
-        std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
-        robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
-
-        goal_status.data = "cancelled";
-        std::cout << "Previous goal cancelled " << std::endl;
-        goal_status_pub.publish(goal_status);*/
 
         if(as2_->isNewGoalAvailable())
 	{
@@ -498,7 +503,7 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
 
      if (goal_status.data == "canceled")
      {
-	as2_->setPreempted();
+	as2_->setAborted(move_base_msgs::MoveBaseResult(), "Goal cancelled");
 	std::cout << "goal canceled, by request" << std::endl;
 	is_goal_active = false;
 	return;

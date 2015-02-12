@@ -116,6 +116,9 @@ private:
 	geometry_msgs::PoseStamped last_goal;
 	ros::ServiceServer get_last_goal_srv;
 	bool getLastGoal(hobbit_msgs::GetPose::Request  &req, hobbit_msgs::GetPose::Response &res);
+	
+	ros::ServiceServer cancel_mira_goal_service;
+	bool cancelMiraGoal(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res);
 
 };
 
