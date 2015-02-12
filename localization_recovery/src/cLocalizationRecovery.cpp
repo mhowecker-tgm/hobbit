@@ -28,7 +28,7 @@ cLocalizationRecovery::cLocalizationRecovery(int argc, char **argv) : init_argc(
 	emergency_stop_client = n.serviceClient<mira_msgs::EmergencyStop>("/emergency_stop");
   	reset_motorstop_client = n.serviceClient<mira_msgs::ResetMotorStop>("/reset_motorstop");
 
-	cancel_goal_client = n.serviceClient<std_srvs::Empty>("/cancel_goal");
+	cancel_goal_client = n.serviceClient<std_srvs::Empty>("/cancel_mira_goal");
  	check_rotation_client = n.serviceClient<hobbit_msgs::GetState>("/check_rotation");
 
 	discrete_motion_cmd_pub = n.advertise<std_msgs::String>("/DiscreteMotionCmd", 20);
@@ -81,6 +81,7 @@ void cLocalizationRecovery::executeCb(const hobbit_msgs::GeneralHobbitGoalConstP
 	//if no current goal abort
 	hobbit_msgs::GetState goal_active_srv;
 	std::cout << "calling service " << std::endl;
+	//is_goal_active_client.call(goal_active_srv);
 	/*if (is_goal_active_client.call(goal_active_srv))
 	{
 		std::cout << "state " << goal_active_srv.response.state << std::endl;
