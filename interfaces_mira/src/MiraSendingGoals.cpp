@@ -649,7 +649,7 @@ bool MiraSendingGoals::isRotationSafe()
 bool MiraSendingGoals::isGoalActive(hobbit_msgs::GetState::Request  &req, hobbit_msgs::GetState::Response &res)
 {
 	
-	//ROS_INFO("is_goal_active request received");
+	ROS_INFO("is_goal_active request received");
 
 	res.state = (is_goal_active);
 
@@ -657,8 +657,6 @@ bool MiraSendingGoals::isGoalActive(hobbit_msgs::GetState::Request  &req, hobbit
 
 }bool MiraSendingGoals::getLastGoal(hobbit_msgs::GetPose::Request  &req, hobbit_msgs::GetPose::Response &res)
 {
-	
-	//ROS_INFO("is_goal_active request received");
 
 	res.pose = last_goal;
 
