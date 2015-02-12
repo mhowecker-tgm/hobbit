@@ -487,11 +487,16 @@ def goToPosition(frame='/map', room='None', place='dock'):
                 transitions={'aborted': 'HEAD_UP'}
             )
         Sequence.add(
+            'PREPARE_STOP',
+            ServiceState(
+                '/user_nav_mode',
+                UserNavMode
+            )
+        )
+        Sequence.add(
             'HEAD_UP_AFTER_MOVEMENT',
             head_move.MoveTo(pose='center_center')
         )
-        # Sequence.add('ENABLE_GESTURES',
-        #              service_disable.enable_gestures())
         Sequence.add(
             'GET_ROBOTS_CURRENT_ROOM',
             ServiceState(
@@ -512,7 +517,18 @@ def goToPosition(frame='/map', room='None', place='dock'):
         )
         Sequence.add(
             'HEAD_UP',
-            head_move.MoveTo(pose='center_center'),
+            head_move.MoveTo(pose='center_center')
+        )
+        Sequence.add(
+            'PREPARE_STOP_1',
+            ServiceState(
+                '/user_nav_mode',
+                UserNavMode
+            )
+        )
+        Sequence.add(
+            'SHOW_MENU_MAIN_1',
+            HobbitMMUI.ShowMenu(menu='MAIN'),
             transitions={'succeeded': 'aborted'}
         )
     return seq
@@ -611,18 +627,6 @@ def goToPose():
         )
         # Sequence.add('ENABLE_GESTURES',
         #              service_disable.enable_gestures())
-        # Sequence.add(
-        #     'GET_ROBOTS_CURRENT_ROOM',
-        #     ServiceState(
-        #         'get_robots_current_room',
-        #         GetName,
-        #         response_key='robots_room_name')
-        # )
-        Sequence.add(
-            'MMUI_SAY_ReachedPlace',
-            speech_output.sayText(info='T_GT_ReachedMyDestination2'),
-            transitions={'failed': 'aborted'}
-        )
         Sequence.add(
             'SHOW_MENU_MAIN',
             HobbitMMUI.ShowMenu(menu='MAIN'),
@@ -631,7 +635,18 @@ def goToPose():
         )
         Sequence.add(
             'HEAD_UP',
-            head_move.MoveTo(pose='center_center'),
+            head_move.MoveTo(pose='center_center')
+        )
+        Sequence.add(
+            'PREPARE_STOP_1',
+            ServiceState(
+                '/user_nav_mode',
+                UserNavMode
+            )
+        )
+        Sequence.add(
+            'SHOW_MENU_MAIN_1',
+            HobbitMMUI.ShowMenu(menu='MAIN'),
             transitions={'succeeded': 'aborted'}
         )
     return seq
@@ -686,7 +701,7 @@ def goToPoseSilent():
                          remapping={'x': 'x',
                                     'y': 'y',
                                     'yaw': 'yaw'},
-                         transitions={'aborted': 'HEAD_UP'}
+                         transitions={'aborted': 'PREPARE_STOP'}
             )
         Sequence.add(
             'PREPARE_STOP',
@@ -709,7 +724,18 @@ def goToPoseSilent():
         )
         Sequence.add(
             'HEAD_UP',
-            head_move.MoveTo(pose='center_center'),
+            head_move.MoveTo(pose='center_center')
+        )
+        Sequence.add(
+            'PREPARE_STOP_1',
+            ServiceState(
+                '/user_nav_mode',
+                UserNavMode
+            )
+        )
+        Sequence.add(
+            'SHOW_MENU_MAIN_1',
+            HobbitMMUI.ShowMenu(menu='MAIN'),
             transitions={'succeeded': 'aborted'}
         )
     return seq
