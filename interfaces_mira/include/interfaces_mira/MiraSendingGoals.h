@@ -63,6 +63,7 @@ public:
 
 private:
         MiraSendingGoals();
+	~MiraSendingGoals();
 
 	ros::Subscriber goal_pose_subscriber;
 	//ros::Subscriber stop_sub;

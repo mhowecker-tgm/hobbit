@@ -27,6 +27,16 @@ MiraSendingGoals::MiraSendingGoals() : MiraRobotModule(std::string ("SendingGoal
 
 }
 
+MiraSendingGoals::~MiraSendingGoals()
+{
+  if(as_ != NULL)
+  	delete as_;
+
+  if(as2_ != NULL)
+  	delete as2_;
+ 
+}
+
 void MiraSendingGoals::initialize() {
         
   goal_pose_subscriber = robot_->getRosNode().subscribe("/goal_pose", 1000, &MiraSendingGoals::goal_pose_callback, this);
@@ -587,10 +597,6 @@ bool MiraSendingGoals::checkRotationStatus(hobbit_msgs::GetState::Request  &req,
 	std::cout << "rotation_ok " << rotation_ok << std::endl;
 
 	res.state = (rotation_ok);
-
-	ROS_INFO("sending back check_rotation_state response");
-        std::cout << "********************* " << std::endl;
-
 
 	return true;
 
