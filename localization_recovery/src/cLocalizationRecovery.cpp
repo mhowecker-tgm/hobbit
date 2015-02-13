@@ -52,6 +52,9 @@ cLocalizationRecovery::~cLocalizationRecovery()
   }
   usleep(100000);
   printf(" - done\n");
+
+  if(as_ != NULL)
+  	delete as_;
 }
 
 
