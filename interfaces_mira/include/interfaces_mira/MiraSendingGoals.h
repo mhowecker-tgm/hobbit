@@ -58,7 +58,6 @@ public:
 
 	void bumper_callback(const std_msgs::Bool::ConstPtr& msg);
 
-	actionlib::SimpleActionServer<interfaces_mira::MiraSendingGoalsAction>* as_; 
 	actionlib::SimpleActionServer<move_base_msgs::MoveBaseAction>* as2_; 
 
 private:
@@ -72,7 +71,6 @@ private:
 
 	std_msgs::String goal_status;
 
-	void executeCb(const interfaces_mira::MiraSendingGoalsGoalConstPtr& goal_pose);
 	void executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& goal_pose);
 
         bool isQuaternionValid(const geometry_msgs::Quaternion& q);
