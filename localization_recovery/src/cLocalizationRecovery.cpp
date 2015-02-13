@@ -171,7 +171,7 @@ void cLocalizationRecovery::executeCb(const hobbit_msgs::GeneralHobbitGoalConstP
 			{
 				started_rotation = false;
 				finished_rotation = false;
-				//sleep(2);
+				sleep(1);
 
 				std_msgs::String rotate_cmd;
 				rotate_cmd.data = "Turn 180";
@@ -181,6 +181,7 @@ void cLocalizationRecovery::executeCb(const hobbit_msgs::GeneralHobbitGoalConstP
 			else
 			{
 				//discrete motion finished
+				sleep(1);
 				as_->setSucceeded(hobbit_msgs::GeneralHobbitResult(), "succeded");
 				std::cout << "rotation finished, succeeded " << numb << std::endl; 
 				return;
