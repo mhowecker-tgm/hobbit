@@ -33,7 +33,9 @@ sleep $DELAY_BETWEEN_STEPS
 
 #set HobbitID
 echo "This hobbit is $hobbit_id"
-rosparam set hobbit_id "$hobbit_id" 
+rosparam set hobbit_id "$hobbit_id"
+rosparam set hobbit/head/pitch_offset "$hobbit_head_pitch_offset"
+rosparam set hobbit/head/yaw_offset "$hobbit_head_yaw_offset"
 sleep $DELAY_BETWEEN_STEPS
 
 #Trying to start basecam
