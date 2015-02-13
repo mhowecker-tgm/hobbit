@@ -184,6 +184,36 @@ class Undock(State):
         self.stop_pub.publish('docking_off')
         return 'succeeded'
 
+class MoveDiscrete(State):
+    """
+    Publish the docking message to mira
+    topic: /docking_task
+    """
+    def __init__(self, motion=None, value=None):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'preempted', 'aborted']
+        )
+        self.init = False
+        self.valid = ['move', 'rotate']
+        self._motion = motion
+        self._value = str(value)
+
+    def execute(self, ud):
+        rospy.loginfo(str(self._motion) + str(self._value))
+        if self.motion not in self.valid:
+            return 'aborted'
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        if not self.init:
+            self.motion_pub = rospy.Publisher(
+                'DiscreteMotionCmd', String,
+                latch=False, queue_size=50)
+            self.init = True
+        self.motion_pub.publish(String(self._motion +' '+self.value))
+        return 'succeeded'
+
 
 class TestData(State):
     """

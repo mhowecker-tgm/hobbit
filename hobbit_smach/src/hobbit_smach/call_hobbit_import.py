@@ -20,6 +20,9 @@ import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.logging_import as log
 from hobbit_msgs.msg import GeneralHobbitAction, GeneralHobbitGoal
 from rgbd_acquisition.msg import Person
+import head_move_import as head_move
+from uashh_smach.util import WaitForMsgState, SleepState
+from hobbit_msgs.msg import Event
 
 
 def closer_cb(ud, goal):
@@ -44,6 +47,12 @@ def battery_cb(msg, ud):
         print('I am NOT charging')
         return False
 
+def event_cb(msg, ud):
+    #rospy.loginfo(str(msg))
+    if msg.event in ['G_CLOSER', 'A_YES', 'G_YES']:
+        return True
+    else:
+        return False
 
 class ExtractGoal(State):
     """
@@ -85,6 +94,73 @@ class PreemptChecker(State):
             self.service_preempt()
             return 'preempted'
         return 'aborted'
+
+class Count(State):
+    """
+    Just count the number of times the come closer should be done
+    """
+    def __init__(self):
+        State.__init__(
+            self,
+            outcomes=['succeeded',
+                      'aborted',
+                      'preempted']
+        )
+        self.counter = 1
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        rospy.loginfo('Counter')
+        # FIXME: use of magic number
+        if self.counter < 3:
+            self.counter += 1
+            return 'succeeded'
+        return 'aborted'
+
+def construct_sm():
+    sm = StateMachine(outcomes = ['succeeded','aborted','preempted'])
+    def child_term_cb(outcome_map):
+        return True
+
+    cc = Concurrence(outcomes=['aborted', 'succeeded', 'preempted'],
+                     default_outcome='aborted',
+                     child_termination_cb=child_term_cb,
+                     outcome_map={'succeeded': {'LISTENER': 'succeeded'},
+                                  'aborted': {'TIMER': 'succeeded'}})
+    with sm:
+        StateMachine.add(
+            'WAIT_FOR_CLOSER',
+            WaitForMsgState(
+                '/Event',
+                Event,
+                msg_cb=event_cb,
+                timeout=10
+            ),
+            transitions={'succeeded': 'MOVE',
+                         'preempted': 'preempted',
+                         'aborted': 'WAIT_FOR_CLOSER'}
+        )
+        StateMachine.add(
+            'MOVE',
+            hobbit_move.MoveDiscrete(motion='Move', value=0.1),
+            transitions={'succeeded': 'COUNT',
+                         'preempted': 'preempted',
+                         'aborted': 'aborted'}
+        )
+        StateMachine.add(
+            'COUNT',
+            Count(),
+            transitions={'succeeded': 'WAIT_FOR_CLOSER',
+                         'preempted': 'preempted',
+                         'aborted': 'succeeded'}
+        )
+
+    with cc:
+        Concurrence.add('LISTENER', sm)
+        Concurrence.add('TIMER', SleepState(duration=60))
+    return cc
 
 
 def getRecharge():
@@ -219,7 +295,6 @@ def call_hobbit():
                          'aborted': 'LOG_ABORT',
                          'preempted': 'LOG_PREEMPT'}
         )
-        # TODO: logic as defined during integration week in January 2015
         StateMachine.add(
             'CLOSER',
             SimpleActionState(
@@ -230,14 +305,38 @@ def call_hobbit():
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
+            transitions={'succeeded': 'MMUI_SAY_ReachedPlace',
+                         'preempted': 'LOG_PREEMPT',
+                         'aborted': 'LOG_ABORT'}
+        )
+        StateMachine.add(
+            'HEAD_UP_AFTER_MOVEMENT',
+            head_move.MoveTo(pose='center_center'),
+            transitions={'succeeded': 'MMUI_SAY_ReachedPlace',
+                         'preempted': 'LOG_PREEMPT',
+                         'aborted': 'LOG_ABORT'}
+        )
+        StateMachine.add(
+            'MMUI_SAY_ReachedPlace',
+            speech_output.sayText(info='MMUI_Say_come_closer'),
+            transitions={'succeeded': 'LOG_SUCCESS',
+                         'preempted': 'LOG_PREEMPT',
+                         'failed': 'LOG_ABORT'}
+        )
+        StateMachine.add(
+            'MMUI_Say_come_closer',
+            speech_output.sayText(info='If you want me to come closer you can tell me so with the gesture.'),
+            transitions={'succeeded': 'GESTURE_HANDLING',
+                         'preempted': 'LOG_PREEMPT',
+                         'failed': 'LOG_ABORT'}
+        )
+        StateMachine.add(
+            'GESTURE_HANDLING',
+            construct_sm(),
             transitions={'succeeded': 'LOG_SUCCESS',
                          'preempted': 'LOG_PREEMPT',
                          'aborted': 'LOG_ABORT'}
         )
-        # TODO: anounce that Hobbit has arrived
-        # TODO: wait for 'come close' gesture 30seconds
-        # TODO: move 10 cm straight ahead
-        # TODO: loop this things twice or thrice
         StateMachine.add(
             'LOG_PREEMPT',
             log.DoLogPreempt(scenario='Call Hobbit'),
