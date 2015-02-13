@@ -66,6 +66,9 @@ cComeCloser::~cComeCloser()
   }
   usleep(100000);
   printf(" - done\n");
+
+  if(as_ != NULL)
+  	delete as_;
 }
 
 void cComeCloser::loc_pose_callback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg)
