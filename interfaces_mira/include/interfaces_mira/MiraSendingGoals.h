@@ -38,6 +38,7 @@
 
 #include "std_srvs/Empty.h"
 #include "hobbit_msgs/GetPose.h"
+#include "hobbit_msgs/SendPose.h"
 
 #define COST_LIMIT 127
 
@@ -120,6 +121,9 @@ private:
 	bool cancelMiraGoal(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res);
 
 	bool cancel_received;
+
+	ros::ServiceServer send_mira_goal_service;
+	bool sendMiraGoal(hobbit_msgs::SendPose::Request  &req, hobbit_msgs::SendPose::Response &res);
 
 };
 

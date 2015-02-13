@@ -79,7 +79,8 @@ void MiraSendingGoals::initialize() {
 
    get_last_goal_srv = robot_->getRosNode().advertiseService("/get_last_goal", &MiraSendingGoals::getLastGoal, this);
 
-   cancel_mira_goal_service = robot_->getRosNode().advertiseService("/cancel_mira_goal", &MiraSendingGoals::cancelMiraGoal, this);
+   cancel_mira_goal_service = robot_->getRosNode().advertiseService("/cancel_nav_goal", &MiraSendingGoals::cancelMiraGoal, this);
+   send_mira_goal_service = robot_->getRosNode().advertiseService("/send_nav_goal", &MiraSendingGoals::sendMiraGoal, this);
 
 
 }
@@ -238,15 +239,35 @@ bool MiraSendingGoals::cancelMiraGoal(std_srvs::Empty::Request  &req, std_srvs::
 	
 }
 
+bool MiraSendingGoals::sendMiraGoal(hobbit_msgs::SendPose::Request  &req, hobbit_msgs::SendPose::Response &res)
+{
+	ROS_INFO("send Mira goal request received");
+
+	geometry_msgs::PoseStamped goal = req.pose;
+
+    std::cout << "Mira goal x:" << goal.pose.position.x << " y: " << goal.pose.position.y << " theta " << tf::getYaw(goal.pose.orientation)*180/M_PI << std::endl;
+
+     TaskPtr goal_task(new Task());
+     goal_task->addSubTask(SubTaskPtr(new PreferredDirectionTask(mira::navigation::PreferredDirectionTask::FORWARD, 1.0f)));
+     goal_task->addSubTask(SubTaskPtr(new mira::navigation::PositionTask(mira::Point2f(goal.pose.position.x, goal.pose.position.y), 0.1f, 0.1f)));
+     goal_task->addSubTask(mira::navigation::SubTaskPtr(new mira::navigation::OrientationTask(tf::getYaw(goal.pose.orientation), mira::deg2rad(10.0f))));
+
+     std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
+     robot_->getMiraAuthority().callService<void>(navService, "setTask", goal_task);	
+	
+}
+
+
+
 void MiraSendingGoals::bumper_callback(const std_msgs::Bool::ConstPtr& msg)
 {
-	/*if (msg->data && !is_bumper_pressed) //bumper was hit
+	if (msg->data && !is_bumper_pressed) //bumper was hit
 	{
 		std::cout << "bumper was hit, cancelling goal " << std::endl;
 		cancelGoal();
 	}
 
-	is_bumper_pressed = msg->data;*/
+	is_bumper_pressed = msg->data;
 
 }
 
@@ -371,8 +392,8 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
 
           //notify the ActionServer that we've successfully preempted
           ROS_DEBUG_NAMED("interfaces_mira","preempting the current goal");
+	  std::cout << "goal preempted, preemt received" << std::endl;
           as2_->setPreempted();
-          std::cout << "goal preempted, preemt received" << std::endl;
 
            //we'll actually return from execute after preempting
 	   is_goal_active = false;
@@ -393,8 +414,8 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
 
      if (goal_status.data == "preempted")
      {
-	as2_->setPreempted();
 	std::cout << "goal preempted, path temporarily lost" << std::endl;
+	as2_->setPreempted();
 	is_goal_active = false;
 	return;
      }
