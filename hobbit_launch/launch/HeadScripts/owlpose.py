@@ -191,8 +191,8 @@ def init():
 	#Read calibration parameters
 	pitch_offset = rospy.get_param('/hobbit/head/pitch_offset', 0)
 	yaw_offset = rospy.get_param('/hobbit/head/yaw_offset', 0)
-	herkulex.setPitchOffset(pitch_offset)
-	herkulex.setYawOffset(yaw_offset)
+	herkulex.setPitchOffset(float(pitch_offset))
+	herkulex.setYawOffset(float(yaw_offset))
 	
 	#Send geometry/tf constantly with 5hz
 	r = rospy.Rate(5) #5hz
