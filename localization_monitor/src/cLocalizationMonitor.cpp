@@ -517,7 +517,8 @@ void cLocalizationMonitor::Run(void)
 							{
 								ROS_INFO("action server not running?");
 							}
-
+							sleep(3);
+							std::cout << "goal re-sent" << std::endl;
 							ac.sendGoal(goal);
 							//TODO notify
 							return;
@@ -538,6 +539,7 @@ void cLocalizationMonitor::Run(void)
 			std::cout << "The robot is lost!!!!!!! Recovery did not succeed " << std::endl;
 			//TODO publish notification
 			//cancel current goTo task
+
 			std_srvs::Empty srv;
 			cancel_goal_client.call(srv);
 			return;
