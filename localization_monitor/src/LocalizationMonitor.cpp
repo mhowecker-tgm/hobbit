@@ -15,7 +15,7 @@ int main(int argc, char **argv)
   
   myLocalizationMonitor.open(n);
 
-  ros::Rate r(10);
+  ros::Rate r(5);
   while (ros::ok())
   {
         ros::spinOnce();

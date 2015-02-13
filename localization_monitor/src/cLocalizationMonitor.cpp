@@ -509,17 +509,18 @@ void cLocalizationMonitor::Run(void)
 							goal.target_pose = srv.response.pose;
 
 							//send goal again
-							MoveBaseClient ac("mira_move_base", true);
+							MoveBaseClient ac_goal("mira_move_base", true);
 
 							// Wait for the action server to come up
 							ROS_INFO("Waiting for the action server to come online...");
-							if(!ac.waitForServer(ros::Duration(5.0)))
+							if(!ac_goal.waitForServer(ros::Duration(5.0)))
 							{
 								ROS_INFO("action server not running?");
 							}
 							sleep(3);
 							std::cout << "goal re-sent" << std::endl;
-							ac.sendGoal(goal);
+							ac_goal.sendGoal(goal);
+							std::cout << "here" << std::endl;
 							//TODO notify
 							return;
 						}
@@ -539,9 +540,10 @@ void cLocalizationMonitor::Run(void)
 			std::cout << "The robot is lost!!!!!!! Recovery did not succeed " << std::endl;
 			//TODO publish notification
 			//cancel current goTo task
-
-			std_srvs::Empty srv;
-			cancel_goal_client.call(srv);
+			sleep(3);
+			std::cout << "*********************** here" << std::endl;
+			std_srvs::Empty srv_e;
+			cancel_goal_client.call(srv_e);
 			return;
 		}
 		
