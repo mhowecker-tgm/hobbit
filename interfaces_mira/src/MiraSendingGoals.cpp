@@ -146,10 +146,10 @@ void MiraSendingGoals::goal_status_channel_callback(mira::ChannelRead<std::strin
   		goal_status.data = "active";
 		goal_status_pub.publish(goal_status);
 	}
-	if(data->value() =="GoalReached") 
+	if(data->value() =="GoalReached" && goal_status.data!= "canceled") 
 	{
 		goal_status.data = "reached";
-		std::cout << "Goal reached " << std::endl;
+		std::cout << "Goal reached received" << std::endl;
 		goal_status_pub.publish(goal_status);
 	}
 	if(data->value() == "PathTemporarilyLost") 
@@ -224,7 +224,7 @@ void MiraSendingGoals::cancelGoal()
   	robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
 
 	goal_status.data = "canceled";
-	std::cout << "Goal cancelled " << std::endl;
+	std::cout << "Goal cancelled, status is canceled" << std::endl;
 	goal_status_pub.publish(goal_status);	
 
 }
@@ -458,6 +458,9 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
           goal = new_goal.target_pose;
 	  std::cout << "goal actionlib loop, x: " << goal.pose.position.x << " y: " << goal.pose.position.y << " theta " << tf::getYaw(goal.pose.orientation)*180/M_PI<< std::endl;
 
+	  cancel_received = false;
+	  goal_status.data = "idle";
+
           //we have a new goal so make sure the planner is awake
           TaskPtr new_goal_task(new Task());
 	  new_goal_task->addSubTask(SubTaskPtr(new PreferredDirectionTask(mira::navigation::PreferredDirectionTask::FORWARD, 1.0f)));
@@ -470,7 +473,7 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
 	  robot_->getMiraAuthority().callService<void>(navService, "setGoal", new_goal_target, 0.1f, mira::deg2rad(10.0f));
 	  last_goal = goal;
 
-	  //std::cout << "The new goal task has been set " << std::endl;
+	  std::cout << "The new goal task has been set " << std::endl;
          
 
         }
@@ -500,7 +503,7 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
 
      if(done)
      {
-	//std::cout << "done " << std::endl;
+	std::cout << "done " << std::endl;
 	as2_->setSucceeded(move_base_msgs::MoveBaseResult(), "Goal reached.");
 	is_goal_active = false;
         return;
