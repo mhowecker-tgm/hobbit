@@ -54,6 +54,9 @@ cPersonFollowing::~cPersonFollowing()
   }
   usleep(100000);
   printf(" - done\n");
+
+  if(as_ != NULL)
+  	delete as_; 
 }
 
 void cPersonFollowing::init()
