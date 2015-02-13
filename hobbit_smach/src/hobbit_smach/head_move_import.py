@@ -37,4 +37,3 @@ class MoveTo(State):
         else:
             print(self._pose)
             return 'aborted'
-            # return 'failed'
