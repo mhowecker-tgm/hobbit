@@ -130,6 +130,8 @@ private:
 
   ros::ServiceServer deactivate_recovery_service;
   bool deactivateRecovery(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res);
+
+  ros::ServiceClient send_goal_client;
  
 
 };

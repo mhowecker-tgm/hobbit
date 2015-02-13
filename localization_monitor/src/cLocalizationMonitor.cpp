@@ -22,6 +22,7 @@
 #include <actionlib/client/terminal_state.h>
 
 #include "hobbit_msgs/GetPose.h"
+#include "hobbit_msgs/SendPose.h"
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Constructor. Initialises member attributes and allocates resources.
@@ -91,7 +92,8 @@ void cLocalizationMonitor::open(ros::NodeHandle & n)
 
 	get_last_goal_client = n.serviceClient<hobbit_msgs::GetPose>("/get_last_goal"); 
 
-	cancel_goal_client = n.serviceClient<std_srvs::Empty>("/cancel_goal");
+	cancel_goal_client = n.serviceClient<std_srvs::Empty>("/cancel_nav_goal");
+	send_goal_client = n.serviceClient<hobbit_msgs::SendPose>("/send_nav_goal");
 
 	activate_recovery_service = n.advertiseService("/activate_recovery", &cLocalizationMonitor::activateRecovery, this);
 
@@ -506,21 +508,12 @@ void cLocalizationMonitor::Run(void)
 						move_base_msgs::MoveBaseGoal goal;
 						if (get_last_goal_client.call(srv))
 						{
-							goal.target_pose = srv.response.pose;
+							hobbit_msgs::SendPose send_goal_srv;
+							send_goal_srv.request.pose = srv.response.pose;
 
 							//send goal again
-							MoveBaseClient ac_goal("mira_move_base", true);
-
-							// Wait for the action server to come up
-							ROS_INFO("Waiting for the action server to come online...");
-							if(!ac_goal.waitForServer(ros::Duration(5.0)))
-							{
-								ROS_INFO("action server not running?");
-							}
-							sleep(3);
+							send_goal_client.call(send_goal_srv);
 							std::cout << "goal re-sent" << std::endl;
-							ac_goal.sendGoal(goal);
-							std::cout << "here" << std::endl;
 							//TODO notify
 							return;
 						}
