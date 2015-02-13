@@ -6,9 +6,28 @@ import time
 import sys
 from math import *
 
+# these are typical values and probably never need to be changed
 device = "/dev/ttyUSB0"
 port = serial.Serial(device, baudrate = 115200, timeout = .01)
-data = []
+
+# Herkulex servo IDs
+# NOTE: pitch and yaw IDs are exchanged on purpose
+pitchServoId = 0x01
+yawServoId = 0x00
+rollServoId = 0x02
+pitch2ServoId = 0x03
+
+# calibration offset for pitch and yaw
+pitchOffset = 0
+yawOffset = 0
+
+# last angles that were set
+lastSetPitch = 0
+lastSetYaw = 0
+
+# for correct speed calculation we need to know if we already have valid
+# lastSetAngles
+firstSetCommand = True
 
 def sendCommand(id,command,data=[]):
 	"send a servo command to the serial port"
@@ -29,7 +48,6 @@ def sendCommand(id,command,data=[]):
 	hexcmd = ''
 	for c in cmd:
 		hexcmd += struct.pack('B', c)
-	#print cmd
 	port.write(hexcmd)
 	time.sleep(0.2)
 
@@ -83,36 +101,85 @@ def resetServos():
 def setTorque():
 	sendCommand(0xFE,0x03,[0x34, 0x01, 0x60])
 
+def setPitchOffset(offs = 0):
+	global pitchOffset
+	pitchOffset = offs
+
+def setYawOffset(offs = 0):
+	global yawOffset
+	yawOffset = offs
+
 def getAngles():
 	angle = []
 	
-	#Servo0:
-	sendCommand(0x00,0x04,[0x3c,0x02])
+	#tilt Servo:
+	sendCommand(pitchServoId,0x04,[0x3c,0x02])
 	response = ack()
-	#print response
 	if response!=-1:
-		#print " ".join(hex(ord(n)) for n in response)
 		angle0 = int(response[10].encode('hex') + response[9].encode('hex'), 16) * 0.325 - 512 + 345
-		angle.append(angle0)
+		angle.append(angle0 - pitchOffset)
 	else:
-		print "Error obtaining Angle from Servo 0"
+		print "Error obtaining Angle from Servo " + str(pitchServoId)
 		angle.append(0)
 		
-	#Servo1:
-	sendCommand(0x01,0x04,[0x3c,0x02])
+	#yaw Servo:
+	sendCommand(yawServoId,0x04,[0x3c,0x02])
 	response = ack()
 	if response!=-1:
-		#print " ".join(hex(ord(n)) for n in response)
 		angle1 = int(response[10].encode('hex') + response[9].encode('hex'), 16) * 0.325 - 512 + 345
-		angle.append(angle1)
+		angle.append(angle1 - yawOffset)
 	else:
-		print "Error obtaining Angle from Servo 1"
+		print "Error obtaining Angle from Servo " + str(yawServoId)
 		angle.append(0)
 	
 	return angle
 
-def setAngles(pitch=0,c1=0x00,yaw=0,c2=0x01,roll=0,c3=0x02,pitch2=0,c4=0x03,playtime=70):
+# This sets angles for a pan/tilt neck. Angles are in degrees.
+# There are 4 angles to set: pitch (=up/down) and yaw (= left/right).
+# playtime is the time until the movement is finished (in god-knows what unit). Depending on
+# the angle distance to move, a given playtime results in different angular speeds.
+def setAngles(pitch=0,yaw=0,playtime=70):
+	global lastSetPitch
+	global lastSetYaw
+	global firstSetCommand
+
 	ledc1 = ledc2 = ledc3 = ledc4 = 0x00
+	roll = 0
+	pitch2 = 0
+
+	# If this is run for the first time, we have no valid previous angles.
+	# The head might currently stand at any angle.
+	print "prev angles: " + str(lastSetPitch) + " " + str(lastSetYaw)
+	if firstSetCommand:
+		currentAngles = getAngles()
+		lastSetPitch = currentAngles[0]
+		lastSetYaw = currentAngles[1]
+		firstSetCommand = False
+		print "first prev angles: " + str(lastSetPitch) + " " + str(lastSetYaw)
+	print "set angles: " + str(pitch) + " " + str(yaw)
+
+	speed = 45
+	# convert speed from degree/s to degree/mysterious playtime unit
+	print "speed in degree/s: " + str(speed)
+	speed = speed * 0.004
+	print "speed in degree/playtime: " + str(speed)
+
+	# calculate playtime according to set angle and speed
+	maxDelta = max(abs(pitch - lastSetPitch), abs(yaw - lastSetYaw))
+	print "maxDelta: " + str(maxDelta)
+	pplaytime = maxDelta / speed
+	# sanity checks
+	pplaytime = max(pplaytime, 10)
+	pplaytime = min(pplaytime, 1000)
+	print "playtime would be: " + str(pplaytime)
+	print ""
+
+	lastSetPitch = pitch
+	lastSetYaw = yaw
+
+	# now add the calibration offsets
+	pitch = pitch + pitchOffset
+	yaw = yaw + yawOffset
 
 	pitch = int(pitch / 0.325 + 512)
 	yaw = int(yaw / 0.325 + 512)
@@ -131,11 +198,11 @@ def setAngles(pitch=0,c1=0x00,yaw=0,c2=0x01,roll=0,c3=0x02,pitch2=0,c4=0x03,play
 	pitch2 = 21 if pitch2 < 21 else pitch2
 	pitch2 = 1002 if pitch2 > 1002 else pitch2
 
-	data = [int(playtime), pitch & 0x00FF, (pitch & 0xFF00) >> 8, ledc1, c1, yaw & 0x00FF, (yaw & 0xFF00) >> 8, ledc2, c2, roll & 0x00FF, (roll & 0xFF00) >> 8, ledc3, c3, pitch2 & 0x00FF, (pitch2 & 0xFF00) >> 8, ledc1, c4]
+	data = [int(playtime), pitch & 0x00FF, (pitch & 0xFF00) >> 8, ledc1, pitchServoId, yaw & 0x00FF, (yaw & 0xFF00) >> 8, ledc2, yawServoId, roll & 0x00FF, (roll & 0xFF00) >> 8, ledc3, rollServoId, pitch2 & 0x00FF, (pitch2 & 0xFF00) >> 8, ledc4, pitch2ServoId]
 	sendCommand(0xFE,0x06,data)
 
 def main():
-	print "Herkulex Servo Driver started!"
+	print "Herkulex Servo Driver started"
 	pass
 
 if __name__ == '__main__':

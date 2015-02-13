@@ -18,9 +18,6 @@ max_lr_angle_deg = 90
 min_ud_angle_deg = -26
 max_ud_angle_deg = 66
 
-pitch = 0	#(wrongly defined as left/right movement)
-yaw = 0	#wrongly defined as up/down movement)
-roll = 0
 br = tf.TransformBroadcaster()
 #base_tf = "hobbit"
 #head_tf = "topcamera_rgb_optical_frame"
@@ -32,51 +29,51 @@ head_tf = "hobbit_neck"
 def set_head_orientation(msg):
 	print "Move to",msg.data
 	if msg.data == "up_center":
-		herkulex.setAngles(yaw=-20, pitch=0, roll=0, playtime=170)	        
+		herkulex.setAngles(pitch=-20, yaw=0, playtime=170)
 		#br.sendTransform((0, 0, 0), (-0.20 ,0.0, 0.0, 1), rospy.Time.now(), base_tf,head_tf)
 	
 	if msg.data == "center_center":
-		herkulex.setAngles(yaw=0, pitch=0, roll=0, playtime=170)
+		herkulex.setAngles(pitch=0, yaw=0, playtime=170)
 		#br.sendTransform((0, 0, 0), (-0.0 ,0.0, 0.0, 1), rospy.Time.now(), base_tf,head_tf)
 
 	if msg.data == "down_center":
-		herkulex.setAngles(yaw=35, pitch=0, roll=0, playtime=170)
+		herkulex.setAngles(pitch=35, yaw=0, playtime=170)
 		#br.sendTransform((0, 0, 0), (0.35 ,0.0, 0.0, 1), rospy.Time.now(), base_tf,head_tf)
 
 	if msg.data == "littledown_center":
-		herkulex.setAngles(yaw=20, pitch=0, roll=0, playtime=170)
+		herkulex.setAngles(pitch=20, yaw=0, playtime=170)
 		#br.sendTransform((0, 0, 0), (0.20 ,0.0, 0.0, 1), rospy.Time.now(), base_tf,head_tf)
 
 	if msg.data == "center_right":
-		herkulex.setAngles(yaw=0, pitch=-90, roll=0, playtime=200)
+		herkulex.setAngles(pitch=0, yaw=-90, playtime=200)
 		#br.sendTransform((0, 0, 0), (0.0 ,-0.90, 0.0, 1), rospy.Time.now(), base_tf,head_tf)
 
 	if msg.data == "down_right":
-		herkulex.setAngles(yaw=50, pitch=-90, roll=0, playtime=200)
+		herkulex.setAngles(pitch=50, yaw=-90, playtime=200)
 		#br.sendTransform((0, 0, 0), (0.50 ,-0.90, 0.0, 1), rospy.Time.now(), base_tf,head_tf)
 
 	if msg.data == "to_turntable":
-		herkulex.setAngles(yaw=40, pitch=-61, roll=0, playtime=200)
+		herkulex.setAngles(pitch=40, yaw=-61, playtime=200)
 		#br.sendTransform((0, 0, 0), (0.4 ,-0.61, 0.0, 1), rospy.Time.now(), base_tf,head_tf)
 
 	if msg.data == "to_grasp":
-		herkulex.setAngles(yaw=62, pitch=-65, roll=0, playtime=200)
+		herkulex.setAngles(pitch=62, yaw=-65, playtime=200)
 		#br.sendTransform((0, 0, 0), (0.45 ,-0.70, 0.0, 1), rospy.Time.now(), base_tf,head_tf)
 
 	if msg.data == "center_left":
-		herkulex.setAngles(yaw=0, pitch=90, roll=0, playtime=200)
+		herkulex.setAngles(pitch=0, yaw=90, playtime=200)
 		#br.sendTransform((0, 0, 0), (0.0 ,0.90, 0.0, 1), rospy.Time.now(), base_tf,head_tf)
 
 	if msg.data == "down_left":
-		herkulex.setAngles(yaw=50, pitch=90, roll=0, playtime=200)
+		herkulex.setAngles(pitch=50, yaw=90, playtime=200)
 		#br.sendTransform((0, 0, 0), (0.50 ,0.90, 0.0, 1), rospy.Time.now(), base_tf,head_tf)
 
 	if msg.data == "up_left":
-		herkulex.setAngles(yaw=-20, pitch=90, roll=0, playtime=200)
+		herkulex.setAngles(pitch=-20, yaw=90, playtime=200)
 		#br.sendTransform((0, 0, 0), (-0.20 ,0.90, 0.0, 1), rospy.Time.now(), base_tf,head_tf)
 
 	if msg.data == "up_right":
-		herkulex.setAngles(yaw=-20, pitch=-90, roll=0, playtime=200)        
+		herkulex.setAngles(pitch=-20, yaw=-90, playtime=200)        
 		#br.sendTransform((0, 0, 0), (-0.20 ,-0.90, 0.0, 1), rospy.Time.now(), base_tf,head_tf)
 
 	try:
@@ -86,7 +83,7 @@ def set_head_orientation(msg):
 			lr_angle = int(input[1])
 			ud_angle = int(input[2])
 			if ( angleLimitsOK(lr_angle, ud_angle) ):
-				herkulex.setAngles(yaw=ud_angle, pitch=lr_angle, roll=0, playtime=200)  
+				herkulex.setAngles(pitch=ud_angle, yaw=lr_angle, playtime=200)  
 			
 		if (msg.data[0]) in ("r", "l", "u", "d"):	#incremental head move
 			print "==> set relative values"
@@ -138,11 +135,11 @@ def set_head_orientation(msg):
 			if ( angleLimitsOK(lr_angle, ud_angle) ):
 				print "6 set yaw=: ", ud_angle
                                 print "6 set pitch=: ", lr_angle
-                                herkulex.setAngles(yaw=ud_angle, pitch=lr_angle, roll=0, playtime=200)
+                                herkulex.setAngles(pitch=ud_angle, yaw=lr_angle, playtime=200)
 				rospy.sleep(2.0)
 			
 	except:
-		print "===============================================> owlpose.py: ERROR during variable setting of HEAD"
+		print "===============================================> owlpose.py: ERROR during variable setting of HEAD: ", sys.exc_info()[0]
 
 	rospy.sleep(0.5)
 	
@@ -170,7 +167,7 @@ def command(msg):
 		herkulex.setTorque()
                 print "Torque Set"
 		rospy.sleep(0.5)
-		herkulex.setAngles(yaw=0, pitch=0, roll=0, playtime=150)
+		herkulex.setAngles(pitch=0, yaw=0, playtime=150)
 		print "Move to center_center"
 			
 def init():
@@ -183,13 +180,19 @@ def init():
 	#print "Servo Reset"
 	#herkulex.setTorque()
 	#print "Torque Set"
-	#herkulex.setAngles(yaw=0, pitch=0, roll=0, playtime=150)
+	#herkulex.setAngles(pitch=0, yaw=0, playtime=150)
 	#print "Move to center_center"
 	
 	#Subscriber for Movements:
 	rospy.Subscriber("/head/move", std_msgs.msg.String, set_head_orientation)
 	rospy.Subscriber("/head/move/incremental", std_msgs.msg.String, set_head_orientation, queue_size=1)
 	rospy.Subscriber("/head/cmd", std_msgs.msg.String, command)
+	
+	#Read calibration parameters
+	pitch_offset = rospy.get_param('/hobbit/head/pitch_offset', 0)
+	yaw_offset = rospy.get_param('/hobbit/head/yaw_offset', 0)
+	herkulex.setPitchOffset(pitch_offset)
+	herkulex.setYawOffset(yaw_offset)
 	
 	#Send geometry/tf constantly with 5hz
 	r = rospy.Rate(5) #5hz
@@ -199,7 +202,7 @@ def init():
 		r.sleep()
 
 def shutdown():
-	herkulex.setAngles(yaw=0, pitch=0, roll=0, playtime=150)
+	herkulex.setAngles(pitch=0, yaw=0, playtime=150)
 
 if __name__ == '__main__':
 	try:
