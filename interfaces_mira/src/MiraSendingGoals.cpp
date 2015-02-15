@@ -247,13 +247,13 @@ bool MiraSendingGoals::sendMiraGoal(hobbit_msgs::SendPose::Request  &req, hobbit
 
     std::cout << "Mira goal x:" << goal.pose.position.x << " y: " << goal.pose.position.y << " theta " << tf::getYaw(goal.pose.orientation)*180/M_PI << std::endl;
 
-     TaskPtr goal_task(new Task());
-     goal_task->addSubTask(SubTaskPtr(new PreferredDirectionTask(mira::navigation::PreferredDirectionTask::FORWARD, 1.0f)));
-     goal_task->addSubTask(SubTaskPtr(new mira::navigation::PositionTask(mira::Point2f(goal.pose.position.x, goal.pose.position.y), 0.1f, 0.1f)));
-     goal_task->addSubTask(mira::navigation::SubTaskPtr(new mira::navigation::OrientationTask(tf::getYaw(goal.pose.orientation), mira::deg2rad(10.0f))));
+	is_goal_active = true;
 
      std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
-     robot_->getMiraAuthority().callService<void>(navService, "setTask", goal_task);	
+
+     mira::Pose2 new_goal_target(goal.pose.position.x, goal.pose.position.y, tf::getYaw(goal.pose.orientation));
+	  robot_->getMiraAuthority().callService<void>(navService, "setGoal", new_goal_target, 0.1f, mira::deg2rad(10.0f));
+	  last_goal = goal;
 	
 }
 
