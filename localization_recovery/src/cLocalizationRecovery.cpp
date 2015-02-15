@@ -30,7 +30,7 @@ cLocalizationRecovery::cLocalizationRecovery(int argc, char **argv) : init_argc(
 	emergency_stop_client = n.serviceClient<mira_msgs::EmergencyStop>("/emergency_stop");
   	reset_motorstop_client = n.serviceClient<mira_msgs::ResetMotorStop>("/reset_motorstop");
 
-	cancel_goal_client = n.serviceClient<std_srvs::Empty>("/cancel_mira_goal");
+	cancel_goal_client = n.serviceClient<std_srvs::Empty>("/cancel_nav_goal");
  	check_rotation_client = n.serviceClient<hobbit_msgs::GetState>("/check_rotation");
 
 	discrete_motion_cmd_pub = n.advertise<std_msgs::String>("/DiscreteMotionCmd", 20);
@@ -110,10 +110,13 @@ void cLocalizationRecovery::executeCb(const hobbit_msgs::GeneralHobbitGoalConstP
 	std_srvs::Empty srv;
 	if (!cancel_goal_client.call(srv))
 	{
-	  ROS_DEBUG("Failed to call service cancel_goal");
+	  ROS_INFO("Failed to call service cancel_nav_goal");
 	  as_->setAborted(hobbit_msgs::GeneralHobbitResult(), "aborted"); 
 	  return;
 	}
+
+	else
+		std::cout << "Navigation goal cancelled" << std::endl;
 
 	sleep(3);
 
