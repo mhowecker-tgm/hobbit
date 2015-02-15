@@ -92,7 +92,7 @@ void cLocalizationMonitor::open(ros::NodeHandle & n)
 
 	get_last_goal_client = n.serviceClient<hobbit_msgs::GetPose>("/get_last_goal"); 
 
-	cancel_goal_client = n.serviceClient<std_srvs::Empty>("/cancel_nav_goal");
+	cancel_goal_client = n.serviceClient<std_srvs::Empty>("/cancel_goal");
 	send_goal_client = n.serviceClient<hobbit_msgs::SendPose>("/send_nav_goal");
 
 	activate_recovery_service = n.advertiseService("/activate_recovery", &cLocalizationMonitor::activateRecovery, this);
