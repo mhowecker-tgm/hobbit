@@ -30,7 +30,7 @@ cComeCloser::cComeCloser(int argc, char **argv) : init_argc(argc), init_argv(arg
 	nh.param("dis_thres", dis_thres, 0.1);
 	nh.param("ang_thres", ang_thres, 15.0);
 
-	nh.param("range_max", range_max, 1.5);
+	nh.param("range_max", range_max, 2.0);
 
 	ros::NodeHandle n;
 	discrete_motion_cmd_pub = n.advertise<std_msgs::String>("/DiscreteMotionCmd", 20);
@@ -196,6 +196,8 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 
 	}
 
+	std::cout << "min_dis " << min_dis << std::endl;
+
 	if (!(min_dis < scanner_info.range_max))
 	{
 		as_->setAborted(hobbit_msgs::GeneralHobbitResult(), "aborted, no detection"); //FIXME, should it move anyway?
@@ -203,7 +205,6 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 		return;
 	}
 
-	std::cout << "min_dis " << min_dis << std::endl;
 
 	double dis2move = min_dis + x_sensor-front_dis-margin;
 	
@@ -221,9 +222,13 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 		if (fabs(angle2turn) < ang_thres*M_PI/180) 
 		{
 			std::cout << "rotation is too small " << std::endl;
-			finished_rotation = true;
+			//finished_rotation = true;
+			if (angle2turn > 0)
+				angle2turn = ang_thres*M_PI/180;
+			else
+				angle2turn = -ang_thres*M_PI/180;
 		}
-		else
+		
 		{
 			std_msgs::String rotate_cmd;
 			std::ostringstream s;
