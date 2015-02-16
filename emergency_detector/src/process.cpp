@@ -69,6 +69,70 @@ unsigned int tempTimestamp=0;
 float bboxCX,bboxCY,bboxCZ,bboxWidth,bboxHeight,bboxDepth;
 unsigned int bboxTimeStamp=0;
 
+int saveNextTopFrame=0;
+int saveNextBottomFrame=0;
+
+unsigned int simplePow(unsigned int base,unsigned int exp)
+{
+if (exp==0) return 1;
+unsigned int retres=base;
+unsigned int i=0;
+for (i=0; i<exp-1; i++)
+{
+retres*=base;
+}
+return retres;
+}
+
+
+int saveRawImageToFile(const char * filename,unsigned char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
+{
+ //fprintf(stderr,"acquisitionSaveRawImageToFile(%s) called\n",filename);
+ #if USE_REGULAR_BYTEORDER_FOR_PNM
+ //Want Conformance to the NETPBM spec http://en.wikipedia.org/wiki/Netpbm_format#16-bit_extensions
+ if (bitsperpixel==16) { swapEndiannessPNM(pixels , width , height , channels , bitsperpixel); }
+ #else
+  #warning "We are using Our Local Byte Order for saving files , this makes things fast but is incompatible with other PNM loaders"
+ #endif // USE_REGULAR_BYTEORDER_FOR_PNM
+ if ( (width==0) || (height==0) || (channels==0) || (bitsperpixel==0) ) { fprintf(stderr,"acquisitionSaveRawImageToFile(%s) called with zero dimensions\n",filename); return 0;}
+ if(pixels==0) { fprintf(stderr,"acquisitionSaveRawImageToFile(%s) called for an unallocated (empty) frame , will not write any file output\n",filename); return 0; }
+ if (bitsperpixel>16) { fprintf(stderr,"PNM does not support more than 2 bytes per pixel..!\n"); return 0; }
+ FILE *fd=0;
+ fd = fopen(filename,"wb");
+ if (fd!=0)
+  {
+   unsigned int n;
+   if (channels==3) fprintf(fd, "P6\n");
+   else if (channels==1) fprintf(fd, "P5\n");
+   else
+  {
+   fprintf(stderr,"Invalid channels arg (%u) for SaveRawImageToFile\n",channels);
+   fclose(fd);
+   return 1;
+  }
+   /* char timeStampStr[256]={0};
+   GetDateString(timeStampStr,"TIMESTAMP",1,0,0,0,0,0,0,0);
+   fprintf(fd, "#%s\n", timeStampStr );*/
+   fprintf(fd, "#TIMESTAMP %lu\n",0);
+   fprintf(fd, "%d %d\n%u\n", width, height , simplePow(2 ,bitsperpixel)-1);
+   float tmp_n = (float) bitsperpixel/ 8;
+   tmp_n = tmp_n * width * height * channels ;
+   n = (unsigned int) tmp_n;
+   fwrite(pixels, 1 , n , fd);
+   fflush(fd);
+   fclose(fd);
+   return 1;
+  }
+else
+{
+fprintf(stderr,"SaveRawImageToFile could not open output file %s\n",filename);
+return 0;
+}
+return 0;
+}
+
+
+
 int setHobbitEMode()
 {
     minHumanTemperature=27.5;
@@ -90,6 +154,9 @@ int decreasePlane()
     segConfDepth.planeNormalOffset-=30.0;
     fprintf(stderr,"Plane Decreased to %0.2f ",segConfDepth.planeNormalOffset);
 }
+
+
+
 
 int processBoundingBox(
                         float ctX,float ctY,float ctZ,
@@ -208,7 +275,8 @@ If you want me to change the name or something or have any problems or whatever 
 
 int mapSaysThatWeMaybeLookingAtFallenUser(unsigned int frameTimestamp)
 {
-
+ //  mapSaysThatWhatWeAreLookingAtShouldBeFreespace()
+ return 1;
 }
 
 
@@ -217,6 +285,14 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
                                         void * calib ,
                                           unsigned int frameTimestamp )
 {
+   if (saveNextTopFrame)
+      {
+        saveRawImageToFile("colorFrame_0_00000.pnm",colorFrame,colorWidth,colorHeight,3,8);
+        saveRawImageToFile("depthFrame_0_00000.pnm",(unsigned char*) depthFrame,depthWidth,depthHeight,1,16);
+        saveNextTopFrame=0;
+      }
+
+
   unsigned char * segmentedRGB = 0;
   unsigned short * segmentedDepth = 0;
   unsigned int tempZoneStartX = (unsigned int ) ((colorWidth-tempZoneWidth) / 2);
@@ -232,7 +308,6 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
   //If we are looking Center then we might detect a person..!
   if (fallDetectionContext.headLookingDirection==HEAD_LOOKING_CENTER)
   {
-
    if  (
           ( temperatureSensorSensesHuman( temperatureObjectDetected ,  tempTimestamp , frameTimestamp) )
            ||
@@ -467,6 +542,14 @@ int runServicesBottomThatNeedColorAndDepth(unsigned char * colorFrame , unsigned
                                            void * calib ,
                                            unsigned int frameTimestamp )
 {
+      if (saveNextBottomFrame)
+      {
+        saveRawImageToFile("colorFrame_1_00000.pnm",colorFrame,colorWidth,colorHeight,3,8);
+        saveRawImageToFile("depthFrame_1_00000.pnm",(unsigned char*) depthFrame,depthWidth,depthHeight,1,16);
+        saveNextBottomFrame=0;
+      }
+
+
       if (skipCalculations) { return 0; }
 
       depthBaseAvg = viewPointChange_countDepths( depthFrame , colorWidth , colorHeight , botX1, botY1 , botWidth , botHeight , maxScoreBaseCamera , 1 , &holesBase );

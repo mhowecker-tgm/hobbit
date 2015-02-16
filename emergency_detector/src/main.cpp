@@ -101,7 +101,6 @@ unsigned int dontPublishPersons=0;
 unsigned int useTFTree=0;
 unsigned int fakeTemperatureActivated=0;
 
-
 void broadcastNewPerson()
 {
   if (dontPublishPersons) { return ; }
@@ -214,6 +213,16 @@ bool resume(std_srvs::Empty::Request& request, std_srvs::Empty::Response& respon
     paused=0;
     return true;
 }
+
+
+
+bool save(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+  saveNextTopFrame=1;
+  saveNextBottomFrame=1;
+    return true;
+}
+
 
 bool visualizeOn(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
@@ -558,6 +567,7 @@ int main(int argc, char **argv)
      //We advertise the services we want accessible using "rosservice call *w/e*"
      ros::ServiceServer visualizeOnService      = nh.advertiseService(name+"/visualize_on" , visualizeOn);
      ros::ServiceServer visualizeOffService     = nh.advertiseService(name+"/visualize_off", visualizeOff);
+     ros::ServiceServer saveGestureRecognitionService    = nh.advertiseService(name+"/save", save);
      ros::ServiceServer pauseGestureRecognitionService    = nh.advertiseService(name+"/pause", pause);
      ros::ServiceServer resumeGestureRecognitionService   = nh.advertiseService(name+"/resume", resume);
      ros::ServiceServer stopGestureRecognitionService     = nh.advertiseService(name+"/terminate", terminate);

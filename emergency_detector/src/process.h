@@ -37,6 +37,10 @@ extern  int minScoreTrigger;
 extern  int maxScoreTrigger;
 
 
+extern int saveNextTopFrame;
+extern int saveNextBottomFrame;
+
+
 int setHobbitEMode();
 
 int increasePlane();
