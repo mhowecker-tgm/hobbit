@@ -48,6 +48,11 @@ double maxHumanTemperature = 37.0;
 
  int minScoreTrigger = 1600;
  int maxScoreTrigger = 2000;
+
+ unsigned int botX1=200,botY1=150,botWidth=100,botHeight=200;
+ unsigned int maxScoreBaseCamera = 3000;
+ unsigned int depthBaseAvg=0;
+ unsigned int holesBase=0;
  //-----------------------------------------------------------------------
 
 unsigned int doCVOutput=0;
@@ -296,7 +301,10 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
 
       unsigned int holesEncountered = 0;
       depthAvg = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , tempZoneStartX , tempZoneStartY , tempZoneWidth , tempZoneHeight , maxScoreTrigger , 1 , &holesEncountered );
-      fprintf(stderr,"Avg Depth is %u mm , empty area is %0.2f %% \n",depthAvg , (float) (100*holesEncountered)/(tempZoneWidth*tempZoneHeight));
+      fprintf(stderr,"Avg Depth is %u mm , empty area is %0.2f %% , Bot Depth %u mm , empty area is %0.2f %% \n",
+              depthAvg , (float) (100*holesEncountered)/(tempZoneWidth*tempZoneHeight) ,
+              depthBaseAvg , (float) (100* holesBase )/(botWidth*botHeight)
+             );
 
 
       if (holesEncountered< ( (unsigned int) tempZoneWidth*tempZoneHeight*minimumAllowedHolePercentage/100 ) )
@@ -448,7 +456,28 @@ int runServicesBottomThatNeedColorAndDepth(unsigned char * colorFrame , unsigned
                                            void * calib ,
                                            unsigned int frameTimestamp )
 {
+      depthBaseAvg = viewPointChange_countDepths( depthFrame , colorWidth , colorHeight , botX1, botY1 , botWidth , botHeight , maxScoreBaseCamera , 1 , &holesBase );
+      fprintf(stderr,"Avg Depth is %u mm , empty area is %0.2f %% \n",depthBaseAvg , (float) (100*holesBase)/(botWidth*botHeight));
 
+
+      if (doCVOutput)
+      {
+        cv::Mat bgrMat,rgbMat;
+        rgbMat = cv::Mat(colorHeight,colorWidth,CV_8UC3,colorFrame,3*colorWidth);
+
+	    cv::cvtColor(rgbMat,bgrMat, CV_RGB2BGR);// opencv expects the image in BGR format
+
+        Point ptIn1; ptIn1.x=botX1;               ptIn1.y=botY1;
+        Point ptIn2; ptIn2.x=botX1+botWidth;      ptIn2.y=botY1+botHeight;
+        Scalar colorEmergency = Scalar ( 255 , 0 , 0 );
+
+       rectangle(bgrMat ,  ptIn1 , ptIn2 , colorEmergency , 2, 8 , 0);
+	   cv::imshow("emergency_detector base visualization",bgrMat);
+	   cv::waitKey(1);
+      }
+
+
+      return 1;
 }
 
 
