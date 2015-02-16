@@ -176,8 +176,11 @@ bool setScale( rgbd_acquisition::SetScale::Request  &request,
                   rgbd_acquisition::SetScale::Response &response )
 {
    scaleDepth =  request.factor;
-
    fprintf(stderr,"depth scale is now %0.2f \n",scaleDepth);
+
+   if ( scaleDepth==1.0 ) { fprintf(stderr,"scaling is now deactivated\n"); }
+   response.ok=1;
+
    return true ;
 }
 
