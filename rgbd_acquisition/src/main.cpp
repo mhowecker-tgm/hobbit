@@ -38,6 +38,7 @@
 #include "services.h"
 
 #include "rgbd_acquisition/SetQuality.h"
+#include "rgbd_acquisition/SetScale.h"
 
 #include "extAcquisition.h"
 
@@ -49,6 +50,8 @@
 int key = 0;
 double  virtual_baseline=0.0; //This is 0 and should be zero since we have a registered depth/rgb stream , however it can be changed to allow fake disparity to be generated
 volatile int paused = 0;
+
+float scaleDepth=1.0;
 
 ros::NodeHandle * nhPtr=0;
 image_transport::Publisher pubRGB;
@@ -168,6 +171,14 @@ bool resumePointingMessages(std_srvs::Empty::Request& request, std_srvs::Empty::
 
 
 
+
+bool setScale( rgbd_acquisition::SetScale::Request  &request,
+                  rgbd_acquisition::SetScale::Response &response )
+{
+   scaleDepth =  request.factor;
+   return true ;
+}
+
 bool setQuality( rgbd_acquisition::SetQuality::Request  &request,
                   rgbd_acquisition::SetQuality::Response &response )
 {
@@ -279,13 +290,58 @@ bool publishImagesFrames(unsigned char * color , unsigned int colorWidth , unsig
    return true;
 }
 
+int scaleDepthFrame(unsigned short * depthFrame , unsigned int width , unsigned int height , float scalingFactor)
+{
+  if (depthFrame==0) { return 0; }
+
+  unsigned short * depthFramePtr = depthFrame;
+  unsigned short * depthFrameLimit =  depthFrame + width * height; //Is a *2 needed here ( dont think so :P )
+
+
+  float curValue=0.0;
+  while (depthFramePtr<depthFramePtr)
+  {
+    curValue=(float) *depthFramePtr;
+    curValue*=scalingFactor;
+    *depthFramePtr = (unsigned short) curValue;
+
+    ++depthFramePtr;
+  }
+ return 1;
+}
+
 
 int publishImages()
 {
    struct calibration rgbCalibration;
    getOpenNI2ColorCalibration(devID,&rgbCalibration);
-   return publishImagesFrames(getOpenNI2ColorPixels(devID),getOpenNI2ColorWidth(devID),getOpenNI2ColorHeight(devID),
-                               getOpenNI2DepthPixels(devID),getOpenNI2DepthWidth(devID),getOpenNI2DepthHeight(devID) , &rgbCalibration );
+
+   unsigned short * depthOriginal = getOpenNI2DepthPixels(devID);
+   unsigned short * depthUsed = depthOriginal;
+   if ( scaleDepth!=1.0)
+   {
+     depthUsed = (unsigned short* ) malloc(getOpenNI2DepthWidth(devID)*getOpenNI2DepthHeight(devID) * sizeof(unsigned short) * 1 );
+     if (depthUsed==0)
+     {
+       fprintf(stderr,"Failed to allocate scaled Depth , falling back to original\n");
+       depthUsed=depthOriginal;
+     } else
+     {
+         scaleDepthFrame(depthUsed,getOpenNI2DepthWidth(devID),getOpenNI2DepthHeight(devID),scaleDepth);
+     }
+   }
+
+
+   int retres = publishImagesFrames(getOpenNI2ColorPixels(devID),getOpenNI2ColorWidth(devID),getOpenNI2ColorHeight(devID),
+                                    depthUsed,getOpenNI2DepthWidth(devID),getOpenNI2DepthHeight(devID) , &rgbCalibration );
+
+
+   if (depthUsed!=depthOriginal)
+   {
+     free(depthUsed);
+   }
+
+   return retres;
 }
 
 
@@ -388,6 +444,7 @@ int main(int argc, char **argv)
      ros::ServiceServer pausePointingService    = nh.advertiseService(name+"/pause_pointing_gesture_messages", pausePointingMessages);
      ros::ServiceServer resumePointingService   = nh.advertiseService(name+"/resume_pointing_gesture_messages", resumePointingMessages);
      ros::ServiceServer setQualityService       = nh.advertiseService(name+"/setQuality", setQuality);
+     ros::ServiceServer setScaleService         = nh.advertiseService(name+"/setScale", setScale);
 
      //Framerate switches
      ros::ServiceServer setStoppedFramerateService   = nh.advertiseService(name+"/setStoppedFramerate", setStoppedFramerate);
