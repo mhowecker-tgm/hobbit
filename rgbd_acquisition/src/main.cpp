@@ -332,6 +332,7 @@ int publishImages()
        depthUsed=depthOriginal;
      } else
      {
+         memcpy(depthUsed,depthOriginal,getOpenNI2DepthWidth(devID)*getOpenNI2DepthHeight(devID) * sizeof(unsigned short) * 1);
          scaleDepthFrame(depthUsed,getOpenNI2DepthWidth(devID),getOpenNI2DepthHeight(devID),scaleDepth);
      }
    }
