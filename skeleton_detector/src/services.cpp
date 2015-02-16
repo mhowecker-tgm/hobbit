@@ -23,6 +23,7 @@
 #include <skeleton_detector/Person.h>
 #include <skeleton_detector/Skeleton2D.h>
 #include <skeleton_detector/Skeleton3D.h>
+#include <skeleton_detector/Skeleton2D3D.h>
 #include <skeleton_detector/SkeletonBBox.h>
 
 #include "hobbit_msgs/SwitchVision.h"
@@ -46,6 +47,7 @@ ros::Publisher gestureEventBroadcaster;
 
 ros::Publisher joint2DBroadcaster;
 ros::Publisher joint3DBroadcaster;
+ros::Publisher joint2D3DBroadcaster;
 ros::Publisher jointBBoxBroadcaster;
 ros::Publisher personBroadcaster;
 ros::Publisher pointEventsBroadcaster;
@@ -220,6 +222,36 @@ void broadcast3DJoints(struct skeletonHuman * skeletonFound)
 
   joint3DBroadcaster.publish(msg);
 }
+
+
+
+void broadcast2D3DJoints(struct skeletonHuman * skeletonFound)
+{
+  if (dontPublishPersons) { return ; }
+
+  skeleton_detector::Skeleton2D3D msg;
+
+  msg.joints2D.resize(HUMAN_SKELETON_PARTS * 2, 0.0);
+  for (unsigned int i=0; i<HUMAN_SKELETON_PARTS; i++)
+  {
+    msg.joints2D[2*i+0]=skeletonFound->joint2D[i].x;
+    msg.joints2D[2*i+1]=skeletonFound->joint2D[i].y;
+  }
+
+
+  msg.joints3D.resize(HUMAN_SKELETON_PARTS * 3, 0.0);
+  for (unsigned int i=0; i<HUMAN_SKELETON_PARTS; i++)
+  {
+    msg.joints3D[3*i+0]=skeletonFound->joint[i].x;
+    msg.joints3D[3*i+1]=skeletonFound->joint[i].y;
+    msg.joints3D[3*i+2]=skeletonFound->joint[i].z;
+  }
+  msg.numberOfJoints=HUMAN_SKELETON_PARTS;
+  msg.timestamp=actualTimestamp;
+
+  joint2D3DBroadcaster.publish(msg);
+}
+
 
 void broadcast2DBBox(struct skeletonHuman * skeletonFound)
 {
@@ -581,7 +613,11 @@ void broadcastNewSkeleton(unsigned int frameNumber,unsigned int skeletonID , str
 
 
       if (processingMode != PROCESSING_MODE_SIMPLE_PERSON_DETECTOR)
-                                    { broadcast2DJoints(skeletonFound); } // We only produce 2d Joints when we have hands ( i.e. when not using simple person detector )
+        {
+          broadcast2DJoints(skeletonFound);
+          broadcast3DJoints(skeletonFound);
+          broadcast2D3DJoints(skeletonFound);
+        } // We only produce 2d Joints when we have hands ( i.e. when not using simple person detector )
       broadcast2DBBox(skeletonFound);
 
     return ;
@@ -652,6 +688,7 @@ int registerServices(ros::NodeHandle * nh,unsigned int width,unsigned int height
   personBroadcaster = nh->advertise <skeleton_detector::Person> (PERSON_TOPIC, divisor);
   joint2DBroadcaster = nh->advertise <skeleton_detector::Skeleton2D> ("joints2D", 1000);
   joint3DBroadcaster = nh->advertise <skeleton_detector::Skeleton3D> ("joints3D", 1000);
+  joint2D3DBroadcaster = nh->advertise <skeleton_detector::Skeleton2D3D> ("joints2D3D", 1000);
   jointBBoxBroadcaster = nh->advertise <skeleton_detector::SkeletonBBox> ("jointsBBox", 1000);
 
   askForUserDistance = nh->advertiseService("/skeleton_detector/isSkeletonCloseEnoughForInteraction", isSkeletonCloseEnoughForInteraction);
