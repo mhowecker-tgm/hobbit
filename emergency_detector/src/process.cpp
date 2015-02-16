@@ -54,6 +54,7 @@ double maxHumanTemperature = 37.0;
  unsigned int depthBaseAvg=0;
  unsigned int holesBase=0;
  //-----------------------------------------------------------------------
+ int skipCalculations=0;
 
 unsigned int doCVOutput=0;
 unsigned int emergencyDetected=0;
@@ -205,6 +206,12 @@ If you want me to change the name or something or have any problems or whatever 
 
 
 
+int mapSaysThatWeMaybeLookingAtFallenUser(unsigned int frameTimestamp)
+{
+
+}
+
+
 int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int colorWidth , unsigned int colorHeight ,
                                        unsigned short * depthFrame  , unsigned int depthWidth , unsigned int depthHeight ,
                                         void * calib ,
@@ -271,17 +278,19 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
 
   }
 
-
+  skipCalculations=1;
   if (fallDetectionContext.headLookingDirection!=HEAD_LOOKING_DOWN)
     { fprintf(stderr,RED "\n\n  Not Looking Down , Thermometer will never pick up the floor\n\n" NORMAL ); }
      else
   if ( temperatureSensorSensesHuman( temperatureObjectDetected ,  tempTimestamp , frameTimestamp) )
   //if ( (minHumanTemperature<temperatureObjectDetected) && (temperatureObjectDetected<maxHumanTemperature) && (temperatureFrameOffset < maximumFrameDifferenceForTemperatureToBeRelevant )  )
     {
-        //fprintf(stderr,"runServicesThatNeedColorAndDepth called \n");
+      if (mapSaysThatWeMaybeLookingAtFallenUser(frameTimestamp))
+      {
+         skipCalculations=0; //We do processing ..!
          segmentedRGB = copyRGB(colorFrame ,colorWidth , colorHeight);
          segmentedDepth = copyDepth(depthFrame ,depthWidth , depthHeight);
-        //fprintf(stderr,"Copied rgb/depth\n");
+
          if (autoPlaneSegmentationFlag) { segConfDepth.autoPlaneSegmentation=1; autoPlaneSegmentationFlag=0;
                                            fprintf(stderr,RED "Emergency Detector doing auto plane segmentation.." NORMAL);
                                         } else
@@ -337,7 +346,9 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
                }
             }
           }
-    }
+
+      } //Map Check
+    } //Temperature Check
 
       if (doCVOutput)
       {
@@ -456,6 +467,8 @@ int runServicesBottomThatNeedColorAndDepth(unsigned char * colorFrame , unsigned
                                            void * calib ,
                                            unsigned int frameTimestamp )
 {
+      if (skipCalculations) { return 0; }
+
       depthBaseAvg = viewPointChange_countDepths( depthFrame , colorWidth , colorHeight , botX1, botY1 , botWidth , botHeight , maxScoreBaseCamera , 1 , &holesBase );
       fprintf(stderr,"Avg Depth is %u mm , empty area is %0.2f %% \n",depthBaseAvg , (float) (100*holesBase)/(botWidth*botHeight));
 
