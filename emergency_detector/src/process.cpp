@@ -29,6 +29,7 @@ using namespace cv;
 
 struct SegmentationFeaturesRGB segConfRGB={0};
 struct SegmentationFeaturesDepth segConfDepth={0};
+struct SegmentationFeaturesDepth segConfBaseDepth={0};
 unsigned int combinationMode=COMBINE_AND;
 
 
@@ -111,10 +112,7 @@ int saveRawImageToFile(const char * filename,unsigned char * pixels , unsigned i
    fclose(fd);
    return 1;
   }
-   /* char timeStampStr[256]={0};
-   GetDateString(timeStampStr,"TIMESTAMP",1,0,0,0,0,0,0,0);
-   fprintf(fd, "#%s\n", timeStampStr );*/
-   fprintf(fd, "#TIMESTAMP %lu\n",0);
+   fprintf(fd, "#hobbit emergency view\n");
    fprintf(fd, "%d %d\n%u\n", width, height , simplePow(2 ,bitsperpixel)-1);
    float tmp_n = (float) bitsperpixel/ 8;
    tmp_n = tmp_n * width * height * channels ;
@@ -597,9 +595,8 @@ void initializeProcess()
  initializeDepthSegmentationConfiguration(&segConfDepth,640,480);
 
 
- segConfDepth.maxDepth=2800;
  //Hobbit orientation according to camera
-
+ segConfDepth.maxDepth=2800;
  segConfDepth.doNotGenerateNormalFrom3Points=0;
  segConfDepth.p1[0]=492.23; segConfDepth.p1[1]=615.87; segConfDepth.p1[2]=1757.00;
  segConfDepth.p2[0]=51.46;  segConfDepth.p2[1]=622.97; segConfDepth.p2[2]=1722.00;
@@ -607,19 +604,19 @@ void initializeProcess()
 
  segConfDepth.normal[0]=0.02; segConfDepth.normal[1]=-0.91; segConfDepth.normal[2]=-0.42;
  segConfDepth.center[0]=51.46; segConfDepth.center[1]=622.97; segConfDepth.center[2]=1722.0;
-
-// segConfDepth.doNotGenerateNormalFrom3Points=1;
-
-// segConfDepth.normal[0]=-0.02;
-// segConfDepth.normal[1]=-0.78;
-// segConfDepth.normal[2]=-0.62;
-
-// segConfDepth.center[0]=114.95;
-// segConfDepth.center[1]=501.61;
-// segConfDepth.center[2]=1338.0;
-
  segConfDepth.planeNormalOffset=40.0;
-
  segConfDepth.enablePlaneSegmentation =1;
 
+ initializeDepthSegmentationConfiguration(&segConfBaseDepth,640,480);
+
+ segConfBaseDepth.maxDepth=2800;
+ segConfBaseDepth.doNotGenerateNormalFrom3Points=0;
+ segConfBaseDepth.p1[0]=440.53;   segConfBaseDepth.p1[1]=433.55;  segConfBaseDepth.p1[2]=1145.0;
+ segConfBaseDepth.p2[0]=-252.23;  segConfBaseDepth.p2[1]=393.59;  segConfBaseDepth.p2[2]=925.00;
+ segConfBaseDepth.p3[0]=-252.71;  segConfBaseDepth.p3[1]=418.15;  segConfBaseDepth.p3[2]=1219.00;
+
+ segConfBaseDepth.normal[0]=0.03;    segConfBaseDepth.normal[1]=-1.00;  segConfBaseDepth.normal[2]=0.08;
+ segConfBaseDepth.center[0]=-252.23; segConfBaseDepth.center[1]=393.59; segConfBaseDepth.center[2]=925.00;
+ segConfBaseDepth.planeNormalOffset=40.0;
+ segConfBaseDepth.enablePlaneSegmentation=1;
 }
