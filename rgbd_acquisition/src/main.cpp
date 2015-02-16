@@ -304,7 +304,7 @@ int scaleDepthFrame(unsigned short * depthFrame , unsigned int width , unsigned 
   while (depthFramePtr<depthFramePtr)
   {
     curValue=(float) *depthFramePtr;
-    curValue*=scalingFactor;
+    curValue=curValue * scalingFactor;
     *depthFramePtr = (unsigned short) curValue;
 
     ++depthFramePtr;
