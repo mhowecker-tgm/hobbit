@@ -121,7 +121,7 @@ void MiraRobotDrive::discrete_motion_cmd_callback(const std_msgs::String::ConstP
 	int sign = 1;
 	if (MotionValue < 0) sign = -1;
 
-	float rot_speed = sign*15*M_PI/180; //FIXME
+	float rot_speed = sign*10*M_PI/180; //FIXME
 	float vMax = 0.1; //FIXME
         float t= MotionValue*M_PI/(180*rot_speed);
 
