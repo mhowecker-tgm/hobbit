@@ -113,8 +113,7 @@ def getRecharge():
             Sequence.add(
                 'SET_NAV_GOAL',
                 hobbit_move.SetNavGoal(room='dock', place='dock'),
-                transitions={'aborted': 'LOG_ABORT',
-                             'preempted': 'LOG_PREEMPT'}
+                transitions={'preempted': 'LOG_PREEMPT'}
             )
             Sequence.add(
                 'MOVE_TO_DOCK',
