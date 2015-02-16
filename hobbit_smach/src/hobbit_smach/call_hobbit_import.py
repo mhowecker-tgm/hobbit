@@ -278,7 +278,7 @@ def call_hobbit():
         StateMachine.add(
             'MOVE_TO_GOAL',
             hobbit_move.goToPose(),
-            transitions={'succeeded': 'CLOSER',
+            transitions={'succeeded': 'GET_PERSON',
                          'aborted': 'LOG_ABORT',
                          'preempted': 'LOG_PREEMPT'}
         )
@@ -289,7 +289,7 @@ def call_hobbit():
                 Person,
                 msg_cb=person_cb,
                 timeout=15,
-                output_keys=['user_pose']
+                output_keys=['user_pose', 'person_z', 'person_x']
             ),
             transitions={'succeeded': 'CLOSER',
                          'aborted': 'LOG_ABORT',
