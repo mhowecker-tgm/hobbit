@@ -176,6 +176,8 @@ bool setScale( rgbd_acquisition::SetScale::Request  &request,
                   rgbd_acquisition::SetScale::Response &response )
 {
    scaleDepth =  request.factor;
+
+   fprintf(stderr,"depth scale is now %0.2f \n",scaleDepth);
    return true ;
 }
 
@@ -401,6 +403,8 @@ int main(int argc, char **argv)
      private_node_handle_.param("highRate", highRate, int(30));
      private_node_handle_.param("midRate", midRate, int(15));
      private_node_handle_.param("lowRate", lowRate, int(5));
+     //private_node_handle_.param("scaleDepth", scaleDepth, float(1.0));
+
      private_node_handle_.param("deviceID", from, std::string(""));
      private_node_handle_.param("virtual_baseline", virtual_baseline, 0.0);
 
