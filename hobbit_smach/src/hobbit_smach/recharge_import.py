@@ -95,9 +95,10 @@ def getRecharge():
     with seq:
         Sequence.add(
             'LOG_RECHARGE',
-            log.do_log_battery_state()
+            log.do_log_battery_state(),
+            transitions={'aborted': 'LOG_ABORT',
+                         'preempted': 'LOG_PREEMPT'}
         )
-
         if not DEBUG:
             Sequence.add(
                 'SAY_TIRED',
@@ -105,22 +106,32 @@ def getRecharge():
                     emo='TIRED',
                     time=0,
                     text='T_CH_MovingToChargingStation'
-                )
+                ),
+                transitions={'aborted': 'LOG_ABORT',
+                             'preempted': 'LOG_PREEMPT'}
             )
             Sequence.add(
                 'SET_NAV_GOAL',
-                hobbit_move.SetNavGoal(room='dock', place='dock')
+                hobbit_move.SetNavGoal(room='dock', place='dock'),
+                transitions={'aborted': 'LOG_ABORT',
+                             'preempted': 'LOG_PREEMPT'}
             )
             Sequence.add(
                 'MOVE_TO_DOCK',
-                hobbit_move.goToPoseSilent())
+                hobbit_move.goToPoseSilent(),
+                transitions={'aborted': 'LOG_ABORT',
+                             'preempted': 'LOG_PREEMPT'})
             Sequence.add(
                 'DOCKING',
-                startDockProcedure())
+                startDockProcedure(),
+                transitions={'aborted': 'LOG_ABORT',
+                             'preempted': 'LOG_PREEMPT'})
         else:
             pass
         Sequence.add('MMUI_MAIN_MENU', HobbitMMUI.ShowMenu(menu='MAIN'),
-                     transitions={'failed': 'aborted'})
+                     transitions={'failed': 'LOG_ABORT',
+                                  'succeeded': 'LOG_SUCCESS',
+                                  'preempted': 'LOG_PREEMPT'})
         Sequence.add(
             'LOG_PREEMPT',
             log.DoLogPreempt(scenario='Recharge'),
