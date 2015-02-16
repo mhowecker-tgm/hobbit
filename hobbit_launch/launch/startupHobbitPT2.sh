@@ -136,6 +136,10 @@ roslaunch startup.launch&
 sleep $DELAY_BETWEEN_STEPS
 roslaunch person_following startup.launch&
 
+sleep $DELAY_BETWEEN_STEPS
+roslaunch come_closer startup.launch&
+
+rosrun dynamic_reconfigure dynparam set /basecam/driver data_skip 1&
 
 cd $STARTDIR
 
