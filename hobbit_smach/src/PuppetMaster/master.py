@@ -681,7 +681,7 @@ def main():
         StateMachine.add(
             'CALL_HOBBIT',
             call_hobbit.call_hobbit(),
-            transitions={'succeeded': 'RESET_ACTIVE_TASK',
+            transitions={'succeeded': 'MAIN_MENU',
                          'preempted': 'PREEMPT_RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
@@ -718,7 +718,7 @@ def main():
             # There is nothing to do during a phone call,
             # so we just wait and do nothing.
             FakeForAllWithoutRunningActionSever(name='CALL'),
-            transitions={'succeeded': 'RESET_ACTIVE_TASK',
+            transitions={'succeeded': 'MAIN_MENU',
                          'preempted': 'PREEMPT_RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )

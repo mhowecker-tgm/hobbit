@@ -200,8 +200,9 @@ class MoveDiscrete(State):
         self._value = str(value)
 
     def execute(self, ud):
-        rospy.loginfo(str(self._motion) + str(self._value))
-        if self.motion not in self.valid:
+        
+        rospy.loginfo(str(self._motion) +' '+str(self._value))
+        if self._motion.lower() not in self.valid:
             return 'aborted'
         if self.preempt_requested():
             self.service_preempt()
@@ -211,7 +212,7 @@ class MoveDiscrete(State):
                 'DiscreteMotionCmd', String,
                 latch=False, queue_size=50)
             self.init = True
-        self.motion_pub.publish(String(self._motion +' '+self.value))
+        self.motion_pub.publish(String(self._motion +' '+self._value))
         return 'succeeded'
 
 
