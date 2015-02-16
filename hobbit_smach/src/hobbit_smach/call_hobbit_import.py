@@ -285,7 +285,7 @@ def call_hobbit():
         StateMachine.add(
             'GET_PERSON',
             WaitForMsgState(
-                '/Person',
+                '/persons',
                 Person,
                 msg_cb=person_cb,
                 timeout=15,
@@ -318,8 +318,8 @@ def call_hobbit():
         )
         StateMachine.add(
             'MMUI_SAY_ReachedPlace',
-            speech_output.sayText(info='MMUI_Say_come_closer'),
-            transitions={'succeeded': 'LOG_SUCCESS',
+            speech_output.sayText(info='T_GT_ReachedMyDestination2'),
+            transitions={'succeeded': 'MMUI_Say_come_closer',
                          'preempted': 'LOG_PREEMPT',
                          'failed': 'LOG_ABORT'}
         )
