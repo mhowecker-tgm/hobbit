@@ -71,6 +71,7 @@ unsigned int bboxTimeStamp=0;
 
 int saveNextTopFrame=0;
 int saveNextBottomFrame=0;
+unsigned int framesSnapped=0;
 
 unsigned int simplePow(unsigned int base,unsigned int exp)
 {
@@ -287,9 +288,13 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
 {
    if (saveNextTopFrame)
       {
-        saveRawImageToFile("colorFrame_0_00000.pnm",colorFrame,colorWidth,colorHeight,3,8);
-        saveRawImageToFile("depthFrame_0_00000.pnm",(unsigned char*) depthFrame,depthWidth,depthHeight,1,16);
+        char filename[512];
+        snprintf(filename,512,"colorFrame_1_%05u.pnm",framesSnapped);
+        saveRawImageToFile(filename,colorFrame,colorWidth,colorHeight,3,8);
+        snprintf(filename,512,"depthFrame_1_%05u.pnm",framesSnapped);
+        saveRawImageToFile("depthFrame_1_00000.pnm",(unsigned char*) depthFrame,depthWidth,depthHeight,1,16);
         saveNextTopFrame=0;
+        if ( (saveNextTopFrame==0) && (saveNextBottomFrame==0) )  { ++framesSnapped; }
       }
 
 
@@ -544,9 +549,13 @@ int runServicesBottomThatNeedColorAndDepth(unsigned char * colorFrame , unsigned
 {
       if (saveNextBottomFrame)
       {
-        saveRawImageToFile("colorFrame_1_00000.pnm",colorFrame,colorWidth,colorHeight,3,8);
+        char filename[512];
+        snprintf(filename,512,"colorFrame_1_%05u.pnm",framesSnapped);
+        saveRawImageToFile(filename,colorFrame,colorWidth,colorHeight,3,8);
+        snprintf(filename,512,"depthFrame_1_%05u.pnm",framesSnapped);
         saveRawImageToFile("depthFrame_1_00000.pnm",(unsigned char*) depthFrame,depthWidth,depthHeight,1,16);
         saveNextBottomFrame=0;
+        if ( (saveNextTopFrame==0) && (saveNextBottomFrame==0) )  { ++framesSnapped; }
       }
 
 
