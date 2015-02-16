@@ -49,7 +49,7 @@ double maxHumanTemperature = 37.0;
  int minScoreTrigger = 1600;
  int maxScoreTrigger = 2000;
 
- unsigned int botX1=200,botY1=150,botWidth=100,botHeight=200;
+ unsigned int botWidth=440,botHeight=150,botX1=200,botY1=150;
  unsigned int maxScoreBaseCamera = 3000;
  unsigned int depthBaseAvg=0;
  unsigned int holesBase=0;
@@ -551,6 +551,10 @@ int runServicesBottomThatNeedColorAndDepth(unsigned char * colorFrame , unsigned
 
 
       if (skipCalculations) { return 0; }
+
+
+      botX1 = (unsigned int ) ((colorWidth-botWidth) / 2);
+      botY1 = 240;
 
       depthBaseAvg = viewPointChange_countDepths( depthFrame , colorWidth , colorHeight , botX1, botY1 , botWidth , botHeight , maxScoreBaseCamera , 1 , &holesBase );
       fprintf(stderr,"Avg Depth is %u mm , empty area is %0.2f %% \n",depthBaseAvg , (float) (100*holesBase)/(botWidth*botHeight));
