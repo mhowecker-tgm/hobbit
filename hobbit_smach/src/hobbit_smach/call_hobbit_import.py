@@ -307,7 +307,7 @@ def call_hobbit():
             ),
             transitions={'succeeded': 'MMUI_SAY_ReachedPlace',
                          'preempted': 'LOG_PREEMPT',
-                         'aborted': 'LOG_ABORT'}
+                         'aborted': 'MMUI_BLIND_CLOSER'}
         )
         StateMachine.add(
             'HEAD_UP_AFTER_MOVEMENT',
@@ -325,7 +325,16 @@ def call_hobbit():
         )
         StateMachine.add(
             'MMUI_Say_come_closer',
-            speech_output.sayText(info='If you want me to come closer you can tell me so with the gesture.'),
+            speech_output.sayText(
+                info='If you want me to move even closer just say or gesture yes or use the come closer gesture.'),
+            transitions={'succeeded': 'GESTURE_HANDLING',
+                         'preempted': 'LOG_PREEMPT',
+                         'failed': 'LOG_ABORT'}
+        )
+        StateMachine.add(
+            'MMUI_BLIND_CLOSER',
+            speech_output.sayText(
+                info='If you want me to move forward say or gesture yes or use the come closer gesture.'),
             transitions={'succeeded': 'GESTURE_HANDLING',
                          'preempted': 'LOG_PREEMPT',
                          'failed': 'LOG_ABORT'}
