@@ -50,11 +50,12 @@ double maxHumanTemperature = 37.0;
  int minScoreTrigger = 1600;
  int maxScoreTrigger = 2000;
 
- unsigned int botWidth=440,botHeight=150,botX1=200,botY1=150;
+ unsigned int botWidth=440,botHeight=200,botX1=200,botY1=150;
  unsigned int maxScoreBaseCamera = 3000;
  unsigned int depthBaseAvg=0;
  unsigned int holesBase=0;
  //-----------------------------------------------------------------------
+ unsigned int doCalculationsCooldown=20;
  int doCalculations=0;
 
 unsigned int doCVOutput=0;
@@ -365,7 +366,7 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
     {
       if (mapSaysThatWeMaybeLookingAtFallenUser(frameTimestamp))
       {
-         if (doCalculations<10) { ++doCalculations; }//We do processing ..!
+         if (doCalculations<doCalculationsCooldown) { ++doCalculations; }//We do processing ..!
          segmentedRGB = copyRGB(colorFrame ,colorWidth , colorHeight);
          segmentedDepth = copyDepth(depthFrame ,depthWidth , depthHeight);
 
@@ -452,7 +453,7 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
 
 
         Scalar tempColor = Scalar ( tempColorB , tempColorG , tempColorR );
-        circle(bgrMat,  centerPt , 20 , tempColor , 4, 8 , 0);
+        circle(bgrMat,  centerPt , 26 , tempColor , 4, 8 , 0);
 
         char rectVal[256]={0};
         int fontUsed=FONT_HERSHEY_SIMPLEX; //FONT_HERSHEY_SCRIPT_SIMPLEX;
@@ -635,6 +636,6 @@ void initializeProcess()
 
  segConfBaseDepth.normal[0]=0.03;    segConfBaseDepth.normal[1]=-1.00;  segConfBaseDepth.normal[2]=0.08;
  segConfBaseDepth.center[0]=-252.23; segConfBaseDepth.center[1]=393.59; segConfBaseDepth.center[2]=925.00;
- segConfBaseDepth.planeNormalOffset=50.0;
+ segConfBaseDepth.planeNormalOffset=55.0;
  segConfBaseDepth.enablePlaneSegmentation=1;
 }
