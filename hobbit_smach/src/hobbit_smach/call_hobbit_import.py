@@ -48,10 +48,11 @@ def battery_cb(msg, ud):
         return False
 
 def event_cb(msg, ud):
-    #rospy.loginfo(str(msg))
-    if msg.event in ['G_CLOSER', 'A_YES', 'G_YES']:
+    if msg.event.upper() in ['G_CLOSER', 'A_YES', 'G_YES']:
+        rospy.loginfo("Move 0.1 meters")
         return True
     else:
+        rospy.loginfo("Do not move")
         return False
 
 class ExtractGoal(State):
@@ -112,11 +113,12 @@ class Count(State):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
-        rospy.loginfo('Counter')
+        rospy.loginfo('Counter'+str(self.counter))
         # FIXME: use of magic number
         if self.counter < 3:
             self.counter += 1
             return 'succeeded'
+        self.counter = 1
         return 'aborted'
 
 def construct_sm():
@@ -292,7 +294,7 @@ def call_hobbit():
                 output_keys=['user_pose', 'person_z', 'person_x']
             ),
             transitions={'succeeded': 'CLOSER',
-                         'aborted': 'LOG_ABORT',
+                         'aborted': 'MMUI_BLIND_CLOSER',
                          'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(

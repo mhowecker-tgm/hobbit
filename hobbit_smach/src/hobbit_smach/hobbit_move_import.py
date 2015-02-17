@@ -209,6 +209,7 @@ class MoveDiscrete(State):
                 'DiscreteMotionCmd', String,
                 latch=False, queue_size=50)
             self.init = True
+            rospy.sleep(1.0)
         self.motion_pub.publish(String(self._motion +' '+self._value))
         return 'succeeded'
 
