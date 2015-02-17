@@ -264,23 +264,44 @@ bool fakeTemperature(std_srvs::Empty::Request& request, std_srvs::Empty::Respons
 }
 
 
+int lookingUpInternal()
+{
+    if (fallDetectionContext.headLookingDirection!=HEAD_LOOKING_UP) { fprintf(stderr,"Head seems to be looking up now..!"); }
+    fallDetectionContext.headLookingDirection=HEAD_LOOKING_UP;
+}
+
+
+int lookingCenterInternal()
+{
+    if (fallDetectionContext.headLookingDirection!=HEAD_LOOKING_CENTER) { fprintf(stderr,"Head seems to be looking center now..!"); }
+    fallDetectionContext.headLookingDirection=HEAD_LOOKING_CENTER;
+}
+
+
+int lookingDownInternal()
+{
+    if (fallDetectionContext.headLookingDirection!=HEAD_LOOKING_DOWN) { fprintf(stderr,"Head seems to be looking down now..!"); }
+    fallDetectionContext.headLookingDirection=HEAD_LOOKING_DOWN;
+}
+
+
 bool lookingUp(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    fallDetectionContext.headLookingDirection=HEAD_LOOKING_UP;
+    lookingUpInternal();
     return true;
 }
 
 
 bool lookingDown(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    fallDetectionContext.headLookingDirection=HEAD_LOOKING_DOWN;
+    lookingDownInternal();
     return true;
 }
 
 
 bool lookingCenter(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    fallDetectionContext.headLookingDirection=HEAD_LOOKING_CENTER;
+    lookingCenterInternal();
     return true;
 }
 
@@ -370,18 +391,18 @@ int updateHeadPosition()
  try
      {
       //using /headcam_rgb_optical_frame and /base_link: , thanks David :)
-      //can check this with : rosrun tf tf_echo "/headcam_rgb_optical_frame" "/base_link"
-     listener.waitForTransform("/headcam_rgb_optical_frame", "/base_link", ros::Time(0), ros::Duration(1.0) );
+      listener.waitForTransform("/headcam_rgb_optical_frame", "/base_link", ros::Time(0), ros::Duration(1.0) );
       listener.lookupTransform("/headcam_rgb_optical_frame", "/base_link",ros::Time(0), transformS);
+      //can check this with : rosrun tf tf_echo "/headcam_rgb_optical_frame" "/base_link"
 
       double roll, pitch, yaw;
       tf::Matrix3x3(transformS.getRotation()).getRPY(roll, pitch, yaw);
 
-      fprintf(stderr,"Head At %0.2f %0.2f %0.2f , looking at rpy %0.2f %0.2f %0.2f\n" ,  transformS.getOrigin().x() ,  transformS.getOrigin().y() ,  transformS.getOrigin().z() ,
-              roll ,
-              pitch ,
-              yaw );
+      fprintf(stderr,"Head Pos(%0.2f %0.2f %0.2f) RPY(%0.2f %0.2f %0.2f)\n",transformS.getOrigin().x(),transformS.getOrigin().y(),transformS.getOrigin().z(),roll,pitch,yaw);
 
+      if (pitch > -1.2) { lookingDownInternal(); }
+                               else
+                        { lookingCenterInternal(); }
 
      }
  catch (tf::TransformException &ex)
