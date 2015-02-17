@@ -98,7 +98,7 @@ unsigned int frameTimestamp=emergencyDetectionCooldown+1; //not 0 so we can imme
 ros::NodeHandle * nhPtr=0;
 unsigned int paused=0;
 unsigned int dontPublishPersons=0;
-unsigned int useTFTree=0;
+unsigned int useTFTree=1;
 unsigned int fakeTemperatureActivated=0;
 
 void broadcastNewPerson()
@@ -371,7 +371,16 @@ int updateHeadPosition()
      {
       //using /headcam_rgb_optical_frame and /base_link: , thanks David :)
       listener.lookupTransform("/headcam_rgb_optical_frame", "/base_link",ros::Time(0), transformS);
-      fprintf(stderr,"Head At %0.2f %0.2f %0.2f \n" ,  transformS.getOrigin().x() ,  transformS.getOrigin().y() ,  transformS.getOrigin().z());
+
+      double roll, pitch, yaw;
+      tf::Matrix3x3(transformS.getRotation()).getRPY(roll, pitch, yaw);
+
+      fprintf(stderr,"Head At %0.2f %0.2f %0.2f , looking at rpy %0.2f %0.2f %0.2f\n" ,  transformS.getOrigin().x() ,  transformS.getOrigin().y() ,  transformS.getOrigin().z() ,
+              roll ,
+              pitch ,
+              yaw );
+
+
      }
  catch (tf::TransformException &ex)
       {
