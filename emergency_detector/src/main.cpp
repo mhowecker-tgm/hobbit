@@ -370,6 +370,8 @@ int updateHeadPosition()
  try
      {
       //using /headcam_rgb_optical_frame and /base_link: , thanks David :)
+      //can check this with : rosrun tf tf_echo "/headcam_rgb_optical_frame" "/base_link"
+     listener.waitForTransform("/headcam_rgb_optical_frame", "/base_link", ros::Time(0), ros::Duration(1.0) );
       listener.lookupTransform("/headcam_rgb_optical_frame", "/base_link",ros::Time(0), transformS);
 
       double roll, pitch, yaw;
