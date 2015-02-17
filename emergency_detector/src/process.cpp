@@ -55,7 +55,7 @@ double maxHumanTemperature = 37.0;
  unsigned int depthBaseAvg=0;
  unsigned int holesBase=0;
  //-----------------------------------------------------------------------
- int skipCalculations=0;
+ int doCalculations=0;
 
 unsigned int doCVOutput=0;
 unsigned int emergencyDetected=0;
@@ -356,7 +356,7 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
 
   }
 
-  skipCalculations=1;
+  if (doCalculations>0) { --doCalculations; }
   if (fallDetectionContext.headLookingDirection!=HEAD_LOOKING_DOWN)
     { fprintf(stderr,RED "\n\n  Not Looking Down , Thermometer will never pick up the floor\n\n" NORMAL ); }
      else
@@ -365,7 +365,7 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
     {
       if (mapSaysThatWeMaybeLookingAtFallenUser(frameTimestamp))
       {
-         skipCalculations=0; //We do processing ..!
+         if (doCalculations<10) { ++doCalculations; }//We do processing ..!
          segmentedRGB = copyRGB(colorFrame ,colorWidth , colorHeight);
          segmentedDepth = copyDepth(depthFrame ,depthWidth , depthHeight);
 
@@ -557,7 +557,7 @@ int runServicesBottomThatNeedColorAndDepth(unsigned char * colorFrame , unsigned
       }
 
 
-      if (skipCalculations) { return 0; }
+      if (doCalculations==0) { return 0; }
 
 
       botX1 = (unsigned int ) ((colorWidth-botWidth) / 2);
