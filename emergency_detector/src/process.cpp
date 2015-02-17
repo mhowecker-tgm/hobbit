@@ -556,7 +556,7 @@ int runServicesBottomThatNeedColorAndDepth(unsigned char * colorFrame , unsigned
         if ( (saveNextTopFrame==0) && (saveNextBottomFrame==0) )  { ++framesSnapped; }
       }
 
-/*
+
       if (skipCalculations) { return 0; }
 
 
@@ -582,7 +582,7 @@ int runServicesBottomThatNeedColorAndDepth(unsigned char * colorFrame , unsigned
 	   cv::imshow("emergency_detector base visualization",bgrMat);
 	   cv::waitKey(1);
       }
-*/
+
 
       return 1;
 }
