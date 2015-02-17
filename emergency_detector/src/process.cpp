@@ -497,7 +497,7 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
             else
              { putText(bgrMat , "Scanning for fallen user.." , txtPosition , fontUsed , 0.7 , color , 2 , 8 ); }
         //======================================================================================================
-        txtPosition.y += 24; snprintf(rectVal,123,"Score : %u",depthAvg);
+        txtPosition.y += 24; snprintf(rectVal,123,"Score Top : %u / Bot : %u ",depthAvg,depthBaseAvg);
         putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , color , 2 , 8 );
         txtPosition.y += 24; snprintf(rectVal,123,"Temperature : %0.2f C",temperatureObjectDetected);
         putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , color , 2 , 8 );
@@ -580,7 +580,7 @@ int runServicesBottomThatNeedColorAndDepth(unsigned char * colorFrame , unsigned
                                 );
 
       depthBaseAvg = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , botX1, botY1 , botWidth , botHeight , maxScoreBaseCamera , 1 , &holesBase );
-      fprintf(stderr,"Avg Depth is %u mm , empty area is %0.2f %% \n",depthBaseAvg , (float) (100*holesBase)/(botWidth*botHeight));
+      fprintf(stderr,"Bottom Avg Depth is %u mm , empty area is %0.2f %% \n",depthBaseAvg , (float) (100*holesBase)/(botWidth*botHeight));
 
 
       if (doCVOutput)
