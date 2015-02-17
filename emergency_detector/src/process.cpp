@@ -58,7 +58,7 @@ double maxHumanTemperature = 37.0;
  int minScoreTrigger = 1600;
  int maxScoreTrigger = 2000;
 
- unsigned int botWidth=440,botHeight=200,botX1=200,botY1=150;
+ unsigned int botWidth=440,botHeight=160,botX1=200,botY1=200;
  unsigned int maxScoreBaseCamera = 3000;
  unsigned int depthBaseAvg=0;
  unsigned int holesBase=0;
@@ -459,11 +459,11 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
             }
           } else
           {
-           fprintf(stderr,RED "\n\n  Top Camera indicates that this , cannot be an emergency ( score %u ,holes %u ) \n\n" NORMAL , depthAvg , holesPercentTop);
+           fprintf(stderr,RED "\n\n  Top Camera indicates that this , cannot be an emergency ( score %u ,holes %0.2f %% ) \n\n" NORMAL , depthAvg , holesPercentTop);
           }
       } else
       {
-        fprintf(stderr,RED "\n\n  BaseCam indicates that this , cannot be an emergency ( score %u ,holes %u ) \n\n" NORMAL , depthBaseAvg , holesPercentBase );
+        fprintf(stderr,RED "\n\n  BaseCam indicates that this , cannot be an emergency ( score %u ,holes %0.2f %% ) \n\n" NORMAL , depthBaseAvg , holesPercentBase );
       }
 
       } //Map Check
