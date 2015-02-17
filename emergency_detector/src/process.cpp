@@ -556,7 +556,7 @@ int runServicesBottomThatNeedColorAndDepth(unsigned char * colorFrame , unsigned
         if ( (saveNextTopFrame==0) && (saveNextBottomFrame==0) )  { ++framesSnapped; }
       }
 
-
+/*
       if (skipCalculations) { return 0; }
 
 
@@ -566,7 +566,7 @@ int runServicesBottomThatNeedColorAndDepth(unsigned char * colorFrame , unsigned
       depthBaseAvg = viewPointChange_countDepths( depthFrame , colorWidth , colorHeight , botX1, botY1 , botWidth , botHeight , maxScoreBaseCamera , 1 , &holesBase );
       fprintf(stderr,"Avg Depth is %u mm , empty area is %0.2f %% \n",depthBaseAvg , (float) (100*holesBase)/(botWidth*botHeight));
 
-/*
+
       if (doCVOutput)
       {
         cv::Mat bgrMat,rgbMat;
