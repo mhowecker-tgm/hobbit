@@ -61,6 +61,11 @@
 				<type>goTo</type>
 				<pose x="-0.845900" y="4.064871" theta="0.171305" />
 			</place>
+			<place>
+				<name>dock</name>
+				<type>docking_base_point</type>
+				<pose x="-1.182" y="4.120" theta="1.7496" />
+			</place>
 		</places>
 	</room>
 </rooms>
