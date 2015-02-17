@@ -1,5 +1,5 @@
 <launch>   
-    <node name="emergency_detector" pkg="emergency_detector" type="run_it.sh" required="true">
+    <node name="emergency_detector" pkg="emergency_detector" type="run_it.sh" respawn="true">
       <param name="name" value="emergency_detector" /> 
 
       <param name="fromTopDepthTopic" value="/headcam/depth_registered/image_rect" /> 
