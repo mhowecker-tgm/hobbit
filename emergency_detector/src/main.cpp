@@ -62,11 +62,12 @@ int rate=DEFAULT_FRAME_RATE;
 
 
 float MinMaxHumanTemperatures[]= {
+                                    0 , 0  ,       //DEV MACHINE
                                     30.8 , 36.0 , //Hobbit A , last tested 23/1/15
                                     29.9 , 36.0 , //Hobbit B , last tested 23/1/15
                                     30.8 , 36.0 , //Hobbit C , todo when I get back to crete
                                     30.8 , 36.0 , //Hobbit D , N/A
-                                    29.8 , 36.0 , //Hobbit E
+                                    29.8 , 36.0 , //Hobbit E , last tested 17/2/15
                                     30.8 , 36.0   //Hobbit F , N/A
                                  };
 
@@ -571,8 +572,8 @@ unsigned int whichHobbitAreWe()
    }
 
 
-   char remember = hobbitName[4];
-   hobbitName[4]=0;
+   char remember = hobbitName[3];
+   hobbitName[3]=0;
 
    if (strcmp(hobbitName,"PT2")!=0)
    {
@@ -587,6 +588,12 @@ unsigned int whichHobbitAreWe()
 
 }
 
+
+unsigned int pickTemperatureProfile(unsigned int hobbitID)
+{
+ minHumanTemperature = MinMaxHumanTemperatures[hobbitID*2+0];
+ maxHumanTemperature = MinMaxHumanTemperatures[hobbitID*2+1];
+}
 
 
 int main(int argc, char **argv)
@@ -631,6 +638,8 @@ int main(int argc, char **argv)
 
      std::cerr<<"Human Temperature Range set to "<<minHumanTemperature<<" up to "<<maxHumanTemperature<<"\n";
      std::cerr<<"  We are hobbit #" << whichHobbitAreWe() << " \n" ;
+     pickTemperatureProfile(whichHobbitAreWe());
+     std::cerr<<"Human Temperature Range set to "<<minHumanTemperature<<" up to "<<maxHumanTemperature<<" for our hobbit\n";
 
     // MinMaxHumanTemperatures[]
 
