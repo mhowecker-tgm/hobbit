@@ -65,7 +65,7 @@ double maxHumanTemperature = 37.0;
  float holesPercentBase=0;
  unsigned int minBaseScoreTrigger = 550;
  unsigned int maxBaseScoreTrigger = 1000;
- float minimumAllowedHolePercentageBase =20;
+ float minimumAllowedHolePercentageBase =5;
  float maximumAllowedHolePercentageBase =60;
 
 unsigned int useTemperatureSensorForLiveFallDetection=0;
