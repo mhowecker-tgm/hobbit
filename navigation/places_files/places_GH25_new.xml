@@ -1,71 +1,80 @@
-<?xml version="1.0"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <rooms>
-	<room>
-		<name>maincorridor</name>
-		<vertices>
-			<vertex x="-0.299999" y="12.900000" />
-			<vertex x="2.200001" y="-5.100000" />
-			<vertex x="5.299999" y="-4.600000" />
-			<vertex x="2.500000" y="13.100000" />
-		</vertices>
-		<places>
-			<place>
-				<name>center</name>
-				<type>goTo</type>
-				<pose x="2.371692" y="6.647361" theta="0.203202" />
-			</place>
-			<place>
-				<name>bench</name>
-				<type>goTo</type>
-				<pose x="2.787569" y="2.472775" theta="-2.969487" />
-			</place>
-			<place>
-				<name>side_entrance</name>
-				<type>goTo</type>
-				<pose x="1.621403" y="6.157151" theta="1.762173" />
-			</place>
-		</places>
-	</room>
-	<room>
-		<name>office</name>
-		<vertices>
-			<vertex x="-6.400000" y="1.799999" />
-			<vertex x="-5.600000" y="-3.500000" />
-			<vertex x="1.100000" y="-2.500000" />
-			<vertex x="0.300001" y="2.699999" />
-		</vertices>
-		<places>
-			<place>
-				<name>Werner</name>
-				<type>goTo</type>
-				<pose x="-0.529823" y="0.073105" theta="-1.395135" />
-			</place>
-			<place>
-				<name>desk</name>
-				<type>searchable</type>
-				<pose x="-0.989167" y="0.541957" theta="-3.038372" />
-			</place>
-		</places>
-	</room>
-	<room>
-		<name>shortcorridor</name>
-		<vertices>
-			<vertex x="0.400000" y="5.900000" />
-			<vertex x="-3.299999" y="5.800000" />
-			<vertex x="-2.900000" y="2.699999" />
-			<vertex x="0.700001" y="3.100000" />
-		</vertices>
-		<places>
-			<place>
-				<name>center</name>
-				<type>goTo</type>
-				<pose x="-0.845900" y="4.064871" theta="0.171305" />
-			</place>
-			<place>
-				<name>dock</name>
-				<type>docking_base_point</type>
-				<pose x="-1.182" y="4.120" theta="1.7496" />
-			</place>
-		</places>
-	</room>
+  <room>
+    <name>maincorridor</name>
+    <vertices>
+      <vertex y="12.9" x="-0.299999"/>
+      <vertex y="-5.1" x="2.200001"/>
+      <vertex y="-4.6" x="5.299999"/>
+      <vertex y="13.1" x="2.5"/>
+    </vertices>
+    <places>
+      <place>
+        <name>center</name>
+        <type>goTo</type>
+        <pose y="6.647361" x="2.371692" theta="0.203202"/>
+        <objects/>
+      </place>
+      <place>
+        <name>bench</name>
+        <type>goTo</type>
+        <pose y="2.152775" x="2.82" theta="-2.969487"/>
+        <objects/>
+      </place>
+      <place>
+        <name>side_entrance</name>
+        <type>goTo</type>
+        <pose y="6.157151" x="1.621403" theta="1.762173"/>
+        <objects/>
+      </place>
+    </places>
+  </room>
+  <room>
+    <name>office</name>
+    <vertices>
+      <vertex y="1.799999" x="-6.4"/>
+      <vertex y="-3.5" x="-5.6"/>
+      <vertex y="-2.5" x="1.1"/>
+      <vertex y="2.699999" x="0.300001"/>
+    </vertices>
+    <places>
+      <place>
+        <name>Werner</name>
+        <type>goTo</type>
+        <pose y="-0.3068" x="-1.1939" theta="-1.539"/>
+        <objects/>
+      </place>
+      <place>
+        <name>desk</name>
+        <type>searchable</type>
+        <pose y="0.541957" x="-0.989167" theta="-3.038372"/>
+        <objects>
+          <object name="Häferl" probability="1.0"/>
+        </objects>
+      </place>
+    </places>
+  </room>
+  <room>
+    <name>shortcorridor</name>
+    <vertices>
+      <vertex y="5.9" x="0.4"/>
+      <vertex y="5.8" x="-3.299999"/>
+      <vertex y="2.699999" x="-2.9"/>
+      <vertex y="3.1" x="0.700001"/>
+    </vertices>
+    <places>
+      <place>
+        <name>center</name>
+        <type>goTo</type>
+        <pose y="4.124871" x="-0.8459" theta="0.171305"/>
+        <objects/>
+      </place>
+      <place>
+        <name>dock</name>
+        <type>docking_base_point</type>
+        <pose y="4.12" x="-1.182" theta="1.7496"/>
+        <objects/>
+      </place>
+    </places>
+  </room>
 </rooms>
