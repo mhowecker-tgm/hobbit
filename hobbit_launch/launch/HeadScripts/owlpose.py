@@ -32,114 +32,115 @@ def set_head_orientation(msg):
 		herkulex.setAngles(pitch=-20, yaw=0, playtime=170)
 		#br.sendTransform((0, 0, 0), (-0.20 ,0.0, 0.0, 1), rospy.Time.now(), base_tf,head_tf)
 	
-	if msg.data == "center_center":
+	elif msg.data == "center_center":
 		herkulex.setAngles(pitch=0, yaw=0, playtime=170)
 		#br.sendTransform((0, 0, 0), (-0.0 ,0.0, 0.0, 1), rospy.Time.now(), base_tf,head_tf)
 
-	if msg.data == "down_center":
+	elif msg.data == "down_center":
 		herkulex.setAngles(pitch=35, yaw=0, playtime=170)
 		#br.sendTransform((0, 0, 0), (0.35 ,0.0, 0.0, 1), rospy.Time.now(), base_tf,head_tf)
 
-	if msg.data == "littledown_center":
+	elif msg.data == "littledown_center":
 		herkulex.setAngles(pitch=20, yaw=0, playtime=170)
 		#br.sendTransform((0, 0, 0), (0.20 ,0.0, 0.0, 1), rospy.Time.now(), base_tf,head_tf)
 
-	if msg.data == "center_right":
+	elif msg.data == "center_right":
 		herkulex.setAngles(pitch=0, yaw=-90, playtime=200)
 		#br.sendTransform((0, 0, 0), (0.0 ,-0.90, 0.0, 1), rospy.Time.now(), base_tf,head_tf)
 
-	if msg.data == "down_right":
+	elif msg.data == "down_right":
 		herkulex.setAngles(pitch=50, yaw=-90, playtime=200)
 		#br.sendTransform((0, 0, 0), (0.50 ,-0.90, 0.0, 1), rospy.Time.now(), base_tf,head_tf)
 
-	if msg.data == "to_turntable":
+	elif msg.data == "to_turntable":
 		herkulex.setAngles(pitch=40, yaw=-61, playtime=200)
 		#br.sendTransform((0, 0, 0), (0.4 ,-0.61, 0.0, 1), rospy.Time.now(), base_tf,head_tf)
 
-	if msg.data == "to_grasp":
+	elif msg.data == "to_grasp":
 		herkulex.setAngles(pitch=62, yaw=-65, playtime=200)
 		#br.sendTransform((0, 0, 0), (0.45 ,-0.70, 0.0, 1), rospy.Time.now(), base_tf,head_tf)
 
-	if msg.data == "center_left":
+	elif msg.data == "center_left":
 		herkulex.setAngles(pitch=0, yaw=90, playtime=200)
 		#br.sendTransform((0, 0, 0), (0.0 ,0.90, 0.0, 1), rospy.Time.now(), base_tf,head_tf)
 
-	if msg.data == "down_left":
+	elif msg.data == "down_left":
 		herkulex.setAngles(pitch=50, yaw=90, playtime=200)
 		#br.sendTransform((0, 0, 0), (0.50 ,0.90, 0.0, 1), rospy.Time.now(), base_tf,head_tf)
 
-	if msg.data == "up_left":
+	elif msg.data == "up_left":
 		herkulex.setAngles(pitch=-20, yaw=90, playtime=200)
 		#br.sendTransform((0, 0, 0), (-0.20 ,0.90, 0.0, 1), rospy.Time.now(), base_tf,head_tf)
 
-	if msg.data == "up_right":
+	elif msg.data == "up_right":
 		herkulex.setAngles(pitch=-20, yaw=-90, playtime=200)        
 		#br.sendTransform((0, 0, 0), (-0.20 ,-0.90, 0.0, 1), rospy.Time.now(), base_tf,head_tf)
 
-	try:
-		if (msg.data[0]) == "a":	#absolut values (in degree) for head servos
-			print "==> set absolut values"
-			input = msg.data.split()
-			lr_angle = int(input[1])
-			ud_angle = int(input[2])
-			if ( angleLimitsOK(lr_angle, ud_angle) ):
-				herkulex.setAngles(pitch=ud_angle, yaw=lr_angle, playtime=200)  
-			
-		if (msg.data[0]) in ("r", "l", "u", "d"):	#incremental head move
-			print "==> set relative values"
-			lr_shift = 0
-			ud_shift = 0
-			currentAngles = herkulex.getAngles()
-			print "currentAngles:", currentAngles
-
-			if msg.data[0] == "r":
-				lr_shift = -1	#default value for move head right
-				if (len(msg.data) > 1) and (int(msg.data[1]) > 0) and (int(msg.data[1]) < 10):
-					lr_shift = -int(msg.data[1])
-			if msg.data[0] == "l":
-				lr_shift = 1	#default value for moving head left
-				if (len(msg.data) > 1) and (int(msg.data[1]) > 0) and (int(msg.data[1]) < 10):
-					lr_shift = int(msg.data[1])	
-					 
-			if msg.data[0] == "u":
-				ud_shift = -1	#default value for move head up
-				if (len(msg.data) > 1) and (int(msg.data[1]) > 0) and (int(msg.data[1]) < 10):
-					ud_shift = -int(msg.data[1])	
-			if msg.data[0] == "d":
-				ud_shift = 1	#default value for moving head left
-				if (len(msg.data) > 1) and (int(msg.data[1]) > 0) and (int(msg.data[1]) < 10):
-					ud_shift = int(msg.data[1])	
-			if (len(msg.data) > 3):
-				if msg.data[3] == "r":
+	else:
+		try:
+			if (msg.data[0]) == "a":	#absolut values (in degree) for head servos
+				print "==> set absolut values"
+				input = msg.data.split()
+				lr_angle = int(input[1])
+				ud_angle = int(input[2])
+				if ( angleLimitsOK(lr_angle, ud_angle) ):
+					herkulex.setAngles(pitch=ud_angle, yaw=lr_angle, playtime=200)  
+				
+			if (msg.data[0]) in ("r", "l", "u", "d"):	#incremental head move
+				print "==> set relative values"
+				lr_shift = 0
+				ud_shift = 0
+				currentAngles = herkulex.getAngles()
+				print "currentAngles:", currentAngles
+	
+				if msg.data[0] == "r":
 					lr_shift = -1	#default value for move head right
-					if (int(msg.data[4]) > 0) and (int(msg.data[4]) < 10):
-						lr_shift = -int(msg.data[4])
-				if msg.data[3] == "l":
+					if (len(msg.data) > 1) and (int(msg.data[1]) > 0) and (int(msg.data[1]) < 10):
+						lr_shift = -int(msg.data[1])
+				if msg.data[0] == "l":
 					lr_shift = 1	#default value for moving head left
-					if (int(msg.data[4]) > 0) and (int(msg.data[4]) < 10):
-						lr_shift = int(msg.data[4])	
-					 
-				if msg.data[3] == "u":
+					if (len(msg.data) > 1) and (int(msg.data[1]) > 0) and (int(msg.data[1]) < 10):
+						lr_shift = int(msg.data[1])	
+						 
+				if msg.data[0] == "u":
 					ud_shift = -1	#default value for move head up
-					if (int(msg.data[4]) > 0) and (int(msg.data[4]) < 10):
-						ud_shift = -int(msg.data[4])	
-				if msg.data[3] == "d":
+					if (len(msg.data) > 1) and (int(msg.data[1]) > 0) and (int(msg.data[1]) < 10):
+						ud_shift = -int(msg.data[1])	
+				if msg.data[0] == "d":
 					ud_shift = 1	#default value for moving head left
-					if (int(msg.data[4]) > 0) and (int(msg.data[4]) < 10):
-						ud_shift = int(msg.data[4])	
-					 				 
-			print "lr_shift: ", lr_shift
-                        print "ud_shift: ", ud_shift
-			lr_angle = currentAngles[0] + lr_shift
-			ud_angle = currentAngles[1] + ud_shift
-			if ( angleLimitsOK(lr_angle, ud_angle) ):
-				print "6 set yaw=: ", ud_angle
-                                print "6 set pitch=: ", lr_angle
-                                herkulex.setAngles(pitch=ud_angle, yaw=lr_angle, playtime=200)
-				rospy.sleep(2.0)
-			
-	except:
-		print "===============================================> owlpose.py: ERROR during variable setting of HEAD: ", sys.exc_info()[0]
+					if (len(msg.data) > 1) and (int(msg.data[1]) > 0) and (int(msg.data[1]) < 10):
+						ud_shift = int(msg.data[1])	
+				if (len(msg.data) > 3):
+					if msg.data[3] == "r":
+						lr_shift = -1	#default value for move head right
+						if (int(msg.data[4]) > 0) and (int(msg.data[4]) < 10):
+							lr_shift = -int(msg.data[4])
+					if msg.data[3] == "l":
+						lr_shift = 1	#default value for moving head left
+						if (int(msg.data[4]) > 0) and (int(msg.data[4]) < 10):
+							lr_shift = int(msg.data[4])	
+						 
+					if msg.data[3] == "u":
+						ud_shift = -1	#default value for move head up
+						if (int(msg.data[4]) > 0) and (int(msg.data[4]) < 10):
+							ud_shift = -int(msg.data[4])	
+					if msg.data[3] == "d":
+						ud_shift = 1	#default value for moving head left
+						if (int(msg.data[4]) > 0) and (int(msg.data[4]) < 10):
+							ud_shift = int(msg.data[4])	
+						 				 
+				print "lr_shift: ", lr_shift
+	                        print "ud_shift: ", ud_shift
+				lr_angle = currentAngles[0] + lr_shift
+				ud_angle = currentAngles[1] + ud_shift
+				if ( angleLimitsOK(lr_angle, ud_angle) ):
+					print "6 set yaw=: ", ud_angle
+	                                print "6 set pitch=: ", lr_angle
+	                                herkulex.setAngles(pitch=ud_angle, yaw=lr_angle, playtime=200)
+					rospy.sleep(2.0)
+				
+		except:
+			print "===============================================> owlpose.py: ERROR during relative setting of HEAD: ", sys.exc_info()[0]
 
 	rospy.sleep(0.5)
 	
@@ -191,7 +192,9 @@ def init():
 	#Read calibration parameters
 	pitch_offset = rospy.get_param('/hobbit/head/pitch_offset', 0)
 	yaw_offset = rospy.get_param('/hobbit/head/yaw_offset', 0)
+	print "set pitch offset of: ", float(pitch_offset)
 	herkulex.setPitchOffset(float(pitch_offset))
+	print "set yaw offset of: ", float(yaw_offset)
 	herkulex.setYawOffset(float(yaw_offset))
 	
 	#Send geometry/tf constantly with 5hz
