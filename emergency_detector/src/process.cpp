@@ -54,7 +54,9 @@ double maxHumanTemperature = 37.0;
  unsigned int maxScoreBaseCamera = 3000;
  unsigned int depthBaseAvg=0;
  unsigned int holesBase=0;
- //-----------------------------------------------------------------------
+ unsigned int minBaseScoreTrigger = 600;
+ unsigned int maxBaseScoreTrigger = 1100;
+  //-----------------------------------------------------------------------
  unsigned int doCalculationsCooldown=20;
  int doCalculations=0;
 
@@ -402,6 +404,11 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
          { fprintf(stderr,RED "\n\n  Too many holes , this cannot be an emergency \n\n" NORMAL ); }
           else
       if (
+            ( depthBaseAvg > minBaseScoreTrigger) &&
+            ( depthBaseAvg < maxBaseScoreTrigger)
+         )
+      {
+      if (
            ( depthAvg > minScoreTrigger) &&
            ( depthAvg < maxScoreTrigger)
          )
@@ -425,6 +432,10 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
                }
             }
           }
+      } else
+      {
+        fprintf(stderr,RED "\n\n  BaseCam indicates that this , cannot be an emergency ( score %u ,holes %u ) \n\n" NORMAL , depthBaseAvg , holesBase);
+      }
 
       } //Map Check
     } //Temperature Check
