@@ -131,17 +131,13 @@ void broadcastEmergency(unsigned int frameNumber)
   if ( !emergencyDetected)  { return ; }
 
 
-  if ( frameNumber < lastEmergencyDetectionTimestamp  + emergencyDetectionCooldown )
+  if ( frameNumber <= lastEmergencyDetectionTimestamp  + emergencyDetectionCooldown )
   {
     emergencyDetected=0;
     fprintf(stderr,"Throttling Emergency Event this frame %u , last detection at %u , cooldown %u  \n" , frameNumber , lastEmergencyDetectionTimestamp , emergencyDetectionCooldown);
     return ;
   }
 
-
-  //emergencyDetected=0;
-  //fprintf(stderr,"emergencyDetection broadcasting disabled , just for a little while more\n");
-  //return ;
 
   #if BROADCAST_HOBBIT
     hobbit_msgs::Event evt;
