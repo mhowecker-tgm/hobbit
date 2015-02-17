@@ -1,5 +1,5 @@
 <launch>   
-    <node name="follow_user" pkg="follow_user" type="run_it.sh" required="true">
+    <node name="follow_user" pkg="follow_user" type="run_it.sh" respawn="true">
       <param name="name" value="follow_user" /> 
 
       <param name="fromDepthTopic" value="/basecam/depth/image" /> 
