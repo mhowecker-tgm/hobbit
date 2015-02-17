@@ -66,7 +66,7 @@ float MinMaxHumanTemperatures[]= {
                                     29.9 , 36.0 , //Hobbit B , last tested 23/1/15
                                     30.8 , 36.0 , //Hobbit C , todo when I get back to crete
                                     30.8 , 36.0 , //Hobbit D , N/A
-                                    30.8 , 36.0 , //Hobbit E
+                                    29.8 , 36.0 , //Hobbit E
                                     30.8 , 36.0   //Hobbit F , N/A
                                  };
 
@@ -554,6 +554,39 @@ void rgbdCallbackBottom(const sensor_msgs::Image::ConstPtr rgb_img_msg,
  rgbdCallbackNoCalibrationBoth(1,rgb_img_msg,depth_img_msg);
 }
 
+unsigned int whichHobbitAreWe()
+{
+  char* hobbitName = getenv ("hobbit_id");
+  if (hobbitName==NULL)
+     {
+      fprintf(stderr,"No hobbit environment variable.. \n");
+      fprintf(stderr,"Please export hobbit_id=\"PT2x\" , probably running on a dev machine.. \n");
+      return 0;
+     }
+
+   if (strlen(hobbitName)<4)
+   {
+     fprintf(stderr,"Too Short Name For a hobbit (%s).. \n",hobbitName);
+     return 0;
+   }
+
+
+   char remember = hobbitName[4];
+   hobbitName[4]=0;
+
+   if (strcmp(hobbitName,"PT2")!=0)
+   {
+     fprintf(stderr,"Malformed hobbit name , was looking for PT2 , got (%s).. \n",hobbitName);
+     return 0;
+   }
+
+
+  unsigned int ourHobbitNumber = (unsigned int) (remember-'a');
+  if (ourHobbitNumber>10) { fprintf(stderr,"We got a very large Hobbit Number ( %u )  \n" , ourHobbitNumber); return 0; }
+  return 1+ourHobbitNumber;
+
+}
+
 
 
 int main(int argc, char **argv)
@@ -587,8 +620,8 @@ int main(int argc, char **argv)
 
 
      private_node_handle_.param("maximumFrameDifferenceForTemperatureToBeRelevant", maximumFrameDifferenceForTemperatureToBeRelevant ,  10 );
-     private_node_handle_.param("minimumAllowedHolePercentage", minimumAllowedHolePercentage ,  15 );
-     private_node_handle_.param("maximumAllowedHolePercentage", maximumAllowedHolePercentage ,  75 );
+     private_node_handle_.param("minimumAllowedHolePercentage", minimumAllowedHolePercentage ,  double(15) );
+     private_node_handle_.param("maximumAllowedHolePercentage", maximumAllowedHolePercentage ,  double(75) );
      private_node_handle_.param("minHumanTemperature", minHumanTemperature , double (31.5) );
      private_node_handle_.param("maxHumanTemperature", maxHumanTemperature , double (37.0) );
      private_node_handle_.param("tempZoneWidth", tempZoneWidth ,  300 );
@@ -597,6 +630,9 @@ int main(int argc, char **argv)
      private_node_handle_.param("maxScoreTrigger", maxScoreTrigger ,  2000 );
 
      std::cerr<<"Human Temperature Range set to "<<minHumanTemperature<<" up to "<<maxHumanTemperature<<"\n";
+     std::cerr<<"  We are hobbit #" << whichHobbitAreWe() << " \n" ;
+
+    // MinMaxHumanTemperatures[]
 
      private_node_handle_.param("name", name, std::string("emergency_detector"));
      private_node_handle_.param("rate", rate , int(DEFAULT_FRAME_RATE)); //11 should me optimal  less for a little less CPU Usage

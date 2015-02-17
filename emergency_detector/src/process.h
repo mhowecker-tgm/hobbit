@@ -24,8 +24,8 @@ extern unsigned int tempTimestamp;
 
 extern  int maximumFrameDifferenceForTemperatureToBeRelevant;
 
-extern  int minimumAllowedHolePercentage;
-extern  int maximumAllowedHolePercentage;
+extern  double minimumAllowedHolePercentage;
+extern  double maximumAllowedHolePercentage;
 
 extern double minHumanTemperature;
 extern double maxHumanTemperature;
