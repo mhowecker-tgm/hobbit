@@ -55,7 +55,7 @@ double maxHumanTemperature = 37.0;
  int tempZoneWidth = 300;
  int tempZoneHeight = 200;
 
- int minScoreTrigger = 1600;
+ int minScoreTrigger = 1350;
  int maxScoreTrigger = 2000;
 
  unsigned int botWidth=440,botHeight=160,botX1=200,botY1=200;
