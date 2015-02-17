@@ -54,7 +54,7 @@ double maxHumanTemperature = 37.0;
  unsigned int maxScoreBaseCamera = 3000;
  unsigned int depthBaseAvg=0;
  unsigned int holesBase=0;
- unsigned int minBaseScoreTrigger = 600;
+ unsigned int minBaseScoreTrigger = 550;
  unsigned int maxBaseScoreTrigger = 1100;
   //-----------------------------------------------------------------------
  unsigned int doCalculationsCooldown=20;
