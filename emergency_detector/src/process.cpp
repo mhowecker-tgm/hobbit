@@ -34,8 +34,13 @@ unsigned int combinationMode=COMBINE_AND;
 
 
 
-//The following values are set by the launch file , so change them there..
+//-----------------------------------------------------------------------
+ //The following values are set by the launch file , so change them there..
+ // Synchronization variables
  int maximumFrameDifferenceForTemperatureToBeRelevant=20;
+ unsigned int doCalculationsCooldown=20;
+ int doCalculations=0;
+ // --------------------------------------------------------------------
 
 
  float holesPercentTop=0;
@@ -61,9 +66,6 @@ double maxHumanTemperature = 37.0;
  unsigned int maxBaseScoreTrigger = 1000;
  float minimumAllowedHolePercentageBase =20;
  float maximumAllowedHolePercentageBase =60;
-  //-----------------------------------------------------------------------
- unsigned int doCalculationsCooldown=20;
- int doCalculations=0;
 
 unsigned int useTemperatureSensorForLiveFallDetection=0;
 unsigned int doUseTopHolesForClassification=0;
@@ -449,10 +451,13 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
                  fprintf(stderr,RED "\n\n  Blob continues over temperature area , maybe standing person \n\n" NORMAL);
                }
             }
+          } else
+          {
+           fprintf(stderr,RED "\n\n  Top Camera indicates that this , cannot be an emergency ( score %u ,holes %u ) \n\n" NORMAL , depthAvg , holesPercentTop);
           }
       } else
       {
-        fprintf(stderr,RED "\n\n  BaseCam indicates that this , cannot be an emergency ( score %u ,holes %u ) \n\n" NORMAL , depthBaseAvg , holesBase);
+        fprintf(stderr,RED "\n\n  BaseCam indicates that this , cannot be an emergency ( score %u ,holes %u ) \n\n" NORMAL , depthBaseAvg , holesPercentBase );
       }
 
       } //Map Check
