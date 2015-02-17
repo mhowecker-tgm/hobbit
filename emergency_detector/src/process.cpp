@@ -563,14 +563,30 @@ int runServicesBottomThatNeedColorAndDepth(unsigned char * colorFrame , unsigned
       botX1 = (unsigned int ) ((colorWidth-botWidth) / 2);
       botY1 = 240;
 
-      depthBaseAvg = viewPointChange_countDepths( depthFrame , colorWidth , colorHeight , botX1, botY1 , botWidth , botHeight , maxScoreBaseCamera , 1 , &holesBase );
+
+
+     unsigned char * segmentedRGB = copyRGB(colorFrame ,colorWidth , colorHeight);
+     unsigned short * segmentedDepth = copyDepth(depthFrame ,depthWidth , depthHeight);
+
+
+        segmentRGBAndDepthFrame (
+                                   segmentedRGB ,
+                                   segmentedDepth ,
+                                   colorWidth , colorHeight,
+                                   &segConfRGB ,
+                                   &segConfBaseDepth ,
+                                   (struct calibration*) calib ,
+                                   COMBINE_AND
+                                );
+
+      depthBaseAvg = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , botX1, botY1 , botWidth , botHeight , maxScoreBaseCamera , 1 , &holesBase );
       fprintf(stderr,"Avg Depth is %u mm , empty area is %0.2f %% \n",depthBaseAvg , (float) (100*holesBase)/(botWidth*botHeight));
 
 
       if (doCVOutput)
       {
         cv::Mat bgrMat,rgbMat;
-        rgbMat = cv::Mat(colorHeight,colorWidth,CV_8UC3,colorFrame,3*colorWidth);
+        rgbMat = cv::Mat(colorHeight,colorWidth,CV_8UC3,segmentedRGB,3*colorWidth);
 
 	    cv::cvtColor(rgbMat,bgrMat, CV_RGB2BGR);// opencv expects the image in BGR format
 
@@ -583,6 +599,8 @@ int runServicesBottomThatNeedColorAndDepth(unsigned char * colorFrame , unsigned
 	   cv::waitKey(1);
       }
 
+   if (segmentedRGB!=0)      { free (segmentedRGB);   }
+   if (segmentedDepth!=0)    { free (segmentedDepth); }
 
       return 1;
 }
