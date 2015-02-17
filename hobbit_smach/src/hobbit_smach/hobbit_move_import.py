@@ -102,10 +102,7 @@ def get_undock():
 
 
 def docking_result_cb(userdata, status, result):
-    if result:
-        return 'succeeded'
-    else:
-        return 'aborted'
+    rospy.loginfo("docking_result_cb"+str(result))
 
 
 def get_dock_action():
