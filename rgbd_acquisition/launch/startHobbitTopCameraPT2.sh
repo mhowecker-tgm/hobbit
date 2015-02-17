@@ -26,7 +26,7 @@
     <arg name="virtual_baseline" value="0.075" type="double" />
 
  
-    <node name="rgbd_acquisition" pkg="rgbd_acquisition" type="run_it.sh" required="true" output="screen"> 
+    <node name="rgbd_acquisition" pkg="rgbd_acquisition" type="run_it.sh" respawn="true" output="screen"> 
       <param name="camera" value="$(arg camera)" />
       <param name="deviceID" value="$(arg deviceID)" /> 
       <param name="virtual_baseline" value="$(arg virtual_baseline)" />   
