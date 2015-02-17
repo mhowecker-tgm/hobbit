@@ -615,7 +615,7 @@ int runServicesBottomThatNeedColorAndDepth(unsigned char * colorFrame , unsigned
 
 
         txtPosition.y += 24; snprintf(rectVal,123,"Base Score : %u Base Holes %0.2f %%",depthBaseAvg,(float) (100*holesBase)/(botWidth*botHeight));
-        putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , color , 2 , 8 );
+        putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , colorEmergency , 2 , 8 );
 
 	    cv::imshow("emergency_detector base visualization",bgrMat);
 	    cv::waitKey(1);
