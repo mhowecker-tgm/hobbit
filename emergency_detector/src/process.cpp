@@ -38,6 +38,9 @@ unsigned int useTemperatureSensorForLiveFallDetection=0;
 //The following values are set by the launch file , so change them there..
  int maximumFrameDifferenceForTemperatureToBeRelevant=20;
 
+
+ float holesPercentTop=0;
+
  int minimumAllowedHolePercentage = 15;
  int maximumAllowedHolePercentage = 75;
 
@@ -54,8 +57,11 @@ double maxHumanTemperature = 37.0;
  unsigned int maxScoreBaseCamera = 3000;
  unsigned int depthBaseAvg=0;
  unsigned int holesBase=0;
+ float holesPercentBase=0;
  unsigned int minBaseScoreTrigger = 550;
  unsigned int maxBaseScoreTrigger = 1100;
+ float minimumAllowedHolePercentageBase =20;
+ float maximumAllowedHolePercentageBase =60;
   //-----------------------------------------------------------------------
  unsigned int doCalculationsCooldown=20;
  int doCalculations=0;
@@ -391,16 +397,26 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
 
       unsigned int holesEncountered = 0;
       depthAvg = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , tempZoneStartX , tempZoneStartY , tempZoneWidth , tempZoneHeight , maxScoreTrigger , 1 , &holesEncountered );
+
+      holesPercentTop = (float) (100*holesEncountered)/(tempZoneWidth*tempZoneHeight);
+
       fprintf(stderr,"Avg Depth is %u mm , empty area is %0.2f %% , Bot Depth %u mm , empty area is %0.2f %% \n",
-              depthAvg , (float) (100*holesEncountered)/(tempZoneWidth*tempZoneHeight) ,
-              depthBaseAvg , (float) (100* holesBase )/(botWidth*botHeight)
+              depthAvg , holesPercentTop ,
+              depthBaseAvg , holesPercentBase
              );
 
 
-      if (holesEncountered< ( (unsigned int) tempZoneWidth*tempZoneHeight*minimumAllowedHolePercentage/100 ) )
+
+      if (holesPercentBase< minimumAllowedHolePercentageBase )
+         { fprintf(stderr,RED "\n\n  Too few holes at Base , too big a blob , cannot be an emergency\n\n" NORMAL ); }
+          else
+      if (holesPercentBase>  maximumAllowedHolePercentageBase )
+         { fprintf(stderr,RED "\n\n  Too many holes at Base , this cannot be an emergency \n\n" NORMAL ); }
+          else
+      if (holesPercentTop< minimumAllowedHolePercentage )
          { fprintf(stderr,RED "\n\n  Too few holes , too big a blob , cannot be an emergency\n\n" NORMAL ); }
           else
-      if (holesEncountered> ( (unsigned int) tempZoneWidth*tempZoneHeight*maximumAllowedHolePercentage/100 ) )
+      if (holesPercentTop>  maximumAllowedHolePercentage )
          { fprintf(stderr,RED "\n\n  Too many holes , this cannot be an emergency \n\n" NORMAL ); }
           else
       if (
@@ -592,7 +608,8 @@ int runServicesBottomThatNeedColorAndDepth(unsigned char * colorFrame , unsigned
                                 );
 
       depthBaseAvg = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , botX1, botY1 , botWidth , botHeight , maxScoreBaseCamera , 1 , &holesBase );
-      fprintf(stderr,"Bottom Avg Depth is %u mm , empty area is %0.2f %% \n",depthBaseAvg , (float) (100*holesBase)/(botWidth*botHeight));
+      holesPercentBase = (float) (100*holesBase)/(botWidth*botHeight);
+      fprintf(stderr,"Bottom Avg Depth is %u mm , empty area is %0.2f %% \n",depthBaseAvg , holesPercentBase );
 
 
       if (doCVOutput)
@@ -611,10 +628,10 @@ int runServicesBottomThatNeedColorAndDepth(unsigned char * colorFrame , unsigned
 
         char rectVal[256]={0};
         int fontUsed=FONT_HERSHEY_SIMPLEX; //FONT_HERSHEY_SCRIPT_SIMPLEX;
-        Point txtPosition;  txtPosition.x = ptIn1.x+15; txtPosition.y = ptIn1.y+20;
+        Point txtPosition;  txtPosition.x = ptIn1.x+15; txtPosition.y = ptIn1.y;
 
 
-        txtPosition.y += 24; snprintf(rectVal,123,"Base Score : %u Base Holes %0.2f %%",depthBaseAvg,(float) (100*holesBase)/(botWidth*botHeight));
+        txtPosition.y += 24; snprintf(rectVal,123,"Base Score : %u\nBase Holes %0.2f %%",depthBaseAvg,holesPercentBase);
         putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , colorEmergency , 2 , 8 );
 
 	    cv::imshow("emergency_detector base visualization",bgrMat);
