@@ -33,7 +33,6 @@ struct SegmentationFeaturesDepth segConfBaseDepth={0};
 unsigned int combinationMode=COMBINE_AND;
 
 
-unsigned int useTemperatureSensorForLiveFallDetection=0;
 
 //The following values are set by the launch file , so change them there..
  int maximumFrameDifferenceForTemperatureToBeRelevant=20;
@@ -59,13 +58,16 @@ double maxHumanTemperature = 37.0;
  unsigned int holesBase=0;
  float holesPercentBase=0;
  unsigned int minBaseScoreTrigger = 550;
- unsigned int maxBaseScoreTrigger = 1100;
+ unsigned int maxBaseScoreTrigger = 1000;
  float minimumAllowedHolePercentageBase =20;
  float maximumAllowedHolePercentageBase =60;
   //-----------------------------------------------------------------------
  unsigned int doCalculationsCooldown=20;
  int doCalculations=0;
 
+unsigned int useTemperatureSensorForLiveFallDetection=0;
+unsigned int doUseTopHolesForClassification=0;
+unsigned int doUseBaseHolesForClassification=1;
 unsigned int doCVOutput=0;
 unsigned int emergencyDetected=0;
 unsigned int personDetected=0;
@@ -407,17 +409,17 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
 
 
 
-      if (holesPercentBase< minimumAllowedHolePercentageBase )
+      if ( (doUseBaseHolesForClassification) && (holesPercentBase< minimumAllowedHolePercentageBase ) )
          { fprintf(stderr,RED "\n\n  Too few holes at Base , too big a blob , cannot be an emergency\n\n" NORMAL ); }
           else
-      if (holesPercentBase>  maximumAllowedHolePercentageBase )
+      if ( (doUseBaseHolesForClassification) && (holesPercentBase>  maximumAllowedHolePercentageBase ) )
          { fprintf(stderr,RED "\n\n  Too many holes at Base , this cannot be an emergency \n\n" NORMAL ); }
           else
-      if (holesPercentTop< minimumAllowedHolePercentage )
-         { fprintf(stderr,RED "\n\n  Too few holes , too big a blob , cannot be an emergency\n\n" NORMAL ); }
+      if ( (doUseTopHolesForClassification) && (holesPercentTop< minimumAllowedHolePercentage ) )
+         { fprintf(stderr,RED "\n\n  Too few holes at Top , too big a blob , cannot be an emergency\n\n" NORMAL ); }
           else
-      if (holesPercentTop>  maximumAllowedHolePercentage )
-         { fprintf(stderr,RED "\n\n  Too many holes , this cannot be an emergency \n\n" NORMAL ); }
+      if ( (doUseTopHolesForClassification) && (holesPercentTop>  maximumAllowedHolePercentage ) )
+         { fprintf(stderr,RED "\n\n  Too many holes at Top , this cannot be an emergency \n\n" NORMAL ); }
           else
       if (
             ( depthBaseAvg > minBaseScoreTrigger) &&
@@ -631,8 +633,12 @@ int runServicesBottomThatNeedColorAndDepth(unsigned char * colorFrame , unsigned
         Point txtPosition;  txtPosition.x = ptIn1.x+15; txtPosition.y = ptIn1.y;
 
 
-        txtPosition.y += 24; snprintf(rectVal,123,"Base Score : %u\nBase Holes %0.2f %%",depthBaseAvg,holesPercentBase);
+        txtPosition.y += 24; snprintf(rectVal,123,"Base Score : %u",depthBaseAvg);
         putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , colorEmergency , 2 , 8 );
+
+        txtPosition.y += 24; snprintf(rectVal,123,"Base Holes %0.2f %%",holesPercentBase);
+        putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , colorEmergency , 2 , 8 );
+
 
 	    cv::imshow("emergency_detector base visualization",bgrMat);
 	    cv::waitKey(1);
