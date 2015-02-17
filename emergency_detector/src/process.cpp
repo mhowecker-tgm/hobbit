@@ -635,6 +635,6 @@ void initializeProcess()
 
  segConfBaseDepth.normal[0]=0.03;    segConfBaseDepth.normal[1]=-1.00;  segConfBaseDepth.normal[2]=0.08;
  segConfBaseDepth.center[0]=-252.23; segConfBaseDepth.center[1]=393.59; segConfBaseDepth.center[2]=925.00;
- segConfBaseDepth.planeNormalOffset=40.0;
+ segConfBaseDepth.planeNormalOffset=50.0;
  segConfBaseDepth.enablePlaneSegmentation=1;
 }
