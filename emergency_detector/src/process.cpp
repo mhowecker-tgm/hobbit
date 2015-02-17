@@ -218,7 +218,7 @@ int detectHighContrastUnusableRGB(unsigned char * rgbFrame , unsigned int width 
          }
     }
   }
-  fprintf(stderr,"Good View with %0.2f high contrast points \n",(float) (100*highContrastPixels)/(width*height));
+  //fprintf(stderr,"Good View with %0.2f high contrast points \n",(float) (100*highContrastPixels)/(width*height));
  return 0;
 }
 
