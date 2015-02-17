@@ -24,7 +24,7 @@ int isSkeletonWrong(struct fallState * fs)
      }
    }
 
-   fprintf(stderr,"Skeleton Spread is %0.2f \n",totalDist);
+  if (totalDist>0) { fprintf(stderr,"Skeleton Spread is %0.2f \n",totalDist); }
   return 0;
 }
 

@@ -43,6 +43,7 @@ unsigned int combinationMode=COMBINE_AND;
  // --------------------------------------------------------------------
 
 
+ unsigned int holesTop=0;
  float holesPercentTop=0;
 
  int minimumAllowedHolePercentage = 15;
@@ -209,7 +210,12 @@ int detectHighContrastUnusableRGB(unsigned char * rgbFrame , unsigned int width 
        )
     {
      ++highContrastPixels;
-     if ( highContrastPixels>targetHighContrastPixels) { fprintf(stderr,"Bad View with %0.2f + high contrast points \n",(float) (100*highContrastPixels)/(width*height)); return 1; }
+     if ( highContrastPixels>targetHighContrastPixels)
+         {
+           //This spams console output and is included in OpenCV visualization
+           //fprintf(stderr,"Bad View with %0.2f + high contrast points \n",(float) (100*highContrastPixels)/(width*height));
+           return 1;
+         }
     }
   }
   fprintf(stderr,"Good View with %0.2f high contrast points \n",(float) (100*highContrastPixels)/(width*height));
@@ -399,10 +405,8 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
                                    combinationMode
                                 );
 
-      unsigned int holesEncountered = 0;
-      depthAvg = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , tempZoneStartX , tempZoneStartY , tempZoneWidth , tempZoneHeight , maxScoreTrigger , 1 , &holesEncountered );
-
-      holesPercentTop = (float) (100*holesEncountered)/(tempZoneWidth*tempZoneHeight);
+      depthAvg = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , tempZoneStartX , tempZoneStartY , tempZoneWidth , tempZoneHeight , maxScoreTrigger , 1 , &holesTop );
+      holesPercentTop = (float) (100*holesTop)/(tempZoneWidth*tempZoneHeight);
 
       fprintf(stderr,"Avg Depth is %u mm , empty area is %0.2f %% , Bot Depth %u mm , empty area is %0.2f %% \n",
               depthAvg , holesPercentTop ,
@@ -438,11 +442,13 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
              else
             {
               //We are almost sure we have a fallen blob , but maybe the blob continues on the top side ( so it is a standing user after all
+              unsigned int holesOverTemperatureArea=0;
               unsigned int overHeight=120;
-              unsigned int depthAvgOver = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , tempZoneStartX , tempZoneStartY-overHeight , tempZoneWidth , overHeight , maxScoreTrigger , 1 , &holesEncountered );
-              fprintf(stderr,MAGENTA "\n\n  Top Avg is %u mm Holes are %0.2f %% \n\n" NORMAL , depthAvgOver, (float) (100*holesEncountered)/(tempZoneWidth*overHeight));
+              unsigned int depthAvgOver = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , tempZoneStartX , tempZoneStartY-overHeight , tempZoneWidth , overHeight , maxScoreTrigger , 1 , &holesOverTemperatureArea );
 
-              if (holesEncountered> ( (unsigned int) tempZoneWidth*overHeight*80/100 ) )
+              fprintf(stderr,MAGENTA "\n\n  Top Avg is %u mm Holes are %0.2f %% \n\n" NORMAL , depthAvgOver, holesPercentTop  );
+
+              if (holesOverTemperatureArea> ( (unsigned int) tempZoneWidth*overHeight*80/100 ) )
                {
                  fprintf(stderr,MAGENTA "\n\n  Already Fallen User Detected , EMERGENCY \n\n" NORMAL);
                  emergencyDetected=1;
