@@ -464,7 +464,7 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
 
 
         Scalar tempColor = Scalar ( tempColorB , tempColorG , tempColorR );
-        circle(bgrMat,  centerPt , 26 , tempColor , 4, 8 , 0);
+        circle(bgrMat,  centerPt , 30 , tempColor , 4, 8 , 0);
 
         char rectVal[256]={0};
         int fontUsed=FONT_HERSHEY_SIMPLEX; //FONT_HERSHEY_SCRIPT_SIMPLEX;
@@ -606,9 +606,19 @@ int runServicesBottomThatNeedColorAndDepth(unsigned char * colorFrame , unsigned
         Point ptIn2; ptIn2.x=botX1+botWidth;      ptIn2.y=botY1+botHeight;
         Scalar colorEmergency = Scalar ( 255 , 0 , 0 );
 
-       rectangle(bgrMat ,  ptIn1 , ptIn2 , colorEmergency , 2, 8 , 0);
-	   cv::imshow("emergency_detector base visualization",bgrMat);
-	   cv::waitKey(1);
+        rectangle(bgrMat ,  ptIn1 , ptIn2 , colorEmergency , 2, 8 , 0);
+
+
+        char rectVal[256]={0};
+        int fontUsed=FONT_HERSHEY_SIMPLEX; //FONT_HERSHEY_SCRIPT_SIMPLEX;
+        Point txtPosition;  txtPosition.x = ptIn1.x+15; txtPosition.y = ptIn1.y+20;
+
+
+        txtPosition.y += 24; snprintf(rectVal,123,"Base Score : %u Base Holes %0.2f %%",depthBaseAvg,(float) (100*holesBase)/(botWidth*botHeight));
+        putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , color , 2 , 8 );
+
+	    cv::imshow("emergency_detector base visualization",bgrMat);
+	    cv::waitKey(1);
       }
 
    if (segmentedRGB!=0)      { free (segmentedRGB);   }
