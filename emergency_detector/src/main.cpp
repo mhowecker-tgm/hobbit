@@ -128,13 +128,13 @@ void broadcastNewPerson()
 
 void broadcastEmergency(unsigned int frameNumber)
 {
-  if ( (!emergencyDetected) ) { return ; }
+  if ( !emergencyDetected)  { return ; }
 
 
   if ( frameNumber > lastEmergencyDetectionTimestamp  + emergencyDetectionCooldown )
   {
     emergencyDetected=0;
-    fprintf(stderr,"Throttling Emergency Event \n");
+    fprintf(stderr,"Throttling Emergency Event this frame %u , last detection at %u , cooldown %u  \n" , frameNumber , lastEmergencyDetectionTimestamp , emergencyDetectionCooldown);
     return ;
   }
 
