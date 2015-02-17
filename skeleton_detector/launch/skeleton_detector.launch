@@ -1,5 +1,5 @@
 <launch>   
-    <node name="skeleton_detector" pkg="skeleton_detector" type="run_it.sh" required="true">
+    <node name="skeleton_detector" pkg="skeleton_detector" type="run_it.sh" respawn="true">
       <param name="name" value="skeleton_detector" /> 
 
       <param name="fromDepthTopic" value="/headcam/depth_registered/image_rect" /> 
