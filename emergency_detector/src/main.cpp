@@ -573,9 +573,7 @@ unsigned int whichHobbitAreWe()
 
 
    char remember = hobbitName[3];
-   hobbitName[3]=0;
-
-   if (strcmp(hobbitName,"PT2")!=0)
+   if (strncmp(hobbitName,"PT2",3)!=0)
    {
      fprintf(stderr,"Malformed hobbit name , was looking for PT2 , got (%s).. \n",hobbitName);
      return 0;
