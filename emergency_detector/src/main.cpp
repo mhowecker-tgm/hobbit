@@ -98,6 +98,7 @@ unsigned int frameTimestamp=emergencyDetectionCooldown+1; //not 0 so we can imme
 ros::NodeHandle * nhPtr=0;
 unsigned int paused=0;
 unsigned int dontPublishPersons=0;
+unsigned int printTFPosition=0;
 unsigned int useTFTree=1;
 unsigned int fakeTemperatureActivated=0;
 
@@ -266,24 +267,30 @@ bool fakeTemperature(std_srvs::Empty::Request& request, std_srvs::Empty::Respons
 
 int lookingUpInternal()
 {
-    if (fallDetectionContext.headLookingDirection!=HEAD_LOOKING_UP) { fprintf(stderr,"Head seems to be looking up now..!"); }
+    if (fallDetectionContext.headLookingDirection!=HEAD_LOOKING_UP)    { fprintf(stderr,"\n\nHead seems to be looking up now..!\n\n"); }
     fallDetectionContext.headLookingDirection=HEAD_LOOKING_UP;
 }
 
 
 int lookingCenterInternal()
 {
-    if (fallDetectionContext.headLookingDirection!=HEAD_LOOKING_CENTER) { fprintf(stderr,"Head seems to be looking center now..!"); }
+    if (fallDetectionContext.headLookingDirection!=HEAD_LOOKING_CENTER) { fprintf(stderr,"\n\nHead seems to be looking center now..!\n\n"); }
     fallDetectionContext.headLookingDirection=HEAD_LOOKING_CENTER;
 }
 
 
 int lookingDownInternal()
 {
-    if (fallDetectionContext.headLookingDirection!=HEAD_LOOKING_DOWN) { fprintf(stderr,"Head seems to be looking down now..!"); }
+    if (fallDetectionContext.headLookingDirection!=HEAD_LOOKING_DOWN) { fprintf(stderr,"\n\nHead seems to be looking down now..!\n\n"); }
     fallDetectionContext.headLookingDirection=HEAD_LOOKING_DOWN;
 }
 
+
+bool toggleTFPrinting(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    if (printTFPosition) { printTFPosition=1; } else { printTFPosition=0; }
+    return true;
+}
 
 bool lookingUp(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
@@ -398,17 +405,18 @@ int updateHeadPosition()
       double roll, pitch, yaw;
       tf::Matrix3x3(transformS.getRotation()).getRPY(roll, pitch, yaw);
 
-      fprintf(stderr,"Head Pos(%0.2f %0.2f %0.2f) RPY(%0.2f %0.2f %0.2f)\n",transformS.getOrigin().x(),transformS.getOrigin().y(),transformS.getOrigin().z(),roll,pitch,yaw);
+      if (printTFPosition)
+       {
+        fprintf(stderr,"Head Pos(%0.2f %0.2f %0.2f)/RPY(%0.2f %0.2f %0.2f)\n",transformS.getOrigin().x(),transformS.getOrigin().y(),transformS.getOrigin().z(),roll,pitch,yaw);
+       }
 
-      if (pitch > -1.2) { lookingDownInternal(); }
-                               else
+      if (pitch > -1.2) { lookingDownInternal(); }  else
                         { lookingCenterInternal(); }
 
      }
  catch (tf::TransformException &ex)
       {
        ROS_ERROR("%s",ex.what());
-       //ros::Duration(1.0).sleep();
       }
  return 1;
 }
@@ -610,6 +618,9 @@ int main(int argc, char **argv)
      ros::ServiceServer lookUpService          = nh.advertiseService(name+"/looking_up" , lookingUp);
      ros::ServiceServer lookCenterService      = nh.advertiseService(name+"/looking_center" , lookingCenter);
      ros::ServiceServer lookDownService        = nh.advertiseService(name+"/looking_down" , lookingDown);
+
+     ros::ServiceServer tfPrintService        = nh.advertiseService(name+"/toggleTFPrinting" , toggleTFPrinting);
+
 
      ros::ServiceServer setHobbitEService        = nh.advertiseService(name+"/setHobbitE" , setHobbitE);
 
