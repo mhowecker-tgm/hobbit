@@ -459,11 +459,11 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
             }
           } else
           {
-           fprintf(stderr,RED "\n\n  Top Camera indicates that this , cannot be an emergency ( score %u ,holes %0.2f %% ) \n\n" NORMAL , depthAvg , holesPercentTop);
+           fprintf(stderr,RED "\n\n  Top Camera indicates that this , cannot be an emergency ( score %u ,holes %0.2f %% )  score Min %u Max %u \n\n" NORMAL , depthAvg , holesPercentTop , minScoreTrigger , maxScoreTrigger );
           }
       } else
       {
-        fprintf(stderr,RED "\n\n  BaseCam indicates that this , cannot be an emergency ( score %u ,holes %0.2f %% ) \n\n" NORMAL , depthBaseAvg , holesPercentBase );
+        fprintf(stderr,RED "\n\n  BaseCam indicates that this , cannot be an emergency ( score %u ,holes %0.2f %% ) score Min %u Max %u \n\n" NORMAL , depthBaseAvg , holesPercentBase , minBaseScoreTrigger , maxBaseScoreTrigger );
       }
 
       } //Map Check
