@@ -416,16 +416,16 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
 
 
       if ( (doUseBaseHolesForClassification) && (holesPercentBase< minimumAllowedHolePercentageBase ) )
-         { fprintf(stderr,RED "\n\n  Too few holes at Base , too big a blob , cannot be an emergency\n\n" NORMAL ); }
+         { fprintf(stderr,RED "\n\n  Too few holes at Base ( min is %0.2f ) , too big a blob , cannot be an emergency\n\n" NORMAL , minimumAllowedHolePercentageBase); }
           else
       if ( (doUseBaseHolesForClassification) && (holesPercentBase>  maximumAllowedHolePercentageBase ) )
-         { fprintf(stderr,RED "\n\n  Too many holes at Base , this cannot be an emergency \n\n" NORMAL ); }
+         { fprintf(stderr,RED "\n\n  Too many holes at Base ( max is %0.2f ) , this cannot be an emergency \n\n" NORMAL  , maximumAllowedHolePercentageBase); }
           else
       if ( (doUseTopHolesForClassification) && (holesPercentTop< minimumAllowedHolePercentage ) )
-         { fprintf(stderr,RED "\n\n  Too few holes at Top , too big a blob , cannot be an emergency\n\n" NORMAL ); }
+         { fprintf(stderr,RED "\n\n  Too few holes at Top ( min is %0.2f ) , too big a blob , cannot be an emergency\n\n" NORMAL , minimumAllowedHolePercentage); }
           else
       if ( (doUseTopHolesForClassification) && (holesPercentTop>  maximumAllowedHolePercentage ) )
-         { fprintf(stderr,RED "\n\n  Too many holes at Top , this cannot be an emergency \n\n" NORMAL ); }
+         { fprintf(stderr,RED "\n\n  Too many holes at Top ( max is %0.2f ) , this cannot be an emergency \n\n" NORMAL , maximumAllowedHolePercentage ); }
           else
       if (
             ( depthBaseAvg > minBaseScoreTrigger) &&
