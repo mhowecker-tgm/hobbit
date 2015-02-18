@@ -98,17 +98,22 @@ bool cPersonFollowing::startFollowing()
 
 	init();
 
+	std::cout << "init done " << std::endl;
 	following_active = true;
 	std_srvs::Empty srv;
         if (!resume_following_client.call(srv))
-        	ROS_DEBUG("Failed to call service resume following");
+        	ROS_INFO("Failed to call service resume following");
+
+	std::cout << "service was resumed " << std::endl;
 
 	goal_status.data = "started";
 	status_pub.publish(goal_status);
 
 	std_srvs::Empty srv2;
 	if (!deactivate_recovery_client.call(srv2))
-		ROS_DEBUG("Failed to call service deactivate recovery"); //This would be a problem
+		ROS_INFO("Failed to call service deactivate recovery"); //This would be a problem
+
+	std::cout << "service was deactivated " << std::endl;
 
 	return true;
 
@@ -126,7 +131,7 @@ bool cPersonFollowing::stopFollowing()
 	following_active = false;
 	std_srvs::Empty srv;
         if (!pause_following_client.call(srv))
-        	ROS_DEBUG("Failed to call service pause following");
+        	ROS_INFO("Failed to call service pause following");
 
 	goal_status.data = "stopped";
 	status_pub.publish(goal_status);
@@ -134,7 +139,7 @@ bool cPersonFollowing::stopFollowing()
 
 	std_srvs::Empty srv2;
 	if (!activate_recovery_client.call(srv2))
-		ROS_DEBUG("Failed to call service activate recovery"); 
+		ROS_INFO("Failed to call service activate recovery"); 
 
 	return true;
 
@@ -183,12 +188,17 @@ void cPersonFollowing::goalDoneCallback(const actionlib::SimpleClientGoalState &
 void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 {
 
+	std::cout << "callback " << std::endl;
 	if (goal->command == "start")
 	{
+		std::cout << "start received " << std::endl;
 		startFollowing();
+		
 	}
 
 	else return;
+
+	std::cout << "starting " << std::endl;
 
 	clock_t begin;
 	clock_t begin_target;
@@ -206,6 +216,8 @@ void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 		ROS_FATAL("action server not running?");
 		ROS_BREAK();
 	}
+
+	std::cout << "server started" << std::endl;
 
 	ros::NodeHandle n;
 	while (n.ok())
@@ -249,6 +261,7 @@ void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 			}
 
 			//at least one target was detected
+			std::cout << "target received " << std::endl;
 
 			//determine local target pose
 			double local_dir = atan2(-current_target.x,current_target.y + x_sensor);			
@@ -263,12 +276,12 @@ void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 			double target_x = current_x + local_target_x*cos(current_theta) - local_target_y*sin(current_theta);
 		        double target_y = current_y + local_target_x*sin(current_theta) + local_target_y*cos(current_theta);
 
-			//std::cout << "target pose " << target_x << " " << target_y << std::endl;
+			std::cout << "target pose " << target_x << " " << target_y << std::endl;
 			//check if new target is not too close to the previous one
 			if ( (target_x-previous_target_x)*(target_x-previous_target_x) + (target_y-previous_target_y)*(target_y-previous_target_y) > dis_thres && local_target_x >0)
 			{
 
-				//std::cout << "target pose " << target_x << " " << target_y << std::endl;
+				std::cout << "target pose " << target_x << " " << target_y << std::endl;
 				//send the new target
 				move_base_msgs::MoveBaseGoal goal;
 				goal.target_pose.pose.position.x = target_x;
@@ -349,6 +362,7 @@ void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 
 		if (goal_status.data == "reached")
 		{
+			stopFollowing();
 			as_->setSucceeded(hobbit_msgs::FollowMeResult(), "Last detected position reached");
 			std::cout << "reached, succeeded " << std::endl; 
 			return;
@@ -356,6 +370,7 @@ void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 
 		if (goal_status.data == "aborted")
 		{
+			stopFollowing();
 			as_->setAborted(hobbit_msgs::FollowMeResult(), "Following aborted, probably because the path is blocked");
 			std::cout << "aborted, blocked " << std::endl; 
 			return;
@@ -363,6 +378,7 @@ void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 
 		if (goal_status.data == "preempted" || goal_status.data == "recalled")
 		{
+			stopFollowing();
 			as_->setPreempted();
 			std::cout << "preempted " << std::endl; 
 			return;
@@ -375,6 +391,7 @@ void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 			double elapsed_secs_feedback = double(end_feedback - begin_feedback) / CLOCKS_PER_SEC;
 			if (elapsed_secs_feedback > time_limit_no_feedback_secs)
 			{
+				stopFollowing();
 				as_->setAborted(hobbit_msgs::FollowMeResult(), "Following aborted, no response from Mira");
 				std::cout << "aborted, no response " << std::endl; 
 				return;
@@ -386,6 +403,7 @@ void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 	}
 
 	//if the node is killed then we'll abort and return
+	stopFollowing();
         as_->setAborted(hobbit_msgs::FollowMeResult(), "Aborting on the goal because the node has been killed");
         return;
 
