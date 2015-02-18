@@ -51,7 +51,8 @@ cLocalizationMonitor::cLocalizationMonitor(int argc, char **argv) : init_argc(ar
 	nh.param("dis_thres_check", dis_thres_check, 1.5);
 	nh.param("rate_thres", rate_thres, 0.6); 
 
-	nh.param("apply_action", apply_action, false); 
+	nh.param("activate_recovery", activate_recovery, false); 
+	apply_action = activate_recovery;
 
 
 }
@@ -465,7 +466,9 @@ void cLocalizationMonitor::Run(void)
 	 	loc_state.data = loc_ok;
 	 	locStatePublisher.publish(loc_state);
 
+		std::cout << "apply_action "<< apply_action << std::endl;
 		if (!loc_ok && apply_action)
+		//if (false)
 		{
 			 // create action client
   			actionlib::SimpleActionClient<hobbit_msgs::GeneralHobbitAction> ac("localization_recovery", true);
@@ -608,13 +611,16 @@ void cLocalizationMonitor::battery_state_callback(const mira_msgs::BatteryState:
 
 bool cLocalizationMonitor::activateRecovery(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res)
 {
-	apply_action = true;
+	if (activate_recovery)
+		apply_action = true;
+		
 	return true;
 }
 
 bool cLocalizationMonitor::deactivateRecovery(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res)
 {
-	apply_action = false;
+	if (activate_recovery)
+		apply_action = false;
 	return false;
 }
 

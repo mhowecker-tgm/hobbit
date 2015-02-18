@@ -132,6 +132,8 @@ private:
   bool deactivateRecovery(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res);
 
   ros::ServiceClient send_goal_client;
+
+  bool activate_recovery;
  
 
 };
