@@ -1,13 +1,26 @@
-<launch>   
+<launch> 
+
+  <arg name="camera" value="headcam"/>   
+
+
   <!--node pkg="tf" type="static_transform_publisher" name="tmp_headcam_rgb_optical_frame_to_frame"
         args="0.0 0.0 0.06 0 0 0 headcam_rgb_optical_frame frame 100" /   -0.26 0 1.09 0 0 0   -->
 
- <node pkg="tf" type="static_transform_publisher" name="base_link_to_hobbit_neck"
-        args="-0.17 0.03 1.035 0 0 0 base_link hobbit_neck 100" />
+ <!-- node pkg="tf" type="static_transform_publisher" name="base_link_to_hobbit_neck"
+        args="-0.17 0.03 1.035 0 0 0 base_link hobbit_neck 100" /-->
 
 <!-- original -->
 <!--node pkg="tf" type="static_transform_publisher" name="base_link_to_hobbit_neck"
         args="-0.26 0 1.09 0 0 0 base_link hobbit_neck 100" /-->
+
+
+  <!-- lowerd z-value for z-axis from 0.165 to 0.155 -->
+  <node pkg="tf" type="static_transform_publisher" name="hobbit_neck_dynamic_to_headcam_link"
+        args="0.02 0.0 0.155 0 0 0 hobbit_neck_dynamic headcam_link 100" />
+
+  <!-- changed y-value from -0.045 to 0.025 -->
+  <node pkg="tf" type="static_transform_publisher" name="$(arg camera)_base_link1"
+        args="0 0.045 0 0 0 0 $(arg camera)_link $(arg camera)_rgb_frame 100" />
 
 
 </launch>
