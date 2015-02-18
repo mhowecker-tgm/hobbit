@@ -389,6 +389,7 @@ void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 
 			clock_t end_feedback = clock();
 			double elapsed_secs_feedback = double(end_feedback - begin_feedback) / CLOCKS_PER_SEC;
+			std::cout << "elapsed time no response " << elapsed_secs_feedback << std::endl;
 			if (elapsed_secs_feedback > time_limit_no_feedback_secs)
 			{
 				stopFollowing();
