@@ -22,6 +22,12 @@
         <objects/>
       </place>
       <place>
+        <name>call4</name>
+        <type>call_button_4</type>
+        <pose y="2.152775" x="2.82" theta="-2.969487"/>
+        <objects/>
+      </place>
+      <place>
         <name>side_entrance</name>
         <type>goTo</type>
         <pose y="6.157151" x="1.621403" theta="1.762173"/>
