@@ -233,9 +233,42 @@ def getRecharge():
 
 def person_cb(msg, ud):
     print(msg)
+    if msg.source == 6:
+        return None
     ud.person_x = msg.x
     ud.person_z = msg.z
     return True
+
+
+class CheckMsgState(WaitForMsgState):
+    def __init__(self, topic, msg_type, msg_cb=None, output_keys=None, latch=False, timeout=None):
+        if output_keys is None:
+            output_keys = []
+        smach.State.__init__(self, outcomes=['succeeded', 'aborted', 'preempted', 'timeout'], output_keys=output_keys)
+        self.latch = latch
+        self.timeout = timeout
+        self.mutex = threading.Lock()
+        self.msg = None
+        self.msg_cb = msg_cb
+        self.subscriber = rospy.Subscriber(topic, msg_type, self._callback, queue_size=1)
+    def execute(self, ud):
+        """Tiny changes to default execute(), see class description."""
+        msg = self.waitForMsg()
+        if msg is not None:
+            if msg == 'preempted':
+                return 'preempted'
+            # call callback if there is one
+            if self.msg_cb is not None:
+                cb_result = self.msg_cb(msg, ud)
+                # check if callback wants to dictate output
+                if cb_result is not None:
+                    if cb_result:
+                        return 'succeeded'
+                    else:
+                        return 'aborted'
+            return 'succeeded'
+        else:
+            return 'timeout'
 
 
 def call_hobbit():
@@ -284,16 +317,24 @@ def call_hobbit():
         )
         StateMachine.add(
             'GET_PERSON',
-            WaitForMsgState(
+            CheckMsgState(
                 '/persons',
                 Person,
                 msg_cb=person_cb,
-                timeout=15,
+                timeout=5,
                 output_keys=['user_pose', 'person_z', 'person_x']
             ),
             transitions={'succeeded': 'CLOSER',
-                         'aborted': 'LOG_ABORT',
-                         'preempted': 'LOG_PREEMPT'}
+                         'aborted': 'COUNT',
+                         'preempted': 'LOG_PREEMPT',
+                         'timeout': 'MMUI_BLIND_CLOSER'}
+        )
+        StateMachine.add(
+            'COUNT',
+            Count(),
+            transitions={'succeeded': 'GET_PERSON',
+                         'preempted': 'preempted',
+                         'aborted': 'CLOSER'}
         )
         StateMachine.add(
             'CLOSER',
