@@ -45,6 +45,8 @@ alias trig="rostopic pub /SS/doSingleShot std_msgs/String "asdf" -1"
 alias dfcatkinmakerelease="catkin_make -DCMAKE_BUILD_TYPE=Release"
 #move head to grasp position
 alias dfh2g="rostopic pub /head/move std_msgs/String "to_grasp" -1"
+#move head to zero zero position
+alias dfh2zz="rostopic pub /head/move std_msgs/String 'a 0 0' -1"
 
 # Call hobbit to one of the call buttons
 alias call1="rostopic pub -1 /Event hobbit_msgs/Event '{header: auto, event: E_CALLHOBBIT, confidence: 0.8, params: [{name: 'place', value: 'CALL1'}, {name: sensor, value: 'CALL1'}]}'"
