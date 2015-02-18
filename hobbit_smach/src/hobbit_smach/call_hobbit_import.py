@@ -8,6 +8,8 @@ PREEMPT_TIMEOUT = 5
 SERVER_TIMEOUT = 5
 
 import rospy
+import smach
+import threading
 from std_msgs.msg import String
 from smach_ros import SimpleActionState
 from smach import Sequence, State, StateMachine, Concurrence
