@@ -18,13 +18,13 @@
       <place>
         <name>bench</name>
         <type>goTo</type>
-        <pose y="2.152775" x="2.82" theta="-2.969487"/>
+        <pose y="1.75" x="3.0" theta="-2.969487"/>
         <objects/>
       </place>
       <place>
         <name>call4</name>
         <type>call_button_4</type>
-        <pose y="2.152775" x="2.82" theta="-2.969487"/>
+        <pose y="1.502775" x="2.7" theta="-2.969487"/>
         <objects/>
       </place>
       <place>
