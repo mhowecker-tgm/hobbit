@@ -27,6 +27,8 @@ head_tf = "hobbit_neck"
 #head_tf = "headcam_depth_optical_frame"
 
 def set_head_orientation(msg):
+	currentAngles = herkulex.getAngles()
+	print "currentAngles:", currentAngles
 	print "Move to",msg.data
 	if msg.data == "up_center":
 		herkulex.setAngles(pitch=-20, yaw=0, playtime=170)
