@@ -223,6 +223,60 @@ void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 	while (n.ok())
 	{
 
+		std::cout << "status " << goal_status.data << std::endl;
+
+		if(as_->isPreemptRequested())
+      		{
+			std::cout << "preempt requested" << std::endl;
+			stopFollowing();
+			//stop the robot, cancel current goal!!!
+			std_srvs::Empty srv;
+        		if (!cancel_goal_client.call(srv))
+        			ROS_INFO("Failed to call service cancel goal"); //This would be a problem
+			as_->setPreempted();
+			return;
+
+		}
+
+		if (goal_status.data == "reached")
+		{
+			stopFollowing();
+			as_->setSucceeded(hobbit_msgs::FollowMeResult(), "Last detected position reached");
+			std::cout << "reached, succeeded " << std::endl; 
+			return;
+		}
+
+		if (goal_status.data == "aborted")
+		{
+			stopFollowing();
+			as_->setAborted(hobbit_msgs::FollowMeResult(), "Following aborted, probably because the path is blocked");
+			std::cout << "aborted, blocked " << std::endl; 
+			return;
+		}
+
+		if (goal_status.data == "preempted" || goal_status.data == "recalled")
+		{
+			stopFollowing();
+			as_->setPreempted();
+			std::cout << "preempted " << std::endl; 
+			return;
+		}
+
+		if (goal_status.data == "goal_sent" && !response)
+		{
+
+			clock_t end_feedback = clock();
+			double elapsed_secs_feedback = double(end_feedback - begin_feedback) / CLOCKS_PER_SEC;
+			std::cout << "elapsed time no response " << elapsed_secs_feedback << std::endl;
+			if (elapsed_secs_feedback > time_limit_no_feedback_secs)
+			{
+				stopFollowing();
+				as_->setAborted(hobbit_msgs::FollowMeResult(), "Following aborted, no response from Mira");
+				std::cout << "aborted, no response " << std::endl; 
+				return;
+			}
+		}	
+
 		if(following_active)
 		{
 
@@ -344,62 +398,6 @@ void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 			if (starting) starting = false;
 			
 		}
-
-		//std::cout << "status " << goal_status.data << std::endl;
-
-		if(as_->isPreemptRequested())
-      		{
-			std::cout << "preempt requested" << std::endl;
-			stopFollowing();
-			//stop the robot, cancel current goal!!!
-			std_srvs::Empty srv;
-        		if (!cancel_goal_client.call(srv))
-        			ROS_DEBUG("Failed to call service cancel goal"); //This would be a problem
-			as_->setPreempted();
-			return;
-
-		}
-
-		if (goal_status.data == "reached")
-		{
-			stopFollowing();
-			as_->setSucceeded(hobbit_msgs::FollowMeResult(), "Last detected position reached");
-			std::cout << "reached, succeeded " << std::endl; 
-			return;
-		}
-
-		if (goal_status.data == "aborted")
-		{
-			stopFollowing();
-			as_->setAborted(hobbit_msgs::FollowMeResult(), "Following aborted, probably because the path is blocked");
-			std::cout << "aborted, blocked " << std::endl; 
-			return;
-		}
-
-		if (goal_status.data == "preempted" || goal_status.data == "recalled")
-		{
-			stopFollowing();
-			as_->setPreempted();
-			std::cout << "preempted " << std::endl; 
-			return;
-		}
-
-		if (goal_status.data == "goal_sent" && !response)
-		{
-
-			clock_t end_feedback = clock();
-			double elapsed_secs_feedback = double(end_feedback - begin_feedback) / CLOCKS_PER_SEC;
-			std::cout << "elapsed time no response " << elapsed_secs_feedback << std::endl;
-			if (elapsed_secs_feedback > time_limit_no_feedback_secs)
-			{
-				stopFollowing();
-				as_->setAborted(hobbit_msgs::FollowMeResult(), "Following aborted, no response from Mira");
-				std::cout << "aborted, no response " << std::endl; 
-				return;
-			}
-		}
-
-		//FIXME, check all possible status	
 
 	}
 
