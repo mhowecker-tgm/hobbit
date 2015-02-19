@@ -13,6 +13,7 @@ from std_srvs.srv import Empty
 #from sensor_msgs.msg import Joy
 #from hobbit_msgs.msg import Command, Status, Event, Parameter
 from hobbit_msgs import MMUIInterface as MMUI
+from hobbit_msgs.srv import LeftJoyStickPressed
 
 #pubC = rospy.Publisher("/Command", Command) 
 #pubE = rospy.Publisher("/Event", Event)    
