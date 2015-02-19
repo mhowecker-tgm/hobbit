@@ -33,6 +33,7 @@ import speech_output_import as speech_output
 import arm_move_import as arm_move
 from math import pi
 from hobbit_msgs.srv import SetCloserState, GetCloserState
+from hobbit_msgs.srv import SetCloserStateRequest, GetCloserStateRequest
 
 
 def switch_vision_cb(ud, response):
@@ -68,7 +69,7 @@ def undock_if_needed():
                 msg_cb=battery_cb
                 ),
             transitions={'succeeded': 'UNDOCK',
-                         'aborted': 'succeeded',
+                         'aborted': 'aborted',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
@@ -124,7 +125,7 @@ def get_dock_action():
 
 
 def back_if_needed():
-    def resp_cb(response):
+    def resp_cb(userdata, response):
         if response.result:
             return 'succeeded'
         else:
@@ -135,15 +136,26 @@ def back_if_needed():
     with sm:
         StateMachine.add(
             'CHECK',
-            ServiceState('/came_closer/set_closer_state',
+            ServiceState('/came_closer/get_closer_state',
                          GetCloserState,
-                         request_cb=get_cb,
+                	 request=GetCloserStateRequest(state=True),
                          response_cb=resp_cb),
             transitions={'succeeded':'MOVE_BACK',
                          'aborted': 'aborted'})
         StateMachine.add(
             'MOVE_BACK',
-            MoveDiscrete(motion='Move', value=-0.6),
+            MoveDiscrete(motion='Move', value=-0.3),
+            transitions={'succeeded': 'MOVED_BACK',
+                         'preempted': 'preempted',
+                         'aborted': 'succeeded'}
+        )
+        StateMachine.add(
+            'MOVED_BACK',
+            ServiceState(
+                '/came_closer/set_closer_state',
+                SetCloserState,
+                request=SetCloserStateRequest(state=False),
+            ),
             transitions={'succeeded': 'succeeded',
                          'preempted': 'preempted',
                          'aborted': 'succeeded'}
@@ -504,11 +516,14 @@ def goToPosition(frame='/map', room='None', place='dock'):
         )
         Sequence.add(
             'UNDOCK_IF_NEEDED',
-            undock_if_needed()
+            undock_if_needed(),
+            transitions={'succeeded': 'SWITCH_VISION',
+                         'aborted': 'BACK_IF_NEEDED'}
         )
         Sequence.add(
             'BACK_IF_NEEDED',
-            back_if_needed()
+            back_if_needed(),
+            transitions={'aborted': 'SWITCH_VISION'}
         )
         # Sequence.add('DISABLE_GESTURES',
         #              service_disable.disable_gestures())
@@ -549,14 +564,6 @@ def goToPosition(frame='/map', room='None', place='dock'):
             ServiceState(
                 '/user_nav_mode',
                 UserNavMode
-            )
-        )
-        Sequence.add(
-            'MOVED_BACK',
-            ServiceState(
-                '/SetCloserState',
-                SetCloserState,
-                request_cb=set_false_cb
             )
         )
         Sequence.add(
@@ -628,18 +635,9 @@ def prepareMovement():
                      SetObstacles(active=True))
     return seq
 
-def set_false_cb(userdata, request):
-       req = SetCloserState().Request
-       req.state = False
-       return req
-
-def set_true_cb(userdata, request):
-       req = SetCloserState().Request
-       req.state = True
-       return req
-
 def get_cb(userdata, request):
-       req = SetCloserState().Request
+       req = SetCloserStateRequest
+       rospy.loginfo(str(req))
        req.state = True
        return req
 
@@ -665,11 +663,14 @@ def goToPose():
         )
         Sequence.add(
             'UNDOCK_IF_NEEDED',
-            undock_if_needed()
+            undock_if_needed(),
+            transitions={'succeeded': 'SWITCH_VISION',
+                         'aborted': 'BACK_IF_NEEDED'}
         )
         Sequence.add(
             'BACK_IF_NEEDED',
-            back_if_needed()
+            back_if_needed(),
+            transitions={'aborted': 'SWITCH_VISION'}
         )
         Sequence.add(
             'SWITCH_VISION',
@@ -704,14 +705,6 @@ def goToPose():
             ServiceState(
                 '/user_nav_mode',
                 UserNavMode
-            )
-        )
-        Sequence.add(
-            'MOVED_BACK',
-            ServiceState(
-                '/SetCloserState',
-                SetCloserState,
-                request_cb=set_false_cb
             )
         )
         Sequence.add(
@@ -772,11 +765,14 @@ def goToPoseSilent():
         )
         Sequence.add(
             'UNDOCK_IF_NEEDED',
-            undock_if_needed()
+            undock_if_needed(),
+            transitions={'succeeded': 'SWITCH_VISION',
+                         'aborted': 'BACK_IF_NEEDED'}
         )
         Sequence.add(
             'BACK_IF_NEEDED',
-            back_if_needed()
+            back_if_needed(),
+            transitions={'aborted': 'SWITCH_VISION'}
         )
         Sequence.add(
             'SWITCH_VISION',
@@ -811,14 +807,6 @@ def goToPoseSilent():
             ServiceState(
                 '/user_nav_mode',
                 UserNavMode
-            )
-        )
-        Sequence.add(
-            'MOVED_BACK',
-            ServiceState(
-                '/SetCloserState',
-                SetCloserState,
-                request_cb=set_false_cb
             )
         )
         Sequence.add(

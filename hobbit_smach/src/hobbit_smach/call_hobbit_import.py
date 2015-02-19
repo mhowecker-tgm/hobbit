@@ -25,13 +25,8 @@ from rgbd_acquisition.msg import Person
 import head_move_import as head_move
 from uashh_smach.util import WaitForMsgState, SleepState
 from hobbit_msgs.msg import Event
+from hobbit_msgs.srv import SetCloserStateRequest
 from hobbit_msgs.srv import SetCloserState
-
-def set_true_cb(userdata, request):
-       req = SetCloserState().Request
-       req.state = True
-       return req
-
 
 def closer_cb(ud, goal):
     params=[]
@@ -147,7 +142,8 @@ class Count(State):
         return 'aborted'
 
 def msg_timer_sm():
-    sm = StateMachine(outcomes = ['succeeded','aborted','preempted'])
+    sm = StateMachine(outcomes = ['succeeded','aborted','preempted'],
+                      output_keys=['person_x', 'person_z'])
 
     def child_term_cb(outcome_map):
         print(outcome_map)
@@ -166,6 +162,7 @@ def msg_timer_sm():
     cc = Concurrence(outcomes=['aborted', 'succeeded'],
                      default_outcome='aborted',
                      child_termination_cb=child_term_cb,
+                     output_keys=['person_x', 'person_z'],
                      outcome_map={'succeeded': {'LISTENER': 'succeeded'},
                                   'aborted': {'TIMER': 'succeeded'}})
     with sm:
@@ -229,9 +226,9 @@ def construct_sm():
         StateMachine.add(
             'MOVED_BACK',
             ServiceState(
-                '/SetCloserState',
+                '/came_closer/set_closer_state',
                 SetCloserState,
-                request_cb=set_true_cb
+                request=SetCloserStateRequest(state=True),
             ),
             transitions={'succeeded': 'succeeded',
                          'preempted': 'preempted',}
