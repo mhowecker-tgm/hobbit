@@ -50,6 +50,7 @@ add_service_files(
   GetRoomName.srv
   GetRooms.srv
   GetUsersCurrentRoom.srv
+  LeftJoyStickPressed.srv
   PointCloud2FeatureHistogram.srv
   Request.srv
   SingleShotPC.srv

@@ -15,6 +15,7 @@ from mira_msgs.srv import ResetMotorStop
 from sensor_msgs.msg import Joy
 from hobbit_msgs.msg import Command, Status, Event, Parameter
 from hobbit_msgs import MMUIInterface as MMUI
+from hobbit_msgs.srv import LeftJoyStickPressed
 
 pubC = rospy.Publisher("/Command", Command) 
 pubE = rospy.Publisher("/Event", Event)    
@@ -173,7 +174,15 @@ def joyCallback(msg):
         pubE.publish(e)
 
     if msg.buttons[10] == 1:   # Left joystick
-        rospy.loginfo("JOYSTICK: Left joystick pressed. Do nothing.")
+        rospy.wait_for_service('left_joy_stick_pressed')
+        try:
+            left_joy_stick_pressed = rospy.ServiceProxy('left_joy_stick_pressed', LeftJoyStickPressed)
+            resp1 = left_joy_stick_pressed()
+            print "left_joy_stick_pressed service was executed"
+        except rospy.ServiceException, e:
+            print "Service call failed: %s"%e
+            
+        rospy.loginfo("JOYSTICK: Left joystick pressed. Something was done.")
 
     if msg.buttons[11] == 1:   # Right joystick
         rospy.loginfo("JOYSTICK: Right joystick pressed. Do nothing.")
