@@ -388,9 +388,16 @@ def call_hobbit():
         StateMachine.add(
             'MOVE_TO_GOAL',
             hobbit_move.goToPose(),
-            transitions={'succeeded': 'GET_PERSON',
+            transitions={'succeeded': 'HEAD_UP',
                          'aborted': 'LOG_ABORT',
                          'preempted': 'LOG_PREEMPT'}
+        )
+        StateMachine.add(
+            'HEAD_UP',
+            head_move.MoveTo(pose='center_center'),
+            transitions={'succeeded': 'GET_PERSON',
+                         'preempted': 'LOG_PREEMPT',
+                         'aborted': 'LOG_ABORT'}
         )
         StateMachine.add(
             'GET_PERSON',
