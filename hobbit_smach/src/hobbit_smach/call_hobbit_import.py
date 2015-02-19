@@ -180,7 +180,7 @@ def msg_timer_sm():
         )
     with cc:
         Concurrence.add('LISTENER', sm)
-        Concurrence.add('TIMER', SleepState(duration=15))
+        Concurrence.add('TIMER', SleepState(duration=20))
     return cc
 
 def construct_sm():
@@ -415,23 +415,26 @@ def call_hobbit():
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
-            transitions={'succeeded': 'MMUI_SAY_ReachedPlace',
+            transitions={'succeeded': 'MOVED',
                          'preempted': 'LOG_PREEMPT',
-                         'aborted': 'MMUI_BLIND_CLOSER'}
+                         'aborted': 'HEAD_UP_AFTER_MOVEMENT'}
+        )
+        StateMachine.add(
+            'MOVED',
+            ServiceState(
+                '/came_closer/set_closer_state',
+                SetCloserState,
+                request=SetCloserStateRequest(state=True),
+            ),
+            transitions={'succeeded': 'MMUI_Say_come_closer',
+                         'preempted': 'LOG_PREEMPT',}
         )
         StateMachine.add(
             'HEAD_UP_AFTER_MOVEMENT',
             head_move.MoveTo(pose='center_center'),
-            transitions={'succeeded': 'MMUI_SAY_ReachedPlace',
+            transitions={'succeeded': 'MMUI_BLIND_CLOSER',
                          'preempted': 'LOG_PREEMPT',
                          'aborted': 'LOG_ABORT'}
-        )
-        StateMachine.add(
-            'MMUI_SAY_ReachedPlace',
-            speech_output.sayText(info='T_GT_ReachedMyDestination2'),
-            transitions={'succeeded': 'MMUI_Say_come_closer',
-                         'preempted': 'LOG_PREEMPT',
-                         'failed': 'LOG_ABORT'}
         )
         StateMachine.add(
             'MMUI_Say_come_closer',
