@@ -11,12 +11,12 @@ from std_msgs.msg import String, Header
 from std_srvs.srv import Empty
 #from mira_msgs.srv import ResetMotorStop
 #from sensor_msgs.msg import Joy
-#from hobbit_msgs.msg import Command, Status, Event, Parameter
+from hobbit_msgs.msg import Command, Status, Event, Parameter
 from hobbit_msgs import MMUIInterface as MMUI
 from hobbit_msgs.srv import LeftJoyStickPressed
 
 #pubC = rospy.Publisher("/Command", Command) 
-#pubE = rospy.Publisher("/Event", Event)    
+pubE = rospy.Publisher("/Event", Event)    
 pubEmo= rospy.Publisher("/head/emo", String)
 
    
@@ -38,15 +38,23 @@ def execute_left_joystick_pressed(req):
     #print "Returning [%s + %s = %s]"%(req.a, req.b, (req.a + req.b))
     print "==> execute_left_joystick_pressed() started"
     
-    # speek something
+    # ==== SPEAK   ====
     mmui.showMMUI_Info("Are you Sarah Connor?")
     
-    #show emotions
+    # ==== EMOTION ====
     pubEmo.publish(String("REDEYE"))
     rospy.sleep(4)
     pubEmo.publish(String("NEUTRAL"))
     
-    return LeftJoyStickPressed()
+    # ==== SEND EVENT ====
+    e = Event()
+    e.header = Header()
+    e.event = "P_E_back" # P_E_back<=>back button for mmui  "E_SOSBUTTON"
+    e.sessionID = ''
+    e.confidence = 0.0
+    pubE.publish(e)
+    
+    print LeftJoyStickPressed()
 
 def joybuttongimmicks_services():
     rospy.init_node('joybuttongimmicks')
