@@ -143,7 +143,7 @@ void broadcastEmergency(unsigned int frameNumber)
     hobbit_msgs::Event evt;
     std::stringstream ss;
      //case GESTURE_NONE   : break;
-     if (emergencyDetected) { ss<<"G_FALL"; } else
+     if (emergencyDetected) { ss<<"G_FALL";  ROS_INFO("Emergency node , emitting emergency..!");  } else
                              { ss<<"G_NONE"; }
 
     //sROS.data=ss.str();
