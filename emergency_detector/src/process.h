@@ -37,6 +37,8 @@ extern  int minScoreTrigger;
 extern  int maxScoreTrigger;
 
 
+extern char * imageDir;
+extern int saveClassification;
 extern int saveNextTopFrame;
 extern int saveNextBottomFrame;
 

@@ -93,6 +93,11 @@ unsigned int lastEmergencyDetectionTimestamp=0;
 unsigned int emergencyDetectionCooldown=150; //This should be time , not frames
 
 
+char emergencyDir[]="emergencies";
+char safeDir[]="safe";
+char curDir[]=".";
+
+
 bool first=false;
 int key = 0;
 unsigned int frameTimestamp=emergencyDetectionCooldown+1; //not 0 so we can immediately trigger
@@ -214,11 +219,36 @@ bool resume(std_srvs::Empty::Request& request, std_srvs::Empty::Response& respon
 
 
 
-bool save(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+
+bool classifyEmergency(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
+  imageDir=emergencyDir;
   saveNextTopFrame=1;
   saveNextBottomFrame=1;
-    return true;
+  return true;
+}
+
+
+
+
+bool classifySafe(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+  imageDir=safeDir;
+  saveNextTopFrame=1;
+  saveNextBottomFrame=1;
+  return true;
+}
+
+
+
+
+
+bool save(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+  imageDir=curDir;
+  saveNextTopFrame=1;
+  saveNextBottomFrame=1;
+  return true;
 }
 
 
