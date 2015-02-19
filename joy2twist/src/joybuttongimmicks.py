@@ -46,7 +46,7 @@ def execute_left_joystick_pressed(req):
     rospy.sleep(4)
     pubEmo.publish(String("NEUTRAL"))
     
-    return LeftJoyStickPressed(True)
+    return LeftJoyStickPressed()
 
 def joybuttongimmicks_services():
     rospy.init_node('joybuttongimmicks')
