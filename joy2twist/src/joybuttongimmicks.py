@@ -29,7 +29,7 @@ mmui = MMUI.MMUIInterface()
 
 #!/usr/bin/env python
 
-from beginner_tutorials.srv import *
+#from beginner_tutorials.srv import *
 import rospy
 
 def execute_left_joystick_pressed(req):
