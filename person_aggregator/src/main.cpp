@@ -352,14 +352,30 @@ bool pauseEverything(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs
     ++target; i+=rosservice_call("/rgbd_acquisition/pause_peopletracker");
     ++target; i+=rosservice_call("/follow_user/pause");
     ++target; i+=rosservice_call("/emergency_detector/pause");
-    ++target; i+=rosservice_call("/face_detection/pause");
+    //++target; i+=rosservice_call("/face_detection/pause");
     //++target; i+=rosservice_call("/hand_gestures/pause");
     ++target; i+=rosservice_call("/skeleton_detector/pause");
-    ++target; i+=rosservice_call("/fitness_coordinator/pause");
+    //++target; i+=rosservice_call("/fitness_coordinator/pause");
     if (target==i) { response.result=true; } else { response.result=false; }
     if (!response.result) { ROS_ERROR("Could not successfully set all relevant nodes to the new mode"); }
     return true;
 }
+
+
+bool resumeBasic(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs::SwitchVision::Response & response  )
+{
+    ROS_INFO("Resuming Basic User Sensing");
+     int i=0,target=0;
+    //++target; i+=rosservice_call("/follow_user/resume");
+    ++target; i+=rosservice_call("/emergency_detector/resume");
+    ++target; i+=rosservice_call("/skeleton_detector/resume");
+
+    if (target==i) { response.result=true; } else { response.result=false; }
+    if (!response.result) { ROS_ERROR("Could not successfully set all relevant nodes to the new mode"); }
+    raw=1;
+    return true;
+}
+
 
 bool resumeEverything(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs::SwitchVision::Response & response  )
 {
@@ -368,10 +384,7 @@ bool resumeEverything(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msg
     //Never Resume People tracker : ++target; i+=rosservice_call("/rgbd_acquisition/resume_peopletracker");
     ++target; i+=rosservice_call("/follow_user/resume");
     ++target; i+=rosservice_call("/emergency_detector/resume");
-    ++target; i+=rosservice_call("/face_detection/resume");
-    //++target; i+=rosservice_call("/hand_gestures/resume");
     ++target; i+=rosservice_call("/skeleton_detector/resume");
-    ++target; i+=rosservice_call("/fitness_coordinator/resume");
     if (target==i) { response.result=true; } else { response.result=false; }
     if (!response.result) { ROS_ERROR("Could not successfully set all relevant nodes to the new mode"); }
     raw=1;
@@ -392,6 +405,19 @@ bool followUser(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs::Swi
     return true;
 }
 
+bool comeCloser(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs::SwitchVision::Response & response)
+{
+    ROS_INFO("Setting Vision System to Come Closer Mode");
+    int i=0,target=0;
+    ++target; i+=rosservice_call("/follow_user/pause");
+    ++target; i+=rosservice_call("/emergency_detector/pause"); // So that we get
+    ++target; i+=rosservice_call("/skeleton_detector/resume");
+    ++target; i+=rosservice_call("/skeleton_detector/advanced"); //
+    if (target==i) { response.result=true; } else { response.result=false; }
+    if (!response.result) { ROS_ERROR("Could not successfully set all relevant nodes to the new mode"); }
+    return true;
+}
+
 bool locateUser(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs::SwitchVision::Response & response  )
 {
     ROS_INFO("Setting Vision System to Locate a User");
@@ -402,6 +428,7 @@ bool locateUser(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs::Swi
     ++target; i+=rosservice_call("/face_detection/resume");
     //++target; i+=rosservice_call("/hand_gestures/resume");
     ++target; i+=rosservice_call("/skeleton_detector/resume");
+    ++target; i+=rosservice_call("/skeleton_detector/simple"); //We want the simple skeleton detector , no hands but fast and more robust ( even without a face )
     if (target==i) { response.result=true; } else { response.result=false; }
     if (!response.result) { ROS_ERROR("Could not successfully set all relevant nodes to the new mode"); }
     raw=1; //We want to be precise..
@@ -441,9 +468,9 @@ bool navigating(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs::Swi
 {
     ROS_INFO("Setting Vision System to Navigating");
      int i=0,target=0;
-    ++target; i+=rosservice_call("/follow_user/resume");
+    ++target; i+=rosservice_call("/follow_user/pause");
     ++target; i+=rosservice_call("/emergency_detector/resume"); // So that we get
-    ++target; i+=rosservice_call("/emergency_detector/looking_down"); // So that we get
+    //++target; i+=rosservice_call("/emergency_detector/looking_down"); // So that we get
     if (target==i) { response.result=true; } else { response.result=false; }
     if (!response.result) { ROS_ERROR("Could not successfully set all relevant nodes to the new mode"); }
     return true;
@@ -467,7 +494,7 @@ bool idle(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs::SwitchVis
     int i=0,target=0;
     ++target; i+=rosservice_call("/follow_user/pause");
     ++target; i+=rosservice_call("/skeleton_detector/resume");
-    ++target; i+=rosservice_call("/emergency_detector/looking_center"); // So that we get
+    //++target; i+=rosservice_call("/emergency_detector/looking_center"); // So that we get
     if (target==i) { response.result=true; } else { response.result=false; }
     if (!response.result) { ROS_ERROR("Could not successfully set all relevant nodes to the new mode"); }
     return true;
@@ -482,7 +509,7 @@ bool startScanning3DObject(hobbit_msgs::SwitchVision::Request & request ,  hobbi
 bool stopScanning3DObject(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs::SwitchVision::Response & response  )
 {
     ROS_INFO("Setting Vision System switching off from 3D Scanning mode");
-    return resumeEverything(request,response);
+    return resumeBasic(request,response);
 }
 
 
@@ -526,6 +553,7 @@ int main(int argc, char **argv)
      ros::ServiceServer VSSeePointingService     = nh.advertiseService("/vision_system/seeWhereUserIsPointing", whereIsUserPointing);
      ros::ServiceServer VSNavigatingService      = nh.advertiseService("/vision_system/navigating", navigating);
      ros::ServiceServer VSIdleService            = nh.advertiseService("/vision_system/idle", idle);
+     ros::ServiceServer VSComeCloserService      = nh.advertiseService("/vision_system/comeCloser", comeCloser);
      ros::ServiceServer VSChargingService        = nh.advertiseService("/vision_system/charging", charging);
      ros::ServiceServer VSStartScan3Service      = nh.advertiseService("/vision_system/startScanning3DObject", startScanning3DObject);
      ros::ServiceServer VSStopScan3Service       = nh.advertiseService("/vision_system/stopScanning3DObject", stopScanning3DObject);
