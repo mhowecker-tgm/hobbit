@@ -51,7 +51,7 @@ def execute_left_joystick_pressed(req):
 def joybuttongimmicks_services():
     rospy.init_node('joybuttongimmicks')
     s = rospy.Service('left_joy_stick_pressed', LeftJoyStickPressed, execute_left_joystick_pressed)
-    print "Ready to add two ints."
+    print "Ready to do stuff after left joystick button was pressed"
     rospy.spin()
 
 if __name__ == "__main__":
