@@ -1,0 +1,4 @@
+# Service definition to set the come closer state
+bool state 
+---
+bool result
