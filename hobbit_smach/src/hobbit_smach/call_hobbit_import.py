@@ -11,7 +11,7 @@ import rospy
 import smach
 import threading
 from std_msgs.msg import String
-from smach_ros import SimpleActionState
+from smach_ros import SimpleActionState, ServiceState
 from smach import Sequence, State, StateMachine, Concurrence
 from uashh_smach.util import SleepState, WaitForMsgState
 # from uashh_smach.platform.move_base import HasMovedState
@@ -25,6 +25,12 @@ from rgbd_acquisition.msg import Person
 import head_move_import as head_move
 from uashh_smach.util import WaitForMsgState, SleepState
 from hobbit_msgs.msg import Event
+from hobbit_msgs.srv import SetCloserState
+
+def set_true_cb(userdata, request):
+       req = SetCloserState().Request
+       req.state = True
+       return req
 
 
 def closer_cb(ud, goal):
@@ -173,8 +179,7 @@ def msg_timer_sm():
                 output_keys=['user_pose', 'person_z', 'person_x']
             ),
             transitions={'succeeded': 'succeeded',
-                         'aborted': 'GET_PERSON',
-                         'preempted': 'preempted'}
+                         'aborted': 'GET_PERSON'}
         )
     with cc:
         Concurrence.add('LISTENER', sm)
@@ -221,12 +226,12 @@ def construct_sm():
                          'aborted': 'succeeded'}
         )
 
-        Sequence.add(
+        StateMachine.add(
             'MOVED_BACK',
             ServiceState(
                 '/SetCloserState',
-                SetCloserStateSrv,
-                request=SetCloserStateSrv(True)
+                SetCloserState,
+                request_cb=set_true_cb
             ),
             transitions={'succeeded': 'succeeded',
                          'preempted': 'preempted',}
@@ -325,7 +330,7 @@ class CheckMsgState(WaitForMsgState):
         self.mutex = threading.Lock()
         self.msg = None
         self.msg_cb = msg_cb
-        self.subscriber = rospy.Subscriber(topic,60 msg_type, self._callback, queue_size=1)
+        self.subscriber = rospy.Subscriber(topic, msg_type, self._callback, queue_size=1)
     def execute(self, ud):
         """Tiny changes to default execute(), see class description."""
         msg = self.waitForMsg()
@@ -385,24 +390,16 @@ def call_hobbit():
         )
         StateMachine.add(
             'MOVE_TO_GOAL',
-            hobbit_move.goToPose(),print(msg)
-    if msg.source == 6:
-        #print('Do not use this data')
-        return False
-    ud.person_x = msg.x
-    ud.person_z = msg.z
-    #print("OK. Use it.")
-    return True
+            hobbit_move.goToPose(),
             transitions={'succeeded': 'GET_PERSON',
                          'aborted': 'LOG_ABORT',
                          'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'GET_PERSON',
-            msg_timer_sm,
+            msg_timer_sm(),
             transitions={'succeeded': 'CLOSER',
-                         'aborted': 'COUNT',
-                         'preempted': 'LOG_PREEMPT'}
+                         'aborted': 'COUNT'}
         )
         StateMachine.add(
             'COUNT',

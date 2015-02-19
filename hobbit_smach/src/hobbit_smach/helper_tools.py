@@ -41,7 +41,7 @@ def set_closer_state(req):
     rospy.loginfo("Set state to "+str(state))
     return True
 
-def set_closer_state(req):
+def get_closer_state(req):
     global state
     response = True
     rospy.loginfo("Get Come closer check called")
@@ -52,7 +52,7 @@ def charge_check_server():
     rospy.init_node('hobbit_helper_node')
     s = rospy.Service('/hobbit/charge_check', ChargeCheck, handle_charge_check)
     s1 = rospy.Service('/came_closer/set_closer_state', SetCloserState, set_closer_state)
-    s2 = rospy.Service('/came_closer/set_closer_state', GetCloserState, get_closer_state)
+    s2 = rospy.Service('/came_closer/get_closer_state', GetCloserState, get_closer_state)
 
     rospy.loginfo('Node started')
     rospy.spin()

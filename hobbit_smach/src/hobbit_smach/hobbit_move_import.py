@@ -32,7 +32,7 @@ import speech_output_import as speech_output
 # import service_disable_import as service_disable
 import arm_move_import as arm_move
 from math import pi
-from hobbit_msgs.srv import GetCloserStateSrv, GetCloserStateSrv
+from hobbit_msgs.srv import SetCloserState, GetCloserState
 
 
 def switch_vision_cb(ud, response):
@@ -136,7 +136,8 @@ def back_if_needed():
         StateMachine.add(
             'CHECK',
             ServiceState('/came_closer/set_closer_state',
-                         GetCloserStateSrv,
+                         GetCloserState,
+                         request_cb=get_cb,
                          response_cb=resp_cb),
             transitions={'succeeded':'MOVE_BACK',
                          'aborted': 'aborted'})
@@ -554,8 +555,8 @@ def goToPosition(frame='/map', room='None', place='dock'):
             'MOVED_BACK',
             ServiceState(
                 '/SetCloserState',
-                SetCloserStateSrv,
-                request=SetCloserStateSrv(False)
+                SetCloserState,
+                request_cb=set_false_cb
             )
         )
         Sequence.add(
@@ -627,6 +628,20 @@ def prepareMovement():
                      SetObstacles(active=True))
     return seq
 
+def set_false_cb(userdata, request):
+       req = SetCloserState().Request
+       req.state = False
+       return req
+
+def set_true_cb(userdata, request):
+       req = SetCloserState().Request
+       req.state = True
+       return req
+
+def get_cb(userdata, request):
+       req = SetCloserState().Request
+       req.state = True
+       return req
 
 def goToPose():
     """
@@ -695,8 +710,8 @@ def goToPose():
             'MOVED_BACK',
             ServiceState(
                 '/SetCloserState',
-                SetCloserStateSrv,
-                request=SetCloserStateSrv(False)
+                SetCloserState,
+                request_cb=set_false_cb
             )
         )
         Sequence.add(
@@ -802,8 +817,8 @@ def goToPoseSilent():
             'MOVED_BACK',
             ServiceState(
                 '/SetCloserState',
-                SetCloserStateSrv,
-                request=SetCloserStateSrv(False)
+                SetCloserState,
+                request_cb=set_false_cb
             )
         )
         Sequence.add(
