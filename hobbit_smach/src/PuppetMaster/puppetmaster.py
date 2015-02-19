@@ -30,7 +30,7 @@ commands = [
      'G_HELP', 'A_HELP', 'C_HELP', 'F_CALLSOS', 'G_EMERGENCY'],
     ['recharge', 'E_RECHARGE', 'C_RECHARGE'],
     ['reminder', 'E_REMINDER'],
-    ['stop', 'C_STOP', 'G_STOP', 'E_STOP', 'E_CANCEL', 'E_FITNESS_CLOSED'],
+    ['stop', 'C_STOP', 'G_STOP', 'E_STOP', 'E_CANCEL'], #'E_FITNESS_CLOSED'],
     ['call_hobbit', 'C_CALLHOBBIT', 'E_CALLHOBBIT'],
     ['call', 'E_CALLRING', 'E_CALLESTABLISHED', 'E_CALLENDED', 'C_MAKECALL'],
     ['away', 'C_AWAY1', 'C_AWAY2', 'C_AWAY3', 'C_AWAY4', 'C_AWAY5', 'C_AWAY6',
