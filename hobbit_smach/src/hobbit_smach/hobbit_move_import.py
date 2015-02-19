@@ -730,7 +730,7 @@ def goToPoseSilent():
                          remapping={'x': 'x',
                                     'y': 'y',
                                     'yaw': 'yaw'},
-                         transitions={'aborted': 'PREPARE_STOP'}
+                         transitions={'aborted': 'HEAD_UP'}
             )
         Sequence.add(
             'PREPARE_STOP',
