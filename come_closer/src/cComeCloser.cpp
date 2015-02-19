@@ -325,7 +325,7 @@ void cComeCloser::stop() //It would be better to have this in a different node, 
 		mira_msgs::EmergencyStop srv;
 		if (!emergency_stop_client.call(srv))
 		{
-		  ROS_DEBUG("Failed to call service stop_request");
+		  ROS_INFO("Failed to call service stop_request");
 		}
 
 		sleep(3);
@@ -333,7 +333,7 @@ void cComeCloser::stop() //It would be better to have this in a different node, 
 		mira_msgs::ResetMotorStop srv2;
 		if (!reset_motorstop_client.call(srv2))
 		{
-		  ROS_DEBUG("Failed to call service reset_motorstop");
+		  ROS_INFO("Failed to call service reset_motorstop");
 		}
 	}
 
