@@ -32,6 +32,7 @@ import speech_output_import as speech_output
 # import service_disable_import as service_disable
 import arm_move_import as arm_move
 from math import pi
+from hobbit_msgs.srv import GetCloserStateSrv, GetCloserStateSrv
 
 
 def switch_vision_cb(ud, response):
@@ -119,6 +120,34 @@ def get_dock_action():
                               )
     return state
 
+
+
+
+def back_if_needed():
+    def resp_cb(response):
+        if response.result:
+            return 'succeeded'
+        else:
+            return 'aborted'
+
+    sm = StateMachine(
+        outcomes=['succeeded', 'aborted', 'preempted'])
+    with sm:
+        StateMachine.add(
+            'CHECK',
+            ServiceState('/came_closer/set_closer_state',
+                         GetCloserStateSrv,
+                         response_cb=resp_cb),
+            transitions={'succeeded':'MOVE_BACK',
+                         'aborted': 'aborted'})
+        StateMachine.add(
+            'MOVE_BACK',
+            MoveDiscrete(motion='Move', value=-0.6),
+            transitions={'succeeded': 'succeeded',
+                         'preempted': 'preempted',
+                         'aborted': 'succeeded'}
+        )
+        return sm
 
 def get_undock_action():
     """
@@ -443,6 +472,8 @@ def getPosition(room='none', place='dock'):
         return (0.0, 0.0, 0.0)
 
 
+
+
 def goToPosition(frame='/map', room='None', place='dock'):
     """
     Return a SMACH Sequence for navigation to a new position.
@@ -473,6 +504,10 @@ def goToPosition(frame='/map', room='None', place='dock'):
         Sequence.add(
             'UNDOCK_IF_NEEDED',
             undock_if_needed()
+        )
+        Sequence.add(
+            'BACK_IF_NEEDED',
+            back_if_needed()
         )
         # Sequence.add('DISABLE_GESTURES',
         #              service_disable.disable_gestures())
@@ -513,6 +548,14 @@ def goToPosition(frame='/map', room='None', place='dock'):
             ServiceState(
                 '/user_nav_mode',
                 UserNavMode
+            )
+        )
+        Sequence.add(
+            'MOVED_BACK',
+            ServiceState(
+                '/SetCloserState',
+                SetCloserStateSrv,
+                request=SetCloserStateSrv(False)
             )
         )
         Sequence.add(
@@ -610,6 +653,10 @@ def goToPose():
             undock_if_needed()
         )
         Sequence.add(
+            'BACK_IF_NEEDED',
+            back_if_needed()
+        )
+        Sequence.add(
             'SWITCH_VISION',
             ServiceState(
                 '/vision_system/navigating',
@@ -642,6 +689,14 @@ def goToPose():
             ServiceState(
                 '/user_nav_mode',
                 UserNavMode
+            )
+        )
+        Sequence.add(
+            'MOVED_BACK',
+            ServiceState(
+                '/SetCloserState',
+                SetCloserStateSrv,
+                request=SetCloserStateSrv(False)
             )
         )
         Sequence.add(
@@ -705,6 +760,10 @@ def goToPoseSilent():
             undock_if_needed()
         )
         Sequence.add(
+            'BACK_IF_NEEDED',
+            back_if_needed()
+        )
+        Sequence.add(
             'SWITCH_VISION',
             ServiceState(
                 '/vision_system/navigating',
@@ -737,6 +796,14 @@ def goToPoseSilent():
             ServiceState(
                 '/user_nav_mode',
                 UserNavMode
+            )
+        )
+        Sequence.add(
+            'MOVED_BACK',
+            ServiceState(
+                '/SetCloserState',
+                SetCloserStateSrv,
+                request=SetCloserStateSrv(False)
             )
         )
         Sequence.add(

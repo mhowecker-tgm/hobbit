@@ -50,7 +50,7 @@ def battery_cb(msg, ud):
         return False
 
 def event_cb(msg, ud):
-    if msg.event.upper() in ['G_CLOSER', 'A_YES', 'G_YES']:
+    if msg.event.upper() in ['G_COME', 'A_YES', 'G_YES']:
         rospy.loginfo("Move 0.1 meters")
         return True
     else:
@@ -98,6 +98,23 @@ class PreemptChecker(State):
             return 'preempted'
         return 'aborted'
 
+class StoreCloser(State):
+    """
+    """
+    def __init__(self):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'aborted', 'preempted']
+        )
+
+    def execute(self, ud):
+        rospy.sleep(1.0)
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        return 'aborted'
+
+
 class Count(State):
     """
     Just count the number of times the come closer should be done
@@ -122,6 +139,47 @@ class Count(State):
             return 'succeeded'
         self.counter = 1
         return 'aborted'
+
+def msg_timer_sm():
+    sm = StateMachine(outcomes = ['succeeded','aborted','preempted'])
+
+    def child_term_cb(outcome_map):
+        print(outcome_map)
+        return True
+
+    def person_cb(msg, ud):
+        print(msg)
+        if msg.source == 6:
+            #print('Do not use this data')
+            return False
+        ud.person_x = msg.x
+        ud.person_z = msg.z
+        #print("OK. Use it.")
+        return True
+
+    cc = Concurrence(outcomes=['aborted', 'succeeded'],
+                     default_outcome='aborted',
+                     child_termination_cb=child_term_cb,
+                     outcome_map={'succeeded': {'LISTENER': 'succeeded'},
+                                  'aborted': {'TIMER': 'succeeded'}})
+    with sm:
+        StateMachine.add(
+            'GET_PERSON',
+            WaitForMsgState(
+                '/persons',
+                Person,
+                msg_cb=person_cb,
+                timeout=3,
+                output_keys=['user_pose', 'person_z', 'person_x']
+            ),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'GET_PERSON',
+                         'preempted': 'preempted'}
+        )
+    with cc:
+        Concurrence.add('LISTENER', sm)
+        Concurrence.add('TIMER', SleepState(duration=15))
+    return cc
 
 def construct_sm():
     sm = StateMachine(outcomes = ['succeeded','aborted','preempted'])
@@ -158,9 +216,20 @@ def construct_sm():
         StateMachine.add(
             'COUNT',
             Count(),
-            transitions={'succeeded': 'WAIT_FOR_CLOSER',
+            transitions={'succeeded': 'MOVED_BACK',
                          'preempted': 'preempted',
                          'aborted': 'succeeded'}
+        )
+
+        Sequence.add(
+            'MOVED_BACK',
+            ServiceState(
+                '/SetCloserState',
+                SetCloserStateSrv,
+                request=SetCloserStateSrv(True)
+            ),
+            transitions={'succeeded': 'succeeded',
+                         'preempted': 'preempted',}
         )
 
     with cc:
@@ -256,7 +325,7 @@ class CheckMsgState(WaitForMsgState):
         self.mutex = threading.Lock()
         self.msg = None
         self.msg_cb = msg_cb
-        self.subscriber = rospy.Subscriber(topic, msg_type, self._callback, queue_size=1)
+        self.subscriber = rospy.Subscriber(topic,60 msg_type, self._callback, queue_size=1)
     def execute(self, ud):
         """Tiny changes to default execute(), see class description."""
         msg = self.waitForMsg()
@@ -316,24 +385,24 @@ def call_hobbit():
         )
         StateMachine.add(
             'MOVE_TO_GOAL',
-            hobbit_move.goToPose(),
+            hobbit_move.goToPose(),print(msg)
+    if msg.source == 6:
+        #print('Do not use this data')
+        return False
+    ud.person_x = msg.x
+    ud.person_z = msg.z
+    #print("OK. Use it.")
+    return True
             transitions={'succeeded': 'GET_PERSON',
                          'aborted': 'LOG_ABORT',
                          'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'GET_PERSON',
-            CheckMsgState(
-                '/persons',
-                Person,
-                msg_cb=person_cb,
-                timeout=15,
-                output_keys=['user_pose', 'person_z', 'person_x']
-            ),
+            msg_timer_sm,
             transitions={'succeeded': 'CLOSER',
                          'aborted': 'COUNT',
-                         'preempted': 'LOG_PREEMPT',
-                         'timeout': 'MMUI_BLIND_CLOSER'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'COUNT',
@@ -399,6 +468,13 @@ def call_hobbit():
                          'preempted': 'LOG_PREEMPT',
                          'aborted': 'LOG_ABORT'}
         )
+        StateMachine.add(
+            'STORE_CLOSER',
+            StoreCloser(),
+            transitions={'succeeded': 'LOG_SUCCESS',
+                         'preempted': 'LOG_PREEMPT',
+                         'aborted': 'LOG_ABORT'}
+)
         StateMachine.add(
             'LOG_PREEMPT',
             log.DoLogPreempt(scenario='Call Hobbit'),
