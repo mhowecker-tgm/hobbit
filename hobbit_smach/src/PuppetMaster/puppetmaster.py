@@ -683,7 +683,7 @@ def main():
             call_hobbit.call_hobbit(),
             transitions={'succeeded': 'MAIN_MENU',
                          'preempted': 'PREEMPT_RESET_ACTIVE_TASK',
-                         'aborted': 'RESET_ACTIVE_TASK'}
+                         'aborted': 'MAIN_MENU'}
         )
         StateMachine.add(
             'EMERGENCY_BATHROOM',

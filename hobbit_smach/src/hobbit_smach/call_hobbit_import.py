@@ -132,7 +132,9 @@ def construct_sm():
                      default_outcome='aborted',
                      child_termination_cb=child_term_cb,
                      outcome_map={'succeeded': {'LISTENER': 'succeeded'},
-                                  'aborted': {'TIMER': 'succeeded'}})
+                                  'aborted': {'TIMER': 'succeeded'},
+                                  'preempted': {'LISTENER': 'preempted',
+                                                'TIMER': 'preempted'}})
     with sm:
         StateMachine.add(
             'WAIT_FOR_CLOSER',
@@ -163,7 +165,7 @@ def construct_sm():
 
     with cc:
         Concurrence.add('LISTENER', sm)
-        Concurrence.add('TIMER', SleepState(duration=60))
+        Concurrence.add('TIMER', SleepState(duration=30))
     return cc
 
 
@@ -237,8 +239,8 @@ def getRecharge():
 
 def person_cb(msg, ud):
     print(msg)
-    if msg.source == 6:
-        return None
+    #if msg.source == 6:
+    #    return None
     ud.person_x = msg.x
     ud.person_z = msg.z
     return True
@@ -325,7 +327,7 @@ def call_hobbit():
                 '/persons',
                 Person,
                 msg_cb=person_cb,
-                timeout=5,
+                timeout=15,
                 output_keys=['user_pose', 'person_z', 'person_x']
             ),
             transitions={'succeeded': 'CLOSER',
@@ -372,7 +374,7 @@ def call_hobbit():
             'MMUI_Say_come_closer',
             speech_output.sayText(
                 info='If you want me to move even closer just say or gesture yes or use the come closer gesture.'),
-            transitions={'succeeded': 'GESTURE_HANDLING',
+            transitions={'succeeded': 'WAIT',
                          'preempted': 'LOG_PREEMPT',
                          'failed': 'LOG_ABORT'}
         )
@@ -383,6 +385,12 @@ def call_hobbit():
             transitions={'succeeded': 'GESTURE_HANDLING',
                          'preempted': 'LOG_PREEMPT',
                          'failed': 'LOG_ABORT'}
+        )
+        StateMachine.add(
+            'WAIT',
+            SleepState(duration=3),
+            transitions={'succeeded': 'GESTURE_HANDLING',
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'GESTURE_HANDLING',
