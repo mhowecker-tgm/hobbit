@@ -230,7 +230,7 @@ def construct_sm():
                 SetCloserState,
                 request=SetCloserStateRequest(state=True),
             ),
-            transitions={'succeeded': 'succeeded',
+            transitions={'succeeded': 'WAIT_FOR_CLOSER',
                          'preempted': 'preempted',}
         )
 
