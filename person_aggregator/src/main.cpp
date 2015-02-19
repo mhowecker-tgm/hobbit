@@ -441,6 +441,7 @@ bool fitnessFunction(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs
      int i=0,target=0;
     ++target; i+=rosservice_call("/rgbd_acquisition/pause_peopletracker"); //Nite tracker is no longer used
     ++target; i+=rosservice_call("/follow_user/pause");
+    ++target; i+=rosservice_call("/emergency_detector/resume"); // So that we see a falling user
     ++target; i+=rosservice_call("/skeleton_detector/resume");
     ++target; i+=rosservice_call("/skeleton_detector/advanced"); //We want the advanced skeleton detector
     ++target; i+=rosservice_call("/fitness_coordinator/resume");
@@ -455,6 +456,7 @@ bool whereIsUserPointing(hobbit_msgs::SwitchVision::Request & request ,  hobbit_
     ROS_INFO("Setting Vision System to see where the User is Pointing");
      int i=0,target=0;
     ++target; i+=rosservice_call("/rgbd_acquisition/pause_peopletracker"); //Nite tracker might be useful
+    ++target; i+=rosservice_call("/emergency_detector/resume"); // So that we see a falling user
     ++target; i+=rosservice_call("/follow_user/pause");
     ++target; i+=rosservice_call("/skeleton_detector/resume");
     ++target; i+=rosservice_call("/skeleton_detector/advanced"); //We want the advanced skeleton detector
@@ -479,12 +481,7 @@ bool navigating(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs::Swi
 bool charging(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs::SwitchVision::Response & response  )
 {
     ROS_INFO("Setting Vision System to Charging , low processing mode");
-    int i=0,target=0;
-    ++target; i+=rosservice_call("/follow_user/pause");
-    ++target; i+=rosservice_call("/skeleton_detector/resume");
-    if (target==i) { response.result=true; } else { response.result=false; }
-    if (!response.result) { ROS_ERROR("Could not successfully set all relevant nodes to the new mode"); }
-    return true;
+    return pauseEverything( request , response );
 }
 
 
@@ -494,6 +491,7 @@ bool idle(hobbit_msgs::SwitchVision::Request & request ,  hobbit_msgs::SwitchVis
     int i=0,target=0;
     ++target; i+=rosservice_call("/follow_user/pause");
     ++target; i+=rosservice_call("/skeleton_detector/resume");
+    ++target; i+=rosservice_call("/emergency_detector/resume"); // So that we get
     //++target; i+=rosservice_call("/emergency_detector/looking_center"); // So that we get
     if (target==i) { response.result=true; } else { response.result=false; }
     if (!response.result) { ROS_ERROR("Could not successfully set all relevant nodes to the new mode"); }
