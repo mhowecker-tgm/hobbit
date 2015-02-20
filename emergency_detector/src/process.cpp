@@ -24,6 +24,19 @@
 #define CYAN "\033[36m" /* Cyan */
 #define WHITE "\033[37m" /* White */
 
+
+#define USE_HOBBIT_MAP_DATA 0
+
+
+
+#if USE_HOBBIT_MAP_DATA
+  #include "hobbit_msgs/GetOccupancyState.h"
+    ros::ServiceClient mapSubscriber;
+#endif // USE_HOBBIT_MAP_DATA
+
+
+
+
 using namespace std;
 using namespace cv;
 
@@ -270,26 +283,46 @@ unsigned int temperatureSensorSensesHuman(unsigned int tempDetected , unsigned i
 }
 
 
+
+#if USE_HOBBIT_MAP_DATA
+bool obstacleDetected(hobbit_msgs::GetOccupancyState::Request  &req, hobbit_msgs::GetOccupancyState::Response &res)
+ {
+   fprintf(stderr,"getOccupancyState() not implemented yet\n");
+   /*
+    Paloma :
+    So, the current implementation is like this:
+    /get_occupancy_state
+    bool cLocalizationMonitor::getOccupancyState(hobbit_msgs::GetOccupancyState::Request  &req, hobbit_msgs::GetOccupancyState::Response &res)
+    You can take a look at the GetOccupancyState service in hobbit_msgs, but it is basically what we talked about.
+    If you want me to change the name or something or have any problems or whatever let me know, ok?
+ */
+  return res.is_occupied;
+ }
+#endif // USE_HOBBIT_MAP_DATA
+
+
 unsigned int mapSaysThatWhatWeAreLookingAtShouldBeFreespace(float x,float y,float z , unsigned int frameTimestamp)
 {
-   fprintf(stderr,"mapSaysThatWhatWeAreLookingAtShouldBeFreespace() not implemented yet\n");
-   /*
+   unsigned int checks=1; // If USE_HOBBIT_MAP_DATA is not defined this function should always return 1;
 
-    Paloma :
-So, the current implementation is like this:
-
-/get_occupancy_state
-
-bool cLocalizationMonitor::getOccupancyState(hobbit_msgs::GetOccupancyState::Request  &req, hobbit_msgs::GetOccupancyState::Response &res)
-
-You can take a look at the GetOccupancyState service in hobbit_msgs, but it is basically what we talked about.
-
-If you want me to change the name or something or have any problems or whatever let me know, ok?
+   #if USE_HOBBIT_MAP_DATA
+       checks=0;
+       hobbit_msgs::GetOccupancyState::Request req;
+       hobbit_msgs::GetOccupancyState::Response res;
 
 
-   */
+       req.local_point.x = 10; req.local_point.y = 10;
+	   checks += obstacleDetected(req,res);
 
-  return 1;
+       req.local_point.x = 15; req.local_point.y = 10;
+	   checks += obstacleDetected(req,res);
+
+       req.local_point.x = 20; req.local_point.y = 10;
+	   checks += obstacleDetected(req,res);
+       fprintf(stderr,"Got %u obstacles from map! \n",checks);
+   #endif // USE_HOBBIT_MAP_DATA
+
+  return (checks>0);
 }
 
 
@@ -666,11 +699,17 @@ int runServicesBottomThatNeedColorAndDepth(unsigned char * colorFrame , unsigned
 
 
 
-void initializeProcess()
+void initializeProcess(ros::NodeHandle * nh)
 {
  initializeRGBSegmentationConfiguration(&segConfRGB,640,480);
  initializeDepthSegmentationConfiguration(&segConfDepth,640,480);
 
+#if USE_HOBBIT_MAP_DATA
+  mapSubscriber = nh->serviceClient<hobbit_msgs::GetOccupancyState>("/get_occupancy_state", obstacleDetected);
+  if (mapSubscriber)
+  { fprintf(stderr,"Successfully created a persistant connection to mapping service\n"); } else
+  { fprintf(stderr,"Could not create a persistant connection to mapping service\n");     }
+#endif // USE_HOBBIT_MAP_DATA
 
  //Hobbit orientation according to camera
  segConfDepth.maxDepth=2800;

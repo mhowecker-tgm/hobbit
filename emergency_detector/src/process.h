@@ -2,6 +2,9 @@
 #ifndef EMERGENCY_DETECTOR_H_INCLUDED
 #define EMERGENCY_DETECTOR_H_INCLUDED
 
+
+#include <ros/ros.h>
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -67,7 +70,7 @@ int runServicesBottomThatNeedColorAndDepth(unsigned char * colorFrame , unsigned
                                            void * calib ,
                                            unsigned int frameTimestamp );
 
-void initializeProcess();
+void initializeProcess(ros::NodeHandle * nh);
 
 #ifdef __cplusplus
 }

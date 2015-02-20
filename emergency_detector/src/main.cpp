@@ -756,7 +756,7 @@ int main(int argc, char **argv)
 
     fallDetectionContext.headLookingDirection=HEAD_LOOKING_CENTER; //TODO : for now ..
      fallDetectionContext.lastJointsTimestamp=100000;
-     initializeProcess();
+     initializeProcess(nhPtr);
 
       //Create our context
       //---------------------------------------------------------------------------------------------------

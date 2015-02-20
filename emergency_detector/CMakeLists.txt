@@ -52,7 +52,7 @@ target_link_libraries(emergency_detector ${catkin_LIBRARIES} ${OpenCV_LIBRARIES}
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencpp)
+add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencpp hobbit_msgs  hobbit_msgs_generate_messages_cpp)
 
 install(TARGETS emergency_detector RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 install(FILES emergency_detector.xml DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
