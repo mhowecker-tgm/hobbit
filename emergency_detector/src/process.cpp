@@ -32,7 +32,7 @@ struct SegmentationFeaturesDepth segConfDepth={0};
 struct SegmentationFeaturesDepth segConfBaseDepth={0};
 unsigned int combinationMode=COMBINE_AND;
 
-char defaultDir[]=".";
+char defaultDir[]="../../web_interface/bin/emergencies/";
 char * imageDir = defaultDir;
 
 

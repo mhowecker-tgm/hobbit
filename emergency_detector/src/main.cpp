@@ -93,9 +93,9 @@ unsigned int lastEmergencyDetectionTimestamp=0;
 unsigned int emergencyDetectionCooldown=150; //This should be time , not frames
 
 
-char emergencyDir[]="emergencies";
-char safeDir[]="safe";
-char curDir[]=".";
+char emergencyDir[]="../../web_interface/bin/emergencies/emergencies";
+char safeDir[]="../../web_interface/bin/emergencies/safe";
+char curDir[]="../../web_interface/bin/emergencies/";
 
 
 bool first=false;
