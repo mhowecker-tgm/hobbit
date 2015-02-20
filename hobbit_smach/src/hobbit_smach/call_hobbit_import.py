@@ -394,7 +394,7 @@ def call_hobbit():
         )
         StateMachine.add(
             'HEAD_UP',
-            head_move.MoveTo(pose='center_center'),
+            head_move.MoveTo(pose='littledown_center'),
             transitions={'succeeded': 'GET_PERSON',
                          'preempted': 'LOG_PREEMPT',
                          'aborted': 'LOG_ABORT'}
