@@ -341,13 +341,6 @@ bool lookingCenter(std_srvs::Empty::Request& request, std_srvs::Empty::Response&
 
 
 
-bool setHobbitE(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
-{
-     setHobbitEMode();
-    return true;
-}
-
-
 bool increasePlaneDistance(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
      increasePlane();
@@ -676,6 +669,10 @@ int main(int argc, char **argv)
      //We advertise the services we want accessible using "rosservice call *w/e*"
      ros::ServiceServer visualizeOnService      = nh.advertiseService(name+"/visualize_on" , visualizeOn);
      ros::ServiceServer visualizeOffService     = nh.advertiseService(name+"/visualize_off", visualizeOff);
+
+     ros::ServiceServer classifyEmergencyService    = nh.advertiseService(name+"/classifyEmergency", classifyEmergency);
+     ros::ServiceServer classifySafeService    = nh.advertiseService(name+"/classifySafe", classifySafe);
+
      ros::ServiceServer saveGestureRecognitionService    = nh.advertiseService(name+"/save", save);
      ros::ServiceServer pauseGestureRecognitionService    = nh.advertiseService(name+"/pause", pause);
      ros::ServiceServer resumeGestureRecognitionService   = nh.advertiseService(name+"/resume", resume);
@@ -690,8 +687,6 @@ int main(int argc, char **argv)
 
      ros::ServiceServer tfPrintService        = nh.advertiseService(name+"/toggleTFPrinting" , toggleTFPrinting);
 
-
-     ros::ServiceServer setHobbitEService        = nh.advertiseService(name+"/setHobbitE" , setHobbitE);
 
      ros::ServiceServer increasePlaneDistanceService = nh.advertiseService(name+"/increasePlaneDistance" , increasePlaneDistance);
      ros::ServiceServer decreasePlaneDistanceService = nh.advertiseService(name+"/decreasePlaneDistance" , decreasePlaneDistance);
