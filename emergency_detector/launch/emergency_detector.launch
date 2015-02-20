@@ -12,6 +12,8 @@
       <param name="fromBottomRGBTopic" value="basecam/rgb/image_raw" /> 
       <param name="fromBottomRGBTopicInfo" value="/basecam/rgb/camera_info" /> 
 
+      <param name="autoRecordEmergencyTriggers" value="1" /> 
+
       <param name="minHumanTemperature" value="31.4" /> 
       <param name="maxHumanTemperature" value="37.1" /> 
       <param name="minimumAllowedHolePercentage" value="15" /> 

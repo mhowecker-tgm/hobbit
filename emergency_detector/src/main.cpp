@@ -89,12 +89,14 @@ message_filters::Subscriber<sensor_msgs::CameraInfo> *depth_cam_info_sub_bottom;
 
 typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image> RgbdSyncPolicy;
 
+ int autoRecordEmergencyTriggers=0;
 unsigned int lastEmergencyDetectionTimestamp=0;
 unsigned int emergencyDetectionCooldown=150; //This should be time , not frames
 
 
 char emergencyDir[]="../../web_interface/bin/emergencies/emergencies";
 char safeDir[]="../../web_interface/bin/emergencies/safe";
+char triggersDir[]="../../web_interface/bin/emergencies/triggers";
 char curDir[]="../../web_interface/bin/emergencies/";
 
 
@@ -218,7 +220,23 @@ bool resume(std_srvs::Empty::Request& request, std_srvs::Empty::Response& respon
 }
 
 
+bool clearRecorded(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+   char buffer[512]={0};
 
+   snprintf(buffer,512,"rm %s/*.pnm",emergencyDir);
+   int i = system(buffer);
+   if (i!=0) { fprintf(stderr,"Error cleaning up %s ",emergencyDir); }
+
+   snprintf(buffer,512,"rm %s/*.pnm",safeDir);
+   i = system(buffer);
+   if (i!=0) { fprintf(stderr,"Error cleaning up %s ",safeDir); }
+
+   snprintf(buffer,512,"rm %s/*.pnm",triggersDir);
+   i = system(buffer);
+   if (i!=0) { fprintf(stderr,"Error cleaning up %s ",triggersDir); }
+
+}
 
 bool classifyEmergency(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
@@ -619,7 +637,7 @@ int main(int argc, char **argv)
 
    try
 	{
-	 ROS_INFO("Initializing ROS");
+	 ROS_INFO("Initializing Emergency Detector Node");
   	 ros::init(argc, argv, "emergency_detector");
      ros::start();
 
@@ -641,6 +659,14 @@ int main(int argc, char **argv)
      private_node_handle_.param("fromBottomDepthTopicInfo", fromBottomDepthTopicInfo, std::string("/basecam/depth_registered/camera_info"));
      private_node_handle_.param("fromBottomRGBTopic", fromBottomRGBTopic, std::string("basecam/rgb/image_rect_color"));
      private_node_handle_.param("fromBottomRGBTopicInfo", fromBottomRGBTopicInfo, std::string("/basecam/rgb/camera_info"));
+
+
+     private_node_handle_.param("autoRecordEmergencyTriggers", autoRecordEmergencyTriggers ,  0 );
+     if (autoRecordEmergencyTriggers)
+     {
+	   ROS_INFO("Emergencies will be auto recorded , this should be switched off in production");
+       fprintf(stderr,"\n\n\n\nEmergencies will be auto recorded , this should be switched off in production \n\n\n\n");
+     }
 
 
      private_node_handle_.param("maximumFrameDifferenceForTemperatureToBeRelevant", maximumFrameDifferenceForTemperatureToBeRelevant ,  10 );
@@ -673,6 +699,7 @@ int main(int argc, char **argv)
      ros::ServiceServer classifyEmergencyService    = nh.advertiseService(name+"/classifyEmergency", classifyEmergency);
      ros::ServiceServer classifySafeService    = nh.advertiseService(name+"/classifySafe", classifySafe);
 
+     ros::ServiceServer clearRecordedService    = nh.advertiseService(name+"/clearRecorded", clearRecorded);
      ros::ServiceServer saveGestureRecognitionService    = nh.advertiseService(name+"/save", save);
      ros::ServiceServer pauseGestureRecognitionService    = nh.advertiseService(name+"/pause", pause);
      ros::ServiceServer resumeGestureRecognitionService   = nh.advertiseService(name+"/resume", resume);
@@ -736,12 +763,29 @@ int main(int argc, char **argv)
 	  //////////////////////////////////////////////////////////////////////////
 	  while ( ( key!='q' ) && (ros::ok()) )
 		{
+                  if(emergencyDetected)
+                    {
+                      if (autoRecordEmergencyTriggers)
+                      {
+	                    ROS_INFO("Recording Emergency Snapshot, this should be disabled on production");
+	                    fprintf(stderr, "\n\n\n\nRecording emergency event this should be disabled on production\n\n\n\n" );
+                        imageDir=triggersDir;
+                        saveNextTopFrame=1;
+                        saveNextBottomFrame=1;
+                      }
+                      broadcastEmergency(frameTimestamp);
+                    }
+
+
+
+
                   ros::spinOnce();//<- this keeps our ros node messages handled up until synergies take control of the main thread
 
                   if (doCVOutput) { vis_loop_rate.sleep(); } else
                                   { loop_rate.sleep();     }
 
-                  if(emergencyDetected) { broadcastEmergency(frameTimestamp); }
+
+
                   if (personDetected)   { broadcastNewPerson(); }
 
                   if (frameTimestamp%20) { fprintf(stderr,"."); }
