@@ -406,7 +406,7 @@ void broadcastNewGesture(unsigned int frameNumber,struct handGesture * gesture)
      case GESTURE_REWARD : ss<<"G_REWARD"; break;
      case GESTURE_POINT  : ss<<"G_POINT";  break;
      case GESTURE_COME   : ss<<"G_COME";  break;
-     case GESTURE_WAVE   : ss<<"G_WAVE";  break;
+     case GESTURE_WAVE   : ss<<"G_WAVE"; return; /*disabled*/ break;
      default :             ss<<"G_NOTFOUND"; break;
     };
 
