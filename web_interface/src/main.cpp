@@ -701,6 +701,8 @@ void execute(char * command,char * param)
     if (strcmp(param,"emergencyTrigger")==0) {  rosservice_call(cR,cRLen,(char *) "/emergency_detector/trigger");    } else
     if (strcmp(param,"emergencyPause")==0)   {  rosservice_call(cR,cRLen,(char *) "/emergency_detector/pause");      } else
     if (strcmp(param,"emergencyResume")==0)  {  rosservice_call(cR,cRLen,(char *) "/emergency_detector/resume");     } else
+    if (strcmp(param,"emergencyClearRecording")==0)  {  rosservice_call(cR,cRLen,(char *) "/emergency_detector/clearRecorded");     } else
+
 
     if (strcmp(param,"gesturePause")==0)              {  rosservice_call(cR,cRLen,(char *) "/hand_gestures/pause");          } else
     if (strcmp(param,"gestureResume")==0)             {  rosservice_call(cR,cRLen,(char *) "/hand_gestures/resume");         } else
