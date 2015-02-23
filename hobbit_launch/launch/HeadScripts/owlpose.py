@@ -16,7 +16,7 @@ min_lr_angle_deg = -90
 max_lr_angle_deg = 90
 
 min_ud_angle_deg = -26
-max_ud_angle_deg = 66
+max_ud_angle_deg = 58
 
 br = tf.TransformBroadcaster()
 #base_tf = "hobbit"
@@ -59,7 +59,7 @@ def set_head_orientation(msg):
 		#br.sendTransform((0, 0, 0), (0.4 ,-0.61, 0.0, 1), rospy.Time.now(), base_tf,head_tf)
 
 	elif msg.data == "to_grasp":
-		herkulex.setAngles(pitch=62, yaw=-65, playtime=200)
+		herkulex.setAngles(pitch=58, yaw=-65, playtime=200)
 		#br.sendTransform((0, 0, 0), (0.45 ,-0.70, 0.0, 1), rospy.Time.now(), base_tf,head_tf)
 
 	elif msg.data == "center_left":
