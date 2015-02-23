@@ -6,7 +6,7 @@ PKG = 'hobbit_smach'
 NAME = 'helper_node'
 DEBUG = False
 RETRY = 10
-state = True
+state = False
 
 import rospy
 from hobbit_msgs.srv import ChargeCheck, ChargeCheckResponse, SetCloserState, GetCloserState
