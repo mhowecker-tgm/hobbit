@@ -99,6 +99,12 @@ def command_cb(msg, ud):
                     new_command = ud.command
                     rospy.loginfo('New task has higher priority. START IT.')
                     return True
+            elif item[0] == 'stop':
+                rospy.loginfo('Reset active_task value')
+                ud.parameters['active_task'] = 100
+                ud.command = 'stop'
+                new_command = ud.command
+                return True
             elif item[0] == 'call_hobbit':
                 ud.command = item[0]
                 for i, v in enumerate(msg.params):
@@ -163,11 +169,6 @@ def command_cb(msg, ud):
                     ud.command = item[0]
                 ud.params = msg.params
                 new_params = ud.params
-                if item[0] == 'stop':
-                    rospy.loginfo('Reset active_task value')
-                    ud.parameters['active_task'] = 100
-                else:
-                    ud.parameters['active_task'] = index
                 new_command = ud.command
                 return True
     rospy.loginfo('Unknown event/command received %s' % input_ce)
