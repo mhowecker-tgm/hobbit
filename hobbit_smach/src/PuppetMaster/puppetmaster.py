@@ -25,6 +25,7 @@ from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 from hobbit_smach.bcolors import bcolors
 
 new_command = None
+new_params = None
 
 commands = [
     ['emergency', 'G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP',
@@ -65,6 +66,7 @@ def IsItNight(ud):
 
 def command_cb(msg, ud):
     global new_command
+    global new_params
     try:
         rospy.loginfo(str(msg.command))
         input_ce = msg.command.upper()
@@ -104,10 +106,12 @@ def command_cb(msg, ud):
                         ud.command = 'emergency_bathroom'
                         ud.parameters['active_task'] = 'emergency_bathroom'
                         ud.params = msg.params
+                        new_params = ud.params
                         rospy.loginfo('New task has higher priority. START IT.')
                         new_command = ud.command
                         return True
                 ud.params = msg.params
+                new_params = ud.params
                 ud.parameters['active_task'] = index
                 rospy.loginfo('New task has higher priority. START IT.')
                 new_command = ud.command
@@ -158,6 +162,7 @@ def command_cb(msg, ud):
                 else:
                     ud.command = item[0]
                 ud.params = msg.params
+                new_params = ud.params
                 if item[0] == 'stop':
                     rospy.loginfo('Reset active_task value')
                     ud.parameters['active_task'] = 100
@@ -376,9 +381,11 @@ def sleep_cb(ud, goal):
 
 def bring_cb(ud, goal):
     par = []
-    par.append({'object_name': ud.params[0].value})
+    #par.append({'object_name': ud.params[0].value})
+    par.append({'object_name': new_params[0].value})
     # par.append(String(ud.params[0].value))
-    rospy.loginfo('bring_cb: %s' % ud.params[0].value)
+    #rospy.loginfo('bring_cb: %s' % ud.params[0].value)
+    rospy.loginfo('bring_cb: %s' % new_params[0].value)
     goal = GeneralHobbitGoal(command=String('bring_object'),
                              previous_state=String('call_hobbit'),
                              parameters=par)
@@ -416,7 +423,8 @@ def follow_cb(ud, goal):
 
 
 def goto_cb(ud, goal):
-    room, place = ud.params[0].value.lower().split(' ')
+    #room, place = ud.params[0].value.lower().split(' ')
+    room, place = new_params[0].value.lower().split(' ')
     par = []
     par.append(String(room))
     par.append(String(place))
@@ -561,6 +569,13 @@ def main():
         StateMachine.add_auto(
             'LOG_TASK_STARTED',
             log.DoLogStart(),
+            connector_outcomes=['succeeded', 'aborted']
+        )
+        StateMachine.add_auto(
+            'EMO',
+            HobbitEmotions.ShowEmotions(
+                emotion='NEUTRAL',
+                emo_time=0),
             connector_outcomes=['succeeded', 'aborted']
         )
         StateMachine.add(
