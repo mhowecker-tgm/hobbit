@@ -40,7 +40,7 @@ cLocalizationMonitor::cLocalizationMonitor(int argc, char **argv) : init_argc(ar
 	initial_mileage_received = false;
 
 	ros::NodeHandle nh("~");
-	nh.param("uncertainty_thres", uncertainty_thres, 0.15);
+	nh.param("uncertainty_thres", uncertainty_thres, 0.2);
 	nh.param("score_thres", score_thres, 0.3); //consider lowering this threshold to account for changes in the environment, compromise needed 
 	nh.param("inflation_thres", inflation_thres, 0.2); //dilate static map to allow for some error 
 	nh.param("max_lim", max_lim, 3.0); //large measurements are more noisy, do not consider
@@ -48,11 +48,13 @@ cLocalizationMonitor::cLocalizationMonitor(int argc, char **argv) : init_argc(ar
 
 	nh.param("dis_thres", dis_thres, 0.2);
 	nh.param("ang_thres", ang_thres, 15.0);
-	nh.param("dis_thres_check", dis_thres_check, 1.5);
+	nh.param("dis_thres_check", dis_thres_check, 3.5);
 	nh.param("rate_thres", rate_thres, 0.6); 
 
 	nh.param("activate_recovery", activate_recovery, false); 
 	apply_action = activate_recovery;
+
+	check = false;
 
 
 }
