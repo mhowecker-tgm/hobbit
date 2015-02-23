@@ -28,6 +28,7 @@ class DoLog(State):
         self.pubEvent = rospy.Publisher('Event', Event, queue_size=50)
 
     def execute(self, ud):
+        print("DoLog: ")
         print ud.scenario
         print self.scenario
         print ud.command
