@@ -25,7 +25,7 @@
 #define WHITE "\033[37m" /* White */
 
 
-#define USE_HOBBIT_MAP_DATA 0
+#define USE_HOBBIT_MAP_DATA 1
 
 
 
@@ -311,13 +311,13 @@ unsigned int mapSaysThatWhatWeAreLookingAtShouldBeFreespace(float x,float y,floa
        hobbit_msgs::GetOccupancyState::Response res;
 
 
-       req.local_point.x = 10; req.local_point.y = 10;
+       req.local_point.x = 1.0; req.local_point.y = 0; //1m mprosta sto robot
 	   checks += obstacleDetected(req,res);
 
-       req.local_point.x = 15; req.local_point.y = 10;
+       req.local_point.x = 1.1; req.local_point.y = 0; //1,1m mprosta
 	   checks += obstacleDetected(req,res);
 
-       req.local_point.x = 20; req.local_point.y = 10;
+       req.local_point.x = 0.9; req.local_point.y = 0; //0.9m mprosta
 	   checks += obstacleDetected(req,res);
        fprintf(stderr,"Got %u obstacles from map! \n",checks);
    #endif // USE_HOBBIT_MAP_DATA

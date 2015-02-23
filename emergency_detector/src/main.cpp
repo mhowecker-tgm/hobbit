@@ -715,6 +715,10 @@ int main(int argc, char **argv)
      ros::ServiceServer tfPrintService        = nh.advertiseService(name+"/toggleTFPrinting" , toggleTFPrinting);
 
 
+     ros::ServiceServer startHeadMotionService    = nh.advertiseService(name+"/startHeadMotion", pause);
+     ros::ServiceServer stopHeadMotionService     = nh.advertiseService(name+"/stopHeadMotion", resume);
+
+
      ros::ServiceServer increasePlaneDistanceService = nh.advertiseService(name+"/increasePlaneDistance" , increasePlaneDistance);
      ros::ServiceServer decreasePlaneDistanceService = nh.advertiseService(name+"/decreasePlaneDistance" , decreasePlaneDistance);
 
