@@ -576,7 +576,7 @@ def main():
             HobbitEmotions.ShowEmotions(
                 emotion='NEUTRAL',
                 emo_time=0),
-            connector_outcomes=['succeeded', 'aborted']
+            connector_outcomes=['succeeded', 'failed']
         )
         StateMachine.add(
             'SELECT_TASK',
