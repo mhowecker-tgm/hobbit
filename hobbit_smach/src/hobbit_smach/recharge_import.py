@@ -301,7 +301,9 @@ class FirstSecondThird(State):
         )
 
     def execute(self, ud):
-        if ud.counter == 3:
+        if not ud.counter:
+            ud.counter = 0
+        if ud.counter == 0:
             ud.counter += 1
             return 'first'
         elif ud.counter == 2:
