@@ -5,6 +5,7 @@ import rospy
 import uashh_smach.util as util
 
 from smach import StateMachine, State
+from hobbit_msgs.msg import Event
 from hobbit_msgs.srv import SwitchVision, SwitchVisionRequest
 from std_msgs.msg import String
 from smach_ros import ServiceState
@@ -91,6 +92,14 @@ class SetSuccess(State):
         return 'succeeded'
 
 
+def event_cb(msg, userdata):
+    rospy.loginfo('Waiting for fitness end')
+    if msg.event.upper() == 'E_FITNESS_CLOSED':
+        return True
+    else:
+        return False
+
+
 def get_do_fitness():
     sm = StateMachine(
         outcomes=['succeeded', 'aborted', 'preempted'],
@@ -107,24 +116,13 @@ def get_do_fitness():
             transitions={'succeeded': 'SWITCH_VISION_TO_FITNESS',
                          'canceled': 'LOG_ABORTED'}
         )
-        # TODO: implement ConfirmPlace with roomname in the question
-        # StateMachine.add(
-        #     'MMUI_ConfirmPlace',
-        #     HobbitMMUI.AskYesNo(question='T_GT_ConfirmGoToPlace'),
-        #     transitions={'yes': 'EMO_HAPPY',
-        #                  'no': 'LOG_ABORTED',
-        #                  'failed': 'LOG_ABORTED',
-        #                  'preempted': 'LOG_PREEMPT',
-        #                  'timeout': 'MMUI_ConfirmPlace',
-        #                  '3times': 'LOG_ABORTED'}
-        # )
-        # StateMachine.add(
-        #     'EMO_HAPPY',
-        #     HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=4),
-        #     transitions={'preempted': 'LOG_PREEMPT',
-        #                  'succeeded': 'MOVE_BASE',
-        #                  'failed': 'LOG_ABORTED'}
-        # )
+        StateMachine.add(
+            'SAY_MOVING_TO_YOU',
+            speech_output.sayText(info='T_FI_MovingToYou'),
+            transitions={'succeeded': 'MOVE_BASE',
+                         'failed': 'LOG_ABORTED',
+                         'preempted': 'LOG_PREEMPT'}
+        )
         StateMachine.add(
             'MOVE_BASE',
             hobbit_move.goToPosition(
@@ -148,7 +146,7 @@ def get_do_fitness():
         )
         StateMachine.add(
             'MOVE_HEAD_UP',
-            head_move.MoveTo(pose='center_center'),
+            head_move.MoveTo(pose='littledown_center'),
             transitions={'succeeded': 'DO_FITNESS',
                          'preempted': 'LOG_PREEMPT',
                          'aborted': 'DO_FITNESS'}
@@ -158,18 +156,20 @@ def get_do_fitness():
             HobbitMMUI.ShowMenu(
                 menu='FITNESS'
             ),
-            transitions={'succeeded': 'LOG_SUCCESS',
+            transitions={'succeeded': 'WAIT_FOR_END',
                          'failed': 'LOG_ABORTED',
                          'preempted': 'LOG_PREEMPT'}
         )
-        # StateMachine.add(
-        #     'SAY_MOVING_TO_YOU',
-        #     speech_output.sayText(info='T_FI_MovingToYou'),
-        #     transitions={'succeeded': 'LOG_SUCCESS',
-        #                  'failed': 'LOG_ABORTED',
-        #                  'preempted': 'LOG_PREEMPT'}
-        # )
-
+        StateMachine.add(
+            'WAIT_FOR_END',
+            util.WaitForMsgState(
+                '/Event',
+                Event,
+                msg_cb=event_cb),
+            transitions={'succeeded': 'LOG_SUCCESS',
+                         'aborted': 'LOG_ABORTED',
+                         'preempted': 'LOG_PREEMPT'}
+        )
         StateMachine.add(
             'LOG_SUCCESS',
             log.DoLogSuccess(scenario='Fitness'),
