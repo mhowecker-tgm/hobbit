@@ -248,6 +248,7 @@ bool MiraSendingGoals::sendMiraGoal(hobbit_msgs::SendPose::Request  &req, hobbit
     std::cout << "Mira goal x:" << goal.pose.position.x << " y: " << goal.pose.position.y << " theta " << tf::getYaw(goal.pose.orientation)*180/M_PI << std::endl;
 
 	is_goal_active = true;
+	cancel_received = false;
 
      std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
 
