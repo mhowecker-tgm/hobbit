@@ -306,11 +306,11 @@ class FirstSecondThird(State):
         if ud.counter == 0:
             ud.counter += 1
             return 'first'
-        elif ud.counter == 2:
+        elif ud.counter == 1:
             ud.counter += 1
             return 'second'
-        elif ud.counter == 3:
-            return 'second'
+        elif ud.counter == 2:
+            return 'third'
         else:
             return 'aborted'
 
@@ -356,13 +356,13 @@ def startDockProcedure():
                                       'preempted': 'preempted'}
         )
         StateMachine.add('ROTATE_CCW',
-                         hobbit_move.rotateRobot(angle=-15),
+                         hobbit_move.rotateRobot(angle=-25),
                          transitions={'succeeded': 'START_DOCKING',
                                       'aborted': 'ROTATE_CW',
                                       'preempted': 'preempted'}
                          )
         StateMachine.add('ROTATE_CW',
-                         hobbit_move.rotateRobot(angle=15),
+                         hobbit_move.rotateRobot(angle=50),
                          transitions={'succeeded': 'START_DOCKING',
                                       'aborted': 'aborted',
                                       'preempted': 'preempted'}
