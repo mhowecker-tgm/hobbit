@@ -32,6 +32,7 @@ class CalibrateHead():
         self.wait = True
         #Publisher
         self.headmove_pub = rospy.Publisher("/head/move", String )
+        self.debug_pc_pub = rospy.Publisher("/dfdebugpc", PointCloud2)
         self.actualize_head_offsets_pub = rospy.Publisher("/head/trigger/set_offsets", String)
          
         self.pc_ = None
@@ -76,7 +77,7 @@ class CalibrateHead():
         self.pc_sub.unregister()
         print "point cloud from camera saved"
         self.wait = False
-        #self.do_publish_cam1()
+        self.debug_pc_pub.publish(self.pc_)
   
     #publishes pc for cam1
     def get_average_z_value(self, cuboidnr=1):
