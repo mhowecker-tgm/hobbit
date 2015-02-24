@@ -14,7 +14,6 @@ from std_msgs.msg import String
 from smach_ros import SimpleActionState, ServiceState
 from smach import Sequence, State, StateMachine, Concurrence
 from uashh_smach.util import SleepState, WaitForMsgState
-# from uashh_smach.platform.move_base import HasMovedState
 from mira_msgs.msg import BatteryState
 import hobbit_smach.hobbit_move_import as hobbit_move
 from hobbit_user_interaction import HobbitMMUI
@@ -37,6 +36,12 @@ def closer_cb(ud, goal):
         parameters=params
     )
     return goal
+
+def switch_vision_cb(ud, response):
+    if response.result:
+        return 'succeeded'
+    else:
+        return 'aborted'
 
 def battery_cb(msg, ud):
     print('Received battery_state message')
@@ -391,6 +396,15 @@ def call_hobbit():
             transitions={'succeeded': 'HEAD_UP',
                          'aborted': 'LOG_ABORT',
                          'preempted': 'LOG_PREEMPT'}
+        )
+        StateMachine.add(
+            'SWITCH_VISION',
+            ServiceState(
+                '/vision_system/comeCloser',
+                SwitchVision,
+                request=SwitchVisionRequest(dummyInput=True),
+                response_cb=switch_vision_cb
+            )
         )
         StateMachine.add(
             'HEAD_UP',
