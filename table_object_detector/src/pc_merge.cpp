@@ -47,7 +47,7 @@ CPCMerge::CPCMerge(ros::NodeHandle nh_)
   position_highestpoint_pub = nh.advertise<std_msgs::String>("/SS/basket_position",1);
   //define service check_free_space
   service_check_free_space = nh.advertiseService("check_free_space", &CPCMerge::check_free_space, this);
-  service_check_mean_values_for_defined_space = nh.advertiseService("check_mean_values_for_defined_space", &CPCMerge::check_mean_values_for_defined_space, this)
+  service_check_mean_values_for_defined_space = nh.advertiseService("check_mean_values_for_defined_space", &CPCMerge::check_mean_values_for_defined_space, this);
   service_check_camera_distance_center = nh.advertiseService("check_camera_distance_center", &CPCMerge::check_camera_distance_center, this);
 
   //df dddd new 11.2.2015 for debugging:
