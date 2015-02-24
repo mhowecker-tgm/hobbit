@@ -29,6 +29,7 @@ class CalibrateHead():
         print "CalibrateHead.__init__() started"
         self.heightdiff_th = 0.03   #threshold that is accepted for heigt difference on 2 different spots (in m)
         self.pc_sub = None
+        self.wait = True
         #Publisher
         self.headmove_pub = rospy.Publisher("/head/move", String )
         self.actualize_head_offsets_pub = rospy.Publisher("/head/trigger/set_offsets", String)
@@ -61,6 +62,7 @@ class CalibrateHead():
     #triggers the process for getting single point cloud 
     def start_calibration(self):
         print "CalibrateHead.start calibration() ===> take single shot of environment"
+        self.wait = True
         self.nr_of_points_in_given_space = -1
         self.t = None
         #start subscriber
@@ -73,6 +75,7 @@ class CalibrateHead():
         self.pc_ = msg
         self.pc_sub.unregister()
         print "point cloud from camera saved"
+        self.wait = False
         #self.do_publish_cam1()
   
     #publishes pc for cam1
@@ -170,6 +173,10 @@ def main(args):
     for i in range(5):
         print "calibration, iteration number: ", i
         calibhead.start_calibration()
+        while (calibhead.wait):
+            print "sleep: wait for pc"
+            rospy.sleep(0.1)
+            
         z_cuboid1 = calibhead.get_average_z_value(1)
         print "main: ==> z_cuboid1", z_cuboid1
         z_cuboid2 = calibhead.get_average_z_value(1)
