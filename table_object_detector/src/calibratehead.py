@@ -66,6 +66,7 @@ class CalibrateHead():
         self.wait = True
         self.nr_of_points_in_given_space = -1
         self.t = None
+        raw_input("press button to grab point cloud")
         #start subscriber
         self.pc_sub = rospy.Subscriber("/headcam/depth_registered/points", PointCloud2, self.pc_callback, queue_size=1)
    
