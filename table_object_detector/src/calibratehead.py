@@ -27,7 +27,7 @@ from table_object_detector.srv import *
 class CalibrateHead():
     def __init__(self, parent=None):
         print "CalibrateHead.__init__() started"
-        self.heightdiff_th = 0.03   #threshold that is accepted for heigt difference on 2 different spots (in m)
+        self.heightdiff_th = 0.015   #threshold that is accepted for heigt difference on 2 different spots (in m)
         self.pc_sub = None
         self.wait = True
         #Publisher
