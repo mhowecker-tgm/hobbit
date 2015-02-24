@@ -310,8 +310,10 @@ class FirstSecondThird(State):
             ud.counter += 1
             return 'second'
         elif ud.counter == 2:
+            ud.counter = 0
             return 'third'
         else:
+            ud.counter = 0
             return 'aborted'
 
 
@@ -326,6 +328,7 @@ def charge_response_cb(userdata, response):
 def startDockProcedure():
     sm = StateMachine(
         outcomes=['succeeded', 'aborted', 'preempted'])
+    sm.userdata.counter = 0
 
     with sm:
         StateMachine.add('START_DOCKING',
