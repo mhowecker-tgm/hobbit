@@ -69,6 +69,7 @@ class CalibrateHead():
     
     #starts method to publish point cloud for camera1; unregisters subscriber camera1
     def pc_callback(self,msg):
+        print "==> pc_callback executed/started"
         self.pc_ = msg
         self.pc_sub.unregister()
         print "point cloud from camera saved"
