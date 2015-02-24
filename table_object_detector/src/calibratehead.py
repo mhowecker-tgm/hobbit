@@ -116,7 +116,7 @@ class CalibrateHead():
     	        return -1000
             
             resp1 = check_mean_values_for_defined_space(input.cloud,input.frame_id_original,input.frame_id_desired,input.x1,input.x2,input.y1,input.y2,input.z1,input.z2)
-    	    print "z-mean of points in area with boarders \nx1: ", input.x1, "\tx2: ",input.x2,"\ny1: ",input.y1,"\ty2: ",input.y2,"\nz1: ",input.z1,"\tz2: ",input.z2,"\nnr_points: ",resp1.z_mean
+    	    print "z-mean of points in area with boarders \nx1: ", input.x1, "\tx2: ",input.x2,"\ny1: ",input.y1,"\ty2: ",input.y2,"\nz1: ",input.z1,"\tz2: ",input.z2,"\nz_mean: ",resp1.z_mean
     	except rospy.ServiceException, e:
             print "Service call failed: %s"%e
             
@@ -179,7 +179,7 @@ def main(args):
             
         z_cuboid1 = calibhead.get_average_z_value(1)
         print "main: ==> z_cuboid1", z_cuboid1
-        z_cuboid2 = calibhead.get_average_z_value(1)
+        z_cuboid2 = calibhead.get_average_z_value(2)
         print "main: ==> z_cuboid2", z_cuboid2
         if calibhead.readjust_head(z_cuboid1, z_cuboid2):
             print "adjusting head was successful"
