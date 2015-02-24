@@ -111,13 +111,17 @@ def setYawOffset(offs = 0):
 
 def getAngles():
 	angle = []
+	valid0 = False
+	valid1 = False
+	valid = False
 	
 	#tilt Servo:
 	sendCommand(pitchServoId,0x04,[0x3c,0x02])
 	response = ack()
-	if response!=-1:
+	if response!=-1 and len(response) >= 11:
 		angle0 = int(response[10].encode('hex') + response[9].encode('hex'), 16) * 0.325 - 512 + 345
 		angle.append(angle0 - pitchOffset)
+		valid0 = True
 	else:
 		print "Error obtaining Angle from Servo " + str(pitchServoId)
 		angle.append(0)
@@ -125,14 +129,16 @@ def getAngles():
 	#yaw Servo:
 	sendCommand(yawServoId,0x04,[0x3c,0x02])
 	response = ack()
-	if response!=-1:
+	if response!=-1 and len(response) >= 11:
 		angle1 = int(response[10].encode('hex') + response[9].encode('hex'), 16) * 0.325 - 512 + 345
 		angle.append(angle1 - yawOffset)
+		valid1 = True
 	else:
 		print "Error obtaining Angle from Servo " + str(yawServoId)
 		angle.append(0)
 	
-	return angle
+	valid = valid0 and valid1
+	return (valid,angle)
 
 # This sets angles for a pan/tilt neck. Angles are in degrees.
 # There are 4 angles to set: pitch (=up/down) and yaw (= left/right).

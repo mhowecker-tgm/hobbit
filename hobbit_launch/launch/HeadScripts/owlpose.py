@@ -27,7 +27,7 @@ head_tf = "hobbit_neck"
 #head_tf = "headcam_depth_optical_frame"
 
 def set_head_orientation(msg):
-	currentAngles = herkulex.getAngles()
+	valid,currentAngles = herkulex.getAngles()
 	print "currentAngles:", currentAngles
 	print "Move to",msg.data
 	if msg.data == "up_center":
@@ -92,54 +92,58 @@ def set_head_orientation(msg):
 				print "==> set relative values"
 				lr_shift = 0
 				ud_shift = 0
-				currentAngles = herkulex.getAngles()
-				print "currentAngles:", currentAngles
+				valid,currentAngles = herkulex.getAngles()
+
+				if valid:
+					print "currentAngles:", currentAngles
 	
-				if msg.data[0] == "r":
-					lr_shift = -1	#default value for move head right
-					if (len(msg.data) > 1) and (int(msg.data[1]) > 0) and (int(msg.data[1]) < 10):
-						lr_shift = -int(msg.data[1])
-				if msg.data[0] == "l":
-					lr_shift = 1	#default value for moving head left
-					if (len(msg.data) > 1) and (int(msg.data[1]) > 0) and (int(msg.data[1]) < 10):
-						lr_shift = int(msg.data[1])	
-						 
-				if msg.data[0] == "u":
-					ud_shift = -1	#default value for move head up
-					if (len(msg.data) > 1) and (int(msg.data[1]) > 0) and (int(msg.data[1]) < 10):
-						ud_shift = -int(msg.data[1])	
-				if msg.data[0] == "d":
-					ud_shift = 1	#default value for moving head left
-					if (len(msg.data) > 1) and (int(msg.data[1]) > 0) and (int(msg.data[1]) < 10):
-						ud_shift = int(msg.data[1])	
-				if (len(msg.data) > 3):
-					if msg.data[3] == "r":
+					if msg.data[0] == "r":
 						lr_shift = -1	#default value for move head right
-						if (int(msg.data[4]) > 0) and (int(msg.data[4]) < 10):
-							lr_shift = -int(msg.data[4])
-					if msg.data[3] == "l":
+						if (len(msg.data) > 1) and (int(msg.data[1]) > 0) and (int(msg.data[1]) < 10):
+							lr_shift = -int(msg.data[1])
+					if msg.data[0] == "l":
 						lr_shift = 1	#default value for moving head left
-						if (int(msg.data[4]) > 0) and (int(msg.data[4]) < 10):
-							lr_shift = int(msg.data[4])	
-						 
-					if msg.data[3] == "u":
+						if (len(msg.data) > 1) and (int(msg.data[1]) > 0) and (int(msg.data[1]) < 10):
+							lr_shift = int(msg.data[1])	
+							 
+					if msg.data[0] == "u":
 						ud_shift = -1	#default value for move head up
-						if (int(msg.data[4]) > 0) and (int(msg.data[4]) < 10):
-							ud_shift = -int(msg.data[4])	
-					if msg.data[3] == "d":
+						if (len(msg.data) > 1) and (int(msg.data[1]) > 0) and (int(msg.data[1]) < 10):
+							ud_shift = -int(msg.data[1])	
+					if msg.data[0] == "d":
 						ud_shift = 1	#default value for moving head left
-						if (int(msg.data[4]) > 0) and (int(msg.data[4]) < 10):
-							ud_shift = int(msg.data[4])	
-						 				 
-				print "lr_shift: ", lr_shift
-	                        print "ud_shift: ", ud_shift
-				lr_angle = currentAngles[0] + lr_shift
-				ud_angle = currentAngles[1] + ud_shift
-				if ( angleLimitsOK(lr_angle, ud_angle) ):
-					print "6 set yaw=: ", ud_angle
-	                                print "6 set pitch=: ", lr_angle
-	                                herkulex.setAngles(pitch=ud_angle, yaw=lr_angle, playtime=200)
-					rospy.sleep(2.0)
+						if (len(msg.data) > 1) and (int(msg.data[1]) > 0) and (int(msg.data[1]) < 10):
+							ud_shift = int(msg.data[1])	
+					if (len(msg.data) > 3):
+						if msg.data[3] == "r":
+							lr_shift = -1	#default value for move head right
+							if (int(msg.data[4]) > 0) and (int(msg.data[4]) < 10):
+								lr_shift = -int(msg.data[4])
+						if msg.data[3] == "l":
+							lr_shift = 1	#default value for moving head left
+							if (int(msg.data[4]) > 0) and (int(msg.data[4]) < 10):
+								lr_shift = int(msg.data[4])	
+							 
+						if msg.data[3] == "u":
+							ud_shift = -1	#default value for move head up
+							if (int(msg.data[4]) > 0) and (int(msg.data[4]) < 10):
+								ud_shift = -int(msg.data[4])	
+						if msg.data[3] == "d":
+							ud_shift = 1	#default value for moving head left
+							if (int(msg.data[4]) > 0) and (int(msg.data[4]) < 10):
+								ud_shift = int(msg.data[4])	
+							 				 
+					print "lr_shift: ", lr_shift
+			                print "ud_shift: ", ud_shift
+					lr_angle = currentAngles[0] + lr_shift
+					ud_angle = currentAngles[1] + ud_shift
+					if ( angleLimitsOK(lr_angle, ud_angle) ):
+						print "6 set yaw=: ", ud_angle
+			                        print "6 set pitch=: ", lr_angle
+			                        herkulex.setAngles(pitch=ud_angle, yaw=lr_angle, playtime=200)
+						rospy.sleep(2.0)
+				else:
+					print "===============================================> owlpose.py: ERROR during variable setting of HEAD"
 				
 		except:
 			print "===============================================> owlpose.py: ERROR during relative setting of HEAD: ", sys.exc_info()[0]
@@ -202,8 +206,9 @@ def init():
 	#Send geometry/tf constantly with 5hz
 	r = rospy.Rate(5) #5hz
 	while not rospy.is_shutdown():
-		angles = herkulex.getAngles()
-		br.sendTransform( (0,0,0), tf.transformations.quaternion_from_euler(0, angles[0]/180.0*math.pi, angles[1]/180.0*math.pi), rospy.Time.now(), base_tf, head_tf)
+		valid,angles = herkulex.getAngles()
+		if valid:
+			br.sendTransform( (0,0,0), tf.transformations.quaternion_from_euler(0, angles[0]/180.0*math.pi, angles[1]/180.0*math.pi), rospy.Time.now(), base_tf, head_tf)
 		r.sleep()
 
 def shutdown():
