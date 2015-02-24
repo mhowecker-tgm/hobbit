@@ -1,4 +1,5 @@
 #!/usr/bin/python
+from rgbd_acquisition.srv._SetScale import SetScale
 
 ## David Fischinger
 ## first version: 24.2.2015
@@ -22,6 +23,7 @@ import time, sys
 from std_msgs.msg import String
 from sensor_msgs.msg import PointCloud2
 from table_object_detector.srv import *
+from rgbd_acquisition.srv import *
 
 
 class CalibrateHead():
@@ -42,16 +44,16 @@ class CalibrateHead():
         self.limitc1_x2 =  1.1
         self.limitc1_y1 = -0.1
         self.limitc1_y2 =  0.1
-        self.limitc1_z1 = -0.3
-        self.limitc1_z2 =  0.3
+        self.limitc1_z1 = -0.6
+        self.limitc1_z2 =  0.6
 
         #set space limits for cuboid 2 (away from) robot 
         self.limitc2_x1 =  1.9
         self.limitc2_x2 =  2.1
         self.limitc2_y1 = -0.1
         self.limitc2_y2 =  0.1
-        self.limitc2_z1 = -0.4
-        self.limitc2_z2 =  0.4
+        self.limitc2_z1 = -0.8
+        self.limitc2_z2 =  0.8
         
         self.nr_of_points_in_given_space = -1 # -1 <=> not correctly calculated, not valid
 
@@ -165,14 +167,16 @@ class CalibrateHead():
 def main(args):       
     print "calibrate head (tf, depth scaling factor) node started" 
     rospy.init_node('calibratehead_node', anonymous=False)
-
+    z_cuboid1 = z_cuboid2 = 0
     calibhead = CalibrateHead()
     rospy.sleep(3)
     calibhead.move_head( String("down_center") )
     print "main: ===> Head is sent to down_center position, wait for some seconds"
     rospy.sleep(5)  #wait for head movement
     
-    for i in range(5):
+    offset_succeded = False
+    iter = 6
+    for i in range(iter):
         print "calibration, iteration number: ", i
         calibhead.start_calibration()
         while (calibhead.wait):
@@ -185,10 +189,35 @@ def main(args):
         print "main: ==> z_cuboid2", z_cuboid2
         if calibhead.readjust_head(z_cuboid1, z_cuboid2):
             print "adjusting head was successful"
+            offset_succeded = True
             break
-        elif i == 4:
+        elif (i == iter-1):
             print "adjusting head was NOT successful"
     
+    #if changing the offset was successful, manipulate also the scaling
+    if (offset_succeded):
+        calibhead.start_calibration()   #get point cloud
+        while (calibhead.wait):
+            print "sleep: wait for pc"
+            rospy.sleep(0.1)
+        
+        z_error = (z_cuboid1+z_cuboid2)/2   #assume this is the error the whole plane is above the ground truth ground
+        print "the plane is to high by (m): ", (z_cuboid1+z_cuboid2)/2
+        camheight_dc = 1.20 #camera height (tf) when camera is looking down_center
+        scalingfactor = camheight_dc/(camheight_dc-z_error)
+        print "calculated SCALING FACTOR: ", scalingfactor
+        if abs(scalingfactor-1.0) > 0.01:
+            #scale whole point cloud (using service)
+            rospy.wait_for_service('/rgbd_acquisition/setScale')
+            try:
+                setscale = rospy.ServiceProxy('/rgbd_acquisition/setScale', SetScale)
+                input = SetScale()
+                input.factor = scalingfactor
+                result = setscale(input)
+                print "headcamera scaling factor was set"
+            except rospy.ServiceException, e:
+                print "Service call failed: %s"%e
+        
     #rospy.spin()
     
 if __name__ == "__main__":        
