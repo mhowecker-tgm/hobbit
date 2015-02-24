@@ -218,7 +218,7 @@ def main():
         )
         Sequence.add(
             'HEAD_MOVE',
-            head_move.MoveTo(pose='center_center'),
+            head_move.MoveTo(pose='littledown_center'),
             transitions={'aborted': 'failed'}
         )
         # if not DEBUG:
@@ -441,7 +441,7 @@ def main():
         )
         StateMachine.add(
             'HEAD_UP',
-            head_move.MoveTo(pose='center_center'),
+            head_move.MoveTo(pose='littledown_center'),
             transitions={'succeeded': 'SAY_WHAT_IS_THE_NAME',
                          'aborted': 'SET_FAILURE'}
         )

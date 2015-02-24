@@ -449,7 +449,7 @@ def get_bring_object():
         )
         smach.StateMachine.add(
             'MOVE_HEAD_UP',
-            head_move.MoveTo(pose='center_center'),
+            head_move.MoveTo(pose='littledown_center'),
             transitions={'succeeded': 'WAIT',
                          'preempted': 'CLEAN_UP',
                          'aborted': 'WAIT'}

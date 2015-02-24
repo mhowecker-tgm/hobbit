@@ -107,7 +107,7 @@ def returnTurntable():
             move_arm.returnTurnTable())
         Sequence.add(
             'MOVE_HEAD_FRONT',
-            head_move.MoveTo(pose='center_center'),
+            head_move.MoveTo(pose='littledown_center'),
             transitions={'aborted': 'failed'})
         Sequence.add('MMUI_MAIN_MENU', HobbitMMUI.ShowMenu(menu='MAIN'))
     return seq

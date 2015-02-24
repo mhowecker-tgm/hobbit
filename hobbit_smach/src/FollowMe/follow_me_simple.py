@@ -175,13 +175,13 @@ def main():
         )
         StateMachine.add(
             'HEAD_UP',
-            head_move.MoveTo(pose='center_center'),
+            head_move.MoveTo(pose='littledown_center'),
             transitions={'succeeded': 'SAY_STOP',
                          'aborted': 'SAY_STOP'}
         )
         StateMachine.add(
             'HEAD_UP1',
-            head_move.MoveTo(pose='center_center'),
+            head_move.MoveTo(pose='littledown_center'),
             transitions={'succeeded': 'SAY_STOP1',
                          'aborted': 'SAY_STOP1'}
         )

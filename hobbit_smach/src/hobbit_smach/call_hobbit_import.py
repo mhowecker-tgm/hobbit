@@ -444,7 +444,7 @@ def call_hobbit():
         )
         StateMachine.add(
             'HEAD_UP_AFTER_MOVEMENT',
-            head_move.MoveTo(pose='center_center'),
+            head_move.MoveTo(pose='littledown_center'),
             transitions={'succeeded': 'MMUI_BLIND_CLOSER',
                          'preempted': 'LOG_PREEMPT',
                          'aborted': 'LOG_ABORT'}

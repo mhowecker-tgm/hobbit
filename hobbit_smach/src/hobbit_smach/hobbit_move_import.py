@@ -346,7 +346,7 @@ def get_full_stop():
         )
         Sequence.add(
             'HEAD_CENTER',
-            head_move.MoveTo(pose='center_center')
+            head_move.MoveTo(pose='littledown_center')
         )
     return seq
 
@@ -568,7 +568,7 @@ def goToPosition(frame='/map', room='None', place='dock'):
         )
         Sequence.add(
             'HEAD_UP_AFTER_MOVEMENT',
-            head_move.MoveTo(pose='center_center')
+            head_move.MoveTo(pose='littledown_center')
         )
         Sequence.add(
             'GET_ROBOTS_CURRENT_ROOM',
@@ -590,7 +590,7 @@ def goToPosition(frame='/map', room='None', place='dock'):
         )
         Sequence.add(
             'HEAD_UP',
-            head_move.MoveTo(pose='center_center')
+            head_move.MoveTo(pose='littledown_center')
         )
         Sequence.add(
             'PREPARE_STOP_1',
@@ -709,7 +709,7 @@ def goToPose():
         )
         Sequence.add(
             'HEAD_UP_AFTER_MOVEMENT',
-            head_move.MoveTo(pose='center_center')
+            head_move.MoveTo(pose='littledown_center')
         )
         # Sequence.add('ENABLE_GESTURES',
         #              service_disable.enable_gestures())
@@ -726,7 +726,7 @@ def goToPose():
         )
         Sequence.add(
             'HEAD_UP',
-            head_move.MoveTo(pose='center_center')
+            head_move.MoveTo(pose='littledown_center')
         )
         Sequence.add(
             'PREPARE_STOP_1',
@@ -811,7 +811,7 @@ def goToPoseSilent():
         )
         Sequence.add(
             'HEAD_UP_AFTER_MOVEMENT',
-            head_move.MoveTo(pose='center_center')
+            head_move.MoveTo(pose='littledown_center')
         )
         # Sequence.add('ENABLE_GESTURES',
         #              service_disable.enable_gestures())
@@ -823,7 +823,7 @@ def goToPoseSilent():
         )
         Sequence.add(
             'HEAD_UP',
-            head_move.MoveTo(pose='center_center')
+            head_move.MoveTo(pose='littledown_center')
         )
         Sequence.add(
             'PREPARE_STOP_1',
