@@ -71,6 +71,7 @@
 
 #include <sstream>
 #include "table_object_detector/CheckFreeSpace.h"
+#include "table_object_detector/CheckMeanValuesForDefinedSpace.h"
 #include "table_object_detector/CheckCameraDistanceCenter.h"
 
 using namespace std;
@@ -87,14 +88,17 @@ public:
 	ros::Publisher pc_cfs_old_cs; //df 11.2.2015
 	ros::Publisher pc_cfs_new_cs; //df 11.2.2015
 	ros::Publisher pc_from_check_free_space_pub;
+	ros::Publisher pc_from_check_mean_values_for_defined_space_pub;
 	ros::Publisher pc_for_basketdet_cam1_pub;		//in camera coordinate system, basket points eliminated
 	ros::Publisher position_highestpoint_pub;
 	ros::Subscriber pc_cam1_sub;
 	ros::Subscriber pc_cam1_sub2;
 	ros::Subscriber pc_cam2_sub;
 	ros::ServiceServer service_check_free_space;
+	ros::ServiceServer service_check_mean_values_for_defined_space;
 	ros::ServiceServer service_check_camera_distance_center;
 	pcl::PointCloud<pcl::PointXYZ> pc_check_free_space_new_cs; //cs ...coordinate system
+	pcl::PointCloud<pcl::PointXYZ> pc_new_cs; //cs ...coordinate system, for check_mean_values_for_defined_space
 	pcl::PointCloud<pcl::PointXYZ> pc_cam1;
 	pcl::PointCloud<pcl::PointXYZ> pc_cam2;
 	pcl::PointCloud<pcl::PointXYZ> pc_for_basketdet_out;
@@ -121,6 +125,8 @@ public:
 	void segment_pc(pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_cloud_merged );
 	//service function for check_free_space
 	bool check_free_space(table_object_detector::CheckFreeSpace::Request  &req, table_object_detector::CheckFreeSpace::Response &res);
+	//service function for check_mean_values_for_defined_space
+	bool check_mean_values_for_defined_space(table_object_detector::CheckMeanValuesForDefinedSpace::Request  &req, table_object_detector::CheckMeanValuesForDefinedSpace::Response &res);
 	//service function for check_camera_distance_center
 	bool check_camera_distance_center(table_object_detector::CheckCameraDistanceCenter::Request  &req, table_object_detector::CheckCameraDistanceCenter::Response &res);
 

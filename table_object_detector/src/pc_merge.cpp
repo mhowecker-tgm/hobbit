@@ -33,6 +33,7 @@
 #include "tf/transform_listener.h"
 
 #include "table_object_detector/CheckFreeSpace.h"
+#include "table_object_detector/CheckMeanValuesForDefinedSpace.h"
 #include "table_object_detector/CheckCameraDistanceCenter.h"
 
 
@@ -49,8 +50,8 @@ CPCMerge::CPCMerge(ros::NodeHandle nh_)
   service_check_camera_distance_center = nh.advertiseService("check_camera_distance_center", &CPCMerge::check_camera_distance_center, this);
 
   //df dddd new 11.2.2015 for debugging:
-  pc_cfs_old_cs = nh.advertise<pcl::PointCloud<pcl::PointXYZ> >("/df_pc_in_for_cfs_pcmerge_old_cs",1); //pc in for cfs
-  pc_cfs_new_cs = nh.advertise<pcl::PointCloud<pcl::PointXYZ> >("/df_pc_in_for_cfs_pcmerge_new_cs",1); //pc in for cfs
+  //pc_cfs_old_cs = nh.advertise<pcl::PointCloud<pcl::PointXYZ> >("/df_pc_in_for_cfs_pcmerge_old_cs",1); //pc in for cfs
+  //pc_cfs_new_cs = nh.advertise<pcl::PointCloud<pcl::PointXYZ> >("/df_pc_in_for_cfs_pcmerge_new_cs",1); //pc in for cfs
 
 
   //define subscriber
@@ -80,13 +81,13 @@ bool CPCMerge::check_free_space(table_object_detector::CheckFreeSpace::Request  
   pcl::fromROSMsg(req.cloud, pcl_cloud_check_free_space_old_cs); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!
   
   //df 11.2.2015
-  pc_cfs_old_cs.publish(pcl_cloud_check_free_space_old_cs);
+  //pc_cfs_old_cs.publish(pcl_cloud_check_free_space_old_cs);
   pc_check_free_space_new_cs = pcl_cloud_check_free_space_old_cs;
 
   pcl_ros::transformPointCloud(req.frame_id_desired.data.c_str(), pcl_cloud_check_free_space_old_cs, pc_check_free_space_new_cs, tf_listener);
 
   //df 11.2.2015
-  pc_cfs_new_cs.publish(pc_check_free_space_new_cs);
+  //pc_cfs_new_cs.publish(pc_check_free_space_new_cs);
 
   pcl::PointCloud<pcl::PointXYZ> pcl_cloud_merged;  //needed zwischenstep?
   pcl_cloud_merged = pc_check_free_space_new_cs;
@@ -107,6 +108,82 @@ bool CPCMerge::check_free_space(table_object_detector::CheckFreeSpace::Request  
   return true;
 }
 
+
+/* 23.2.2015
+ * This service takes a point cloud, transforms the point cloud to the desired tf-frame, uses given limits to cut a block,
+ * and calculates the average x,y,and z-values of this block. In addition it returns the number of points in this block
+ *
+ * input:
+ * 		  point cloud
+ * 		  original tf_frame
+ *        disired_tf_frame
+ *        limit min_x, max_x, min_y, max_y, min_z, max_z
+ *
+ * output:
+ * 		  average height in mm of points in cloud (new tf-system) in box defined by limits
+ */
+bool CPCMerge::check_mean_values_for_defined_space/*free_space*/(table_object_detector::CheckMeanValuesForDefinedSpace::Request  &req,
+		 table_object_detector::CheckMeanValuesForDefinedSpace::Response &res)
+{
+  m.lock();
+  ROS_INFO("pc_merge.cpp: check_mean_values_for_defined_space: point cloud received");
+  //search for tf transform for pc for the 2 given input and output tf-frames
+  ros::Time now = req.cloud.header.stamp;
+  bool foundTransform = tf_listener.waitForTransform(req.frame_id_desired.data.c_str(), req.frame_id_original.data.c_str(), now, ros::Duration(5.0));
+  if (!foundTransform)
+  {
+	ROS_WARN("check_mean_values_for_defined_space: No transform for point cloud found");
+	m.unlock();
+	return false;
+  }
+
+  //ROS_INFO(tf_listener);
+  ROS_INFO("check_mean_values_for_defined_space: Transform for point cloud found");
+
+  pcl::PointCloud<pcl::PointXYZ> pcl_cloud_old_cs;
+  pcl::fromROSMsg(req.cloud, pcl_cloud_old_cs); // !
+
+  pc_new_cs = pcl_cloud_old_cs;
+
+  pcl_ros::transformPointCloud(req.frame_id_desired.data.c_str(), pcl_cloud_old_cs, pc_new_cs, tf_listener);
+
+  pcl::PointCloud<pcl::PointXYZ> pcl_cloud_merged;  //needed zwischenstep?
+  pcl_cloud_merged = pc_new_cs;
+
+
+  filter_pc(pcl_cloud_merged, false, req.x1, req.x2, req.y1, req.y2, req.z1, req.z2); //second entry false <=> coordinates of highest points of scene are published instead of basket center point
+  ROS_INFO("%d",(int)pcl_cloud_merged.points.size());
+
+  //publish point clouds of area where free space was checked
+  if (pcl_cloud_merged.points.size() > 0)
+  {
+	  pc_from_check_mean_values_for_defined_space_pub.publish(pcl_cloud_merged);
+  }
+
+  //go through points and calculate mean height
+  float x_sum,y_sum,z_sum;
+  x_sum=0;
+  y_sum=0;
+  z_sum=0;
+
+  for (int i=0; i< pcl_cloud_merged.points.size(); i++){
+	  x_sum += pcl_cloud_merged.points[i].x;
+	  y_sum += pcl_cloud_merged.points[i].y;
+	  z_sum += pcl_cloud_merged.points[i].z;
+  }
+
+  res.nr_points_in_area = pcl_cloud_merged.points.size();
+  res.x_mean = x_sum/pcl_cloud_merged.points.size();
+  res.y_mean = y_sum/pcl_cloud_merged.points.size();
+  res.z_mean = z_sum/pcl_cloud_merged.points.size();
+
+  ROS_INFO("sending back response res.nr_points_in_area: [%ld]", (long int)res.nr_points_in_area);
+  ROS_INFO("sending back response res.x_mean: [%f]", (float)res.x_mean);
+  ROS_INFO("sending back response res.y_mean: [%f]", (float)res.y_mean);
+  ROS_INFO("sending back response res.z_mean: [%f]", (float)res.z_mean);
+  m.unlock();
+  return true;
+}
 
 
 

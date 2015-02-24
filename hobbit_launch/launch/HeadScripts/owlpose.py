@@ -176,7 +176,16 @@ def command(msg):
 		rospy.sleep(0.5)
 		herkulex.setAngles(pitch=0, yaw=0, playtime=150)
 		print "Move to center_center"
-			
+
+def read_and_set_offsets(msg):
+	#Read calibration parameters
+	pitch_offset = rospy.get_param('/hobbit/head/pitch_offset', 0)
+	yaw_offset = rospy.get_param('/hobbit/head/yaw_offset', 0)
+	print "set pitch offset of: ", float(pitch_offset)
+	herkulex.setPitchOffset(float(pitch_offset))
+	print "set yaw offset of: ", float(yaw_offset)
+	herkulex.setYawOffset(float(yaw_offset))
+
 def init():
 	#Initialize Rosnode:
 	rospy.init_node('owlpose')
@@ -194,6 +203,7 @@ def init():
 	rospy.Subscriber("/head/move", std_msgs.msg.String, set_head_orientation)
 	rospy.Subscriber("/head/move/incremental", std_msgs.msg.String, set_head_orientation, queue_size=1)
 	rospy.Subscriber("/head/cmd", std_msgs.msg.String, command)
+	rospy.Subscriber("/head/trigger/set_offsets", std_msgs.msg.String, read_and_set_offsets, queue_size=1)
 	
 	#Read calibration parameters
 	pitch_offset = rospy.get_param('/hobbit/head/pitch_offset', 0)
