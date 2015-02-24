@@ -159,29 +159,36 @@ bool CPCMerge::check_mean_values_for_defined_space/*free_space*/(table_object_de
   if (pcl_cloud_merged.points.size() > 0)
   {
 	  pc_from_check_mean_values_for_defined_space_pub.publish(pcl_cloud_merged);
+	  res.nr_points_in_area = pcl_cloud_merged.points.size();
+	  //res.x_mean = -10000;
+	  //res.y_mean = -10000;
+	  //res.z_mean = -10000;
+	  ROS_INFO("sending back response res.nr_points_in_area: [%ld]", (long int)res.nr_points_in_area);
   }
+  else {
 
-  //go through points and calculate mean height
-  float x_sum,y_sum,z_sum;
-  x_sum=0;
-  y_sum=0;
-  z_sum=0;
+	  //go through points and calculate mean height
+	  float x_sum,y_sum,z_sum;
+	  x_sum=0;
+	  y_sum=0;
+	  z_sum=0;
 
-  for (int i=0; i< pcl_cloud_merged.points.size(); i++){
-	  x_sum += pcl_cloud_merged.points[i].x;
-	  y_sum += pcl_cloud_merged.points[i].y;
-	  z_sum += pcl_cloud_merged.points[i].z;
+	  for (int i=0; i< pcl_cloud_merged.points.size(); i++){
+		  x_sum += pcl_cloud_merged.points[i].x;
+		  y_sum += pcl_cloud_merged.points[i].y;
+		  z_sum += pcl_cloud_merged.points[i].z;
+	  }
+
+	  res.nr_points_in_area = pcl_cloud_merged.points.size();
+	  res.x_mean = x_sum/pcl_cloud_merged.points.size();
+	  res.y_mean = y_sum/pcl_cloud_merged.points.size();
+	  res.z_mean = z_sum/pcl_cloud_merged.points.size();
+
+	  ROS_INFO("sending back response res.nr_points_in_area: [%ld]", (long int)res.nr_points_in_area);
+	  ROS_INFO("sending back response res.x_mean: [%f]", (float)res.x_mean);
+	  ROS_INFO("sending back response res.y_mean: [%f]", (float)res.y_mean);
+	  ROS_INFO("sending back response res.z_mean: [%f]", (float)res.z_mean);
   }
-
-  res.nr_points_in_area = pcl_cloud_merged.points.size();
-  res.x_mean = x_sum/pcl_cloud_merged.points.size();
-  res.y_mean = y_sum/pcl_cloud_merged.points.size();
-  res.z_mean = z_sum/pcl_cloud_merged.points.size();
-
-  ROS_INFO("sending back response res.nr_points_in_area: [%ld]", (long int)res.nr_points_in_area);
-  ROS_INFO("sending back response res.x_mean: [%f]", (float)res.x_mean);
-  ROS_INFO("sending back response res.y_mean: [%f]", (float)res.y_mean);
-  ROS_INFO("sending back response res.z_mean: [%f]", (float)res.z_mean);
   m.unlock();
   return true;
 }
