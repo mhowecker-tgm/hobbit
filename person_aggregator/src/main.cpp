@@ -178,8 +178,8 @@ void personMessageAggregator(const person_aggregator::Person & msg , unsigned in
     prsn.actualTheta = msg.theta;
 
     prsn.actualInFieldOfView = msg.inFieldOfView;
-    prsn.actualInFieldOfView = msg.confidence;
-    prsn.actualInFieldOfView = msg.timestamp;
+    prsn.actualConfidence    = msg.confidence; //fixed copy paste bug , thanks Daniel 24/2/2015
+    prsn.actualTimestamp     = msg.timestamp;
 
     if (prsn.source<TOTAL_TIMERS)
     {
