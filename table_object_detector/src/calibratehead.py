@@ -14,13 +14,6 @@
 
 
 
-# subscribes to /SS/doSingleShotTestCFS", if String comes in:
-#     subscribes to /headcam/depth_registered/points and uses point cloud for service call
-# publishes result (= number of points in defined area)
-# after that it unregisters subscriber of /headcam/depth_registered/points 
-
-
-
 PKG = 'hobbit_smach'
 import roslib; roslib.load_manifest(PKG)
 import rospy
@@ -33,7 +26,7 @@ from table_object_detector.srv import *
 
 class CalibrateHead():
     def __init__(self, parent=None):
-    
+        print "CalibrateHead.__init__() started"
         self.heightdiff_th = 0.03   #threshold that is accepted for heigt difference on 2 different spots (in m)
         self.pc_sub = None
         #Publisher
