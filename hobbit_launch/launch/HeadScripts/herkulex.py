@@ -157,7 +157,7 @@ def setAngles(pitch=0,yaw=0,playtime=70):
 	# The head might currently stand at any angle.
 	print "prev angles: " + str(lastSetPitch) + " " + str(lastSetYaw)
 	if firstSetCommand:
-		currentAngles = getAngles()
+		valid,currentAngles = getAngles()
 		lastSetPitch = currentAngles[0]
 		lastSetYaw = currentAngles[1]
 		firstSetCommand = False
