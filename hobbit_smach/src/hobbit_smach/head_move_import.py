@@ -4,12 +4,11 @@
 PKG = 'hobbit_smach'
 NAME = 'head_move'
 
-import roslib
-roslib.load_manifest(PKG)
 import rospy
 
 from smach import State
 from std_msgs.msg import String
+from std_srvs,srv import Empty
 
 
 class MoveTo(State):
@@ -31,9 +30,22 @@ class MoveTo(State):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
+        rospy.wait_for_service('/emergency_detector/startHeadMotion', timeout=2)
+        startHeadMotion = rospy.ServiceProxy('/emergency_detector/startHeadMotion', Empty)
+        try:
+            resp = startHeadMotion()
+        except rospy.ServiceException as exc:
+            print("Service did not process request: " + str(exc))
         if self._pose in self._available_poses:
             print(self._pose)
             self._publisher.publish(self._pose)
+            rospy.sleep(2)
+            rospy.wait_for_service('/emergency_detector/stopHeadMotion', timeout=2)
+            stopHeadMotion = rospy.ServiceProxy('/emergency_detector/stopHeadMotion', Empty)
+            try:
+                resp = stopHeadMotion()
+            except rospy.ServiceException as exc:
+                print("Service did not process request: " + str(exc))
             return 'succeeded'
         else:
             print(self._pose)
