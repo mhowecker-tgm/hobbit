@@ -245,75 +245,6 @@ def construct_sm():
     return cc
 
 
-def getRecharge():
-    """This function handles the autonomous charging sequence.
-    It is without the user interaction and is mainly used during
-    the night or as part of the recharging scenario.
-    """
-
-    seq = Sequence(
-        outcomes=['succeeded', 'aborted', 'preempted'],
-        connector_outcome='succeeded',
-    )
-    seq.userdata.room_name = 'dock'
-    seq.userdata.location_name = 'dock'
-
-    with seq:
-        if not DEBUG:
-            Sequence.add(
-                'SET_NAV_GOAL',
-                hobbit_move.SetNavGoal(room='dock', place='dock')
-            )
-            Sequence.add(
-                'MOVE_TO_DOCK',
-                hobbit_move.goToPose())
-            Sequence.add(
-                'DOCKING',
-                startDockProcedure())
-        else:
-            pass
-        Sequence.add('MMUI_MAIN_MENU', HobbitMMUI.ShowMenu(menu='MAIN'),
-                     transitions={'failed': 'aborted'})
-    return seq
-
-
-# def get_end_recharge():
-#     """This function handles the autonomous charging sequence.
-#     It is without the user interaction and is mainly used during
-#     the night or as part of the recharging scenario.
-#     """
-#
-#     seq = Sequence(
-#         outcomes=['succeeded', 'aborted', 'preempted'],
-#         input_keys=['room_name', 'location_name'],
-#         connector_outcome='succeeded'
-#     )
-#
-#     with seq:
-#         Sequence.add(
-#             'UNDOCK',
-#             hobbit_move.Undock()
-#         )
-#         #  Sequence.add(
-#         #      'SOUND',
-#         #      speech_output.playMoveOut()
-#         #  )
-#         Sequence.add(
-#             'WAIT_FOR_MIRA',
-#             SleepState(duration=5)
-#         )
-#         Sequence.add(
-#             'SET_NAV_GOAL_DOCK',
-#             hobbit_move.SetNavGoal(room='dock', place='dock')
-#         )
-#         Sequence.add(
-#             'MOVE_AWAY_FROM_DOCK',
-#             hobbit_move.goToPose())
-#     return seq
-#
-#
-
-
 class CheckMsgState(WaitForMsgState):
     def __init__(self, topic, msg_type, msg_cb=None, output_keys=None, latch=False, timeout=None):
         if output_keys is None:
@@ -384,7 +315,7 @@ def call_hobbit():
         )
         StateMachine.add(
             'MOVE_TO_GOAL',
-            hobbit_move.goToPose(),
+            hobbit_move.goToPoseSilent(),
             transitions={'succeeded': 'HEAD_UP',
                          'aborted': 'LOG_ABORT',
                          'preempted': 'LOG_PREEMPT'}
