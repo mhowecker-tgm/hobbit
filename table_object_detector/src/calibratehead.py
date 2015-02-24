@@ -52,9 +52,7 @@ class CalibrateHead():
         self.limitc2_z2 =  0.4
         
         self.nr_of_points_in_given_space = -1 # -1 <=> not correctly calculated, not valid
-        self.headmove_pub.publish(String("down_center"))
-        print "CalibrateHead.__init__() ===> Head is sent to down_center position, wait for some seconds"
-        rospy.sleep(5)  #wait for head movement
+
     
     #executes head movement commands
     def move_head(self, cmd):
@@ -149,9 +147,9 @@ class CalibrateHead():
         rospy.sleep(1)
         self.actualize_head_offsets_pub.publish(String("asdf"))
         rospy.sleep(3)
-        self.headmove_pub(String("center_center"))
+        self.move_head( String("center_center") )
         rospy.sleep(3)
-        self.headmove_pub(String("down_center"))
+        self.move_head( String("down_center") )
         rospy.sleep(3)
         
         return False
@@ -163,6 +161,10 @@ def main(args):
     rospy.init_node('calibratehead_node', anonymous=False)
 
     calibhead = CalibrateHead()
+    rospy.sleep(3)
+    calibhead.move_head( String("down_center") )
+    print "main: ===> Head is sent to down_center position, wait for some seconds"
+    rospy.sleep(5)  #wait for head movement
     
     for i in range(5):
         print "calibration, iteration number: ", i
