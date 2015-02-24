@@ -8,7 +8,7 @@ import rospy
 
 from smach import State
 from std_msgs.msg import String
-from std_srvs,srv import Empty
+from std_srvs.srv import Empty
 
 
 class MoveTo(State):

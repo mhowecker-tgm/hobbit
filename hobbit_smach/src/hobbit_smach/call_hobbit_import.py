@@ -25,7 +25,7 @@ import head_move_import as head_move
 from uashh_smach.util import WaitForMsgState, SleepState
 from hobbit_msgs.msg import Event
 from hobbit_msgs.srv import SetCloserStateRequest
-from hobbit_msgs.srv import SetCloserState
+from hobbit_msgs.srv import SwitchVision, SwitchVisionRequest, SetCloserState
 
 def closer_cb(ud, goal):
     params=[]
@@ -312,14 +312,6 @@ def getRecharge():
 #     return seq
 #
 #
-
-def person_cb(msg, ud):
-    print(msg)
-    #if msg.source == 6:
-    #    return None
-    ud.person_x = msg.x
-    ud.person_z = msg.z
-    return True
 
 
 class CheckMsgState(WaitForMsgState):
