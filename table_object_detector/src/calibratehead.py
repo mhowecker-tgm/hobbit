@@ -133,17 +133,17 @@ class CalibrateHead():
         if abs(z_diff) < self.heightdiff_th:   # plane is acceptably horizontal
             return True
         elif z_diff < -0.2:
-            offsetshift = 5
-        elif z_diff < -0.1:
-            offsetshift = 3
-        elif z_diff < -self.heightdiff_th:
-            offsetshift = 1            
-        elif z_diff > 0.2:
             offsetshift = -5
-        elif z_diff > 0.1:
+        elif z_diff < -0.1:
             offsetshift = -3
+        elif z_diff < -self.heightdiff_th:
+            offsetshift = -1            
+        elif z_diff > 0.2:
+            offsetshift = 5
+        elif z_diff > 0.1:
+            offsetshift = 3
         elif z_diff > self.heightdiff_th:
-            offsetshift = -1
+            offsetshift = 1
          
         cur_pitch_offset = rospy.get_param('/hobbit/head/pitch_offset', 0)
         print "==> readjust_head: current pitch offset read from rosparameter: ", cur_pitch_offset   
