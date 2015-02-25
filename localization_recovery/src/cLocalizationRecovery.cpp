@@ -25,12 +25,9 @@ cLocalizationRecovery::cLocalizationRecovery(int argc, char **argv) : init_argc(
 
 	current_motion_state.data = "Idle";
 
-	check_goal_client = n.serviceClient<hobbit_msgs::GetState>("/is_goal_active");
-
 	emergency_stop_client = n.serviceClient<mira_msgs::EmergencyStop>("/emergency_stop");
   	reset_motorstop_client = n.serviceClient<mira_msgs::ResetMotorStop>("/reset_motorstop");
 
-	cancel_goal_client = n.serviceClient<std_srvs::Empty>("/cancel_nav_goal");
  	check_rotation_client = n.serviceClient<hobbit_msgs::GetState>("/check_rotation");
 
 	discrete_motion_cmd_pub = n.advertise<std_msgs::String>("/DiscreteMotionCmd", 20);
@@ -83,42 +80,6 @@ void cLocalizationRecovery::executeCb(const hobbit_msgs::GeneralHobbitGoalConstP
 
 	started_rotation = false;
 	finished_rotation = false;
-
-	//if no current goal abort
-	hobbit_msgs::GetState my_srv;
-	std::cout << "calling service!!!!!!!! " << std::endl;
-	//check_goal_client.call(my_srv);
-	if (check_goal_client.call(my_srv))
-	{
-		if(!my_srv.response.state) 
-		{
-			std::cout << "no current goal " << std::endl;
-			as_->setAborted(hobbit_msgs::GeneralHobbitResult(), "aborted");
-			return;
-		}
-	}
-	else
-	{
-		as_->setAborted(hobbit_msgs::GeneralHobbitResult(), "aborted");
-		ROS_DEBUG("Failed to call service is_goal_active");
-		return;
-		
-	}
-
-	//cancel current goal
-	std::cout << "cancel goal " << std::endl;
-	std_srvs::Empty srv;
-	if (!cancel_goal_client.call(srv))
-	{
-	  ROS_INFO("Failed to call service cancel_nav_goal");
-	  as_->setAborted(hobbit_msgs::GeneralHobbitResult(), "aborted"); 
-	  return;
-	}
-
-	else
-		std::cout << "Navigation goal cancelled" << std::endl;
-
-	sleep(3);
 
 	std::cout << "check rotation " << std::endl;
 

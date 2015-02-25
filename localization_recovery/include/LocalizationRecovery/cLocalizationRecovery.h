@@ -25,8 +25,6 @@ public:
 
 private:
 	int numb;
-	ros::ServiceClient check_goal_client;
-	ros::ServiceClient cancel_goal_client;
   	ros::ServiceClient check_rotation_client;
   	ros::Publisher discrete_motion_cmd_pub;
   	bool started_rotation;
