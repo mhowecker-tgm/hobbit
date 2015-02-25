@@ -41,6 +41,8 @@ void broadcastNewPerson()
   msg.z = actualZ;
   msg.source = 3;
   msg.theta = actualTheta;
+  ros::Time timestampOfCreation = ros::Time::now();
+  msg.stamp = timestampOfCreation;
 
   msg.inFieldOfView = 1;
   msg.confidence = actualConfidence;
