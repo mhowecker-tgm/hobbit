@@ -79,6 +79,9 @@ struct personMessageSt
 {
     float actualX , actualY , actualZ , actualTheta , actualConfidence;
     unsigned int actualTimestamp , actualInFieldOfView;
+
+    unsigned long seconds;
+    unsigned long nsecs;
     unsigned int source;
 };
 
@@ -95,6 +98,11 @@ void broadcastNewPerson( struct personMessageSt * p)
   msg.z = p->actualZ;
   msg.source = p->source;
   msg.theta = p->actualTheta;
+
+  ros::Time timestampOfCreation;
+  timestampOfCreation.sec = p->seconds;
+  timestampOfCreation.nsec = p->nsecs;
+  msg.stamp = timestampOfCreation;
 
   msg.inFieldOfView = p->actualInFieldOfView;
   msg.confidence = p->actualConfidence;
@@ -173,6 +181,9 @@ void personMessageAggregator(const person_aggregator::Person & msg , unsigned in
     prsn.actualX = msg.x;
     prsn.actualY = msg.y;
     prsn.actualZ = msg.z;
+
+    prsn.seconds = msg.stamp.sec;
+    prsn.nsecs = msg.stamp.nsec;
 
     prsn.source = msg.source;
     prsn.actualTheta = msg.theta;
@@ -257,6 +268,11 @@ bool trigger(std_srvs::Empty::Request& request, std_srvs::Empty::Response& respo
     p.actualZ=1000;
     p.actualTheta=0;
     p.source=0;
+
+
+    ros::Time timestampOfCreation = ros::Time::now();
+    p.seconds = timestampOfCreation.sec;
+    p.nsecs = timestampOfCreation.nsec;
     //--------------
     broadcastNewPerson(&p);
 
