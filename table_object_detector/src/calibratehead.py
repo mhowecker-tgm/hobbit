@@ -213,7 +213,7 @@ def main(args):
                 setscale = rospy.ServiceProxy('/rgbd_acquisition/setScale', SetScale)
                 input = SetScale()
                 input.factor = scalingfactor
-                result = setscale(input)
+                result = setscale(input.factor)
                 print "headcamera scaling factor was set"
             except rospy.ServiceException, e:
                 print "Service call failed: %s"%e
