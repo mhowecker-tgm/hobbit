@@ -94,7 +94,9 @@ then
  miracenter mira_vis_config.xml&
 
  sleep $DELAY_BETWEEN_STEPS
-sleep $DELAY_BETWEEN_STEPS
+ sleep $DELAY_BETWEEN_STEPS
+ sleep $DELAY_BETWEEN_STEPS
+
  cd /opt/ros/hobbit_hydro/src/interfaces_mira/launch
  roslaunch startup.launch&
 
