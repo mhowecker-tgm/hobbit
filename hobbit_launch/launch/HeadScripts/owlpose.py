@@ -37,6 +37,9 @@ imuPitch = 0
 # indicates whether the robot is currently moving, in which case IMU values
 # are not valid
 robotMoving = False
+pitch_offset = 0
+yaw_offset = 0
+imu_pitch_offset = 0
 
 def set_head_orientation(msg):
 	valid,currentAngles = herkulex.getAngles()
@@ -193,22 +196,24 @@ def command(msg):
 # NOTE: this assumes a specific mounting of the IMU inside the head:
 # z pointing down, x pointing forward
 def imuUpdate(msg):
-	# never forget those global definitions - god how I hate python ..
-	global imuPitch
-	global robotMoving
+    # never forget those global definitions - god how I hate python ..
+    global imuPitch
+    global robotMoving
+    global imu_pitch_offset
+
 	# HACK: this actually needs a mutex or something. No idea how that works
 	# in python. I hate python. I also hate HOBBIT.
-	if robotMoving == False:
-		x = msg.linear_acceleration.x
-		y = msg.linear_acceleration.y
-		z = msg.linear_acceleration.z
-		m = math.sqrt(x*x + y*y + z*z)
-		x = x/m
-		y = y/m
-		z = z/m
-		# HACK: this also needs a mutex or something.
-		imuPitch = -math.asin(x)*180.0/math.pi
-	# else: do not update angle
+    if robotMoving == False:
+        x = msg.linear_acceleration.x
+        y = msg.linear_acceleration.y
+        z = msg.linear_acceleration.z
+        m = math.sqrt(x*x + y*y + z*z)
+        x = x/m
+        y = y/m
+        z = z/m
+        # HACK: this also needs a mutex or something.
+        imuPitch = -math.asin(x)*180.0/math.pi - imu_pitch_offset
+    # else: do not update angle
 
 # store whether the robot is currently moving
 def movementUpdate(msg):
@@ -220,58 +225,66 @@ def movementUpdate(msg):
 		robotMoving = True
 
 def read_and_set_offsets(msg):
+    global pitch_offset
+    global yaw_offset
+    global imu_pitch_offset
 	#Read calibration parameters
-	pitch_offset = rospy.get_param('/hobbit/head/pitch_offset', 0)
-	yaw_offset = rospy.get_param('/hobbit/head/yaw_offset', 0)
-	print "set pitch offset of: ", float(pitch_offset)
-	herkulex.setPitchOffset(float(pitch_offset))
-	print "set yaw offset of: ", float(yaw_offset)
-	herkulex.setYawOffset(float(yaw_offset))
+    pitch_offset = rospy.get_param('/hobbit/head/pitch_offset', 0)
+    yaw_offset = rospy.get_param('/hobbit/head/yaw_offset', 0)
+    imu_pitch_offset = rospy.get_param('/hobbit/head/imu_pitch_offset', 0)
+    print "set pitch offset of: ", float(pitch_offset)
+    herkulex.setPitchOffset(float(pitch_offset))
+    print "set yaw offset of: ", float(yaw_offset)
+    herkulex.setYawOffset(float(yaw_offset))
 
 def init():
-	global imuPitch
-
-	#Initialize Rosnode:
-	rospy.init_node('owlpose')
-	print "Initialized"
-	#rospy.sleep(3)
-	#Initialize Servos:
-	#herkulex.resetServos()
-	#print "Servo Reset"
-	#herkulex.setTorque()
-	#print "Torque Set"
-	#herkulex.setAngles(pitch=0, yaw=0, playtime=150)
-	#print "Move to center_center"
-	
-	#Subscriber for Movements:
-	rospy.Subscriber("/head/move", std_msgs.msg.String, set_head_orientation)
-	rospy.Subscriber("/head/move/incremental", std_msgs.msg.String, set_head_orientation, queue_size=1)
-	rospy.Subscriber("/head/cmd", std_msgs.msg.String, command)
-	#Subscriber to IMU messages for tilt angle
-	rospy.Subscriber("/imu/data_raw", sensor_msgs.msg.Imu, imuUpdate)
-	#Subscriber to robot motion state
-	rospy.Subscriber("/DiscreteMotionState", std_msgs.msg.String, movementUpdate)
-	#get triggered if new calibration offsets are available
-	rospy.Subscriber("/head/trigger/set_offsets", std_msgs.msg.String, read_and_set_offsets, queue_size=1)
-	
-	#Read calibration parameters
-	pitch_offset = rospy.get_param('/hobbit/head/pitch_offset', 0)
-	yaw_offset = rospy.get_param('/hobbit/head/yaw_offset', 0)
-	print "set pitch offset of: ", float(pitch_offset)
-	herkulex.setPitchOffset(float(pitch_offset))
-	print "set yaw offset of: ", float(yaw_offset)
-	herkulex.setYawOffset(float(yaw_offset))
-	
-	#Send geometry/tf constantly with 5hz
-	r = rospy.Rate(5) #5hz
-	while not rospy.is_shutdown():
-		#get angles from neck servos
-		valid,angles = herkulex.getAngles()
-		if valid:
-			#ignore the servo pitch angle (0) and use pitch from IMU instead
-			br.sendTransform( (0,0,0), tf.transformations.quaternion_from_euler(0, imuPitch/180.0*math.pi, angles[1]/180.0*math.pi), rospy.Time.now(), base_tf, head_tf)
-		print "owlpose pitch/yaw [deg]: " + str(imuPitch) + " " + str(angles[1])
-		r.sleep()
+    global imuPitch
+    global pitch_offset
+    global yaw_offset
+    global imu_pitch_offset
+    
+    #Initialize Rosnode:
+    rospy.init_node('owlpose')
+    print "Initialized"
+    #rospy.sleep(3)
+    #Initialize Servos:
+    #herkulex.resetServos()
+    #print "Servo Reset"
+    #herkulex.setTorque()
+    #print "Torque Set"
+    #herkulex.setAngles(pitch=0, yaw=0, playtime=150)
+    #print "Move to center_center"
+    
+    #Subscriber for Movements:
+    rospy.Subscriber("/head/move", std_msgs.msg.String, set_head_orientation)
+    rospy.Subscriber("/head/move/incremental", std_msgs.msg.String, set_head_orientation, queue_size=1)
+    rospy.Subscriber("/head/cmd", std_msgs.msg.String, command)
+    #Subscriber to IMU messages for tilt angle
+    rospy.Subscriber("/imu/data_raw", sensor_msgs.msg.Imu, imuUpdate)
+    #Subscriber to robot motion state
+    rospy.Subscriber("/DiscreteMotionState", std_msgs.msg.String, movementUpdate)
+    #get triggered if new calibration offsets are available
+    rospy.Subscriber("/head/trigger/set_offsets", std_msgs.msg.String, read_and_set_offsets, queue_size=1)
+    
+    #Read calibration parameters
+    pitch_offset = rospy.get_param('/hobbit/head/pitch_offset', 0)
+    yaw_offset = rospy.get_param('/hobbit/head/yaw_offset', 0)
+    imu_pitch_offset = rospy.get_param('/hobbit/head/imu_pitch_offset', 0)
+    print "set pitch offset of: ", float(pitch_offset)
+    herkulex.setPitchOffset(float(pitch_offset))
+    print "set yaw offset of: ", float(yaw_offset)
+    herkulex.setYawOffset(float(yaw_offset))
+    
+    #Send geometry/tf constantly with 5hz
+    r = rospy.Rate(5) #5hz
+    while not rospy.is_shutdown():
+    	#get angles from neck servos
+    	valid,angles = herkulex.getAngles()
+    	if valid:
+    		#ignore the servo pitch angle (0) and use pitch from IMU instead
+    		br.sendTransform( (0,0,0), tf.transformations.quaternion_from_euler(0, imuPitch/180.0*math.pi, angles[1]/180.0*math.pi), rospy.Time.now(), base_tf, head_tf)
+    	print "owlpose pitch (IMU/servo) yaw [deg]: " + str(imuPitch) + " / " + str(angles[0]) + " " + str(angles[1])
+    	r.sleep()
 
 def shutdown():
 	herkulex.setAngles(pitch=0, yaw=0, playtime=150)
