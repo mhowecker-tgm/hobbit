@@ -156,7 +156,7 @@ bool CPCMerge::check_mean_values_for_defined_space/*free_space*/(table_object_de
   ROS_INFO("%d",(int)pcl_cloud_merged.points.size());
 
   //publish point clouds of area where free space was checked
-  if (pcl_cloud_merged.points.size() > 0)
+  if (pcl_cloud_merged.points.size() == 0)
   {
 	  pc_from_check_mean_values_for_defined_space_pub.publish(pcl_cloud_merged);
 	  res.nr_points_in_area = pcl_cloud_merged.points.size();
@@ -167,7 +167,7 @@ bool CPCMerge::check_mean_values_for_defined_space/*free_space*/(table_object_de
   }
   else {
 
-	  //go through points and calculate mean height
+	  //go through points and calculate mean x,y,z values
 	  float x_sum,y_sum,z_sum;
 	  x_sum=0;
 	  y_sum=0;
