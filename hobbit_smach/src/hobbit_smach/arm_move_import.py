@@ -146,7 +146,7 @@ class CheckArmAtHomePos(State):
         rospy.sleep(1)
         if not arm_client.GetArmIsEnabled():
             return 'aborted'
-        result = getArmAtPosition('home'):
+        result = getArmAtPosition('home')
         rospy.loginfo("ArmAtHomePosition: "+str(result))
         if result:
             return 'succeeded'
