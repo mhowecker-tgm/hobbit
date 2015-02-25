@@ -283,7 +283,7 @@ def init():
     	if valid:
     		#ignore the servo pitch angle (0) and use pitch from IMU instead
     		br.sendTransform( (0,0,0), tf.transformations.quaternion_from_euler(0, imuPitch/180.0*math.pi, angles[1]/180.0*math.pi), rospy.Time.now(), base_tf, head_tf)
-    	print "owlpose pitch (IMU/servo) yaw [deg]: " + str(imuPitch) + " / " + str(angles[0]) + " " + str(angles[1])
+    	print "owlpose pitch  (IMU/servo) yaw [deg]: " + str(imuPitch) + " / " + str(angles[0]) + " " + str(angles[1])
     	r.sleep()
 
 def shutdown():
