@@ -84,7 +84,7 @@ class DavidLookForObject(State):
         self.pubClust = rospy.Publisher("/objectclusters", PointCloud2)
         self.rec = TD()
         self.restrictfind = False
-        self.robotDistFromGraspPntForGrasping = 0.46
+        self.robotDistFromGraspPntForGrasping = 0.50
         self.robotOffsetRotationForGrasping = 0.06+math.pi/2.0
         self.graspable_center_of_cluster_wcs = None
         self.min_obj_to_mapboarder_distance = 0.30 #object has to be at least self.min_obj_to_mapboarder_distance cm away from next boarder in navigation map
@@ -268,8 +268,8 @@ class DavidLookForObject(State):
         print "===> pickup_import.py: DavidLookForObject.ispossibleobject() started"
         #criteria for valid objects
         x_min = -0.5
-        x_max = 1.0
-        y_min = -1.0
+        x_max = 1.1
+        y_min = -1.1
         y_max = 0.5
         z_min = 0.0
         z_max = 0.25	#only that high because of buggy camera
@@ -919,7 +919,7 @@ class DavidPickingUp(State):
         if (self.restrictfind): #only search for objects where grasped object was lying
             x_min = -0.15
             x_max = 0.20
-            y_min = -0.55
+            y_min = -0.57
             y_max = -0.23
             z_min = 0.01
             z_max = 0.18    #only that high because of buggy camera
