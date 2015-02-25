@@ -174,6 +174,8 @@ void broadcastNewPerson()
   msg.z = actualZ;
   msg.source = 2;
   msg.theta = actualTheta;
+  ros::Time timestampOfCreation = ros::Time::now();
+  msg.stamp = timestampOfCreation;
 
   msg.inFieldOfView = actualInFieldOfView;
   msg.confidence = actualConfidence;
