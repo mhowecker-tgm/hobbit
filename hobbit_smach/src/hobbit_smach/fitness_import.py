@@ -113,7 +113,7 @@ def get_do_fitness():
         StateMachine.add(
             'INIT',
             Init(),
-            transitions={'succeeded': 'SWITCH_VISION_TO_FITNESS',
+            transitions={'succeeded': 'SAY_MOVING_TO_YOU',
                          'canceled': 'LOG_ABORTED'}
         )
         StateMachine.add(
