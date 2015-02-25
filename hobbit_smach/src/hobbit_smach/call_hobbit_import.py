@@ -156,6 +156,9 @@ def msg_timer_sm():
 
     def person_cb(msg, ud):
         print(msg)
+        if (rospy.Time.now() - msg.stamp) > rospy.Duration(1);
+            rospy.loginfo('Person data is too old. Ignore.')
+            return False
         if msg.source == 6:
             #print('Do not use this data')
             return False
