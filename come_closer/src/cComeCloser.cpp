@@ -230,6 +230,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 		}
 		
 		{
+
 			std_msgs::String rotate_cmd;
 			std::ostringstream s;
 			s << "Turn " << angle2turn*180/M_PI;
@@ -275,7 +276,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 
 		if (finished_movement)
 		{
-			//discrete motion finished
+			
 			as_->setSucceeded(hobbit_msgs::GeneralHobbitResult(), "succeded");
 			std::cout << "discrete motion finished, succeeded " << std::endl; 
 			return;
@@ -309,6 +310,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 	}
 
 	//if the node is killed then we'll abort and return
+			
         as_->setAborted(hobbit_msgs::GeneralHobbitResult(), "Aborting on the goal because the node has been killed");
         return;
 
