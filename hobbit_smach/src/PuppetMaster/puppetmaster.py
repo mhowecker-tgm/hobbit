@@ -50,8 +50,8 @@ commands = [
 
 
 def IsItNight(ud):
-    sleep_time = ud.parameters['sleep_time']
-    wakeup_time = ud.parameters['wakeup_time']
+    global wakeup_time
+    global sleep_time
 
     wake = wakeup_time.split(':')
     sleep = sleep_time.split(':')
@@ -909,5 +909,14 @@ def main():
     sis.stop()
 
 if __name__ == '__main__':
+    global wakeup_time
+    global sleep_time
+    wakeup_time = "09:00"
+    sleep_time = "22:00"
+
     rospy.set_param('active_task', 100)
+    if rospy.has_param('/Hobbit/sleep_time'):
+        sleep_time = ud.parameters['/Hobbit/sleep_time']
+    if rospy.has_param('/Hobbit/wakeup_time'):
+        wakeup_time = ud.parameters['/Hobbit/wakeup_time']
     main()
