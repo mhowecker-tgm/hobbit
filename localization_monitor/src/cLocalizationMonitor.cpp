@@ -96,10 +96,11 @@ void cLocalizationMonitor::open(ros::NodeHandle & n)
 
 	get_occupancy_state_service = n.advertiseService("/get_occupancy_state", &cLocalizationMonitor::getOccupancyState, this);
 
+	check_goal_client = n.serviceClient<hobbit_msgs::GetState>("/is_goal_active");
+	cancel_nav_goal_client = n.serviceClient<std_srvs::Empty>("/cancel_nav_goal");
 	get_last_goal_client = n.serviceClient<hobbit_msgs::GetPose>("/get_last_goal"); 
-
+	send_nav_goal_client = n.serviceClient<hobbit_msgs::SendPose>("/send_nav_goal");
 	cancel_goal_client = n.serviceClient<std_srvs::Empty>("/cancel_goal");
-	send_goal_client = n.serviceClient<hobbit_msgs::SendPose>("/send_nav_goal");
 
 	activate_recovery_service = n.advertiseService("/activate_recovery", &cLocalizationMonitor::activateRecovery, this);
 
@@ -508,6 +509,36 @@ void cLocalizationMonitor::Run(void)
 		if (!loc_ok && apply_action)
 		//if (false)
 		{
+
+			//if no current goal nothing is done
+			hobbit_msgs::GetState my_srv_goal;
+			std::cout << "calling service!!!!!!!! " << std::endl;
+			if (check_goal_client.call(my_srv_goal))
+			{
+				if(!my_srv_goal.response.state) 
+				{
+					std::cout << "no current goal " << std::endl;
+				}
+			}
+			else
+			{
+				ROS_DEBUG("Failed to call service is_goal_active");
+		
+			}
+
+			//cancel current goal
+			std::cout << "cancel goal " << std::endl;
+			std_srvs::Empty srv_cancel_goal;
+			if (!cancel_nav_goal_client.call(srv_cancel_goal))
+			{
+				ROS_INFO("Failed to call service cancel_nav_goal");
+			}
+
+			else
+				std::cout << "Navigation goal cancelled" << std::endl;
+
+			sleep(3);
+
 			 // create action client
   			actionlib::SimpleActionClient<hobbit_msgs::GeneralHobbitAction> ac("localization_recovery", true);
 
@@ -553,7 +584,7 @@ void cLocalizationMonitor::Run(void)
 							send_goal_srv.request.pose = srv.response.pose;
 
 							//send goal again
-							send_goal_client.call(send_goal_srv);
+							send_nav_goal_client.call(send_goal_srv);
 							std::cout << "goal re-sent" << std::endl;
 							//TODO notify
 							return;
