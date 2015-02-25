@@ -552,12 +552,17 @@ def main():
         StateMachine.add(
             'EMO_SAY_DID_NOT_PICKUP_2',
             pickup.sayDidNotPickupObject2(),
-            transitions={'succeeded': 'aborted',
+            transitions={'succeeded': 'MOVE_ARM_TO_HOME_POSITION_AFTER_FAILED',
                          'failed': 'aborted'}
         )
-
-        
-        
+        #df new 25.2.2015
+        StateMachine.add(
+            'MOVE_ARM_TO_HOME_POSITION_AFTER_FAILED',  #done after 2 times unsucessful grasped
+            arm_move.goToHomePosition(),
+            transitions={'succeeded': 'aborted', 
+                         'preempted': 'LOG_PREEMPT',
+                         'failed': 'MOVE_ARM_TO_HOME_POSITION_AFTER_FAILED'}    # better failure handling appreciated
+        )   
         StateMachine.add(
             'END_PICKUP_SEQ',
             pickup.getEndPickupSeq(),
