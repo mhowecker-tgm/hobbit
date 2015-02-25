@@ -121,6 +121,8 @@ void broadcastNewPerson()
   msg.z = temperatureZ;;
   msg.source = 5; //5 = temperature / emergency
   msg.theta = 0;
+  ros::Time timestampOfCreation = ros::Time::now();
+  msg.stamp = timestampOfCreation;
 
   msg.inFieldOfView = 1;
   msg.confidence = 0.5;
