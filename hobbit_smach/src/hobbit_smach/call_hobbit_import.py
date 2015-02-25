@@ -188,7 +188,7 @@ def msg_timer_sm():
         )
     with cc:
         Concurrence.add('LISTENER', sm)
-        Concurrence.add('TIMER', SleepState(duration=20))
+        Concurrence.add('TIMER', SleepState(duration=3))
     return cc
 
 def construct_sm():
@@ -350,7 +350,7 @@ def call_hobbit():
             Count(),
             transitions={'succeeded': 'GET_PERSON',
                          'preempted': 'preempted',
-                         'aborted': 'CLOSER'}
+                         'aborted': 'MMUI_BLIND_CLOSER'}
         )
         StateMachine.add(
             'CLOSER',

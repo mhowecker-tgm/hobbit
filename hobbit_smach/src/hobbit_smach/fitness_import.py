@@ -93,7 +93,7 @@ class SetSuccess(State):
 
 
 def event_cb(msg, userdata):
-    rospy.loginfo('Waiting for fitness end')
+    rospy.loginfo('Got message with event: '+str(msg.event))
     if msg.event.upper() == 'E_FITNESS_CLOSED':
         return True
     else:
@@ -167,7 +167,7 @@ def get_do_fitness():
                 Event,
                 msg_cb=event_cb),
             transitions={'succeeded': 'LOG_SUCCESS',
-                         'aborted': 'LOG_ABORTED',
+                         'aborted': 'WAIT_FOR_END',
                          'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(

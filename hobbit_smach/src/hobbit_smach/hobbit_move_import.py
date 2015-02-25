@@ -411,11 +411,14 @@ class SetNavigationGoal(ServiceState):
             if not ud.location_name == 'None':
                 self.place = ud.location_name
             else:
-                self.place = String('default')
+                self.place = 'default'
         else:
             print('No userdata received.')
             print(self.room)
             print(self.place)
+            if 'fitness' in [self.room, self.place]:
+                self.room=''
+                self.place='fitness'
         request = GetCoordinatesRequest()
         # request.header.stamp = rospy.Time.now()
         request.room_name.data = self.room
@@ -455,7 +458,8 @@ class SetNavGoal(State):
         req = GetCoordinatesRequest(String(room), String(place))
         try:
             resp = serv(req)
-        # print(resp.pose.x, resp.pose.y, resp.pose.theta)
+            rospy.loginfo("RETURNED POSE")
+            rospy.loginfo(str(resp.pose.x)+" "+str(resp.pose.y)+" "+str(resp.pose.theta))
             return (resp.pose.x, resp.pose.y, resp.pose.theta)
         except rospy.ServiceException as exc:
             print("Service did not process request: " + str(exc))
