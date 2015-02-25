@@ -80,10 +80,8 @@ def getArmAtPosition(position='home'):
             return True
     else:
         # Unless the data is correct we just wait 3 seconds and assume the arm reached the goal
-	print "getArmAtPosition result was False at time of execution for position: [=> wait 3 sec and assume arm is in correct position!]",position
-	rospy.sleep(3.0)
-        return True
-        # return False
+	    print "getArmAtPosition result was False at time of execution for position: [=> wait 3 sec and assume arm is in correct position!]",position
+    return False
 
 
 class SetMoveToLearning(State):
@@ -148,7 +146,9 @@ class CheckArmAtHomePos(State):
         rospy.sleep(1)
         if not arm_client.GetArmIsEnabled():
             return 'aborted'
-        if getArmAtPosition('home'):
+        result = getArmAtPosition('home'):
+        rospy.loginfo("ArmAtHomePosition: "+str(result))
+        if result:
             return 'succeeded'
         else:
             return 'aborted'
