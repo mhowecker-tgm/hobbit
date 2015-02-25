@@ -1,4 +1,11 @@
 #!/usr/bin/env python
+# ROS node to access the Herkulex servos in the neck.
+# Also takes IMU pitch angles to replace the shitty
+# angles returned by the overstrained pitch servo.
+#
+# @author Tobias Ferner (some), Andreas Baldinger (some more), Michael Zillich (final)
+# @date Feb 2015
+
 PKG = 'blue_owlpose'
 import roslib; roslib.load_manifest(PKG)
 import rospy
@@ -25,6 +32,11 @@ base_tf = "hobbit_neck_dynamic"
 head_tf = "hobbit_neck"
 #base_tf = "hobbit_head"
 #head_tf = "headcam_depth_optical_frame"
+# pitch angle from IMU, in degrees
+imuPitch = 0
+# indicates whether the robot is currently moving, in which case IMU values
+# are not valid
+robotMoving = False
 
 def set_head_orientation(msg):
 	valid,currentAngles = herkulex.getAngles()
@@ -177,6 +189,36 @@ def command(msg):
 		herkulex.setAngles(pitch=0, yaw=0, playtime=150)
 		print "Move to center_center"
 
+# get an IMU message and store pitch angle
+# NOTE: this assumes a specific mounting of the IMU inside the head:
+# z pointing down, x pointing forward
+def imuUpdate(msg):
+	# never forget those global definitions - god how I hate python ..
+	global imuPitch
+	global robotMoving
+	# HACK: this actually needs a mutex or something. No idea how that works
+	# in python. I hate python. I also hate HOBBIT.
+	if robotMoving == False:
+		x = msg.linear_acceleration.x
+		y = msg.linear_acceleration.y
+		z = msg.linear_acceleration.z
+		m = math.sqrt(x*x + y*y + z*z)
+		x = x/m
+		y = y/m
+		z = z/m
+		# HACK: this also needs a mutex or something.
+		imuPitch = -math.asin(x)*180.0/math.pi
+	# else: do not update angle
+
+# store whether the robot is currently moving
+def movementUpdate(msg):
+	global robotMoving
+	# HACK: this also needs a mutex or something.
+	if msg.data == "Idle":
+		robotMoving = False
+	else:
+		robotMoving = True
+
 def read_and_set_offsets(msg):
 	#Read calibration parameters
 	pitch_offset = rospy.get_param('/hobbit/head/pitch_offset', 0)
@@ -187,6 +229,8 @@ def read_and_set_offsets(msg):
 	herkulex.setYawOffset(float(yaw_offset))
 
 def init():
+	global imuPitch
+
 	#Initialize Rosnode:
 	rospy.init_node('owlpose')
 	print "Initialized"
@@ -203,6 +247,11 @@ def init():
 	rospy.Subscriber("/head/move", std_msgs.msg.String, set_head_orientation)
 	rospy.Subscriber("/head/move/incremental", std_msgs.msg.String, set_head_orientation, queue_size=1)
 	rospy.Subscriber("/head/cmd", std_msgs.msg.String, command)
+	#Subscriber to IMU messages for tilt angle
+	rospy.Subscriber("/imu/data_raw", sensor_msgs.msg.Imu, imuUpdate)
+	#Subscriber to robot motion state
+	rospy.Subscriber("/DiscreteMotionState", std_msgs.msg.String, movementUpdate)
+	#get triggered if new calibration offsets are available
 	rospy.Subscriber("/head/trigger/set_offsets", std_msgs.msg.String, read_and_set_offsets, queue_size=1)
 	
 	#Read calibration parameters
@@ -216,9 +265,12 @@ def init():
 	#Send geometry/tf constantly with 5hz
 	r = rospy.Rate(5) #5hz
 	while not rospy.is_shutdown():
+		#get angles from neck servos
 		valid,angles = herkulex.getAngles()
 		if valid:
-			br.sendTransform( (0,0,0), tf.transformations.quaternion_from_euler(0, angles[0]/180.0*math.pi, angles[1]/180.0*math.pi), rospy.Time.now(), base_tf, head_tf)
+			#ignore the servo pitch angle (0) and use pitch from IMU instead
+			br.sendTransform( (0,0,0), tf.transformations.quaternion_from_euler(0, imuPitch/180.0*math.pi, angles[1]/180.0*math.pi), rospy.Time.now(), base_tf, head_tf)
+		print "owlpose pitch/yaw [deg]: " + str(imuPitch) + " " + str(angles[1])
 		r.sleep()
 
 def shutdown():
@@ -230,3 +282,4 @@ if __name__ == '__main__':
 		atexit.register(shutdown)
 	except rospy.ROSInterruptException:
 		pass
+

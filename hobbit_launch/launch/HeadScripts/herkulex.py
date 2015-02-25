@@ -109,6 +109,9 @@ def setYawOffset(offs = 0):
 	global yawOffset
 	yawOffset = offs
 
+# Write function header comments, GODDAMNIT!
+# Returns an ARRAY with PITCH and then YAAAAAAAW, in ....... DEGREEES.
+# Now that was not so hard, was it?
 def getAngles():
 	angle = []
 	valid0 = False
@@ -144,6 +147,7 @@ def getAngles():
 # There are 4 angles to set: pitch (=up/down) and yaw (= left/right).
 # playtime is the time until the movement is finished (in god-knows what unit). Depending on
 # the angle distance to move, a given playtime results in different angular speeds.
+# playTime = (int) (playTime / 11.2f); // ms --> value
 def setAngles(pitch=0,yaw=0,playtime=70):
 	global lastSetPitch
 	global lastSetYaw
@@ -213,3 +217,4 @@ def main():
 
 if __name__ == '__main__':
 	main()
+
