@@ -101,6 +101,8 @@ void broadcastNewPerson(unsigned int frameTimestamp , unsigned int trackerID , s
   msg.z=ptt->y*1000;
   msg.source = 6;
   msg.theta = 0;
+  ros::Time timestampOfCreation = ros::Time::now();
+  msg.stamp = timestampOfCreation;
 
   msg.inFieldOfView = 1;
   msg.confidence = 0.8;
