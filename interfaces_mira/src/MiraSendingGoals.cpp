@@ -417,9 +417,9 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
      if (goal_status.data == "preempted")
      {
 	std::cout << "goal preempted, path temporarily lost" << std::endl;
-	as2_->setPreempted();
-	is_goal_active = false;
-	return;
+	//as2_->setPreempted();
+	//is_goal_active = false;
+	//return;
      }
 
      if (goal_status.data == "canceled")
