@@ -51,6 +51,9 @@ cLocalizationMonitor::cLocalizationMonitor(int argc, char **argv) : init_argc(ar
 	nh.param("dis_thres_check", dis_thres_check, 3.5);
 	nh.param("rate_thres", rate_thres, 0.6); 
 
+	nh.param("method", method, 0);
+	nh.param("checks_num", checks_num, 30);
+
 	nh.param("activate_recovery", activate_recovery, false); 
 	apply_action = activate_recovery;
 
@@ -402,7 +405,7 @@ bool cLocalizationMonitor::getOccupancyState(hobbit_msgs::GetOccupancyState::Req
 	
 	ROS_INFO("occupancy_state request received");
 
-	geometry_msgs::Point local_point = req.local_point;
+	geometry_msgs::Point local_point = req.local_point; //relative to the robot's reference system
 
 	double current_x = current_pose.pose.pose.position.x;
 	double current_y = current_pose.pose.pose.position.y;
@@ -445,17 +448,50 @@ void cLocalizationMonitor::Run(void)
 	 {
 		bool scan_ok = checkScan();
 		bool uncertainty_ok = checkUncertainty();
-		if (uncertainty_ok && scan_ok)
-			ok_count ++;
-		else
-			not_ok_count++;
+		bool double_check_ok = (uncertainty_ok && scan_ok);
+
+		if (method == 0)
+		{
+			if (double_check_ok)
+				ok_count ++;
+			else
+				not_ok_count++;
+		}
+	
+		else if (method == 1)
+		{
+			if (check_results.size() < checks_num)
+				check_results.push_back(double_check_ok);
+			else
+			{
+				check_results.erase(check_results.begin());
+				check_results.push_back(double_check_ok);
+	
+			}
+		}
+
 		prev_pose = current_pose;	
 	 }
 
-	 if (check) //based on mileage
+	 if (( method == 0 && check) || method == 1) //based on mileage or continuous
 	 {
-		if (!(ok_count+not_ok_count)) return; //should never happen, but just in case
-		double rate = (double)ok_count/(ok_count+not_ok_count);
+		double rate;
+
+		if (method == 0)
+		{
+			if (!(ok_count+not_ok_count)) return; //should never happen, but just in case
+			rate = (double)ok_count/(ok_count+not_ok_count);
+		}
+
+		if (method == 1)
+		{
+			if (check_results.size() < checks_num) return; //
+			int ok_count_v = 0;
+			for (int k=0; k<check_results.size(); k++)
+				if (check_results[k]) ok_count_v++;
+			rate = (double)ok_count_v/(check_results.size());
+		}
+		
 		std::cout << "loc_ok_rate " << rate << std::endl; 
 		log_output << std::setprecision(4) << std::fixed << rate << '\t';
 		loc_ok = (rate > rate_thres); //default 50%

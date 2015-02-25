@@ -134,7 +134,10 @@ private:
   ros::ServiceClient send_goal_client;
 
   bool activate_recovery;
- 
+
+  std::vector<bool> check_results;
+  int checks_num;
+  int method; 
 
 };
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
