@@ -7,6 +7,7 @@ from datetime import datetime, time
 from hobbit_user_interaction import HobbitMMUI
 import hobbit_smach.hobbit_move_import as hobbit_move
 import hobbit_smach.logging_import as log
+import hobbit_smach.speech_output_import as speech_output
 
 
 class TimeCheck(State):
@@ -76,6 +77,20 @@ def get_hobbit_full_stop():
         Sequence.add(
             'STOP_MOVEMENT',
             hobbit_move.get_full_stop()
+        )
+        Sequence.add(
+            'SAY_FULL_STOP',
+            speech_output.sayText(
+                info='Doing a full stop as commanded by you.'),
+            transitions={'succeeded': 'WAIT',
+                         'preempted': 'LOG_PREEMPT',
+                         'failed': 'LOG_ABORT'}
+        )
+        Sequence.add(
+            'WAIT',
+            SleepState(duration=3),
+            transitions={'succeeded': 'MAIN_MENU',
+                         'preempted': 'LOG_PREEMPT'}
         )
         Sequence.add(
             'MAIN_MENU',
