@@ -582,14 +582,15 @@ def goToPosition(frame='/map', room='None', place='dock'):
         Sequence.add(
             'MMUI_SAY_ReachedPlace',
             speech_output.sayText(info='T_GT_ReachedMyDestination2'),
-            transitions={'failed': 'aborted'}
-        )
-        Sequence.add(
-            'SHOW_MENU_MAIN',
-            HobbitMMUI.ShowMenu(menu='MAIN'),
-            transitions={'failed': 'HEAD_UP',
+            transitions={'failed': 'aborted',
                          'succeeded': 'succeeded'}
         )
+        # Sequence.add(
+        #     'SHOW_MENU_MAIN',
+        #     HobbitMMUI.ShowMenu(menu='MAIN'),
+        #     transitions={'failed': 'HEAD_UP',
+        #                  'succeeded': 'succeeded'}
+        # )
         Sequence.add(
             'HEAD_UP',
             head_move.MoveTo(pose='littledown_center')
@@ -607,14 +608,15 @@ def goToPosition(frame='/map', room='None', place='dock'):
             ServiceState(
                 '/user_nav_mode',
                 UserNavMode
-            )
+            ),
+            transitions={'succeeded': 'aborted'}
         )
-        Sequence.add(
-            'SHOW_MENU_MAIN_1',
-            HobbitMMUI.ShowMenu(menu='MAIN'),
-            transitions={'succeeded': 'aborted',
-                         'failed': 'aborted'}
-        )
+        # Sequence.add(
+        #     'SHOW_MENU_MAIN_1',
+        #     HobbitMMUI.ShowMenu(menu='MAIN'),
+        #     transitions={'succeeded': 'aborted',
+        #                  'failed': 'aborted'}
+        # )
         Sequence.add(
             'SAY_ARM',
             HobbitMMUI.ShowInfo(info='My arm is not in the home position. Will not move.'),
@@ -737,14 +739,15 @@ def goToPose():
         Sequence.add(
             'MMUI_SAY_ReachedPlace',
             speech_output.sayText(info='T_GT_ReachedMyDestination2'),
-            transitions={'failed': 'aborted'}
-        )
-        Sequence.add(
-            'SHOW_MENU_MAIN',
-            HobbitMMUI.ShowMenu(menu='MAIN'),
-            transitions={'failed': 'HEAD_UP',
+            transitions={'failed': 'aborted',
                          'succeeded': 'succeeded'}
         )
+        # Sequence.add(
+        #     'SHOW_MENU_MAIN',
+        #     HobbitMMUI.ShowMenu(menu='MAIN'),
+        #     transitions={'failed': 'HEAD_UP',
+        #                  'succeeded': 'succeeded'}
+        # )
         Sequence.add(
             'HEAD_UP',
             head_move.MoveTo(pose='littledown_center')
@@ -763,13 +766,14 @@ def goToPose():
         Sequence.add(
             'MMUI_SAY_WayBlocked',
             HobbitMMUI.ShowInfo(info='T_GT_WayBlocked'),
-            transitions={'failed': 'aborted'})
-        Sequence.add(
-            'SHOW_MENU_MAIN_1',
-            HobbitMMUI.ShowMenu(menu='MAIN'),
-            transitions={'succeeded': 'aborted',
-                         'failed': 'aborted'}
-        )
+            transitions={'failed': 'aborted',
+                         'succeeded': 'aborted'})
+        # Sequence.add(
+        #     'SHOW_MENU_MAIN_1',
+        #     HobbitMMUI.ShowMenu(menu='MAIN'),
+        #     transitions={'succeeded': 'aborted',
+        #                  'failed': 'aborted'}
+        # )
         Sequence.add(
             'SAY_ARM',
             HobbitMMUI.ShowInfo(info='My arm is not in the home position. Will not move.'),
@@ -851,16 +855,17 @@ def goToPoseSilent():
         )
         Sequence.add(
             'HEAD_UP_AFTER_MOVEMENT',
-            head_move.MoveTo(pose='littledown_center')
+            head_move.MoveTo(pose='littledown_center'),
+            transitions={'succeeded': 'succeeded'}
         )
         # Sequence.add('ENABLE_GESTURES',
         #              service_disable.enable_gestures())
-        Sequence.add(
-            'SHOW_MENU_MAIN',
-            HobbitMMUI.ShowMenu(menu='MAIN'),
-            transitions={'failed': 'HEAD_UP',
-                         'succeeded': 'succeeded'}
-        )
+        # Sequence.add(
+        #     'SHOW_MENU_MAIN',
+        #     HobbitMMUI.ShowMenu(menu='MAIN'),
+        #     transitions={'failed': 'HEAD_UP',
+        #                  'succeeded': 'succeeded'}
+        # )
         Sequence.add(
             'HEAD_UP',
             head_move.MoveTo(pose='littledown_center')
@@ -878,14 +883,15 @@ def goToPoseSilent():
             ServiceState(
                 '/user_nav_mode',
                 UserNavMode
-            )
+            ),
+            transitions={'succeeded': 'aborted'}
         )
-        Sequence.add(
-            'SHOW_MENU_MAIN_1',
-            HobbitMMUI.ShowMenu(menu='MAIN'),
-            transitions={'succeeded': 'aborted',
-                         'failed': 'aborted'}
-        )
+        # Sequence.add(
+        #     'SHOW_MENU_MAIN_1',
+        #     HobbitMMUI.ShowMenu(menu='MAIN'),
+        #     transitions={'succeeded': 'aborted',
+        #                  'failed': 'aborted'}
+        # )
         Sequence.add(
             'SAY_ARM',
             HobbitMMUI.ShowInfo(info='My arm is not in the home position. Will not move.'),
