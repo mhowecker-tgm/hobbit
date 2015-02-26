@@ -2,10 +2,8 @@
 # -*- coding: utf-8 -*-
 
 PKG = 'hobbit_smach'
-NAME = 'away'
+NAME = 'away_break'
 
-import roslib
-roslib.load_manifest(PKG)
 import rospy
 import smach
 #import uashh_smach.util as util
