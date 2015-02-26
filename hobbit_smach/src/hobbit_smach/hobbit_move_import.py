@@ -519,8 +519,8 @@ def goToPosition(frame='/map', room='None', place='dock'):
         Sequence.add(
             'UNDOCK_IF_NEEDED',
             undock_if_needed(),
-            transitions={'succeeded': 'SWITCH_VISION',
-                         'aborted': 'BACK_IF_NEEDED'}
+            transitions={'succeeded': 'BACK_IF_NEEDED',
+                         'aborted': 'HEAD_UP'}
         )
         Sequence.add(
             'BACK_IF_NEEDED',
@@ -674,8 +674,8 @@ def goToPose():
         Sequence.add(
             'UNDOCK_IF_NEEDED',
             undock_if_needed(),
-            transitions={'succeeded': 'SWITCH_VISION',
-                         'aborted': 'BACK_IF_NEEDED'}
+            transitions={'succeeded': 'BACK_IF_NEEDED',
+                         'aborted': 'HEAD_UP'}
         )
         Sequence.add(
             'BACK_IF_NEEDED',
@@ -784,8 +784,8 @@ def goToPoseSilent():
         Sequence.add(
             'UNDOCK_IF_NEEDED',
             undock_if_needed(),
-            transitions={'succeeded': 'SWITCH_VISION',
-                         'aborted': 'BACK_IF_NEEDED'}
+            transitions={'succeeded': 'BACK_IF_NEEDED',
+                         'aborted': 'HEAD_UP'}
         )
         Sequence.add(
             'BACK_IF_NEEDED',
