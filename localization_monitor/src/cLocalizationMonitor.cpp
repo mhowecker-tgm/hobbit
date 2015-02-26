@@ -58,6 +58,7 @@ cLocalizationMonitor::cLocalizationMonitor(int argc, char **argv) : init_argc(ar
 	apply_action = activate_recovery;
 
 	check = false;
+	check_updated = false;
 
 
 }
@@ -440,6 +441,8 @@ void cLocalizationMonitor::Run(void)
 
 	 if (!initial_current_pose_received) return;
 
+	check_updated = false;
+
 	dis_covered_sq = (current_pose.pose.pose.position.x-prev_pose.pose.pose.position.x)*(current_pose.pose.pose.position.x-prev_pose.pose.pose.position.x) + (current_pose.pose.pose.position.y-prev_pose.pose.pose.position.y)*(current_pose.pose.pose.position.y-prev_pose.pose.pose.position.y);
 
 	 double current_orientation = tf::getYaw(current_pose.pose.pose.orientation);
@@ -471,10 +474,11 @@ void cLocalizationMonitor::Run(void)
 			}
 		}
 
-		prev_pose = current_pose;	
+		prev_pose = current_pose;
+		check_updated = true;	
 	 }
 
-	 if (( method == 0 && check) || method == 1) //based on mileage or continuous
+	 if (( method == 0 && check) || (method == 1 && check_updated)) //based on mileage or continuous
 	 {
 		double rate;
 
@@ -510,6 +514,8 @@ void cLocalizationMonitor::Run(void)
 		//if (false)
 		{
 
+			bool is_goal_active = false;
+
 			//if no current goal nothing is done
 			hobbit_msgs::GetState my_srv_goal;
 			std::cout << "calling service!!!!!!!! " << std::endl;
@@ -519,88 +525,103 @@ void cLocalizationMonitor::Run(void)
 				{
 					std::cout << "no current goal " << std::endl;
 				}
+				else is_goal_active = true;
 			}
 			else
 			{
-				ROS_DEBUG("Failed to call service is_goal_active");
+				ROS_INFO("Failed to call service is_goal_active");
 		
 			}
 
-			//cancel current goal
-			std::cout << "cancel goal " << std::endl;
-			std_srvs::Empty srv_cancel_goal;
-			if (!cancel_nav_goal_client.call(srv_cancel_goal))
+			if (is_goal_active)
 			{
-				ROS_INFO("Failed to call service cancel_nav_goal");
-			}
 
-			else
-				std::cout << "Navigation goal cancelled" << std::endl;
+				bool nav_goal_cancelled = false;
 
-			sleep(3);
-
-			 // create action client
-  			actionlib::SimpleActionClient<hobbit_msgs::GeneralHobbitAction> ac("localization_recovery", true);
-
-  			ROS_INFO("Waiting for action server to start.");
-  			// wait for the action server to start
-  			ac.waitForServer(); //will wait for infinite time
-
-  			ROS_INFO("Action server started, sending goal.");
-  			// send a goal to the action
-  			hobbit_msgs::GeneralHobbitGoal goal;
-  			goal.command.data = "start";
-  			ac.sendGoal(goal); 
-
-  			//wait for the action, rotation should take less than a minute
-  			bool finished_before_timeout = ac.waitForResult(ros::Duration(60.0));
-
-			if (finished_before_timeout)
-			{
-				actionlib::SimpleClientGoalState state = ac.getState();
-				 ROS_INFO("Action finished: %s",state.toString().c_str());
-			    	if (state.toString() == "SUCCEEDED")
+				//cancel current goal
+				std::cout << "cancel goal " << std::endl;
+				std_srvs::Empty srv_cancel_goal;
+				if (!cancel_nav_goal_client.call(srv_cancel_goal))
 				{
-					std::cout << "recovery action finished " << std::endl;
-					log_output << 1 << '\t';
-					//check current localization
-					bool scan_ok = checkScan();
-					bool uncertainty_ok = checkUncertainty();
-					std::cout << "scan_ok " << scan_ok << std::endl;
-					std::cout << "uncertainty_ok " << uncertainty_ok << std::endl;
+					ROS_INFO("Failed to call service cancel_nav_goal");
+				}
 
-					log_output << '\t' << '\t';
-					if (uncertainty_ok && scan_ok)
+				else
+				{
+					std::cout << "Navigation goal cancelled" << std::endl;
+					nav_goal_cancelled = true;
+				}
+
+				if (nav_goal_cancelled)
+				{
+
+					 sleep(2);
+
+					 // create action client
+		  			actionlib::SimpleActionClient<hobbit_msgs::GeneralHobbitAction> ac("localization_recovery", true);
+
+		  			ROS_INFO("Waiting for action server to start.");
+		  			// wait for the action server to start
+		  			ac.waitForServer(); //will wait for infinite time
+
+		  			ROS_INFO("Action server started, sending goal.");
+		  			// send a goal to the action
+		  			hobbit_msgs::GeneralHobbitGoal goal;
+		  			goal.command.data = "start";
+		  			ac.sendGoal(goal); 
+
+		  			//wait for the action, rotation should take less than a minute
+		  			bool finished_before_timeout = ac.waitForResult(ros::Duration(60.0));
+
+					if (finished_before_timeout)
 					{
-						std::cout << "localization recovery succeeded " << std::endl;
-						log_output << 1;
-
-						//get last goal
-						hobbit_msgs::GetPose srv;
-						move_base_msgs::MoveBaseGoal goal;
-						if (get_last_goal_client.call(srv))
+						actionlib::SimpleClientGoalState state = ac.getState();
+						 ROS_INFO("Action finished: %s",state.toString().c_str());
+					    	if (state.toString() == "SUCCEEDED")
 						{
-							hobbit_msgs::SendPose send_goal_srv;
-							send_goal_srv.request.pose = srv.response.pose;
+							std::cout << "recovery action finished " << std::endl;
+							log_output << 1 << '\t';
+							//check current localization
+							bool scan_ok = checkScan();
+							bool uncertainty_ok = checkUncertainty();
+							std::cout << "scan_ok " << scan_ok << std::endl;
+							std::cout << "uncertainty_ok " << uncertainty_ok << std::endl;
 
-							//send goal again
-							send_nav_goal_client.call(send_goal_srv);
-							std::cout << "goal re-sent" << std::endl;
-							//TODO notify
-							return;
-						}
+							log_output << '\t' << '\t';
+							if (uncertainty_ok && scan_ok)
+							{
+								std::cout << "localization recovery succeeded " << std::endl;
+								log_output << 1;
 
+								//get last goal
+								hobbit_msgs::GetPose srv;
+								move_base_msgs::MoveBaseGoal goal;
+								if (get_last_goal_client.call(srv))
+								{
+									hobbit_msgs::SendPose send_goal_srv;
+									send_goal_srv.request.pose = srv.response.pose;
+
+									//send goal again
+									send_nav_goal_client.call(send_goal_srv);
+									std::cout << "goal re-sent" << std::endl;
+									//TODO notify
+									return;
+								}
+
+							}
+							else
+							{
+								log_output << 0;
+								std::cout << "localization recovery did not succeed " << std::endl;				}
+
+						 }
+				
 					}
 					else
-					{
-						log_output << 0;
-						std::cout << "localization recovery did not succeed " << std::endl;				}
+					    ROS_INFO("Rotation did not finish before the time out.");
 
-				 }
-				
+				}
 			}
-			else
-			    ROS_INFO("Rotation did not finish before the time out.");
 
 			std::cout << "The robot is lost!!!!!!! Recovery did not succeed " << std::endl;
 			//TODO publish notification

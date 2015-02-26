@@ -141,6 +141,8 @@ private:
   int checks_num;
   int method; 
 
+  bool check_updated;
+
 };
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #endif
