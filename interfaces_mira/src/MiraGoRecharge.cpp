@@ -152,6 +152,7 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 		if(providers.empty()) 
 		{
 		    std::cout << "no providers for IDockingProcess" << std::endl;
+		    as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting, no providers");
 		    return;
 		}
 
@@ -192,8 +193,10 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 	else
 	{
 	 	as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting because no proper task was received");
+		return;
 	}
 
+	std::cout << "Docking action started " << std::endl;
  	ros::NodeHandle n = robot_->getRosNode();
     	while(n.ok())
     	{
