@@ -916,7 +916,11 @@ if __name__ == '__main__':
 
     rospy.set_param('active_task', 100)
     if rospy.has_param('/Hobbit/sleep_time'):
-        sleep_time = ud.parameters['/Hobbit/sleep_time']
+        sleep_tmp = rospy.get_param('/Hobbit/sleep_time')
+        if type(sleep_tmp) is not int:
+            sleep_time = sleep_tmp
     if rospy.has_param('/Hobbit/wakeup_time'):
-        wakeup_time = ud.parameters['/Hobbit/wakeup_time']
+        wakeup_tmp = rospy.get_param('/Hobbit/wakeup_time')
+        if type(wakeup_tmp) is not int:
+            wakeup_time = wakeup_tmp
     main()
