@@ -12,7 +12,6 @@ from smach_ros import IntrospectionServer, ActionServerWrapper
 
 from hobbit_msgs.msg import GeneralHobbitAction
 import hobbit_smach.bring_object_simple_import as bring_object
-import hobbit_smach.locate_user_simple_import as locate_user
 
 
 def main():
