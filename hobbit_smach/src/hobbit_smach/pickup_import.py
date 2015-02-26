@@ -84,7 +84,7 @@ class DavidLookForObject(State):
         self.pubClust = rospy.Publisher("/objectclusters", PointCloud2)
         self.rec = TD()
         self.restrictfind = False
-        self.robotDistFromGraspPntForGrasping = 0.50
+        self.robotDistFromGraspPntForGrasping = 0.51
         self.robotOffsetRotationForGrasping = 0.06+math.pi/2.0
         self.graspable_center_of_cluster_wcs = None
         self.min_obj_to_mapboarder_distance = 0.30 #object has to be at least self.min_obj_to_mapboarder_distance cm away from next boarder in navigation map
