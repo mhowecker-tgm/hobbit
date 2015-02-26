@@ -233,6 +233,7 @@ bool MiraSendingGoals::cancelMiraGoal(std_srvs::Empty::Request  &req, std_srvs::
 	std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
   	robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
 
+	is_goal_active = false;
 	cancel_received = true;
 	goal_status.data = "internal_cancel";
 	goal_status_pub.publish(goal_status);	
