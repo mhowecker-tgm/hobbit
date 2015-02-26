@@ -277,8 +277,11 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 
 			  }
 			  
-			  else 
-			  {
+			  
+	        	} // end of is new task available
+
+			else 
+			{
 
 				//notify the ActionServer that we've successfully preempted
 				ROS_DEBUG_NAMED("interfaces_mira","preempting the current docking task");
@@ -287,8 +290,7 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 
 				//we'll actually return from execute after preempting
 				return;
-			  }
-	        	} // end of is new task available
+			}
 
 
 	  	} // end of preempt requested
