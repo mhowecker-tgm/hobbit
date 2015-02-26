@@ -596,10 +596,12 @@ def goToPosition(frame='/map', room='None', place='dock'):
         )
         Sequence.add(
             'EMO_SAD',
-            HobbitEmotions.ShowEmotions(emotion='EMO_SAD', emo_time=1))
+            HobbitEmotions.ShowEmotions(emotion='EMO_SAD', emo_time=1),
+            transitions={'failed': 'aborted')
         Sequence.add(
             'MMUI_SAY_WayBlocked',
-            HobbitMMUI.ShowInfo(info='T_GT_WayBlocked'))
+            HobbitMMUI.ShowInfo(info='T_GT_WayBlocked'),
+            transitions={'failed': 'aborted')
         Sequence.add(
             'PREPARE_STOP_1',
             ServiceState(
@@ -745,10 +747,12 @@ def goToPose():
         )
         Sequence.add(
             'EMO_SAD',
-            HobbitEmotions.ShowEmotions(emotion='EMO_SAD', emo_time=1))
+            HobbitEmotions.ShowEmotions(emotion='EMO_SAD', emo_time=1),
+            transitions={'failed': 'aborted')
         Sequence.add(
             'MMUI_SAY_WayBlocked',
-            HobbitMMUI.ShowInfo(info='T_GT_WayBlocked'))
+            HobbitMMUI.ShowInfo(info='T_GT_WayBlocked'),
+            transitions={'failed': 'aborted')
         Sequence.add(
             'SHOW_MENU_MAIN_1',
             HobbitMMUI.ShowMenu(menu='MAIN'),
@@ -841,10 +845,12 @@ def goToPoseSilent():
         )
         Sequence.add(
             'EMO_SAD',
-            HobbitEmotions.ShowEmotions(emotion='EMO_SAD', emo_time=1))
+            HobbitEmotions.ShowEmotions(emotion='EMO_SAD', emo_time=1),
+            transitions={'failed': 'aborted')
         Sequence.add(
             'MMUI_SAY_WayBlocked',
-            HobbitMMUI.ShowInfo(info='T_GT_WayBlocked'))
+            HobbitMMUI.ShowInfo(info='T_GT_WayBlocked'),
+            transitions={'failed': 'aborted')
         Sequence.add(
             'PREPARE_STOP_1',
             ServiceState(
