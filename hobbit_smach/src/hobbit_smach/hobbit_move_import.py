@@ -122,8 +122,6 @@ def get_dock_action():
     return state
 
 
-
-
 def back_if_needed():
     def resp_cb(userdata, response):
         if response.result:

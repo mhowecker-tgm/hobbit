@@ -24,6 +24,7 @@ from smach import StateMachine, Concurrence, Sequence
 from smach_ros import IntrospectionServer, ActionServerWrapper, MonitorState, SimpleActionState
 from hobbit_msgs.msg import GeneralHobbitAction, FollowMeAction, FollowMeGoal
 import hobbit_smach.logging_import as log
+import hobbit_smach.hobbit_move_import as hobbit_move
 
 
 class Init(smach.State):
@@ -107,6 +108,25 @@ def main():
             Init(),
             transitions={'succeeded': 'ENABLE_TRACKING',
                          'canceled': 'LOG_ABORTED'}
+        )
+        StateMachine.add(
+            'UNDOCK_IF_NEEDED',
+            hobbit_move.undock_if_needed(),
+            transitions={'succeeded': 'BACK_IF_NEEDED',
+                         'aborted': 'LOG_ABORTED'}
+        )
+        StateMachine.add(
+            'BACK_IF_NEEDED',
+            hobbit_move.back_if_needed(),
+            transitions={'succeeded': 'ROTATE_180',
+                         'aborted': 'LOG_ABORTED'}
+        )
+        StateMachine.add(
+            'ROTATE_180',
+            hobbit_move.MoveDiscrete(motion='Rotate', value=180),
+            transitions={'succeeded': 'ENABLE_TRACKING',
+                         'preempted': 'LOG_PREEMPT',
+                         'aborted': 'LOG_ABORTED'}
         )
         StateMachine.add_auto(
             'ENABLE_TRACKING',
