@@ -704,6 +704,10 @@ def goToPose():
         Sequence.add('ACTIVATE_OBSTACLES',
                      SetObstacles(active=True))
         if not DEBUG:
+            Sequence.add(
+                'CHECK_ARM',
+                arm_move.CheckArmAtHomePos()
+            )
             Sequence.add('MOVE_BASE_GOAL', move_base.MoveBaseState(frame),
                          remapping={'x': 'x',
                                     'y': 'y',
@@ -814,6 +818,10 @@ def goToPoseSilent():
         Sequence.add('ACTIVATE_OBSTACLES',
                      SetObstacles(active=True))
         if not DEBUG:
+            Sequence.add(
+                'CHECK_ARM',
+                arm_move.CheckArmAtHomePos()
+            )
             Sequence.add('MOVE_BASE_GOAL', move_base.MoveBaseState(frame),
                          remapping={'x': 'x',
                                     'y': 'y',

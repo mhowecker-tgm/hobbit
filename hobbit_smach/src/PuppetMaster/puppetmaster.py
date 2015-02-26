@@ -118,6 +118,9 @@ def command_cb(msg, ud):
                         return True
                 ud.params = msg.params
                 new_params = ud.params
+                rospy.loginfo("CALL_HOBBIT: "+str(msg.params))
+                rospy.loginfo("CALL_HOBBIT: "+str(ud.params))
+                rospy.loginfo("CALL_HOBBIT: "+str(new_params))
                 ud.parameters['active_task'] = index
                 rospy.loginfo('New task has higher priority. START IT.')
                 new_command = ud.command
