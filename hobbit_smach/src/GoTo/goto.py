@@ -369,7 +369,7 @@ def main():
             Sequence.add(
                 'MOVE_TO_GOAL',
                 hobbit_move.goToPose(),
-                transitions={'aborted': 'EMO_SAD',
+                transitions={'aborted': 'WAIT',
                              'succeeded': 'EMO_HAPPY_1'}
             )
             # Sequence.add(
