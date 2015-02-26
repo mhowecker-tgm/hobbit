@@ -99,6 +99,31 @@ class Count(State):
         self.counter = 1
         return 'aborted'
 
+class Count2(State):
+    """
+    Just count the number of times the come closer should be done
+    """
+    def __init__(self):
+        State.__init__(
+            self,
+            outcomes=['succeeded',
+                      'aborted',
+                      'preempted']
+        )
+        self.counter = 1
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        rospy.loginfo('Counter: '+str(self.counter))
+        # FIXME: use of magic number
+        if self.counter < 2:
+            self.counter += 1
+            return 'succeeded'
+        self.counter = 1
+        return 'aborted'
+
 def msg_timer_sm():
     sm = StateMachine(outcomes = ['succeeded','aborted','preempted'],
                       output_keys=['person_x', 'person_z'])
@@ -187,18 +212,10 @@ def gesture_sm():
         StateMachine.add(
             'MOVE',
             hobbit_move.MoveDiscrete(motion='Move', value=0.1),
-            transitions={'succeeded': 'COUNT',
+            transitions={'succeeded': 'MOVED_BACK',
                          'preempted': 'preempted',
                          'aborted': 'aborted'}
         )
-        StateMachine.add(
-            'COUNT',
-            Count(),
-            transitions={'succeeded': 'MOVED_BACK',
-                         'preempted': 'preempted',
-                         'aborted': 'succeeded'}
-        )
-
         StateMachine.add(
             'MOVED_BACK',
             ServiceState(
@@ -358,9 +375,16 @@ def call_hobbit():
         StateMachine.add(
             'GESTURE_HANDLING',
             gesture_sm(),
-            transitions={'succeeded': 'LOG_SUCCESS',
+            transitions={'succeeded': 'COUNT_2',
                          'preempted': 'LOG_PREEMPT',
                          'aborted': 'LOG_ABORT'}
+        )
+        StateMachine.add(
+            'COUNT_2',
+            Count2(),
+            transitions={'succeeded': 'GESTURE_HANDLING',
+                         'aborted': 'LOG_SUCCESS',
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'LOG_PREEMPT',
