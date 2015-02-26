@@ -13,8 +13,7 @@ import rospy
 import smach
 import uashh_smach.util as util
 from uashh_smach.util import SleepState, WaitForMsgState  # df 30.7.2014
-# import tf
-# import math
+
 from smach import StateMachine
 from smach_ros import ActionServerWrapper, IntrospectionServer, ServiceState,\
     MonitorState
@@ -30,7 +29,10 @@ import hobbit_smach.arm_move_import as arm_move
 import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.pickup_import as pickup
 import hobbit_smach.logging_import as log
+import hobbit_smach.locate_user_simple_import as locate_user
 # from hobbit_smach.helper_import import WaitForMsgState
+# import tf
+# import math
 
 
 def switch_vision_cb(ud, response):
@@ -574,15 +576,22 @@ def main():
             'CHECK_HELP',
             CheckHelpAccepted(),
             transitions={'yes': 'SAY_THANK_YOU',
-                         'no': 'SET_SUCCESS',
+                         'no': 'GO_TO_USER',
                          'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'SAY_THANK_YOU',
             speech_output.sayText(info='T_PU_ThankYouPointing'),
-            transitions={'succeeded': 'SET_SUCCESS',
-                         'failed': 'SET_SUCCESS',
+            transitions={'succeeded': 'GO_TO_USER',
+                         'failed': 'GO_TO_USER',
                          'preempted': 'LOG_PREEMPT'}
+        )
+        StateMachine.add(
+            'GO_TO_USER',
+            locate_user.get_detect_user(),
+            transitions={'succeeded': 'SET_SUCCESS',
+                         'preempted': 'LOG_PREEMPT',
+                         'aborted': 'PLAN_PATH'}
         )
         StateMachine.add(
             'SET_SUCCESS',
