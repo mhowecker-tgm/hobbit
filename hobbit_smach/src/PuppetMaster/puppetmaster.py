@@ -15,7 +15,7 @@ from hobbit_msgs.msg import Command, Event, GeneralHobbitAction,\
     GeneralHobbitGoal
 import hobbit_smach.helper_import as helper
 import hobbit_smach.recharge_import as recharge
-import hobbit_smach.call_hobbit_import as call_hobbit
+import hobbit_smach.call_hobbit_2_import as call_hobbit
 import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.social_role_import as social_role
 import hobbit_smach.end_interaction_import as end_interaction
