@@ -69,7 +69,7 @@ def undock_if_needed():
                 msg_cb=battery_cb
                 ),
             transitions={'succeeded': 'UNDOCK',
-                         'aborted': 'aborted',
+                         'aborted': 'succeeded',
                          'preempted': 'preempted'}
         )
         StateMachine.add(

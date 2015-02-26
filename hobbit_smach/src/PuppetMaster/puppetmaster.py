@@ -138,8 +138,7 @@ def command_cb(msg, ud):
                     ud.command = 'sleep'
                 else:
                     ud.command = 'away'
-                ud.parameters['sleep_time'] = times[index]
-                new_params = ud.parameters['sleep_time']
+                new_params = str(times[index])
                 new_command = ud.command
                 return True
             # elif index == 1 and night and index + 1 <= active_task:
@@ -396,10 +395,10 @@ def bring_cb(ud, goal):
 
 def away_cb(ud, goal):
     par = []
-    print("away_cb")
-    print(type(new_params))
-    print(new_params)
-    par.append(String(ud.parameters['sleep_time']))
+    rospy.loginfo("away_cb")
+    rospy.loginfo(str(type(new_params)))
+    rospy.loginfo((new_params))
+    par.append(String(new_params))
     goal = GeneralHobbitGoal(command=String('away'),
                              previous_state=String('call_hobbit'),
                              parameters=par)
