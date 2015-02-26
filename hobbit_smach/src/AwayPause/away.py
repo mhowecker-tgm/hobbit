@@ -335,13 +335,17 @@ def main():
                 speech_output.sayText(info='T_BR_Goodbye'),
                 transitions={'failed': 'failed'})
             Sequence.add(
-                'SET_NAV_GOAL',
-                hobbit_move.SetNavGoal(room='dock', place='dock')
+                'RECHARGE',
+                recharge.getRecharge()
             )
-            Sequence.add(
-                'MOVE_TO_DOCK',
-                hobbit_move.goToPose(),
-                transitions={'aborted': 'failed'})
+            #Sequence.add(
+            #    'SET_NAV_GOAL',
+            #    hobbit_move.SetNavGoal(room='dock', place='dock')
+            #)
+            #Sequence.add(
+            #    'MOVE_TO_DOCK',
+            #    hobbit_move.goToPose(),
+            #    transitions={'aborted': 'failed'})
 
             seq2.userdata.text = 'Tell me when you are back/awake again.'
             # TODO: menu='MAIN' has to be changed to the 'User is back menu'

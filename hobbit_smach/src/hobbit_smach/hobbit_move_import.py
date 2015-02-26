@@ -489,8 +489,6 @@ def getPosition(room='none', place='dock'):
         return (0.0, 0.0, 0.0)
 
 
-
-
 def goToPosition(frame='/map', room='None', place='dock'):
     """
     Return a SMACH Sequence for navigation to a new position.
@@ -596,6 +594,12 @@ def goToPosition(frame='/map', room='None', place='dock'):
             'HEAD_UP',
             head_move.MoveTo(pose='littledown_center')
         )
+        Sequence.add(
+            'EMO_SAD',
+            HobbitEmotions.ShowEmotions(emotion='EMO_SAD', emo_time=1))
+        Sequence.add(
+            'MMUI_SAY_WayBlocked',
+            HobbitMMUI.ShowInfo(info='T_GT_WayBlocked'))
         Sequence.add(
             'PREPARE_STOP_1',
             ServiceState(
@@ -740,6 +744,12 @@ def goToPose():
             )
         )
         Sequence.add(
+            'EMO_SAD',
+            HobbitEmotions.ShowEmotions(emotion='EMO_SAD', emo_time=1))
+        Sequence.add(
+            'MMUI_SAY_WayBlocked',
+            HobbitMMUI.ShowInfo(info='T_GT_WayBlocked'))
+        Sequence.add(
             'SHOW_MENU_MAIN_1',
             HobbitMMUI.ShowMenu(menu='MAIN'),
             transitions={'succeeded': 'aborted',
@@ -829,6 +839,12 @@ def goToPoseSilent():
             'HEAD_UP',
             head_move.MoveTo(pose='littledown_center')
         )
+        Sequence.add(
+            'EMO_SAD',
+            HobbitEmotions.ShowEmotions(emotion='EMO_SAD', emo_time=1))
+        Sequence.add(
+            'MMUI_SAY_WayBlocked',
+            HobbitMMUI.ShowInfo(info='T_GT_WayBlocked'))
         Sequence.add(
             'PREPARE_STOP_1',
             ServiceState(
