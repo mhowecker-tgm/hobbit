@@ -582,6 +582,15 @@ def get_detect_user():
                        'yaw': 'goal_position_yaw'}
         )
         smach.StateMachine.add(
+            'SWITCH_VISION',
+            ServiceState(
+                '/vision_system/comeCloser',
+                SwitchVision,
+                request=SwitchVisionRequest(dummyInput=True),
+                response_cb=switch_vision_cb
+            )
+        )
+        smach.StateMachine.add(
             'MOVE_HEAD_UP',
             head_move.MoveTo(pose='littledown_center'),
             transitions={'succeeded': 'WAIT',
