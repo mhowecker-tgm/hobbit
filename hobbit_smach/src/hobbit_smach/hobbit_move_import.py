@@ -23,7 +23,7 @@ from move_base_msgs.msg import MoveBaseAction
 from hobbit_msgs.msg import MiraDockingAction, MiraDockingGoal
 from std_msgs.msg import String
 from mira_msgs.msg import BatteryState
-from hobbit_user_interaction import HobbitMMUI
+from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 from uashh_smach.util import SleepState, WaitForMsgState
 from actionlib import SimpleActionClient
 import uashh_smach.platform.move_base as move_base
