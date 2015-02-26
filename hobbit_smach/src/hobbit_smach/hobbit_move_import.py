@@ -551,7 +551,8 @@ def goToPosition(frame='/map', room='None', place='dock'):
         Sequence.add('SET_NAV_GOAL', SetNavigationGoal(room, place))
         Sequence.add(
             'CHECK_ARM',
-            arm_move.CheckArmAtHomePos()
+            arm_move.CheckArmAtHomePos(),
+            transitions={'aborted': 'SAY_ARM'}
         )
         if not DEBUG:
             Sequence.add(
@@ -610,6 +611,12 @@ def goToPosition(frame='/map', room='None', place='dock'):
         Sequence.add(
             'SHOW_MENU_MAIN_1',
             HobbitMMUI.ShowMenu(menu='MAIN'),
+            transitions={'succeeded': 'aborted',
+                         'failed': 'aborted'}
+        )
+        Sequence.add(
+            'SAY_ARM',
+            HobbitMMUI.ShowInfo(info='My arm is not in the home position. Will not move.'),
             transitions={'succeeded': 'aborted',
                          'failed': 'aborted'}
         )
@@ -704,7 +711,8 @@ def goToPose():
         if not DEBUG:
             Sequence.add(
                 'CHECK_ARM',
-                arm_move.CheckArmAtHomePos()
+                arm_move.CheckArmAtHomePos(),
+                transitions={'aborted': 'SAY_ARM'}
             )
             Sequence.add('MOVE_BASE_GOAL', move_base.MoveBaseState(frame),
                          remapping={'x': 'x',
@@ -758,6 +766,12 @@ def goToPose():
         Sequence.add(
             'SHOW_MENU_MAIN_1',
             HobbitMMUI.ShowMenu(menu='MAIN'),
+            transitions={'succeeded': 'aborted',
+                         'failed': 'aborted'}
+        )
+        Sequence.add(
+            'SAY_ARM',
+            HobbitMMUI.ShowInfo(info='My arm is not in the home position. Will not move.'),
             transitions={'succeeded': 'aborted',
                          'failed': 'aborted'}
         )
@@ -818,7 +832,8 @@ def goToPoseSilent():
         if not DEBUG:
             Sequence.add(
                 'CHECK_ARM',
-                arm_move.CheckArmAtHomePos()
+                arm_move.CheckArmAtHomePos(),
+                transitions={'aborted': 'SAY_ARM'}
             )
             Sequence.add('MOVE_BASE_GOAL', move_base.MoveBaseState(frame),
                          remapping={'x': 'x',
@@ -867,6 +882,12 @@ def goToPoseSilent():
         Sequence.add(
             'SHOW_MENU_MAIN_1',
             HobbitMMUI.ShowMenu(menu='MAIN'),
+            transitions={'succeeded': 'aborted',
+                         'failed': 'aborted'}
+        )
+        Sequence.add(
+            'SAY_ARM',
+            HobbitMMUI.ShowInfo(info='My arm is not in the home position. Will not move.'),
             transitions={'succeeded': 'aborted',
                          'failed': 'aborted'}
         )
