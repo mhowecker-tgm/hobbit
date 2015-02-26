@@ -11,7 +11,7 @@ from smach import StateMachine
 from smach_ros import IntrospectionServer, ActionServerWrapper
 
 from hobbit_msgs.msg import GeneralHobbitAction
-import hobbit_smach.locate_user_import as locate_user
+import hobbit_smach.locate_user_simple_import as locate_user
 
 
 def main():

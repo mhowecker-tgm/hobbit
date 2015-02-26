@@ -5,8 +5,6 @@ PKG = 'hobbit_smach'
 NAME = 'reminder'
 DEBUG = False
 
-import roslib
-roslib.load_manifest(PKG)
 import rospy
 #import smach
 #import uashh_smach.util as util
@@ -23,7 +21,7 @@ from smach import StateMachine, State, cb_interface
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 import hobbit_smach.sos_call_import as sos_call
 import hobbit_smach.speech_output_import as speech_output
-import hobbit_smach.locate_user_import as locate_user
+import hobbit_smach.locate_user_simple_import as locate_user
 from datetime import datetime, time
 
 

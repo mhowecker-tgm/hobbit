@@ -22,7 +22,7 @@ import hobbit_smach.arm_move_import as arm_move
 import hobbit_smach.hobbit_move_import as hobbit_move
 import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.bcolors as bcolors
-import hobbit_smach.locate_user_import as locate_user
+import hobbit_smach.locate_user_simple_import as locate_user
 import hobbit_smach.social_role_import as social_role
 import hobbit_smach.logging_import as logging
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions

@@ -16,7 +16,7 @@ from smach_ros import ActionServerWrapper, \
     SimpleActionState, IntrospectionServer
 from smach import StateMachine, State
 from hobbit_user_interaction import HobbitMMUI
-import hobbit_smach.locate_user_import as locate_user
+import hobbit_smach.locate_user_simple_import as locate_user
 import hobbit_smach.logging_import as log
 
 

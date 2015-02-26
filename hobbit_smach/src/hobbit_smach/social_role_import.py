@@ -14,7 +14,7 @@ from hobbit_msgs.srv import GetCoordinates, GetCoordinatesRequest
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 import hobbit_smach.sos_call_import as sos_call
 import hobbit_smach.speech_output_import as speech_output
-import hobbit_smach.locate_user_import as locate_user
+import hobbit_smach.locate_user_simple_import as locate_user
 import hobbit_smach.logging_import as log
 
 
