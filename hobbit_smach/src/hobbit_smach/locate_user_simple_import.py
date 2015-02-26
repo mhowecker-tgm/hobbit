@@ -1,6 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+PREEMPT_TIMEOUT = 5
+SERVER_TIMEOUT = 5
+
 import rospy
 import smach
 import uashh_smach.util as util
@@ -9,7 +12,7 @@ import math
 
 from hobbit_msgs.srv import SwitchVision, SwitchVisionRequest
 from std_msgs.msg import String
-from smach_ros import ServiceState
+from smach_ros import ServiceState, SimpleActionState
 from mira_msgs.srv import UserNavMode, ObsNavMode
 from nav_msgs.srv import GetPlan, GetPlanRequest
 from geometry_msgs.msg import PoseStamped, Point, Quaternion
@@ -19,7 +22,11 @@ from hobbit_msgs.srv import GetRooms
 import hobbit_smach.hobbit_move_import as hobbit_move
 import uashh_smach.platform.move_base as move_base
 import hobbit_smach.head_move_import as head_move
-
+from uashh_smach.util import SleepState, WaitForMsgState
+from hobbit_msgs.srv import SetCloserStateRequest
+from hobbit_msgs.srv import SwitchVision, SwitchVisionRequest, SetCloserState
+from hobbit_msgs.msg import GeneralHobbitAction
+import hobbit_smach.logging_import as log
 
 def switch_vision_cb(ud, response):
     if response.result:
@@ -28,6 +35,15 @@ def switch_vision_cb(ud, response):
     else:
         return 'aborted'
 
+def closer_cb(ud, goal):
+    params=[]
+    params.append(String(str(ud.person_z/1000)))
+    params.append(String(str(-ud.person_x/1000)))
+    goal = GeneralHobbitGoal(
+        command=String('start'),
+        parameters=params
+    )
+    return goal
 
 def detectUser():
     sm = smach.StateMachine(
@@ -54,6 +70,50 @@ def detectUser():
         )
         return sm
 
+def msg_timer_sm():
+    sm = smach.StateMachine(outcomes = ['succeeded','aborted','preempted'],
+                      output_keys=['person_x', 'person_z'])
+
+    def child_term_cb(outcome_map):
+        print(outcome_map)
+        return True
+
+    def person_cb(msg, ud):
+        print(msg)
+        if (rospy.Time.now() - msg.stamp) > rospy.Duration(1):
+            rospy.loginfo('Person data is too old. Ignore.')
+            return False
+        if msg.source == 6:
+            #print('Do not use this data')
+            return False
+        ud.person_x = msg.x
+        ud.person_z = msg.z
+        #print("OK. Use it.")
+        return True
+
+    cc = smach.Concurrence(outcomes=['aborted', 'succeeded', 'preempted'],
+                     default_outcome='aborted',
+                     child_termination_cb=child_term_cb,
+                     output_keys=['person_x', 'person_z'],
+                     outcome_map={'succeeded': {'LISTENER': 'succeeded'},
+                                  'aborted': {'TIMER': 'succeeded'}})
+    with sm:
+        smach.StateMachine.add(
+            'GET_PERSON',
+            WaitForMsgState(
+                '/persons',
+                Person,
+                msg_cb=person_cb,
+                timeout=3,
+                output_keys=['user_pose', 'person_z', 'person_x']
+            ),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'GET_PERSON'}
+        )
+    with cc:
+        smach.Concurrence.add('LISTENER', sm)
+        smach.Concurrence.add('TIMER', SleepState(duration=3))
+    return cc
 
 class UserCounter(smach.State):
     def __init__(self):
@@ -357,7 +417,7 @@ def get_detect_user():
             'INIT',
             Init(),
             transitions={'succeeded': 'GET_ALL_POSITIONS',
-                         'canceled': 'CLEAN_UP'}
+                         'canceled': 'LOG_ABORT'}
         )
         # smach.StateMachine.add(
         #     'DOCK_CHECK',
@@ -371,7 +431,7 @@ def get_detect_user():
                          GetRooms,
                          response_key='response'),
             transitions={'succeeded': 'GET_ROBOT_POSE',
-                         'aborted': 'CLEAN_UP'}
+                         'aborted': 'LOG_ABORT'}
         )
         smach.StateMachine.add(
             'GET_ROBOT_POSE',
@@ -387,15 +447,15 @@ def get_detect_user():
             'PLAN_PATH',
             PlanPath(),
             transitions={'succeeded': 'MOVE_BASE',
-                         'preempted': 'CLEAN_UP',
-                         'aborted': 'CLEAN_UP'}
+                         'preempted': 'LOG_PREEMPT',
+                         'aborted': 'LOG_ABORT'}
         )
         smach.StateMachine.add(
             'MOVE_BASE',
             hobbit_move.goToPose(),
             transitions={'succeeded': 'SWITCH_VISION',
-                         'preempted': 'CLEAN_UP',
-                         'aborted': 'CLEAN_UP'},
+                         'preempted': 'LOG_PREEMPT',
+                         'aborted': 'LOG_ABORT'},
             remapping={'x': 'goal_position_x',
                        'y': 'goal_position_y',
                        'yaw': 'goal_position_yaw'}
@@ -417,14 +477,14 @@ def get_detect_user():
                 UserNavMode
             ),
             transitions={'succeeded': 'MOVE_HEAD_UP',
-                         'preempted': 'CLEAN_UP',
+                         'preempted': 'LOG_PREEMPT',
                          'aborted': 'MOVE_HEAD_UP'}
         )
         smach.StateMachine.add(
             'MOVE_HEAD_UP',
             head_move.MoveTo(pose='littledown_center'),
             transitions={'succeeded': 'WAIT',
-                         'preempted': 'CLEAN_UP',
+                         'preempted': 'LOG_PREEMPT',
                          'aborted': 'WAIT'}
         )
         smach.StateMachine.add(
@@ -434,10 +494,11 @@ def get_detect_user():
         )
         smach.StateMachine.add(
             'USER_DETECTION',
-            detectUser(),
-            transitions={'succeeded': 'SET_SUCCESS',
-                         'preempted': 'preempted',
-                         'failed': 'PREPARE_MOVEMENT'}
+            msg_timer_sm(),
+            transitions={'succeeded': 'CLOSER',
+                         'preempted': 'LOG_PREEMPT',
+                         'aborted': 'PREPARE_MOVEMENT'},
+
         )
         smach.StateMachine.add(
             'PREPARE_MOVEMENT',
@@ -446,19 +507,52 @@ def get_detect_user():
                 ObsNavMode
             ),
             transitions={'succeeded': 'PLAN_PATH',
-                         'preempted': 'CLEAN_UP',
+                         'preempted': 'LOG_PREEMPT',
                          'aborted': 'PLAN_PATH'}
         )
         smach.StateMachine.add(
-            'SET_SUCCESS',
-            SetSuccess(),
-            transitions={'succeeded': 'succeeded',
-                         'preempted': 'CLEAN_UP'}
+            'CLOSER',
+            SimpleActionState(
+                'come_closer',
+                GeneralHobbitAction,
+                goal_cb=closer_cb,
+                input_keys=['person_z', 'person_x'],
+                preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
+                server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
+            ),
+            transitions={'succeeded': 'MOVED',
+                         'preempted': 'LOG_PREEMPT',
+                         'aborted': 'LOG_ABORT'}
+        )
+        smach.StateMachine.add(
+            'MOVED',
+            ServiceState(
+                '/came_closer/set_closer_state',
+                SetCloserState,
+                request=SetCloserStateRequest(state=True),
+            ),
+            transitions={'succeeded': 'LOG_SUCCESS',
+                         'preempted': 'LOG_PREEMPT'}
         )
         smach.StateMachine.add(
             'CLEAN_UP',
             CleanUp(),
             transitions={'succeeded': 'preempted'}
+        )
+        smach.StateMachine.add(
+            'LOG_PREEMPT',
+            log.DoLogPreempt(scenario='Locate User'),
+            transitions={'succeeded': 'preempted'}
+        )
+        smach.StateMachine.add(
+            'LOG_ABORT',
+            log.DoLogAborted(scenario='Locate User'),
+            transitions={'succeeded': 'aborted'}
+        )
+        smach.StateMachine.add(
+            'LOG_SUCCESS',
+            log.DoLogSuccess(scenario='Locate User'),
+            transitions={'succeeded': 'succeeded'}
         )
     return sm
 

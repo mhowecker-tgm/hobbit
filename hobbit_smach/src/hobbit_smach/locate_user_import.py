@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 steps = 12
+PREEMPT_TIMEOUT = 5
+SERVER_TIMEOUT = 5
 
 import rospy
 import smach
@@ -25,6 +27,8 @@ import hobbit_smach.head_move_import as head_move
 from uashh_smach.util import SleepState, WaitForMsgState
 from hobbit_msgs.srv import SetCloserStateRequest
 from hobbit_msgs.srv import SwitchVision, SwitchVisionRequest, SetCloserState
+from hobbit_msgs.msg import GeneralHobbitAction
+import hobbit_smach.logging_import as log
 
 def detectUser():
     sm = smach.StateMachine(
@@ -57,6 +61,16 @@ def detectUser():
                          'preempted': 'preempted'}
         )
         return sm
+
+def closer_cb(ud, goal):
+    params=[]
+    params.append(String(str(ud.person_z/1000)))
+    params.append(String(str(-ud.person_x/1000)))
+    goal = GeneralHobbitGoal(
+        command=String('start'),
+        parameters=params
+    )
+    return goal
 
 def msg_timer_sm():
     sm = smach.StateMachine(outcomes = ['succeeded','aborted','preempted'],
@@ -99,10 +113,9 @@ def msg_timer_sm():
                          'aborted': 'GET_PERSON'}
         )
     with cc:
-        Concurrence.add('LISTENER', sm)
-        Concurrence.add('TIMER', SleepState(duration=3))
+        smach.Concurrence.add('LISTENER', sm)
+        smach.Concurrence.add('TIMER', SleepState(duration=3))
     return cc
-
 
 class UserCounter(smach.State):
     def __init__(self):
@@ -122,7 +135,6 @@ class UserCounter(smach.State):
         else:
             self.counter = 0
             return 'aborted'
-
 
 class Init(smach.State):
     """
@@ -516,12 +528,6 @@ def get_detect_user():
             transitions={'succeeded': 'GET_ALL_POSITIONS',
                          'canceled': 'LOG_ABORT'}
         )
-        # smach.StateMachine.add(
-        #     'DOCK_CHECK',
-        #     hobbit_move.undock_if_needed(),
-        #     transitions={'succeeded': 'GET_ALL_POSITIONS',
-        #                  'canceled': 'CLEAN_UP'}
-        # )
         smach.StateMachine.add(
             'GET_ALL_POSITIONS',
             ServiceState('getRooms',
