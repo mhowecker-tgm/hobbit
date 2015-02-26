@@ -622,6 +622,7 @@ def get_detect_user():
             transitions={'succeeded': 'MOVED',
                          'preempted': 'LOG_PREEMPT',
                          'aborted': 'LOG_ABORT'}
+        )
         smach.StateMachine.add(
             'MOVED',
             ServiceState(
