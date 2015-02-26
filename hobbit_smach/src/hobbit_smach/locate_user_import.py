@@ -17,7 +17,7 @@ from hobbit_msgs.srv import *
 from hobbit_msgs.msg import *
 from hobbit_msgs.srv import *
 from smach import Sequence
-from smach_ros import ServiceState
+from smach_ros import ServiceState, SimpleActionState
 from nav_msgs.srv import GetPlan, GetPlanRequest
 from geometry_msgs.msg import PoseStamped, Point, Quaternion
 import hobbit_smach.hobbit_move_import as hobbit_move
@@ -29,6 +29,13 @@ from hobbit_msgs.srv import SetCloserStateRequest
 from hobbit_msgs.srv import SwitchVision, SwitchVisionRequest, SetCloserState
 from hobbit_msgs.msg import GeneralHobbitAction
 import hobbit_smach.logging_import as log
+
+
+def switch_vision_cb(ud, response):
+    if response.result:
+        return 'succeeded'
+    else:
+        return 'aborted'
 
 def detectUser():
     sm = smach.StateMachine(
@@ -93,7 +100,7 @@ def msg_timer_sm():
         #print("OK. Use it.")
         return True
 
-    cc = smach.Concurrence(outcomes=['aborted', 'succeeded'],
+    cc = smach.Concurrence(outcomes=['aborted', 'succeeded', 'preempted'],
                      default_outcome='aborted',
                      child_termination_cb=child_term_cb,
                      output_keys=['person_x', 'person_z'],
