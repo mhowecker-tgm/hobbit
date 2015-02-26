@@ -12,7 +12,7 @@ from smach_ros import IntrospectionServer, ActionServerWrapper
 
 from hobbit_msgs.msg import GeneralHobbitAction
 import hobbit_smach.bring_object_simple_import as bring_object
-
+import hobbit_smach.logging_import as log
 
 def main():
     rospy.init_node(NAME)
