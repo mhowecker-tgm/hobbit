@@ -32,6 +32,8 @@ alias sshpi='ssh -X pi@192.168.2.199'
 #update (=>copy) files on robot head (pi)
 alias updateHead="source /opt/ros/hobbit_hydro/src/hobbit_launch/launch/HeadScripts/updateHead.sh"
 
+#get robot id
+alias dfidhobbit="rosparam get /hobbit_id"
 #system commands for xpc/rpi ( see hobbit_launch/launch/System/systemCommands.c ) 
 alias systemCommands='/opt/ros/hobbit_hydro/src/hobbit_launch/launch/System/systemCommands'
 
