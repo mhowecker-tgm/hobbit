@@ -19,6 +19,7 @@ import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.logging_import as log
 from hobbit_msgs.msg import GeneralHobbitAction, GeneralHobbitGoal
 from rgbd_acquisition.msg import Person
+from hobbit_user_interaction import HobbitMMUI
 import head_move_import as head_move
 from uashh_smach.util import WaitForMsgState, SleepState
 from hobbit_msgs.msg import Event
@@ -152,9 +153,11 @@ def gesture_sm():
         rospy.loginfo(str(outcome_map))
         if outcome_map['LISTENER'] == 'succeeded':
             return 'succeeded'
-        elif outcome_map['YES_NO'] == 'succeeded':
+        elif outcome_map['YES_NO'] == 'yes':
             return 'succeeded'
         elif outcome_map['TIMER'] == 'succeeded':
+            return 'aborted'
+        elif outcome_map['YES_NO'] in ['no', 'timout', '3times', 'failed']:
             return 'aborted'
         else:
             return 'preempted'
@@ -212,7 +215,7 @@ def gesture_sm():
         Concurrence.add('TIMER', SleepState(duration=30))
         Concurrence.add(
             'YES_NO',
-            speech_output.skYesNo(question='Shall I come even closer?')
+            HobbitMMUI.AskYesNo(question='Shall I come even closer?'),
         )
     return cc
 
@@ -328,7 +331,7 @@ def call_hobbit():
                 SetCloserState,
                 request=SetCloserStateRequest(state=True),
             ),
-            transitions={'succeeded': 'MMUI_Say_come_closer',
+            transitions={'succeeded': 'HEAD_UP_AFTER_MOVEMENT',
                          'preempted': 'LOG_PREEMPT',}
         )
         StateMachine.add(
