@@ -21,6 +21,7 @@ import hobbit_smach.hobbit_move_import as hobbit_move
 import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.hobbit_cronjobs_import as cronjobs
 import hobbit_smach.logging_import as log
+import hobbit_smach.recharge_import as recharge
 
 
 class bcolors:
@@ -336,7 +337,8 @@ def main():
                 transitions={'failed': 'failed'})
             Sequence.add(
                 'RECHARGE',
-                recharge.getRecharge()
+                recharge.getRecharge(),
+                transitions={'aborted': 'failed'}
             )
             #Sequence.add(
             #    'SET_NAV_GOAL',
