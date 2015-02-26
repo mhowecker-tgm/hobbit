@@ -168,7 +168,7 @@ def main():
             CallCheck(),
             transitions={'preempted': 'CLEAN_UP',
                          'failure': 'SET_FAILURE',
-                         'command': 'MMUI_CONFIRM',
+                         'command': 'LOCATE_USER',
                          'event': 'LOCATE_USER'}
         )
         StateMachine.add(
@@ -192,24 +192,9 @@ def main():
         StateMachine.add(
             'LOCATE_USER',
             locate_user.get_detect_user(),
-            {'succeeded': 'SKIP_APPROACH_USER',
-             'aborted': 'CLEAN_UP',
-             'preempted': 'CLEAN_UP'})
-        StateMachine.add(
-            'APPROACH_USER',
-            SimpleActionState(
-                'approach_user',
-                ApproachUserAction,
-                goal=ApproachUserGoal(command=String('approachUser'))),
             {'succeeded': 'MMUI_CONFIRM',
              'aborted': 'CLEAN_UP',
              'preempted': 'CLEAN_UP'})
-        StateMachine.add(
-            'SKIP_APPROACH_USER',
-            SleepState(duration=0.1),
-            {'succeeded': 'MMUI_CONFIRM',
-             'preempted': 'CLEAN_UP'}
-        )
         StateMachine.add(
             'SET_SUCCESS',
             SetSuccess(),
