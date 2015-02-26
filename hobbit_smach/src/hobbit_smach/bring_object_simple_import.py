@@ -462,8 +462,7 @@ def get_bring_object():
         smach.StateMachine.add(
             'OBJECT_DETECTION',
             detect_object(),
-            # TODO: s/TELL\_USER/GO_TO_USER/g
-            transitions={'succeeded': 'TELL_USER',
+            transitions={'succeeded': 'GO_TO_USER',
                          'preempted': 'LOG_PREEMPT',
                          'aborted': 'PLAN_PATH'}
         )

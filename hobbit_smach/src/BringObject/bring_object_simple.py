@@ -12,6 +12,7 @@ from smach_ros import IntrospectionServer, ActionServerWrapper
 
 from hobbit_msgs.msg import GeneralHobbitAction
 import hobbit_smach.bring_object_simple_import as bring_object
+import hobbit_smach.locate_user_simple_import as locate_user
 
 
 def main():
@@ -26,9 +27,24 @@ def main():
         StateMachine.add(
             'BRING_OBJECT',
             bring_object.get_bring_object(),
-            transitions={'succeeded': 'succeeded',
-                         'aborted': 'aborted',
-                         'preempted': 'preempted'}
+            transitions={'succeeded': 'LOG_SUCCESS',
+                         'aborted': 'LOG_ABORTED',
+                         'preempted': 'LOG_PREEMPT'}
+        )
+        StateMachine.add(
+            'LOG_SUCCESS',
+            log.DoLogSuccess(scenario='Bring object'),
+            transitions={'succeeded': 'succeeded'}
+        )
+        StateMachine.add(
+            'LOG_PREEMPT',
+            log.DoLogPreempt(scenario='Bring object'),
+            transitions={'succeeded': 'preempted'}
+        )
+        StateMachine.add(
+            'LOG_ABORTED',
+            log.DoLogAborted(scenario='Bring object'),
+            transitions={'succeeded': 'aborted'}
         )
 
     asw = ActionServerWrapper(
