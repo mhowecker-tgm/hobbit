@@ -8,6 +8,7 @@ from hobbit_user_interaction import HobbitMMUI
 import hobbit_smach.hobbit_move_import as hobbit_move
 import hobbit_smach.logging_import as log
 import hobbit_smach.speech_output_import as speech_output
+from uashh_smach.util import SleepState
 
 
 class TimeCheck(State):
@@ -84,7 +85,7 @@ def get_hobbit_full_stop():
                 info='Doing a full stop as commanded by you.'),
             transitions={'succeeded': 'WAIT',
                          'preempted': 'LOG_PREEMPT',
-                         'failed': 'LOG_ABORT'}
+                         'failed': 'LOG_ABORTED'}
         )
         Sequence.add(
             'WAIT',
