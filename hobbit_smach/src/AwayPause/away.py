@@ -349,10 +349,9 @@ def main():
 
             seq2.userdata.text = 'Tell me when you are back/awake again.'
             # TODO: menu='MAIN' has to be changed to the 'User is back menu'
-            # This is not yet implemented in the MMUI
             Sequence.add(
                 'MMUI_SHOW_MENU_ME_BACK_AWAKE',
-                HobbitMMUI.ShowMenu(menu='MAIN'))
+                HobbitMMUI.ShowMenu(menu='AWAY'))
             Sequence.add(
                 'SET_CRONJOB',
                 cronjobs.SleepAway(),
