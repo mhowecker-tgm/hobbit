@@ -526,10 +526,10 @@ class GoToFinalGraspPose(State):
         print "turn (String): ", turn
         move = String("Move "+str(distance_m))
         print "move (String): ", move
-        raw_input("press enter")
+        #raw_input("press enter")
         self.move_robot_relative_pub.publish(turn)
         rospy.sleep(5)
-        raw_input("press enter")
+        #raw_input("press enter")
         self.move_robot_relative_pub.publish(move)
         rospy.sleep(7)
         
