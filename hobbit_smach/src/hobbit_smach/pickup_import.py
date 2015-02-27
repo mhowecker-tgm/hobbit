@@ -468,7 +468,7 @@ class GoToFinalGraspPose(State):
         #pnt_RG = Point()
         
         #distance between robot base and best grasp region        
-        d_O_GR = sqrt( pnt_GR.x*pnt_GR.x + pnt_GR.y*pnt_GR.y)
+        d_O_GR = math.sqrt( pnt_GR.x*pnt_GR.x + pnt_GR.y*pnt_GR.y)
         print "d_O_GR (m): ", d_O_GR
         
         # a_MX_GR: angle between robot minus x-axis of robot and best grasp region (calclated as 90 degrees (pi/2) plus degree of direction between -y-axis and d_O_GR
@@ -477,7 +477,7 @@ class GoToFinalGraspPose(State):
         print "a_MX_GR (grad):", a_MX_GR*180/math.pi
         
         # d_O_OC fix distance between robot base (initially) and object center
-        d_O_OC = sqrt( ud.obj_center_rcs.x*ud.obj_center_rcs.x + ud.obj_center_rcs.y*ud.obj_center_rcs.y )
+        d_O_OC = math.sqrt( ud.obj_center_rcs.x*ud.obj_center_rcs.x + ud.obj_center_rcs.y*ud.obj_center_rcs.y )
         print "d_O_OC (distance between robot base (initially) and object center in m): ", d_O_OC
         
         #a_OC_RG: the angle (measured from the robot origin) between the line O_OC and O_RG (sine rule on triangle O - RG - OC and transformations)
@@ -500,7 +500,7 @@ class GoToFinalGraspPose(State):
         print "a_OC_MY: the fix angle (measured at origin O) between the object center (graspable object) and the negativ y-axis in grad: ", a_OC_MY*180/math.pi
         
         #calculate how much robot has to turn
-        turn_rad = pi/2 - a_OC_MY - a_OC_RG
+        turn_rad = math.pi/2 - a_OC_MY - a_OC_RG
         #since robot has to turn right, it has to be multiplied by -1
         turn_rad = -turn_rad
         turn_degree = turn_rad*180/math.pi
