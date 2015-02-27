@@ -516,7 +516,7 @@ class GoToFinalGraspPose(State):
             return 'succeeded'
 
         except:
-            print "===> GoToFinalGraspPose: Error: %s"%e
+            print "===> GoToFinalGraspPose: Error "
             return 'aborted'
 
     def moveRobotRelative(turn_degree, distance_m):
