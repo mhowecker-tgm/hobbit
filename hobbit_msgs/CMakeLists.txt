@@ -65,6 +65,7 @@ add_service_files(
   GraspSuccessCheck.srv
   GetPose.srv
   SendPose.srv
+  SendValue.srv
 )
 
 add_action_files(
