@@ -515,7 +515,7 @@ class GoToFinalGraspPose(State):
     
             return 'succeeded'
 
-        except e:
+        except:
             print "===> GoToFinalGraspPose: Error: %s"%e
             return 'aborted'
 
