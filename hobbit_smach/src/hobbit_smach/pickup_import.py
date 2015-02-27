@@ -519,7 +519,7 @@ class GoToFinalGraspPose(State):
     #    print "===> GoToFinalGraspPose: Error "
     #    return 'aborted'
 
-    def moveRobotRelative(turn_degree, distance_m):
+    def moveRobotRelative(self, turn_degree, distance_m):
         #turns the robot, then moves the robot to perfect grasp position
 
         turn = String("Turn "+turn_degree)
