@@ -586,14 +586,17 @@ def main():
             'CHECK_HELP',
             CheckHelpAccepted(),
             transitions={'yes': 'SAY_THANK_YOU',
-                         'no': 'GO_TO_USER',
+                         #'no': 'GO_TO_USER',
+                         'no': 'SET_SUCCESS',
                          'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'SAY_THANK_YOU',
             speech_output.sayText(info='T_PU_ThankYouPointing'),
-            transitions={'succeeded': 'GO_TO_USER',
-                         'failed': 'GO_TO_USER',
+#            transitions={'succeeded': 'GO_TO_USER',
+#                         'failed': 'GO_TO_USER',
+            transitions={'succeeded': 'SET_SUCCESS',
+                         'failed': 'SET_SUCCESS',
                          'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
