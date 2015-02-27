@@ -522,9 +522,9 @@ class GoToFinalGraspPose(State):
     def moveRobotRelative(self, turn_degree, distance_m):
         #turns the robot, then moves the robot to perfect grasp position
 
-        turn = String("Turn "+turn_degree)
+        turn = String("Turn "+str(turn_degree))
         print "turn (String): ", turn
-        move = String("Move "+distance_m)
+        move = String("Move "+str(distance_m))
         print "move (String): ", move
         raw_input("press enter")
         self.move_robot_relative_pub.publish(turn)
