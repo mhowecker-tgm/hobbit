@@ -419,7 +419,7 @@ class GoToFinalGraspPose(State):
             input_keys=['obj_center_rcs'],
             output_keys=[]
         )
-    self.move_robot_relative_pub = rospy.Publisher('/DiscreteMotionCmd', String)
+        move_robot_relative_pub = rospy.Publisher('/DiscreteMotionCmd', String)
 
     def execute(self, ud):
         if self.preempt_requested():
