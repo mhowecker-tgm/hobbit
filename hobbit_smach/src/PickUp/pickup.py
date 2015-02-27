@@ -604,7 +604,7 @@ def main():
             locate_user.get_detect_user(),
             transitions={'succeeded': 'SET_SUCCESS',
                          'preempted': 'LOG_PREEMPT',
-                         'aborted': 'PLAN_PATH'}
+                         'aborted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'SET_SUCCESS',
