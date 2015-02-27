@@ -454,25 +454,25 @@ class GoToFinalGraspPose(State):
     #try:        
         # pnt_O:       
         pnt_O = Point()
-        pnt_O.point.x = 0
-        pnt_O.point.y = 0
+        pnt_O.x = 0
+        pnt_O.y = 0
         
         # pnt_GR: define best grasp regien (right now 5cm infront and 50 cm right of robot base)       
         pnt_GR = Point()
-        pnt_GR.point.x =  0.05
-        if (pnt_GR.point.x < 0.0):
-            print "pnt_GR.point.x has to be greater than 0. Act. value is: ", pnt_GR.point.x # rely on assumption for calculating  angle a_MX_GR
-        pnt_GR.point.y = -0.50
+        pnt_GR.x =  0.05
+        if (pnt_GR.x < 0.0):
+            print "pnt_GR.x has to be greater than 0. Act. value is: ", pnt_GR.x # rely on assumption for calculating  angle a_MX_GR
+        pnt_GR.y = -0.50
         
         # pnt_RG: define best grasp regien (right now 5cm infront and 50 cm right of robot base)       
         #pnt_RG = Point()
         
         #distance between robot base and best grasp region        
-        d_O_GR = sqrt( pnt_GR.point.x*pnt_GR.point.x + pnt_GR.point.y*pnt_GR.point.y)
+        d_O_GR = sqrt( pnt_GR.x*pnt_GR.x + pnt_GR.y*pnt_GR.y)
         print "d_O_GR (m): ", d_O_GR
         
         # a_MX_GR: angle between robot minus x-axis of robot and best grasp region (calclated as 90 degrees (pi/2) plus degree of direction between -y-axis and d_O_GR
-        a_MX_GR = math.pi/2 + math.atan( pnt_GR.point.x/ abs(pnt_GR.point.y) )
+        a_MX_GR = math.pi/2 + math.atan( pnt_GR.x/ abs(pnt_GR.y) )
         print "a_MX_GR (rad):", a_MX_GR
         print "a_MX_GR (grad):", a_MX_GR*180/math.pi
         
