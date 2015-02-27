@@ -64,6 +64,7 @@ class DavidLookForObject(State):
         classes scope (SMACH thingy)
         goal_position_yaw: Needed to be able to write in the
         classes scope (SMACH thingy)
+        obj_center_rcs
 
     output_keys:
         goal_position_x: x coordinate of the pose the robot should move to
@@ -72,13 +73,14 @@ class DavidLookForObject(State):
         (world coordinates.)
         goal_position_yaw: rotation of the pose the robot should move to
         (world coordinates.)
+        obj_center_rcs: x,y coordinates of the center of graspable object found (point)
     """
     def __init__(self):
         State.__init__(
             self,
             outcomes=['succeeded', 'failed', 'preempted'],
-            input_keys=['cloud', 'goal_position_x', 'goal_position_y', 'goal_position_yaw'],
-            output_keys=['goal_position_x', 'goal_position_y', 'goal_position_yaw']
+            input_keys=['cloud', 'goal_position_x', 'goal_position_y', 'goal_position_yaw','obj_center_rcs'],
+            output_keys=['goal_position_x', 'goal_position_y', 'goal_position_yaw','obj_center_rcs']
         )
         self.listener = tf.TransformListener()
         self.pubClust = rospy.Publisher("/objectclusters", PointCloud2)
@@ -87,6 +89,7 @@ class DavidLookForObject(State):
         self.robotDistFromGraspPntForGrasping = 0.51
         self.robotOffsetRotationForGrasping = 0.06+math.pi/2.0
         self.graspable_center_of_cluster_wcs = None
+        self.graspable_center_of_cluster_rcs = None
         self.min_obj_to_mapboarder_distance = 0.30 #object has to be at least self.min_obj_to_mapboarder_distance cm away from next boarder in navigation map
 
     def findobject(self, ud):
@@ -142,7 +145,7 @@ class DavidLookForObject(State):
 
 
         if self.findobject(ud):
-            #object was found, is graspable (has correct dimension is is not near to fixed obstacle such as a wall)
+            #object was found, is graspable (has correct dimension; is not near to fixed obstacle such as a wall)
             
             (robot_x, robot_y, robot_yaw) = util.get_current_robot_position(frame='/map')
             posRobot = [robot_x, robot_y] #Bajo, please fill in
@@ -156,6 +159,10 @@ class DavidLookForObject(State):
             ud.goal_position_x = self.graspable_center_of_cluster_wcs.point.x - self.robotDistFromGraspPntForGrasping * robotApproachDir[0]
             ud.goal_position_y = self.graspable_center_of_cluster_wcs.point.y - self.robotDistFromGraspPntForGrasping * robotApproachDir[1]
             ud.goal_position_yaw = math.atan2(robotApproachDir[1],robotApproachDir[0]) + self.robotOffsetRotationForGrasping #can be negative!  180/math.pi*math.atan2(y,x) = angle in degree of vector (x,y)
+            #define center of found object in rcs
+            ud.obj_center_rcs = self.graspable_center_of_cluster_rcs.point
+            
+            
             print "===> pickup_import.py: DavidLookForObject.execute(): robotDistFromGraspPntForGrasping: ", self.robotDistFromGraspPntForGrasping
             print "===> pickup_import.py: DavidLookForObject.execute(): robotOffsetRotationForGrasping: ", self.robotOffsetRotationForGrasping
             print "===> pickup_import.py: DavidLookForObject.execute(): robot goal position:"
@@ -205,6 +212,7 @@ class DavidLookForObject(State):
         if isgraspable:
             self.pc_rcs = self.transformPointCloud('/base_link',self.pc)
             self.graspable_center_of_cluster_wcs = pnt_wcs
+            self.graspable_center_of_cluster_rcs = pnt_rcs
             if self.isObjectAwayFromMapBoarders():
                 return True
             else:
@@ -372,6 +380,163 @@ class DavidLookForObject(State):
         return fmt
 
 
+# new: 27.2.2015 start
+class GoToFinalGraspPose(State):
+    """
+    This state should handle the following task.
+    Calculate angle and distance the robot has to turn and move to get perfect grasping position
+    (x,y,z,vectorX, vectorY, vectorZ)
+    a Pose is calculated to which the robot will then navigate. This pose has
+    to be stored inside the userdata output keys.
+
+    input_keys:
+        obj_center_rcs: defines the x,y-values of the object center (of graspable object) in rcs
+
+    output_keys:
+        none
+(
+    input_keys:
+        goal_position_x: Needed to be able to write in the
+        classes scope (SMACH thingy)
+        goal_position_y: Needed to be able to write in the
+        classes scope (SMACH thingy)
+        goal_position_yaw: Needed to be able to write in the
+        classes scope (SMACH thingy)
+
+    output_keys:
+        goal_position_x: x coordinate of the pose the robot should move to
+        (world coordinates.)
+        goal_position_y y coordinate of the pose the robot should move to
+        (world coordinates.)
+        goal_position_yaw: rotation of the pose the robot should move to
+        (world coordinates.)
+ old)
+    """
+    def __init__(self):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'failed', 'preempted'],
+            input_keys=['obj_center_rcs'],
+            output_keys=[]
+        )
+    self.move_robot_relative_pub = rospy.Publisher('/DiscreteMotionCmd', String)
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            return 'preempted'
+        print "===> GoToFinalGraspPose.execute: execute started and received obj_center_x_rcs: ",ud.obj_center_rcs.point.x
+        print "===> GoToFinalGraspPose.execute: execute started and received obj_center_y_rcs: ",ud.obj_center_rcs.point.y
+
+        # robot detected object to grasp. Goal: robot turns "turn_r" (rad) and then 
+        # moves mv_m (meter) to reach perfect grasping position
+        # terminology: 
+        #   d...distance
+        #   a...angle in rad
+        # We use for all points the rcs (x-axis forward, minus y-axis to the right side):
+        #   pnt_O  .............. origin of robot => (0,0)
+        #   pnt_GR .............. Grasp Region: relative to origin of robot (currently used: (0.05,-0.50)
+        #   ud.obj_center_rcs ... input parameter: object center of graspable object (finally (after robot movement) this point should match the pnt_GR)
+        #   pnt_RG .............. Robot Goal: this is the position (point) where the robot base has to be placed for the perfect grasp 
+        #                         (we calculate it in a way such that no final rotation is needed 
+        #   d_O_GR .............. fix distance between robot base point and best grasp region
+        #   d_O_OC .............. fix distance between robot base (initially) and object center
+        #   d_O_RG .............. distance (to calculate) between (original position of) robot base and desired end position for robot base
+        #   a_MX_GR ............. fix angle between the minus x-axis of the robot and the GR (best Grasp Region relative to robot origin)
+        #   a_OC_RG ............. the angle (measured at the robot origin) between the line O_OC and O_RG
+        #   a_O_RG .............. the angle (measured at point ud.obj_center_rcs) between line to O (origin robot base) and point RG (robot goal) 
+        #   a_OC_MY ............. the fix angle (measured at origin O) between the object center (graspable object) and the negative y-axis 
+        #   
+        #
+        # we search now for the position where the robot base (pnt_O) has the distance of d_O_GR from ud.obj_center_rcs
+        # and the angle for the movement to the final grasp position is s.t. the robot arrives already with the correct rotation angle
+        # Therefore sine rule is applied to the triangle with points pnt_O, ud.obj_center_rcs and pnt_RG (has to be determined)
+        
+        try:        
+            # pnt_O:       
+            pnt_O = Point()
+            pnt_O.point.x = 0
+            pnt_O.point.y = 0
+            
+            # pnt_GR: define best grasp regien (right now 5cm infront and 50 cm right of robot base)       
+            pnt_GR = Point()
+            pnt_GR.point.x =  0.05
+            if (pnt_GR.point.x < 0.0):
+                print "pnt_GR.point.x has to be greater than 0. Act. value is: ", pnt_GR.point.x # rely on assumption for calculating  angle a_MX_GR
+            pnt_GR.point.y = -0.50
+            
+            # pnt_RG: define best grasp regien (right now 5cm infront and 50 cm right of robot base)       
+            #pnt_RG = Point()
+            
+            #distance between robot base and best grasp region        
+            d_O_GR = sqrt( pnt_GR.point.x*pnt_GR.point.x + pnt_GR.point.y*pnt_GR.point.y)
+            print "d_O_GR (m): ", d_O_GR
+            
+            # a_MX_GR: angle between robot minus x-axis of robot and best grasp region (calclated as 90 degrees (pi/2) plus degree of direction between -y-axis and d_O_GR
+            a_MX_GR = math.pi/2 + math.atan( pnt_GR.point.x/ abs(pnt_GR.point.y) )
+            print "a_MX_GR (rad):", a_MX_GR
+            print "a_MX_GR (grad):", a_MX_GR*180/math.pi
+            
+            # d_O_OC fix distance between robot base (initially) and object center
+            d_O_OC = sqrt( ud.obj_center_rcs.point.x*ud.obj_center_rcs.point.x + ud.obj_center_rcs.point.y*ud.obj_center_rcs.point.y )
+            print "d_O_OC (distance between robot base (initially) and object center in m): ", d_O_OC
+            
+            #a_OC_RG: the angle (measured from the robot origin) between the line O_OC and O_RG (sine rule on triangle O - RG - OC and transformations)
+            a_OC_RG = math.asin( d_O_GR * math.sin(a_MX_GR) / d_O_OC )
+            print "a_OC_RG: the angle (measured from the robot origin) between the line O_OC and O_RG (in rad)", a_OC_RG
+            print "a_OC_RG: the angle (measured from the robot origin) between the line O_OC and O_RG (in degree)", a_OC_RG*180/math.pi
+            
+            #a_O_RG: the angle (measured at point ud.obj_center_rcs) between line to O (origin robot base) and point RG (robot goal)
+            a_O_RG = 180 - a_MX_GR - a_OC_RG
+            print "a_O_RG: the angle (measured at point ud.obj_center_rcs) between line to O (origin robot base) and point RG (robot goal) in rad: ", a_O_RG
+            print "a_O_RG: the angle (measured at point ud.obj_center_rcs) between line to O (origin robot base) and point RG (robot goal) in grad: ", a_O_RG*180/math.pi
+            
+            #d_O_RG: distance (to calculate) between (original position of) robot base and desired end position for robot base
+            d_O_RG = math.sin( a_O_RG ) * d_O_OC / math.sin( a_MX_GR )
+            print "d_O_RG: distance (to calculate) between (original position of) robot base and desired end position for robot base in m: ", d_O_RG
+            
+            # a_OC_MY: the fix angle (measured at origin O) between the object center (graspable object) and the negativ y-axis (normal tan calculation in triangle O-(0,abs(y))-OC
+            a_OC_MY = math.atan( ud.obj_center_rcs.point.x / abs(ud.obj_center_rcs.point.y) )
+            print "a_OC_MY: the fix angle (measured at origin O) between the object center (graspable object) and the negativ y-axis in rad: ", a_OC_MY
+            print "a_OC_MY: the fix angle (measured at origin O) between the object center (graspable object) and the negativ y-axis in grad: ", a_OC_MY*180/math.pi
+            
+            #calculate how much robot has to turn
+            turn_rad = pi/2 - a_OC_MY - a_OC_RG
+            #since robot has to turn right, it has to be multiplied by -1
+            turn_rad = -turn_rad
+            turn_degree = turn_rad*180/math.pi
+            print "robot has to turn by (turn_rad): ", turn_rad        
+            print "robot has to turn by (turn_degree): ", turn_degree
+            print "robot has to move by d_O_RG (m)", d_O_RG
+            
+            if not self.moveRobotRelative(turn_degree, d_O_RG):
+                return 'failed'
+            
+    
+    
+            return 'succeeded'
+
+        except e:
+            print "===> GoToFinalGraspPose: Error: %s"%e
+            return 'failed'
+
+    def moveRobotRelative(turn_degree, distance_m):
+        #turns the robot, then moves the robot to perfect grasp position
+
+        turn = String("Turn "+turn_degree)
+        print "turn (String): ", turn
+        move = String("Move "+distance_m)
+        print "move (String): ", move
+        raw_input("press enter")
+        self.move_robot_relative_pub.publish(turn)
+        rospy.sleep(5)
+        raw_input("press enter")
+        self.move_robot_relative_pub.publish(move)
+        rospy.sleep(7)
+        
+        #here we hope that it works without any control (of obstacles, odometry, or whatever)
+        
+        return True
+# new 27.2.2015 = end ==
 
 
 class DavidLookingPose(State):

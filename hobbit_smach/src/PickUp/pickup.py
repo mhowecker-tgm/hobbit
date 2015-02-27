@@ -397,8 +397,10 @@ def main():
         StateMachine.add(
             'EMO_SAY_OBJECT_FOUND',
             pickup.sayObjectFoundRepositioning(),
-            transitions={'succeeded': 'MOVE_TO_GRASP_POSE',
-                         'failed': 'MOVE_TO_GRASP_POSE'}
+            #transitions={'succeeded': 'MOVE_TO_GRASP_POSE',
+            #                         'failed': 'MOVE_TO_GRASP_POSE'}
+            transitions={'succeeded': 'MOVE_TO_GRASP_POSE_REL_MOVEMENT_BLIND',
+                         'failed': 'MOVE_TO_GRASP_POSE_REL_MOVEMENT_BLIND'}
         )
         StateMachine.add(
             'MOVE_TO_GRASP_POSE',
@@ -409,6 +411,14 @@ def main():
             remapping={'x': 'goal_position_x',
                        'y': 'goal_position_y',
                        'yaw': 'goal_position_yaw'}
+        )
+        #df new 27.2.2015
+        StateMachine.add(
+            'MOVE_TO_GRASP_POSE_REL_MOVEMENT_BLIND',        #!!!!!!!!!!!!!!!! TODO check if robot can go to position safely!!!!!!!!!!!!!!
+            pickup.GoToFinalGraspPose(),
+            transitions={'succeeded': 'HEAD_TO_GRASP_POSITION',
+                         'aborted': 'MOVE_COUNTER',
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'HEAD_TO_GRASP_POSITION',
