@@ -415,7 +415,7 @@ class GoToFinalGraspPose(State):
     def __init__(self):
         State.__init__(
             self,
-            outcomes=['succeeded', 'failed', 'preempted'],
+            outcomes=['succeeded', 'aborted', 'preempted'],
             input_keys=['obj_center_rcs'],
             output_keys=[]
         )
@@ -509,7 +509,7 @@ class GoToFinalGraspPose(State):
             print "robot has to move by d_O_RG (m)", d_O_RG
             
             if not self.moveRobotRelative(turn_degree, d_O_RG):
-                return 'failed'
+                return 'aborted'
             
     
     
@@ -517,7 +517,7 @@ class GoToFinalGraspPose(State):
 
         except e:
             print "===> GoToFinalGraspPose: Error: %s"%e
-            return 'failed'
+            return 'aborted'
 
     def moveRobotRelative(turn_degree, distance_m):
         #turns the robot, then moves the robot to perfect grasp position
