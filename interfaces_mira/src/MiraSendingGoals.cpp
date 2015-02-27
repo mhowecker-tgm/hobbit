@@ -82,6 +82,7 @@ void MiraSendingGoals::initialize() {
    cancel_mira_goal_service = robot_->getRosNode().advertiseService("/cancel_nav_goal", &MiraSendingGoals::cancelMiraGoal, this);
    send_mira_goal_service = robot_->getRosNode().advertiseService("/send_nav_goal", &MiraSendingGoals::sendMiraGoal, this);
 
+apply_rotation_service = robot_->getRosNode().advertiseService("/apply_rotation", &MiraSendingGoals::applyRotation, this);
 
 }
 
@@ -128,6 +129,22 @@ bool MiraSendingGoals::obs_nav_mode(mira_msgs::ObsNavMode::Request &req, mira_ms
 	return true;
 
 }
+bool MiraSendingGoals::applyRotation(hobbit_msgs::SendValue::Request  &req, hobbit_msgs::SendValue::Response &res)
+{
+	ROS_INFO("apply rotation request received");
+
+	const float phi = req.value.data; // Global orientation in radians
+	const float rotTolerance = 0.075; // Tolerance in radians 
+
+	boost::shared_ptr<Task> task(new Task());
+	task->addSubTask(SubTaskPtr(new OrientationTask(phi, rotTolerance)));
+
+	std::string navService = robot_->getMiraAuthority().waitForServiceInterface("/navigation/Pilot");
+  	auto ftr = robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
+
+	ftr.get(); // 
+}
+
 
 void MiraSendingGoals::goal_status_channel_callback(mira::ChannelRead<std::string> data) 
 {

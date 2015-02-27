@@ -39,6 +39,7 @@
 #include "std_srvs/Empty.h"
 #include "hobbit_msgs/GetPose.h"
 #include "hobbit_msgs/SendPose.h"
+#include "hobbit_msgs/SendValue.h"
 
 #define COST_LIMIT 127
 
@@ -124,6 +125,9 @@ private:
 
 	ros::ServiceServer send_mira_goal_service;
 	bool sendMiraGoal(hobbit_msgs::SendPose::Request  &req, hobbit_msgs::SendPose::Response &res);
+
+	ros::ServiceServer apply_rotation_service;
+	bool applyRotation(hobbit_msgs::SendValue::Request  &req, hobbit_msgs::SendValue::Response &res);
 
 };
 
