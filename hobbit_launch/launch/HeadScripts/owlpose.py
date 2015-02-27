@@ -40,6 +40,7 @@ robotMoving = False
 pitch_offset = 0
 yaw_offset = 0
 imu_pitch_offset = 0
+haveImu = False
 
 def set_head_orientation(msg):
 	valid,currentAngles = herkulex.getAngles()
@@ -101,7 +102,7 @@ def set_head_orientation(msg):
 				lr_angle = int(input[1])
 				ud_angle = int(input[2])
 				if ( angleLimitsOK(lr_angle, ud_angle) ):
-					herkulex.setAngles(pitch=ud_angle, yaw=lr_angle, playtime=200)  
+					herkulex.setAngles(pitch=ud_angle, yaw=lr_angle, playtime=150)  
 				
 			if (msg.data[0]) in ("r", "l", "u", "d"):	#incremental head move
 				print "==> set relative values"
@@ -173,8 +174,7 @@ def angleLimitsOK(lr_angle, ud_angle):
 		return True
 	else:
 		return False
-	
-	
+
 def command(msg):
 	if msg.data == "restart":
 		herkulex.resetServos()
@@ -201,8 +201,8 @@ def imuUpdate(msg):
     global robotMoving
     global imu_pitch_offset
 
-	# HACK: this actually needs a mutex or something. No idea how that works
-	# in python. I hate python. I also hate HOBBIT.
+    # HACK: this actually needs a mutex or something. No idea how that works
+    # in python. I hate python. I also hate HOBBIT.
     if robotMoving == False:
         x = msg.linear_acceleration.x
         y = msg.linear_acceleration.y
@@ -242,18 +242,11 @@ def init():
     global pitch_offset
     global yaw_offset
     global imu_pitch_offset
+    global haveImu
     
     #Initialize Rosnode:
     rospy.init_node('owlpose')
     print "Initialized"
-    #rospy.sleep(3)
-    #Initialize Servos:
-    #herkulex.resetServos()
-    #print "Servo Reset"
-    #herkulex.setTorque()
-    #print "Torque Set"
-    #herkulex.setAngles(pitch=0, yaw=0, playtime=150)
-    #print "Move to center_center"
     
     #Subscriber for Movements:
     rospy.Subscriber("/head/move", std_msgs.msg.String, set_head_orientation)
@@ -270,21 +263,37 @@ def init():
     pitch_offset = rospy.get_param('/hobbit/head/pitch_offset', 0)
     yaw_offset = rospy.get_param('/hobbit/head/yaw_offset', 0)
     imu_pitch_offset = rospy.get_param('/hobbit/head/imu_pitch_offset', 0)
+    haveImu = rospy.get_param('/hobbit/head/have_imu', False)
     print "set pitch offset of: ", float(pitch_offset)
     herkulex.setPitchOffset(float(pitch_offset))
     print "set yaw offset of: ", float(yaw_offset)
     herkulex.setYawOffset(float(yaw_offset))
-    
+
+    #Initialize Servos:
+    rospy.sleep(3)
+    herkulex.resetServos()
+    print "Servo Reset"
+    rospy.sleep(0.5)
+    herkulex.setTorque()
+    print "Torque Set"
+    rospy.sleep(0.5)
+    herkulex.setAngles(pitch=0, yaw=0, playtime=150)
+    print "Move to center_center"
+
     #Send geometry/tf constantly with 5hz
     r = rospy.Rate(5) #5hz
     while not rospy.is_shutdown():
-    	#get angles from neck servos
-    	valid,angles = herkulex.getAngles()
-    	if valid:
-    		#ignore the servo pitch angle (0) and use pitch from IMU instead
-    		br.sendTransform( (0,0,0), tf.transformations.quaternion_from_euler(0, imuPitch/180.0*math.pi, angles[1]/180.0*math.pi), rospy.Time.now(), base_tf, head_tf)
-    	print "owlpose pitch  (IMU/servo) yaw [deg]: " + str(imuPitch) + " / " + str(angles[0]) + " " + str(angles[1])
-    	r.sleep()
+        #get angles from neck servos
+        valid,angles = herkulex.getAngles()
+        if valid:
+            if haveImu:
+                #ignore the servo pitch angle (0) and use pitch from IMU instead
+                br.sendTransform( (0,0,0), tf.transformations.quaternion_from_euler(0, imuPitch/180.0*math.pi, angles[1]/180.0*math.pi), rospy.Time.now(), base_tf, head_tf)
+                print "owlpose pitch (IMU/servo) yaw [deg]: " + str(imuPitch) + " / " + str(angles[0]) + "  " + str(angles[1])
+            else:
+                br.sendTransform( (0,0,0), tf.transformations.quaternion_from_euler(0, angles[0]/180.0*math.pi, angles[1]/180.0*math.pi), rospy.Time.now(), base_tf, head_tf)
+                print "owlpose pitch yaw [deg]: " + str(angles[0]) + "  " + str(angles[1])
+        r.sleep()
 
 def shutdown():
 	herkulex.setAngles(pitch=0, yaw=0, playtime=150)
