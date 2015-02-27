@@ -390,7 +390,7 @@ class GoToFinalGraspPose(State):
     to be stored inside the userdata output keys.
 
     input_keys:
-        obj_center_rcs: defines the x,y-values of the object center (of graspable object) in rcs
+        obj_center_rcs: point that defines the x,y-values of the object center (of graspable object) in rcs
 
     output_keys:
         none
@@ -424,8 +424,8 @@ class GoToFinalGraspPose(State):
     def execute(self, ud):
         if self.preempt_requested():
             return 'preempted'
-        print "===> GoToFinalGraspPose.execute: execute started and received obj_center_x_rcs: ",ud.obj_center_rcs.point.x
-        print "===> GoToFinalGraspPose.execute: execute started and received obj_center_y_rcs: ",ud.obj_center_rcs.point.y
+        print "===> GoToFinalGraspPose.execute: execute started and received obj_center_x_rcs: ",ud.obj_center_rcs.x
+        print "===> GoToFinalGraspPose.execute: execute started and received obj_center_y_rcs: ",ud.obj_center_rcs.y
 
         # robot detected object to grasp. Goal: robot turns "turn_r" (rad) and then 
         # moves mv_m (meter) to reach perfect grasping position
@@ -477,7 +477,7 @@ class GoToFinalGraspPose(State):
             print "a_MX_GR (grad):", a_MX_GR*180/math.pi
             
             # d_O_OC fix distance between robot base (initially) and object center
-            d_O_OC = sqrt( ud.obj_center_rcs.point.x*ud.obj_center_rcs.point.x + ud.obj_center_rcs.point.y*ud.obj_center_rcs.point.y )
+            d_O_OC = sqrt( ud.obj_center_rcs.x*ud.obj_center_rcs.x + ud.obj_center_rcs.y*ud.obj_center_rcs.y )
             print "d_O_OC (distance between robot base (initially) and object center in m): ", d_O_OC
             
             #a_OC_RG: the angle (measured from the robot origin) between the line O_OC and O_RG (sine rule on triangle O - RG - OC and transformations)
@@ -495,7 +495,7 @@ class GoToFinalGraspPose(State):
             print "d_O_RG: distance (to calculate) between (original position of) robot base and desired end position for robot base in m: ", d_O_RG
             
             # a_OC_MY: the fix angle (measured at origin O) between the object center (graspable object) and the negativ y-axis (normal tan calculation in triangle O-(0,abs(y))-OC
-            a_OC_MY = math.atan( ud.obj_center_rcs.point.x / abs(ud.obj_center_rcs.point.y) )
+            a_OC_MY = math.atan( ud.obj_center_rcs.x / abs(ud.obj_center_rcs.y) )
             print "a_OC_MY: the fix angle (measured at origin O) between the object center (graspable object) and the negativ y-axis in rad: ", a_OC_MY
             print "a_OC_MY: the fix angle (measured at origin O) between the object center (graspable object) and the negativ y-axis in grad: ", a_OC_MY*180/math.pi
             
