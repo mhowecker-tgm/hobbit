@@ -486,7 +486,7 @@ class GoToFinalGraspPose(State):
         print "a_OC_RG: the angle (measured from the robot origin) between the line O_OC and O_RG (in degree)", a_OC_RG*180/math.pi
         
         #a_O_RG: the angle (measured at point ud.obj_center_rcs) between line to O (origin robot base) and point RG (robot goal)
-        a_O_RG = 180 - a_MX_GR - a_OC_RG
+        a_O_RG = math.pi - a_MX_GR - a_OC_RG
         print "a_O_RG: the angle (measured at point ud.obj_center_rcs) between line to O (origin robot base) and point RG (robot goal) in rad: ", a_O_RG
         print "a_O_RG: the angle (measured at point ud.obj_center_rcs) between line to O (origin robot base) and point RG (robot goal) in grad: ", a_O_RG*180/math.pi
         
