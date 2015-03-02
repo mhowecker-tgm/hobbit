@@ -24,6 +24,8 @@ from sensor_msgs.msg import PointCloud2
 from table_object_detector.srv import *
 from rgbd_acquisition.srv import *
 
+scaleHeadCameraDepth = False
+
 
 class CalibrateHeadForGrasping():
     def __init__(self, parent=None):
@@ -168,7 +170,8 @@ class CalibrateHeadForGrasping():
         
         
 
-def main(args):       
+def main(args):    
+    global scaleHeadCameraDepth   
     print "calibrate head for grasping (find tf correction values) node started" 
     rospy.init_node('calibratehead_for_grasping_node', anonymous=False)
     z_cuboid1 = z_cuboid2 = 0
@@ -179,31 +182,33 @@ def main(args):
     print "main: ===> Head is sent to to_grasp position, wait for some seconds and remove all objects in grasping area!!!!!"
     rospy.sleep(5)  #wait for head movement
     
-    calibhead.start_calibration()
-    while (calibhead.wait):
-        print "sleep: wait for pc"
-        rospy.sleep(0.1)
-            
-    z_cuboid2 = calibhead.get_average_z_value(2)
-    print "main: average height of floor (NO OBJECT!!!!! on floor) in grasp area ==> z_cuboid2", z_cuboid2
-
     
-    z_error = z_cuboid2   #assume the floor plane is horizontal!! (z_cuboid2 was average height in grasp area)
-    print "the plane is to high by (m): ", z_cuboid2
-    camheight_tg = 1.156 #camera height (tf) when camera is looking to to_grasp position
-    scalingfactor = camheight_tg/(camheight_tg-z_error)
-    print "calculated SCALING FACTOR: ", scalingfactor
-    if abs(scalingfactor-1.0) > 0.01:
-        #scale whole point cloud (using service)
-        rospy.wait_for_service('/rgbd_acquisition/setScale')
-        try:
-            setscale = rospy.ServiceProxy('/rgbd_acquisition/setScale', SetScale)
-            input = SetScale()
-            input.factor = scalingfactor
-            result = setscale(input.factor)
-            print "headcamera scaling factor was set"
-        except rospy.ServiceException, e:
-            print "Service call failed: %s"%e
+    if scaleHeadCameraDepth:    
+        calibhead.start_calibration()
+        while (calibhead.wait):
+            print "sleep: wait for pc"
+            rospy.sleep(0.1)
+                
+        z_cuboid2 = calibhead.get_average_z_value(2)
+        print "main: average height of floor (NO OBJECT!!!!! on floor) in grasp area ==> z_cuboid2", z_cuboid2
+    
+        
+        z_error = z_cuboid2   #assume the floor plane is horizontal!! (z_cuboid2 was average height in grasp area)
+        print "the plane is to high by (m): ", z_cuboid2
+        camheight_tg = 1.156 #camera height (tf) when camera is looking to to_grasp position
+        scalingfactor = camheight_tg/(camheight_tg-z_error)
+        print "calculated SCALING FACTOR: ", scalingfactor
+        if abs(scalingfactor-1.0) > 0.01:
+            #scale whole point cloud (using service)
+            rospy.wait_for_service('/rgbd_acquisition/setScale')
+            try:
+                setscale = rospy.ServiceProxy('/rgbd_acquisition/setScale', SetScale)
+                input = SetScale()
+                input.factor = scalingfactor
+                result = setscale(input.factor)
+                print "headcamera scaling factor was set"
+            except rospy.ServiceException, e:
+                print "Service call failed: %s"%e
         
     
     # get tf correction values:
