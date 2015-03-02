@@ -206,7 +206,8 @@ def main(args):
             print "Service call failed: %s"%e
         
     #rospy.spin()
-    raw_input("Put an object with max height: ", calibhead.co_emax_z, "\nat position: x: ", calibhead.co_emean_x, "\n  y: ", calibhead.co_emean_y )
+    print "Put an object with max height: ", calibhead.co_emax_z, "\nat position: x: ", calibhead.co_emean_x, "\n  y: ", calibhead.co_emean_y
+    raw_input("read line above and press enter")
     calibhead.start_calibration()   #get point cloud
     while (calibhead.wait):
         print "sleep: wait for pc"
