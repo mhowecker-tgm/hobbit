@@ -34,7 +34,7 @@ class CalibrateHeadForGrasping():
         self.pc_sub = None
         self.wait = True
         #Publisher
-        #self.headmove_pub = rospy.Publisher("/head/move", String )
+        self.headmove_pub = rospy.Publisher("/head/move", String )
         self.debug_pc_pub = rospy.Publisher("/dfdebugpc", PointCloud2)
         #self.actualize_head_offsets_pub = rospy.Publisher("/head/trigger/set_offsets", String)
          
