@@ -26,6 +26,8 @@ public:
 private:
 	int numb;
   	ros::ServiceClient check_rotation_client;
+	ros::ServiceClient get_nav_mode_client;
+
   	ros::Publisher discrete_motion_cmd_pub;
   	bool started_rotation;
   	bool finished_rotation;

@@ -5,6 +5,7 @@
 #include <mira_msgs/EmergencyStop.h>
 
 #include "hobbit_msgs/GetState.h"
+#include <mira_msgs/GetBoolValue.h>
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Constructor. Initialises member attributes and allocates resources.
@@ -32,6 +33,8 @@ cLocalizationRecovery::cLocalizationRecovery(int argc, char **argv) : init_argc(
 
 	discrete_motion_cmd_pub = n.advertise<std_msgs::String>("/DiscreteMotionCmd", 20);
 	motion_state_sub = n.subscribe<std_msgs::String>("/DiscreteMotionState", 2, &cLocalizationRecovery::motion_state_callback, this);
+
+	get_nav_mode_client = n.serviceClient<mira_msgs::GetBoolValue>("/get_nav_mode");
 
 	std::cout << "numb " << numb << std::endl;
 
@@ -61,9 +64,22 @@ void cLocalizationRecovery::motion_state_callback(const std_msgs::String::ConstP
 
   if (!started_rotation && current_motion_state.data == "Turning")
   	started_rotation = true;
-  else if (started_rotation && current_motion_state.data == "Idle")
-	finished_rotation = true;
-}
+
+  else if (started_rotation && !finished_rotation && current_motion_state.data == "Idle")
+  {
+	bool dist_mode = true;
+	mira_msgs::GetBoolValue get_nav_mode_srv;
+	if (get_nav_mode_client.call(get_nav_mode_srv))
+	{	
+		dist_mode = get_nav_mode_srv.response.value;
+	}
+	else
+		ROS_INFO("Failed to call service get_nav_mode");
+		
+	if (!dist_mode)
+		finished_rotation = true;
+  }
+} 
 
 
 
@@ -94,7 +110,7 @@ void cLocalizationRecovery::executeCb(const hobbit_msgs::GeneralHobbitGoalConstP
 	}
 	else
 	{
-		ROS_DEBUG("Failed to call service check_rotation");
+		ROS_INFO("Failed to call service check_rotation");
 		
 	}
 
