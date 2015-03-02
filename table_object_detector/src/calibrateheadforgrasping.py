@@ -134,7 +134,7 @@ class CalibrateHeadForGrasping():
 
     #returns average xyz values for coboid2
     def get_average_xyz_values(self):
-        print "get average z value of cuboid number 2
+        print "get average z value of cuboid number 2"
         self.t = rospy.Time.now()
         if self.pc_ == None:
             print "CalibrateHeadForGrasping.get_average_xyz_values() ==> no point cloud found!"
