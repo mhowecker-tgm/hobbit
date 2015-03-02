@@ -37,6 +37,7 @@ add_service_files(
    EnableMotors.srv
    UserNavMode.srv
    ObsNavMode.srv
+   GetBoolValue.srv
 )
 
 ## Generate added messages and services with any dependencies listed here
