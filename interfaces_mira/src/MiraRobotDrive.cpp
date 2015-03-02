@@ -50,6 +50,8 @@ void MiraRobotDrive::initialize()
   emergency_stop_service_ = robot_->getRosNode().advertiseService("/emergency_stop", &MiraRobotDrive::emergency_stop, this);
   enable_motors_service_ = robot_->getRosNode().advertiseService("/enable_motors", &MiraRobotDrive::enable_motors, this);
 
+  get_nav_mode_service_ = robot_->getRosNode().advertiseService("/get_nav_mode", &MiraRobotDrive::get_nav_mode, this);
+
 
    this->callback_queue_thread_ = boost::thread(boost::bind(&MiraRobotDrive::QueueThread, this));
 
@@ -278,6 +280,18 @@ bool MiraRobotDrive::enable_motors(mira_msgs::EnableMotors::Request &req, mira_m
   mira::RPCFuture<void> r = robot_->getMiraAuthority().callService<void>("/robot/Robot", std::string("enableMotors"),(bool)req.enable);
   r.timedWait(mira::Duration::seconds(1));
   r.get();
+
+  return true;
+}
+
+bool MiraRobotDrive::get_nav_mode(mira_msgs::GetBoolValue::Request &req, mira_msgs::GetBoolValue::Response &res) 
+{
+  std::string s = get_mira_param_("MainControlUnit.DriveMode");
+
+  bool value;
+  std::istringstream(s) >> value;
+
+  res.value = value;
 
   return true;
 }
