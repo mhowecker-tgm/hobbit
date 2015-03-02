@@ -133,15 +133,19 @@ bool MiraSendingGoals::applyRotation(hobbit_msgs::SendValue::Request  &req, hobb
 {
 	ROS_INFO("apply rotation request received");
 
-	const float phi = req.value.data; // Global orientation in radians
+	const mira::PoseCov2 robotPose = robot_->getMiraAuthority().getTransform<mira::PoseCov2>("/robot/RobotFrame", "/maps/MapFrame", Time::now());
+
+	const float phi = robotPose.phi() + req.value.data; // Global orientation in radians
+
 	const float rotTolerance = 0.075; // Tolerance in radians 
 
 	boost::shared_ptr<Task> task(new Task());
 	task->addSubTask(SubTaskPtr(new OrientationTask(phi, rotTolerance)));
 
-	std::string navService = robot_->getMiraAuthority().waitForServiceInterface("/navigation/Pilot");
+	std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
   	auto ftr = robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
 
+	std::cout << "here ------- " << std::endl;
 	ftr.get(); // 
 }
 
