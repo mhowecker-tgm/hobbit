@@ -530,6 +530,9 @@ class GoToFinalGraspPose(State):
             #resp1 = check_free_space(input)
             resp = apply_rotation(input.value)
             print "===> moveRobotRelative(): execute service apply rotation. Turn by degree: ", turn_degree
+            print "==> moveRobotRelative() ==> turn successful: ", resp.state
+            if resp.state == False:
+                return -1
         except rospy.ServiceException, e:
             print "Service call failed: %s"%e
             return -1
