@@ -139,6 +139,8 @@ bool MiraSendingGoals::applyRotation(hobbit_msgs::SendValue::Request  &req, hobb
 
 	const float rotTolerance = 0.075; // Tolerance in radians 
 
+	goal_status.data = "rotation_request";
+
 	boost::shared_ptr<Task> task(new Task());
 	task->addSubTask(SubTaskPtr(new OrientationTask(phi, rotTolerance)));
 
@@ -146,6 +148,14 @@ bool MiraSendingGoals::applyRotation(hobbit_msgs::SendValue::Request  &req, hobb
   	auto ftr = robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
 
 	ftr.get(); // 
+
+	while (goal_status.data == "rotation_request"){;}
+
+	if (goal_status.data == "reached")
+		res.state = true;
+	else
+		res.state = false;
+
 }
 
 
@@ -165,8 +175,8 @@ void MiraSendingGoals::goal_status_channel_callback(mira::ChannelRead<std::strin
 	if(data->value() =="GoalReached" && goal_status.data!= "canceled") 
 	{
 		std::cout << "Goal reached received " << std::endl;
-		goal_status_pub.publish(goal_status);
 		goal_status.data = "reached";
+		goal_status_pub.publish(goal_status);
 	}
 	if(data->value() == "PathTemporarilyLost") 
 	{
