@@ -145,7 +145,6 @@ bool MiraSendingGoals::applyRotation(hobbit_msgs::SendValue::Request  &req, hobb
 	std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
   	auto ftr = robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
 
-	std::cout << "here ------- " << std::endl;
 	ftr.get(); // 
 }
 
