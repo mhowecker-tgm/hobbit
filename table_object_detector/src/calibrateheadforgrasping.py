@@ -176,7 +176,7 @@ def main(args):
     rospy.sleep(2)
     #move head to grasp position
     calibhead.move_head( String("to_grasp") )
-    print "main: ===> Head is sent to to_grasp position, wait for some seconds"
+    print "main: ===> Head is sent to to_grasp position, wait for some seconds and remove all objects in grasping area!!!!!"
     rospy.sleep(5)  #wait for head movement
     
     calibhead.start_calibration()
@@ -211,14 +211,14 @@ def main(args):
             print "Service call failed: %s"%e
         
     #rospy.spin()
-    raw_input("Put an object with max height: ", self.co_emax_z, "\nat position: x: ", self.co_emean_x, "\n  y: ", self.co_emean_y )
+    raw_input("Put an object with max height: ", calibhead.co_emax_z, "\nat position: x: ", calibhead.co_emean_x, "\n  y: ", calibhead.co_emean_y )
     calibhead.start_calibration()   #get point cloud
     while (calibhead.wait):
         print "sleep: wait for pc"
         rospy.sleep(0.1)
     
     meanxyz_cuboid2 = calibhead.get_average_xyz_values()
-    print "tf correction factors (x,y,z): ", self.co_emean_x-meanxyz_cuboid2.x_mean, " ", self.co_emean_y-meanxyz_cuboid2.y_mean, " ", self.co_emax_z-meanxyz_cuboid2.z_mean
+    print "tf correction factors (x,y,z): ", calibhead.co_emean_x-meanxyz_cuboid2.x_mean, " ", calibhead.co_emean_y-meanxyz_cuboid2.y_mean, " ", calibhead.co_emax_z-meanxyz_cuboid2.z_mean
     
     
 if __name__ == "__main__":        
