@@ -187,11 +187,6 @@ def main(args):
     z_cuboid2 = calibhead.get_average_z_value(2)
     print "main: average height of floor (NO OBJECT!!!!! on floor) in grasp area ==> z_cuboid2", z_cuboid2
 
-    #manipulate the scaling factor
-    calibhead.start_calibration()   #get point cloud
-    while (calibhead.wait):
-        print "sleep: wait for pc"
-        rospy.sleep(0.1)
     
     z_error = z_cuboid2   #assume the floor plane is horizontal!! (z_cuboid2 was average height in grasp area)
     print "the plane is to high by (m): ", z_cuboid2
