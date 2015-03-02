@@ -522,14 +522,25 @@ class GoToFinalGraspPose(State):
     def moveRobotRelative(self, turn_degree, distance_m):
         #turns the robot, then moves the robot to perfect grasp position
 
-        turn = String("Turn "+str(turn_degree))
-        print "turn (String): ", turn
+        rospy.wait_for_service('apply_rotation')
+        try:
+            apply_rotation = rospy.ServiceProxy('apply_rotation', SendValue)
+            input = SendValue()
+            input.value = turn_degree*3.1415926/180
+            #resp1 = check_free_space(input)
+            resp = apply_rotation(input.value)
+            print "===> moveRobotRelative(): execute service apply rotation. Turn by degree: ", turn_degree
+        except rospy.ServiceException, e:
+            print "Service call failed: %s"%e
+            return -1
+
+        print "this is printed after the service for turning Hobbit is executed (without delay)"
+        #turn = String("Turn "+str(turn_degree))
+        #print "turn (String): ", turn
         move = String("Move "+str(distance_m))
         print "move (String): ", move
-        #raw_input("press enter")
-        self.move_robot_relative_pub.publish(turn)
-        rospy.sleep(5)
-        #raw_input("press enter")
+        #self.move_robot_relative_pub.publish(turn)
+        #rospy.sleep(5)
         self.move_robot_relative_pub.publish(move)
         rospy.sleep(7)
         
