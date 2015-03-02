@@ -181,7 +181,8 @@ class GraspTrajectoryActionServerFromFloor():
                     self.robot.WaitForController(0)
                     
                     if (EXECUTE_ARM_MOVEMENT):
-                        raw_input("press enter to send trajectory to arm_action_server and physically execute the grasp action")
+                        #raw_input("press enter to send trajectory to arm_action_server and physically execute the grasp action")
+                        print "press enter to send trajectory to arm_action_server and physically execute the grasp action"
                         #EXECUTE arm movement for grasping from floor
                         if (self.ArmClient.SetMoveToPreGraspFromFloorPos()):
                             print "Arm was moved to PreGraspFromFloorPos"
