@@ -28,7 +28,7 @@ from tf.transformations import euler_from_quaternion, quaternion_matrix
 from sensor_msgs.msg import PointField
 from visualization_msgs.msg import Marker
 from visualization_msgs.msg import MarkerArray
-from std_msgs.msg import String
+from std_msgs.msg import String, Float32
 from geometry_msgs.msg import Pose
 from hobbit_smach.ArmActionClient import ArmActionClient
 import actionlib
@@ -526,9 +526,9 @@ class GoToFinalGraspPose(State):
         try:
             apply_rotation = rospy.ServiceProxy('apply_rotation', SendValue)
             input = SendValue()
-            input.value = turn_degree*3.1415926/180
+            input.value = Float32(turn_degree*3.1415926/180)
             #resp1 = check_free_space(input)
-            resp = apply_rotation(input)
+            resp = apply_rotation(input.value)
             print "===> moveRobotRelative(): execute service apply rotation. Turn by degree: ", turn_degree
         except rospy.ServiceException, e:
             print "Service call failed: %s"%e
