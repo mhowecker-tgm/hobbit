@@ -143,6 +143,10 @@ private:
 
   bool check_updated;
 
+  boost::thread callback_queue_thread_;
+  void QueueThread();
+  ros::CallbackQueue my_queue;
+
 };
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #endif

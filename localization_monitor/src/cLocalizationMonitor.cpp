@@ -82,8 +82,19 @@ cLocalizationMonitor::~cLocalizationMonitor()
 ////************************************************************************************
 void cLocalizationMonitor::open(ros::NodeHandle & n)
 {
-        current_loc_sub = n.subscribe<geometry_msgs::PoseWithCovarianceStamped>("/amcl_pose", 2, &cLocalizationMonitor::loc_pose_callback, this);
-        laserSubs = n.subscribe<sensor_msgs::LaserScan>("loc_scan", 1, &cLocalizationMonitor::loc_scan_callback, this); 
+
+
+	ros::SubscribeOptions ops = ros::SubscribeOptions::create<geometry_msgs::PoseWithCovarianceStamped>("/amcl_pose",1, boost::bind(&cLocalizationMonitor::loc_pose_callback, this, _1),ros::VoidPtr(),&my_queue);
+  	current_loc_sub = n.subscribe(ops);
+	
+        //current_loc_sub = n.subscribe<geometry_msgs::PoseWithCovarianceStamped>("/amcl_pose", 2, &cLocalizationMonitor::loc_pose_callback, this);
+
+	ros::SubscribeOptions ops2 = ros::SubscribeOptions::create<sensor_msgs::LaserScan>("/loc_scan",1, boost::bind(&cLocalizationMonitor::loc_scan_callback, this, _1),ros::VoidPtr(),&my_queue);
+  	laserSubs = n.subscribe(ops2);
+
+        //laserSubs = n.subscribe<sensor_msgs::LaserScan>("loc_scan", 1, &cLocalizationMonitor::loc_scan_callback, this); 
+
+
 	mileage_sub = n.subscribe<std_msgs::Float32>("/mileage", 2, &cLocalizationMonitor::mileage_callback, this);
 	
 	locStatePublisher = n.advertise<std_msgs::Bool>("loc_ok", 1); 
@@ -106,6 +117,8 @@ void cLocalizationMonitor::open(ros::NodeHandle & n)
 	activate_recovery_service = n.advertiseService("/activate_recovery", &cLocalizationMonitor::activateRecovery, this);
 
 	deactivate_recovery_service = n.advertiseService("/deactivate_recovery", &cLocalizationMonitor::activateRecovery, this);
+
+	this->callback_queue_thread_ = boost::thread(boost::bind(&cLocalizationMonitor::QueueThread, this));
 	
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -331,10 +344,13 @@ bool cLocalizationMonitor::checkScan()
 
 	}
 
+	std::cout << "+++++++++++++++++++++++++++++++++++++++++++++ " << std::endl;
+
 	log_output << std::endl;
 	if (valid_points < min_valid_points) 
 	{
 		log_output << std::setprecision(4) << std::fixed << double(-1)   << '\t';
+		std::cout << "scan_score " << -1 << std::endl;
 		return true; //open space, we cannot tell if the robot is lost yet
 	}
 
@@ -342,6 +358,7 @@ bool cLocalizationMonitor::checkScan()
 	//std::cout << "rel_score " << rel_score << std::endl;
 	
 	log_output << std::setprecision(5) << std::fixed << rel_score   << '\t';
+	std::cout << "scan_score " << rel_score << std::endl;
 	if (rel_score > score_thres)
 		return true;
 	else 
@@ -519,11 +536,13 @@ void cLocalizationMonitor::Run(void)
 			//if no current goal nothing is done
 			hobbit_msgs::GetState my_srv_goal;
 			std::cout << "calling service!!!!!!!! " << std::endl;
+			
 			if (check_goal_client.call(my_srv_goal))
 			{
 				if(!my_srv_goal.response.state) 
 				{
 					std::cout << "no current goal " << std::endl;
+					return;
 				}
 				else is_goal_active = true;
 			}
@@ -582,6 +601,8 @@ void cLocalizationMonitor::Run(void)
 							std::cout << "recovery action finished " << std::endl;
 							log_output << 1 << '\t';
 							//check current localization
+							log_output << "******************* "<< std::endl;
+							sleep(1);
 							bool scan_ok = checkScan();
 							bool uncertainty_ok = checkUncertainty();
 							std::cout << "scan_ok " << scan_ok << std::endl;
@@ -592,7 +613,7 @@ void cLocalizationMonitor::Run(void)
 							{
 								std::cout << "localization recovery succeeded " << std::endl;
 								log_output << 1;
-
+								check_results.clear();
 								//get last goal
 								hobbit_msgs::GetPose srv;
 								move_base_msgs::MoveBaseGoal goal;
@@ -612,9 +633,16 @@ void cLocalizationMonitor::Run(void)
 							else
 							{
 								log_output << 0;
-								std::cout << "localization recovery did not succeed " << std::endl;				}
+								std::cout << "localization recovery did not succeed " << std::endl;					}
 
-						 }
+						}
+						else
+						{
+							std::cout << "recovery action aborted " << std::endl;
+							log_output << 0 << '\t';
+
+						}
+						
 				
 					}
 					else
@@ -687,6 +715,7 @@ void cLocalizationMonitor::battery_state_callback(const mira_msgs::BatteryState:
 	 if (reset_loc_client.call(srv))
 	 {
 		  std::cout << "Localization reset at docking station " << std::endl;
+		  check_results.clear();
 	 }
 	 else
 	 {
@@ -714,4 +743,15 @@ bool cLocalizationMonitor::deactivateRecovery(std_srvs::Empty::Request  &req, st
 	return false;
 }
 
+void cLocalizationMonitor::QueueThread() 
+{
+     ros::Rate r(10);
+     ros::NodeHandle n;
+
+     while(n.ok()) 
+     {
+        my_queue.callAvailable(ros::WallDuration());
+        r.sleep();
+     }
+}
 
