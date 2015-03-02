@@ -134,7 +134,7 @@ class CalibrateHeadForGrasping():
 
     #returns average xyz values for coboid2
     def get_average_xyz_values(self):
-        print "get average z value of cuboid number 2"
+        print "get average z value of cuboid number 1"
         self.t = rospy.Time.now()
         if self.pc_ == None:
             print "CalibrateHeadForGrasping.get_average_xyz_values() ==> no point cloud found!"
@@ -150,15 +150,15 @@ class CalibrateHeadForGrasping():
             print "input.frame_id_original: ",input.frame_id_original
             input.frame_id_desired = String("base_link")
             print "input.frame_id_desired: ",input.frame_id_desired
-            input.x1 = self.limitc2_x1
-            input.x2 = self.limitc2_x2
-            input.y1 = self.limitc2_y1
-            input.y2 = self.limitc2_y2
-            input.z1 = self.limitc2_z1
-            input.z2 = self.limitc2_z2
+            input.x1 = self.limitc1_x1
+            input.x2 = self.limitc1_x2
+            input.y1 = self.limitc1_y1
+            input.y2 = self.limitc1_y2
+            input.z1 = self.limitc1_z1
+            input.z2 = self.limitc1_z2
             
             resp1 = check_mean_values_for_defined_space(input.cloud,input.frame_id_original,input.frame_id_desired,input.x1,input.x2,input.y1,input.y2,input.z1,input.z2)
-            print "z-mean of points in area with boarders \nx1: ", input.x1, "\tx2: ",input.x2,"\ny1: ",input.y1,"\ty2: ",input.y2,"\nz1: ",input.z1,"\tz2: ",input.z2,"\nz_mean: ",resp1.z_mean
+            print "mean values of points in area with boarders \nx1: ", input.x1, "\tx2: ",input.x2,"\ny1: ",input.y1,"\ty2: ",input.y2,"\nz1: ",input.z1,"\tz2: ",input.z2,"\nz_mean: ",resp1.z_mean
         except rospy.ServiceException, e:
             print "Service call failed: %s"%e
             
@@ -205,8 +205,9 @@ def main(args):
         except rospy.ServiceException, e:
             print "Service call failed: %s"%e
         
-    #rospy.spin()
-    print "Put an object with max height: ", calibhead.co_emax_z, "\nat position: x: ", calibhead.co_emean_x, "\n  y: ", calibhead.co_emean_y
+    
+    # get tf correction values:
+    print "Put an object with max height: ", calibhead.co_emax_z, "\nat position: \n  x: ", calibhead.co_emean_x, "\n  y: ", calibhead.co_emean_y
     raw_input("read line above and press enter")
     calibhead.start_calibration()   #get point cloud
     while (calibhead.wait):
