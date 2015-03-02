@@ -30,7 +30,7 @@ class CalibrateHeadForGrasping():
         print "CalibrateHeadForGrasping.__init__() started"
         self.co_emax_z = 0.2     #expected max z-value for calibration object
         self.co_emean_x = 0.0    # expected mean x of highest points for calibration object
-        self.co_emean_y = -0.45    # expected mean y of highest points for calibration object
+        self.co_emean_y = -0.50    # expected mean y of highest points for calibration object
         self.pc_sub = None
         self.wait = True
         #Publisher
@@ -46,8 +46,8 @@ class CalibrateHeadForGrasping():
         self.limitc1_x2 =  self.co_emean_x + c1_dist
         self.limitc1_y1 =  self.co_emean_y - c1_dist
         self.limitc1_y2 =  self.co_emean_y + c1_dist
-        self.limitc1_z1 =  self.co_emax_z  - c1_dist
-        self.limitc1_z2 =  self.co_emax_z  + c1_dist
+        self.limitc1_z1 =  self.co_emax_z  - c1_dist/2
+        self.limitc1_z2 =  self.co_emax_z  + c1_dist/2
 
         #set space limits for cuboid 2: cuboid 2 is for patch on floor for scaling 
         self.limitc2_x1 =  0.0
@@ -131,6 +131,40 @@ class CalibrateHeadForGrasping():
         return resp1.z_mean
 
 
+
+    #returns average xyz values for coboid2
+    def get_average_xyz_values(self):
+        print "get average z value of cuboid number 2
+        self.t = rospy.Time.now()
+        if self.pc_ == None:
+            print "CalibrateHeadForGrasping.get_average_xyz_values() ==> no point cloud found!"
+            return
+        self.pc_.header.stamp = self.t
+        #self.pc_pub.publish(self.pc_)
+        rospy.wait_for_service('check_mean_values_for_defined_space')
+        try:
+            check_mean_values_for_defined_space = rospy.ServiceProxy('check_mean_values_for_defined_space', CheckMeanValuesForDefinedSpace)
+            input = CheckMeanValuesForDefinedSpace()
+            input.cloud = self.pc_
+            input.frame_id_original = String(self.pc_.header.frame_id)
+            print "input.frame_id_original: ",input.frame_id_original
+            input.frame_id_desired = String("base_link")
+            print "input.frame_id_desired: ",input.frame_id_desired
+            input.x1 = self.limitc2_x1
+            input.x2 = self.limitc2_x2
+            input.y1 = self.limitc2_y1
+            input.y2 = self.limitc2_y2
+            input.z1 = self.limitc2_z1
+            input.z2 = self.limitc2_z2
+            
+            resp1 = check_mean_values_for_defined_space(input.cloud,input.frame_id_original,input.frame_id_desired,input.x1,input.x2,input.y1,input.y2,input.z1,input.z2)
+            print "z-mean of points in area with boarders \nx1: ", input.x1, "\tx2: ",input.x2,"\ny1: ",input.y1,"\ty2: ",input.y2,"\nz1: ",input.z1,"\tz2: ",input.z2,"\nz_mean: ",resp1.z_mean
+        except rospy.ServiceException, e:
+            print "Service call failed: %s"%e
+            
+        print "==================================\n result:", resp1
+        self.nr_of_points_in_given_space = resp1.nr_points_in_area
+        return resp1
         
         
 
@@ -152,17 +186,8 @@ def main(args):
             
     z_cuboid2 = calibhead.get_average_z_value(2)
     print "main: average height of floor (NO OBJECT!!!!! on floor) in grasp area ==> z_cuboid2", z_cuboid2
-    '''z_cuboid2 = calibhead.get_average_z_value(2)
-        print "main: ==> z_cuboid2", z_cuboid2
-        if calibhead.readjust_head(z_cuboid1, z_cuboid2):
-            print "adjusting head was successful"
-            offset_succeded = True
-            break
-        elif (i == iter-1):
-            print "adjusting head was NOT successful"
-    '''
-    #manipulate the scaling factor
 
+    #manipulate the scaling factor
     calibhead.start_calibration()   #get point cloud
     while (calibhead.wait):
         print "sleep: wait for pc"
@@ -186,6 +211,15 @@ def main(args):
             print "Service call failed: %s"%e
         
     #rospy.spin()
+    raw_input("Put an object with max height: ", self.co_emax_z, "\nat position: x: ", self.co_emean_x, "\n  y: ", self.co_emean_y )
+    calibhead.start_calibration()   #get point cloud
+    while (calibhead.wait):
+        print "sleep: wait for pc"
+        rospy.sleep(0.1)
+    
+    meanxyz_cuboid2 = calibhead.get_average_xyz_values()
+    print "tf correction factors (x,y,z): ", self.co_emean_x-meanxyz_cuboid2.x_mean, " ", self.co_emean_y-meanxyz_cuboid2.y_mean, " ", self.co_emax_z-meanxyz_cuboid2.z_mean
+    
     
 if __name__ == "__main__":        
     main(sys.argv)
