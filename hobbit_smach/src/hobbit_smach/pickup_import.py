@@ -521,29 +521,48 @@ class GoToFinalGraspPose(State):
 
     def moveRobotRelative(self, turn_degree, distance_m):
         #turns the robot, then moves the robot to perfect grasp position
+        min_turn_deg = 3    # minimal angles that rotation is executed (otherwise it is ignored)
+        max_turn_deg_for_service = 7
+        min_turn_deg_for_discretemotion = 10
+        
+        if (abs(turn_degree) < min_turn_deg):
+            print "abs(turn_degree) < ", min_turn_deg, " => no turn executed"
+        elif (abs(turn_degree) < max_turn_deg_for_service):
 
-        rospy.wait_for_service('apply_rotation')
-        try:
-            apply_rotation = rospy.ServiceProxy('apply_rotation', SendValue)
-            input = SendValue()
-            input.value = Float32(turn_degree*3.1415926/180)
-            #resp1 = check_free_space(input)
-            resp = apply_rotation(input.value)
-            print "===> moveRobotRelative(): execute service apply rotation. Turn by degree: ", turn_degree
-            print "==> moveRobotRelative() ==> turn successful: ", resp.state
-            if resp.state == False:
-                return -1
-        except rospy.ServiceException, e:
-            print "Service call failed: %s"%e
-            return -1
-
-        print "this is printed after the service for turning Hobbit is executed (without delay)"
-        #turn = String("Turn "+str(turn_degree))
-        #print "turn (String): ", turn
+            #use service to turn robot for small values
+            rospy.wait_for_service('apply_rotation')
+            try:
+                apply_rotation = rospy.ServiceProxy('apply_rotation', SendValue)
+                input = SendValue()
+                input.value = Float32(turn_degree*3.1415926/180)
+                resp = apply_rotation(input.value)
+                print "===> moveRobotRelative(): execute service apply rotation. Turn by degree: ", turn_degree
+                print "==> moveRobotRelative() ==> turn successful: ", resp.state
+                if resp.state == False:
+                    print "======================================================================> TURNING ROBOT WITH SERVICE FAILED !!!!!!!!!!!!!!!!!!!!! => proceed"
+                    #return -1    ignore problem and hope...
+            except rospy.ServiceException, e:
+                print "Service call failed: %s"%e
+                print "=====exception============================================================> TURNING ROBOT WITH SERVICE FAILED !!!!!!!!!!!!!!!!!!!!! => proceed"
+                #return -1
+            print "this is printed after the service for turning Hobbit is executed (without delay) "
+        elif (abs(turn_degree) < min_turn_deg_for_discretemotion):
+            turn_degree = min_turn_deg_for_discretemotion   #in case turndegree is between 7 and 10 degree => turn 10 degree
+            if turn_degree < 0:
+                turn_degree = -10
+            if turn_degree > 0:
+                turn_degree = 10
+        
+        #if (abs of) turn_degree greater the 10 degree, use topic for Hobbit rotation
+        if (abs(turn_degree) >= min_turn_deg_for_discretemotion): 
+            turn = String("Turn "+str(turn_degree))
+            print "turn (String): ", turn
+            self.move_robot_relative_pub.publish(turn)
+            rospy.sleep(5)
+        
+        #move Hobbit forward (discrete Motion)
         move = String("Move "+str(distance_m))
         print "move (String): ", move
-        #self.move_robot_relative_pub.publish(turn)
-        #rospy.sleep(5)
         self.move_robot_relative_pub.publish(move)
         rospy.sleep(7)
         
