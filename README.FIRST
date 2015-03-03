@@ -58,6 +58,7 @@ SETUP HOBBIT WORKSPACE FOR PT2
   In case of non-build action, service or message header files recompile with the -k flag added to catkin_make
   >> catkin_make -DCMAKE_BUILD_TYPE=Release
  
+  If you do not have Mira installed add a CATKIN_IGNORE file to the package interfaces_mira
  
   You need to declare the hobbit id on ~/.bashrc by appending a line like
   #set HobbitID
