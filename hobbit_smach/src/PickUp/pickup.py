@@ -565,7 +565,7 @@ def main():
             'EMO_SAY_DID_NOT_PICKUP_2',
             pickup.sayDidNotPickupObject2(),
             transitions={'succeeded': 'MOVE_ARM_TO_HOME_POSITION_AFTER_FAILED',
-                         'failed': 'aborted'}
+                         'failed': 'EMO_SAY_DID_NOT_PICKUP_2'}
         )
         #df new 25.2.2015
         StateMachine.add(

@@ -419,11 +419,12 @@ def goToHomePosition():
     with seq:
         Sequence.add('MOVE_ARM_TO_HOME',
                      SetArmPosition(position='home'))
-        Sequence.add('ARM_POSE_REACHED',
-                     CheckArmReachedKnownPosition(position='home'),
-                     transitions={'failed': 'ARM_POSE_REACHED'})
         Sequence.add('CHECK_ARM_IS_NOT_MOVING', CheckArmIsNotMoving(),
                      transitions={'failed': 'CHECK_ARM_IS_NOT_MOVING'})
+        Sequence.add('ARM_POSE_REACHED',
+                     CheckArmReachedKnownPosition(position='home'),
+                     transitions={'failed': 'MOVE_ARM_TO_HOME'})
+
     return seq
 
 
