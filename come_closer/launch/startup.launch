@@ -9,8 +9,8 @@
 
 	<param name="x_offset" value="-0.24"/>
 
-	<param name="dis_threshold" value="0.1"/>
-	<param name="ang_threshold" value="10"/>
+	<param name="dis_thres" value="0.1"/>
+	<param name="ang_thres" value="10"/>
 
 	<param name="range_max" value="2.0"/>
 
