@@ -81,6 +81,8 @@ private:
 	ros::Subscriber stop_sub;
 	void stop_callback(const std_msgs::String::ConstPtr& msg);
 
+	ros::ServiceClient get_nav_mode_client;
+
 };
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #endif

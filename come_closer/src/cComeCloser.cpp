@@ -10,6 +10,8 @@
 #include <mira_msgs/ResetMotorStop.h>
 #include <mira_msgs/EmergencyStop.h>
 
+#include <mira_msgs/GetBoolValue.h>
+
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Constructor. Initialises member attributes and allocates resources.
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -53,6 +55,8 @@ cComeCloser::cComeCloser(int argc, char **argv) : init_argc(argc), init_argv(arg
 
 	stop_sub = n.subscribe("/stop_request", 2, &cComeCloser::stop_callback, this);
 
+	get_nav_mode_client = n.serviceClient<mira_msgs::GetBoolValue>("/get_nav_mode");
+
 }
 
 cComeCloser::~cComeCloser()
@@ -87,8 +91,19 @@ void cComeCloser::motion_state_callback(const std_msgs::String::ConstPtr& msg)
   if (finished_rotation && current_motion_state.data == "Moving")
 	started_movement = true;
   if (started_movement && current_motion_state.data == "Idle")
-	finished_movement = true;
-
+  {
+	bool dist_mode = true;
+	mira_msgs::GetBoolValue get_nav_mode_srv;
+  	if (get_nav_mode_client.call(get_nav_mode_srv))
+	{	
+		dist_mode = get_nav_mode_srv.response.value;
+	}
+	else
+		ROS_INFO("Failed to call service get_nav_mode");
+		
+	if (!dist_mode)
+		finished_movement = true;
+  }
 
 }
 
