@@ -135,7 +135,7 @@ bool MiraSendingGoals::applyRotation(hobbit_msgs::SendValue::Request  &req, hobb
 
 	const mira::PoseCov2 robotPose = robot_->getMiraAuthority().getTransform<mira::PoseCov2>("/robot/RobotFrame", "/maps/MapFrame", Time::now());
 
-	const float phi = robotPose.phi() + req.value.data; // Global orientation in radians
+	const float phi = robotPose.phi() + req.value.data*M_PI/180; // Global orientation in radians
 
 	const float rotTolerance = 0.075; // Tolerance in radians 
 
