@@ -292,7 +292,13 @@ class ArmClientFunctions():
         ReceiveDataList = self.SendTCP(buf)
         #ArmControllerFunctions.PublishToROS(ReceiveDataList)
         return ReceiveDataList
-
+		
+    def SetShutdown(self):
+        buf = 'SET;Shutdown;'
+        ReceiveDataList = self.SendTCP(buf)
+        #ArmControllerFunctions.PublishToROS(ReceiveDataList)
+        return ReceiveDataList
+		
     def SetClearPosBuffer(self):
         buf = 'SET;ClearPosBuffer;'
         ReceiveDataList = self.SendTCP(buf)
