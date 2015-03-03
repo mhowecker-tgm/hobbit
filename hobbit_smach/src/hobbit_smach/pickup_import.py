@@ -534,7 +534,7 @@ class GoToFinalGraspPose(State):
             try:
                 apply_rotation = rospy.ServiceProxy('apply_rotation', SendValue)
                 input = SendValue()
-                input.value = Float32(turn_degree*3.1415926/180)
+                input.value = Float32(turn_degree)
                 resp = apply_rotation(input.value)
                 print "===> moveRobotRelative(): execute service apply rotation. Turn by degree: ", turn_degree
                 print "==> moveRobotRelative() ==> turn successful: ", resp.state
