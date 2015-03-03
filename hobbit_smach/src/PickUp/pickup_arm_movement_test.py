@@ -112,7 +112,7 @@ def main():
         StateMachine.add(
             'WAIT_FINISH_HEAD_TO_SEARCH',
             SleepState(duration=2),
-            transitions={'succeeded': 'SAY_MOVE_ARM_TO_PRE_GRASP_POS',
+            transitions={'succeeded': 'SAY_MOVE_ARM_HOME',
                          'preempted': 'LOG_ABORT'}
         )
         
