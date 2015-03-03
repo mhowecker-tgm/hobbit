@@ -128,8 +128,8 @@ def main():
             'MOVE_ARM_TO_PRE_GRASP_POS',
             arm_move.goToPreGraspPosition(),
             transitions={'succeeded': 'SAY_MOVE_ARM_HOME', 
-                         'preempted': 'LOG_PREEMPT',
-                         'failed': 'LOG_PREEMPT'}    # better failure handling appreciated
+                         'preempted': 'LOG_ABORT',
+                         'failed': 'LOG_ABORT'}    # better failure handling appreciated
         )
         
             
@@ -145,8 +145,8 @@ def main():
             'MOVE_ARM_TO_HOME',   #position where gripper is not blocking view to floor where object was lying
             arm_move.goToHomePosition(),
             transitions={'succeeded': 'succeeded', 
-                         'preempted': 'LOG_PREEMPT',
-                         'failed': 'LOG_PREEMPT'}    # better failure handling appreciated
+                         'preempted': 'LOG_ABORT',
+                         'failed': 'LOG_ABORT'}    # better failure handling appreciated
         )
         
         
