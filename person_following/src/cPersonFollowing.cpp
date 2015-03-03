@@ -13,7 +13,7 @@ cPersonFollowing::cPersonFollowing(int argc, char **argv) : init_argc(argc), ini
 	nh.param("dis_thres", dis_thres, 0.2);
 	nh.param("v_thres", v_thres, 0.2);
 	//nh.param("it_limit", it_limit, 10.0);
-	nh.param("time_limit", time_limit_secs, 20.0);
+	nh.param("time_limit", time_limit_secs, 60.0);
 	nh.param("time_limit_no_feedback", time_limit_no_feedback_secs, 20.0);
 
 	ros::NodeHandle n;
@@ -200,6 +200,10 @@ void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 
 	std::cout << "starting " << std::endl;
 
+	ros::Time timeout;
+	ros::Time timeout_target; 
+	ros::Time timeout_feedback;
+
 	clock_t begin;
 	clock_t begin_target;
 
@@ -223,7 +227,7 @@ void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 	while (n.ok())
 	{
 
-		std::cout << "status " << goal_status.data << std::endl;
+		//std::cout << "status " << goal_status.data << std::endl;
 
 		if(as_->isPreemptRequested())
       		{
@@ -265,10 +269,12 @@ void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 		if (goal_status.data == "goal_sent" && !response)
 		{
 
-			clock_t end_feedback = clock();
-			double elapsed_secs_feedback = double(end_feedback - begin_feedback) / CLOCKS_PER_SEC;
-			std::cout << "elapsed time no response " << elapsed_secs_feedback << std::endl;
-			if (elapsed_secs_feedback > time_limit_no_feedback_secs)
+			//clock_t end_feedback = clock();
+			//double elapsed_secs_feedback = double(end_feedback - begin_feedback) / CLOCKS_PER_SEC;
+			//std::cout << "elapsed time no response " << elapsed_secs_feedback << std::endl;
+			//if (elapsed_secs_feedback > time_limit_no_feedback_secs)
+			ros::Duration time_left_feedback = timeout_feedback - ros::Time::now();
+			if (time_left_feedback <= ros::Duration(0,0))
 			{
 				stopFollowing();
 				as_->setAborted(hobbit_msgs::FollowMeResult(), "Following aborted, no response from Mira");
@@ -285,7 +291,8 @@ void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 			{
 				if (starting) //the follow-me behavior is just starting
 				{
-					begin_target = clock();
+					//begin_target = clock();
+					timeout_target = ros::Time::now() + ros::Duration(time_limit_secs);
 					std::cout << "starting, no new target " << std::endl;
 					starting = false;
 					continue;
@@ -295,10 +302,12 @@ void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 				else 
 				{
 					//check the time
-					clock_t end_target = clock();
-		  			double elapsed_secs_target = double(end_target - begin_target) / CLOCKS_PER_SEC;
+					//clock_t end_target = clock();
+		  			//double elapsed_secs_target = double(end_target - begin_target) / CLOCKS_PER_SEC;
 					//std::cout << "no new target " << std::endl;
-					if (elapsed_secs_target >= time_limit_secs) //the timeout has been reached
+					ros::Duration time_left_target = timeout_target - ros::Time::now();
+					if (time_left_target <= ros::Duration(0,0) )
+					//if (elapsed_secs_target >= time_limit_secs) //the timeout has been reached
 					{
 						//the user has been lost for a while, so the following behaviour is stopped
 						std::cout << "no target for a while, stopping " << std::endl;
@@ -351,7 +360,8 @@ void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 
 				goal_status.data = "goal_sent";
 				response = false;
-				begin_feedback = clock();
+				//begin_feedback = clock();
+				timeout_feedback = ros::Time::now() + ros::Duration(time_limit_no_feedback_secs);
 				
 
 			}
@@ -359,7 +369,8 @@ void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 			{
 				if (new_pose || starting) //there was a new pose in the previous iteration or the follow-me behavior is just starting
 				{
-					begin = clock();
+					//begin = clock();
+					timeout = ros::Time::now() + ros::Duration(time_limit_secs);
 					new_pose = false;
 
 				}
@@ -367,9 +378,12 @@ void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 				else // there was no new pose in the previous iteration
 				{
 					//check the time
-					clock_t end = clock();
-		  			double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-					if (elapsed_secs >= time_limit_secs) //the timeout has been reached
+					//clock_t end = clock();
+		  			//double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+					//if (elapsed_secs >= time_limit_secs) //the timeout has been reached
+					ros::Duration time_left = timeout - ros::Time::now();
+					//std::cout << "time left " << time_left.sec << std::endl;
+					if (time_left <= ros::Duration(0,0))
 					{
 						//the user has not moved for a while, so the following behaviour is stopped
 						std::cout << "no new poses for a while, stopping " << std::endl; // no new positions will be sent
