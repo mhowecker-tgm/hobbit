@@ -34,6 +34,12 @@ cComeCloser::cComeCloser(int argc, char **argv) : init_argc(argc), init_argv(arg
 
 	nh.param("range_max", range_max, 2.0);
 
+	started_rotation = false;
+	finished_rotation = false;
+	started_movement = false;
+	finished_movement = false;
+	movement_cmd_sent = false;
+
 	ros::NodeHandle n;
 	discrete_motion_cmd_pub = n.advertise<std_msgs::String>("/DiscreteMotionCmd", 20);
 
@@ -86,11 +92,11 @@ void cComeCloser::motion_state_callback(const std_msgs::String::ConstPtr& msg)
 
   if (!started_rotation && current_motion_state.data == "Turning")
   	started_rotation = true;
-  if (started_rotation && current_motion_state.data == "Idle")
+  if (started_rotation && !finished_rotation && current_motion_state.data == "Idle")
 	finished_rotation = true;
   if (finished_rotation && current_motion_state.data == "Moving")
 	started_movement = true;
-  if (started_movement && current_motion_state.data == "Idle")
+  if (started_movement && !finished_movement && current_motion_state.data == "Idle")
   {
 	bool dist_mode = true;
 	mira_msgs::GetBoolValue get_nav_mode_srv;
@@ -102,7 +108,10 @@ void cComeCloser::motion_state_callback(const std_msgs::String::ConstPtr& msg)
 		ROS_INFO("Failed to call service get_nav_mode");
 		
 	if (!dist_mode)
+	{
 		finished_movement = true;
+		std::cout << "finished movement " << std::endl;
+	}
   }
 
 }
