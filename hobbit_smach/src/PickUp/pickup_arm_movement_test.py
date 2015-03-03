@@ -143,8 +143,8 @@ def main():
         
         StateMachine.add(
             'MOVE_ARM_TO_HOME',   #position where gripper is not blocking view to floor where object was lying
-            #arm_move.goToHomePosition(),
-            arm_move.goToTrayPosition(),
+            arm_move.goToHomePosition(),
+            #arm_move.goToTrayPosition(),
             transitions={'succeeded': 'succeeded', 
                          'preempted': 'LOG_ABORT',
                          'failed': 'LOG_ABORT'}    # better failure handling appreciated
