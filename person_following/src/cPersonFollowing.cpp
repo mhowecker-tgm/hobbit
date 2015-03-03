@@ -204,11 +204,6 @@ void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 	ros::Time timeout_target; 
 	ros::Time timeout_feedback;
 
-	clock_t begin;
-	clock_t begin_target;
-
-	clock_t begin_feedback;
-
 	// Tell the action client that we want to spin a thread by default
 	MoveBaseClient ac("mira_move_base", true);
 
@@ -269,10 +264,6 @@ void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 		if (goal_status.data == "goal_sent" && !response)
 		{
 
-			//clock_t end_feedback = clock();
-			//double elapsed_secs_feedback = double(end_feedback - begin_feedback) / CLOCKS_PER_SEC;
-			//std::cout << "elapsed time no response " << elapsed_secs_feedback << std::endl;
-			//if (elapsed_secs_feedback > time_limit_no_feedback_secs)
 			ros::Duration time_left_feedback = timeout_feedback - ros::Time::now();
 			if (time_left_feedback <= ros::Duration(0,0))
 			{
@@ -291,7 +282,6 @@ void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 			{
 				if (starting) //the follow-me behavior is just starting
 				{
-					//begin_target = clock();
 					timeout_target = ros::Time::now() + ros::Duration(time_limit_secs);
 					std::cout << "starting, no new target " << std::endl;
 					starting = false;
@@ -302,12 +292,8 @@ void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 				else 
 				{
 					//check the time
-					//clock_t end_target = clock();
-		  			//double elapsed_secs_target = double(end_target - begin_target) / CLOCKS_PER_SEC;
-					//std::cout << "no new target " << std::endl;
 					ros::Duration time_left_target = timeout_target - ros::Time::now();
-					if (time_left_target <= ros::Duration(0,0) )
-					//if (elapsed_secs_target >= time_limit_secs) //the timeout has been reached
+					if (time_left_target <= ros::Duration(0,0) ) //the timeout has been reached
 					{
 						//the user has been lost for a while, so the following behaviour is stopped
 						std::cout << "no target for a while, stopping " << std::endl;
@@ -360,7 +346,6 @@ void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 
 				goal_status.data = "goal_sent";
 				response = false;
-				//begin_feedback = clock();
 				timeout_feedback = ros::Time::now() + ros::Duration(time_limit_no_feedback_secs);
 				
 
@@ -369,7 +354,6 @@ void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 			{
 				if (new_pose || starting) //there was a new pose in the previous iteration or the follow-me behavior is just starting
 				{
-					//begin = clock();
 					timeout = ros::Time::now() + ros::Duration(time_limit_secs);
 					new_pose = false;
 
@@ -378,12 +362,9 @@ void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 				else // there was no new pose in the previous iteration
 				{
 					//check the time
-					//clock_t end = clock();
-		  			//double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-					//if (elapsed_secs >= time_limit_secs) //the timeout has been reached
 					ros::Duration time_left = timeout - ros::Time::now();
 					//std::cout << "time left " << time_left.sec << std::endl;
-					if (time_left <= ros::Duration(0,0))
+					if (time_left <= ros::Duration(0,0))  //the timeout has been reached
 					{
 						//the user has not moved for a while, so the following behaviour is stopped
 						std::cout << "no new poses for a while, stopping " << std::endl; // no new positions will be sent
@@ -394,20 +375,6 @@ void cPersonFollowing::executeCb(const hobbit_msgs::FollowMeGoalConstPtr& goal)
 
 			}
 
-			//check if the average velocity is low
-			/*v_sum += current_target.vX*current_target.vX + current_target.vY*current_target.vY;
-			count_num++;
-			if (count_num == it_limit)
-			{
-				if (v_sum < v_thres*v_thres*it_limit ) //the average speed in the last iterations has been low
-				{	
-					std::cout << "speed is low, stopping " << std::endl; // no new positions will be sent
-					stopFollowing();
-				}
-
-				count_num = 0;
-				v_sum = 0;
-			}*/
 
 			if (starting) starting = false;
 			
