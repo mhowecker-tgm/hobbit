@@ -129,7 +129,7 @@ def main():
             arm_move.goToPreGraspPosition(),
             transitions={'succeeded': 'SAY_MOVE_ARM_HOME', 
                          'preempted': 'LOG_PREEMPT',
-                         'failed': 'MOVE_ARM_TO_CHECK_GRASP_POSITION'}    # better failure handling appreciated
+                         'failed': 'LOG_PREEMPT'}    # better failure handling appreciated
         )
         
             
