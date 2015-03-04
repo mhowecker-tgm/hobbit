@@ -247,10 +247,20 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 		{
 			std::cout << "rotation is too small " << std::endl;
 			//finished_rotation = true;
-			if (angle2turn > 0)
+			if (angle2turn > 0.5*ang_thres*M_PI/180)
+			{
 				angle2turn = ang_thres*M_PI/180;
-			else
+			}
+			else if (angle2turn < -0.5*ang_thres*M_PI/180 )
+			{
 				angle2turn = -ang_thres*M_PI/180;
+			}
+			else
+			{
+				finished_rotation=true;
+				std::cout << "no rotation " << std::endl;
+			}
+		
 		}
 		
 		{
