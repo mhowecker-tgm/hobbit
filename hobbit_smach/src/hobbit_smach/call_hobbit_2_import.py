@@ -176,35 +176,32 @@ def gesture_sm():
         return True
     def out_cb(outcome_map):
         rospy.loginfo(str(outcome_map))
-        if outcome_map['LISTENER'] == 'succeeded':
+        if outcome_map['TOPIC'] == 'succeeded':
             return 'succeeded'
         elif outcome_map['YES_NO'] == 'yes':
             return 'succeeded'
-        elif outcome_map['TIMER'] == 'succeeded':
-            return 'aborted'
         elif outcome_map['YES_NO'] in ['no', 'timout', '3times', 'failed']:
             return 'aborted'
         else:
             return 'preempted'
 
-    cc = Concurrence(outcomes=['aborted', 'succeeded', 'preempted'],
+    cc1 = Concurrence(outcomes=['aborted', 'succeeded', 'preempted'],
                      default_outcome='aborted',
                      child_termination_cb=child_term_cb,
                      outcome_cb=out_cb
-                     #outcome_map={'succeeded': {'LISTENER': 'succeeded'},
-                     #             'aborted': {'TIMER': 'succeeded'},
-                     #             'preempted': {'LISTENER': 'preempted',
-                     #                           'TIMER': 'preempted'}}
-                     )
+    )
+    cc = Concurrence(outcomes=['aborted', 'succeeded', 'preempted'],
+                      default_outcome='aborted',
+                      child_termination_cb=child_term_cb,
+                      outcome_map={'succeeded': {'LISTENER': 'succeeded'},
+                                   'aborted': {'TIMER': 'succeeded'},
+                                   'preempted': {'LISTENER': 'preempted',
+                                                 'TIMER': 'preempted'}}
+                      )
     with sm:
         StateMachine.add(
             'WAIT_FOR_CLOSER',
-            WaitForMsgState(
-                '/Event',
-                Event,
-                msg_cb=event_cb,
-                timeout=10
-            ),
+            cc1,
             transitions={'succeeded': 'MOVE',
                          'preempted': 'preempted',
                          'aborted': 'WAIT_FOR_CLOSER'}
@@ -230,10 +227,23 @@ def gesture_sm():
     with cc:
         Concurrence.add('LISTENER', sm)
         Concurrence.add('TIMER', SleepState(duration=30))
+
+    with cc1:
         Concurrence.add(
             'YES_NO',
             HobbitMMUI.AskYesNo(question='Shall I come even closer?'),
         )
+        Concurrence.add(
+            'TOPIC',
+            WaitForMsgState(
+                '/Event',
+                Event,
+                msg_cb=event_cb,
+                timeout=10
+            )
+
+        )
+
     return cc
 
 
