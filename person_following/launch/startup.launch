@@ -7,7 +7,7 @@
   	<param name="v_thres" value="0.2"/>
 	<param name="it_limit" value="5000.0"/>
 	<param name="time_limit" value="30.0"/>
-	<param name="time_limit_no_feedback" value="15.0"/>
+	<param name="time_limit_no_feedback" value="30.0"/>
 
   </node>
 </launch>
