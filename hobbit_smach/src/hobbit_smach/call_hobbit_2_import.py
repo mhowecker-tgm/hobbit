@@ -43,6 +43,7 @@ def switch_vision_cb(ud, response):
         return 'aborted'
 
 def event_cb(msg, ud):
+    rospy.loginfo('TOPIC received: '+str(msg.event))
     if msg.event.upper() in ['G_COME', 'A_YES', 'G_YES']:
         rospy.loginfo("Move 0.1 meters")
         return True
@@ -173,17 +174,19 @@ def gesture_sm():
     sm = StateMachine(outcomes = ['succeeded','aborted','preempted'])
 
     def child_term_cb(outcome_map):
+        rospy.loginfo('cc1: child_term_cb: ')
+        rospy.loginfo(str(outcome_map))
         return True
     def out_cb(outcome_map):
         rospy.loginfo(str(outcome_map))
-        if outcome_map['TOPIC'] == 'succeeded':
+        if outcome_map['YES_NO'] == 'yes':
             return 'succeeded'
-        elif outcome_map['YES_NO'] == 'yes':
+        elif outcome_map['TOPIC'] == 'succeeded':
             return 'succeeded'
-        elif outcome_map['YES_NO'] in ['no', 'timout', '3times', 'failed']:
+        elif outcome_map['YES_NO'] in ['no', 'timeout', '3times', 'failed']:
             return 'aborted'
         else:
-            return 'preempted'
+            return 'aborted'
 
     cc1 = Concurrence(outcomes=['aborted', 'succeeded', 'preempted'],
                      default_outcome='aborted',
