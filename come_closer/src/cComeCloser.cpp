@@ -275,7 +275,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 
 	}
 
-	clock_t begin = clock();
+	ros::Time timeout = ros::Time::now() + ros::Duration(time_limit_secs);
 
 
 	///////////////////////////////////////////////////////////////////////////////////////
@@ -319,9 +319,9 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 
 		}
 
-		clock_t end = clock();
-		double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-		if (elapsed_secs >= time_limit_secs)
+		//check the time
+		ros::Duration time_left = timeout - ros::Time::now();
+		if (time_left <= ros::Duration(0,0) ) //the timeout has been reached
 		{
 			
 			as_->setAborted(hobbit_msgs::GeneralHobbitResult(), "aborted, it's taking too long, something went wrong?");
