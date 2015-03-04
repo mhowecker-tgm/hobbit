@@ -308,7 +308,7 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
         		r2.timedWait(mira::Duration::seconds(1));
         		r2.get();			
 	
-			std::cout << "task succeeded, robot recharging " << std::endl;
+			std::cout << "task succeeded, robot stoppped moving forwards " << std::endl;
 			as_->setSucceeded(interfaces_mira::MiraDockingResult(), "Task succeeded, robot stoppped moving forwards");
 			status_updated = false;
 			return;
