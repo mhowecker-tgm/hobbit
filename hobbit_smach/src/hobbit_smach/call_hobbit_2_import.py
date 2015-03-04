@@ -272,11 +272,10 @@ class WaitAndCheckMsgState(smach.State):
     timeout: Seconds to wait for a message, defaults to None, disabling timeout
     output_keys: Userdata keys that the message callback needs to write to.
     """
-
     def __init__(self, topic, msg_type, msg_cb=None, output_keys=None, latch=False, timeout=None):
         if output_keys is None:
             output_keys = []
-        smach.State.__init__(self, outcomes=['succeeded', 'aborted', 'preempted'], output_keys=output_keys)
+        State.__init__(self, outcomes=['succeeded', 'aborted', 'preempted'], output_keys=output_keys)
         self.latch = latch
         self.timeout = timeout
         self.mutex = threading.Lock()
@@ -302,9 +301,8 @@ class WaitAndCheckMsgState(smach.State):
 
                 if not self.latch:
                     self.msg = None
-
-                self.mutex.release()
-                if message == 'succeeded':
+                if message.event.upper() in ['G_COME', 'A_YES', 'G_YES']:
+                    self.mutex.release()
                     return message
             self.mutex.release()
 
@@ -336,6 +334,7 @@ class WaitAndCheckMsgState(smach.State):
             return 'succeeded'
         else:
             return 'aborted'
+
 
 def call_hobbit():
     """
