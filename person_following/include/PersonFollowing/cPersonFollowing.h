@@ -33,7 +33,7 @@ public:
 
   	actionlib::SimpleActionServer<hobbit_msgs::FollowMeAction>* as_;
 
-  	double x_sensor, dis2target, dis_thres, v_thres, it_limit, time_limit_secs;
+  	double x_sensor, dis2target, dis_thres, v_thres, time_limit_secs;
 	double time_limit_no_feedback_secs;
 
   	ros::Subscriber user_pose_sub;

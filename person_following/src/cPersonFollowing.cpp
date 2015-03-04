@@ -12,7 +12,6 @@ cPersonFollowing::cPersonFollowing(int argc, char **argv) : init_argc(argc), ini
 	nh.param("dis2target", dis2target, 1.0);
 	nh.param("dis_thres", dis_thres, 0.2);
 	nh.param("v_thres", v_thres, 0.2);
-	//nh.param("it_limit", it_limit, 10.0);
 	nh.param("time_limit", time_limit_secs, 60.0);
 	nh.param("time_limit_no_feedback", time_limit_no_feedback_secs, 20.0);
 
