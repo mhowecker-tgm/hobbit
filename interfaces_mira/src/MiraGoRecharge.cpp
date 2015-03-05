@@ -34,6 +34,7 @@ void MiraGoRecharge::template_channel_callback(mira::ChannelRead<std::string> da
         if(data->value().compare("Success") == 0) 
 	{
 		status.data = "template_found";
+		template_found = true;
 		std::cout << "template_found " << std::endl;
 
 	}
@@ -41,6 +42,7 @@ void MiraGoRecharge::template_channel_callback(mira::ChannelRead<std::string> da
 	{
   		status.data = "template_not_found";
 		std::cout << "template_not_found " << std::endl;
+		template_found = false;
 	}
 
 	status_updated = true;
@@ -135,6 +137,7 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 	int task = docking_action->docking_task;
 
 	status_updated = false;
+	template_found = false;
 
 	//if (task.data.compare("docking_on") == 0)
 	if (task == 0)
@@ -205,6 +208,7 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 	      if(as_->isPreemptRequested())
 	      {
 			std::cout << "preempt requested" << std::endl;
+			template_found = false;
 		
 			TaskPtr task(new Task());
 			//cancel the task
@@ -308,7 +312,7 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
         		r2.timedWait(mira::Duration::seconds(1));
         		r2.get();			
 	
-			std::cout << "task succeeded, robot stoppped moving forwards " << std::endl;
+			std::cout << "task succeeded, template found and robot stoppped moving forwards " << std::endl;
 			as_->setSucceeded(interfaces_mira::MiraDockingResult(), "Task succeeded, robot stoppped moving forwards");
 			status_updated = false;
 			return;
@@ -343,8 +347,18 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
         		r2.timedWait(mira::Duration::seconds(1));
         		r2.get();
 
-			std::cout << "task aborted, failure " << std::endl;
-			as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting because task failed");
+			if (template_found)
+			{
+				std::cout << "task succeeded, template found and robot stoppped moving forwards after failure" << std::endl;
+				as_->setSucceeded(interfaces_mira::MiraDockingResult(), "Task succeeded, robot stoppped moving forwards after failure");
+
+			}
+			else
+			{
+				std::cout << "task aborted, failure " << std::endl;
+				as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting because task failed");
+			}
+
 			status_updated = false;
 			return;
 		}

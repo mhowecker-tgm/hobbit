@@ -53,6 +53,7 @@ private:
 
 	bool status_updated;
 
+	bool template_found;
 };
 
 
