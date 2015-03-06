@@ -161,6 +161,12 @@ class MMUIInterface:
         parr.append(p)
         return self.callMMUIService('0', 'create', parr)
 
+    def remove_last_prompt(self):
+        parr=[]
+        p = Parameter('type', 'D_REMOVE')
+        parr.append(p)
+        return self.callMMUIService('-1', 'create', parr)
+
     def GoToMenu(self, menu='F_MAIN'):
         parr = []
         p = Parameter('type', 'F_GOTOMENU')
