@@ -1,4 +1,4 @@
-#!/usr/bin/python
+###!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 PKG = 'hobbit_smach'
@@ -12,7 +12,7 @@ import smach
 import threading
 from std_msgs.msg import String
 from smach_ros import SimpleActionState, ServiceState
-from smach import Sequence, State, StateMachine, Concurrence
+from smach import Iterator, Sequence, State, StateMachine, Concurrence
 from uashh_smach.util import SleepState, WaitForMsgState
 import hobbit_smach.hobbit_move_import as hobbit_move
 import hobbit_smach.speech_output_import as speech_output
@@ -107,6 +107,7 @@ class Count2(State):
 
     def execute(self, ud):
         if self.preempt_requested():
+        # self.counter = 1
             self.service_preempt()
             return 'preempted'
         rospy.loginfo('Counter: '+str(self.counter))
@@ -163,71 +164,93 @@ def msg_timer_sm():
     return cc
 
 def gesture_sm():
+
+    
     sm = StateMachine(outcomes = ['succeeded','aborted','preempted'])
 
-    def child_term_cb(outcome_map):
-        rospy.loginfo('cc1: child_term_cb: ')
-        rospy.loginfo(str(outcome_map))
-        return True
-    def out_cb(outcome_map):
-        rospy.loginfo(str(outcome_map))
-        if outcome_map['YES_NO'] == 'yes':
-            return 'succeeded'
-        elif outcome_map['TOPIC'] == 'succeeded':
-            return 'succeeded'
-        elif outcome_map['TOPIC'] == 'aborted':
-            return 'aborted'
-        elif outcome_map['YES_NO'] in ['no', 'timeout', '3times', 'failed']:
-            return 'aborted'
-        else:
-            return 'preempted'
-
-    cc1 = Concurrence(outcomes=['aborted', 'succeeded', 'preempted'],
-                     default_outcome='aborted',
-                     child_termination_cb=child_term_cb,
-                     outcome_cb=out_cb
-    )
     with sm:
-        StateMachine.add(
-            'WAIT_FOR_CLOSER',
-            cc1,
-            transitions={'succeeded': 'MOVE',
-                         'preempted': 'preempted',
-                         'aborted': 'aborted'}
-        )
-        StateMachine.add(
-            'MOVE',
-            hobbit_move.MoveDiscrete(motion='Move', value=0.1),
-            transitions={'succeeded': 'MOVED_BACK',
-                         'preempted': 'preempted',
-                         'aborted': 'aborted'}
-        )
-        StateMachine.add(
-            'MOVED_BACK',
-            ServiceState(
-                '/came_closer/set_closer_state',
-                SetCloserState,
-                request=SetCloserStateRequest(state=True),
-            ),
-            transitions={'succeeded': 'succeeded',
-                         'preempted': 'preempted',}
-        )
+        counter_it = Iterator(outcomes = ['succeeded', 'preempted', 'aborted'],
+                              input_keys = [],
+                              output_keys = [],
+                              it = lambda: range(0, 2),
+                              it_label = 'index',
+                              exhausted_outcome = 'succeeded')
 
-    with cc1:
-        Concurrence.add(
-            'YES_NO',
-            HobbitMMUI.AskYesNo(question='Shall I come even closer?'),
-        )
-        Concurrence.add(
-            'TOPIC',
-            WaitAndCheckMsgState(
-                '/Event',
-                Event,
-                timeout=28
+        with counter_it:
+            def child_term_cb(outcome_map):
+                rospy.loginfo('cc1: child_term_cb: ')
+                rospy.loginfo(str(outcome_map))
+                return True
+            def out_cb(outcome_map):
+                rospy.loginfo(str(outcome_map))
+                if outcome_map['YES_NO'] == 'yes':
+                    return 'succeeded'
+                elif outcome_map['TOPIC'] == 'succeeded':
+                    return 'succeeded'
+                elif outcome_map['TOPIC'] == 'aborted':
+                    return 'aborted'
+                elif outcome_map['YES_NO'] in ['no', 'timeout', '3times', 'failed']:
+                    return 'aborted'
+                else:
+                    return 'preempted'
+
+
+            container_sm = StateMachine(outcomes = ['succeeded','aborted','preempted'])
+        
+            cc1 = Concurrence(outcomes=['aborted', 'succeeded', 'preempted'],
+                             default_outcome='aborted',
+                             child_termination_cb=child_term_cb,
+                             outcome_cb=out_cb
             )
+            with container_sm:
+                StateMachine.add(
+                    'WAIT_FOR_CLOSER',
+                    cc1,
+                    transitions={'succeeded': 'MOVE',
+                                 'preempted': 'preempted',
+                                 'aborted': 'aborted'}
+                )
+                StateMachine.add(
+                    'MOVE',
+                    hobbit_move.MoveDiscrete(motion='Move', value=0.1),
+                    transitions={'succeeded': 'MOVED_BACK',
+                                 'preempted': 'preempted',
+                                 'aborted': 'aborted'}
+                )
+                StateMachine.add(
+                    'MOVED_BACK',
+                    ServiceState(
+                        '/came_closer/set_closer_state',
+                        SetCloserState,
+                        request=SetCloserStateRequest(state=True),
+                    ),
+                    transitions={'succeeded': 'succeeded',
+                                 'preempted': 'preempted',}
+                )
 
-        )
+            with cc1:
+                Concurrence.add(
+                    'YES_NO',
+                    HobbitMMUI.AskYesNo(question='Shall I come even closer?'),
+                )
+                Concurrence.add(
+                    'TOPIC',
+                    WaitAndCheckMsgState(
+                        '/Event',
+                        Event,
+                        timeout=28
+                    )
+                )
 
+            Iterator.set_contained_state('CONTAINER_STATE',
+                                         container_sm,
+                                         loop_outcomes = ['succeeded']
+                                        )
+
+        StateMachine.add('COUNT_GESTURES', counter_it,
+                        {'succeeded':'succeeded',
+                         'preempted':'preempted',
+                         'aborted':'aborted'})
     return sm
 
 
@@ -283,10 +306,10 @@ class WaitAndCheckMsgState(smach.State):
                 if message.event.upper() == 'G_COME':
                     self.mutex.release()
                     rospy.loginfo('Was G_COME! Close MMUI Prompt!')
-		    mmui = MMUI.MMUIInterface()
-        	    mmui.remove_last_prompt()
-		    return 'succeeded'
-		rospy.loginfo('Was not G_COME.')
+                    mmui = MMUI.MMUIInterface()
+                    mmui.remove_last_prompt()
+                    return 'succeeded'
+                rospy.loginfo('Was not G_COME.')
             self.mutex.release()
 
             if self.preempt_requested():
@@ -411,7 +434,7 @@ def call_hobbit():
         StateMachine.add(
             'GESTURE_HANDLING',
             gesture_sm(),
-            transitions={'succeeded': 'COUNT_2',
+            transitions={'succeeded': 'LOG_SUCCESS',
                          'preempted': 'LOG_PREEMPT',
                          'aborted': 'LOG_ABORT'}
         )
