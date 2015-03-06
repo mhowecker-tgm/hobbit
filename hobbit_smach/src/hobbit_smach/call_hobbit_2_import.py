@@ -25,6 +25,7 @@ from uashh_smach.util import WaitForMsgState, SleepState
 from hobbit_msgs.msg import Event
 from hobbit_msgs.srv import SetCloserStateRequest
 from hobbit_msgs.srv import SwitchVision, SwitchVisionRequest, SetCloserState
+from hobbit_msgs import MMUIInterface as MMUI
 
 def closer_cb(ud, goal):
     params=[]
@@ -41,15 +42,6 @@ def switch_vision_cb(ud, response):
         return 'succeeded'
     else:
         return 'aborted'
-
-def event_cb(msg, ud):
-    rospy.loginfo('TOPIC received: '+str(msg.event))
-    if msg.event.upper() in ['G_COME', 'A_YES', 'G_YES']:
-        rospy.loginfo("Move 0.1 meters")
-        return True
-    else:
-        rospy.loginfo("Do not move")
-        return False
 
 class ExtractGoal(State):
     """
@@ -183,7 +175,7 @@ def gesture_sm():
             return 'succeeded'
         elif outcome_map['TOPIC'] == 'succeeded':
             return 'succeeded'
-        elif outcome_map['TOPIC'] == 'succeeded':
+        elif outcome_map['TOPIC'] == 'aborted':
             return 'aborted'
         elif outcome_map['YES_NO'] in ['no', 'timeout', '3times', 'failed']:
             return 'aborted'
@@ -195,21 +187,13 @@ def gesture_sm():
                      child_termination_cb=child_term_cb,
                      outcome_cb=out_cb
     )
-    cc = Concurrence(outcomes=['aborted', 'succeeded', 'preempted'],
-                      default_outcome='aborted',
-                      child_termination_cb=child_term_cb,
-                      outcome_map={'succeeded': {'LISTENER': 'succeeded'},
-                                   'aborted': {'TIMER': 'succeeded'},
-                                   'preempted': {'LISTENER': 'preempted',
-                                                 'TIMER': 'preempted'}}
-                      )
     with sm:
         StateMachine.add(
             'WAIT_FOR_CLOSER',
             cc1,
             transitions={'succeeded': 'MOVE',
                          'preempted': 'preempted',
-                         'aborted': 'WAIT_FOR_CLOSER'}
+                         'aborted': 'aborted'}
         )
         StateMachine.add(
             'MOVE',
@@ -225,13 +209,9 @@ def gesture_sm():
                 SetCloserState,
                 request=SetCloserStateRequest(state=True),
             ),
-            transitions={'succeeded': 'WAIT_FOR_CLOSER',
+            transitions={'succeeded': 'succeeded',
                          'preempted': 'preempted',}
         )
-
-    with cc:
-        Concurrence.add('LISTENER', sm)
-        Concurrence.add('TIMER', SleepState(duration=30))
 
     with cc1:
         Concurrence.add(
@@ -243,13 +223,12 @@ def gesture_sm():
             WaitAndCheckMsgState(
                 '/Event',
                 Event,
-                msg_cb=event_cb,
                 timeout=28
             )
 
         )
 
-    return cc
+    return sm
 
 
 class WaitAndCheckMsgState(smach.State):
@@ -289,7 +268,7 @@ class WaitAndCheckMsgState(smach.State):
         self.mutex.release()
 
     def waitForMsg(self):
-        """Await and return the message or None on timeout."""
+        """If G_COME received -> suceeded, if timeout -> aborted."""
         rospy.loginfo('Waiting for message...')
         if self.timeout is not None:
             timeout_time = rospy.Time.now() + rospy.Duration.from_sec(self.timeout)
@@ -301,9 +280,13 @@ class WaitAndCheckMsgState(smach.State):
 
                 if not self.latch:
                     self.msg = None
-                if message.event.upper() in ['G_COME', 'A_YES', 'G_YES']:
+                if message.event.upper() == 'G_COME':
                     self.mutex.release()
-                    return message
+                    rospy.loginfo('Was G_COME! Close MMUI Prompt!')
+		    mmui = MMUI.MMUIInterface()
+        	    mmui.remove_last_prompt()
+		    return 'succeeded'
+		rospy.loginfo('Was not G_COME.')
             self.mutex.release()
 
             if self.preempt_requested():
@@ -314,26 +297,11 @@ class WaitAndCheckMsgState(smach.State):
             rospy.sleep(.1) # TODO: maybe convert ROSInterruptException into valid outcome
 
         rospy.loginfo('Timeout on waiting for message!')
-        return None
+        return 'aborted'
 
     def execute(self, ud):
         """Default simplest execute(), see class description."""
-        msg = self.waitForMsg()
-        if msg is not None:
-            if msg == 'preempted':
-                return 'preempted'
-            # call callback if there is one
-            if self.msg_cb is not None:
-                cb_result = self.msg_cb(msg, ud)
-                # check if callback wants to dictate output
-                if cb_result is not None:
-                    if cb_result:
-                        return 'succeeded'
-                    else:
-                        return 'aborted'
-            return 'succeeded'
-        else:
-            return 'aborted'
+        return self.waitForMsg()
 
 
 def call_hobbit():
