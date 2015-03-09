@@ -22,6 +22,12 @@
         <objects/>
       </place>
       <place>
+        <name>side</name>
+        <type>goTo</type>
+        <pose y="-2.0" x="3.21" theta="1.67"/>
+        <objects/>
+      </place>
+      <place>
         <name>fitness</name>
         <type>fitness</type>
         <pose y="1.75" x="3.2" theta="-2.969487"/>
