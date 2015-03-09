@@ -172,7 +172,62 @@ class WaitForMsgState(smach.State):
         else:
             return 'aborted'
 
+class WaitAndCheckMsgState(smach.State):
+    """
+	This state listens to a specific topic for a defined timeout time. If a message is received,
+        msg_cb is called, which can perform checks on the message to define if the state should exit
+        with succeeded or wait for the next message. This is helpful if you have to wait for a
+        specific message on a topic and ignore all other messages. If a timeout occurs, aborted is
+        returned.
+    """
+    def __init__(self, topic, msg_type, msg_cb=None, output_keys=None, latch=False, timeout=None):
+        if output_keys is None:
+            output_keys = []
+        smach.State.__init__(self, outcomes=['succeeded', 'aborted', 'preempted'], output_keys=output_keys)
+        self.latch = latch
+        self.timeout = timeout
+        self.mutex = threading.Lock()
+        self.msg = None
+        self.msg_cb = msg_cb
+        self.subscriber = rospy.Subscriber(topic, msg_type, self._callback, queue_size=1)
 
+    def _callback(self, msg):
+        self.mutex.acquire()
+        self.msg = msg
+        self.mutex.release()
+
+    def waitForMsg(self, ud):
+        rospy.loginfo('Waiting for message...')
+        if self.timeout is not None:
+            timeout_time = rospy.Time.now() + rospy.Duration.from_sec(self.timeout)
+        while self.timeout is None or rospy.Time.now() < timeout_time:
+            self.mutex.acquire()
+            if self.msg is not None:
+                rospy.loginfo('Got message.')
+                message = self.msg
+
+                if not self.latch:
+                    self.msg = None
+
+                if self.msg_cb(message, ud):
+                    self.mutex.release()
+                    return 'succeeded'
+ 
+            self.mutex.release()
+
+            if self.preempt_requested():
+                self.service_preempt()
+                rospy.loginfo('waitForMsg is preempted!')
+                return 'preempted'
+
+            rospy.sleep(.1) # TODO: maybe convert ROSInterruptException into valid outcome
+
+        rospy.loginfo('Timeout on waiting for message!')
+        return 'aborted'
+
+    def execute(self, ud):
+        """Default simplest execute(), see class description."""
+        return self.waitForMsg(ud)
 
 class CheckSmachEnabledState(WaitForMsgState):
     def __init__(self, **kwargs):
