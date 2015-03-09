@@ -319,6 +319,9 @@ class FirstSecondThird(State):
 
 def charge_response_cb(userdata, response):
     print(response.response)
+    rospy.loginfo("userdata counter: "+str(userdata.counter))
+    userdata.counter = 0
+    rospy.loginfo("userdata counter2: "+str(userdata.counter))
     if response.response:
         return 'succeeded'
     else:
@@ -340,7 +343,7 @@ def startDockProcedure():
         StateMachine.add('CHARGE_CHECK',
                          ServiceState('/hobbit/charge_check',
                                       ChargeCheck,
-                                      response_cb=charge_response_cb
+                                      response_cb=charge_response_cb,input_keys=['counter'],output_keys=['counter']
                          ),
                          transitions={'succeeded': 'succeeded',
                                       'aborted': 'UNDOCK',
