@@ -105,8 +105,8 @@ def get_undock():
 
 
 def docking_result_cb(userdata, status, result):
-    rospy.loginfo("docking_result_cb: "+str(result))
-    if result == True:
+    rospy.loginfo("docking_result_cb: "+str(status))
+    if status == 3:
         return 'succeeded'
     else:
         return 'aborted'
@@ -120,9 +120,10 @@ def get_dock_action():
                               MiraDockingAction,
                               goal=docking_goal,
                               result_cb=docking_result_cb,
-                              preempt_timeout=rospy.Duration(TIMEOUT),
+                              preempt_timeout=rospy.Duration(20),
                               server_wait_timeout=rospy.Duration(TIMEOUT)
                               )
+    rospy.loginfo("state: "+str(state))
     return state
 
 
@@ -236,7 +237,7 @@ class MoveDiscrete(State):
             outcomes=['succeeded', 'preempted', 'aborted']
         )
         self.init = False
-        self.valid = ['move', 'rotate']
+        self.valid = ['move', 'turn']
         self._motion = motion
         self._value = str(value)
 
@@ -255,6 +256,7 @@ class MoveDiscrete(State):
             self.init = True
             rospy.sleep(1.0)
         self.motion_pub.publish(String(self._motion +' '+self._value))
+	rospy.sleep(2.5)
         return 'succeeded'
 
 
