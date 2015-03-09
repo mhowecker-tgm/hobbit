@@ -13,7 +13,7 @@ import threading
 from std_msgs.msg import String
 from smach_ros import SimpleActionState, ServiceState
 from smach import Iterator, Sequence, State, StateMachine, Concurrence
-from uashh_smach.util import SleepState, WaitForMsgState
+from uashh_smach.util import SleepState, WaitForMsgState, WaitAndCheckMsgState
 import hobbit_smach.hobbit_move_import as hobbit_move
 import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.logging_import as log
@@ -122,10 +122,6 @@ def msg_timer_sm():
     sm = StateMachine(outcomes = ['succeeded','aborted','preempted'],
                       output_keys=['person_x', 'person_z'])
 
-    def child_term_cb(outcome_map):
-        print(outcome_map)
-        return True
-
     def person_cb(msg, ud):
         print(msg)
         if (rospy.Time.now() - msg.stamp) > rospy.Duration(1):
@@ -139,29 +135,20 @@ def msg_timer_sm():
         #print("OK. Use it.")
         return True
 
-    cc = Concurrence(outcomes=['aborted', 'succeeded'],
-                     default_outcome='aborted',
-                     child_termination_cb=child_term_cb,
-                     output_keys=['person_x', 'person_z'],
-                     outcome_map={'succeeded': {'LISTENER': 'succeeded'},
-                                  'aborted': {'TIMER': 'succeeded'}})
     with sm:
         StateMachine.add(
             'GET_PERSON',
-            WaitForMsgState(
+            WaitAndCheckMsgState(
                 '/persons',
                 Person,
                 msg_cb=person_cb,
-                timeout=3,
+                timeout=5,
                 output_keys=['user_pose', 'person_z', 'person_x']
             ),
             transitions={'succeeded': 'succeeded',
-                         'aborted': 'GET_PERSON'}
+                         'aborted': 'aborted'}
         )
-    with cc:
-        Concurrence.add('LISTENER', sm)
-        Concurrence.add('TIMER', SleepState(duration=3))
-    return cc
+    return sm
 
 def gesture_sm():
 
@@ -203,6 +190,13 @@ def gesture_sm():
                              outcome_cb=out_cb
             )
             with container_sm:
+                def g_come_cb(event_message, ud):
+                    if event_message.event.upper() == 'G_COME':
+                         rospy.loginfo('Was G_COME! Close MMUI Prompt!')
+                         mmui = MMUI.MMUIInterface()
+                         mmui.remove_last_prompt()
+                         return 'succeeded'
+
                 StateMachine.add(
                     'WAIT_FOR_CLOSER',
                     cc1,
@@ -238,7 +232,8 @@ def gesture_sm():
                     WaitAndCheckMsgState(
                         '/Event',
                         Event,
-                        timeout=28
+                        msg_cb=g_come_cb,
+                        timeout=45
                     )
                 )
 
@@ -252,79 +247,6 @@ def gesture_sm():
                          'preempted':'preempted',
                          'aborted':'aborted'})
     return sm
-
-
-class WaitAndCheckMsgState(smach.State):
-    """This class acts as a generic message listener with blocking, timeout, latch and flexible usage.
-    It is meant to be extended with a case specific class that initializes this one appropriately
-    and contains the msg_cb (or overrides execute if really needed).
-    Its waitForMsg method implements the core functionality: waiting for the message, returning
-    the message itself or None on timeout.
-    Its execute method wraps the waitForMsg and returns succeeded or aborted, depending on the returned
-    message beeing existent or None. Additionally, in the successfull case, the msg_cb, if given, will
-    be called with the message and the userdata, so that a self defined method can convert message data to
-    smach userdata.
-    Those userdata fields have to be passed via 'output_keys'.
-    If the state outcome should depend on the message content, the msg_cb can dictate the outcome:
-    If msg_cb returns True, execute() will return "succeeded".
-    If msg_cb returns False, execute() will return "aborted".
-    If msg_cb has no return statement, execute() will act as described above.
-    If thats still not enough, execute() might be overridden.
-    latch: If True waitForMsg will return the last received message, so one message might be returned indefinite times.
-    timeout: Seconds to wait for a message, defaults to None, disabling timeout
-    output_keys: Userdata keys that the message callback needs to write to.
-    """
-    def __init__(self, topic, msg_type, msg_cb=None, output_keys=None, latch=False, timeout=None):
-        if output_keys is None:
-            output_keys = []
-        State.__init__(self, outcomes=['succeeded', 'aborted', 'preempted'], output_keys=output_keys)
-        self.latch = latch
-        self.timeout = timeout
-        self.mutex = threading.Lock()
-        self.msg = None
-        self.msg_cb = msg_cb
-        self.subscriber = rospy.Subscriber(topic, msg_type, self._callback, queue_size=1)
-
-    def _callback(self, msg):
-        self.mutex.acquire()
-        self.msg = msg
-        self.mutex.release()
-
-    def waitForMsg(self):
-        """If G_COME received -> suceeded, if timeout -> aborted."""
-        rospy.loginfo('Waiting for message...')
-        if self.timeout is not None:
-            timeout_time = rospy.Time.now() + rospy.Duration.from_sec(self.timeout)
-        while self.timeout is None or rospy.Time.now() < timeout_time:
-            self.mutex.acquire()
-            if self.msg is not None:
-                rospy.loginfo('Got message.')
-                message = self.msg
-
-                if not self.latch:
-                    self.msg = None
-                if message.event.upper() == 'G_COME':
-                    self.mutex.release()
-                    rospy.loginfo('Was G_COME! Close MMUI Prompt!')
-                    mmui = MMUI.MMUIInterface()
-                    mmui.remove_last_prompt()
-                    return 'succeeded'
-                rospy.loginfo('Was not G_COME.')
-            self.mutex.release()
-
-            if self.preempt_requested():
-                self.service_preempt()
-                rospy.loginfo('waitForMsg is preempted!')
-                return 'preempted'
-
-            rospy.sleep(.1) # TODO: maybe convert ROSInterruptException into valid outcome
-
-        rospy.loginfo('Timeout on waiting for message!')
-        return 'aborted'
-
-    def execute(self, ud):
-        """Default simplest execute(), see class description."""
-        return self.waitForMsg()
 
 
 def call_hobbit():
@@ -377,12 +299,6 @@ def call_hobbit():
             'GET_PERSON',
             msg_timer_sm(),
             transitions={'succeeded': 'CLOSER',
-                         'aborted': 'COUNT'}
-        )
-        StateMachine.add(
-            'COUNT',
-            Count(),
-            transitions={'succeeded': 'GET_PERSON',
                          'preempted': 'preempted',
                          'aborted': 'SAY_NOT_DETECTED'}
         )
@@ -398,7 +314,7 @@ def call_hobbit():
             ),
             transitions={'succeeded': 'MOVED',
                          'preempted': 'LOG_PREEMPT',
-                         'aborted': 'HEAD_UP_AFTER_MOVEMENT'}
+                         'aborted': 'GESTURE_HANDLING'}
         )
         StateMachine.add(
             'MOVED',
@@ -407,15 +323,8 @@ def call_hobbit():
                 SetCloserState,
                 request=SetCloserStateRequest(state=True),
             ),
-            transitions={'succeeded': 'HEAD_UP_AFTER_MOVEMENT',
-                         'preempted': 'LOG_PREEMPT',}
-        )
-        StateMachine.add(
-            'HEAD_UP_AFTER_MOVEMENT',
-            head_move.MoveTo(pose='littledown_center'),
             transitions={'succeeded': 'GESTURE_HANDLING',
-                         'preempted': 'LOG_PREEMPT',
-                         'aborted': 'LOG_ABORT'}
+                         'preempted': 'LOG_PREEMPT',}
         )
         StateMachine.add(
             'SAY_NOT_DETECTED',
@@ -426,24 +335,11 @@ def call_hobbit():
                          'failed': 'LOG_ABORT'}
         )
         StateMachine.add(
-            'WAIT',
-            SleepState(duration=3),
-            transitions={'succeeded': 'GESTURE_HANDLING',
-                         'preempted': 'LOG_PREEMPT'}
-        )
-        StateMachine.add(
             'GESTURE_HANDLING',
             gesture_sm(),
             transitions={'succeeded': 'LOG_SUCCESS',
                          'preempted': 'LOG_PREEMPT',
                          'aborted': 'LOG_ABORT'}
-        )
-        StateMachine.add(
-            'COUNT_2',
-            Count2(),
-            transitions={'succeeded': 'GESTURE_HANDLING',
-                         'aborted': 'LOG_SUCCESS',
-                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'LOG_PREEMPT',
