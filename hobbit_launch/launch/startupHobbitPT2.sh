@@ -31,7 +31,7 @@ sleep $DELAY_BETWEEN_STEPS
 /opt/ros/hobbit_hydro/src/rgbd_acquisition/scripts/workAroundUSB.sh
 sleep $DELAY_BETWEEN_STEPS
 
-#set HobbitID
+#set HobbitID and Robot-specific parameters
 echo "This hobbit is $hobbit_id"
 rosparam set hobbit_id "$hobbit_id"
 rosparam set hobbit/head/pitch_offset "$hobbit_head_pitch_offset"
