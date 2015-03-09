@@ -2,7 +2,7 @@ Hobbit: {current_emotion: EMO_HAPPY, social_role: 1, user_away: false}
 checkalive: 1
 rosdistro: 'hydro'
 hobbit_id: 'PT2e'
-hobbit/head/pitch_offset: 5
-hobbit/head/yaw_offset: 0
-hobbit/head/imu_pitch_offset: 0
-hobbit/head/have_imu: false
+hobbit/head/pitch_offset: 19
+hobbit/head/yaw_offset: -4
+hobbit/head/imu_pitch_offset: 17
+hobbit/head/have_imu: true
