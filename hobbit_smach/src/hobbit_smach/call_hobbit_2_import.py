@@ -191,8 +191,8 @@ def gesture_sm():
             )
             with container_sm:
                 def g_come_cb(event_message, ud):
-                    if event_message.event.upper() == 'G_COME':
-                         rospy.loginfo('Was G_COME! Close MMUI Prompt!')
+                    if event_message.event.upper() in ['G_COME', 'A_CLOSER']:
+                         rospy.loginfo('Was G_COME or A_CLOSER! Close MMUI Prompt!')
                          mmui = MMUI.MMUIInterface()
                          mmui.remove_last_prompt()
                          return 'succeeded'
