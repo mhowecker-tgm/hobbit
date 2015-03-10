@@ -141,6 +141,33 @@ void cLocalizationRecovery::executeCb(const hobbit_msgs::GeneralHobbitGoalConstP
 	while (n.ok())
 	{
 
+		if(as_->isPreemptRequested())
+      		{
+			std::cout << "preempt requested" << std::endl;
+			
+			if(current_motion_state.data == "Turning")
+			{
+
+				mira_msgs::EmergencyStop srv;
+				if (!emergency_stop_client.call(srv))
+				{
+				  ROS_DEBUG("Failed to call service stop_request");
+				}
+
+				sleep(5);
+
+				mira_msgs::ResetMotorStop srv2;
+				if (!reset_motorstop_client.call(srv2))
+				{
+				  ROS_DEBUG("Failed to call service reset_motorstop");
+				}
+			}
+
+			as_->setPreempted();
+			return;
+
+		}
+
 		if (finished_rotation)
 		{
 			rot_numb++;
@@ -168,33 +195,6 @@ void cLocalizationRecovery::executeCb(const hobbit_msgs::GeneralHobbitGoalConstP
 
 			}
 				
-
-		}
-
-		if(as_->isPreemptRequested())
-      		{
-			std::cout << "preempt requested" << std::endl;
-			
-			if(current_motion_state.data == "Turning")
-			{
-
-				mira_msgs::EmergencyStop srv;
-				if (!emergency_stop_client.call(srv))
-				{
-				  ROS_DEBUG("Failed to call service stop_request");
-				}
-
-				sleep(5);
-
-				mira_msgs::ResetMotorStop srv2;
-				if (!reset_motorstop_client.call(srv2))
-				{
-				  ROS_DEBUG("Failed to call service reset_motorstop");
-				}
-			}
-
-			as_->setPreempted();
-			return;
 
 		}
 
