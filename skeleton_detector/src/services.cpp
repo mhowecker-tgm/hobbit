@@ -289,6 +289,8 @@ void broadcastNewRepetition(unsigned int frameNumber,struct exerciseData * exerc
   ss<<"C_EXERCISE_REPETITION";
   msg.command=ss.str();
 
+
+
   hobbit_msgs::Parameter p;
   ss.str("");
   ss<<exercise->monotonicRepetitionNumber;
@@ -298,7 +300,10 @@ void broadcastNewRepetition(unsigned int frameNumber,struct exerciseData * exerc
   if (strlen(exercise->errorReason)!=0)
   {
    ss.str(exercise->errorReason);
-   p.value=ss.str();
+   if ( exercise->excerciseNumber == DUAL_ELBOW_BEND_SYNC_EXERCISE ) { p.value="DUAL_ELBOW_BEND_SYNC_"+ss.str(); } else
+   if ( exercise->excerciseNumber == DUAL_ELBOW_BEND_ASYNC_EXERCISE ) { p.value="DUAL_ELBOW_BEND_ASYNC_"+ss.str(); } else
+                                                                       { p.value=ss.str(); }
+
   } else
   { p.value="SUCCESS"; }
 
@@ -324,7 +329,9 @@ void broadcastNewRepetitionError(unsigned int frameNumber,struct exerciseData * 
   if (strlen(exercise->errorReason)!=0)
   {
    ss.str(exercise->errorReason);
-   p.value=ss.str();
+   if ( exercise->excerciseNumber == DUAL_ELBOW_BEND_SYNC_EXERCISE ) { p.value="DUAL_ELBOW_BEND_SYNC_"+ss.str(); } else
+   if ( exercise->excerciseNumber == DUAL_ELBOW_BEND_ASYNC_EXERCISE ) { p.value="DUAL_ELBOW_BEND_ASYNC_"+ss.str(); } else
+                                                                       { p.value=ss.str(); }
   } else
   { p.value="ERROR"; }
 
