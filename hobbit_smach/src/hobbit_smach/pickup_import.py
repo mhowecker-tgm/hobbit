@@ -388,6 +388,8 @@ class GoToFinalGraspPose(State):
     (x,y,z,vectorX, vectorY, vectorZ)
     a Pose is calculated to which the robot will then navigate. This pose has
     to be stored inside the userdata output keys.
+    If a detected object is already very near to the object, it could be that there is no mathematical solution
+    In the case the system returns a failure which is then handled in the pickup logic.
 
     input_keys:
         obj_center_rcs: point that defines the x,y-values of the object center (of graspable object) in rcs
@@ -451,73 +453,73 @@ class GoToFinalGraspPose(State):
         # and the angle for the movement to the final grasp position is s.t. the robot arrives already with the correct rotation angle
         # Therefore sine rule is applied to the triangle with points pnt_O, ud.obj_center_rcs and pnt_RG (has to be determined)
         
-    #try:        
-        # pnt_O:       
-        pnt_O = Point()
-        pnt_O.x = 0
-        pnt_O.y = 0
-        
-        # pnt_GR: define best grasp regien (right now 5cm infront and 50 cm right of robot base)       
-        pnt_GR = Point()
-        pnt_GR.x =  0.05
-        if (pnt_GR.x < 0.0):
-            print "pnt_GR.x has to be greater than 0. Act. value is: ", pnt_GR.x # rely on assumption for calculating  angle a_MX_GR
-        pnt_GR.y = -0.50
-        
-        # pnt_RG: define best grasp regien (right now 5cm infront and 50 cm right of robot base)       
-        #pnt_RG = Point()
-        
-        #distance between robot base and best grasp region        
-        d_O_GR = math.sqrt( pnt_GR.x*pnt_GR.x + pnt_GR.y*pnt_GR.y)
-        print "d_O_GR (m): ", d_O_GR
-        
-        # a_MX_GR: angle between robot minus x-axis of robot and best grasp region (calclated as 90 degrees (pi/2) plus degree of direction between -y-axis and d_O_GR
-        a_MX_GR = math.pi/2 + math.atan( pnt_GR.x/ abs(pnt_GR.y) )
-        print "a_MX_GR (rad):", a_MX_GR
-        print "a_MX_GR (grad):", a_MX_GR*180/math.pi
-        
-        # d_O_OC fix distance between robot base (initially) and object center
-        d_O_OC = math.sqrt( ud.obj_center_rcs.x*ud.obj_center_rcs.x + ud.obj_center_rcs.y*ud.obj_center_rcs.y )
-        print "d_O_OC (distance between robot base (initially) and object center in m): ", d_O_OC
-        
-        #a_OC_RG: the angle (measured from the robot origin) between the line O_OC and O_RG (sine rule on triangle O - RG - OC and transformations)
-        a_OC_RG = math.asin( d_O_GR * math.sin(a_MX_GR) / d_O_OC )
-        print "a_OC_RG: the angle (measured from the robot origin) between the line O_OC and O_RG (in rad)", a_OC_RG
-        print "a_OC_RG: the angle (measured from the robot origin) between the line O_OC and O_RG (in degree)", a_OC_RG*180/math.pi
-        
-        #a_O_RG: the angle (measured at point ud.obj_center_rcs) between line to O (origin robot base) and point RG (robot goal)
-        a_O_RG = math.pi - a_MX_GR - a_OC_RG
-        print "a_O_RG: the angle (measured at point ud.obj_center_rcs) between line to O (origin robot base) and point RG (robot goal) in rad: ", a_O_RG
-        print "a_O_RG: the angle (measured at point ud.obj_center_rcs) between line to O (origin robot base) and point RG (robot goal) in grad: ", a_O_RG*180/math.pi
-        
-        #d_O_RG: distance (to calculate) between (original position of) robot base and desired end position for robot base
-        d_O_RG = math.sin( a_O_RG ) * d_O_OC / math.sin( a_MX_GR )
-        print "d_O_RG: distance (to calculate) between (original position of) robot base and desired end position for robot base in m: ", d_O_RG
-        
-        # a_OC_MY: the fix angle (measured at origin O) between the object center (graspable object) and the negativ y-axis (normal tan calculation in triangle O-(0,abs(y))-OC
-        a_OC_MY = math.atan( ud.obj_center_rcs.x / abs(ud.obj_center_rcs.y) )
-        print "a_OC_MY: the fix angle (measured at origin O) between the object center (graspable object) and the negativ y-axis in rad: ", a_OC_MY
-        print "a_OC_MY: the fix angle (measured at origin O) between the object center (graspable object) and the negativ y-axis in grad: ", a_OC_MY*180/math.pi
-        
-        #calculate how much robot has to turn
-        turn_rad = math.pi/2 - a_OC_MY - a_OC_RG
-        #since robot has to turn right, it has to be multiplied by -1
-        turn_rad = -turn_rad
-        turn_degree = turn_rad*180/math.pi
-        print "robot has to turn by (turn_rad): ", turn_rad        
-        print "robot has to turn by (turn_degree): ", turn_degree
-        print "robot has to move by d_O_RG (m)", d_O_RG
-        
-        if not self.moveRobotRelative(turn_degree, d_O_RG):
+        try:        
+            # pnt_O:       
+            pnt_O = Point()
+            pnt_O.x = 0
+            pnt_O.y = 0
+            
+            # pnt_GR: define best grasp regien (right now 5cm infront and 50 cm right of robot base)       
+            pnt_GR = Point()
+            pnt_GR.x =  0.05
+            if (pnt_GR.x < 0.0):
+                print "pnt_GR.x has to be greater than 0. Act. value is: ", pnt_GR.x # rely on assumption for calculating  angle a_MX_GR
+            pnt_GR.y = -0.50
+            
+            # pnt_RG: define best grasp regien (right now 5cm infront and 50 cm right of robot base)       
+            #pnt_RG = Point()
+            
+            #distance between robot base and best grasp region        
+            d_O_GR = math.sqrt( pnt_GR.x*pnt_GR.x + pnt_GR.y*pnt_GR.y)
+            print "d_O_GR (m): ", d_O_GR
+            
+            # a_MX_GR: angle between robot minus x-axis of robot and best grasp region (calclated as 90 degrees (pi/2) plus degree of direction between -y-axis and d_O_GR
+            a_MX_GR = math.pi/2 + math.atan( pnt_GR.x/ abs(pnt_GR.y) )
+            print "a_MX_GR (rad):", a_MX_GR
+            print "a_MX_GR (grad):", a_MX_GR*180/math.pi
+            
+            # d_O_OC fix distance between robot base (initially) and object center
+            d_O_OC = math.sqrt( ud.obj_center_rcs.x*ud.obj_center_rcs.x + ud.obj_center_rcs.y*ud.obj_center_rcs.y )
+            print "d_O_OC (distance between robot base (initially) and object center in m): ", d_O_OC
+            
+            #a_OC_RG: the angle (measured from the robot origin) between the line O_OC and O_RG (sine rule on triangle O - RG - OC and transformations)
+            a_OC_RG = math.asin( d_O_GR * math.sin(a_MX_GR) / d_O_OC )
+            print "a_OC_RG: the angle (measured from the robot origin) between the line O_OC and O_RG (in rad)", a_OC_RG
+            print "a_OC_RG: the angle (measured from the robot origin) between the line O_OC and O_RG (in degree)", a_OC_RG*180/math.pi
+            
+            #a_O_RG: the angle (measured at point ud.obj_center_rcs) between line to O (origin robot base) and point RG (robot goal)
+            a_O_RG = math.pi - a_MX_GR - a_OC_RG
+            print "a_O_RG: the angle (measured at point ud.obj_center_rcs) between line to O (origin robot base) and point RG (robot goal) in rad: ", a_O_RG
+            print "a_O_RG: the angle (measured at point ud.obj_center_rcs) between line to O (origin robot base) and point RG (robot goal) in grad: ", a_O_RG*180/math.pi
+            
+            #d_O_RG: distance (to calculate) between (original position of) robot base and desired end position for robot base
+            d_O_RG = math.sin( a_O_RG ) * d_O_OC / math.sin( a_MX_GR )
+            print "d_O_RG: distance (to calculate) between (original position of) robot base and desired end position for robot base in m: ", d_O_RG
+            
+            # a_OC_MY: the fix angle (measured at origin O) between the object center (graspable object) and the negativ y-axis (normal tan calculation in triangle O-(0,abs(y))-OC
+            a_OC_MY = math.atan( ud.obj_center_rcs.x / abs(ud.obj_center_rcs.y) )
+            print "a_OC_MY: the fix angle (measured at origin O) between the object center (graspable object) and the negativ y-axis in rad: ", a_OC_MY
+            print "a_OC_MY: the fix angle (measured at origin O) between the object center (graspable object) and the negativ y-axis in grad: ", a_OC_MY*180/math.pi
+            
+            #calculate how much robot has to turn
+            turn_rad = math.pi/2 - a_OC_MY - a_OC_RG
+            #since robot has to turn right, it has to be multiplied by -1
+            turn_rad = -turn_rad
+            turn_degree = turn_rad*180/math.pi
+            print "robot has to turn by (turn_rad): ", turn_rad        
+            print "robot has to turn by (turn_degree): ", turn_degree
+            print "robot has to move by d_O_RG (m)", d_O_RG
+            
+            if not self.moveRobotRelative(turn_degree, d_O_RG):
+                return 'aborted'
+            
+    
+    
+            return 'succeeded'
+    
+        except:
+            print "===> GoToFinalGraspPose: Error "
             return 'aborted'
-        
-
-
-        return 'succeeded'
-
-    #except:
-    #    print "===> GoToFinalGraspPose: Error "
-    #    return 'aborted'
 
     def moveRobotRelative(self, turn_degree, distance_m):
         #turns the robot, then moves the robot to perfect grasp position

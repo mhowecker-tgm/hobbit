@@ -257,6 +257,13 @@ class ArmActionServerROS(object):
             self._feedback.feedback.data = str(feedback)
             print "ArmActionServer, feedback: ", self._feedback.feedback.data
             self._result.result = Bool(feedback[1]=='COMMAND_OK')
+        #df: new 10.3.2015   
+        elif cmd == 'SetShutdown':      #shuts down PLC!!
+            feedback = self.ArmClient.SetShutdown()
+            self._feedback.feedback.data = str(feedback)
+            print "ArmActionServer, feedback: ", self._feedback.feedback.data
+            self._result.result = Bool(feedback[1]=='COMMAND_OK')
+        #df end
         elif cmd == 'SetAbsolutePos':
             feedback = self.ArmClient.SetAbsolutePos(float(input[1]),float(input[2]),float(input[3]),float(input[4]),float(input[5]),float(input[6])) #(90, 0, 50, 0, 110, 0)
             self._feedback.feedback.data = str(feedback)
@@ -503,6 +510,8 @@ class ArmActionServerROS(object):
             print self.ArmClient.SetResetArm()
         elif cmd == 'SetStopArmMove':
             print self.ArmClient.SetStopArmMove()
+        elif cmd == 'SetShutdown':
+            print self.ArmClient.SetShutdown()
         elif cmd == 'SetAbsolutePos':
             print self.ArmClient.SetAbsolutePos(float(input[1]),float(input[2]),float(input[3]),float(input[4]),float(input[5]),float(input[6])) #(90, 0, 50, 0, 110, 0)
         elif cmd == 'SetStartMove':
@@ -571,6 +580,7 @@ class ArmActionServerROS(object):
         print 'SetCloseGripper'
         print 'SetResetArm'
         print 'SetStopArmMove'
+        print 'SetShutdown'
         print 'SetAbsolutePos p1 p2 p3 p4 p5 p6'
         print 'SetStartMove v1'
         print '\nFor Interpolation Mode:  '
