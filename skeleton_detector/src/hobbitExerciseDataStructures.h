@@ -8,43 +8,48 @@ extern "C"
 
 
 static const char * exerciseNames[] =
-{
- "None",
- "-",
- "Left Flap",
- "Left Double Flap",
- "-",
- "-",
- "Right Flap",
- "Right Double Flap",
- "-",
- "-" ,
- "Dual Flap",
- "Dual Elbow Bend",
- "-"
+{ 
+  "None", // No exercise
+  "-" ,
+  "Left Pump",
+  "Left Flap",
+  "Left Elbow Bend",
+  "-" ,
+  //-----------------------
+  "-",
+  "Right Pump",
+  "Right Flap",
+  "Right Elbow Bend",
+  "-" ,
+  //-----------------------
+  "-",
+  "Dual Flap" ,
+  "Dual Elbow Bend Synchronous",
+  "Dual Elbow Bend Asynchronous",
+  "-" 
 };
 
 
 static const char * exercisePrefix[] =
-{
- "",  
- "",
- "LEFT_ARMPUMP",
- "LEFT_MONOFLAP",
- "LEFT_ELBOWBEND",
+{ 
+  "", // No exercise
+  "" ,
+  "LEFT_ARMPUMP",
+  "LEFT_MONOFLAP",
+  "LEFT_ELBOW_BEND",
   "" ,
   //-----------------------
   "",
   "RIGHT_ARMPUMP",
   "RIGHT_MONOFLAP",
-  "RIGHT_ELBOWBEND",
+  "RIGHT_ELBOW_BEND",
   "" ,
   //-----------------------
   "",
-  "DUALFLAP",
-  "DUALELBOWBEND",
-  "DUALELBOWBEND", 
-  ""
+  "DUALFLAP" ,
+  "DUALELBOWBEND_SYNC",
+  "DUALELBOWBEND_ASYNC",
+  "" 
 };
 
 enum excerciseEnumerator
