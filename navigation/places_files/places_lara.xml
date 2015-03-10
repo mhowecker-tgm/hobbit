@@ -16,6 +16,12 @@
         <objects/>
       </place>
       <place>
+        <name>fitness</name>
+        <type>goTo</type>
+        <pose y="-1.918836" x="0.843679" theta="-0.085574"/>
+        <objects/>
+      </place>
+      <place>
         <name>call4</name>
         <type>call_button_4</type>
         <pose y="-3.066435" x="1.054919" theta="0.224285"/>
@@ -28,8 +34,14 @@
         <objects/>
       </place>
       <place>
-        <name>goTo</name>
-        <type>chair</type>
+        <name>sofa</name>
+        <type>goTo</type>
+        <pose y="-0.234732" x="1.808063" theta="1.372537"/>
+        <objects/>
+      </place>
+      <place>
+        <name>chair</name>
+        <type>goTo</type>
         <pose y="-3.066435" x="1.054919" theta="0.224285"/>
         <objects/>
       </place>
@@ -41,10 +53,11 @@
           <object name="Häferl" probability="1.0"/>
         </objects>
       </place>
-	<place>
+      <place>
         <name>small_cupboard</name>
         <type>goTo</type>
         <pose y="0.191048" x="-0.848747" theta="1.494886"/>
+        <objects/>
       </place>
       <place>
         <name>dock</name>
@@ -66,7 +79,7 @@
       <place>
         <name>center</name>
         <type>goTo</type>
-        <pose y="-1.04" x="5.57" theta="0.0"/>
+        <pose y="-1.04" x="4.3" theta="0.0"/>
         <objects/>
       </place>
     </places>
