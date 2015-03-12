@@ -118,8 +118,6 @@ void cLocalizationMonitor::open(ros::NodeHandle & n)
 
 	deactivate_recovery_service = n.advertiseService("/deactivate_recovery", &cLocalizationMonitor::activateRecovery, this);
 
-	clear_loc_monitor_service = n.advertiseService("/clear_loc_monitor", &cLocalizationMonitor::activateRecovery, this);
-
 	this->callback_queue_thread_ = boost::thread(boost::bind(&cLocalizationMonitor::QueueThread, this));
 	
 
@@ -728,12 +726,6 @@ void cLocalizationMonitor::battery_state_callback(const mira_msgs::BatteryState:
 
   is_charging = charging;
     
-}
-
-bool cLocalizationMonitor::clearLocMonitor(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res)
-{
-	check_results.clear();	
-	return true;
 }
 
 bool cLocalizationMonitor::activateRecovery(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res)
