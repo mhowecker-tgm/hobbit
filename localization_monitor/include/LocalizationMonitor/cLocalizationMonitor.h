@@ -130,6 +130,9 @@ private:
 
   ros::ServiceServer deactivate_recovery_service;
   bool deactivateRecovery(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res);
+
+  ros::ServiceServer clear_loc_monitor_service;
+  bool clearLocMonitor(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res);
   
   ros::ServiceClient check_goal_client;
   ros::ServiceClient cancel_nav_goal_client;

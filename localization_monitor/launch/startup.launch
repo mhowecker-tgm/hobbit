@@ -11,10 +11,10 @@
 	<param name="dis_thres" value="0.2"/>
 
   	<param name="dis_thres_check" value="3.5"/> #distance to be covered between localization checks
-	<param name="rate_thres" value="0.65"/>	#rate of succesful localization results between localization checks
+	<param name="rate_thres" value="0.6"/>	#rate of succesful localization results between localization checks
 
 	<param name="method" value="1"/>
-	<param name="checks_num" value="10"/>
+	<param name="checks_num" value="30"/>
 
 	<param name="activate_recovery" value="false"/>
 
