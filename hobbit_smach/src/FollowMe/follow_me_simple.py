@@ -25,7 +25,16 @@ from smach_ros import IntrospectionServer, ActionServerWrapper, MonitorState, Si
 from hobbit_msgs.msg import GeneralHobbitAction, FollowMeAction, FollowMeGoal
 import hobbit_smach.logging_import as log
 import hobbit_smach.hobbit_move_import as hobbit_move
+from mira_msgs.srv import UserNavMode, ObsNavMode
+from hobbit_msgs.srv import SwitchVision, SwitchVisionRequest
 
+
+def switch_vision_cb(ud, response):
+    if response.result:
+        rospy.loginfo('switch vision reported: '+str(response.result))
+        return 'succeeded'
+    else:
+        return 'aborted'
 
 class Init(smach.State):
     """
@@ -127,6 +136,24 @@ def main():
             transitions={'succeeded': 'ENABLE_TRACKING',
                          'preempted': 'LOG_PREEMPT',
                          'aborted': 'LOG_ABORTED'}
+        )
+        StateMachine.add_auto(
+            'PREPARE_MOVEMENT',
+            ServiceState(
+                '/obs_nav_mode',
+                ObsNavMode
+            ),
+            connector_outcomes=['succeeded', 'aborted']
+        )
+        StateMachine.add_auto(
+            'SWITCH_VISION',
+            ServiceState(
+                '/vision_system/navigating',
+                SwitchVision,
+                request=SwitchVisionRequest(dummyInput=True),
+                response_cb=switch_vision_cb
+            ),
+            connector_outcomes=['succeeded', 'aborted']
         )
         StateMachine.add_auto(
             'ENABLE_TRACKING',
