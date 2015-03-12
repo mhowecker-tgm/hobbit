@@ -30,7 +30,7 @@ new_params = None
 commands = [
     ['emergency', 'G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP',
      'G_HELP', 'A_HELP', 'C_HELP', 'F_CALLSOS', 'G_EMERGENCY'],
-    ['recharge', 'E_RECHARGE', 'C_RECHARGE'],
+    ['recharge', 'E_RECHARGE', 'C_RECHARGE', 'A_Recharge'],
     ['reminder', 'E_REMINDER'],
     ['stop', 'C_STOP', 'G_STOP', 'E_STOP', 'A_STOP', 'E_CANCEL', 'P_E_CANCEL'], #'E_FITNESS_CLOSED'],
     ['call_hobbit', 'C_CALLHOBBIT', 'E_CALLHOBBIT'],
@@ -41,8 +41,8 @@ commands = [
     ['pickup', 'follow', 'learn_object', 'bring_object', 'goto', 'pickup',
      'C_PICKUP', 'C_FOLLOW', 'C_LEARN', 'C_BRING', 'C_GOTOPOINT', 'G_POINTING'],
     ['patrol', 'E_PATROL'],
-    ['surprise', 'C_SURPRISE'],
-    ['reward', 'C_REWARD', 'G_REWARD'],
+    ['surprise', 'C_SURPRISE', 'A_Surprise'],
+    ['reward', 'C_REWARD', 'G_REWARD', 'A_welldone'],
     ['social_role', 'E_SOCIALROLE'],
     ['master_reset', 'C_MASTER_RESET'],
     ['fitness', 'B_FITNESS']
