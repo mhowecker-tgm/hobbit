@@ -757,7 +757,7 @@ def main():
         StateMachine.add(
             'SURPRISE',
             social_role.get_surprise(),
-            transitions={'succeeded': 'MAIN_MENU',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
