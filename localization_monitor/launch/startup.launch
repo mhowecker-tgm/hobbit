@@ -3,7 +3,7 @@
 
 	<param name="uncertainty_thres" value="0.15"/>
 	<param name="score_thres" value="0.3"/> #depends on dynamic nature of the environment and quality of map
-	<param name="inflation_thres" value="0.2"/> #depends on accepted localization accuracy
+	<param name="inflation_thres" value="0.15"/> #depends on accepted localization accuracy
 	<param name="max_lim" value="3.0"/> #sensor maximum range with acceptable accuracy
 	<param name="min_valid_points" value="20"/>
 
@@ -13,8 +13,8 @@
   	<param name="dis_thres_check" value="3.5"/> #distance to be covered between localization checks
 	<param name="rate_thres" value="0.65"/>	#rate of succesful localization results between localization checks
 
-	<param name="method" value="0"/>
-	<param name="checks_num" value="30"/>
+	<param name="method" value="1"/>
+	<param name="checks_num" value="10"/>
 
 	<param name="activate_recovery" value="false"/>
 
