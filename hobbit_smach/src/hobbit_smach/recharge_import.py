@@ -20,6 +20,15 @@ from hobbit_user_interaction import HobbitMMUI
 import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.logging_import as log
 
+def charge_response_cb(userdata, response):
+    print(response.response)
+    rospy.loginfo("userdata counter: "+str(userdata.counter))
+    userdata.counter = 0
+    rospy.loginfo("userdata counter2: "+str(userdata.counter))
+    if response.response:
+        return 'succeeded'
+    else:
+        return 'aborted'
 
 def battery_cb(msg, ud):
     print('Received battery_state message')
@@ -99,17 +108,27 @@ def getRecharge():
             transitions={'aborted': 'LOG_ABORT',
                          'preempted': 'LOG_PREEMPT'}
         )
+        Sequence.add(
+            'CHECK_IF_CHARGING_ALREADY',
+            ServiceState('/hobbit/charge_check',
+                         ChargeCheck,
+                         response_cb=charge_response_cb,input_keys=['counter'],output_keys=['counter']
+            ),
+            transitions={'succeeded': 'LOG_SUCCESS',
+                         'aborted': 'SAY_TIRED',
+                         'preempted': 'LOG_PREEMPT'}
+        )
+        Sequence.add(
+            'SAY_TIRED',
+            speech_output.emo_say_something(
+                emo='TIRED',
+                time=0,
+                text='T_CH_MovingToChargingStation'
+            ),
+            transitions={'aborted': 'LOG_ABORT',
+                         'preempted': 'LOG_PREEMPT'}
+        )
         if not DEBUG:
-            Sequence.add(
-                'SAY_TIRED',
-                speech_output.emo_say_something(
-                    emo='TIRED',
-                    time=0,
-                    text='T_CH_MovingToChargingStation'
-                ),
-                transitions={'aborted': 'LOG_ABORT',
-                             'preempted': 'LOG_PREEMPT'}
-            )
             Sequence.add(
                 'SET_NAV_GOAL',
                 hobbit_move.SetNavGoal(room='dock', place='dock'),
@@ -315,17 +334,6 @@ class FirstSecondThird(State):
         else:
             ud.counter = 0
             return 'aborted'
-
-
-def charge_response_cb(userdata, response):
-    print(response.response)
-    rospy.loginfo("userdata counter: "+str(userdata.counter))
-    userdata.counter = 0
-    rospy.loginfo("userdata counter2: "+str(userdata.counter))
-    if response.response:
-        return 'succeeded'
-    else:
-        return 'aborted'
 
 
 def startDockProcedure():
