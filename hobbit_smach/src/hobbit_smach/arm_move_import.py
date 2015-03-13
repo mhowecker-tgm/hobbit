@@ -84,6 +84,23 @@ def getArmAtPosition(position='home'):
     return False
 
 
+class DoArmStop(State):
+    """
+    Stop the arm immediately. This state can not be preempted, as the stop command needs to be executable without
+    exception
+    """
+    def __init__(self):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'aborted']
+        )
+
+    def execute(self, ud):
+        rospy.loginfo('Full stop of arm movement')
+        if arm_client.SetStopArmMove():
+            return 'succeeded'
+        return 'aborted'
+
 class SetMoveToLearning(State):
     """
     Move the arm to the turntable, grasp it and move to the Learning position.

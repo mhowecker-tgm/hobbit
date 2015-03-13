@@ -8,6 +8,7 @@ from hobbit_user_interaction import HobbitMMUI
 import hobbit_smach.hobbit_move_import as hobbit_move
 import hobbit_smach.logging_import as log
 import hobbit_smach.speech_output_import as speech_output
+import hobbit_smach.arm_move_import as arm_move
 from uashh_smach.util import SleepState
 
 
@@ -77,7 +78,14 @@ def get_hobbit_full_stop():
     with seq:
         Sequence.add(
             'STOP_MOVEMENT',
-            hobbit_move.get_full_stop()
+            hobbit_move.get_full_stop(),
+            transitions={'aborted': 'SAY_FULL_STOP'}
+        )
+        )
+        Sequence.add(
+            'STOP_ARM',
+            arm_move.DoArmStop(),
+            transitions={'aborted': 'SAY_FULL_STOP'}
         )
         Sequence.add(
             'SAY_FULL_STOP',
