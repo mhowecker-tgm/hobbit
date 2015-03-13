@@ -5,15 +5,15 @@ PKG = 'hobbit_smach'
 NAME = 'ArmMove'
 DEBUG = False
 
-import roslib
-roslib.load_manifest(PKG)
 import rospy
 
-from smach import Sequence, State
+from smach import Sequence, State, StateMachine
 from uashh_smach.util import SleepState
 from ArmControllerClientFunctions import ArmClientFunctions
 from ArmClientFunctionsPublisher import ArmClientFunctionsPublisher
 from ArmActionClient import ArmActionClient
+from hobbit_user_interaction import HobbitMMUI
+
 
 import actionlib
 import hobbit_msgs.msg
@@ -122,7 +122,6 @@ class SetMoveToLearning(State):
         else:
             return 'failed'
 
-
 class StoreTurntable(State):
     """
     """
@@ -142,7 +141,6 @@ class StoreTurntable(State):
             return 'succeeded'
         else:
             return 'failed'
-
 
 class CheckArmAtHomePos(State):
     """
@@ -173,7 +171,6 @@ class CheckArmAtHomePos(State):
         else:
             return 'aborted'
 
-
 class CheckArmReachedKnownPosition(State):
     """
     Check that the Arm has reached the specified predefined position.
@@ -197,7 +194,6 @@ class CheckArmReachedKnownPosition(State):
         else:
             return 'failed'
 
-
 class CheckArmIsNotMoving(State):
     """
     Check that the Arm has stopped the movement.
@@ -218,7 +214,6 @@ class CheckArmIsNotMoving(State):
             return 'failed'
         else:
             return 'succeeded'
-
 
 class SetArmPosition(State):
     """
@@ -270,7 +265,6 @@ class SetArmPosition(State):
         #else:
         #    return 'failed'
 
-
 def goToPreGraspPosition():
     """
     Return a SMACH Sequence that will move the arm to pregrasp position.
@@ -309,7 +303,6 @@ def goToPreGraspPositionManually(): #move via joint values, directly from whatev
                      transitions={'failed': 'CHECK_ARM_IS_NOT_MOVING'})
     return seq
 
-
 #df new 5.2.2015
 def goToCheckGraspPosition():
     """
@@ -327,11 +320,6 @@ def goToCheckGraspPosition():
         Sequence.add('CHECK_ARM_IS_NOT_MOVING', CheckArmIsNotMoving(),
                      transitions={'failed': 'CHECK_ARM_IS_NOT_MOVING'})
     return seq
-
-
-
-
-
 
 def goToTrayPosition():
     """
@@ -353,7 +341,6 @@ def goToTrayPosition():
                      transitions={'failed': 'CHECK_ARM_IS_NOT_MOVING'})
     return seq
 
-
 def moveToCW():
     """
     Return a SMACH Sequence that will return the turntable after the learning.
@@ -372,7 +359,6 @@ def moveToCW():
                      transitions={'failed': 'ARM_POSE_REACHED'})
         Sequence.add('CHECK_ARM_IS_NOT_MOVING', CheckArmIsNotMoving(),
                      transitions={'failed': 'CHECK_ARM_IS_NOT_MOVING'})
-
 
 def returnTurnTable():
     """
@@ -393,7 +379,6 @@ def returnTurnTable():
         Sequence.add('CHECK_TT_IS_NOT_MOVING', CheckArmIsNotMoving(),
                      transitions={'failed': 'CHECK_TT_IS_NOT_MOVING'})
     return seq
-
 
 def goToLearnPosition():
     """
@@ -422,7 +407,6 @@ def goToLearnPosition():
         #             transitions={'failed': 'CHECK_TT_IS_NOT_MOVING'})
     return seq
 
-
 def goToHomePosition():
     """
     Return a SMACH Sequence that will move the arm to the home pose.
@@ -443,7 +427,6 @@ def goToHomePosition():
                      transitions={'failed': 'MOVE_ARM_TO_HOME'})
 
     return seq
-
 
 def rotateToCW():
     """
@@ -466,7 +449,6 @@ def rotateToCW():
                      transitions={'failed': 'CHECK_TT_IS_NOT_MOVING'})
     return seq
 
-
 def rotateToCCW():
     """
     Return a SMACH Sequence that will move the arm to the learning pose.
@@ -486,3 +468,38 @@ def rotateToCCW():
         Sequence.add('CHECK_TT_IS_NOT_MOVING', CheckArmIsNotMoving(),
                      transitions={'failed': 'CHECK_TT_IS_NOT_MOVING'})
     return seq
+
+def check_and_inform_about_arm_not_referenced_or_at_home():
+    """
+    check if the arm is at home. this will also fail if the arm is not referenced
+
+    :return: succeeded, aborted, preempted
+    """
+    sm = StateMachine(outcomes=['succeeded', 'aborted', 'preempted'])
+    with sm:
+        StateMachine.add(
+            'CHECK_ARM',
+            CheckArmAtHomePos(),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'TELL_USER'}
+        )
+        StateMachine.add(
+            'TELL_USER',
+            HobbitMMUI.ConfirmOk(text='The arm is not in home position. Please make sure that there is enough free'
+                                      'space to move the arm and the turntable back. Press ok when ready.'),
+            transitions={'succeeded': 'RETURN_ARM',
+                         'timeout': 'TELL_USER',
+                         '3times': 'aborted',
+                         'preempted': 'preempted'}
+        )
+        #The success of RETURN_ARM will loop back to CHECK_ARM to make sure that only if the arm is confirmed to be
+        # home position this method will report succeeded
+        StateMachine.add(
+            'RETURN_ARM',
+            #TODO: Confirm this is the correct way to bring back the turntable and the arm if necessary
+            goToHomePosition(),
+            transitions={'succeeded': 'CHECK_ARM',
+                         'failed': 'aborted',
+                         'preempted': 'preempted'}
+        )
+    return sm
