@@ -436,7 +436,9 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
 
   if (doCalculations>0) { --doCalculations; }
   if (fallDetectionContext.headLookingDirection!=HEAD_LOOKING_DOWN)
-    { fprintf(stderr,RED "\n\n  Not Looking Down , Thermometer will never pick up the floor\n\n" NORMAL ); }
+  {
+    fprintf(stderr,YELLOW "\n\n  Head Not Looking Down , Only doing active user falling check \n\n" NORMAL );
+  }
      else
   if ( temperatureSensorSensesHuman( temperatureObjectDetected ,  tempTimestamp , frameTimestamp) )
   //if ( (minHumanTemperature<temperatureObjectDetected) && (temperatureObjectDetected<maxHumanTemperature) && (temperatureFrameOffset < maximumFrameDifferenceForTemperatureToBeRelevant )  )
