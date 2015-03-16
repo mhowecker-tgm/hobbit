@@ -78,12 +78,23 @@ unsigned int pageLength=0;
 
 //----------------------------------------------------------
 //Advertised Service switches
+unsigned int baseCameraIsOk=0;
+
+
 bool terminate(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
     ROS_INFO("Stopping Web Interface");
     stopWebInterface=1;
     return true;
 }
+
+
+bool baseCamIsOk(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    baseCameraIsOk=1;
+    return true;
+}
+
 
 //The deceleration of some dynamic content resources..
 struct AmmServer_Instance  * default_server=0;
@@ -252,6 +263,18 @@ int addServiceCheck(char * mem, char * label , char * processName )
 }
 
 
+int addBoolCheck(char * mem , char * label , unsigned int boolVal)
+{
+  strcat(mem,"<tr><td>");
+  strcat(mem,label);
+  strcat(mem,"</td><td>");
+  if (boolVal)  { strcat(mem,"<img src=\"statusOk.png\" height=15>"); } else
+                { strcat(mem,"<img src=\"statusFailed.png\" height=15>"); }
+  strcat(mem,"</td></tr>");
+
+  return 1;
+}
+
 
 int addScreenCheck(char * mem, char * label , char * processName )
 {
@@ -346,7 +369,9 @@ void * prepare_stats_content_callback(struct AmmServer_DynamicRequest  * rqst)
   strcat(statusControl, (char*) "<center><table>");
    addHeadRPICheck(statusControl , (char*) "Head ");
    addServiceCheck(statusControl , (char*) "RGBDAcquisition"      , (char*)  "rgbd" );
-   addScreenCheck (statusControl , (char*) "Base Camera"          , (char*)  "basecam" );
+   //addScreenCheck (statusControl , (char*) "Base Camera"          , (char*)  "basecam" );
+   addBoolCheck (statusControl , (char*) "Base Camera"            , baseCameraIsOk );
+
    addServiceCheck(statusControl , (char*)  "Skeleton Detector"   , (char*)  "skeleton" );
    //addServiceCheck(statusControl , (char*)  "Hand Gestures"       , (char*)  "hand" ); -- Hand Gestures are deprecated
    //addServiceCheck(statusControl , (char*)  "Face Detection"      , (char*)  "face_det" ); -- Face Detection is deprecated
@@ -1142,7 +1167,6 @@ void close_dynamic_content()
 
 
 
-
 int main(int argc, char **argv)
 {
    ROS_INFO("Starting Up!!");
@@ -1161,7 +1185,9 @@ int main(int argc, char **argv)
      nhPtr = &nh;
 
      //We advertise the services we want accessible using "rosservice call *w/e*"
-     ros::ServiceServer stopWebService     = nh.advertiseService("web_interface/terminate", terminate);
+     ros::ServiceServer stopWebService             = nh.advertiseService("web_interface/terminate", terminate);
+     ros::ServiceServer signalBaseCamOkService     = nh.advertiseService("web_interface/signalBaseCamIsOk", baseCamIsOk);
+
 
      ros::Rate loop_rate(1); //  1hz should be our target spin time
 

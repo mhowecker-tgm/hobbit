@@ -104,6 +104,7 @@ char curDir[]="../../web_interface/bin/emergencies/";
 bool first=false;
 int key = 0;
 unsigned int frameTimestamp=emergencyDetectionCooldown+1; //not 0 so we can immediately trigger
+unsigned int receivedBaseImages=0;
 ros::NodeHandle * nhPtr=0;
 unsigned int paused=0;
 unsigned int dontPublishPersons=0;
@@ -621,6 +622,16 @@ void rgbdCallbackTop(const sensor_msgs::Image::ConstPtr rgb_img_msg,
 void rgbdCallbackBottom(const sensor_msgs::Image::ConstPtr rgb_img_msg,
                         const sensor_msgs::Image::ConstPtr depth_img_msg )
 {
+  ++receivedBaseImages;
+
+  if ( (receivedBaseImages==1) || ( (receivedBaseImages>0) && (receivedBaseImages%1000==0) ) )
+  {
+    char commandToRun[512]={0};
+    snprintf(commandToRun,512,"/bin/bash -c \"rosservice call /web_interface/signalBaseCamIsOk\"");
+    int i=system(commandToRun);
+    fprintf(stderr,"Signaling to web interface that basecam is receiving input..!\n");
+  }
+
  rgbdCallbackNoCalibrationBoth(1,rgb_img_msg,depth_img_msg);
 }
 
