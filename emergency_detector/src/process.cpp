@@ -31,7 +31,7 @@
 #if USE_HOBBIT_MAP_DATA
   #include "hobbit_msgs/GetOccupancyState.h"
     ros::ServiceClient mapSubscriber;
-    unsigned int consultHobbitMap=1;
+    unsigned int consultHobbitMap=0;
 #else
     unsigned int consultHobbitMap=0;
 #endif // USE_HOBBIT_MAP_DATA
@@ -321,7 +321,7 @@ unsigned int mapSaysThatWhatWeAreLookingAtPossibleFallenUser(unsigned int frameT
 	   obstacleChecks[2] = obstacleDetected(req,res);
 	   totalObstacleChecks += obstacleChecks[2];
 
-       fprintf(stderr,"Got %u obstacles from map! \n",totalObstacleChecks);
+       fprintf(stderr,"\nGot %u obstacles from map! \n",totalObstacleChecks);
    #endif // USE_HOBBIT_MAP_DATA
 
   return (totalObstacleChecks>0);
