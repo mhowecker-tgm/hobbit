@@ -340,6 +340,45 @@ int mapSaysThatWeMaybeLookingAtFallenUser(unsigned int frameTimestamp)
 }
 
 
+
+
+int weDetectAStandingPersonUsingTemperatureSensor(unsigned short * depthFrame  , unsigned int depthWidth , unsigned int depthHeight ,
+                                               void * calib ,
+                                               unsigned int frameTimestamp )
+{
+  //Contemplate about emitting a Person message ( not an emergency )
+  if ( temperatureSensorSensesHuman( temperatureObjectDetected ,  tempTimestamp , frameTimestamp) )
+     {
+       unsigned int x2d = (unsigned int) depthWidth/2;
+       unsigned int y2d = (unsigned int) depthHeight/2;
+       unsigned short * depthValue = depthFrame + (y2d * depthWidth + x2d );
+
+       struct calibration calibSpontaneous;
+       NullCalibration(depthWidth,depthHeight,&calibSpontaneous);
+       struct calibration * calibSelected = (struct calibration * ) calib;
+       if (calibSelected==0) { calibSelected=&calibSpontaneous; }
+       if (transform2DProjectedPointTo3DPoint( calibSelected,
+                                               x2d,
+                                               y2d,
+                                                *depthValue ,
+                                               &temperatureX ,
+                                               &temperatureY ,
+                                               &temperatureZ
+                                              )
+           )
+            {
+               if (temperatureZ==0)    { fprintf(stderr,YELLOW "Will not emit person message because we don't have a depth\n" NORMAL); } else
+               if (temperatureZ<=2500) { return 1; } else
+                                       { fprintf(stderr,YELLOW "Will not emit person message because skeleton is too far (%0.2f mm) to trust thermometer\n" NORMAL,temperatureZ); }
+            }
+     }
+   return 0;
+}
+
+
+
+
+
 int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int colorWidth , unsigned int colorHeight ,
                                        unsigned short * depthFrame  , unsigned int depthWidth , unsigned int depthHeight ,
                                         void * calib ,
@@ -387,32 +426,10 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
    }
 
 
-     //Contemplate about emitting a Person message ( not an emergency )
-     if ( temperatureSensorSensesHuman( temperatureObjectDetected ,  tempTimestamp , frameTimestamp) )
-     {
-       unsigned int x2d = (unsigned int) depthWidth/2;
-       unsigned int y2d = (unsigned int) depthHeight/2;
-       unsigned short * depthValue = depthFrame + (y2d * depthWidth + x2d );
-
-       struct calibration calibSpontaneous;
-       NullCalibration(depthWidth,depthHeight,&calibSpontaneous);
-       struct calibration * calibSelected = (struct calibration * ) calib;
-       if (calibSelected==0) { calibSelected=&calibSpontaneous; }
-       if (transform2DProjectedPointTo3DPoint( calibSelected,
-                                               x2d,
-                                               y2d,
-                                                *depthValue ,
-                                               &temperatureX ,
-                                               &temperatureY ,
-                                               &temperatureZ
-                                              )
-           )
-            {
-               if (temperatureZ==0)    { fprintf(stderr,YELLOW "Will not emit person message because we don't have a depth\n" NORMAL); } else
-               if (temperatureZ<=2500) { personDetected=1; } else
-                                       { fprintf(stderr,YELLOW "Will not emit person message because skeleton is too far (%0.2f mm) to trust thermometer\n" NORMAL,temperatureZ); }
-            }
-     }
+   if ( weDetectAStandingPersonUsingTemperatureSensor( depthFrame  , depthWidth , depthHeight , calib  , frameTimestamp) )
+    {
+      personDetected=1;
+    }
 
 
   }
