@@ -740,6 +740,8 @@ bool cLocalizationMonitor::deactivateRecovery(std_srvs::Empty::Request  &req, st
 {
 	if (activate_recovery)
 		apply_action = false;
+
+	check_results.clear();
 	return false;
 }
 
