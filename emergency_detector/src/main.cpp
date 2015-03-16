@@ -611,7 +611,16 @@ void rgbdCallbackNoCalibrationBoth(unsigned int cameraID,
 }
 
 
-
+int tellWebInterfaceAboutBottomCamera()
+{
+ if ( (receivedBaseImages==1) || ( (receivedBaseImages>0) && (receivedBaseImages%2000==0) ) )
+  {
+    char commandToRun[512]={0};
+    snprintf(commandToRun,512,"/bin/bash -c \"rosservice call /web_interface/signalBaseCamIsOk\"");
+    int i=system(commandToRun);
+    fprintf(stderr,"Signaling to web interface that basecam is receiving input..!\n");
+  }
+}
 
 void rgbdCallbackTop(const sensor_msgs::Image::ConstPtr rgb_img_msg,
                         const sensor_msgs::Image::ConstPtr depth_img_msg )
@@ -623,16 +632,8 @@ void rgbdCallbackBottom(const sensor_msgs::Image::ConstPtr rgb_img_msg,
                         const sensor_msgs::Image::ConstPtr depth_img_msg )
 {
   ++receivedBaseImages;
-
-  if ( (receivedBaseImages==1) || ( (receivedBaseImages>0) && (receivedBaseImages%1000==0) ) )
-  {
-    char commandToRun[512]={0};
-    snprintf(commandToRun,512,"/bin/bash -c \"rosservice call /web_interface/signalBaseCamIsOk\"");
-    int i=system(commandToRun);
-    fprintf(stderr,"Signaling to web interface that basecam is receiving input..!\n");
-  }
-
- rgbdCallbackNoCalibrationBoth(1,rgb_img_msg,depth_img_msg);
+  tellWebInterfaceAboutBottomCamera();
+  rgbdCallbackNoCalibrationBoth(1,rgb_img_msg,depth_img_msg);
 }
 
 unsigned int whichHobbitAreWe()
