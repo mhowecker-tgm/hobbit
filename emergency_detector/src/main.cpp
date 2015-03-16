@@ -57,6 +57,7 @@ ros::Publisher personBroadcaster;
 
 
 #define DEFAULT_FRAME_RATE 4
+#define HEAD_POSITION_LOOKUP_DURATION 1.5
 
 int rate=DEFAULT_FRAME_RATE;
 
@@ -460,7 +461,7 @@ int updateHeadPosition()
  try
      {
       //using /headcam_rgb_optical_frame and /base_link: , thanks David :)
-      listener.waitForTransform("/headcam_rgb_optical_frame", "/base_link", ros::Time(0), ros::Duration(1.0) );
+      listener.waitForTransform("/headcam_rgb_optical_frame", "/base_link", ros::Time(0), ros::Duration(HEAD_POSITION_LOOKUP_DURATION) );
       listener.lookupTransform("/headcam_rgb_optical_frame", "/base_link",ros::Time(0), transformS);
       //can check this with : rosrun tf tf_echo "/headcam_rgb_optical_frame" "/base_link"
 
