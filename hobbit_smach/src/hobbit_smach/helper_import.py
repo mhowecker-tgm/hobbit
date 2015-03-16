@@ -81,7 +81,6 @@ def get_hobbit_full_stop():
             hobbit_move.get_full_stop(),
             transitions={'aborted': 'SAY_FULL_STOP'}
         )
-        )
         Sequence.add(
             'STOP_ARM',
             arm_move.DoArmStop(),
