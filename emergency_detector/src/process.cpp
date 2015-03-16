@@ -28,10 +28,12 @@
 #define USE_HOBBIT_MAP_DATA 1
 
 
-
 #if USE_HOBBIT_MAP_DATA
   #include "hobbit_msgs/GetOccupancyState.h"
     ros::ServiceClient mapSubscriber;
+    unsigned int consultHobbitMap=1;
+#else
+    unsigned int consultHobbitMap=0;
 #endif // USE_HOBBIT_MAP_DATA
 
 
@@ -104,6 +106,9 @@ int saveNextTopFrame=0;
 int saveNextBottomFrame=0;
 unsigned int framesSnapped=0;
 
+unsigned int obstacleChecks[6]={0};
+unsigned int totalObstacleChecks=0;
+
 unsigned int simplePow(unsigned int base,unsigned int exp)
 {
 if (exp==0) return 1;
@@ -142,7 +147,7 @@ int saveRawImageToFile(const char * filename,unsigned char * pixels , unsigned i
    fclose(fd);
    return 1;
   }
-   fprintf(fd, "#hobbit emergency view\n");
+   fprintf(fd, "#HOBBIT_EMERGENCY_TEMPERATURE(%0.2f) OBSTACLE_CHECKS(%u,%u,%u)\n",temperatureObjectDetected,obstacleChecks[0],obstacleChecks[1],obstacleChecks[2]);
    fprintf(fd, "%d %d\n%u\n", width, height , simplePow(2 ,bitsperpixel)-1);
    float tmp_n = (float) bitsperpixel/ 8;
    tmp_n = tmp_n * width * height * channels ;
@@ -162,12 +167,6 @@ return 0;
 
 
 
-int setHobbitEMode()
-{
-    minHumanTemperature=27.5;
-    segConfDepth.planeNormalOffset=430.0;
-    segConfDepth.maxDepth=2500;
-}
 
 
 int increasePlane()
@@ -272,8 +271,8 @@ unsigned int temperatureSensorSensesHuman(unsigned int tempDetected , unsigned i
 {
  unsigned int temperatureFrameOffset = ABSDIFF(frameTimestamp,tempTimestamp);
   if (
-       (minHumanTemperature<tempDetected) &&
-       (tempDetected<maxHumanTemperature) &&
+       (minHumanTemperature<=tempDetected) &&
+       (tempDetected<=maxHumanTemperature) &&
        (temperatureFrameOffset < maximumFrameDifferenceForTemperatureToBeRelevant )
      )
     {
@@ -287,7 +286,6 @@ unsigned int temperatureSensorSensesHuman(unsigned int tempDetected , unsigned i
 #if USE_HOBBIT_MAP_DATA
 bool obstacleDetected(hobbit_msgs::GetOccupancyState::Request  &req, hobbit_msgs::GetOccupancyState::Response &res)
  {
-   fprintf(stderr,"getOccupancyState() not implemented yet\n");
    /*
     Paloma :
     So, the current implementation is like this:
@@ -301,36 +299,44 @@ bool obstacleDetected(hobbit_msgs::GetOccupancyState::Request  &req, hobbit_msgs
 #endif // USE_HOBBIT_MAP_DATA
 
 
-unsigned int mapSaysThatWhatWeAreLookingAtShouldBeFreespace(float x,float y,float z , unsigned int frameTimestamp)
+unsigned int mapSaysThatWhatWeAreLookingAtPossibleFallenUser(unsigned int frameTimestamp)
 {
-   unsigned int checks=1; // If USE_HOBBIT_MAP_DATA is not defined this function should always return 1;
+   totalObstacleChecks=1; // If USE_HOBBIT_MAP_DATA is not defined this function should always return 1;
 
    #if USE_HOBBIT_MAP_DATA
-       checks=0;
+       totalObstacleChecks=0;
        hobbit_msgs::GetOccupancyState::Request req;
        hobbit_msgs::GetOccupancyState::Response res;
 
 
        req.local_point.x = 1.0; req.local_point.y = 0; //1m mprosta sto robot
-	   checks += obstacleDetected(req,res);
+	   obstacleChecks[0] = obstacleDetected(req,res);
+	   totalObstacleChecks += obstacleChecks[0];
 
        req.local_point.x = 1.1; req.local_point.y = 0; //1,1m mprosta
-	   checks += obstacleDetected(req,res);
+	   obstacleChecks[1] = obstacleDetected(req,res);
+	   totalObstacleChecks += obstacleChecks[1];
 
        req.local_point.x = 0.9; req.local_point.y = 0; //0.9m mprosta
-	   checks += obstacleDetected(req,res);
-       fprintf(stderr,"Got %u obstacles from map! \n",checks);
+	   obstacleChecks[2] = obstacleDetected(req,res);
+	   totalObstacleChecks += obstacleChecks[2];
+
+       fprintf(stderr,"Got %u obstacles from map! \n",totalObstacleChecks);
    #endif // USE_HOBBIT_MAP_DATA
 
-  return (checks>0);
+  return (totalObstacleChecks>0);
 }
 
 
 
 int mapSaysThatWeMaybeLookingAtFallenUser(unsigned int frameTimestamp)
 {
- //  mapSaysThatWhatWeAreLookingAtShouldBeFreespace()
- return 1;
+ if (consultHobbitMap)
+   {
+    return mapSaysThatWhatWeAreLookingAtPossibleFallenUser(frameTimestamp);
+   }
+
+ return 1; // If we are not using the map we always think that we might be looking at a fallen person
 }
 
 
@@ -531,6 +537,13 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
         Scalar tempColor = Scalar ( tempColorB , tempColorG , tempColorR );
         circle(bgrMat,  centerPt , 30 , tempColor , 4, 8 , 0);
 
+        if ( temperatureSensorSensesHuman( temperatureObjectDetected ,  tempTimestamp , frameTimestamp) )
+        {
+           Scalar tempRColor = Scalar ( 0 , 0 , 255 );
+           circle(bgrMat,  centerPt , 10 , tempRColor , 4, 8 , 0);
+        }
+
+
         char rectVal[256]={0};
         int fontUsed=FONT_HERSHEY_SIMPLEX; //FONT_HERSHEY_SCRIPT_SIMPLEX;
         Point txtPosition;  txtPosition.x = pt1.x+15; txtPosition.y = pt1.y+20;
@@ -578,6 +591,16 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
         putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , color , 2 , 8 );
         txtPosition.y += 24; snprintf(rectVal,123,"Temperature : %0.2f C",temperatureObjectDetected);
         putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , color , 2 , 8 );
+
+
+        txtPosition.y += 50;
+
+
+        if (consultHobbitMap)
+        {
+          txtPosition.y += 24; snprintf(rectVal,123,"Obstacle map hits : %u ",totalObstacleChecks);
+          putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , color , 2 , 8 );
+        }
 
        if (userIsRecent(&fallDetectionContext,frameTimestamp))
        {

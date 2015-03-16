@@ -10,6 +10,7 @@ extern "C"
 {
 #endif
 
+extern unsigned int consultHobbitMap;
 
 extern unsigned int doCVOutput;
 extern unsigned int emergencyDetected;

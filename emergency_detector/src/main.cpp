@@ -306,8 +306,15 @@ bool autoPlaneSegmentation(std_srvs::Empty::Request& request, std_srvs::Empty::R
 
 bool fakeTemperature(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    if (fakeTemperatureActivated) { fakeTemperatureActivated=0; } else
-                                  { fakeTemperatureActivated=1; }
+    if (fakeTemperatureActivated) { ROS_INFO("Will use REAL temperature from now on");  fakeTemperatureActivated=0; } else
+                                  { ROS_INFO("Will use FAKE temperature from now on");  fakeTemperatureActivated=1; }
+    return true;
+}
+
+bool useMap(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    if (consultHobbitMap) {  ROS_INFO("Will NOT use hobbit map from now on"); consultHobbitMap=0; } else
+                          {  ROS_INFO("Will use hobbit map from now on"); consultHobbitMap=1; }
     return true;
 }
 
@@ -456,7 +463,7 @@ int updateHeadPosition()
      }
  catch (tf::TransformException &ex)
       {
-       ROS_ERROR("%s",ex.what());
+       ROS_ERROR("Cannot understand head position : %s",ex.what());
       }
  return 1;
 }
@@ -513,6 +520,13 @@ void rgbdCallbackNoCalibrationBoth(unsigned int cameraID,
 {
  if (paused) { return; } //If we are paused spend no time with new input
  //Using Intrinsic camera matrix for the raw (distorted) input images.
+
+ if (fakeTemperatureActivated)
+   {
+      temperatureObjectDetected= (float) maxHumanTemperature -  minHumanTemperature  / 2;
+      fprintf(stderr,"Emulating temperature %0.2f \n",temperatureObjectDetected);
+      tempTimestamp=frameTimestamp;
+   }
 
  unsigned int colorWidth = rgb_img_msg->width;   unsigned int colorHeight = rgb_img_msg->height;
  unsigned int depthWidth = depth_img_msg->width; unsigned int depthHeight = depth_img_msg->height;
@@ -708,6 +722,8 @@ int main(int argc, char **argv)
      ros::ServiceServer stopGestureRecognitionService     = nh.advertiseService(name+"/terminate", terminate);
      ros::ServiceServer triggerGestureRecognitionService     = nh.advertiseService(name+"/trigger", trigger);
      ros::ServiceServer fakeTemperatureGestureRecognitionService     = nh.advertiseService(name+"/fakeTemperature", fakeTemperature);
+     ros::ServiceServer useMapService     = nh.advertiseService(name+"/useMap", useMap);
+
      ros::ServiceServer autoPlaneSegmentationService     = nh.advertiseService(name+"/autoPlaneSegmentation", autoPlaneSegmentation);
 
      ros::ServiceServer lookUpService          = nh.advertiseService(name+"/looking_up" , lookingUp);
