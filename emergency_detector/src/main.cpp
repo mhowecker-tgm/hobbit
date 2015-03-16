@@ -319,6 +319,21 @@ bool useMap(std_srvs::Empty::Request& request, std_srvs::Empty::Response& respon
 }
 
 
+bool checkMap(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+
+    if ( mapSaysThatWhatWeAreLookingAtPossibleFallenUser(frameTimestamp) )
+    {
+       ROS_INFO("Map Indicates fallen user!");
+    } else
+    {
+       ROS_INFO("Map Indicates free space!");
+    }
+
+    return true;
+}
+
+
 int lookingUpInternal()
 {
     if (fallDetectionContext.headLookingDirection!=HEAD_LOOKING_UP)    { fprintf(stderr,"\n\nHead seems to be looking up now..!\n\n"); }
@@ -723,6 +738,8 @@ int main(int argc, char **argv)
      ros::ServiceServer triggerGestureRecognitionService     = nh.advertiseService(name+"/trigger", trigger);
      ros::ServiceServer fakeTemperatureGestureRecognitionService     = nh.advertiseService(name+"/fakeTemperature", fakeTemperature);
      ros::ServiceServer useMapService     = nh.advertiseService(name+"/useMap", useMap);
+     ros::ServiceServer checkMapService     = nh.advertiseService(name+"/checkMap", checkMap);
+
 
      ros::ServiceServer autoPlaneSegmentationService     = nh.advertiseService(name+"/autoPlaneSegmentation", autoPlaneSegmentation);
 

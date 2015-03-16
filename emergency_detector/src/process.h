@@ -52,6 +52,8 @@ int setHobbitEMode();
 int increasePlane();
 int decreasePlane();
 
+unsigned int mapSaysThatWhatWeAreLookingAtPossibleFallenUser(unsigned int frameTimestamp);
+
 int processNewTemperatureReading(float temperature);
 
 int processBoundingBox( float ctX,float ctY,float ctZ,
