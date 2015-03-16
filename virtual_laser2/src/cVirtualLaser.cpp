@@ -109,7 +109,7 @@ void cVirtualLaser::FillGrids(float *pCloud)
   //std::cout << "num " << num_elements_row << std::endl;
 ////////////////////////////////////////////////////////////////////////////////////////
 //debugging
-       pcl::PointCloud<pcl::PointXYZ> pcl_cloud;
+       /*pcl::PointCloud<pcl::PointXYZ> pcl_cloud;
 	
 	for (int x = (init_row-1)*num_elements_row; x < (end_row*num_elements_row-2); x+=4)
   	{
@@ -123,7 +123,7 @@ void cVirtualLaser::FillGrids(float *pCloud)
 
 	pcl::PointCloud<pcl::PointXYZ>::Ptr mycloudPtr (new pcl::PointCloud<pcl::PointXYZ> (pcl_cloud));
         viewer.showCloud(mycloudPtr);
-	sleep (50);
+	sleep (50);*/
   ////////////////////////////////////////////////////////////////////////////////////////
     for (int x = (init_row-1)*num_elements_row; x < (end_row*num_elements_row-2); x+=4)
     {
@@ -172,7 +172,7 @@ void cVirtualLaser::cameraCallback(const sensor_msgs::PointCloud2::ConstPtr& msg
 
 
   row_step = msg->row_step;
-  std::cout << "data size " << msg->data.size() << std::endl;
+  //std::cout << "data size " << msg->data.size() << std::endl;
 
   /*for (int i=0;i<msg->fields.size();i++)
   {
