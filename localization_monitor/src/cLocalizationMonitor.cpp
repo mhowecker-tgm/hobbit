@@ -83,17 +83,15 @@ cLocalizationMonitor::~cLocalizationMonitor()
 void cLocalizationMonitor::open(ros::NodeHandle & n)
 {
 
-
+	//////////////////////////////////////////////////////////////////////////////////////////////
+	//callbacks in different queue so that new data can be received when checking the recovery
 	ros::SubscribeOptions ops = ros::SubscribeOptions::create<geometry_msgs::PoseWithCovarianceStamped>("/amcl_pose",1, boost::bind(&cLocalizationMonitor::loc_pose_callback, this, _1),ros::VoidPtr(),&my_queue);
   	current_loc_sub = n.subscribe(ops);
-	
-        //current_loc_sub = n.subscribe<geometry_msgs::PoseWithCovarianceStamped>("/amcl_pose", 2, &cLocalizationMonitor::loc_pose_callback, this);
 
 	ros::SubscribeOptions ops2 = ros::SubscribeOptions::create<sensor_msgs::LaserScan>("/loc_scan",1, boost::bind(&cLocalizationMonitor::loc_scan_callback, this, _1),ros::VoidPtr(),&my_queue);
   	laserSubs = n.subscribe(ops2);
 
-        //laserSubs = n.subscribe<sensor_msgs::LaserScan>("loc_scan", 1, &cLocalizationMonitor::loc_scan_callback, this); 
-
+	//////////////////////////////////////////////////////////////////////////////////////////////
 
 	mileage_sub = n.subscribe<std_msgs::Float32>("/mileage", 2, &cLocalizationMonitor::mileage_callback, this);
 	
