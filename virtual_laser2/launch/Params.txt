@@ -1,6 +1,6 @@
 SlowDown=2.0
 MinRelHeight=-0.04
-MaxRelHeight=0.04
+MaxRelHeight=0.00
 MinAngle=-30.0
 MaxAngle=30.0
 DeltaAngle=0.5
