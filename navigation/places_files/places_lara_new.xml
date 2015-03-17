@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<rooms>
+	<room>
+		<name>living_room</name>
+		<vertices>
+			<vertex x="-3.799999" y="2.400000" />
+			<vertex x="-3.500000" y="-3.000000" />
+			<vertex x="2.900000" y="-2.800001" />
+			<vertex x="2.299999" y="3.400000" />
+		</vertices>
+		<places>
+			<place>
+				<name>call1</name>
+				<type>call_button_1</type>
+				<pose x="-2.254711" y="-0.799793" theta="-1.407587" />
+			</place>
+			<place>
+				<name>fitness</name>
+				<type>fitness</type>
+				<pose x="-1.262025" y="-0.728473" theta="-1.512580" />
+			</place>
+			<place>
+				<name>call2</name>
+				<type>call_button_2</type>
+				<pose x="0.124177" y="-1.175629" theta="0.012439" />
+			</place>
+			<place>
+				<name>cupboard</name>
+				<type>searchable</type>
+				<pose x="0.832168" y="1.168717" theta="0.071046" />
+			</place>
+		</places>
+	</room>
+	<room>
+		<name>corridor</name>
+		<vertices>
+			<vertex x="-3.600000" y="-3.100000" />
+			<vertex x="-3.600000" y="-5.300001" />
+			<vertex x="0.799999" y="-5.300001" />
+			<vertex x="0.799999" y="-3.100000" />
+		</vertices>
+	</room>
+	<room>
+		<name>bedroom</name>
+		<vertices>
+			<vertex x="1.000000" y="-3.700001" />
+			<vertex x="5.799999" y="-3.600000" />
+			<vertex x="6.200001" y="-8.500000" />
+			<vertex x="1.200001" y="-8.200001" />
+		</vertices>
+		<places>
+			<place>
+				<name>call3</name>
+				<type>call_button_3</type>
+				<pose x="2.017" y="-6.287" theta="0.044" />
+			</place>
+		</places>
+	</room>
+	<room>
+		<name>bathroom</name>
+		<vertices>
+			<vertex x="-3.699999" y="-5.500000" />
+			<vertex x="-3.699999" y="-7.500000" />
+			<vertex x="-0.900000" y="-7.700001" />
+			<vertex x="-1.100000" y="-5.400000" />
+		</vertices>
+		<places>
+			<place>
+				<name>bathroom</name>
+				<type>call_button_b</type>
+				<pose x="-1.1227" y="-5.1438" theta="3.11" />
+			</place>
+		</places>
+	</room>
+</rooms>
