@@ -26,8 +26,9 @@ int initializeClassifier()
   minimums.holesPercentBase=5;
   maximums.holesPercentBase=60;
 
-  minimums.objectTemperature = 31.5;
-  maximums.objectTemperature = 37.0;
+  //These are initialized by the main.cpp
+  //minimums.objectTemperature = 31.5;
+  //maximums.objectTemperature = 37.0;
 
   minimums.scoreTop = 1350;
   maximums.scoreTop = 2000;
