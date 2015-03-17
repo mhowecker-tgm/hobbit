@@ -91,7 +91,7 @@ message_filters::Subscriber<sensor_msgs::CameraInfo> *depth_cam_info_sub_bottom;
 
 typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image> RgbdSyncPolicy;
 
- int autoRecordEmergencyTriggers=0;
+int autoRecordEmergencyTriggers=1;
 unsigned int lastEmergencyDetectionTimestamp=0;
 unsigned int emergencyDetectionCooldown=150; //This should be time , not frames
 

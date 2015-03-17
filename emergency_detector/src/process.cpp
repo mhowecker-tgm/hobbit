@@ -365,21 +365,6 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
 
 
 
-
-   if (emergencyDetected)
-      {
-        char filename[512];
-        snprintf(filename,512,"snapshots/%s/colorFrame_0_%05u.pnm",triggersDir,framesSnapped);
-        saveRawImageToFile(filename,colorFrame,colorWidth,colorHeight,3,8);
-        snprintf(filename,512,"snapshots/%s/depthFrame_0_%05u.pnm",triggersDir,framesSnapped);
-        saveRawImageToFile(filename,(unsigned char*) depthFrame,depthWidth,depthHeight,1,16);
-        ++framesSnapped;
-      }
-
-
-
-
-
    if (segmentedRGB!=0)      { free (segmentedRGB);   }
    if (segmentedDepth!=0)    { free (segmentedDepth); }
 
@@ -403,17 +388,6 @@ int runServicesBottomThatNeedColorAndDepth(unsigned char * colorFrame , unsigned
         saveRawImageToFile(filename,(unsigned char*) depthFrame,depthWidth,depthHeight,1,16);
         saveNextBottomFrame=0;
         if ( (saveNextTopFrame==0) && (saveNextBottomFrame==0) )  { ++framesSnapped; }
-      }
-
-
-   if (emergencyDetected)
-      {
-        char filename[512];
-        snprintf(filename,512,"snapshots/%s/colorFrame_1_%05u.pnm",triggersDir,framesSnapped);
-        saveRawImageToFile(filename,colorFrame,colorWidth,colorHeight,3,8);
-        snprintf(filename,512,"snapshots/%s/depthFrame_1_%05u.pnm",triggersDir,framesSnapped);
-        saveRawImageToFile(filename,(unsigned char*) depthFrame,depthWidth,depthHeight,1,16);
-        ++framesSnapped;
       }
 
 
