@@ -10,6 +10,9 @@ extern "C"
 {
 #endif
 
+extern unsigned int receivedBaseImages;
+
+
 extern unsigned int consultHobbitMap;
 
 extern unsigned int doCVOutput;
@@ -18,28 +21,7 @@ extern unsigned int personDetected;
 extern unsigned int autoPlaneSegmentationFlag;
 
 
-
-extern float temperatureX,temperatureY,temperatureZ;
-extern float temperatureAmbientDetected;
-extern float temperatureObjectDetected;
-extern unsigned int tempTimestamp;
-
-
-
 extern  int maximumFrameDifferenceForTemperatureToBeRelevant;
-
-extern  double minimumAllowedHolePercentage;
-extern  double maximumAllowedHolePercentage;
-
-extern double minHumanTemperature;
-extern double maxHumanTemperature;
-
-extern  int tempZoneWidth;
-extern  int tempZoneHeight;
-
-extern  int minScoreTrigger;
-extern  int maxScoreTrigger;
-
 
 extern char * imageDir;
 extern int saveClassification;

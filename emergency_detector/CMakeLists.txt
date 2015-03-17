@@ -22,6 +22,9 @@ add_executable(emergency_detector
                src/main.cpp
                src/process.cpp
                src/fall_detection.cpp
+               src/tools.cpp
+               src/classifier.cpp
+               src/visualization.cpp
                src/RGBDAcquisition/acquisitionSegment/AcquisitionSegment.c
                src/RGBDAcquisition/acquisitionSegment/automaticPlaneSegmentation.c
                src/RGBDAcquisition/acquisitionSegment/colorSelector.c

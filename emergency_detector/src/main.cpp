@@ -10,6 +10,7 @@
 
 #include "process.h"
 #include "fall_detection.h"
+#include "classifier.h"
 
 #include <message_filters/subscriber.h>
 #include <message_filters/sync_policies/approximate_time.h>
@@ -104,7 +105,6 @@ char curDir[]="../../web_interface/bin/emergencies/";
 bool first=false;
 int key = 0;
 unsigned int frameTimestamp=emergencyDetectionCooldown+1; //not 0 so we can immediately trigger
-unsigned int receivedBaseImages=0;
 ros::NodeHandle * nhPtr=0;
 unsigned int paused=0;
 unsigned int dontPublishPersons=0;
@@ -118,9 +118,9 @@ void broadcastNewPerson()
   personDetected=0;
 
   emergency_detector::Person msg;
-  msg.x = temperatureX;
-  msg.y = temperatureY;
-  msg.z = temperatureZ;;
+  msg.x = lastState.temperatureX;
+  msg.y = lastState.temperatureY;
+  msg.z = lastState.temperatureZ;;
   msg.source = 5; //5 = temperature / emergency
   msg.theta = 0;
   ros::Time timestampOfCreation = ros::Time::now();
@@ -130,7 +130,7 @@ void broadcastNewPerson()
   msg.confidence = 0.5;
   msg.timestamp=frameTimestamp;
 
-  fprintf(stderr, "Publishing a new Person @ %0.2f %0.2f %0.2f\n" ,temperatureX,temperatureY,temperatureZ);
+  fprintf(stderr, "Publishing a new Person @ %0.2f %0.2f %0.2f\n" ,lastState.temperatureX,lastState.temperatureY,lastState.temperatureZ);
   personBroadcaster.publish(msg);
   ros::spinOnce();
 }
@@ -184,15 +184,15 @@ void broadcastEmergency(unsigned int frameNumber)
 
 void getAmbientTemperature(const std_msgs::Float32::ConstPtr& request)
 {
-    temperatureAmbientDetected=request->data;
+    lastState.ambientTemperature =request->data;
     return;
 }
 
 
 void getObjectTemperature(const std_msgs::Float32::ConstPtr& request)
 {
-    temperatureObjectDetected=request->data;
-    tempTimestamp=frameTimestamp;
+    lastState.objectTemperature=request->data;
+    lastState.timestampTemperature=frameTimestamp;
     return;
 }
 
@@ -485,49 +485,6 @@ int updateHeadPosition()
  return 1;
 }
 
-/*
-//RGBd Callback is called every time we get a new pair of frames , it is synchronized to the main thread
-void rgbdCallbackNoCalibration(const sensor_msgs::Image::ConstPtr rgb_img_msg,
-                                 const sensor_msgs::Image::ConstPtr depth_img_msg  )
-{
- if (paused) { return; } //If we are paused spend no time with new input
-  //A new pair of frames has arrived , copy and convert them so that they are ready
-  unsigned int colorWidth = rgb_img_msg->width;   unsigned int colorHeight = rgb_img_msg->height;
-  unsigned int depthWidth = depth_img_msg->width; unsigned int depthHeight = depth_img_msg->height;
-
-
- cv_bridge::CvImageConstPtr orig_rgb_img;
- cv_bridge::CvImageConstPtr orig_depth_img;
- orig_rgb_img = cv_bridge::toCvShare(rgb_img_msg, "rgb8");
- orig_depth_img = cv_bridge::toCvShare(depth_img_msg, sensor_msgs::image_encodings::TYPE_16UC1);
-
-  //doDrawOut();
-
-  if (frameTimestamp%2==0)
-  { //Preserve resources
-
-   //Emulate Human Temperature , since we don't always have the temperature sensor available
-   if (fakeTemperatureActivated)
-   {
-      temperatureObjectDetected=36;
-      tempTimestamp=frameTimestamp;
-   }
-   runServicesThatNeedColorAndDepth((unsigned char*) orig_rgb_img->image.data, colorWidth , colorHeight ,
-                                    (unsigned short*) orig_depth_img->image.data ,  depthWidth , depthHeight ,
-                                     0 , frameTimestamp );
-
-
-  }
- //After running (at least) once it is not a first run any more!
- first = false;
- ++frameTimestamp;
-return;
-}
-*/
-
-
-
-
 
 
 //RGBd Callback is called every time we get a new pair of frames , it is synchronized to the main thread
@@ -540,9 +497,9 @@ void rgbdCallbackNoCalibrationBoth(unsigned int cameraID,
 
  if (fakeTemperatureActivated)
    {
-      temperatureObjectDetected= (float) maxHumanTemperature -  minHumanTemperature  / 2;
-      fprintf(stderr,"Emulating temperature %0.2f \n",temperatureObjectDetected);
-      tempTimestamp=frameTimestamp;
+      lastState.objectTemperature = (float) maximums.objectTemperature -  minimums.objectTemperature  / 2;
+      fprintf(stderr,"Emulating temperature %0.2f \n",lastState.objectTemperature );
+      lastState.timestampTemperature=frameTimestamp;
    }
 
  unsigned int colorWidth = rgb_img_msg->width;   unsigned int colorHeight = rgb_img_msg->height;
@@ -670,8 +627,8 @@ unsigned int whichHobbitAreWe()
 
 unsigned int pickTemperatureProfile(unsigned int hobbitID)
 {
- minHumanTemperature = MinMaxHumanTemperatures[hobbitID*2+0];
- maxHumanTemperature = MinMaxHumanTemperatures[hobbitID*2+1];
+ minimums.objectTemperature = MinMaxHumanTemperatures[hobbitID*2+0];
+ maximums.objectTemperature = MinMaxHumanTemperatures[hobbitID*2+1];
 }
 
 
@@ -714,19 +671,12 @@ int main(int argc, char **argv)
 
 
      private_node_handle_.param("maximumFrameDifferenceForTemperatureToBeRelevant", maximumFrameDifferenceForTemperatureToBeRelevant ,  10 );
-     private_node_handle_.param("minimumAllowedHolePercentage", minimumAllowedHolePercentage ,  double(15) );
-     private_node_handle_.param("maximumAllowedHolePercentage", maximumAllowedHolePercentage ,  double(75) );
-     private_node_handle_.param("minHumanTemperature", minHumanTemperature , double (31.5) );
-     private_node_handle_.param("maxHumanTemperature", maxHumanTemperature , double (37.0) );
-     private_node_handle_.param("tempZoneWidth", tempZoneWidth ,  300 );
-     private_node_handle_.param("tempZoneHeight", tempZoneHeight ,  200 );
-     private_node_handle_.param("minScoreTrigger", minScoreTrigger ,  1600 );
-     private_node_handle_.param("maxScoreTrigger", maxScoreTrigger ,  2000 );
 
-     std::cerr<<"Human Temperature Range set to "<<minHumanTemperature<<" up to "<<maxHumanTemperature<<"\n";
+
+     std::cerr<<"Human Temperature Range was "<<minimums.objectTemperature<<" up to "<<maximums.objectTemperature<<"\n";
      std::cerr<<"  We are hobbit #" << whichHobbitAreWe() << " \n" ;
      pickTemperatureProfile(whichHobbitAreWe());
-     std::cerr<<"Human Temperature Range set to "<<minHumanTemperature<<" up to "<<maxHumanTemperature<<" for our hobbit\n";
+     std::cerr<<"Human Temperature Range set to "<<minimums.objectTemperature<<" up to "<<maximums.objectTemperature<<" for our hobbit\n";
 
     // MinMaxHumanTemperatures[]
 

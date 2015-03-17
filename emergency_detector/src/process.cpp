@@ -1,5 +1,6 @@
 #include "process.h"
 #include "fall_detection.h"
+#include "classifier.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,7 +8,8 @@
 
 #include "RGBDAcquisition/acquisitionSegment/AcquisitionSegment.h"
 #include "RGBDAcquisition/processors/ViewpointChange/ViewpointChange.h"
-
+#include "tools.h"
+#include "visualization.h"
 
 #include <opencv2/imgproc/imgproc_c.h>
 #include <opencv2/legacy/legacy.hpp>
@@ -36,9 +38,6 @@
     unsigned int consultHobbitMap=0;
 #endif // USE_HOBBIT_MAP_DATA
 
-
-
-
 using namespace std;
 using namespace cv;
 
@@ -59,44 +58,20 @@ char * imageDir = defaultDir;
  int doCalculations=0;
  // --------------------------------------------------------------------
 
-
- unsigned int holesTop=0;
- float holesPercentTop=0;
-
- double minimumAllowedHolePercentage = 15;
- double maximumAllowedHolePercentage = 75;
-
-double minHumanTemperature = 31.5;
-double maxHumanTemperature = 37.0;
+unsigned int receivedBaseImages=0;
 
  int tempZoneWidth = 300;
  int tempZoneHeight = 200;
 
- int minScoreTrigger = 1350;
- int maxScoreTrigger = 2000;
 
- unsigned int botWidth=440,botHeight=160,botX1=200,botY1=200;
- unsigned int maxScoreBaseCamera = 3000;
- unsigned int depthBaseAvg=0;
- unsigned int holesBase=0;
- float holesPercentBase=0;
- unsigned int minBaseScoreTrigger = 550;
- unsigned int maxBaseScoreTrigger = 1000;
- float minimumAllowedHolePercentageBase =5;
- float maximumAllowedHolePercentageBase =60;
+
 
 unsigned int useTemperatureSensorForLiveFallDetection=0;
-unsigned int doUseTopHolesForClassification=0;
-unsigned int doUseBaseHolesForClassification=1;
 unsigned int doCVOutput=0;
 unsigned int emergencyDetected=0;
 unsigned int personDetected=0;
 unsigned int autoPlaneSegmentationFlag=0;
 
-float temperatureAmbientDetected=0.0; //<- YODO : default value should be 0
-float temperatureObjectDetected=0.0; //<- YODO : default value should be 0
-float temperatureX=0.0,temperatureY=0.0,temperatureZ=0.0;
-unsigned int tempTimestamp=0;
 
 float bboxCX,bboxCY,bboxCZ,bboxWidth,bboxHeight,bboxDepth;
 unsigned int bboxTimeStamp=0;
@@ -108,62 +83,6 @@ unsigned int framesSnapped=0;
 
 unsigned int obstacleChecks[6]={0};
 unsigned int totalObstacleChecks=0;
-
-unsigned int simplePow(unsigned int base,unsigned int exp)
-{
-if (exp==0) return 1;
-unsigned int retres=base;
-unsigned int i=0;
-for (i=0; i<exp-1; i++)
-{
-retres*=base;
-}
-return retres;
-}
-
-
-int saveRawImageToFile(const char * filename,unsigned char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
-{
- //fprintf(stderr,"acquisitionSaveRawImageToFile(%s) called\n",filename);
- #if USE_REGULAR_BYTEORDER_FOR_PNM
- //Want Conformance to the NETPBM spec http://en.wikipedia.org/wiki/Netpbm_format#16-bit_extensions
- if (bitsperpixel==16) { swapEndiannessPNM(pixels , width , height , channels , bitsperpixel); }
- #else
-  #warning "We are using Our Local Byte Order for saving files , this makes things fast but is incompatible with other PNM loaders"
- #endif // USE_REGULAR_BYTEORDER_FOR_PNM
- if ( (width==0) || (height==0) || (channels==0) || (bitsperpixel==0) ) { fprintf(stderr,"acquisitionSaveRawImageToFile(%s) called with zero dimensions\n",filename); return 0;}
- if(pixels==0) { fprintf(stderr,"acquisitionSaveRawImageToFile(%s) called for an unallocated (empty) frame , will not write any file output\n",filename); return 0; }
- if (bitsperpixel>16) { fprintf(stderr,"PNM does not support more than 2 bytes per pixel..!\n"); return 0; }
- FILE *fd=0;
- fd = fopen(filename,"wb");
- if (fd!=0)
-  {
-   unsigned int n;
-   if (channels==3) fprintf(fd, "P6\n");
-   else if (channels==1) fprintf(fd, "P5\n");
-   else
-  {
-   fprintf(stderr,"Invalid channels arg (%u) for SaveRawImageToFile\n",channels);
-   fclose(fd);
-   return 1;
-  }
-   fprintf(fd, "#HOBBIT_EMERGENCY_TEMPERATURE(%0.2f) OBSTACLE_CHECKS(%u,%u,%u)\n",temperatureObjectDetected,obstacleChecks[0],obstacleChecks[1],obstacleChecks[2]);
-   fprintf(fd, "%d %d\n%u\n", width, height , simplePow(2 ,bitsperpixel)-1);
-   float tmp_n = (float) bitsperpixel/ 8;
-   tmp_n = tmp_n * width * height * channels ;
-   n = (unsigned int) tmp_n;
-   fwrite(pixels, 1 , n , fd);
-   fflush(fd);
-   fclose(fd);
-   return 1;
-  }
-else
-{
-fprintf(stderr,"SaveRawImageToFile could not open output file %s\n",filename);
-return 0;
-}
-return 0;
-}
 
 
 
@@ -203,76 +122,13 @@ int processBoundingBox(
 }
 
 
-int detectHighContrastUnusableRGB(unsigned char * rgbFrame , unsigned int width , unsigned int height , float percentageHigh)
-{
-  unsigned char * rgbPtr = rgbFrame;
-  unsigned char * rgbLimit = rgbFrame + width * height * 3;
-
-  float tmp = percentageHigh / 100;
-        tmp = tmp * width * height;
-  unsigned int targetHighContrastPixels = (unsigned int) tmp;
-  unsigned int highContrastPixels = 0;
-
-  unsigned char r, g , b;
-  while (rgbPtr<rgbLimit)
-  {
-    r = *rgbPtr++;
-    g = *rgbPtr++;
-    b = *rgbPtr++;
-    if (
-         ( (r<45) && (g<45)  && (b<45) ) ||
-         ( (r>200) && (g>200)  && (b>200) )
-       )
-    {
-     ++highContrastPixels;
-     if ( highContrastPixels>targetHighContrastPixels)
-         {
-           //This spams console output and is included in OpenCV visualization
-           //fprintf(stderr,"Bad View with %0.2f + high contrast points \n",(float) (100*highContrastPixels)/(width*height));
-           return 1;
-         }
-    }
-  }
-  //fprintf(stderr,"Good View with %0.2f high contrast points \n",(float) (100*highContrastPixels)/(width*height));
- return 0;
-}
-
-
-unsigned char * copyRGB(unsigned char * source , unsigned int width , unsigned int height)
-{
-  if ( (source==0)  || (width==0) || (height==0) )
-    {
-      fprintf(stderr,"copyRGB called with zero arguments\n");
-      return 0;
-    }
-
-  unsigned char * output = (unsigned char*) malloc(width*height*3*sizeof(unsigned char));
-  if (output==0) { fprintf(stderr,"copyRGB could not allocate memory for output\n"); return 0; }
-  memcpy(output , source , width*height*3*sizeof(unsigned char));
-  return output;
-}
-
-unsigned short * copyDepth(unsigned short * source , unsigned int width , unsigned int height)
-{
-  if ( (source==0)  || (width==0) || (height==0) )
-    {
-      fprintf(stderr,"copyDepth called with zero arguments\n");
-      return 0;
-    }
-
-  unsigned short * output = (unsigned short*) malloc(width*height*sizeof(unsigned short));
-  if (output==0) { fprintf(stderr,"copyDepth could not allocate memory for output\n"); return 0; }
-  memcpy(output , source , width*height*sizeof(unsigned short));
-  return output;
-}
-
 
 unsigned int temperatureSensorSensesHuman(unsigned int tempDetected , unsigned int tempTimestamp , unsigned int frameTimestamp)
 {
  unsigned int temperatureFrameOffset = ABSDIFF(frameTimestamp,tempTimestamp);
   if (
-       (minHumanTemperature<=tempDetected) &&
-       (tempDetected<=maxHumanTemperature) &&
+       (minimums.objectTemperature<=tempDetected) &&
+       (tempDetected<=maximums.objectTemperature) &&
        (temperatureFrameOffset < maximumFrameDifferenceForTemperatureToBeRelevant )
      )
     {
@@ -347,7 +203,7 @@ int weDetectAStandingPersonUsingTemperatureSensor(unsigned short * depthFrame  ,
                                                unsigned int frameTimestamp )
 {
   //Contemplate about emitting a Person message ( not an emergency )
-  if ( temperatureSensorSensesHuman( temperatureObjectDetected ,  tempTimestamp , frameTimestamp) )
+  if ( temperatureSensorSensesHuman( lastState.objectTemperature ,  lastState.timestampTemperature , frameTimestamp) )
      {
        unsigned int x2d = (unsigned int) depthWidth/2;
        unsigned int y2d = (unsigned int) depthHeight/2;
@@ -361,15 +217,15 @@ int weDetectAStandingPersonUsingTemperatureSensor(unsigned short * depthFrame  ,
                                                x2d,
                                                y2d,
                                                 *depthValue ,
-                                               &temperatureX ,
-                                               &temperatureY ,
-                                               &temperatureZ
+                                               &lastState.temperatureX ,
+                                               &lastState.temperatureY ,
+                                               &lastState.temperatureZ
                                               )
            )
             {
-               if (temperatureZ==0)    { fprintf(stderr,YELLOW "Will not emit person message because we don't have a depth\n" NORMAL); } else
-               if (temperatureZ<=2500) { return 1; } else
-                                       { fprintf(stderr,YELLOW "Will not emit person message because skeleton is too far (%0.2f mm) to trust thermometer\n" NORMAL,temperatureZ); }
+               if (lastState.temperatureZ==0)    { fprintf(stderr,YELLOW "Will not emit person message because we don't have a depth\n" NORMAL); } else
+               if (lastState.temperatureZ<=2500) { return 1; } else
+                                                 { fprintf(stderr,YELLOW "Will not emit person message because skeleton is too far (%0.2f mm) to trust thermometer\n" NORMAL,lastState.temperatureZ); }
             }
      }
    return 0;
@@ -401,7 +257,7 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
   unsigned int tempZoneStartX = (unsigned int ) ((colorWidth-tempZoneWidth) / 2);
   unsigned int tempZoneStartY = (unsigned int ) ((colorHeight-tempZoneHeight) / 2);
   unsigned int depthAvg = 0;
-  unsigned int badView = detectHighContrastUnusableRGB(colorFrame,colorWidth,colorHeight,40.0);
+  unsigned int badView = 0;// detectHighContrastUnusableRGB(colorFrame,colorWidth,colorHeight,40.0);
 
   //unsigned int temperatureFrameOffset = ABSDIFF(frameTimestamp,tempTimestamp);
 
@@ -412,7 +268,7 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
   if (fallDetectionContext.headLookingDirection==HEAD_LOOKING_CENTER)
   {
    if  (
-          ( temperatureSensorSensesHuman( temperatureObjectDetected ,  tempTimestamp , frameTimestamp) )
+          ( temperatureSensorSensesHuman( lastState.objectTemperature ,  lastState.timestampTemperature , frameTimestamp) )
            ||
           (!useTemperatureSensorForLiveFallDetection) //If we dont want to use temperature check just check using skeleton..!
         )
@@ -440,8 +296,7 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
     fprintf(stderr,YELLOW "\n\n  Head Not Looking Down , Only doing active user falling check \n\n" NORMAL );
   }
      else
-  if ( temperatureSensorSensesHuman( temperatureObjectDetected ,  tempTimestamp , frameTimestamp) )
-  //if ( (minHumanTemperature<temperatureObjectDetected) && (temperatureObjectDetected<maxHumanTemperature) && (temperatureFrameOffset < maximumFrameDifferenceForTemperatureToBeRelevant )  )
+  if ( temperatureSensorSensesHuman( lastState.objectTemperature , lastState.timestampTemperature , frameTimestamp) )
     {
       if (mapSaysThatWeMaybeLookingAtFallenUser(frameTimestamp))
       {
@@ -466,36 +321,40 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
                                    combinationMode
                                 );
 
-      depthAvg = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , tempZoneStartX , tempZoneStartY , tempZoneWidth , tempZoneHeight , maxScoreTrigger , 1 , &holesTop );
-      holesPercentTop = (float) (100*holesTop)/(tempZoneWidth*tempZoneHeight);
+      unsigned int holesTop=0;
+      lastState.scoreTop = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , tempZoneStartX , tempZoneStartY , tempZoneWidth , tempZoneHeight , maximums.scoreTop , 1 , &holesTop );
+      lastState.holesPercentTop = (float) (100*holesTop)/(tempZoneWidth*tempZoneHeight);
 
       fprintf(stderr,"Avg Depth is %u mm , empty area is %0.2f %% , Bot Depth %u mm , empty area is %0.2f %% \n",
-              depthAvg , holesPercentTop ,
-              depthBaseAvg , holesPercentBase
+              lastState.scoreTop , lastState.holesPercentTop ,
+              lastState.scoreBase , lastState.holesPercentBase
              );
 
 
 
-      if ( (doUseBaseHolesForClassification) && (holesPercentBase< minimumAllowedHolePercentageBase ) )
-         { fprintf(stderr,RED "\n\n  Too few holes at Base ( min is %0.2f ) , too big a blob , cannot be an emergency\n\n" NORMAL , minimumAllowedHolePercentageBase); }
+      if ( (lastState.useHolesBase) && (lastState.holesPercentBase < minimums.holesPercentBase) )
+         { fprintf(stderr,RED "\n\n  Too few holes at Base ( min is %0.2f ) , too big a blob , cannot be an emergency\n\n" NORMAL , minimums.holesPercentBase); }
           else
-      if ( (doUseBaseHolesForClassification) && (holesPercentBase>  maximumAllowedHolePercentageBase ) )
-         { fprintf(stderr,RED "\n\n  Too many holes at Base ( max is %0.2f ) , this cannot be an emergency \n\n" NORMAL  , maximumAllowedHolePercentageBase); }
+      if ( (lastState.useHolesBase) && (lastState.holesPercentBase > maximums.holesPercentBase) )
+         { fprintf(stderr,RED "\n\n  Too many holes at Base ( max is %0.2f ) , this cannot be an emergency \n\n" NORMAL  , maximums.holesPercentBase); }
           else
-      if ( (doUseTopHolesForClassification) && (holesPercentTop< minimumAllowedHolePercentage ) )
-         { fprintf(stderr,RED "\n\n  Too few holes at Top ( min is %0.2f ) , too big a blob , cannot be an emergency\n\n" NORMAL , minimumAllowedHolePercentage); }
+      if ( (lastState.useHolesTop) && (lastState.holesPercentTop < minimums.holesPercentTop) )
+         { fprintf(stderr,RED "\n\n  Too few holes at Top ( min is %0.2f ) , too big a blob , cannot be an emergency\n\n" NORMAL , minimums.holesPercentTop); }
           else
-      if ( (doUseTopHolesForClassification) && (holesPercentTop>  maximumAllowedHolePercentage ) )
-         { fprintf(stderr,RED "\n\n  Too many holes at Top ( max is %0.2f ) , this cannot be an emergency \n\n" NORMAL , maximumAllowedHolePercentage ); }
+      if ( (lastState.useHolesTop) && (lastState.holesPercentTop > maximums.holesPercentTop) )
+         { fprintf(stderr,RED "\n\n  Too many holes at Top ( max is %0.2f ) , this cannot be an emergency \n\n" NORMAL , maximums.holesPercentTop ); }
           else
       if (
-            ( depthBaseAvg > minBaseScoreTrigger) &&
-            ( depthBaseAvg < maxBaseScoreTrigger)
+           (
+            ( lastState.scoreBase > minimums.scoreBase) &&
+            ( lastState.scoreBase < maximums.scoreBase)
+           ) ||
+           (lastState.useScoreBase==0)
          )
       {
       if (
-           ( depthAvg > minScoreTrigger) &&
-           ( depthAvg < maxScoreTrigger)
+           ( lastState.scoreTop > minimums.scoreTop) &&
+           ( lastState.scoreTop < maximums.scoreTop)
          )
          {
            if (userIsStanding(&fallDetectionContext,frameTimestamp))
@@ -505,9 +364,9 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
               //We are almost sure we have a fallen blob , but maybe the blob continues on the top side ( so it is a standing user after all
               unsigned int holesOverTemperatureArea=0;
               unsigned int overHeight=120;
-              unsigned int depthAvgOver = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , tempZoneStartX , tempZoneStartY-overHeight , tempZoneWidth , overHeight , maxScoreTrigger , 1 , &holesOverTemperatureArea );
+              unsigned int depthAvgOver = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , tempZoneStartX , tempZoneStartY-overHeight , tempZoneWidth , overHeight , maximums.scoreTop , 1 , &holesOverTemperatureArea );
 
-              fprintf(stderr,MAGENTA "\n\n  Top Avg is %u mm Holes are %0.2f %% \n\n" NORMAL , depthAvgOver, holesPercentTop  );
+              fprintf(stderr,MAGENTA "\n\n  Top Avg is %u mm Holes are %0.2f %% \n\n" NORMAL , depthAvgOver, lastState.holesPercentTop  );
 
               if (holesOverTemperatureArea> ( (unsigned int) tempZoneWidth*overHeight*80/100 ) )
                {
@@ -520,11 +379,11 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
             }
           } else
           {
-           fprintf(stderr,RED "\n\n  Top Camera indicates that this , cannot be an emergency ( score %u ,holes %0.2f %% )  score Min %u Max %u \n\n" NORMAL , depthAvg , holesPercentTop , minScoreTrigger , maxScoreTrigger );
+           fprintf(stderr,RED "\n\n  Top Camera indicates that this , cannot be an emergency ( score %u ,holes %0.2f %% )  score Min %u Max %u \n\n" NORMAL , lastState.scoreTop , lastState.holesPercentTop , minimums.scoreTop , maximums.scoreTop );
           }
       } else
       {
-        fprintf(stderr,RED "\n\n  BaseCam indicates that this , cannot be an emergency ( score %u ,holes %0.2f %% ) score Min %u Max %u \n\n" NORMAL , depthBaseAvg , holesPercentBase , minBaseScoreTrigger , maxBaseScoreTrigger );
+        fprintf(stderr,RED "\n\n  BaseCam indicates that this , cannot be an emergency ( score %u ,holes %0.2f %% ) score Min %u Max %u \n\n" NORMAL , lastState.scoreBase , lastState.holesPercentBase , minimums.scoreBase , maximums.scoreBase );
       }
 
       } //Map Check
@@ -548,15 +407,15 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
 
 
         unsigned int tempColorR=255 , tempColorG=0 , tempColorB=0;
-        if (temperatureObjectDetected<30) { tempColorR=0 , tempColorG=0 , tempColorB=255; } else
-        if (temperatureObjectDetected>40) { tempColorR=255 , tempColorG=0 , tempColorB=0; } else
-                                          { tempColorR=(unsigned int) 125+( 40-temperatureObjectDetected/10 ) * 125 , tempColorG=0 , tempColorB=0; }
+        if (lastState.objectTemperature<30) { tempColorR=0 , tempColorG=0 , tempColorB=255; } else
+        if (lastState.objectTemperature>40) { tempColorR=255 , tempColorG=0 , tempColorB=0; } else
+                                          { tempColorR=(unsigned int) 125+( 40-lastState.objectTemperature/10 ) * 125 , tempColorG=0 , tempColorB=0; }
 
 
         Scalar tempColor = Scalar ( tempColorB , tempColorG , tempColorR );
         circle(bgrMat,  centerPt , 30 , tempColor , 4, 8 , 0);
 
-        if ( temperatureSensorSensesHuman( temperatureObjectDetected ,  tempTimestamp , frameTimestamp) )
+        if ( temperatureSensorSensesHuman( lastState.objectTemperature ,  lastState.timestampTemperature , frameTimestamp) )
         {
            Scalar tempRColor = Scalar ( 0 , 0 , 255 );
            circle(bgrMat,  centerPt , 10 , tempRColor , 4, 8 , 0);
@@ -606,9 +465,9 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
             else
              { putText(bgrMat , "Scanning for fallen user.." , txtPosition , fontUsed , 0.7 , color , 2 , 8 ); }
         //======================================================================================================
-        txtPosition.y += 24; snprintf(rectVal,123,"Top : %u / Bot : %u ",depthAvg,depthBaseAvg);
+        txtPosition.y += 24; snprintf(rectVal,123,"Top : %u / Bot : %u ",depthAvg,lastState.scoreBase);
         putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , color , 2 , 8 );
-        txtPosition.y += 24; snprintf(rectVal,123,"Temperature : %0.2f C",temperatureObjectDetected);
+        txtPosition.y += 24; snprintf(rectVal,123,"Temperature : %0.2f C",lastState.objectTemperature);
         putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , color , 2 , 8 );
 
 
@@ -679,8 +538,8 @@ int runServicesBottomThatNeedColorAndDepth(unsigned char * colorFrame , unsigned
       if (doCalculations==0) { return 0; }
 
 
-      botX1 = (unsigned int ) ((colorWidth-botWidth) / 2);
-      botY1 = 240;
+      lastState.baseX1 = (unsigned int ) ((colorWidth-lastState.baseWidth) / 2);
+      lastState.baseY1 = 240;
 
 
 
@@ -688,7 +547,7 @@ int runServicesBottomThatNeedColorAndDepth(unsigned char * colorFrame , unsigned
      unsigned short * segmentedDepth = copyDepth(depthFrame ,depthWidth , depthHeight);
 
 
-        segmentRGBAndDepthFrame (
+     segmentRGBAndDepthFrame (
                                    segmentedRGB ,
                                    segmentedDepth ,
                                    colorWidth , colorHeight,
@@ -696,41 +555,20 @@ int runServicesBottomThatNeedColorAndDepth(unsigned char * colorFrame , unsigned
                                    &segConfBaseDepth ,
                                    (struct calibration*) calib ,
                                    COMBINE_AND
-                                );
+                             );
 
-      depthBaseAvg = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , botX1, botY1 , botWidth , botHeight , maxScoreBaseCamera , 1 , &holesBase );
-      holesPercentBase = (float) (100*holesBase)/(botWidth*botHeight);
-      fprintf(stderr,"Bottom Avg Depth is %u mm , empty area is %0.2f %% \n",depthBaseAvg , holesPercentBase );
+      unsigned int holesBase=0;
+      lastState.scoreBase = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight ,
+                                                         lastState.baseX1, lastState.baseY1 , lastState.baseWidth , lastState.baseHeight , maximums.scoreBase , 1 , &holesBase );
+      lastState.holesPercentBase = (float) (100*holesBase)/(lastState.baseWidth*lastState.baseHeight);
+      fprintf(stderr,"Bottom Avg Depth is %u mm , empty area is %0.2f %% \n",lastState.scoreBase , lastState.holesPercentBase );
+
+
 
 
       if (doCVOutput)
       {
-        cv::Mat bgrMat,rgbMat;
-        rgbMat = cv::Mat(colorHeight,colorWidth,CV_8UC3,segmentedRGB,3*colorWidth);
-
-	    cv::cvtColor(rgbMat,bgrMat, CV_RGB2BGR);// opencv expects the image in BGR format
-
-        Point ptIn1; ptIn1.x=botX1;               ptIn1.y=botY1;
-        Point ptIn2; ptIn2.x=botX1+botWidth;      ptIn2.y=botY1+botHeight;
-        Scalar colorEmergency = Scalar ( 255 , 0 , 0 );
-
-        rectangle(bgrMat ,  ptIn1 , ptIn2 , colorEmergency , 2, 8 , 0);
-
-
-        char rectVal[256]={0};
-        int fontUsed=FONT_HERSHEY_SIMPLEX; //FONT_HERSHEY_SCRIPT_SIMPLEX;
-        Point txtPosition;  txtPosition.x = ptIn1.x+15; txtPosition.y = ptIn1.y;
-
-
-        txtPosition.y += 24; snprintf(rectVal,123,"Base Score : %u",depthBaseAvg);
-        putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , colorEmergency , 2 , 8 );
-
-        txtPosition.y += 24; snprintf(rectVal,123,"Base Holes %0.2f %%",holesPercentBase);
-        putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , colorEmergency , 2 , 8 );
-
-
-	    cv::imshow("emergency_detector base visualization",bgrMat);
-	    cv::waitKey(1);
+        visualizeBaseCam(segmentedRGB,colorWidth,colorHeight);
       }
 
    if (segmentedRGB!=0)      { free (segmentedRGB);   }
@@ -743,6 +581,8 @@ int runServicesBottomThatNeedColorAndDepth(unsigned char * colorFrame , unsigned
 
 void initializeProcess(ros::NodeHandle * nh)
 {
+ initializeClassifier();
+
  initializeRGBSegmentationConfiguration(&segConfRGB,640,480);
  initializeDepthSegmentationConfiguration(&segConfDepth,640,480);
 
