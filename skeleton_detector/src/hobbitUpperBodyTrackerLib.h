@@ -16,6 +16,7 @@ extern "C"
 /*Exercise Functions*/
 int hobbitFitnessFunction_StartExercise(unsigned int frameNumber,unsigned int excerciseNumber,unsigned int leftHand , unsigned int repetitions);
 int hobbitFitnessFunction_CheckExercise(unsigned int frameNumber);
+int hobbitFitnessFunction_AreWeDoingAnExercise();
 int hobbitFitnessFunction_StopExercise(unsigned int frameNumber);
 int hobbitFitnessFunction_RegisterExerciseRepetitionDetected(void * callback);
 int hobbitFitnessFunction_RegisterExerciseRepetitionErrorDetected(void * callback);
