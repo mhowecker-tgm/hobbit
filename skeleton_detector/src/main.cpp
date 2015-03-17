@@ -428,8 +428,8 @@ int main(int argc, char **argv)
                {
                  //No Sleep at all
                } else
-            if (runFullSpeed)
-                {
+            if ( (hobbitFitnessFunction_AreWeDoingAnExercise()) || (runFullSpeed) )
+                { //if we want exercise tracking or running at full speed we try to run as fast as possible..
                   loop_rate_fullSpeed.sleep();
                 } else
             if (processingMode==PROCESSING_MODE_UPPER_GESTURE_BODY_TRACKER)
