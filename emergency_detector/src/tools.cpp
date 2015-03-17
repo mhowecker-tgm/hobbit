@@ -132,7 +132,7 @@ unsigned short * copyDepth(unsigned short * source , unsigned int width , unsign
 
 
 
-unsigned int temperatureSensorSensesHuman(unsigned int tempDetected , unsigned int tempTimestamp , unsigned int frameTimestamp)
+unsigned int temperatureSensorSensesHuman(float tempDetected , unsigned int tempTimestamp , unsigned int frameTimestamp)
 {
  unsigned int temperatureFrameOffset = ABSDIFF(frameTimestamp,tempTimestamp);
   if (

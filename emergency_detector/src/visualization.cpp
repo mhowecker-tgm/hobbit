@@ -42,7 +42,7 @@ int visualizeTopCam(unsigned char * colorFrame,unsigned char * segmentedRGB,unsi
 
 
         Scalar tempColor = Scalar ( tempColorB , tempColorG , tempColorR );
-        circle(bgrMat,  centerPt , 30 , tempColor , 4, 8 , 0);
+        circle(bgrMat,  centerPt , 25 , tempColor , 4, 8 , 0);
 
         if ( temperatureSensorSensesHuman( lastState.objectTemperature ,  lastState.timestampTemperature , frameTimestamp) )
         {
