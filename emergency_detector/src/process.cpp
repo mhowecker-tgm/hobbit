@@ -334,16 +334,17 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
               unsigned int holesOverTemperatureArea=0;
               unsigned int overHeight=120;
               unsigned int depthAvgOver = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , lastState.topX1 , lastState.topY1-overHeight , lastState.topWidth , overHeight , maximums.scoreTop , 1 , &holesOverTemperatureArea );
+              float holesPercentOverTop = (float) (100*holesOverTemperatureArea)/(lastState.topWidth*overHeight);
 
               fprintf(stderr,MAGENTA "\n\n  Top Avg is %u mm Holes are %0.2f %% \n\n" NORMAL , depthAvgOver, lastState.holesPercentTop  );
 
-              if (holesOverTemperatureArea> ( (unsigned int) lastState.topWidth*overHeight*60/100 ) )
+              if (holesPercentOverTop < 60 )
                {
                  fprintf(stderr,MAGENTA "\n\n  Already Fallen User Detected , EMERGENCY \n\n" NORMAL);
                  emergencyDetected=1;
                } else
                {
-                 fprintf(stderr,RED "\n\n  Blob continues over temperature area , maybe standing person \n\n" NORMAL);
+                 fprintf(stderr,RED "\n\n  Blob continues over temperature area ( holes %0.2f %% ), maybe standing person \n\n" NORMAL, holesPercentOverTop);
                }
             }
           } else
