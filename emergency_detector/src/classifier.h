@@ -20,6 +20,8 @@ enum MAP_CHECK_ENUM
 struct classifierData
 {
   unsigned int headLookingDirection;
+  //---------------------------------------
+  unsigned int badContrastTop;
 
   //---------------------------------------
   float temperatureX,temperatureY,temperatureZ;
@@ -38,6 +40,7 @@ struct classifierData
   unsigned int useScoreBase;
   //----------------------------------------
   unsigned int mapShouldBeClear[NUMBER_OF_MAP_CHECKS];
+  unsigned int totalMapObstacleHits;
   unsigned int useMapInfo;
 
   //----------------------------------------
@@ -55,8 +58,30 @@ extern struct classifierData minimums;
 extern struct classifierData lastState;
 extern struct classifierData maximums;
 
+extern unsigned int emergencyDetected;
+
+
+
+
+//-----------------------------------------------------------------------
+ // Synchronization variables
+ extern int maximumFrameDifferenceForTemperatureToBeRelevant;
+ extern unsigned int doCalculationsCooldown;
+ extern int doCalculations;
+ extern unsigned int receivedBaseImages;
+ // --------------------------------------------------------------------
+
+
+
+
+
+
 
 int initializeClassifier();
+
+
+
+
 
 
 #ifdef __cplusplus

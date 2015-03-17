@@ -497,8 +497,9 @@ void rgbdCallbackNoCalibrationBoth(unsigned int cameraID,
 
  if (fakeTemperatureActivated)
    {
-      lastState.objectTemperature = (float) maximums.objectTemperature -  minimums.objectTemperature  / 2;
-      fprintf(stderr,"Emulating temperature %0.2f \n",lastState.objectTemperature );
+      lastState.objectTemperature = (float) (maximums.objectTemperature - minimums.objectTemperature)  / 2;
+      lastState.objectTemperature += (float) minimums.objectTemperature;
+      fprintf(stderr,"Emulating temperature %0.2f ( min/max %0.2f/%0.2f ) \n",lastState.objectTemperature , minimums.objectTemperature ,maximums.objectTemperature );
       lastState.timestampTemperature=frameTimestamp;
    }
 

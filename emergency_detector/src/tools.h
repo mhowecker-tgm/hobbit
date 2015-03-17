@@ -8,6 +8,7 @@ int saveRawImageToFile(const char * filename,unsigned char * pixels , unsigned i
 int detectHighContrastUnusableRGB(unsigned char * rgbFrame , unsigned int width , unsigned int height , float percentageHigh) ;
 unsigned char * copyRGB(unsigned char * source , unsigned int width , unsigned int height) ;
 unsigned short * copyDepth(unsigned short * source , unsigned int width , unsigned int height);
+unsigned int temperatureSensorSensesHuman(unsigned int tempDetected , unsigned int tempTimestamp , unsigned int frameTimestamp);
 
 
 #endif

@@ -10,8 +10,6 @@ extern "C"
 {
 #endif
 
-extern unsigned int receivedBaseImages;
-
 
 extern unsigned int consultHobbitMap;
 
@@ -21,7 +19,6 @@ extern unsigned int personDetected;
 extern unsigned int autoPlaneSegmentationFlag;
 
 
-extern  int maximumFrameDifferenceForTemperatureToBeRelevant;
 
 extern char * imageDir;
 extern int saveClassification;

@@ -50,25 +50,12 @@ char defaultDir[]="../../web_interface/bin/emergencies/";
 char * imageDir = defaultDir;
 
 
-//-----------------------------------------------------------------------
- //The following values are set by the launch file , so change them there..
- // Synchronization variables
- int maximumFrameDifferenceForTemperatureToBeRelevant=20;
- unsigned int doCalculationsCooldown=20;
- int doCalculations=0;
- // --------------------------------------------------------------------
-
-unsigned int receivedBaseImages=0;
-
- int tempZoneWidth = 300;
- int tempZoneHeight = 200;
 
 
 
 
 unsigned int useTemperatureSensorForLiveFallDetection=0;
 unsigned int doCVOutput=0;
-unsigned int emergencyDetected=0;
 unsigned int personDetected=0;
 unsigned int autoPlaneSegmentationFlag=0;
 
@@ -80,11 +67,6 @@ int saveClassification=0;
 int saveNextTopFrame=0;
 int saveNextBottomFrame=0;
 unsigned int framesSnapped=0;
-
-unsigned int obstacleChecks[6]={0};
-unsigned int totalObstacleChecks=0;
-
-
 
 
 
@@ -123,20 +105,6 @@ int processBoundingBox(
 
 
 
-unsigned int temperatureSensorSensesHuman(unsigned int tempDetected , unsigned int tempTimestamp , unsigned int frameTimestamp)
-{
- unsigned int temperatureFrameOffset = ABSDIFF(frameTimestamp,tempTimestamp);
-  if (
-       (minimums.objectTemperature<=tempDetected) &&
-       (tempDetected<=maximums.objectTemperature) &&
-       (temperatureFrameOffset < maximumFrameDifferenceForTemperatureToBeRelevant )
-     )
-    {
-        return 1;
-    }
-   return 0;
-}
-
 
 
 #if USE_HOBBIT_MAP_DATA
@@ -157,30 +125,30 @@ bool obstacleDetected(hobbit_msgs::GetOccupancyState::Request  &req, hobbit_msgs
 
 unsigned int mapSaysThatWhatWeAreLookingAtPossibleFallenUser(unsigned int frameTimestamp)
 {
-   totalObstacleChecks=1; // If USE_HOBBIT_MAP_DATA is not defined this function should always return 1;
+   lastState.totalMapObstacleHits=1; // If USE_HOBBIT_MAP_DATA is not defined this function should always return 1;
 
    #if USE_HOBBIT_MAP_DATA
-       totalObstacleChecks=0;
+       lastState.totalMapObstacleHits=0;
        hobbit_msgs::GetOccupancyState::Request req;
        hobbit_msgs::GetOccupancyState::Response res;
 
 
        req.local_point.x = 1.0; req.local_point.y = 0; //1m mprosta sto robot
-	   obstacleChecks[0] = obstacleDetected(req,res);
-	   totalObstacleChecks += obstacleChecks[0];
+	   lastState.mapShouldBeClear[0] = obstacleDetected(req,res);
+	   lastState.totalMapObstacleHits += lastState.mapShouldBeClear[0];
 
        req.local_point.x = 1.1; req.local_point.y = 0; //1,1m mprosta
-	   obstacleChecks[1] = obstacleDetected(req,res);
-	   totalObstacleChecks += obstacleChecks[1];
+	   lastState.mapShouldBeClear[1] = obstacleDetected(req,res);
+	   lastState.totalMapObstacleHits += lastState.mapShouldBeClear[1];
 
        req.local_point.x = 0.9; req.local_point.y = 0; //0.9m mprosta
-	   obstacleChecks[2] = obstacleDetected(req,res);
-	   totalObstacleChecks += obstacleChecks[2];
+	   lastState.mapShouldBeClear[2] = obstacleDetected(req,res);
+	   lastState.totalMapObstacleHits += lastState.mapShouldBeClear[2];
 
-       fprintf(stderr,"\nGot %u obstacles from map! \n",totalObstacleChecks);
+       fprintf(stderr,"\nGot %u obstacles from map! \n",lastState.totalMapObstacleHits);
    #endif // USE_HOBBIT_MAP_DATA
 
-  return (totalObstacleChecks>0);
+  return (lastState.totalMapObstacleHits>0);
 }
 
 
@@ -254,10 +222,10 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
 
   unsigned char * segmentedRGB = 0;
   unsigned short * segmentedDepth = 0;
-  unsigned int tempZoneStartX = (unsigned int ) ((colorWidth-tempZoneWidth) / 2);
-  unsigned int tempZoneStartY = (unsigned int ) ((colorHeight-tempZoneHeight) / 2);
-  unsigned int depthAvg = 0;
-  unsigned int badView = 0;// detectHighContrastUnusableRGB(colorFrame,colorWidth,colorHeight,40.0);
+  lastState.topX1 = (unsigned int ) ((colorWidth-lastState.topWidth) / 2);
+  lastState.topY1 = (unsigned int ) ((colorHeight-lastState.topHeight) / 2);
+
+  lastState.badContrastTop = detectHighContrastUnusableRGB(colorFrame,colorWidth,colorHeight,40.0);
 
   //unsigned int temperatureFrameOffset = ABSDIFF(frameTimestamp,tempTimestamp);
 
@@ -322,8 +290,8 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
                                 );
 
       unsigned int holesTop=0;
-      lastState.scoreTop = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , tempZoneStartX , tempZoneStartY , tempZoneWidth , tempZoneHeight , maximums.scoreTop , 1 , &holesTop );
-      lastState.holesPercentTop = (float) (100*holesTop)/(tempZoneWidth*tempZoneHeight);
+      lastState.scoreTop = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , lastState.topX1 , lastState.topY1 , lastState.topWidth , lastState.topHeight , maximums.scoreTop , 1 , &holesTop );
+      lastState.holesPercentTop = (float) (100*holesTop)/(lastState.topWidth*lastState.topHeight);
 
       fprintf(stderr,"Avg Depth is %u mm , empty area is %0.2f %% , Bot Depth %u mm , empty area is %0.2f %% \n",
               lastState.scoreTop , lastState.holesPercentTop ,
@@ -332,10 +300,10 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
 
 
 
-      if ( (lastState.useHolesBase) && (lastState.holesPercentBase < minimums.holesPercentBase) )
+      if ( (lastState.useHolesBase) && (receivedBaseImages!=0) && (lastState.holesPercentBase < minimums.holesPercentBase) )
          { fprintf(stderr,RED "\n\n  Too few holes at Base ( min is %0.2f ) , too big a blob , cannot be an emergency\n\n" NORMAL , minimums.holesPercentBase); }
           else
-      if ( (lastState.useHolesBase) && (lastState.holesPercentBase > maximums.holesPercentBase) )
+      if ( (lastState.useHolesBase) && (receivedBaseImages!=0) && (lastState.holesPercentBase > maximums.holesPercentBase) )
          { fprintf(stderr,RED "\n\n  Too many holes at Base ( max is %0.2f ) , this cannot be an emergency \n\n" NORMAL  , maximums.holesPercentBase); }
           else
       if ( (lastState.useHolesTop) && (lastState.holesPercentTop < minimums.holesPercentTop) )
@@ -349,7 +317,8 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
             ( lastState.scoreBase > minimums.scoreBase) &&
             ( lastState.scoreBase < maximums.scoreBase)
            ) ||
-           (lastState.useScoreBase==0)
+           (lastState.useScoreBase==0) ||
+           (receivedBaseImages==0) // If we have no zero images we can't use base camera to judge result
          )
       {
       if (
@@ -364,11 +333,11 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
               //We are almost sure we have a fallen blob , but maybe the blob continues on the top side ( so it is a standing user after all
               unsigned int holesOverTemperatureArea=0;
               unsigned int overHeight=120;
-              unsigned int depthAvgOver = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , tempZoneStartX , tempZoneStartY-overHeight , tempZoneWidth , overHeight , maximums.scoreTop , 1 , &holesOverTemperatureArea );
+              unsigned int depthAvgOver = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , lastState.topX1 , lastState.topY1-overHeight , lastState.topWidth , overHeight , maximums.scoreTop , 1 , &holesOverTemperatureArea );
 
               fprintf(stderr,MAGENTA "\n\n  Top Avg is %u mm Holes are %0.2f %% \n\n" NORMAL , depthAvgOver, lastState.holesPercentTop  );
 
-              if (holesOverTemperatureArea> ( (unsigned int) tempZoneWidth*overHeight*80/100 ) )
+              if (holesOverTemperatureArea> ( (unsigned int) lastState.topWidth*overHeight*80/100 ) )
                {
                  fprintf(stderr,MAGENTA "\n\n  Already Fallen User Detected , EMERGENCY \n\n" NORMAL);
                  emergencyDetected=1;
@@ -391,123 +360,10 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
 
       if (doCVOutput)
       {
-        cv::Mat bgrMat,rgbMat;
-        if (segmentedRGB!=0)  { rgbMat = cv::Mat(colorHeight,colorWidth,CV_8UC3,segmentedRGB,3*colorWidth); } else
-                              { rgbMat = cv::Mat(colorHeight,colorWidth,CV_8UC3,colorFrame,3*colorWidth); }
-
-	    cv::cvtColor(rgbMat,bgrMat, CV_RGB2BGR);// opencv expects the image in BGR format
-
-        RNG rng(12345);
-        Point centerPt; centerPt.x=colorWidth/2;       centerPt.y=colorHeight/2;
-        Point pt1;      pt1.x=tempZoneStartX;               pt1.y=tempZoneStartY;
-        Point pt2;      pt2.x=tempZoneStartX+tempZoneWidth; pt2.y=tempZoneStartY+tempZoneHeight;
-        Scalar color = Scalar ( rng.uniform(0,255) , rng.uniform(0,255) , rng.uniform(0,255)  );
-        Scalar colorEmergency = Scalar ( 0 , 0 , 255  );
-        rectangle(bgrMat ,  pt1 , pt2 , color , 2, 8 , 0);
-
-
-        unsigned int tempColorR=255 , tempColorG=0 , tempColorB=0;
-        if (lastState.objectTemperature<30) { tempColorR=0 , tempColorG=0 , tempColorB=255; } else
-        if (lastState.objectTemperature>40) { tempColorR=255 , tempColorG=0 , tempColorB=0; } else
-                                          { tempColorR=(unsigned int) 125+( 40-lastState.objectTemperature/10 ) * 125 , tempColorG=0 , tempColorB=0; }
-
-
-        Scalar tempColor = Scalar ( tempColorB , tempColorG , tempColorR );
-        circle(bgrMat,  centerPt , 30 , tempColor , 4, 8 , 0);
-
-        if ( temperatureSensorSensesHuman( lastState.objectTemperature ,  lastState.timestampTemperature , frameTimestamp) )
-        {
-           Scalar tempRColor = Scalar ( 0 , 0 , 255 );
-           circle(bgrMat,  centerPt , 10 , tempRColor , 4, 8 , 0);
-        }
-
-
-        char rectVal[256]={0};
-        int fontUsed=FONT_HERSHEY_SIMPLEX; //FONT_HERSHEY_SCRIPT_SIMPLEX;
-        Point txtPosition;  txtPosition.x = pt1.x+15; txtPosition.y = pt1.y+20;
-
-
-        if ( emergencyDetected )
-        {
-          putText(bgrMat , "Emergency Detected ..! " , txtPosition , fontUsed , 0.7 , color , 2 , 8 );
-          Point ptIn1; ptIn1.x=tempZoneStartX;               ptIn1.y=tempZoneStartY;
-          Point ptIn2; ptIn2.x=tempZoneStartX+tempZoneWidth; ptIn2.y=tempZoneStartY+tempZoneHeight;
-
-          unsigned int i=0;
-          for (i=0; i<3; i++)
-          {
-            ptIn1.x-=10; ptIn1.y-=10;
-            ptIn2.x+=10; ptIn2.y+=10;
-            rectangle(bgrMat ,  ptIn1 , ptIn2 , colorEmergency , 2, 8 , 0);
-          }
-
-          Point ul; ul.x=0;          ul.y=0;
-          Point ur; ur.x=colorWidth; ur.y=0;
-          Point dl; dl.x=0;          dl.y=colorHeight;
-          Point dr; dr.x=colorWidth; dr.y=colorHeight;
-          line(bgrMat,ul,ptIn1 , colorEmergency , 2 , 8 , 0);
-          line(bgrMat,dr,ptIn2 , colorEmergency , 2 , 8 , 0);
-
-          ptIn1.x+=tempZoneWidth+60;
-          ptIn2.x-=tempZoneWidth+60;
-          line(bgrMat,ur,ptIn1 , colorEmergency , 2 , 8 , 0);
-          line(bgrMat,dl,ptIn2 , colorEmergency , 2 , 8 , 0);
-        } else
-        //======================================================================================================
-        if (fallDetectionContext.headLookingDirection==HEAD_LOOKING_CENTER)
-             { putText(bgrMat , "Horizontal Only Live Fall" , txtPosition , fontUsed , 0.7 , color , 2 , 8 ); }
-            else
-        if (segmentedRGB==0)
-             { putText(bgrMat , "Low Temp / Power Save" , txtPosition , fontUsed , 0.7 , color , 2 , 8 ); }
-            else
-        if (fallDetectionContext.headLookingDirection!=HEAD_LOOKING_DOWN)
-             { putText(bgrMat , "Head Not Looking Down" , txtPosition , fontUsed , 0.7 , color , 2 , 8 ); }
-            else
-             { putText(bgrMat , "Scanning for fallen user.." , txtPosition , fontUsed , 0.7 , color , 2 , 8 ); }
-        //======================================================================================================
-        txtPosition.y += 24; snprintf(rectVal,123,"Top : %u / Bot : %u ",depthAvg,lastState.scoreBase);
-        putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , color , 2 , 8 );
-        txtPosition.y += 24; snprintf(rectVal,123,"Temperature : %0.2f C",lastState.objectTemperature);
-        putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , color , 2 , 8 );
-
-
-        txtPosition.y += 50;
-
-
-        if (consultHobbitMap)
-        {
-          txtPosition.y += 24; snprintf(rectVal,123,"Obstacle map hits : %u ",totalObstacleChecks);
-          putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , color , 2 , 8 );
-        }
-
-       if (userIsRecent(&fallDetectionContext,frameTimestamp))
-       {
-        txtPosition.y += 24; snprintf(rectVal,123,"Sk Movem. : %u",fallDetectionContext.skeletonVelocity);
-        putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , color , 2 , 8 );
-
-        unsigned int i=0;
-        for (i=0; i<fallDetectionContext.numberOfJoints; i++)
-         {
-           Scalar jointColor = Scalar ( 0 , 255 , 0 );
-           if ( ( fallDetectionContext.currentJoint2D[i].x!=0.0 ) || ( fallDetectionContext.currentJoint2D[i].y!=0.0) )
-           {
-               centerPt.x=fallDetectionContext.currentJoint2D[i].x;       centerPt.y=fallDetectionContext.currentJoint2D[i].y;
-               circle(bgrMat,  centerPt , 15 , jointColor , -4, 8 , 0);
-           }
-         }
-       }
-
-
-       if (badView)
-       {
-        txtPosition.y += 24; snprintf(rectVal,123,"BAD VIEW!");
-        putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , color , 2 , 8 );
-
-       }
-
-	    cv::imshow("emergency_detector visualization",bgrMat);
-	    cv::waitKey(1);
+        visualizeTopCam(colorFrame,segmentedRGB,colorWidth,colorHeight,consultHobbitMap,frameTimestamp);
       }
+
+
 
    if (segmentedRGB!=0)      { free (segmentedRGB);   }
    if (segmentedDepth!=0)    { free (segmentedDepth); }

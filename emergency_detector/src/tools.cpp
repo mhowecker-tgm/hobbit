@@ -6,6 +6,9 @@
 
 #include "classifier.h"
 
+
+#define ABSDIFF(num1,num2) ( (num1-num2) >=0 ? (num1-num2) : (num2 - num1) )
+
 unsigned int simplePow(unsigned int base,unsigned int exp)
 {
 if (exp==0) return 1;
@@ -124,4 +127,21 @@ unsigned short * copyDepth(unsigned short * source , unsigned int width , unsign
   if (output==0) { fprintf(stderr,"copyDepth could not allocate memory for output\n"); return 0; }
   memcpy(output , source , width*height*sizeof(unsigned short));
   return output;
+}
+
+
+
+
+unsigned int temperatureSensorSensesHuman(unsigned int tempDetected , unsigned int tempTimestamp , unsigned int frameTimestamp)
+{
+ unsigned int temperatureFrameOffset = ABSDIFF(frameTimestamp,tempTimestamp);
+  if (
+       (minimums.objectTemperature<=tempDetected) &&
+       (tempDetected<=maximums.objectTemperature) &&
+       (temperatureFrameOffset < maximumFrameDifferenceForTemperatureToBeRelevant )
+     )
+    {
+        return 1;
+    }
+   return 0;
 }
