@@ -141,7 +141,9 @@ unsigned int temperatureSensorSensesHuman(float tempDetected , unsigned int temp
        (temperatureFrameOffset < maximumFrameDifferenceForTemperatureToBeRelevant )
      )
     {
+        fprintf(stderr,"HUMAN TEMP %0.2f <= %0.2f <= %0.2f , sensor lag %u ",minimums.objectTemperature , tempDetected , maximums.objectTemperature , temperatureFrameOffset);
         return 1;
     }
+   fprintf(stderr,"NONHUMAN TEMP %0.2f <!= %0.2f <!= %0.2f , sensor lag %u ",minimums.objectTemperature , tempDetected , maximums.objectTemperature , temperatureFrameOffset);
    return 0;
 }
