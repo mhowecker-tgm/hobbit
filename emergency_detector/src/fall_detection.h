@@ -61,7 +61,7 @@ int logSkeletonState(struct fallState * fs,unsigned int mode3D);
 
 extern struct fallState fallDetectionContext;
 
-int isSkeletonWrong(struct fallState * fs);
+int isSkeletonWrong(struct fallState * fs,unsigned int frameTimestamp);
 
 int userIsRecent(struct fallState * fs,unsigned int timeStamp);
 int userIsStanding(struct fallState * fs,unsigned int timeStamp);

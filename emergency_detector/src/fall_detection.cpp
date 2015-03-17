@@ -5,8 +5,16 @@
 struct fallState fallDetectionContext={0};
 
 
-int isSkeletonWrong(struct fallState * fs)
+int userIsRecent(struct fallState * fs,unsigned int timeStamp)
 {
+  if (ABSDIFF(fs->jointsTimestamp,timeStamp)>30) { return 0; }
+  return 1;
+}
+
+int isSkeletonWrong(struct fallState * fs,unsigned int frameTimestamp)
+{
+  if (!userIsRecent(fs,frameTimestamp)) { return 0; }
+
   int i=0;
   float totalDist=0;
   float thisDist=0;
@@ -32,6 +40,8 @@ int isSkeletonWrong(struct fallState * fs)
 
 int isSkeletonStanding(struct fallState * fs)
 {
+ // if (isSkeletonTooOld(fs,frameTimestamp)) { return 0; }
+
   //If we are standing we have at least 1 particle high on the Y axis of the frame..!
   unsigned int i=0;
   unsigned int height=0;
@@ -106,17 +116,12 @@ int logSkeletonState(struct fallState * fs,unsigned int mode3D)
       }
   }
 
-  if (isSkeletonStanding(fs)) { fprintf(stderr,"Skeleton Is Standing");  fs->state=FALL_DETECTION_SKELETON_STANDING; return 1; }
+  if (isSkeletonStanding(fs)) { fprintf(stderr,"Skeleton Is Standing\n");  fs->state=FALL_DETECTION_SKELETON_STANDING; return 1; }
 
 
   return 1;
 }
 
-int userIsRecent(struct fallState * fs,unsigned int timeStamp)
-{
-  if (ABSDIFF(fs->jointsTimestamp,timeStamp)>30) { return 0; }
-  return 1;
-}
 
 int userIsStanding(struct fallState * fs,unsigned int timeStamp)
 {
