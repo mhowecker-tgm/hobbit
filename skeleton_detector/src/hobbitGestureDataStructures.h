@@ -13,7 +13,7 @@ static const char * gestureNamesInternal[] =
  "Help",
  "Yes",
  "No",
- "Reward",
+ "Circle", //This is not reward
  "Point",
  "Come",
  "Wave",
