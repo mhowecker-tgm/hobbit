@@ -489,8 +489,8 @@ int updateHeadPosition()
         fprintf(stderr,"Head Pos(%0.2f %0.2f %0.2f)/RPY(%0.2f %0.2f %0.2f)\n",transformS.getOrigin().x(),transformS.getOrigin().y(),transformS.getOrigin().z(),roll,pitch,yaw);
        }
 
-      if ( ( pitch < -1.0  ) && ( pitch > -1.15  )  ) { lookingLittleDownInternal(); }  else
-      if (pitch > -1.0)                               { lookingDownInternal(); }  else
+      if ( ( pitch <= -1.0  ) && ( pitch >= -1.26  )  ) { lookingLittleDownInternal(); }  else
+      if (pitch >= -1.0)                               { lookingDownInternal(); }  else
                                                       { lookingCenterInternal(); }
 
      }
