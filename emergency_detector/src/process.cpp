@@ -231,9 +231,7 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
 
   lastState.badContrastTop = detectHighContrastUnusableRGB(colorFrame,colorWidth,colorHeight,40.0);
 
-  //unsigned int temperatureFrameOffset = ABSDIFF(frameTimestamp,tempTimestamp);
-
-  isSkeletonWrong(&fallDetectionContext,frameTimestamp);
+  //isSkeletonWrong(&fallDetectionContext,frameTimestamp);
 
   //If we are looking Center then we might detect a person..!
   if (
