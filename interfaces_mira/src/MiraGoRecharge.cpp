@@ -36,6 +36,7 @@ void MiraGoRecharge::template_channel_callback(mira::ChannelRead<std::string> da
 		status.data = "template_found";
 		template_found = true;
 		std::cout << "template_found " << std::endl;
+		timeout = ros::Time::now() + ros::Duration(40); //FIXME, add parameter
 
 	}
 	if(data->value().compare("Failure") == 0) 
@@ -324,6 +325,18 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 			as_->setSucceeded(interfaces_mira::MiraDockingResult(), "Task succeeded, robot stopped moving backwards");
 			status_updated = false;
 			return;
+		}
+
+		if (status.data.compare("template_found") == 0)
+		{
+			ros::Duration time_left = timeout - ros::Time::now();
+			if (time_left <= ros::Duration(0,0))  //the timeout has been reached
+			{
+				std::cout << "task succeeded, template found but no feedback received" << std::endl;
+				as_->setSucceeded(interfaces_mira::MiraDockingResult(), "Task succeeded, template found but no feedback received");
+				
+			}	
+
 		}
 
 		if (status.data.compare("template_not_found") == 0)
