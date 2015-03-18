@@ -495,7 +495,7 @@ int updateHeadPosition()
        if (pitchChange<0) { pitchChange = -1 * pitchChange; }
        headLastPitch=pitch;
 
-       if (pitchChange>0.2) { headIsMoving=20; }
+       if (pitchChange>0.2) { headIsMoving=5; }
 
        if ( (headIsMoving>0) )
         {
