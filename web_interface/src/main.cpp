@@ -617,7 +617,22 @@ int shutdownRaspberryPi()
   return 0;
 }
 
-
+int shutdownArm()
+{
+     int i=system("python /opt/ros/hobbit_hydro/src/hobbit_smach/src/hobbit_smach/ArmActionClientShutDownPLC.py");
+     if (i!=0)
+        {
+          AmmServer_Error("Shutting down the arm appears to have failed\n");
+        }
+         else
+        {
+          AmmServer_Success("Shutting down the arm appears to have succeeded , waiting a little for it to shutdown before returning \n");
+          //Sleep for 1.0 sec , could also ping raspberry here to see if it still alive ( or not )
+          usleep(1500*1000);
+          return 1;
+        }
+ return 0;
+}
 
 
 
@@ -840,6 +855,7 @@ void execute(char * command,char * param)
     if (strcmp(param,"systemShutdown")==0)
          {
            //When we shut down we also need to shutdown the raspberry pi's and this requires us to add another command
+           shutdownArm();
            shutdownRaspberryPi();
            //Assuming that the raspberry pi is off we can then shutdown XPC
            strncpy(cR,"../../hobbit_launch/launch/System/systemCommands shutdown",cRLen);
