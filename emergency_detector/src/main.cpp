@@ -489,9 +489,11 @@ int updateHeadPosition()
         fprintf(stderr,"Head Pos(%0.2f %0.2f %0.2f)/RPY(%0.2f %0.2f %0.2f)\n",transformS.getOrigin().x(),transformS.getOrigin().y(),transformS.getOrigin().z(),roll,pitch,yaw);
        }
 
-      if ( ( pitch <= -1.0  ) && ( pitch >= -1.26  )  ) { lookingLittleDownInternal(); }  else
-      if (pitch >= -1.0)                               { lookingDownInternal(); }  else
-                                                      { lookingCenterInternal(); }
+
+      // <-- LOW ( -1.10 ) ----   ( LOWMAX(-1.15) --- LOWMIN(-1.29) ) ----- HIGH( -1.35 )
+      if ( ( pitch <= -1.15  ) && ( pitch >= -1.29  )  ) { lookingLittleDownInternal(); }  else
+      if (pitch >= -1.10)                                { lookingDownInternal(); }  else
+      if (pitch <= -1.35)                                { lookingCenterInternal(); }
 
      }
  catch (tf::TransformException &ex)
