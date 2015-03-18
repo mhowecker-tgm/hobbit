@@ -12,7 +12,7 @@
       <place>
         <name>call1</name>
         <type>call_button_1</type>
-        <pose y="-0.4909" x="-1.996" theta="4.455"/>
+        <pose y="-0.482" x="-1.957" theta="-1.705"/>
         <objects/>
       </place>
       <place>
@@ -24,19 +24,19 @@
       <place>
         <name>call2</name>
         <type>call_button_2</type>
-        <pose y="-0.6537" x="7.1287" theta="0.5067"/>
+        <pose y="-0.6537" x="7.1287e-05" theta="-0.459"/>
         <objects/>
       </place>
       <place>
         <name>sofa</name>
         <type>goTo</type>
-        <pose y="-0.6537" x="7.1287" theta="0.5067"/>
+        <pose y="-0.6537" x="7.1287e-05" theta="-0.459"/>
         <objects/>
       </place>
       <place>
         <name>cupboard</name>
         <type>searchable</type>
-        <pose y="0.811" x="0.85097" theta="-0.459"/>
+        <pose y="0.811" x="0.85097" theta="0.506"/>
         <objects>
           <object name="Häferl" probability="1.0"/>
         </objects>
@@ -44,7 +44,7 @@
       <place>
         <name>cupboard</name>
         <type>goTo</type>
-        <pose y="0.811" x="0.85097" theta="-0.459"/>
+        <pose y="0.811" x="0.85097" theta="0.506"/>
         <objects/>
       </place>
       <place>
@@ -84,7 +84,7 @@
       <place>
         <name>call3</name>
         <type>call_button_3</type>
-        <pose y="-6.287" x="1.949" theta="0.044"/>
+        <pose y="-5.7504" x="1.949" theta="-0.7596"/>
         <objects/>
       </place>
     </places>
