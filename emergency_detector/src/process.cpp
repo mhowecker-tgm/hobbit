@@ -219,6 +219,10 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
         if ( (saveNextTopFrame==0) && (saveNextBottomFrame==0) )  { ++framesSnapped; }
       }
 
+  //Clear last state in case we dont finish
+  lastState.scoreOverTop = 0;
+  lastState.holesPercentOverTop = 0;
+
 
   unsigned char * segmentedRGB = 0;
   unsigned short * segmentedDepth = 0;
