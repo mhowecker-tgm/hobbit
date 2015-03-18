@@ -331,10 +331,11 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
            ( lastState.scoreTop < maximums.scoreTop)
          )
          {
+           /*
            if (userIsStanding(&fallDetectionContext,frameTimestamp))
             { fprintf(stderr,RED "\n\n  We have a standing user , so he is taking care of fallen user , will not emit emergency \n\n" NORMAL ); }
              else
-            {
+            {*/
               //We are almost sure we have a fallen blob , but maybe the blob continues on the top side ( so it is a standing user after all
               unsigned int holesOverTemperatureArea=0;
 
@@ -353,7 +354,7 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
                  fprintf(stderr,MAGENTA "\n\n  Already Fallen User Detected , EMERGENCY \n\n" NORMAL);
                  emergencyDetected=1;
                }
-            }
+            //}
           } else
           {
            fprintf(stderr,RED "\n\n  Top Camera indicates that this , cannot be an emergency ( score %u ,holes %0.2f %% )  score Min %u Max %u \n\n" NORMAL , lastState.scoreTop , lastState.holesPercentTop , minimums.scoreTop , maximums.scoreTop );
