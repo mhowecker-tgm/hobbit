@@ -36,7 +36,7 @@ int initializeClassifier()
   //minimums.objectTemperature = 31.5;
   //maximums.objectTemperature = 37.0;
 
-  minimums.scoreTop = 1350;
+  minimums.scoreTop = 1300;
   maximums.scoreTop = 1600;
 
   minimums.scoreBase = 550;
