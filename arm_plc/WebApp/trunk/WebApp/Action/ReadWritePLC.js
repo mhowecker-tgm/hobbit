@@ -628,14 +628,19 @@
                 // HANDLE TcAdsWebService.ResquestError HERE;
                 document.getElementById("div_log").innerHTML = "Error: StatusText = " + e.error.statusText + " Status: " + e.error.status;
                 ShowComErr(e.error.statusText + " " + e.error.status, true);
+                UpdatePLCState("ERROR");
             }
             else if (e.error.getTypeString() == "TcAdsWebService.Error") {
                 // HANDLE TcAdsWebService.Error HERE;
                 document.getElementById("div_log").innerHTML = "Error: ErrorMessage = " + e.error.errorMessage + " ErrorCode: " + e.error.errorCode;
                 ShowComErr(e.error.errorMessage + " " + e.error.errorCode, true);
+                UpdatePLCState("ERROR");
             }
             else
+            {
                 ShowComErr("UNKNOWN", true);
+                UpdatePLCState("UNKOWN");
+            }   
         }
         if (!connected && readLoopID1!==null)
         {
