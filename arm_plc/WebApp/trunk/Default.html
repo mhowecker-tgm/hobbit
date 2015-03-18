@@ -22,7 +22,7 @@
 
 
 <body contenteditable="false">
-    <div id="WebApp">
+    <div id="WebApp" style="position: relative">
 
 
         <!--
@@ -71,15 +71,15 @@
         				<li><a href="#_ActualArmStates"><img src="WebApp/Design/Img/next.png">Actual States</a></li>
         			</ul>
                     
-                    <ul>
-                        <h2>Actual Arm Positions</h2>
-                        <li><span id="_ActPos1"></span>Joint 1 [DEG]</li>
-                        <li><span id="_ActPos2"></span>Joint 2 [DEG]</li>
-                        <li><span id="_ActPos3"></span>Joint 3 [DEG]</li>
-                        <li><span id="_ActPos4"></span>Joint 4 [DEG]</li>
-                        <li><span id="_ActPos5"></span>Joint 5 [DEG]</li>
-                        <li><span id="_ActPos6"></span>Joint 6 [DEG]</li>
-        			</ul>        			
+                        <ul>
+                            <h2>Actual Arm Positions</h2>
+                            <li><span id="_ActPos1"></span>Joint 1 [DEG]</li>
+                            <li><span id="_ActPos2"></span>Joint 2 [DEG]</li>
+                            <li><span id="_ActPos3"></span>Joint 3 [DEG]</li>
+                            <li><span id="_ActPos4"></span>Joint 4 [DEG]</li>
+                            <li><span id="_ActPos5"></span>Joint 5 [DEG]</li>
+                            <li><span id="_ActPos6"></span>Joint 6 [DEG]</li>
+        		</ul>        			
         		</div>
         	</div>
 
@@ -300,7 +300,7 @@
             
 
 
-            <div class="iLayer" id="waMoveSingelAxis" title="Move Singel Axis">
+            <div class="iLayer" id="waMoveSingelAxis" title="Move Single Axis">
                 <div class="iBlock">
                     <h1>Move Single Axis</h1>
     		        <p>To start a singel axis move, choose the axis and positive or negative direction. ATTENTION: A single axis move is possible without referenced arm. Therefore be carefull when moving to maximum or minimum limits!</p>
@@ -462,7 +462,12 @@
 
 		  </div>
 
-	</div>
+        <div id="iFooter" class="iFooter">
+            Fußleisten Test
+        </div>
+        
+    </div>
+    
 
 
 </body></html>

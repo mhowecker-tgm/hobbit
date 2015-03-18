@@ -555,6 +555,9 @@
             
         document.getElementById("_AdsError").innerHTML = "Communication ERROR: " + text;
     });
+    var UpdatePLCState = (function (state){
+       document.getElementById("iFooter").innerHTML = "Current PLC State: " + state; 
+    });
     
     // Occurs if the readState command has finished;
     var ReadStateCallback = (function (e, s) {
@@ -579,20 +582,24 @@
                 case (AdsStates.RESET):
                     document.getElementById("_AdsState").innerHTML = "RESET";
                     ShowComErr("RESET", true); 
+                    UpdatePLCState("RESET");
                     connected = false;
                     break;
                 case (AdsStates.INIT):
                     document.getElementById("_AdsState").innerHTML = "INIT";
                     ShowComErr("INIT", true);
+                    UpdatePLCState("INIT");
                     connected = false;
                     break;
                 case (AdsStates.START):
                     document.getElementById("_AdsState").innerHTML = "START";
                     ShowComErr("START", false);
+                    UpdatePLCState("START");
                     break;
                 case (AdsStates.RUN):
                     document.getElementById("_AdsState").innerHTML = "RUN";
                     ShowComErr("RUN", false);
+                    UpdatePLCState("RUN");
                     if (!connected)
                     {
                         CreateVarHandles();
@@ -602,11 +609,13 @@
                 case (AdsStates.STOP):
                     document.getElementById("_AdsState").innerHTML = "STOP";
                     ShowComErr("STOP", true);
+                    UpdatePLCState("STOP");
                     connected = false;
                     break;
                 case (AdsStates.CONFIG):
                     document.getElementById("_AdsState").innerHTML = "CONFIG";
                     ShowComErr("CONFIG", true); 
+                    UpdatePLCState("CONFIG");
                     connected = false;
                     break;  
             }
