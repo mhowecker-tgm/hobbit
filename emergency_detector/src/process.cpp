@@ -233,7 +233,6 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
 
   //unsigned int temperatureFrameOffset = ABSDIFF(frameTimestamp,tempTimestamp);
 
-
   isSkeletonWrong(&fallDetectionContext,frameTimestamp);
 
   //If we are looking Center then we might detect a person..!
