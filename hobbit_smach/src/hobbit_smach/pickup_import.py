@@ -574,6 +574,84 @@ class GoToFinalGraspPose(State):
 # new 27.2.2015 = end ==
 
 
+
+
+#move robot back and turn to see an object that it couldn't see before
+# new: 17.3.2015 start
+class MoveRobotBackForBetterObjectView(State): #GoToFinalGraspPose
+    """
+    This state should handle the following task.
+    Robot could not grasp object (no object, no trajectory, ...) => hence the robot should move back turn and try again 
+    (assume the object was to near to robot or not in grasping area)
+    
+    input_keys:
+        none
+
+    output_keys:
+        none
+    """
+
+    def __init__(self):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'aborted', 'preempted'],
+            input_keys=[],
+            output_keys=[]
+        )
+        self.move_robot_relative_pub = rospy.Publisher('/DiscreteMotionCmd', String)
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            return 'preempted'
+        print "===> GoToFinalGraspPose.execute: execute started and received obj_center_x_rcs: ",ud.obj_center_rcs.x
+        print "===> GoToFinalGraspPose.execute: execute started and received obj_center_y_rcs: ",ud.obj_center_rcs.y
+
+        # robot moves back distance d and turns by turn_r (rad)
+        #   dis_m...........distance (m)
+        #   turn_degree .....degree
+        dis_m = -0.5
+        turn_degree = 30
+        
+        try:        
+            if not self.moveRobotRelative(turn_degree, dis_m):
+                return 'aborted'
+            
+            
+    
+    
+            return 'succeeded'
+    
+        except:
+            print "===> MoveRobotBackForBetterObjectView: Error "
+            return 'aborted'
+
+    def moveRobotRelative(self, turn_degree, distance_m):
+        #moves the robot back and then moves the robot to perfect grasp position
+        
+        
+        #move Hobbit backward (discrete Motion)
+        move = String("Move "+str(distance_m))
+        print "move (String): ", move
+        self.move_robot_relative_pub.publish(move)
+        rospy.sleep(7)
+  
+        
+        #turn robot
+        
+        #if (abs of) turn_degree greater the 10 degree, use topic for Hobbit rotation
+        turn = String("Turn "+str(turn_degree))
+        print "turn (String): ", turn
+        self.move_robot_relative_pub.publish(turn)
+        rospy.sleep(5)
+        
+        return True
+# new 17.3.2015 = end ==
+
+
+
+
+
+
 class DavidLookingPose(State):
     """
     This state should handle the following task.

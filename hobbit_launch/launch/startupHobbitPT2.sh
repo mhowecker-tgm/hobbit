@@ -34,8 +34,11 @@ sleep $DELAY_BETWEEN_STEPS
 #set HobbitID and Robot-specific parameters
 echo "This hobbit is $hobbit_id"
 rosparam set hobbit_id "$hobbit_id"
-rosparam set hobbit/head/pitch_offset "$hobbit_head_pitch_offset"
-rosparam set hobbit/head/yaw_offset "$hobbit_head_yaw_offset"
+rm /opt/ros/hobbit_hydro/src/configuration/active.yaml
+ln -s /opt/ros/hobbit_hydro/src/configuration/$hobbit_id.yaml  /opt/ros/hobbit_hydro/src/configuration/active.yaml
+rosparam load /opt/ros/hobbit_hydro/src/configuration/active.yaml
+#rosparam set hobbit/head/pitch_offset "$hobbit_head_pitch_offset"
+#rosparam set hobbit/head/yaw_offset "$hobbit_head_yaw_offset"
 sleep $DELAY_BETWEEN_STEPS
 
 #Trying to start basecam

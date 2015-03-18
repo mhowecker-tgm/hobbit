@@ -557,10 +557,21 @@ def main():
         StateMachine.add(
             'MOVE_ARM_TO_HOME_POSITION',  #VIA TRAY POSITION because maybe the checkgrasp result was wrong!
             arm_move.goToTrayPosition(),
-            transitions={'succeeded': 'SAY_PICKING_UP', 
+            transitions={'succeeded': 'MOVE_TO_BETTER_POSE_TO_REVIEW_OBJECT',  #=> move robot back and turn it to better see object and start new from "HEAD_TO_SEARCH"
                          'preempted': 'LOG_PREEMPT',
                          'failed': 'MOVE_ARM_TO_HOME_POSITION'}    # better failure handling appreciated
         )
+        
+        
+        #df new 17.3.2015
+        StateMachine.add(
+            'MOVE_TO_BETTER_POSE_TO_REVIEW_OBJECT',        
+            pickup.MoveRobotBackForBetterObjectView(),
+            transitions={'succeeded': 'HEAD_TO_SEARCH',
+                         'aborted': 'MOVE_COUNTER',
+                         'preempted': 'LOG_PREEMPT'}
+        )        
+        #df enf 17.3.2015
         StateMachine.add(
             'EMO_SAY_DID_NOT_PICKUP_2',
             pickup.sayDidNotPickupObject2(),
