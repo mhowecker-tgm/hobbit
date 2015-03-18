@@ -236,13 +236,13 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
   //If we are looking Center then we might detect a person..!
   if (
        (fallDetectionContext.headLookingDirection==HEAD_LOOKING_CENTER) ||
-       (fallDetectionContext.headLookingDirection==HEAD_LOOKING_LITTLE_DOWN)
+       (fallDetectionContext.headLookingDirection==HEAD_LOOKING_LITTLE_DOWN)||
+       (fallDetectionContext.headLookingDirection==HEAD_LOOKING_DOWN)
      )
   {
    if  (
           ( temperatureSensorSensesHuman( lastState.objectTemperature ,  lastState.timestampTemperature , frameTimestamp) )
-           ||
-          (!useTemperatureSensorForLiveFallDetection) //If we dont want to use temperature check just check using skeleton..!
+           || (!useTemperatureSensorForLiveFallDetection) //If we dont want to use temperature check just check using skeleton..!
         )
    {
     if (userHasFallen(&fallDetectionContext,frameTimestamp))
@@ -263,7 +263,8 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
   }
 
   if (doCalculations>0) { --doCalculations; }
-  if (fallDetectionContext.headLookingDirection!=HEAD_LOOKING_DOWN)
+
+  if ( (fallDetectionContext.headLookingDirection!=HEAD_LOOKING_DOWN) || (emergencyDetected) )
   {
    // fprintf(stderr,YELLOW "\n\n  Head Not Looking Down , Only doing active user falling check \n\n" NORMAL );
    //We are done if the head is not looking down..
