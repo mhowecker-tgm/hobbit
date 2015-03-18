@@ -119,7 +119,7 @@ int logSkeletonState(struct fallState * fs,unsigned int mode3D)
       }
   }
 
-  if (isSkeletonStanding(fs)) { fprintf(stderr,"Skeleton Is Standing\n");  fs->state=FALL_DETECTION_SKELETON_STANDING; return 1; }
+  //if (isSkeletonStanding(fs)) { fprintf(stderr,"Skeleton Is Standing\n");  fs->state=FALL_DETECTION_SKELETON_STANDING; return 1; }
 
 
   return 1;
