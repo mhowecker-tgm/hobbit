@@ -603,8 +603,8 @@ class MoveRobotBackForBetterObjectView(State): #GoToFinalGraspPose
     def execute(self, ud):
         if self.preempt_requested():
             return 'preempted'
-        print "===> GoToFinalGraspPose.execute: execute started and received obj_center_x_rcs: ",ud.obj_center_rcs.x
-        print "===> GoToFinalGraspPose.execute: execute started and received obj_center_y_rcs: ",ud.obj_center_rcs.y
+        print "===> MoveRobotBackForBetterObjectView.execute: execute (move back and turn)"
+        
 
         # robot moves back distance d and turns by turn_r (rad)
         #   dis_m...........distance (m)
