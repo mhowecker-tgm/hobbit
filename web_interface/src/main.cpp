@@ -604,14 +604,10 @@ int shutdownRaspberryPi()
 {
      int i=system("../../hobbit_launch/launch/System/systemCommands shutdownPi");
      if (i!=0)
-        {
-          AmmServer_Error("Shutting down the raspberry pi appears to have failed\n");
-        }
+        { AmmServer_Error("Shutting down the raspberry pi appears to have failed\n"); }
          else
         {
           AmmServer_Success("Shutting down the raspberry pi appears to have succeeded , waiting a little for it to shutdown before returning \n");
-          //Sleep for 1.0 sec , could also ping raspberry here to see if it still alive ( or not )
-          usleep(1500*1000);
           return 1;
         }
   return 0;
@@ -620,17 +616,11 @@ int shutdownRaspberryPi()
 int shutdownArm()
 {
      int i=system("python /opt/ros/hobbit_hydro/src/hobbit_smach/src/hobbit_smach/ArmActionClientShutDownPLC.py");
-     if (i!=0)
-        {
-          AmmServer_Error("Shutting down the arm appears to have failed\n");
-        }
-         else
-        {
-          AmmServer_Success("Shutting down the arm appears to have succeeded , waiting a little for it to shutdown before returning \n");
-          //Sleep for 1.0 sec , could also ping raspberry here to see if it still alive ( or not )
-          usleep(1500*1000);
-          return 1;
-        }
+     if (i!=0) { AmmServer_Error("Shutting down the arm appears to have failed\n"); }
+         else  {
+                 AmmServer_Success("Shutting down the arm appears to have succeeded , waiting a little for it to shutdown before returning \n");
+                 return 1;
+                }
  return 0;
 }
 
@@ -858,6 +848,9 @@ void execute(char * command,char * param)
            shutdownArm();
            shutdownRaspberryPi();
            //Assuming that the raspberry pi is off we can then shutdown XPC
+           //We give some time for things to shut down
+           usleep(4000*1000);
+
            strncpy(cR,"../../hobbit_launch/launch/System/systemCommands shutdown",cRLen);
          } else
     if (strcmp(param,"systemUpdate")==0)       { strncpy(cR,"../../hobbit_launch/launch/System/update.sh",cRLen); }   else
