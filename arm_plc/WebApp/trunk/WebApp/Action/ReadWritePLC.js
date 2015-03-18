@@ -11,6 +11,7 @@
 
     var readLoopID1 = null;
     var readLoopID2 = null;
+    var connected = false;
     
     var readLoopDelay = 500;
 
@@ -183,6 +184,16 @@
     // Occurs if the window has loaded;
     window.onload = (function () {
 
+        //create variable handles
+        //CreateVarHandles();
+            
+        //start read-state loop
+        readLoopID2 = window.setInterval(ReadLoop2, readLoopDelay);
+    });
+
+
+    var CreateVarHandles = (function(){
+        
         // Create sumcommando for reading twincat symbol handles by symbol name;
         var handleswriter = new TcAdsWebService.DataWriter();
 
@@ -224,11 +235,7 @@
             general_timeout,
             RequestHandlesTimeoutCallback,
             true);
-            
-        readLoopID2 = window.setInterval(ReadLoop2, readLoopDelay);
     });
-
-
 
     // Occurs if the readwrite for the sumcommando has finished;
     var RequestHandlesCallback = (function (e, s) {
@@ -563,10 +570,12 @@
                 case (AdsStates.RESET):
                     document.getElementById("_AdsState").innerHTML = "RESET";
                     document.getElementById("ComErr").style.display= 'block'; 
+                    connected = false;
                     break;
                 case (AdsStates.INIT):
                     document.getElementById("_AdsState").innerHTML = "INIT";
-                    document.getElementById("ComErr").style.display= 'block'; 
+                    document.getElementById("ComErr").style.display= 'block';
+                    connected = false;
                     break;
                 case (AdsStates.START):
                     document.getElementById("_AdsState").innerHTML = "START";
@@ -575,19 +584,27 @@
                 case (AdsStates.RUN):
                     document.getElementById("_AdsState").innerHTML = "RUN";
                     document.getElementById("ComErr").style.display= 'none';
+                    if (!connected)
+                    {
+                        CreateVarHandles();
+                        connected = true;
+                    }
                     break;
                 case (AdsStates.STOP):
                     document.getElementById("_AdsState").innerHTML = "STOP";
                     document.getElementById("ComErr").style.display= 'block'; 
+                    connected = false;
                     break;
                 case (AdsStates.CONFIG):
                     document.getElementById("_AdsState").innerHTML = "CONFIG";
                     document.getElementById("ComErr").style.display= 'block'; 
+                    connected = false;
                     break;  
             }
             
         } else {                    
             document.getElementById("ComErr").style.display= 'block'; 
+            connected = false;
 
             if (e.error.getTypeString() == "TcAdsWebService.ResquestError") {
                 // HANDLE TcAdsWebService.ResquestError HERE;
@@ -597,6 +614,10 @@
                 // HANDLE TcAdsWebService.Error HERE;
                 document.getElementById("div_log").innerHTML = "Error: ErrorMessage = " + e.error.errorMessage + " ErrorCode: " + e.error.errorCode;
             }
+        }
+        if (!connected && readLoopID1!==null)
+        {
+            window.clearInterval(readLoopID1);
         }
         
     });
