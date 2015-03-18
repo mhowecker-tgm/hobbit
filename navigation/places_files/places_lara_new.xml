@@ -12,13 +12,13 @@
       <place>
         <name>call1</name>
         <type>call_button_1</type>
-        <pose y="-0.482" x="-1.957" theta="-1.705"/>
+        <pose y="-0.482" x="-1.957" theta="-1.57"/>
         <objects/>
       </place>
       <place>
         <name>fitness</name>
         <type>fitness</type>
-        <pose y="-0.728473" x="-1.262025" theta="-1.51258"/>
+        <pose y="-1.3" x="-0.549867" theta="1.57"/>
         <objects/>
       </place>
       <place>
