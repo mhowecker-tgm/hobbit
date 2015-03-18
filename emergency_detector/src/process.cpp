@@ -237,7 +237,10 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
   isSkeletonWrong(&fallDetectionContext,frameTimestamp);
 
   //If we are looking Center then we might detect a person..!
-  if (fallDetectionContext.headLookingDirection==HEAD_LOOKING_CENTER)
+  if (
+       (fallDetectionContext.headLookingDirection==HEAD_LOOKING_CENTER) ||
+       (fallDetectionContext.headLookingDirection==HEAD_LOOKING_LITTLE_DOWN)
+     )
   {
    if  (
           ( temperatureSensorSensesHuman( lastState.objectTemperature ,  lastState.timestampTemperature , frameTimestamp) )
@@ -265,7 +268,8 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
   if (doCalculations>0) { --doCalculations; }
   if (fallDetectionContext.headLookingDirection!=HEAD_LOOKING_DOWN)
   {
-    fprintf(stderr,YELLOW "\n\n  Head Not Looking Down , Only doing active user falling check \n\n" NORMAL );
+   // fprintf(stderr,YELLOW "\n\n  Head Not Looking Down , Only doing active user falling check \n\n" NORMAL );
+   //We are done if the head is not looking down..
   }
      else
   if ( temperatureSensorSensesHuman( lastState.objectTemperature , lastState.timestampTemperature , frameTimestamp) )
