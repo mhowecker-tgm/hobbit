@@ -356,10 +356,18 @@ int lookingDownInternal()
     fallDetectionContext.headLookingDirection=HEAD_LOOKING_DOWN;
 }
 
+int lookingLittleDownInternal()
+{
+    if (fallDetectionContext.headLookingDirection!=HEAD_LOOKING_LITTLE_DOWN) { fprintf(stderr,"\n\nHead seems to be looking little down now..!\n\n"); }
+    fallDetectionContext.headLookingDirection=HEAD_LOOKING_LITTLE_DOWN;
+}
+
+
+
 
 bool toggleTFPrinting(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    if (printTFPosition) { printTFPosition=1; } else { printTFPosition=0; }
+    if (printTFPosition) { printTFPosition=0; } else { printTFPosition=1; }
     return true;
 }
 
@@ -373,6 +381,13 @@ bool lookingUp(std_srvs::Empty::Request& request, std_srvs::Empty::Response& res
 bool lookingDown(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
     lookingDownInternal();
+    return true;
+}
+
+
+bool lookingLittleDown(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    lookingLittleDownInternal();
     return true;
 }
 
@@ -475,6 +490,7 @@ int updateHeadPosition()
        }
 
       if (pitch > -1.2) { lookingDownInternal(); }  else
+      //if ( (pitch <  ) && (lookingLittleDownInternal(); ) )  else
                         { lookingCenterInternal(); }
 
      }
@@ -710,6 +726,8 @@ int main(int argc, char **argv)
      ros::ServiceServer lookUpService          = nh.advertiseService(name+"/looking_up" , lookingUp);
      ros::ServiceServer lookCenterService      = nh.advertiseService(name+"/looking_center" , lookingCenter);
      ros::ServiceServer lookDownService        = nh.advertiseService(name+"/looking_down" , lookingDown);
+     ros::ServiceServer lookLittleDownService  = nh.advertiseService(name+"/looking_little_down" , lookingLittleDown);
+
 
      ros::ServiceServer tfPrintService        = nh.advertiseService(name+"/toggleTFPrinting" , toggleTFPrinting);
 

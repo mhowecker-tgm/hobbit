@@ -97,7 +97,10 @@ int visualizeTopCam(unsigned char * colorFrame,unsigned char * segmentedRGB,unsi
           else
         //======================================================================================================
         if (fallDetectionContext.headLookingDirection==HEAD_LOOKING_CENTER)
-             { putText(bgrMat , "Horizontal Only Live Fall" , txtPosition , fontUsed , 0.7 , color , 2 , 8 ); }
+             { putText(bgrMat , "Horizontal View - Live Fall" , txtPosition , fontUsed , 0.7 , color , 2 , 8 ); }
+            else
+        if (fallDetectionContext.headLookingDirection==HEAD_LOOKING_LITTLE_DOWN)
+             { putText(bgrMat , "Diagonal View - Live Fall" , txtPosition , fontUsed , 0.7 , color , 2 , 8 ); }
             else
         if (segmentedRGB==0)
              { putText(bgrMat , "Low Temp / Power Save" , txtPosition , fontUsed , 0.7 , color , 2 , 8 ); }
