@@ -606,7 +606,7 @@ def goToPosition(frame='/map', room='None', place='dock'):
             transitions={'failed': 'aborted'})
         Sequence.add(
             'MMUI_SAY_WayBlocked',
-            HobbitMMUI.ShowInfo(info='T_GT_WayBlocked'),
+            speech_output.sayText(info='T_GT_WayBlocked'),
             transitions={'failed': 'aborted'})
         Sequence.add(
             'PREPARE_STOP_1',
@@ -624,7 +624,7 @@ def goToPosition(frame='/map', room='None', place='dock'):
         # )
         Sequence.add(
             'SAY_ARM',
-            HobbitMMUI.ShowInfo(info='My arm is not in the home position. Will not move.'),
+            speech_output.sayText(info='My arm is not in the home position. Will not move.'),
             transitions={'succeeded': 'aborted',
                          'failed': 'aborted'}
         )
@@ -770,7 +770,7 @@ def goToPose():
             transitions={'failed': 'aborted'})
         Sequence.add(
             'MMUI_SAY_WayBlocked',
-            HobbitMMUI.ShowInfo(info='T_GT_WayBlocked'),
+            speech_output.sayText(info='T_GT_WayBlocked'),
             transitions={'failed': 'aborted',
                          'succeeded': 'aborted'})
         # Sequence.add(
@@ -781,7 +781,7 @@ def goToPose():
         # )
         Sequence.add(
             'SAY_ARM',
-            HobbitMMUI.ShowInfo(info='My arm is not in the home position. Will not move.'),
+            speech_output.sayText(info='My arm is not in the home position. Will not move.'),
             transitions={'succeeded': 'aborted',
                          'failed': 'aborted'}
         )
@@ -881,7 +881,7 @@ def goToPoseSilent():
             transitions={'failed': 'aborted'})
         Sequence.add(
             'MMUI_SAY_WayBlocked',
-            HobbitMMUI.ShowInfo(info='T_GT_WayBlocked'),
+            speech_output.sayText(info='T_GT_WayBlocked'),
             transitions={'failed': 'aborted'})
         Sequence.add(
             'PREPARE_STOP_1',
@@ -899,7 +899,7 @@ def goToPoseSilent():
         # )
         Sequence.add(
             'SAY_ARM',
-            HobbitMMUI.ShowInfo(info='My arm is not in the home position. Will not move.'),
+            speech_output.sayText(info='My arm is not in the home position. Will not move.'),
             transitions={'succeeded': 'aborted',
                          'failed': 'aborted'}
         )
