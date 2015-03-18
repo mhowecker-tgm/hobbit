@@ -547,6 +547,15 @@
 
     });
     
+    var ShowComErr = (function (text, show){   
+        if (show)
+            document.getElementById("ComErr").style.display= 'block';
+        else
+            document.getElementById("ComErr").style.display= 'none';
+            
+        document.getElementById("_AdsError").innerHTML = "Communication ERROR: " + text;
+    });
+    
     // Occurs if the readState command has finished;
     var ReadStateCallback = (function (e, s) {
 
@@ -569,21 +578,21 @@
             switch (AdsStateNum) {
                 case (AdsStates.RESET):
                     document.getElementById("_AdsState").innerHTML = "RESET";
-                    document.getElementById("ComErr").style.display= 'block'; 
+                    ShowComErr("RESET", true); 
                     connected = false;
                     break;
                 case (AdsStates.INIT):
                     document.getElementById("_AdsState").innerHTML = "INIT";
-                    document.getElementById("ComErr").style.display= 'block';
+                    ShowComErr("INIT", true);
                     connected = false;
                     break;
                 case (AdsStates.START):
                     document.getElementById("_AdsState").innerHTML = "START";
-                    document.getElementById("ComErr").style.display= 'none';
+                    ShowComErr("START", false);
                     break;
                 case (AdsStates.RUN):
                     document.getElementById("_AdsState").innerHTML = "RUN";
-                    document.getElementById("ComErr").style.display= 'none';
+                    ShowComErr("RUN", false);
                     if (!connected)
                     {
                         CreateVarHandles();
@@ -592,28 +601,32 @@
                     break;
                 case (AdsStates.STOP):
                     document.getElementById("_AdsState").innerHTML = "STOP";
-                    document.getElementById("ComErr").style.display= 'block'; 
+                    ShowComErr("STOP", true);
                     connected = false;
                     break;
                 case (AdsStates.CONFIG):
                     document.getElementById("_AdsState").innerHTML = "CONFIG";
-                    document.getElementById("ComErr").style.display= 'block'; 
+                    ShowComErr("CONFIG", true); 
                     connected = false;
                     break;  
             }
             
         } else {                    
-            document.getElementById("ComErr").style.display= 'block'; 
+            //document.getElementById("ComErr").style.display= 'block'; 
             connected = false;
 
             if (e.error.getTypeString() == "TcAdsWebService.ResquestError") {
                 // HANDLE TcAdsWebService.ResquestError HERE;
                 document.getElementById("div_log").innerHTML = "Error: StatusText = " + e.error.statusText + " Status: " + e.error.status;
+                ShowComErr(e.error.statusText + " " + e.error.status, true);
             }
             else if (e.error.getTypeString() == "TcAdsWebService.Error") {
                 // HANDLE TcAdsWebService.Error HERE;
                 document.getElementById("div_log").innerHTML = "Error: ErrorMessage = " + e.error.errorMessage + " ErrorCode: " + e.error.errorCode;
+                ShowComErr(e.error.errorMessage + " " + e.error.errorCode, true);
             }
+            else
+                ShowComErr("UNKNOWN", true);
         }
         if (!connected && readLoopID1!==null)
         {
