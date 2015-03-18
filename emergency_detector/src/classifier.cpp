@@ -5,6 +5,8 @@ struct classifierData minimums={0};
 struct classifierData lastState={0};
 struct classifierData maximums={0};
 
+unsigned int headIsMoving=0;
+
 unsigned int emergencyDetected=0;
 unsigned int overHeight=120;
 

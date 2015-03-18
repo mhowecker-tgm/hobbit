@@ -62,7 +62,7 @@ extern struct classifierData lastState;
 extern struct classifierData maximums;
 
 extern unsigned int emergencyDetected;
-
+extern unsigned int headIsMoving;
 
 extern unsigned int overHeight;
 

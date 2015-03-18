@@ -102,6 +102,8 @@ char triggersDir[]="../../../web_interface/bin/emergencies/triggers";
 char curDir[]="../../../web_interface/bin/emergencies/";
 
 
+double headLastPitch=0.0;
+
 bool first=false;
 int key = 0;
 unsigned int frameTimestamp=emergencyDetectionCooldown+1; //not 0 so we can immediately trigger
@@ -489,6 +491,18 @@ int updateHeadPosition()
         fprintf(stderr,"Head Pos(%0.2f %0.2f %0.2f)/RPY(%0.2f %0.2f %0.2f)\n",transformS.getOrigin().x(),transformS.getOrigin().y(),transformS.getOrigin().z(),roll,pitch,yaw);
        }
 
+       double pitchChange=pitch-headLastPitch;
+       if (pitchChange<0) { pitchChange = -1 * pitchChange; }
+
+       if (pitchChange>0.2) { headIsMoving=20; }
+
+       if ( (headIsMoving>0) )
+        {
+         fprintf(stderr,"Head is moving ( cooldown %u )\n",headIsMoving);
+         fallDetectionContext.headLookingDirection=HEAD_MOVING_FAST;
+         --headIsMoving;
+         return 1;
+        }
 
       // <-- LOW ( -1.10 ) ----   ( LOWMAX(-1.15) --- LOWMIN(-1.29) ) ----- HIGH( -1.35 )
       if ( ( pitch <= -1.15  ) && ( pitch >= -1.29  )  ) { lookingLittleDownInternal(); }  else

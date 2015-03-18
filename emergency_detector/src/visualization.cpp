@@ -96,6 +96,10 @@ int visualizeTopCam(unsigned char * colorFrame,unsigned char * segmentedRGB,unsi
         } // EMERGENCY GRAPHICS HERE ----------------------------------------------------------------------
           else
         //======================================================================================================
+
+        if (fallDetectionContext.headLookingDirection==HEAD_MOVING_FAST)
+             { putText(bgrMat , "Head Moving" , txtPosition , fontUsed , 0.7 , color , 2 , 8 ); }
+            else
         if (fallDetectionContext.headLookingDirection==HEAD_LOOKING_CENTER)
              { putText(bgrMat , "Horizontal - Live Fall" , txtPosition , fontUsed , 0.7 , color , 2 , 8 ); }
             else
