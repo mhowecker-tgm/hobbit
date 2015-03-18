@@ -20,9 +20,12 @@ using namespace cv;
 int visualizeTopCam(unsigned char * colorFrame,unsigned char * segmentedRGB,unsigned int colorWidth , unsigned int colorHeight ,
                     unsigned int consultHobbitMap , unsigned int frameTimestamp)
 {
+     char rectVal[256]={0};
+     int fontUsed=FONT_HERSHEY_SIMPLEX; //FONT_HERSHEY_SCRIPT_SIMPLEX;
      cv::Mat bgrMat,rgbMat;
-        if (segmentedRGB!=0)  { rgbMat = cv::Mat(colorHeight,colorWidth,CV_8UC3,segmentedRGB,3*colorWidth); } else
-                              { rgbMat = cv::Mat(colorHeight,colorWidth,CV_8UC3,colorFrame,3*colorWidth); }
+
+     if (segmentedRGB!=0)  { rgbMat = cv::Mat(colorHeight,colorWidth,CV_8UC3,segmentedRGB,3*colorWidth); } else
+                           { rgbMat = cv::Mat(colorHeight,colorWidth,CV_8UC3,colorFrame,3*colorWidth); }
 
 	    cv::cvtColor(rgbMat,bgrMat, CV_RGB2BGR);// opencv expects the image in BGR format
 
@@ -33,6 +36,14 @@ int visualizeTopCam(unsigned char * colorFrame,unsigned char * segmentedRGB,unsi
         Scalar color = Scalar ( rng.uniform(0,255) , rng.uniform(0,255) , rng.uniform(0,255)  );
         Scalar colorEmergency = Scalar ( 0 , 0 , 255  );
         rectangle(bgrMat ,  pt1 , pt2 , color , 2, 8 , 0);
+
+        pt2.x=lastState.topX1+lastState.topWidth;  pt2.y=lastState.topY1-overHeight;
+        rectangle(bgrMat ,  pt1 , pt2 , color , 1, 8 , 0);
+        pt2.x = pt1.x+15;
+        pt2.y += 24; snprintf(rectVal,123,"Over : %u ",lastState.scoreOverTop);
+        putText(bgrMat , rectVal, pt2 , fontUsed , 0.5 , color , 2 , 8 );
+        pt2.y += 24; snprintf(rectVal,123,"Holes : %0.2f %%",lastState.holesPercentOverTop);
+        putText(bgrMat , rectVal, pt2 , fontUsed , 0.5 , color , 2 , 8 );
 
 
         unsigned int tempColorR=255 , tempColorG=0 , tempColorB=0;
@@ -51,13 +62,11 @@ int visualizeTopCam(unsigned char * colorFrame,unsigned char * segmentedRGB,unsi
         }
 
 
-        char rectVal[256]={0};
-        int fontUsed=FONT_HERSHEY_SIMPLEX; //FONT_HERSHEY_SCRIPT_SIMPLEX;
         Point txtPosition;  txtPosition.x = pt1.x+15; txtPosition.y = pt1.y+20;
 
 
         if ( emergencyDetected )
-        {
+        { // EMERGENCY GRAPHICS HERE ----------------------------------------------------------------------
           putText(bgrMat , "Emergency Detected ..! " , txtPosition , fontUsed , 0.7 , color , 2 , 8 );
           Point ptIn1; ptIn1.x=lastState.topX1;                    ptIn1.y=lastState.topY1;
           Point ptIn2; ptIn2.x=lastState.topX1+lastState.topWidth; ptIn2.y=lastState.topY1+lastState.topHeight;
@@ -81,7 +90,8 @@ int visualizeTopCam(unsigned char * colorFrame,unsigned char * segmentedRGB,unsi
           ptIn2.x-=lastState.topWidth+60;
           line(bgrMat,ur,ptIn1 , colorEmergency , 2 , 8 , 0);
           line(bgrMat,dl,ptIn2 , colorEmergency , 2 , 8 , 0);
-        } else
+        } // EMERGENCY GRAPHICS HERE ----------------------------------------------------------------------
+          else
         //======================================================================================================
         if (fallDetectionContext.headLookingDirection==HEAD_LOOKING_CENTER)
              { putText(bgrMat , "Horizontal Only Live Fall" , txtPosition , fontUsed , 0.7 , color , 2 , 8 ); }

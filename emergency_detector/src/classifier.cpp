@@ -6,7 +6,7 @@ struct classifierData lastState={0};
 struct classifierData maximums={0};
 
 unsigned int emergencyDetected=0;
-
+unsigned int overHeight=120;
 
 //-----------------------------------------------------------------------
  //The following values are set by the launch file , so change them there..
@@ -20,6 +20,10 @@ unsigned int receivedBaseImages=0;
 
 int initializeClassifier()
 {
+  minimums.holesPercentOverTop=60;
+  maximums.holesPercentOverTop=100;
+  lastState.useHolesOverTop=1;
+
   minimums.holesPercentTop=15;
   maximums.holesPercentTop=75;
   lastState.useHolesTop=0;

@@ -30,11 +30,14 @@ struct classifierData
   unsigned int timestampTemperature;
   unsigned int useObjectTemperature;
   //----------------------------------------
+  float holesPercentOverTop;
+  unsigned int useHolesOverTop;
   float holesPercentTop;
   unsigned int useHolesTop;
   float holesPercentBase;
   unsigned int useHolesBase;
   //----------------------------------------
+  unsigned int scoreOverTop;
   unsigned int scoreTop;
   unsigned int scoreBase;
   unsigned int useScoreBase;
@@ -61,7 +64,7 @@ extern struct classifierData maximums;
 extern unsigned int emergencyDetected;
 
 
-
+extern unsigned int overHeight;
 
 //-----------------------------------------------------------------------
  // Synchronization variables
