@@ -60,6 +60,10 @@ int visualizeTopCam(unsigned char * colorFrame,unsigned char * segmentedRGB,unsi
          putText(bgrMat , rectVal, pt2 , fontUsed , 0.5 , color , 2 , 8 );
          pt2.y += 24; snprintf(rectVal,123,"Holes : %0.2f %%",lastState.holesPercentOverTop);
          putText(bgrMat , rectVal, pt2 , fontUsed , 0.5 , color , 2 , 8 );
+
+
+         pt2.y += 24; snprintf(rectVal,123,"Bord : %u ",lowBorderY);
+         putText(bgrMat , rectVal, pt2 , fontUsed , 0.5 , color , 2 , 8 );
         }
 
         unsigned int tempColorR=255 , tempColorG=0 , tempColorB=0;
