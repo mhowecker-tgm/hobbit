@@ -24,7 +24,7 @@
       <place>
         <name>fitness</name>
         <type>fitness</type>
-        <pose y="-1.5" x="-0.449867" theta="1.57"/>
+        <pose y="-0.546" x="-1.0" theta="-1.57"/>
         <objects/>
       </place>
       <place>
@@ -72,7 +72,13 @@
     <places>
       <place>
         <name>bathroom</name>
-        <type>call_button_b</type>
+        <type>call_button_5</type>
+        <pose y="-5.1438" x="-1.1227" theta="3.11"/>
+        <objects/>
+      </place>
+      <place>
+        <name>side</name>
+        <type>goTo</type>
         <pose y="-5.1438" x="-1.1227" theta="3.11"/>
         <objects/>
       </place>
