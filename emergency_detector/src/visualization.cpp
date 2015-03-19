@@ -38,7 +38,7 @@ int visualizeTopCam(unsigned char * colorFrame,unsigned char * segmentedRGB,unsi
         Point pt2;
 
         //Draw Low Border
-        pt1.x=0;            pt1.y=lastState.lowBorderY;
+        pt1.x=0;            pt1.y=lowBorderY;
         pt2.x=colorWidth;   pt2.y=colorHeight;
         rectangle(bgrMat ,  pt1 , pt2 , color , 1, 8 , 0);
         //------------------
