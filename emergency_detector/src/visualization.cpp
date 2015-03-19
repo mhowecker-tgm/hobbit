@@ -103,6 +103,12 @@ int visualizeTopCam(unsigned char * colorFrame,unsigned char * segmentedRGB,unsi
         if (fallDetectionContext.headLookingDirection==HEAD_LOOKING_CENTER)
              { putText(bgrMat , "Horizontal - Live Fall" , txtPosition , fontUsed , 0.7 , color , 2 , 8 ); }
             else
+        if (fallDetectionContext.headLookingDirection==HEAD_LOOKING_LEFT)
+             { putText(bgrMat , "Left / Disabled" , txtPosition , fontUsed , 0.7 , color , 2 , 8 ); }
+            else
+        if (fallDetectionContext.headLookingDirection==HEAD_LOOKING_RIGHT)
+             { putText(bgrMat , "Right / Disabled" , txtPosition , fontUsed , 0.7 , color , 2 , 8 ); }
+            else
         if (fallDetectionContext.headLookingDirection==HEAD_LOOKING_LITTLE_DOWN)
              { putText(bgrMat , "Diagonal - Live Fall" , txtPosition , fontUsed , 0.7 , color , 2 , 8 ); }
             else
