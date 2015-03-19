@@ -65,7 +65,8 @@ int rate=DEFAULT_FRAME_RATE;
 
 float MinMaxHumanTemperatures[]= {
                                     0 , 0  ,       //DEV MACHINE
-                                    30.8 , 36.0 , //Hobbit A , last tested 23/1/15
+                                    25.7 , 33.0 , //Hobbit Demo settings *WITH* clothes
+                                    //30.8 , 36.0 , //Hobbit A , last tested 23/1/15
                                     29.9 , 36.0 , //Hobbit B , last tested 23/1/15
                                     30.8 , 36.0 , //Hobbit C , todo when I get back to crete
                                     26.6 , 33.0 , //Hobbit D , last checked 17/03/15
