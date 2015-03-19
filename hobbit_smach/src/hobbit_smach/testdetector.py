@@ -173,6 +173,16 @@ class TD:
         except rospy.ServiceException, e:
           print "Service did not process request: %s"%str(e)
           return None
+      
+    def findObjectsOnFloorSmall(self, pointcloud, groundplane):
+        rospy.wait_for_service('/CloudSegmenthor/findObjectsOnFloorSmall')
+        servicecall = rospy.ServiceProxy('/CloudSegmenthor/findObjectsOnFloorSmall', ClustersOnPlane)
+        try:
+            resp = servicecall(pointcloud, groundplane)    # call the service            
+            return resp.clusters
+        except rospy.ServiceException, e:
+          print "Service did not process request: %s"%str(e)
+          return None
 
     #df start 31.01.2013
     def findObjectsOnTable(self, pointcloud, tableplane):
