@@ -139,10 +139,14 @@ void MiraGetPose::loc_pose_callback(mira::ChannelRead<mira::Pose2> data)
 
 bool MiraGetPose::atDockingStation(hobbit_msgs::GetState::Request  &req, hobbit_msgs::GetState::Response &res) 
 {
+
+   //std::cout << "isDocked service called" << std::endl;
  
    if ( (pose_msg.pose.pose.position.x - docking_pose.x() < 0.05) && (pose_msg.pose.pose.position.y - docking_pose.y() < 0.05) && (tf::getYaw(pose_msg.pose.pose.orientation) - docking_pose.phi() < 5*M_PI/180))
-	return true;
+	res.state = true;
    else
-	return false;
+	res.state = false;
+
+   return true;
 }
 
