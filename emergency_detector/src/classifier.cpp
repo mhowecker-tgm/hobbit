@@ -43,7 +43,7 @@ int initializeClassifier()
   maximums.scoreTop = 1600;
 
   minimums.scoreBase = 550;
-  maximums.scoreBase = 1000;
+  maximums.scoreBase = 1100;
   lastState.useScoreBase=1;
 
   lastState.badContrastTop=0;
