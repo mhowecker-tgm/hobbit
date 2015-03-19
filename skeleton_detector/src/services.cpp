@@ -405,6 +405,26 @@ void broadcastNewGesture(unsigned int frameNumber,struct handGesture * gesture)
 
     hobbit_msgs::Event evt;
     std::stringstream ss;
+
+
+    if ( hobbitFitnessFunction_AreWeDoingAnExercise() )
+    {
+     switch (gesture->gestureID)
+     {
+        case GESTURE_COME   : fprintf(stderr,RED "Filtering G_COME while doing an exercise" NORMAL);   return;      break;
+        case GESTURE_CANCEL : fprintf(stderr,RED "Filtering G_CANCEL while doing an exercise" NORMAL); return;      break;
+        case GESTURE_WAVE   : fprintf(stderr,RED "Filtering G_WAVE while doing an exercise" NORMAL);   return;      break;
+        default :
+         fprintf(stderr,YELLOW "Received Gesture while doing exercise , letting it through..\n" NORMAL);
+        break;
+     }
+    }
+
+
+
+
+
+
     switch (gesture->gestureID)
     {
      case GESTURE_NONE   : ss<<"G_NONE";   break;
