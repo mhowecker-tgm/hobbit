@@ -1047,7 +1047,9 @@ class DavidPickingUp(State):
         pc_ccs = ud.cloud   #point cloud in camera coordinate system
         #raw_input(" ==============> publish cluster that findObjectsOnFloor is receiving from pickup_import.py")
         self.pubClust.publish(ud.cloud)
-        clusters = self.rec.findObjectsOnFloor(pc_ccs, [0,0,0,0]) #before: pointcloud instead of pc_ccs
+        #clusters = self.rec.findObjectsOnFloor(pc_ccs, [0,0,0,0]) #before: pointcloud instead of pc_ccs
+        #df 19.3.2015 => changed for smaller objects dfdfdfdf
+        clusters = self.rec.findObjectsOnFloorSmall(pc_ccs, [0,0,0,0]) #before: pointcloud instead of pc_ccs
         print "===> pickup_import.py: DavidPickingUp.findobject(): number of object clusters on floor found: ", len(clusters)
 
         for cluster in clusters:

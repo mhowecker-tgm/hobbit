@@ -78,6 +78,9 @@ public:
 				&CloudSegmenthor::do_service_findObjectOnTurnTable, this);
 		this->foof_service = nh_.advertiseService("findObjectsOnFloor",
 				&CloudSegmenthor::do_service_findObjectsOnFloor, this);
+		//df new 19.3.2015
+		this->foofs_service = nh_.advertiseService("findObjectsOnFloorSmall",
+				&CloudSegmenthor::do_service_findObjectsOnFloorSmall, this);
 		//df start: find objects on table
 		this->foot_service = nh_.advertiseService("findObjectsOnTable",
 				&CloudSegmenthor::do_service_findObjectsOnTable, this);
@@ -186,6 +189,29 @@ public:
 				"SERVICE_CALL findObjectOnFloor  done :: Spent %f seconds.", (ros::Time::now () - t1).toSec ());
 		return true;
 	}
+
+
+	// new 19.3.2015
+	bool do_service_findObjectsOnFloorSmall(
+			hobbit_msgs::ClustersOnPlane::Request& req,
+			hobbit_msgs::ClustersOnPlane::Response& res) {
+		ROS_INFO("SERVICE_CALL findOBJECTonFLOORSmall");
+		ROS_INFO(" %s ",req.point_cloud.header.frame_id.c_str());
+		ros::Time t1 = ros::Time::now();
+		pcl::PointCloud<pcl::PointXYZRGB> cloud;
+		pcl::fromROSMsg(req.point_cloud, cloud);
+		this->findObjectsOnFloorSmall(cloud, req.plane, res.clusters);
+
+		for (int i = 0; i < res.clusters.size(); i++) {
+			res.clusters[i].header.frame_id = req.point_cloud.header.frame_id;
+			res.clusters[i].header.stamp = req.point_cloud.header.stamp;
+		}
+
+		ROS_WARN(
+				"SERVICE_CALL findObjectOnFloor  done :: Spent %f seconds.", (ros::Time::now () - t1).toSec ());
+		return true;
+	}
+
 
 	//df start 31.01.2013
 	// input: table plane as float array, output: vector of pointcloud2
@@ -730,6 +756,110 @@ public:
 		}
 	}
 
+	//df new 19.3.2015
+	void findObjectsOnFloorSmall(pcl::PointCloud<pcl::PointXYZRGB> &cloud,
+			std::vector<float> &planeparams,
+			std::vector<sensor_msgs::PointCloud2> &clusters) {
+		pcl::PointCloud<pcl::PointXYZRGB> cloud_filtered;
+		// Create the filtering object
+		pcl::PassThrough<pcl::PointXYZRGB> pass;
+		pass.setInputCloud(cloud.makeShared());
+		pass.setFilterFieldName("z");
+		pass.setFilterLimits(0.95, 1.7);
+		pass.filter(cloud_filtered);
+
+		pcl::PointCloud<pcl::PointXYZRGB> objectcloud;
+		{
+			pcl::ModelCoefficients coefficients;
+			//pcl::PointIndices inliers;
+			pcl::PointIndices::Ptr inliers(new pcl::PointIndices);
+			// Create the segmentation object
+			pcl::SACSegmentation<pcl::PointXYZRGB> seg;
+			// Optional
+			seg.setOptimizeCoefficients(true);
+			// Mandatory
+			seg.setModelType(pcl::SACMODEL_PLANE);
+			seg.setMethodType(pcl::SAC_RANSAC);
+			seg.setDistanceThreshold(0.03);
+			seg.setInputCloud(cloud_filtered.makeShared());
+			seg.segment(*inliers, coefficients);
+
+			if (inliers->indices.size() == 0) {
+				std::cerr
+						<< "Could not estimate a planar model for the given dataset."
+						<< std::endl;
+				return;
+			}
+
+			planeparams.push_back(coefficients.values[0]);
+			planeparams.push_back(coefficients.values[1]);
+			planeparams.push_back(coefficients.values[2]);
+			planeparams.push_back(coefficients.values[3]);
+			std::cout << coefficients.values[0] << " " << coefficients.values[1] << " " << coefficients.values[2] << " " << coefficients.values[3] << " \n";
+			float distthresh = 0.017;
+			int cntr = 0;
+			for (size_t i = 0; i < cloud_filtered.points.size(); ++i)
+			{
+				float dist = 0.0;
+				dist = cloud_filtered.points[i].x * coefficients.values[0]
+						+ cloud_filtered.points[i].y * coefficients.values[1]
+						+ cloud_filtered.points[i].z * coefficients.values[2]
+						+ coefficients.values[3];
+				if (dist > -distthresh)
+					continue;
+				{
+					objectcloud.push_back(cloud_filtered.points[i]);
+					cntr++;
+				}
+
+			}
+			objectcloud.height = 1;
+			objectcloud.width = cntr;
+		}
+		sensor_msgs::PointCloud2 output;
+		pcl::toROSMsg (objectcloud, output);
+		output.header.frame_id = "/headcam_rgb_optical_frame";
+		// Publish the data (= data without detected plane => ros topic /debug)
+		pub.publish (output);
+
+
+		pcl::search::KdTree<pcl::PointXYZRGB>::Ptr tree(
+				new pcl::search::KdTree<pcl::PointXYZRGB>);
+		tree->setInputCloud(objectcloud.makeShared());
+
+		std::vector<pcl::PointIndices> cluster_indices;
+		pcl::EuclideanClusterExtraction<pcl::PointXYZRGB> ec;
+		ec.setClusterTolerance(0.01); // 2cm
+		ec.setMinClusterSize(50); //df: before 200 for normal objects
+		ec.setMaxClusterSize(5000);
+		ec.setSearchMethod(tree);
+		ec.setInputCloud(objectcloud.makeShared());
+		ec.extract(cluster_indices);
+
+		for (std::vector<pcl::PointIndices>::const_iterator it =
+				cluster_indices.begin(); it != cluster_indices.end(); ++it) {
+			pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_cluster(
+					new pcl::PointCloud<pcl::PointXYZRGB>);
+			for (std::vector<int>::const_iterator pit = it->indices.begin();
+					pit != it->indices.end(); pit++)
+				cloud_cluster->points.push_back(objectcloud.points[*pit]);
+
+			ROS_INFO("==> findObjectsOnFloorSmall() -> cluster size: %f ", cloud_cluster->points.size() );
+
+			cloud_cluster->width = cloud_cluster->points.size();
+			cloud_cluster->height = 1;
+			cloud_cluster->is_dense = true;
+
+			sensor_msgs::PointCloud2 cloud_out;
+			pcl::toROSMsg(*cloud_cluster, cloud_out);
+			clusters.push_back(cloud_out);
+
+
+
+		}
+	}
+
+	//df end 19.3.2015
 
 	//df start 31.01.2013
 	void findObjectsOnTable(pcl::PointCloud<pcl::PointXYZRGB> &cloud,
