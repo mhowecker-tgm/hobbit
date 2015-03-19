@@ -973,7 +973,7 @@ class DavidPickingUp(State):
             print "===> DavidPickingUp.execute: gp_representation: ", gp_representation
             gp_pres_str = str(gp_representation.result.data)
             gp_eval = int(gp_pres_str[0:2])
-            if (gp_eval < 8):
+            if (gp_eval < 2):
                 print "===> DavidPickingUp.execute: GRASP EVALUATION WAS TO BAD FOR RELIABLE GRASPING - GRASPING STOPPED"
                 return 'failed_no_sufficient_grasp_detected'
             # 3) (and 4)) call GraspFromFloorTrajectoryActionServer/Client to receive a trajectory (that will be directly executed) by calling the ArmActionServer/client
