@@ -96,7 +96,9 @@ class DavidLookForObject(State):
         print "===> pickup_import.py: DavidLookForObject.findobject() started"
         #random.seed(rospy.get_time())
         pointcloud = ud.cloud
-        clusters = self.rec.findObjectsOnFloor(pointcloud, [0,0,0,0])
+        #df 19.3.2015 changed to small objects:
+        #clusters = self.rec.findObjectsOnFloor(pointcloud, [0,0,0,0])
+        clusters = self.rec.findObjectsOnFloorSmall(pointcloud, [0,0,0,0])
         print "===> pickup_import.py: findobect():number of object clusters on floor found: ", len(clusters)
 
         for cluster in clusters:
