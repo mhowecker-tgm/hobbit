@@ -146,10 +146,10 @@ def main():
             'GRASP_OBJECT',
             pickup.getPickupSeq(), #
             #pickup.DavidPickingUp(),
-            transitions={'succeeded': 'LOG_PREEMPT',
-                         'preempted': 'LOG_PREEMPT',
-                         'failed': 'LOG_PREEMPT',
-                         'failed_arm_not_moved': 'LOG_PREEMPT' #not moved away from home position
+            transitions={'succeeded': 'LOG_ABORT',
+                         'preempted': 'LOG_ABORT',
+                         'failed': 'LOG_ABORT',
+                         'failed_arm_not_moved': 'LOG_ABORT' #not moved away from home position
                         }
                          
         #================> NEW 10.12.2014  ENDE                         
