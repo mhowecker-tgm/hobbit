@@ -582,7 +582,7 @@ def main():
         StateMachine.add(
             'MOVE_ARM_TO_HOME_POSITION_AFTER_FAILED',  #done after 2 times unsucessful grasped
             arm_move.goToHomePosition(),
-            transitions={'succeeded': 'aborted', 
+            transitions={'succeeded': 'MOVE_TO_BETTER_POSE_TO_REVIEW_OBJECT',  #third try after 2 fails!
                          'preempted': 'LOG_PREEMPT',
                          'failed': 'MOVE_ARM_TO_HOME_POSITION_AFTER_FAILED'}    # better failure handling appreciated
         )   
