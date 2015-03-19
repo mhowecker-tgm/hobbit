@@ -845,7 +845,7 @@ public:
 					pit != it->indices.end(); pit++)
 				cloud_cluster->points.push_back(objectcloud.points[*pit]);
 
-			ROS_INFO("==> findObjectsOnFloorSmall() -> cluster size: %f ", cloud_cluster->points.size() );
+			ROS_INFO("==> findObjectsOnFloorSmall() -> cluster size: %d ", cloud_cluster->points.size() );
 
 			cloud_cluster->width = cloud_cluster->points.size();
 			cloud_cluster->height = 1;
