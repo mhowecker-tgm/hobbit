@@ -51,6 +51,7 @@ public:
 
 	ros::ServiceServer foott_service;
 	ros::ServiceServer foof_service;
+	ros::ServiceServer foofs_service;
 	ros::ServiceServer foot_service; //df: find objects on table
 	ros::ServiceServer singleshot_service;
 	ros::ServiceServer tsout_service;
