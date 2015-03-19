@@ -849,7 +849,7 @@ void execute(char * command,char * param)
            shutdownRaspberryPi();
            //Assuming that the raspberry pi is off we can then shutdown XPC
            //We give some time for things to shut down
-           usleep(4000*1000);
+           usleep(14000*1000);
 
            strncpy(cR,"../../hobbit_launch/launch/System/systemCommands shutdown",cRLen);
          } else
