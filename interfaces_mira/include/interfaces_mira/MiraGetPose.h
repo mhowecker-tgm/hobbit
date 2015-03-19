@@ -23,6 +23,7 @@
 #include "tf/transform_broadcaster.h"
 
 #include "std_srvs/Empty.h"
+#include "hobbit_msgs/GetState.h"
 
 class MiraGetPose: public MiraRobotModule {
 public:
@@ -33,6 +34,7 @@ public:
         void initialize();
 
 	ros::ServiceServer reset_loc_service;
+	ros::ServiceServer is_docked_service;
 
 
 private:
@@ -48,6 +50,10 @@ private:
 	bool resetLoc(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res);
 
 	mira::PoseCov2 docking_pose;
+
+	geometry_msgs::PoseWithCovarianceStamped pose_msg;
+
+        bool atDockingStation(hobbit_msgs::GetState::Request  &req, hobbit_msgs::GetState::Response &res);
 
 };
 
