@@ -75,12 +75,12 @@ int visualizeTopCam(unsigned char * colorFrame,unsigned char * segmentedRGB,unsi
                                           { tempColorR=(unsigned int) 125+( 40-lastState.objectTemperature/10 ) * 125 , tempColorG=0 , tempColorB=0; }
 
 
+        Scalar tempRColor = Scalar ( 0 , 0 , 255 );
         Scalar tempColor = Scalar ( tempColorB , tempColorG , tempColorR );
         circle(bgrMat,  centerPt , 25 , tempColor , 4, 8 , 0);
 
         if ( temperatureSensorSensesHuman( lastState.objectTemperature ,  lastState.timestampTemperature , frameTimestamp) )
         {
-           Scalar tempRColor = Scalar ( 0 , 0 , 255 );
            circle(bgrMat,  centerPt , 10 , tempRColor , 4, 8 , 0);
         }
 
@@ -167,6 +167,12 @@ int visualizeTopCam(unsigned char * colorFrame,unsigned char * segmentedRGB,unsi
            if ( ( fallDetectionContext.currentJoint2D[i].x!=0.0 ) || ( fallDetectionContext.currentJoint2D[i].y!=0.0) )
            {
                centerPt.x=fallDetectionContext.currentJoint2D[i].x;       centerPt.y=fallDetectionContext.currentJoint2D[i].y;
+
+               if (fallDetectionContext.currentJoint2D[i].y > lowBorderY)
+               {
+                   jointColor=tempRColor;
+               }
+
                circle(bgrMat,  centerPt , 15 , jointColor , -4, 8 , 0);
            }
          }
