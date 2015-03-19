@@ -37,8 +37,6 @@ rosparam set hobbit_id "$hobbit_id"
 rm /opt/ros/hobbit_hydro/src/configuration/active.yaml
 ln -s /opt/ros/hobbit_hydro/src/configuration/$hobbit_id.yaml  /opt/ros/hobbit_hydro/src/configuration/active.yaml
 rosparam load /opt/ros/hobbit_hydro/src/configuration/active.yaml
-#rosparam set hobbit/head/pitch_offset "$hobbit_head_pitch_offset"
-#rosparam set hobbit/head/yaw_offset "$hobbit_head_yaw_offset"
 sleep $DELAY_BETWEEN_STEPS
 
 #Trying to start basecam
@@ -135,6 +133,11 @@ rosrun calc_grasppoints_svm calc_grasppoints_action_server&
 sleep $DELAY_BETWEEN_STEPS
 cd /opt/ros/hobbit_hydro/src/top_scan_points/launch
 roslaunch startup.launch&
+
+#new 19.3.2015
+sleep $DELAY_BETWEEN_STEPS
+cd /opt/ros/hobbit_hydro/src/arm_simulation
+rosrun arm_simulation GraspFromFloorTrajectoryActionServer.py&
 
 sleep $DELAY_BETWEEN_STEPS
 roslaunch person_following startup.launch&
