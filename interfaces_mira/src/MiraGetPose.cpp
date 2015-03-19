@@ -17,6 +17,8 @@ void MiraGetPose::initialize() {
   robot_->getMiraAuthority().subscribe<mira::Pose2>("/robot/RobotFrame", &MiraGetPose::loc_pose_callback, this);
 
   reset_loc_service = robot_->getRosNode().advertiseService("/reset_loc", &MiraGetPose::resetLoc, this);
+
+  is_docked_service = robot_->getRosNode().advertiseService("/isDocked", &MiraGetPose::atDockingStation, this);
  
   //get docking pose from stations.xml file
 
@@ -79,7 +81,7 @@ void MiraGetPose::loc_pose_callback(mira::ChannelRead<mira::Pose2> data)
 
   const mira::PoseCov2 robotPose = robot_->getMiraAuthority().getTransform<mira::PoseCov2>("/robot/RobotFrame", "/maps/MapFrame", Time::now());
 
-  geometry_msgs::PoseWithCovarianceStamped pose_msg;
+  //geometry_msgs::PoseWithCovarianceStamped pose_msg;
 
   // parse pose fields
 
@@ -133,5 +135,14 @@ void MiraGetPose::loc_pose_callback(mira::ChannelRead<mira::Pose2> data)
    (*p_robot_broadcaster).sendTransform(robot_trans);
 
         
+}
+
+bool MiraGetPose::atDockingStation(hobbit_msgs::GetState::Request  &req, hobbit_msgs::GetState::Response &res) 
+{
+ 
+   if ( (pose_msg.pose.pose.position.x - docking_pose.x() < 0.05) && (pose_msg.pose.pose.position.y - docking_pose.y() < 0.05) && (tf::getYaw(pose_msg.pose.pose.orientation) - docking_pose.phi() < 5*M_PI/180))
+	return true;
+   else
+	return false;
 }
 
