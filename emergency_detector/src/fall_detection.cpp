@@ -1,4 +1,5 @@
 #include "fall_detection.h"
+#include "visualization.h"
 #include <stdio.h>
 #include <math.h>
 
@@ -71,6 +72,8 @@ int isSkeletonFallenAndFar(struct fallState * fs)
   if (fs->headLookingDirection==HEAD_LOOKING_CENTER)      { height=330; } else
   if (fs->headLookingDirection==HEAD_LOOKING_LITTLE_DOWN) { height=240; } else
   if (fs->headLookingDirection==HEAD_LOOKING_DOWN)        { height=200; }
+
+  lowBorderY = height; //Update Visualization Coords
 
   unsigned int lowPoints = 0;
   unsigned int highPoints = 0;

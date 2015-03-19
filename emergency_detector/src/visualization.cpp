@@ -15,6 +15,7 @@ using namespace std;
 using namespace cv;
 
 
+unsigned int lowBorderY=480;
 
 
 int visualizeTopCam(unsigned char * colorFrame,unsigned char * segmentedRGB,unsigned int colorWidth , unsigned int colorHeight ,
@@ -30,11 +31,23 @@ int visualizeTopCam(unsigned char * colorFrame,unsigned char * segmentedRGB,unsi
 	    cv::cvtColor(rgbMat,bgrMat, CV_RGB2BGR);// opencv expects the image in BGR format
 
         RNG rng(12345);
-        Point centerPt; centerPt.x=colorWidth/2;       centerPt.y=colorHeight/2;
-        Point pt1;      pt1.x=lastState.topX1;                     pt1.y=lastState.topY1;
-        Point pt2;      pt2.x=lastState.topX1+lastState.topWidth;  pt2.y=lastState.topY1+lastState.topHeight;
+
         Scalar color = Scalar ( rng.uniform(0,255) , rng.uniform(0,255) , rng.uniform(0,255)  );
         Scalar colorEmergency = Scalar ( 0 , 0 , 255  );
+        Point pt1;
+        Point pt2;
+
+        //Draw Low Border
+        pt1.x=0;            pt1.y=lastState.lowBorderY;
+        pt2.x=colorWidth;   pt2.y=colorHeight;
+        rectangle(bgrMat ,  pt1 , pt2 , color , 1, 8 , 0);
+        //------------------
+
+
+        Point centerPt; centerPt.x=colorWidth/2;       centerPt.y=colorHeight/2;
+        pt1.x=lastState.topX1;                     pt1.y=lastState.topY1;
+        pt2.x=lastState.topX1+lastState.topWidth;  pt2.y=lastState.topY1+lastState.topHeight;
+
         rectangle(bgrMat ,  pt1 , pt2 , color , 2, 8 , 0);
 
 
