@@ -37,6 +37,51 @@ int visualizeTopCam(unsigned char * colorFrame,unsigned char * segmentedRGB,unsi
         Scalar colorEmergency = Scalar ( 0 , 0 , 255  );
         Point pt1;
         Point pt2;
+        Point centerPt; centerPt.x=colorWidth/2;       centerPt.y=colorHeight/2;
+
+        unsigned int tempColorR=255 , tempColorG=0 , tempColorB=0;
+        if (lastState.objectTemperature<30) { tempColorR=0 , tempColorG=0 , tempColorB=255; } else
+        if (lastState.objectTemperature>40) { tempColorR=255 , tempColorG=0 , tempColorB=0; } else
+                                          { tempColorR=(unsigned int) 125+( 40-lastState.objectTemperature/10 ) * 125 , tempColorG=0 , tempColorB=0; }
+
+
+        Scalar tempYColor = Scalar ( 0 , 255 , 255 );
+        Scalar tempBColor = Scalar ( 255 , 0 , 0 );
+        Scalar tempRColor = Scalar ( 0 , 0 , 255 );
+        Scalar tempColor = Scalar ( tempColorB , tempColorG , tempColorR );
+
+       if (userIsRecent(&fallDetectionContext,frameTimestamp))
+       {
+        //txtPosition.y += 24; snprintf(rectVal,123,"Sk Movem. : %u",fallDetectionContext.skeletonVelocity);
+        //putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , color , 2 , 8 );
+
+        unsigned int i=0;
+        for (i=0; i<fallDetectionContext.numberOfJoints; i++)
+         {
+           Scalar jointColor = Scalar ( 0 , 255 , 0 );
+           if ( ( fallDetectionContext.currentJoint2D[i].x!=0.0 ) || ( fallDetectionContext.currentJoint2D[i].y!=0.0) )
+           {
+               centerPt.x=fallDetectionContext.currentJoint2D[i].x;       centerPt.y=fallDetectionContext.currentJoint2D[i].y;
+
+               if (fallDetectionContext.currentJoint3D[i].z > farBorderZ ) {  jointColor=tempBColor;  } else
+               if (fallDetectionContext.currentJoint3D[i].z < closeBorderZ ) {  jointColor=tempYColor;  } else
+               if (fallDetectionContext.currentJoint2D[i].y > lowBorderY)  {  jointColor=tempRColor;  }
+
+               circle(bgrMat,  centerPt , 15 , jointColor , -4, 8 , 0);
+
+               snprintf(rectVal,123,"%0.2f",fallDetectionContext.currentJoint3D[i].z);
+               putText(bgrMat , rectVal, centerPt , fontUsed , 0.3 , color , 2 , 8 );
+           }
+         }
+       }
+
+
+
+
+
+
+
+
 
         //Draw Low Border
         pt1.x=0; pt2.x=lastState.topX1;
@@ -48,7 +93,6 @@ int visualizeTopCam(unsigned char * colorFrame,unsigned char * segmentedRGB,unsi
         //------------------
 
 
-        Point centerPt; centerPt.x=colorWidth/2;       centerPt.y=colorHeight/2;
         pt1.x=lastState.topX1;                     pt1.y=lastState.topY1;
         pt2.x=lastState.topX1+lastState.topWidth;  pt2.y=lastState.topY1+lastState.topHeight;
 
@@ -70,16 +114,7 @@ int visualizeTopCam(unsigned char * colorFrame,unsigned char * segmentedRGB,unsi
          putText(bgrMat , rectVal, pt2 , fontUsed , 0.5 , color , 2 , 8 );
         }
 
-        unsigned int tempColorR=255 , tempColorG=0 , tempColorB=0;
-        if (lastState.objectTemperature<30) { tempColorR=0 , tempColorG=0 , tempColorB=255; } else
-        if (lastState.objectTemperature>40) { tempColorR=255 , tempColorG=0 , tempColorB=0; } else
-                                          { tempColorR=(unsigned int) 125+( 40-lastState.objectTemperature/10 ) * 125 , tempColorG=0 , tempColorB=0; }
-
-
-        Scalar tempYColor = Scalar ( 0 , 255 , 255 );
-        Scalar tempBColor = Scalar ( 255 , 0 , 0 );
-        Scalar tempRColor = Scalar ( 0 , 0 , 255 );
-        Scalar tempColor = Scalar ( tempColorB , tempColorG , tempColorR );
+        centerPt.x=colorWidth/2;       centerPt.y=colorHeight/2;
         circle(bgrMat,  centerPt , 25 , tempColor , 4, 8 , 0);
 
         if ( temperatureSensorSensesHuman( lastState.objectTemperature ,  lastState.timestampTemperature , frameTimestamp) )
@@ -157,31 +192,6 @@ int visualizeTopCam(unsigned char * colorFrame,unsigned char * segmentedRGB,unsi
           txtPosition.y += 24; snprintf(rectVal,123,"Obstacle map hits : %u ",lastState.totalMapObstacleHits);
           putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , color , 2 , 8 );
         }
-
-       if (userIsRecent(&fallDetectionContext,frameTimestamp))
-       {
-        txtPosition.y += 24; snprintf(rectVal,123,"Sk Movem. : %u",fallDetectionContext.skeletonVelocity);
-        putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , color , 2 , 8 );
-
-        unsigned int i=0;
-        for (i=0; i<fallDetectionContext.numberOfJoints; i++)
-         {
-           Scalar jointColor = Scalar ( 0 , 255 , 0 );
-           if ( ( fallDetectionContext.currentJoint2D[i].x!=0.0 ) || ( fallDetectionContext.currentJoint2D[i].y!=0.0) )
-           {
-               centerPt.x=fallDetectionContext.currentJoint2D[i].x;       centerPt.y=fallDetectionContext.currentJoint2D[i].y;
-
-               if (fallDetectionContext.currentJoint3D[i].z > farBorderZ ) {  jointColor=tempBColor;  } else
-               if (fallDetectionContext.currentJoint3D[i].z < closeBorderZ ) {  jointColor=tempYColor;  } else
-               if (fallDetectionContext.currentJoint2D[i].y > lowBorderY)  {  jointColor=tempRColor;  }
-
-               circle(bgrMat,  centerPt , 15 , jointColor , -4, 8 , 0);
-
-               snprintf(rectVal,123,"%0.2f",fallDetectionContext.currentJoint3D[i].z);
-               putText(bgrMat , rectVal, centerPt , fontUsed , 0.3 , color , 2 , 8 );
-           }
-         }
-       }
 
 
 
