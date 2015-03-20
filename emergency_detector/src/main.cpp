@@ -424,7 +424,7 @@ void bboxReceived(const emergency_detector::SkeletonBBox & msg)
                       msg.width2D , msg.height2D ,msg.depth2D , frameTimestamp );
 }
 
-
+/*
 void joints2DReceived(const emergency_detector::Skeleton2D & msg)
 {
   if (msg.numberOfJoints/2 < MAX_NUMBER_OF_2D_JOINTS)
@@ -458,6 +458,38 @@ void joints3DReceived(const emergency_detector::Skeleton3D & msg)
     fallDetectionContext.numberOfJoints = (unsigned int) msg.numberOfJoints/2;
     for (i=0; i<fallDetectionContext.numberOfJoints; i++)
     {
+        fallDetectionContext.lastJoint3D[i].x = fallDetectionContext.currentJoint3D[i].x;
+        fallDetectionContext.lastJoint3D[i].y = fallDetectionContext.currentJoint3D[i].y;
+        fallDetectionContext.lastJoint3D[i].z = fallDetectionContext.currentJoint3D[i].z;
+
+        fallDetectionContext.currentJoint3D[i].x = (float) msg.joints3D[0+i*3];
+        fallDetectionContext.currentJoint3D[i].y = (float) msg.joints3D[1+(i*3)];
+        fallDetectionContext.currentJoint3D[i].y = (float) msg.joints3D[2+(i*3)];
+    }
+
+    logSkeletonState(&fallDetectionContext,1);
+  }
+}*/
+
+
+//New Double 2D/3D receiver
+void joints2D3DReceived(const emergency_detector::Skeleton3D & msg)
+{
+  if (msg.numberOfJoints/2 < MAX_NUMBER_OF_2D_JOINTS)
+  {
+    unsigned int i=0;
+    fallDetectionContext.lastJointsTimestamp = fallDetectionContext.jointsTimestamp;
+    fallDetectionContext.jointsTimestamp = frameTimestamp;
+    fallDetectionContext.numberOfJoints = (unsigned int) msg.numberOfJoints/2;
+    for (i=0; i<fallDetectionContext.numberOfJoints; i++)
+    {
+        fallDetectionContext.lastJoint2D[i].x = fallDetectionContext.currentJoint2D[i].x;
+        fallDetectionContext.lastJoint2D[i].y = fallDetectionContext.currentJoint2D[i].y;
+
+        fallDetectionContext.currentJoint2D[i].x = (float) msg.joints2D[i*2];
+        fallDetectionContext.currentJoint2D[i].y = (float) msg.joints2D[1+(i*2)];
+
+
         fallDetectionContext.lastJoint3D[i].x = fallDetectionContext.currentJoint3D[i].x;
         fallDetectionContext.lastJoint3D[i].y = fallDetectionContext.currentJoint3D[i].y;
         fallDetectionContext.lastJoint3D[i].z = fallDetectionContext.currentJoint3D[i].z;
@@ -804,8 +836,9 @@ int main(int argc, char **argv)
 
 
 
-     ros::Subscriber sub2D = nh.subscribe("joints2D",1000,joints2DReceived);
-     ros::Subscriber sub3D = nh.subscribe("joints3D",1000,joints3DReceived);
+     //ros::Subscriber sub2D = nh.subscribe("joints2D",1000,joints2DReceived);
+     //ros::Subscriber sub3D = nh.subscribe("joints3D",1000,joints3DReceived);
+     ros::Subscriber sub3D = nh.subscribe("joints2D3D",1000,joints2D3DReceived);
      ros::Subscriber sub = nh.subscribe("jointsBBox",1000,bboxReceived);
      ros::Subscriber subTempAmbient = nh.subscribe("/head/tempAmbient",1000,getAmbientTemperature);
      ros::Subscriber subTempObject = nh.subscribe("/head/tempObject",1000,getObjectTemperature);
@@ -826,9 +859,9 @@ int main(int argc, char **argv)
 	  //////////////////////////////////////////////////////////////////////////
 	  while ( ( key!='q' ) && (ros::ok()) )
 		{
- 
+
                  if (!paused)
-                  { 
+                  {
                    if(emergencyDetected)
                      {
                       if (autoRecordEmergencyTriggers)
@@ -845,13 +878,13 @@ int main(int argc, char **argv)
                    updateHeadPosition();
                   }
 
- 
+
                   ros::spinOnce();//<- this keeps our ros node messages handled up until synergies take control of the main thread
 
                   if (doCVOutput) { vis_loop_rate.sleep(); } else
                                   { loop_rate.sleep();     }
 
- 
+
                   if (frameTimestamp%30) { fprintf(stderr,"."); }
 
 		 }
