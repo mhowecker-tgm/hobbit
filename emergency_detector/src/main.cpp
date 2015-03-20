@@ -488,9 +488,23 @@ int updateHeadPosition()
       double roll, pitch, yaw;
       tf::Matrix3x3(transformS.getRotation()).getRPY(roll, pitch, yaw);
 
+      // Converts degrees to radians.
+      #define degreesToRadians(angleDegrees) (angleDegrees * M_PI / 180.0)
+      // Converts radians to degrees.
+      #define radiansToDegrees(angleRadians) (angleRadians * 180.0 / M_PI)
+      double rollDeg=radiansToDegrees(roll);
+      double pitchDeg=radiansToDegrees(pitch);
+      double yawDeg=radiansToDegrees(yaw);
+
+
       if (printTFPosition)
        {
-        fprintf(stderr,"Head Pos(%0.2f %0.2f %0.2f)/RPY(%0.2f %0.2f %0.2f)\n",transformS.getOrigin().x(),transformS.getOrigin().y(),transformS.getOrigin().z(),roll,pitch,yaw);
+        fprintf(
+                stderr,"Head Pos(%0.2f %0.2f %0.2f)/RPY(%0.2f %0.2f %0.2f)/RPYDeg(%0.2f %0.2f %0.2f)\n",
+                transformS.getOrigin().x(),transformS.getOrigin().y(),transformS.getOrigin().z(),
+                roll,pitch,yaw,
+                rollDeg,pitchDeg,yawDeg
+               );
        }
 
        double pitchChange=pitch-headLastPitch; if (pitchChange<0) { pitchChange = -1 * pitchChange; }
@@ -509,7 +523,7 @@ int updateHeadPosition()
          --headIsMoving;
          return 1;
         }
-      
+
       float downBorder = -1.02; // -1.10
       float upBorder = -1.35; // -1.10
 
