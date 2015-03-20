@@ -699,6 +699,7 @@ int registerServices(ros::NodeHandle * nh,unsigned int width,unsigned int height
   hobbitUpperBodyTracker_useGestures(1);
   //hobbitUpperBodyTracker_useGesturesWithoutABody(1); This causes false positives :(
   hobbitUpperBodyTracker_useGesturesWithoutABody(0);
+  //hobbitUpperBodyTracker_setCameraPitch(10);
 
   fprintf(stderr,"Registering Gesture callbacks..\n");
   gestureEventBroadcaster = nh->advertise <hobbit_msgs::Event> ("Event", 1000);
