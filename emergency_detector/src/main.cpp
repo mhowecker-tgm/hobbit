@@ -69,7 +69,7 @@ float MinMaxHumanTemperatures[]= {
                                     //30.8 , 36.0 , //Hobbit A , last tested 23/1/15
                                     29.9 , 36.0 , //Hobbit B , last tested 23/1/15
                                     30.8 , 36.0 , //Hobbit C , todo when I get back to crete
-                                    26.6 , 33.0 , //Hobbit D , last checked 17/03/15
+                                    25.6 , 33.0 , //Hobbit D , last checked 17/03/15
                                     29.8 , 36.0 , //Hobbit E , last tested 17/2/15
                                     30.8 , 36.0   //Hobbit F , N/A
                                  };
