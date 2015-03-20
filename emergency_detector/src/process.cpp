@@ -295,6 +295,7 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
       unsigned int holesTop=0;
       lastState.scoreTop = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , lastState.topX1 , lastState.topY1 , lastState.topWidth , lastState.topHeight , maximums.scoreTop , 1 , &holesTop );
       lastState.holesPercentTop = (float) (100*holesTop)/(lastState.topWidth*lastState.topHeight);
+      if (lastState.holesPercentTop>100) {lastState.holesPercentTop=100;}
 
       fprintf(stderr,"Avg Depth is %u mm , empty area is %0.2f %% , Bot Depth %u mm , empty area is %0.2f %% \n",
               lastState.scoreTop , lastState.holesPercentTop ,
@@ -339,6 +340,8 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
 
               lastState.scoreOverTop = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , lastState.topX1 , lastState.topY1-overHeight , lastState.topWidth , overHeight , maximums.scoreTop , 1 , &holesOverTemperatureArea );
               lastState.holesPercentOverTop = (float) (100*holesOverTemperatureArea)/(lastState.topWidth*overHeight);
+              if (lastState.holesPercentOverTop>100) {lastState.holesPercentOverTop=100;}
+
 
               fprintf(stderr,MAGENTA "\n\n  Top Avg is %u mm Holes are %0.2f %% \n\n" NORMAL , lastState.scoreOverTop, lastState.holesPercentTop  );
 
@@ -424,6 +427,7 @@ int runServicesBottomThatNeedColorAndDepth(unsigned char * colorFrame , unsigned
       lastState.scoreBase = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight ,
                                                          lastState.baseX1, lastState.baseY1 , lastState.baseWidth , lastState.baseHeight , maximums.scoreBase , 1 , &holesBase );
       lastState.holesPercentBase = (float) (100*holesBase)/(lastState.baseWidth*lastState.baseHeight);
+      if (lastState.holesPercentBase>100) {lastState.holesPercentBase=100;}
       fprintf(stderr,"Bottom Avg Depth is %u mm , empty area is %0.2f %% \n",lastState.scoreBase , lastState.holesPercentBase );
 
 
