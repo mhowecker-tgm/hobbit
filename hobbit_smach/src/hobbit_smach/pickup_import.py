@@ -933,7 +933,7 @@ class DavidPickingUp(State):
         #define limits for checking free space for grasping (ccs)
         self.limit_x1 = -0.5
         self.limit_x2 = 0.4
-        self.limit_y1 = -1
+        self.limit_y1 = -0.7
         self.limit_y2 = -0.35
         self.limit_z1 = 0.25
         self.limit_z2 = 1.2
