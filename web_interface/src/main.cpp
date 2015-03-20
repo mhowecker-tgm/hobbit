@@ -864,8 +864,9 @@ void execute(char * command,char * param)
     if (strcmp(param,"systemShutdown")==0)
          {
            //When we shut down we also need to shutdown the raspberry pi's and this requires us to add another command
-           MMUIExecute((char*) "say",(char*) "Shutting down!");
+           MMUIExecute((char*) "say",(char*) "Shutting down");
            rosservice_call_execute("/vision_system/pauseEverything"); // Pause everything ( see emergency trigger )
+           rosservice_call_execute("/emergency_detector/pause"); // Pause everything ( see emergency trigger )
            shutdownArm();
            shutdownRaspberryPi();
            //Assuming that the raspberry pi is off we can then shutdown XPC
