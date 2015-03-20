@@ -8,7 +8,7 @@ struct fallState fallDetectionContext={0};
 
 int userIsRecent(struct fallState * fs,unsigned int timeStamp)
 {
-  if (ABSDIFF(fs->jointsTimestamp,timeStamp)>30) { return 0; }
+  if (ABSDIFF(fs->jointsTimestamp,timeStamp)>40) { return 0; }
   return 1;
 }
 
