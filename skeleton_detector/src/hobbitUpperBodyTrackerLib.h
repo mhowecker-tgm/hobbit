@@ -25,6 +25,8 @@ int hobbitFitnessFunction_RegisterExerciseRepetitionBatchCompleted(void * callba
 
 
 
+int hobbitUpperBodyTracker_setCameraPitch(float angleInDegrees);
+
 
 
 int hobbitUpperBodyTracker_useFaceDetector(int useFaceDetector);
