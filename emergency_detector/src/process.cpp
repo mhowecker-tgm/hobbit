@@ -304,16 +304,16 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
 
 
       if ( (lastState.useHolesBase) && (receivedBaseImages!=0) && (lastState.holesPercentBase < minimums.holesPercentBase) )
-         { fprintf(stderr,RED "\n\n  Too few holes at Base ( min is %0.2f ) , too big a blob , cannot be an emergency\n\n" NORMAL , minimums.holesPercentBase); }
+         { fprintf(stderr,RED "\n\n  Too few holes at Base %0.2f ( min is %0.2f ) , too big a blob , cannot be an emergency\n\n" NORMAL , lastState.holesPercentBase , minimums.holesPercentBase); }
           else
       if ( (lastState.useHolesBase) && (receivedBaseImages!=0) && (lastState.holesPercentBase > maximums.holesPercentBase) )
-         { fprintf(stderr,RED "\n\n  Too many holes at Base ( max is %0.2f ) , this cannot be an emergency \n\n" NORMAL  , maximums.holesPercentBase); }
+         { fprintf(stderr,RED "\n\n  Too many holes at Base %0.2f ( max is %0.2f ) , this cannot be an emergency \n\n" NORMAL  , lastState.holesPercentBase , maximums.holesPercentBase); }
           else
       if ( (lastState.useHolesTop) && (lastState.holesPercentTop < minimums.holesPercentTop) )
-         { fprintf(stderr,RED "\n\n  Too few holes at Top ( min is %0.2f ) , too big a blob , cannot be an emergency\n\n" NORMAL , minimums.holesPercentTop); }
+         { fprintf(stderr,RED "\n\n  Too few holes at Top %0.2f ( min is %0.2f ) , too big a blob , cannot be an emergency\n\n" NORMAL , lastState.holesPercentBase ,  minimums.holesPercentTop); }
           else
       if ( (lastState.useHolesTop) && (lastState.holesPercentTop > maximums.holesPercentTop) )
-         { fprintf(stderr,RED "\n\n  Too many holes at Top ( max is %0.2f ) , this cannot be an emergency \n\n" NORMAL , maximums.holesPercentTop ); }
+         { fprintf(stderr,RED "\n\n  Too many holes at Top %0.2f ( max is %0.2f ) , this cannot be an emergency \n\n" NORMAL , lastState.holesPercentBase,  maximums.holesPercentTop ); }
           else
       if (
            (
