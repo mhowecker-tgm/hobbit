@@ -167,6 +167,24 @@ class MoveCounter(smach.State):
             return 'second'
         else:
             return 'first'
+        
+#df 20.3.2015: count how often robot should move to other grasping position (1 time overall <=> blind backwards move))
+class MoveBackBlindCounter(smach.State):
+    """
+    Just a counter in a SMACH State.
+    """
+    def __init__(self):
+        smach.State.__init__(self, outcomes=['first', 'second'])
+        self._counter = 0
+
+    def execute(self, ud):
+        self._counter += 1
+        print('self._counter: %d' % self._counter)
+        if self._counter > 1:
+            self._counter = 0
+            return 'second'
+        else:
+            return 'first'
 
 
 class Init(smach.State):
@@ -312,19 +330,6 @@ def main():
                           'invalid': 'START_LOOKING',   
                           'preempted': 'LOG_PREEMPT'}
          )
-        #StateMachine.add(
-        #    'GET_POINTING_DIRECTION',
-        #    WaitForMsgState(
-        #        '/pointEvents',
-        #        PointEvents,
-        #        msg_cb=point_other_state_cb,
-        #        timeout=15,
-        #        output_keys=['pointing_msg']
-        #    ),
-        #    transitions={'succeeded': 'START_LOOKING',
-        #                 'aborted': 'POINTING_COUNTER',
-        #                 'preempted': 'LOG_PREEMPT'}
-        #)
         StateMachine.add(
             'POINTING_COUNTER',
             PointingCounter(),
@@ -557,12 +562,10 @@ def main():
         StateMachine.add(
             'MOVE_ARM_TO_HOME_POSITION',  #VIA TRAY POSITION because maybe the checkgrasp result was wrong!
             arm_move.goToTrayPosition(),
-            transitions={'succeeded': 'MOVE_TO_BETTER_POSE_TO_REVIEW_OBJECT',  #=> move robot back and turn it to better see object and start new from "HEAD_TO_SEARCH"
+            transitions={'succeeded': 'GET_POINT_CLOUD_FOR_GRASP',  #=> try to grasp again without changing position (assume: head is still lookingt to object"
                          'preempted': 'LOG_PREEMPT',
                          'failed': 'MOVE_ARM_TO_HOME_POSITION'}    # better failure handling appreciated
         )
-        
-        
         #df new 17.3.2015
         StateMachine.add(
             'MOVE_TO_BETTER_POSE_TO_REVIEW_OBJECT',        
@@ -582,10 +585,17 @@ def main():
         StateMachine.add(
             'MOVE_ARM_TO_HOME_POSITION_AFTER_FAILED',  #done after 2 times unsucessful grasped
             arm_move.goToHomePosition(),
-            transitions={'succeeded': 'MOVE_TO_BETTER_POSE_TO_REVIEW_OBJECT',  #third try after 2 fails!
+            transitions={'succeeded': 'MOVE_BLIND_BACK_COUNTER',  #do this only ones
                          'preempted': 'LOG_PREEMPT',
                          'failed': 'MOVE_ARM_TO_HOME_POSITION_AFTER_FAILED'}    # better failure handling appreciated
         )   
+        #new 20.3.2015: only move back blind once
+        StateMachine.add(
+            'MOVE_BLIND_BACK_COUNTER',
+            MoveBackBlindCounter(),
+            transitions={'first': 'MOVE_TO_BETTER_POSE_TO_REVIEW_OBJECT',
+                         'second': 'LOG_PREEMPT'}
+        )        
         StateMachine.add(
             'END_PICKUP_SEQ',
             pickup.getEndPickupSeq(),
