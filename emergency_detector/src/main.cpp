@@ -826,8 +826,11 @@ int main(int argc, char **argv)
 	  //////////////////////////////////////////////////////////////////////////
 	  while ( ( key!='q' ) && (ros::ok()) )
 		{
-                  if(emergencyDetected)
-                    {
+ 
+                 if (!paused)
+                  { 
+                   if(emergencyDetected)
+                     {
                       if (autoRecordEmergencyTriggers)
                       {
 	                    ROS_INFO("Recording Emergency Snapshot, this should be disabled on production");
@@ -837,23 +840,20 @@ int main(int argc, char **argv)
                         saveNextBottomFrame=1;
                       }
                       broadcastEmergency(frameTimestamp);
-                    }
+                     }
+                   if (personDetected)   { broadcastNewPerson(); }
+                   updateHeadPosition();
+                  }
 
-
-
-
+ 
                   ros::spinOnce();//<- this keeps our ros node messages handled up until synergies take control of the main thread
 
                   if (doCVOutput) { vis_loop_rate.sleep(); } else
                                   { loop_rate.sleep();     }
 
+ 
+                  if (frameTimestamp%30) { fprintf(stderr,"."); }
 
-
-                  if (personDetected)   { broadcastNewPerson(); }
-
-                  if (frameTimestamp%20) { fprintf(stderr,"."); }
-
-                  updateHeadPosition();
 		 }
 
 
