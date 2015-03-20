@@ -22,7 +22,7 @@ unsigned int receivedBaseImages=0;
 
 int initializeClassifier()
 {
-  minimums.holesPercentOverTop=60;
+  minimums.holesPercentOverTop=70;
   maximums.holesPercentOverTop=100;
   lastState.useHolesOverTop=1;
 
