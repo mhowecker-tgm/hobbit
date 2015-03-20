@@ -18,6 +18,7 @@
 #include <cv_bridge/cv_bridge.h>
 
 #include <std_srvs/Empty.h>
+#include "skeleton_detector/setPitch.h"
 
 
 #include <sensor_msgs/Image.h>
@@ -66,6 +67,19 @@ message_filters::Subscriber<sensor_msgs::Image> *depth_img_sub;
 message_filters::Subscriber<sensor_msgs::CameraInfo> *depth_cam_info_sub;
 
 //----------------------------------------------------------
+
+
+
+
+bool setPitch( skeleton_detector::setPitch::Request  &request,
+                  skeleton_detector::setPitch::Response &response )
+{
+   hobbitUpperBodyTracker_setCameraPitch(request.num);
+   response.ok=1;
+
+   return true ;
+}
+
 
 bool visualizeOn(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
@@ -391,6 +405,9 @@ int main(int argc, char **argv)
      ros::ServiceServer  startExerciseDuSyncService    = nh.advertiseService(name+"/startDualElbowBendSyncExercise"       , startDualElbowBendSyncExercise);
      ros::ServiceServer  startExerciseDuAsyncService   = nh.advertiseService(name+"/startDualElbowBendAsyncExercise"       , startDualElbowBendAsyncExercise);
      ros::ServiceServer  stopExerciseService       = nh.advertiseService(name+"/stopExercise"         , stopExercise);
+
+
+     ros::ServiceServer setPitchService         = nh.advertiseService(name+"/setPitch", setPitch);
      //Make our rostopic cmaera grabber
      message_filters::Synchronizer<RgbdSyncPolicy> *sync;
 
