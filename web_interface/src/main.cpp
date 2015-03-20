@@ -96,6 +96,7 @@ bool baseCamIsOk(std_srvs::Empty::Request& request, std_srvs::Empty::Response& r
 }
 
 
+
 //The deceleration of some dynamic content resources..
 struct AmmServer_Instance  * default_server=0;
 struct AmmServer_Instance  * admin_server=0;
@@ -626,6 +627,14 @@ int shutdownArm()
 
 
 
+bool postMessage(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{ 
+    MMUIExecute((char*) "say",(char*) "I am Ready!");
+    return true;
+}
+
+
+
 int executeSystem(char * what2Execute)
 {
  int i=system(what2Execute);
@@ -865,13 +874,13 @@ void execute(char * command,char * param)
          {
            //When we shut down we also need to shutdown the raspberry pi's and this requires us to add another command
            MMUIExecute((char*) "say",(char*) "Shutting down");
+           shutdownArm();
            rosservice_call_execute("/vision_system/pauseEverything"); // Pause everything ( see emergency trigger )
            rosservice_call_execute("/emergency_detector/pause"); // Pause everything ( see emergency trigger )
-           shutdownArm();
            shutdownRaspberryPi();
            //Assuming that the raspberry pi is off we can then shutdown XPC
            //We give some time for things to shut down
-           usleep(14000*1000);
+           usleep(10000*1000);
 
            strncpy(cR,"../../hobbit_launch/launch/System/systemCommands shutdown",cRLen);
          } else
@@ -1222,6 +1231,8 @@ int main(int argc, char **argv)
      //We advertise the services we want accessible using "rosservice call *w/e*"
      ros::ServiceServer stopWebService             = nh.advertiseService("web_interface/terminate", terminate);
      ros::ServiceServer signalBaseCamOkService     = nh.advertiseService("web_interface/signalBaseCamIsOk", baseCamIsOk);
+     ros::ServiceServer postMessageService         = nh.advertiseService("web_interface/postMessage", postMessage);
+ 
 
 
      ros::Rate loop_rate(1); //  1hz should be our target spin time
