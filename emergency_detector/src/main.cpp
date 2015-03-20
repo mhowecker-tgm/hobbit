@@ -509,14 +509,17 @@ int updateHeadPosition()
          --headIsMoving;
          return 1;
         }
+      
+      float downBorder = -1.02; // -1.10
+      float upBorder = -1.35; // -1.10
 
       //We dont want head to be looking left or right
       if ((-3.00<roll)&&(roll<-1.40)) { fallDetectionContext.headLookingDirection=HEAD_LOOKING_RIGHT; } else
       if ((3.10>roll)&&(roll> 1.40)) { fallDetectionContext.headLookingDirection=HEAD_LOOKING_LEFT; } else
       // <-- LOW ( -1.10 ) ----   ( LOWMAX(-1.15) --- LOWMIN(-1.29) ) ----- HIGH( -1.35 )
-      if ( ( pitch <= -1.15  ) && ( pitch >= -1.35  )  ) { lookingLittleDownInternal(); }  else
-      if (pitch >= -1.02)                                { lookingDownInternal(); }  else
-      if (pitch <= -1.35)                                { lookingCenterInternal(); }
+      if ( ( pitch <= downBorder  ) && ( pitch >= upBorder  )  ) { lookingLittleDownInternal(); }  else
+      if (pitch >= downBorder) /*-1.10*/                      { lookingDownInternal(); }  else
+      if (pitch <= upBorder)                                { lookingCenterInternal(); }
 
      }
  catch (tf::TransformException &ex)
