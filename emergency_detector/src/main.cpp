@@ -572,6 +572,7 @@ int updateHeadPosition()
  catch (tf::TransformException &ex)
       {
        ROS_ERROR("Cannot understand head position : %s",ex.what());
+       //fallDetectionContext.headLookingDirection=HEAD_UNKNOWN_DIRECTION;
       }
  return 1;
 }
