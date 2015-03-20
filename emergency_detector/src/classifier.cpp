@@ -14,7 +14,7 @@ unsigned int overHeight=120;
  //The following values are set by the launch file , so change them there..
  // Synchronization variables
  int maximumFrameDifferenceForTemperatureToBeRelevant=20;
- unsigned int doCalculationsCooldown=20;
+ unsigned int doCalculationsCooldown=10;
  int doCalculations=0;
 unsigned int receivedBaseImages=0;
  // --------------------------------------------------------------------
