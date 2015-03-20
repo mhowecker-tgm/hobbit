@@ -634,6 +634,25 @@ int executeSystem(char * what2Execute)
  return (i==0);
 }
 
+int rosservice_call_execute(char * rosservice)
+{
+  unsigned int cRLen=MAX_COMMAND_SIZE;
+  char * cR = (char*) malloc((MAX_COMMAND_SIZE+1) * sizeof(char));
+  if (cR!=0)
+  {
+   cR[0]=0;
+      rosservice_call(cR,cRLen,rosservice);
+      if ( strlen(cR)!=0 )
+         {
+           int i=system(cR);
+           if (i!=0) { AmmServer_Error("Command %s failed\n",cR); } else
+                    { AmmServer_Success("Command %s success\n",cR); }
+         }
+   free(cR);
+   return 1;
+  }
+ return 0;
+}
 
 
 void execute(char * command,char * param)
@@ -845,6 +864,8 @@ void execute(char * command,char * param)
     if (strcmp(param,"systemShutdown")==0)
          {
            //When we shut down we also need to shutdown the raspberry pi's and this requires us to add another command
+           MMUIExecute((char*) "say",(char*) "Shutting down!");
+           rosservice_call_execute("/vision_system/pauseEverything"); // Pause everything ( see emergency trigger )
            shutdownArm();
            shutdownRaspberryPi();
            //Assuming that the raspberry pi is off we can then shutdown XPC
