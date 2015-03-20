@@ -31,8 +31,9 @@
 #include <image_transport/image_transport.h>
 
 #include "emergency_detector/SkeletonBBox.h"
-#include "emergency_detector/Skeleton2D.h"
-#include "emergency_detector/Skeleton3D.h"
+//#include "emergency_detector/Skeleton2D.h"
+//#include "emergency_detector/Skeleton3D.h"
+#include "emergency_detector/Skeleton2D3D.h"
 #include "emergency_detector/Person.h"
 
 #include <std_msgs/Float32.h>
@@ -473,7 +474,7 @@ void joints3DReceived(const emergency_detector::Skeleton3D & msg)
 
 
 //New Double 2D/3D receiver
-void joints2D3DReceived(const emergency_detector::Skeleton3D & msg)
+void joints2D3DReceived(const emergency_detector::Skeleton2D3D & msg)
 {
   if (msg.numberOfJoints/2 < MAX_NUMBER_OF_2D_JOINTS)
   {
