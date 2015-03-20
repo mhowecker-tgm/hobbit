@@ -147,6 +147,13 @@ roslaunch come_closer startup.launch&
 
 rosrun dynamic_reconfigure dynparam set /basecam/driver data_skip 1&
 
+
+
+#We have finally gone through this hole procedure , lets signal that hobbit is ready..
+rosservice call /web_interface/postMessage
+
+
+
 cd $STARTDIR
 
 exit 0
