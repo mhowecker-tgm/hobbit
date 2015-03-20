@@ -31,7 +31,7 @@ int initializeClassifier()
   lastState.useHolesTop=0;
 
   minimums.holesPercentBase=3;
-  maximums.holesPercentBase=55;
+  maximums.holesPercentBase=50;
   lastState.useHolesBase=1;
 
   //These are initialized by the main.cpp

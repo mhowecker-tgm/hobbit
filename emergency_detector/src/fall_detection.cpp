@@ -47,9 +47,9 @@ int isSkeletonStanding(struct fallState * fs)
   unsigned int i=0;
   unsigned int height=0;
 
-  if (fs->headLookingDirection==HEAD_LOOKING_CENTER) { height=200; } else
+  if (fs->headLookingDirection==HEAD_LOOKING_CENTER)      { height=200; } else
   if (fs->headLookingDirection==HEAD_LOOKING_LITTLE_DOWN) { height=150;  } else
-  if (fs->headLookingDirection==HEAD_LOOKING_DOWN)   { height=100; }
+  if (fs->headLookingDirection==HEAD_LOOKING_DOWN)        { height=100; }
 
    for (i=0; i<fs->numberOfJoints; i++)
    {
@@ -71,7 +71,7 @@ int isSkeletonFallenAndFar(struct fallState * fs)
 
   if (fs->headLookingDirection==HEAD_LOOKING_CENTER)      { height=330; } else
   if (fs->headLookingDirection==HEAD_LOOKING_LITTLE_DOWN) { height=260; } else
-  if (fs->headLookingDirection==HEAD_LOOKING_DOWN)        { height=180; }
+  if (fs->headLookingDirection==HEAD_LOOKING_DOWN)        { height=130; }
 
   lowBorderY = height; //Update Visualization Coords
 
