@@ -14,7 +14,8 @@
 using namespace std;
 using namespace cv;
 
-
+float farBorderZ=2200;
+float closeBorderZ=600;
 unsigned int lowBorderY=480;
 
 
@@ -75,6 +76,8 @@ int visualizeTopCam(unsigned char * colorFrame,unsigned char * segmentedRGB,unsi
                                           { tempColorR=(unsigned int) 125+( 40-lastState.objectTemperature/10 ) * 125 , tempColorG=0 , tempColorB=0; }
 
 
+        Scalar tempYColor = Scalar ( 0 , 255 , 255 );
+        Scalar tempBColor = Scalar ( 255 , 0 , 0 );
         Scalar tempRColor = Scalar ( 0 , 0 , 255 );
         Scalar tempColor = Scalar ( tempColorB , tempColorG , tempColorR );
         circle(bgrMat,  centerPt , 25 , tempColor , 4, 8 , 0);
@@ -168,12 +171,14 @@ int visualizeTopCam(unsigned char * colorFrame,unsigned char * segmentedRGB,unsi
            {
                centerPt.x=fallDetectionContext.currentJoint2D[i].x;       centerPt.y=fallDetectionContext.currentJoint2D[i].y;
 
-               if (fallDetectionContext.currentJoint2D[i].y > lowBorderY)
-               {
-                   jointColor=tempRColor;
-               }
+               if (fallDetectionContext.currentJoint3D[i].z > farBorderZ ) {  jointColor=tempBColor;  } else
+               if (fallDetectionContext.currentJoint3D[i].z < closeBorderZ ) {  jointColor=tempYColor;  } else
+               if (fallDetectionContext.currentJoint2D[i].y > lowBorderY)  {  jointColor=tempRColor;  }
 
                circle(bgrMat,  centerPt , 15 , jointColor , -4, 8 , 0);
+
+               snprintf(rectVal,123,"%0.2f",fallDetectionContext.currentJoint3D[i].z);
+               putText(bgrMat , rectVal, centerPt , fontUsed , 0.3 , color , 2 , 8 );
            }
          }
        }

@@ -77,16 +77,18 @@ int isSkeletonFallenAndFar(struct fallState * fs)
 
   unsigned int lowPoints = 0;
   unsigned int highPoints = 0;
+  unsigned int farPoints = 0;
 
    for (i=0; i<fs->numberOfJoints; i++)
    {
+    if (fs->lastJoint3D[i].z>farBorderZ)      { ++farPoints;  }
     if ( (fs->lastJoint2D[i].y!=0)&& (fs->lastJoint2D[i].y>=height) )    { ++lowPoints;  } else
     if ( (fs->lastJoint2D[i].y!=0)&& (fs->lastJoint2D[i].y<height) )     { ++highPoints; }
    }
 
-  fprintf(stderr,"Skeleton : Border @ %u , High Points : %u / Low Points : %u \n",height,highPoints,lowPoints);
+  fprintf(stderr,"Skeleton : Border @ %u , High : %u / Low : %u / Far : %u \n",height,highPoints,lowPoints,farPoints);
 
-  if ( (highPoints==0) && (lowPoints>0) ) { return 1; }
+  if ( (highPoints==0) && (lowPoints>0) && (farPoints==0) ) { return 1; }
   return 0;
 }
 

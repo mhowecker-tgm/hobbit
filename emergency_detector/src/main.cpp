@@ -58,7 +58,7 @@ ros::Publisher personBroadcaster;
 #endif // USE_PERSON_AGGREGATOR
 
 
-#define DEFAULT_FRAME_RATE 4
+#define DEFAULT_FRAME_RATE 5
 #define HEAD_POSITION_LOOKUP_DURATION 1.5
 
 int rate=DEFAULT_FRAME_RATE;
@@ -465,7 +465,7 @@ void joints3DReceived(const emergency_detector::Skeleton3D & msg)
 
         fallDetectionContext.currentJoint3D[i].x = (float) msg.joints3D[0+i*3];
         fallDetectionContext.currentJoint3D[i].y = (float) msg.joints3D[1+(i*3)];
-        fallDetectionContext.currentJoint3D[i].y = (float) msg.joints3D[2+(i*3)];
+        fallDetectionContext.currentJoint3D[i].z = (float) msg.joints3D[2+(i*3)];
     }
 
     logSkeletonState(&fallDetectionContext,1);
@@ -497,7 +497,7 @@ void joints2D3DReceived(const emergency_detector::Skeleton2D3D & msg)
 
         fallDetectionContext.currentJoint3D[i].x = (float) msg.joints3D[0+i*3];
         fallDetectionContext.currentJoint3D[i].y = (float) msg.joints3D[1+(i*3)];
-        fallDetectionContext.currentJoint3D[i].y = (float) msg.joints3D[2+(i*3)];
+        fallDetectionContext.currentJoint3D[i].z = (float) msg.joints3D[2+(i*3)];
     }
 
     logSkeletonState(&fallDetectionContext,1);
