@@ -49,7 +49,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #include <sensor_msgs/CameraInfo.h>
 #include <image_transport/image_transport.h>
 
-
+//DO_VIDEOS_DIR_CHECK not declared
 #define NODE_NAME "web_interface"
 
 ros::NodeHandle * nhPtr=0;
@@ -615,7 +615,7 @@ int shutdownRaspberryPi()
 
 int shutdownArm()
 {
-     int i=system("python /opt/ros/hobbit_hydro/src/hobbit_smach/src/hobbit_smach/ArmActionClientShutDownPLC.py");
+     int i=system("python /opt/ros/hobbit_hydro/src/hobbit_smach/src/hobbit_smach/ArmActionClientShutDownPLC.py&");
      if (i!=0) { AmmServer_Error("Shutting down the arm appears to have failed\n"); }
          else  {
                  AmmServer_Success("Shutting down the arm appears to have succeeded , waiting a little for it to shutdown before returning \n");
@@ -1178,11 +1178,15 @@ void close_dynamic_content()
 
 int main(int argc, char **argv)
 {
-   ROS_INFO("Starting Up!!");
+   ROS_INFO("Starting Up Web Interface!!");
 
+   #if DO_VIDEOS_DIR_CHECK
    int i=system("./videos/getVideos.sh");
-   if (i!=0 ) { ROS_INFO("Could not check for video datasets");       } else
-              { ROS_INFO("Successfully checked for video datasets");  }
+    if (i!=0 ) { ROS_INFO("Could not check for video datasets");       } else
+               { ROS_INFO("Successfully checked for video datasets");  }
+   #else
+     ROS_INFO("No longer doing Video Folder check");
+   #endif // DO_VIDEOS_DIR_CHECK
 
    try
    {
@@ -1202,7 +1206,7 @@ int main(int argc, char **argv)
 
 
      //Is there some race condition with rosmaster ?
-     unsigned int countdown=5;
+     unsigned int countdown=3;
      fprintf(stderr,"Giving some time to ROS before the multithreaded stuff kicks in\n");
      while (countdown>0)
      {
