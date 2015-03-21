@@ -1,0 +1,4 @@
+# Service definition to set the docking state
+bool state 
+---
+bool result
