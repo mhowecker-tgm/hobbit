@@ -14,7 +14,6 @@ from std_msgs.msg import String
 from smach_ros import SimpleActionState, ServiceState
 from smach import Sequence, State, StateMachine, Concurrence
 from uashh_smach.util import SleepState, WaitForMsgState
-from mira_msgs.msg import BatteryState
 import hobbit_smach.hobbit_move_import as hobbit_move
 from hobbit_user_interaction import HobbitMMUI
 import hobbit_smach.speech_output_import as speech_output
@@ -42,18 +41,6 @@ def switch_vision_cb(ud, response):
         return 'succeeded'
     else:
         return 'aborted'
-
-def battery_cb(msg, ud):
-    print('Received battery_state message')
-    print(msg.charging)
-    #print(ud.params)
-    rospy.sleep(2.0)
-    if msg.charging:
-        print('I am charging')
-        return True
-    else:
-        print('I am NOT charging')
-        return False
 
 def event_cb(msg, ud):
     if msg.event.upper() in ['G_COME', 'A_YES', 'G_YES']:

@@ -12,13 +12,12 @@ import rospy
 from smach import Sequence, State, StateMachine, Concurrence
 from smach_ros import ServiceState
 from uashh_smach.util import SleepState, WaitForMsgState
-# from uashh_smach.platform.move_base import HasMovedState
-from mira_msgs.msg import BatteryState
 from hobbit_msgs.srv import ChargeCheck
 import hobbit_smach.hobbit_move_import as hobbit_move
 from hobbit_user_interaction import HobbitMMUI
 import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.logging_import as log
+from hobbit_msgs.srv import SetDockState, GetDockState, SetDockStateRequest, GetDockStateRequest
 
 def charge_response_cb(userdata, response):
     print(response.response)
@@ -58,35 +57,11 @@ class PreemptChecker(State):
             return 'preempted'
         return 'aborted'
 
-
-def undock_if_needed():
-    """
-    Returns a SMACH StateMachine that check if it is needed to undock
-    before any movement is done.
-    """
-    sm = StateMachine(
-        outcomes=['succeeded', 'aborted', 'preempted'])
-    with sm:
-        StateMachine.add(
-            WaitForMsgState(
-                '/battery_state',
-                BatteryState,
-                msg_cb=battery_cb
-                ),
-            transitions={'succeeded': 'UNDOCK',
-                         'aborted': 'aborted',
-                         'preempted': 'preempted'}
-        )
-        StateMachine.add(
-            'UNDOCK',
-            # hobbit_move.get_undock(),
-            hobbit_move.get_undock_action(),
-            transitions={'succeeded': 'succeeded',
-                         'aborted': 'aborted',
-                         'preempted': 'preempted'}
-        )
-        return sm
-
+def resp_cb(userdata, response):
+        if response.result:
+            return 'succeeded'
+        else:
+            return 'aborted'
 
 def getRecharge():
     """This function handles the autonomous charging sequence.
@@ -101,6 +76,7 @@ def getRecharge():
     seq.userdata.room_name = 'dock'
     seq.userdata.location_name = 'dock'
 
+
     with seq:
         Sequence.add(
             'LOG_RECHARGE',
@@ -108,12 +84,14 @@ def getRecharge():
             transitions={'aborted': 'LOG_ABORT',
                          'preempted': 'LOG_PREEMPT'}
         )
+
         Sequence.add(
             'CHECK_IF_CHARGING_ALREADY',
-            ServiceState('/hobbit/charge_check',
-                         ChargeCheck,
-                         response_cb=charge_response_cb,input_keys=['counter'],output_keys=['counter']
-            ),
+            ServiceState(
+                '/docking/get_dock_state',
+                GetDockState,
+                request=GetDockStateRequest(state=True),
+                response_cb=resp_cb),
             transitions={'succeeded': 'LOG_SUCCESS',
                          'aborted': 'SAY_TIRED',
                          'preempted': 'LOG_PREEMPT'}
@@ -218,95 +196,6 @@ def getEndRecharge():
     # return seq
 
 
-def startDockProcedureOld():
-    seq = Sequence(
-        outcomes=['succeeded', 'preempted', 'aborted'],
-        connector_outcome='succeeded'
-    )
-
-    seq1 = Sequence(
-        outcomes=['succeeded', 'preempted', 'aborted'],
-        connector_outcome='succeeded'
-    )
-
-    sm = StateMachine(
-        outcomes=['succeeded', 'aborted', 'preempted'])
-
-    def child_term_cb(outcome_map):
-            return True
-
-    with seq:
-        Sequence.add(
-            'CHARGE_CHECK',
-            WaitForMsgState('/battery_state', BatteryState, msg_cb=battery_cb),
-            transitions={'succeeded': 'succeeded',
-                         'aborted': 'PREEMPT',
-                         'preempted': 'preempted'})
-        Sequence.add(
-            'PREEMPT',
-            PreemptChecker(),
-            transitions={'preempted': 'preempted',
-                         'aborted': 'CHARGE_CHECK'})
-
-    seq = Sequence(
-        outcomes=['succeeded', 'preempted', 'aborted'],
-        connector_outcome='succeeded'
-    )
-
-    seq1 = Sequence(
-        outcomes=['succeeded', 'preempted', 'aborted'],
-        connector_outcome='succeeded'
-    )
-
-    sm = StateMachine(
-        outcomes=['succeeded', 'aborted', 'preempted'])
-
-    def out_cb(outcome_map):
-        print('CHECK: outcome_map')
-        print(outcome_map)
-        if outcome_map['CHARGE_CHECK'] == 'succeeded':
-            return 'succeeded'
-        elif outcome_map['WAIT'] == 'succeeded':
-            return 'failed'
-
-    cc = Concurrence(
-        outcomes=['succeeded', 'preempted', 'failed'],
-        default_outcome='failed',
-        child_termination_cb=child_term_cb,
-        outcome_cb=out_cb
-    )
-
-    with cc:
-        Concurrence.add(
-            'WAIT', SleepState(duration=5))
-        Concurrence.add(
-            'CHARGE_CHECK',
-            seq)
-
-
-    with seq1:
-        Sequence.add('START_DOCK', hobbit_move.get_dock_action())
-        # Sequence.add('START_DOCK', hobbit_move.Dock())
-        Sequence.add('WAIT', SleepState(duration=10))
-        Sequence.add('CHECK',
-                     cc,
-                     transitions={'succeeded': 'aborted',
-                                  'failed': 'RETRY'})
-        Sequence.add('RETRY', hobbit_move.get_undock_action())
-        # Sequence.add('RETRY', hobbit_move.get_undock())
-        Sequence.add('WAIT1', SleepState(duration=10))
-        Sequence.add('CHECK_1', cc,
-                     transitions={'succeeded': 'aborted',
-                                  'failed': 'START_DOCK'})
-
-    with sm:
-        StateMachine.add('DOCKING_PROCEDURE', seq1,
-                         transitions={'succeeded': 'succeeded',
-                                      'aborted': 'aborted'})
-        # StateMachine.add('STOP', hobbit_move.Stop(),
-        #                 transitions={'succeeded': 'aborted'})
-    return sm
-
 class FirstSecondThird(State):
     """
     Class for setting the result message and clean up persistent variables
@@ -349,10 +238,11 @@ def startDockProcedure():
                                       'preempted': 'preempted'}
                          )
         StateMachine.add('CHARGE_CHECK',
-                         ServiceState('/hobbit/charge_check',
-                                      ChargeCheck,
-                                      response_cb=charge_response_cb,input_keys=['counter'],output_keys=['counter']
-                         ),
+                         ServiceState(
+                             '/docking/get_dock_state',
+                             GetDockState,
+                             request=GetDockStateRequest(state=True),
+                             response_cb=resp_cb),
                          transitions={'succeeded': 'succeeded',
                                       'aborted': 'UNDOCK',
                                       'preempted': 'preempted'}
