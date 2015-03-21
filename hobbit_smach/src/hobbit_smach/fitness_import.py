@@ -95,7 +95,7 @@ class SetSuccess(State):
 
 def event_cb(msg, userdata):
     rospy.loginfo('Got message with event: '+str(msg.event))
-    if msg.event.upper() == 'E_FITNESS_CLOSED':
+    if msg.event.upper() in ['E_FITNESS_CLOSED', 'E_HELP']:
         return True
     else:
         return False
@@ -160,8 +160,17 @@ def get_do_fitness():
                 '/Event',
                 Event,
                 msg_cb=event_cb),
-            transitions={'succeeded': 'BACK_TO_USER',
+            transitions={'succeeded': 'SHOW_MAIN',
                          'aborted': 'WAIT_FOR_END',
+                         'preempted': 'LOG_PREEMPT'}
+        )
+        StateMachine.add(
+            'SHOW_MAIN',
+            HobbitMMUI.ShowMenu(
+                menu='MAIN'
+            ),
+            transitions={'succeeded': 'BACK_TO_USER',
+                         'failed': 'LOG_ABORTED',
                          'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
