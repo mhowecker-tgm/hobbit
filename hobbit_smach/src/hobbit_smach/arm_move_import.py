@@ -83,7 +83,6 @@ def getArmAtPosition(position='home'):
 	    print "getArmAtPosition result was False at time of execution for position: [=> wait 3 sec and assume arm is in correct position!]",position
     return False
 
-
 class DoArmStop(State):
     """
     Stop the arm immediately. This state can not be preempted, as the stop command needs to be executable without
@@ -496,7 +495,6 @@ def check_and_inform_about_arm_not_referenced_or_at_home():
         # home position this method will report succeeded
         StateMachine.add(
             'RETURN_ARM',
-            #TODO: Confirm this is the correct way to bring back the turntable and the arm if necessary
             goToHomePosition(),
             transitions={'succeeded': 'CHECK_ARM',
                          'failed': 'aborted',
