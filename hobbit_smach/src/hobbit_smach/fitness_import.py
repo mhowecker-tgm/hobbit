@@ -14,6 +14,7 @@ import hobbit_smach.hobbit_move_import as hobbit_move
 import hobbit_smach.head_move_import as head_move
 import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.logging_import as log
+import hobbit_smach.call_hobbit_2_import as call_hobbit
 
 
 def switch_vision_cb(ud, response):
@@ -159,6 +160,13 @@ def get_do_fitness():
                 '/Event',
                 Event,
                 msg_cb=event_cb),
+            transitions={'succeeded': 'BACK_TO_USER',
+                         'aborted': 'WAIT_FOR_END',
+                         'preempted': 'LOG_PREEMPT'}
+        )
+        StateMachine.add(
+            'BACK_TO_USER',
+            call_hobbit.come_closer_from_everywhere(),
             transitions={'succeeded': 'LOG_SUCCESS',
                          'aborted': 'WAIT_FOR_END',
                          'preempted': 'LOG_PREEMPT'}

@@ -275,7 +275,7 @@ def call_hobbit():
         StateMachine.add(
             'MOVE_TO_GOAL',
             hobbit_move.goToPoseSilent(),
-            transitions={'succeeded': 'HEAD_UP',
+            transitions={'succeeded': 'SWITCH_VISION',
                          'aborted': 'LOG_ABORT',
                          'preempted': 'LOG_PREEMPT'}
         )
@@ -286,7 +286,10 @@ def call_hobbit():
                 SwitchVision,
                 request=SwitchVisionRequest(dummyInput=True),
                 response_cb=switch_vision_cb
-            )
+            ),
+            transitions={'succeeded': 'HEAD_UP',
+                         'aborted': 'LOG_ABORT',
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'HEAD_UP',
@@ -358,3 +361,74 @@ def call_hobbit():
         )
 
         return sm
+
+
+def come_closer_from_everywhere():
+    sm = StateMachine(outcomes=['succeeded', 'aborted', 'preempted'])
+    with sm:
+        StateMachine.add(
+            'SWITCH_VISION',
+            ServiceState(
+                '/vision_system/comeCloser',
+                SwitchVision,
+                request=SwitchVisionRequest(dummyInput=True),
+                response_cb=switch_vision_cb
+            ),
+            transitions={'succeeded': 'HEAD_UP',
+                         'aborted': 'aborted',
+                         'preempted': 'preempted'}
+        )
+        StateMachine.add(
+            'HEAD_UP',
+            head_move.MoveTo(pose='littledown_center'),
+            transitions={'succeeded': 'GET_PERSON',
+                         'preempted': 'preempted',
+                         'aborted': 'aborted'}
+        )
+        StateMachine.add(
+            'GET_PERSON',
+            msg_timer_sm(),
+            transitions={'succeeded': 'CLOSER',
+                         'preempted': 'preempted',
+                         'aborted': 'SAY_NOT_DETECTED'}
+        )
+        StateMachine.add(
+            'CLOSER',
+            SimpleActionState(
+                'come_closer',
+                GeneralHobbitAction,
+                goal_cb=closer_cb,
+                input_keys=['person_z', 'person_x'],
+                preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
+                server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
+            ),
+            transitions={'succeeded': 'MOVED',
+                         'preempted': 'preempted',
+                         'aborted': 'GESTURE_HANDLING'}
+        )
+        StateMachine.add(
+            'MOVED',
+            ServiceState(
+                '/came_closer/set_closer_state',
+                SetCloserState,
+                request=SetCloserStateRequest(state=True),
+            ),
+            transitions={'succeeded': 'GESTURE_HANDLING',
+                         'preempted': 'preempted',}
+        )
+        StateMachine.add(
+            'SAY_NOT_DETECTED',
+            speech_output.sayText(
+                info="T_NO_USER"),
+            transitions={'succeeded': 'aborted',
+                         'preempted': 'preempted',
+                         'failed': 'aborted'}
+        )
+        StateMachine.add(
+            'GESTURE_HANDLING',
+            gesture_sm(),
+            transitions={'succeeded': 'succeeded',
+                         'preempted': 'preempted',
+                         'aborted': 'aborted'}
+        )
+    return sm
