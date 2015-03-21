@@ -42,6 +42,7 @@ add_service_files(
   AddObject.srv
   ClustersOnPlane.srv
   ChargeCheck.srv
+  GetArmState.srv
   GetCloserState.srv
   GetDockState.srv
   GetMoveState.srv
@@ -56,6 +57,7 @@ add_service_files(
   LeftJoyStickPressed.srv
   PointCloud2FeatureHistogram.srv
   Request.srv
+  SetArmState.srv
   SetCloserState.srv
   SetDockState.srv
   SetMoveState.srv

@@ -1,0 +1,4 @@
+# Service definition to set the movement state
+bool state 
+---
+bool result
