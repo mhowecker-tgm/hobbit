@@ -19,10 +19,22 @@ from std_msgs.msg import String, Bool
 import actionlib
 import hobbit_msgs.msg
 import time
+from hobbit_msgs.srv import SetArmState, SetArmStateRequest
 
 
 def str2bool(v):
   return v.lower() in ("yes", "true", "t", "1")
+
+def set_arm_moving(state=False):
+    rospy.loginfo('CHANGE ARM STATE')
+    rospy.wait_for_service('/arm/set_move_state')
+    try:
+        srv = rospy.ServiceProxy('/arm/set_move_state', SetArmState)
+        req = SetArmStateRequest(state)
+        resp = srv(req)
+        return resp
+    except rospy.ServiceException, e:
+        print "Service call failed: %s"%e
 
 
 class ArmActionServerROS(object):
@@ -49,15 +61,24 @@ class ArmActionServerROS(object):
     #check if Arm in target position
     def CheckTargetPos(self, feedback, checkpos, timeout):	
         if feedback[1]=='COMMAND_OK':
+            set_arm_moving(state=True)
             for i in range(0,timeout):
+                if self._as.is_preempt_requested():
+                    rospy.loginfo('%s: Preempted' % self._action_name)
+                    self._as.set_preempted()
+                    set_arm_moving(state=False)
+                    return Bool(False)
+
                 if self._stop_arm:
                     print "ArmActionServer: CheckTargetPos: stop function due to stop arm command on topic /arm/commands"
+                    set_arm_moving(state=False)
                     break #arm was actively stopped by command StopArm over topic /arm/commands
                 time.sleep(0.5)
                 print "loop round: ", i+1
                 armInTargetPos = checkpos()
                 print "armInTargetPos: ",armInTargetPos
                 if armInTargetPos:
+                    set_arm_moving(state=False)
                     return Bool(True)
                     break
             return Bool(False)
@@ -153,6 +174,7 @@ class ArmActionServerROS(object):
         elif cmd == 'GetArmIsMoving':
             self._feedback.feedback.data = str(self.ArmClient.GetArmIsMoving())
             print "ArmActionServer, feedback: ", self._feedback.feedback.data
+            rospy.loginfo("ArmActionServer, feedback: "+str(self._feedback.feedback.data))
             self._result.result.data = str2bool(self._feedback.feedback.data)
         elif cmd == 'GetArmSoftLimitMax':
             self._feedback.feedback.data = str(self.ArmClient.GetArmSoftLimitMax())
@@ -181,7 +203,7 @@ class ArmActionServerROS(object):
             feedback = self.ArmClient.SetMoveToHomePos()
             self._feedback.feedback.data = str(feedback)
             print "ArmActionServer, feedback: ", self._feedback.feedback.data        
-            self._result.result = self.CheckTargetPos(feedback, self.ArmClient.GetArmAtHomePos, 20)        
+            self._result.result = self.CheckTargetPos(feedback, self.ArmClient.GetArmAtHomePos, 60)        
         elif cmd == 'SetMoveToCandlePos':
             feedback = self.ArmClient.SetMoveToCandlePos()
             self._feedback.feedback.data = str(feedback)
@@ -253,6 +275,7 @@ class ArmActionServerROS(object):
             print "ArmActionServer, feedback: ", self._feedback.feedback.data
             self._result.result = Bool(feedback[1]=='COMMAND_OK')
         elif cmd == 'SetStopArmMove':
+            set_arm_moving(state=False)
             feedback = self.ArmClient.SetStopArmMove()
             self._feedback.feedback.data = str(feedback)
             print "ArmActionServer, feedback: ", self._feedback.feedback.data
@@ -425,7 +448,9 @@ class ArmActionServerROS(object):
     
         #publish feedback
         self._as.publish_feedback(self._feedback)
-        self._as.set_succeeded(self._result)
+        rospy.loginfo("Before preempt check at the end")
+        if not self._as.is_preempt_requested():
+            self._as.set_succeeded(self._result)
     
             # helper variables
             #r = rospy.Rate(1)
@@ -535,6 +560,7 @@ class ArmActionServerROS(object):
         #arm stop function
         elif cmd == 'StopArm':
             self._stop_arm = True
+            set_arm_moving(state=False)
             print "StopArm command received via topic /arm/commands"
         elif cmd == 'help':
             self.help()
