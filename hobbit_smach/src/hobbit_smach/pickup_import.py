@@ -1704,28 +1704,28 @@ def getPickupSeq():
         )
         StateMachine.add(
             'TRAJECTORY',
-            speech_output.emo_say_something(text='There was no trajectory for the arm found for grasping the object.'),
+            speech_output.emo_say_something(text='T_PICKUP_BETTER_POSITION'),
             transitions={'succeeded': 'failed_arm_not_moved',
                          'preempted': 'preempted',
                          'aborted': 'failed',}
         )
         StateMachine.add(
             'ARM',
-            speech_output.emo_say_something(text='There was not enough space to safely move my arm.'),
+            speech_output.emo_say_something(text='T_ARM_NO_SPACE'),
             transitions={'succeeded': 'failed',
                          'preempted': 'preempted',
                          'aborted': 'failed',}
         )
         StateMachine.add(
             'OBJECT',
-            speech_output.emo_say_something(text='No suitable object was detected.'),
+            speech_output.emo_say_something(text='T_PICKUP_NO_OBJECT'),
             transitions={'succeeded': 'failed',
                          'preempted': 'preempted',
                          'aborted': 'failed',}
         )
         StateMachine.add(
             'GRASP',
-            speech_output.emo_say_something(text='I could not calulate a sufficient grasp for the object.'),
+            speech_output.emo_say_something(text='T_PICKUP_BETTER_POSITION'),
             transitions={'succeeded': 'failed',
                          'preempted': 'preempted',
                          'aborted': 'failed',}

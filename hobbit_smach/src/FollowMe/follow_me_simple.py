@@ -25,6 +25,7 @@ from smach_ros import IntrospectionServer, ActionServerWrapper, MonitorState, Si
 from hobbit_msgs.msg import GeneralHobbitAction, FollowMeAction, FollowMeGoal
 import hobbit_smach.logging_import as log
 import hobbit_smach.hobbit_move_import as hobbit_move
+import hobbit_smach.arm_move_import as arm_move
 from mira_msgs.srv import UserNavMode, ObsNavMode
 from hobbit_msgs.srv import SwitchVision, SwitchVisionRequest
 
@@ -115,8 +116,15 @@ def main():
         StateMachine.add(
             'INIT',
             Init(),
-            transitions={'succeeded': 'ENABLE_TRACKING',
+            transitions={'succeeded': 'ARM_CHECK',
                          'canceled': 'LOG_ABORTED'}
+        )
+        StateMachine.add(
+            'ARM_CHECK',
+            arm_move.check_and_inform_about_arm_not_referenced_or_at_home(),
+            transitions={'succeeded': 'ENABLE_TRACKING',
+                         'aborted': 'LOG_ABORTED',
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'UNDOCK_IF_NEEDED',
@@ -166,8 +174,7 @@ def main():
         StateMachine.add(
             'SAY_START',
             speech_output.sayText(
-                info='Bitte stell dich vor mich.'),
-                #info="Please stand in front of me so i can follow you."),
+                info='T_STAND_IN_FRONT'),
             transitions={'succeeded': 'GET_USER',
                          'failed': 'LOG_ABORTED'}
         )
@@ -186,8 +193,7 @@ def main():
         StateMachine.add(
             'SAY_FOUND_YOU',
             speech_output.sayText(
-                info="Ich habe dich gefunden werde dir jetzt folgen."),
-                #info="Found you. Will start following you."),
+                info="T_FOLLOW_YOU"),
             transitions={'succeeded': 'HEAD_DOWN',
                          'failed': 'LOG_ABORTED'}
         )
@@ -215,8 +221,7 @@ def main():
         StateMachine.add(
             'SAY_CANT_SEE',
             speech_output.sayText(
-                info="Ich konnte dich nicht erkennen und bleibe deshalb hier stehen."),
-                #info="I did not see you and will stay here."),
+                info="T_STOP_FOLLOWING"),
             transitions={'succeeded': 'LOG_ABORTED',
                          'failed': 'LOG_ABORTED'}
         )
@@ -235,16 +240,14 @@ def main():
         StateMachine.add(
             'SAY_STOP',
             speech_output.sayText(
-                info="Ich bleibe jetzt stehen."),
-                #info="I will stop moving now."),
+                info="T_STOP_FOLLOWING"),
             transitions={'succeeded': 'LOG_SUCCESS',
                          'failed': 'LOG_ABORTED'}
         )
         StateMachine.add(
             'SAY_STOP1',
             speech_output.sayText(
-                info="Ich sehe dich nicht mehr und bleibe deshalb hier stehen."),
-                #info="I will stop moving now."),
+                info="T_STOP_FOLLOWING"),
             transitions={'succeeded': 'LOG_SUCCESS',
                          'failed': 'LOG_ABORTED'}
         )

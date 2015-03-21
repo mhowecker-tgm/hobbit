@@ -329,7 +329,7 @@ def call_hobbit():
         StateMachine.add(
             'SAY_NOT_DETECTED',
             speech_output.sayText(
-                info="Sorry, I can't see you. Press the call button again if I should try again."),
+                info="T_NO_USER"),
             transitions={'succeeded': 'LOG_ABORT',
                          'preempted': 'LOG_PREEMPT',
                          'failed': 'LOG_ABORT'}
