@@ -24,6 +24,7 @@ import uashh_smach.util as util
 from hobbit_msgs import MMUIInterface as MMUI
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 from hobbit_smach.bcolors import bcolors
+import hobbit_smach.arm_move_import as arm_move
 
 new_command = None
 new_params = None
@@ -33,7 +34,7 @@ commands = [
      'G_HELP', 'A_HELP', 'C_HELP', 'F_CALLSOS', 'G_EMERGENCY'],
     ['recharge', 'E_RECHARGE', 'C_RECHARGE', 'A_Recharge'],
     ['reminder', 'E_REMINDER'],
-    ['stop', 'C_STOP', 'G_STOP', 'E_STOP', 'A_STOP', 'E_CANCEL', 'P_E_CANCEL'], #'E_FITNESS_CLOSED'],
+    ['stop', 'C_STOP', 'G_STOP', 'E_STOP', 'A_STOP', 'B_CANCEL', 'E_CANCEL', 'P_E_CANCEL'], #'E_FITNESS_CLOSED'],
     ['call_hobbit', 'C_CALLHOBBIT', 'E_CALLHOBBIT'],
     ['call', 'E_CALLRING', 'E_CALLESTABLISHED', 'E_CALLENDED', 'C_MAKECALL'],
     ['away', 'C_AWAY1', 'C_AWAY2', 'C_AWAY3', 'C_AWAY4', 'C_AWAY5', 'C_AWAY6',
@@ -109,6 +110,9 @@ def command_cb(msg, ud):
                 rospy.loginfo('Reset active_task value')
                 ud.parameters['active_task'] = 100
                 ud.command = 'stop'
+                #pub = rospy.Publisher('/arm/commands', String, queue_size=5)
+                #pub.publish('SetStopArmMove')
+                arm_move.do_stop()
                 new_command = ud.command
                 return start_command()
             elif item[0] == 'call_hobbit':
