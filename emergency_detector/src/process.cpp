@@ -459,7 +459,7 @@ void initializeProcess(ros::NodeHandle * nh)
 #endif // USE_HOBBIT_MAP_DATA
 
  //Hobbit orientation according to camera
- segConfDepth.maxDepth=1600;
+ segConfDepth.maxDepth=1700;
  segConfDepth.doNotGenerateNormalFrom3Points=0;
  segConfDepth.p1[0]=492.23; segConfDepth.p1[1]=615.87; segConfDepth.p1[2]=1757.00;
  segConfDepth.p2[0]=51.46;  segConfDepth.p2[1]=622.97; segConfDepth.p2[2]=1722.00;
