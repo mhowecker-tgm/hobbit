@@ -15,7 +15,7 @@ using namespace std;
 using namespace cv;
 
 float farBorderZ=2000;
-float closeBorderZ=1050;
+float closeBorderZ=1150;
 unsigned int lowBorderY=480;
 
 
