@@ -57,6 +57,9 @@ class ArmActionClient():
         print "cmd: ", cmd
         #print "ArmActionClient.py: class ArmActionClient: function arm_action_client (=> sends/receives actionlib data from/to server): returnval.result.data: ", returnval.result.data
         return returnval
+    
+    def cancel_all_goals(self):
+        self.client.cancel_all_goals()
         
     def feedback_cb(self, feedback):
         print "feedback_cb executed!"
