@@ -13,6 +13,8 @@ from ArmControllerClientFunctions import ArmClientFunctions
 from ArmClientFunctionsPublisher import ArmClientFunctionsPublisher
 from ArmActionClient import ArmActionClient
 from hobbit_user_interaction import HobbitMMUI
+from std_msgs.msg import String
+from hobbit_msgs.srv import SetArmState, SetArmStateRequest
 
 
 import actionlib
@@ -55,6 +57,17 @@ arm_client = ArmActionClient()
 #else:
 #    arm = True
 
+
+def set_arm_moving(state=False):
+    rospy.wait_for_service('/arm/set_move_state')
+    try:
+        srv = rospy.ServiceProxy('/arm/set_move_state', SetArmState)
+        req = SetArmStateRequest(state)
+        resp = srv(req)
+        return resp
+    except rospy.ServiceException, e:
+        print "Service call failed: %s"%e
+
 def getArmAtPosition(position='home'):
     #status = ast.literal_eval(arm.GetArmState())
     if position == 'home':
@@ -93,12 +106,18 @@ class DoArmStop(State):
             self,
             outcomes=['succeeded', 'aborted']
         )
+        self._pub = rospy.Publisher('/arm/commands', String, queue_size=5)
 
     def execute(self, ud):
         rospy.loginfo('Full stop of arm movement')
-        if arm_client.SetStopArmMove():
-            return 'succeeded'
-        return 'aborted'
+        self._pub.publish('SetStopArmMove')
+        return 'succeeded'
+
+
+def do_stop():
+    arm_client.cancel_all_goals()
+    rospy.loginfo('FINISH FULL ARM STOP')
+    set_arm_moving(state=False) 
 
 class SetMoveToLearning(State):
     """
@@ -210,9 +229,14 @@ class CheckArmIsNotMoving(State):
         if not arm_client.GetArmIsEnabled():
             return 'failed'
         if arm_client.GetArmIsMoving():
+            set_arm_moving(state=True) 
             return 'failed'
         else:
+            set_arm_moving(state=False) 
             return 'succeeded'
+
+def is_arm_moving():
+    return arm_client.GetArmIsMoving()
 
 class SetArmPosition(State):
     """
@@ -484,8 +508,7 @@ def check_and_inform_about_arm_not_referenced_or_at_home():
         )
         StateMachine.add(
             'TELL_USER',
-            HobbitMMUI.ConfirmOk(text='The arm is not in home position. Please make sure that there is enough free'
-                                      'space to move the arm and the turntable back. Press ok when ready.'),
+            HobbitMMUI.ConfirmOk(text='T_ARM_STILL_EXTENDED'),
             transitions={'succeeded': 'RETURN_ARM',
                          'timeout': 'TELL_USER',
                          '3times': 'aborted',
