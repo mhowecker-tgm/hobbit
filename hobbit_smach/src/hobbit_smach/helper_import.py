@@ -3,6 +3,7 @@
 import rospy
 import threading
 from smach import State, Sequence
+from smach_ros import ServiceState
 from datetime import datetime, time
 from hobbit_user_interaction import HobbitMMUI
 import hobbit_smach.hobbit_move_import as hobbit_move
@@ -10,6 +11,8 @@ import hobbit_smach.logging_import as log
 import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.arm_move_import as arm_move
 from uashh_smach.util import SleepState
+from hobbit_msgs.srv import GetMoveState, GetMoveStateRequest
+#from hobbit_msgs.srv import GetArmState, GetArmStateRequest
 
 
 class TimeCheck(State):
@@ -74,15 +77,45 @@ def get_hobbit_full_stop():
         outcomes=['succeeded', 'aborted', 'preempted'],
         connector_outcome='succeeded'
     )
+    def resp_cb(userdata, response):
+        if response.result:
+            return 'succeeded'
+        else:
+            return 'aborted'
 
     with seq:
+        Sequence.add(
+            'CHECK_MOVE',
+            ServiceState('/moving/get_move_state',
+                         GetMoveState,
+                         request=GetMoveStateRequest(state=True),
+                         response_cb=resp_cb),
+            transitions={'aborted': 'STOP_ARM'}
+            #transitions={'aborted': 'CHECK_ARM'}
+        )
         Sequence.add(
             'STOP_MOVEMENT',
             hobbit_move.get_full_stop()
         )
+        # Sequence.add(
+        #     'CHECK_ARM',
+        #     ServiceState('/arm/get_move_state',
+        #                  GetArmState,
+        #                  request=GetArmStateRequest(state=True),
+        #                  response_cb=resp_cb),
+        #     transitions={'aborted': 'MAIN_MENU'}
+        # )
         Sequence.add(
             'STOP_ARM',
             arm_move.DoArmStop()
+        )
+        Sequence.add(
+            'SAY_FULL_STOP',
+            speech_output.sayText(
+                info='Doing a full stop as commanded by you.'),
+            transitions={'succeeded': 'WAIT',
+                         'preempted': 'LOG_PREEMPT',
+                         'failed': 'LOG_ABORTED'}
         )
         Sequence.add(
             'WAIT',

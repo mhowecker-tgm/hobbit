@@ -30,7 +30,7 @@ from math import pi
 from hobbit_msgs.srv import SetCloserState, GetCloserState
 from hobbit_msgs.srv import SetCloserStateRequest, GetCloserStateRequest
 from hobbit_msgs.srv import SetDockState, GetDockState, SetDockStateRequest, GetDockStateRequest
-
+from hobbit_msgs.srv import SetMoveState, GetMoveState, SetMoveStateRequest, GetMoveStateRequest
 
 def switch_vision_cb(ud, response):
     if response.result:
@@ -191,6 +191,7 @@ def get_undock_action():
             return 'succeeded'
         else:
             return 'aborted'
+
     sm = StateMachine(outcomes=['succeeded', 'preempted', 'aborted'])
     docking_goal = MiraDockingGoal(docking_task=1)
     StateMachine.add(
@@ -218,22 +219,48 @@ def get_undock_action():
                          'preempted': 'preempted'})
     return sm
 
+def resp_cb(userdata, response):
+        if response.result:
+            return 'succeeded'
+        else:
+            return 'aborted'
+
 def move_discrete(in_motion=None, in_value=None):
     sm = StateMachine(outcomes=['succeeded', 'aborted', 'preempted'])
     with sm:
         StateMachine.add(
             'CHECK_ARM',
             arm_move.check_and_inform_about_arm_not_referenced_or_at_home(),
-            transitions={'succeeded': 'MOVE',
+            transitions={'succeeded': 'SET_MOVING',
                          'preempted': 'preempted',
                          'aborted': 'aborted'}
         )
         StateMachine.add(
+            'SET_MOVING',
+            ServiceState('/moving/set_move_state',
+                         SetDockState,
+                         request=SetDockStateRequest(state=True),
+                         response_cb=resp_cb),
+            transitions={'succeeded':'MOVE',
+                         'aborted': 'aborted',
+                         'preempted': 'preempted'}
+        )
+        StateMachine.add(
             'MOVE',
             MoveDiscrete(motion=in_motion, value=in_value),
-            transitions={'succeeded': 'succeeded',
+            transitions={'succeeded': 'SET_NOT_MOVING',
                          'preempted': 'preempted',
                          'aborted': 'aborted'}
+        )
+        StateMachine.add(
+            'SET_NOT_MOVING',
+            ServiceState('/moving/set_move_state',
+                         SetDockState,
+                         request=SetDockStateRequest(state=False),
+                         response_cb=resp_cb),
+            transitions={'succeeded':'succeeded',
+                         'aborted': 'aborted',
+                         'preempted': 'preempted'}
         )
     return sm
 
@@ -608,13 +635,26 @@ def goToPosition(frame='/map', room='None', place='dock'):
             arm_move.CheckArmAtHomePos(),
             transitions={'aborted': 'SAY_ARM'}
         )
+        Sequence.add(
+            'SET_MOVING',
+            ServiceState('/moving/set_move_state',
+                         SetDockState,
+                         request=SetDockStateRequest(state=True),
+                         response_cb=resp_cb),
+        )
         if not DEBUG:
             Sequence.add(
                 'MOVE_HOBBIT',
                 move_base.MoveBaseState(frame),
-                transitions={'aborted': 'HEAD_UP',
-                             'preempted': 'SAY_FULL_STOP'}
+                transitions={'aborted': 'HEAD_UP'}
             )
+        Sequence.add(
+            'SET_NOT_MOVING',
+            ServiceState('/moving/set_move_state',
+                         SetDockState,
+                         request=SetDockStateRequest(state=False),
+                         response_cb=resp_cb),
+        )
         Sequence.add(
             'PREPARE_STOP',
             ServiceState(
@@ -664,14 +704,6 @@ def goToPosition(frame='/map', room='None', place='dock'):
             speech_output.sayText(info='My arm is not in the home position. Will not move.'),
             transitions={'succeeded': 'aborted',
                          'failed': 'aborted'}
-        )
-        Sequence.add(
-            'SAY_FULL_STOP',
-            speech_output.sayText(
-                info='Doing a full stop as commanded by you.'),
-            transitions={'succeeded': 'preempted',
-                         'preempted': 'preempted',
-                         'failed': 'preempted'}
         )
     return seq
 
@@ -767,13 +799,26 @@ def goToPose():
                 arm_move.CheckArmAtHomePos(),
                 transitions={'aborted': 'SAY_ARM'}
             )
+            Sequence.add(
+            'SET_MOVING',
+            ServiceState('/moving/set_move_state',
+                         SetDockState,
+                         request=SetDockStateRequest(state=True),
+                         response_cb=resp_cb),
+            )
             Sequence.add('MOVE_BASE_GOAL', move_base.MoveBaseState(frame),
                          remapping={'x': 'x',
                                     'y': 'y',
                                     'yaw': 'yaw'},
-                         transitions={'aborted': 'HEAD_UP',
-                                      'preempted': 'SAY_FULL_STOP'}
+                         transitions={'aborted': 'HEAD_UP'}
             )
+        Sequence.add(
+            'SET_NOT_MOVING',
+            ServiceState('/moving/set_move_state',
+                         SetDockState,
+                         request=SetDockStateRequest(state=False),
+                         response_cb=resp_cb),
+        )
         Sequence.add(
             'PREPARE_STOP',
             ServiceState(
@@ -793,12 +838,6 @@ def goToPose():
             transitions={'failed': 'aborted',
                          'succeeded': 'succeeded'}
         )
-        # Sequence.add(
-        #     'SHOW_MENU_MAIN',
-        #     HobbitMMUI.ShowMenu(menu='MAIN'),
-        #     transitions={'failed': 'HEAD_UP',
-        #                  'succeeded': 'succeeded'}
-        # )
         Sequence.add(
             'HEAD_UP',
             head_move.MoveTo(pose='littledown_center')
@@ -819,25 +858,11 @@ def goToPose():
             speech_output.sayText(info='T_GT_WayBlocked'),
             transitions={'failed': 'aborted',
                          'succeeded': 'aborted'})
-        # Sequence.add(
-        #     'SHOW_MENU_MAIN_1',
-        #     HobbitMMUI.ShowMenu(menu='MAIN'),
-        #     transitions={'succeeded': 'aborted',
-        #                  'failed': 'aborted'}
-        # )
         Sequence.add(
             'SAY_ARM',
             speech_output.sayText(info='My arm is not in the home position. Will not move.'),
             transitions={'succeeded': 'aborted',
                          'failed': 'aborted'}
-        )
-        Sequence.add(
-            'SAY_FULL_STOP',
-            speech_output.sayText(
-                info='Doing a full stop as commanded by you.'),
-            transitions={'succeeded': 'preempted',
-                         'preempted': 'preempted',
-                         'failed': 'preempted'}
         )
     return seq
 
@@ -899,13 +924,26 @@ def goToPoseSilent():
                 arm_move.CheckArmAtHomePos(),
                 transitions={'aborted': 'SAY_ARM'}
             )
+            Sequence.add(
+            'SET_MOVING',
+            ServiceState('/moving/set_move_state',
+                         SetDockState,
+                         request=SetDockStateRequest(state=True),
+                         response_cb=resp_cb),
+            )
             Sequence.add('MOVE_BASE_GOAL', move_base.MoveBaseState(frame),
                          remapping={'x': 'x',
                                     'y': 'y',
                                     'yaw': 'yaw'},
-                         transitions={'aborted': 'HEAD_UP',
-                                      'preempted': 'SAY_FULL_STOP'}
+                         transitions={'aborted': 'HEAD_UP'}
             )
+        Sequence.add(
+            'SET_NOT_MOVING',
+            ServiceState('/moving/set_move_state',
+                         SetDockState,
+                         request=SetDockStateRequest(state=False),
+                         response_cb=resp_cb),
+        )
         Sequence.add(
             'PREPARE_STOP',
             ServiceState(
@@ -957,14 +995,6 @@ def goToPoseSilent():
             speech_output.sayText(info='My arm is not in the home position. Will not move.'),
             transitions={'succeeded': 'aborted',
                          'failed': 'aborted'}
-        )
-        Sequence.add(
-            'SAY_FULL_STOP',
-            speech_output.sayText(
-                info='Doing a full stop as commanded by you.'),
-            transitions={'succeeded': 'preempted',
-                         'preempted': 'preempted',
-                         'failed': 'preempted'}
         )
     return seq
 
