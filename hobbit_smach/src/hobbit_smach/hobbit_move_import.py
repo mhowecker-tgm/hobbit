@@ -148,7 +148,7 @@ def back_if_needed():
         StateMachine.add(
             'MOVE_BACK',
             #MoveDiscrete(motion='Move', value=-0.3),
-            move_discrete(in_motion='Move', in_value=-0.3)
+            move_discrete(in_motion='Move', in_value=-0.3),
             transitions={'succeeded': 'MOVED_BACK',
                          'preempted': 'preempted',
                          'aborted': 'succeeded'}

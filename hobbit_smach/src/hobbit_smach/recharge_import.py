@@ -370,13 +370,13 @@ def startDockProcedure():
                                       'preempted': 'preempted'}
         )
         StateMachine.add('ROTATE_CCW',
-                         hobbit_move.move_discrete(in_motion='Turn', in_value=-25)
+                         hobbit_move.move_discrete(in_motion='Turn', in_value=-25),
                          transitions={'succeeded': 'START_DOCKING',
                                       'aborted': 'ROTATE_CW',
                                       'preempted': 'preempted'}
                          )
         StateMachine.add('ROTATE_CW',
-                         hobbit_move.move_discrete(in_motion='Turn', in_value=50)
+                         hobbit_move.move_discrete(in_motion='Turn', in_value=50),
                          transitions={'succeeded': 'START_DOCKING',
                                       'aborted': 'aborted',
                                       'preempted': 'preempted'}
