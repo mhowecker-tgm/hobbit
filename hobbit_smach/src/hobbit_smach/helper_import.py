@@ -12,7 +12,45 @@ import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.arm_move_import as arm_move
 from uashh_smach.util import SleepState
 from hobbit_msgs.srv import GetMoveState, GetMoveStateRequest
-#from hobbit_msgs.srv import GetArmState, GetArmStateRequest
+from hobbit_msgs.srv import SetMoveState, SetMoveStateRequest
+from hobbit_msgs.srv import GetArmState, GetArmStateRequest
+from hobbit_msgs.srv import SetArmState, SetArmStateRequest
+
+movement = False
+
+class ResetStorage(State):
+    """
+    """
+    def __init__(self):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'aborted', 'preempted']
+        )
+
+    def execute(self, ud):
+        global movement
+        rospy.loginfo(movement)
+        movement = False
+        rospy.loginfo(movement)
+        return 'succeeded'
+
+
+class CheckStorage(State):
+    """
+    """
+    def __init__(self):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'aborted', 'preempted']
+        )
+
+    def execute(self, ud):
+        global movement
+        rospy.loginfo(movement)
+        if movement:
+            return 'succeeded'
+        else:
+            return 'aborted'
 
 
 class TimeCheck(State):
@@ -78,10 +116,18 @@ def get_hobbit_full_stop():
         connector_outcome='succeeded'
     )
     def resp_cb(userdata, response):
+        global movement
         if response.result:
+            movement = True
+            rospy.loginfo('setting movement to TRUE')
+            rospy.loginfo(response.result)
+            rospy.loginfo(movement)
             return 'succeeded'
         else:
             return 'aborted'
+
+    def resp_empty_cb(userdata, response):
+        return 'succeeded'
 
     with seq:
         Sequence.add(
@@ -90,32 +136,63 @@ def get_hobbit_full_stop():
                          GetMoveState,
                          request=GetMoveStateRequest(state=True),
                          response_cb=resp_cb),
-            transitions={'aborted': 'STOP_ARM'}
-            #transitions={'aborted': 'CHECK_ARM'}
+            transitions={'aborted': 'CHECK_ARM'}
         )
         Sequence.add(
             'STOP_MOVEMENT',
             hobbit_move.get_full_stop()
         )
-        # Sequence.add(
-        #     'CHECK_ARM',
-        #     ServiceState('/arm/get_move_state',
-        #                  GetArmState,
-        #                  request=GetArmStateRequest(state=True),
-        #                  response_cb=resp_cb),
-        #     transitions={'aborted': 'MAIN_MENU'}
-        # )
         Sequence.add(
-            'STOP_ARM',
-            arm_move.DoArmStop()
+            'CHECK_ARM',
+            ServiceState('/arm/get_move_state',
+                         GetArmState,
+                         request=GetArmStateRequest(state=True),
+                         response_cb=resp_cb),
+            transitions={'aborted': 'CHECK_MOVEMENT_STORAGE'}
         )
         Sequence.add(
-            'SAY_FULL_STOP',
+            'STOP_ARM',
+            arm_move.DoArmStop(),
+            transitions={'aborted': 'CHECK_MOVEMENT_STORAGE'}
+        )
+        Sequence.add(
+            'CHECK_MOVEMENT_STORAGE',
+            CheckStorage(),
+            transitions={'succeeded': 'RESET_MOVEMENT_STORAGE',
+                         'aborted': 'succeeded'}
+        )
+        Sequence.add(
+            'RESET_MOVEMENT_STORAGE',
+            ResetStorage(),
+            transitions={'succeeded': 'SAY_STOP',
+                         'aborted': 'SET_ARM_STATE'}
+        )
+        Sequence.add(
+            'SAY_STOP',
             speech_output.sayText(
-                info='Doing a full stop as commanded by you.'),
-            transitions={'succeeded': 'WAIT',
-                         'preempted': 'LOG_PREEMPT',
+                info='You told me to stop'),
+            transitions={'preempted': 'LOG_PREEMPT',
                          'failed': 'LOG_ABORTED'}
+        )
+        Sequence.add(
+            'SET_ARM_STATE',
+            ServiceState('/moving/set_move_state',
+                         SetArmState,
+                         request=SetArmStateRequest(state=False),
+                         response_cb=resp_empty_cb),
+            transitions={'succeeded':'SET_NOT_MOVING',
+                         'aborted': 'SET_NOT_MOVING',
+                         'preempted': 'preempted'}
+        )
+        Sequence.add(
+            'SET_NOT_MOVING',
+            ServiceState('/moving/set_move_state',
+                         SetMoveState,
+                         request=SetMoveStateRequest(state=False),
+                         response_cb=resp_empty_cb),
+            transitions={'succeeded':'succeeded',
+                         'aborted': 'aborted',
+                         'preempted': 'preempted'}
         )
         Sequence.add(
             'WAIT',

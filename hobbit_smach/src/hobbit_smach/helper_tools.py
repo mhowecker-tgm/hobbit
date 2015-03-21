@@ -7,13 +7,14 @@ NAME = 'helper_node'
 DEBUG = False
 RETRY = 10
 state = False
-dock_state = True
+dock_state = False
 move_state = False
 arm_state = False
 
 import rospy
 from hobbit_msgs.srv import SetCloserState, GetCloserState, SetDockState, GetDockState, SetMoveState, GetMoveState
-#from hobbit_msgs.srv import GetArmState, SetArmState
+from hobbit_msgs.srv import GetArmState, SetArmState
+from mira_msgs.msg import BatteryState
 
 def set_closer_state(req):
     global state
@@ -75,6 +76,13 @@ def get_arm_state(req):
     rospy.loginfo("Get state is "+str(arm_state))
     return arm_state
 
+def set_dock_state_true(msg):
+    global dock_state
+    if msg.charging:
+        #rospy.loginfo("Set docked to TRUE")
+        dock_state = True
+     
+
 def charge_check_server():
     rospy.init_node('hobbit_helper_node')
     s1 = rospy.Service('/came_closer/set_closer_state', SetCloserState, set_closer_state)
@@ -83,8 +91,9 @@ def charge_check_server():
     s4 = rospy.Service('/docking/get_dock_state', GetDockState, get_dock_state)
     s5 = rospy.Service('/moving/set_move_state', SetMoveState, set_move_state)
     s6 = rospy.Service('/moving/get_move_state', GetMoveState, get_move_state)
-    #s7 = rospy.Service('/arm/set_move_state', SetArmState, set_arm_state)
-    #s8 = rospy.Service('/arm/get_move_state', GetArmState, get_arm_state
+    s7 = rospy.Service('/arm/set_move_state', SetArmState, set_arm_state)
+    s8 = rospy.Service('/arm/get_move_state', GetArmState, get_arm_state)
+    rospy.Subscriber('battery_state', BatteryState, set_dock_state_true)
 
     rospy.loginfo('Node started')
     rospy.spin()
