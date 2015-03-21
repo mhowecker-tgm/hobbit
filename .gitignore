@@ -4,3 +4,4 @@
 rgbd_acquisition/bin/*
 CATKIN_IGNORE
 .idea
+core
