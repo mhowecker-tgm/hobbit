@@ -79,7 +79,7 @@ def undock_if_needed():
                          'aborted': 'aborted',
                          'preempted': 'preempted'}
         )
-        return sm
+    return sm
 
 def get_undock():
     """
@@ -118,29 +118,31 @@ def get_dock_action():
             return 'aborted'
     sm = StateMachine(outcomes=['succeeded', 'preempted', 'aborted'])
     docking_goal = MiraDockingGoal(docking_task=0)
-    StateMachine.add(
-        'DOCK_ACTION',
-        SimpleActionState(
-            'docking_task',
-            MiraDockingAction,
-            goal=docking_goal,
-            result_cb=docking_result_cb,
-            preempt_timeout=rospy.Duration(20),
-            server_wait_timeout=rospy.Duration(TIMEOUT)
-            ),
-        transitions={'succeeded':'SET_DOCK_STATE_VARIABLE',
-                     'aborted': 'aborted',
-                     'preempted': 'preempted'}
-    )
-    StateMachine.add(
-            'SET_DOCK_STATE_VARIABLE',
-            ServiceState('/docking/set_dock_state',
-                         SetDockState,
-                         request=SetDockStateRequest(state=True),
-                         response_cb=resp_cb),
-            transitions={'succeeded':'succeeded',
+    with sm:
+        StateMachine.add(
+            'DOCK_ACTION',
+            SimpleActionState(
+                'docking_task',
+                MiraDockingAction,
+                goal=docking_goal,
+                result_cb=docking_result_cb,
+                preempt_timeout=rospy.Duration(20),
+                server_wait_timeout=rospy.Duration(TIMEOUT)
+                ),
+            transitions={'succeeded':'SET_DOCK_STATE_VAR',
                          'aborted': 'aborted',
-                         'preempted': 'preempted'})
+                         'preempted': 'preempted'}
+        )
+        StateMachine.add(
+                'SET_DOCK_STATE_VAR',
+                ServiceState('/docking/set_dock_state',
+                             SetDockState,
+                             request=SetDockStateRequest(state=True),
+                             response_cb=resp_cb),
+                transitions={'succeeded':'succeeded',
+                             'aborted': 'aborted',
+                             'preempted': 'preempted'}
+        )
     return sm
 
 def back_if_needed():
@@ -180,7 +182,7 @@ def back_if_needed():
                          'preempted': 'preempted',
                          'aborted': 'succeeded'}
         )
-        return sm
+    return sm
 
 def get_undock_action():
     """
@@ -194,29 +196,30 @@ def get_undock_action():
 
     sm = StateMachine(outcomes=['succeeded', 'preempted', 'aborted'])
     docking_goal = MiraDockingGoal(docking_task=1)
-    StateMachine.add(
-        'UNDOCK_ACTION',
-        SimpleActionState(
-            'docking_task',
-            MiraDockingAction,
-            goal=docking_goal,
-            result_cb=docking_result_cb,
-            preempt_timeout=rospy.Duration(20),
-            server_wait_timeout=rospy.Duration(TIMEOUT)
-            ),
-        transitions={'succeeded':'SET_DOCK_STATE_VARIABLE',
-                     'aborted': 'aborted',
-                     'preempted': 'preempted'}
-    )
-    StateMachine.add(
-            'SET_DOCK_STATE_VARIABLE',
-            ServiceState('/docking/set_dock_state',
-                         SetDockState,
-                         request=SetDockStateRequest(state=False),
-                         response_cb=resp_cb),
-            transitions={'succeeded':'succeeded',
+    with sm:
+        StateMachine.add(
+            'UNDOCK_ACTION',
+            SimpleActionState(
+                'docking_task',
+                MiraDockingAction,
+                goal=docking_goal,
+                result_cb=docking_result_cb,
+                preempt_timeout=rospy.Duration(20),
+                server_wait_timeout=rospy.Duration(TIMEOUT)
+                ),
+            transitions={'succeeded':'SET_DOCK_STATE_VARIABLE',
                          'aborted': 'aborted',
-                         'preempted': 'preempted'})
+                         'preempted': 'preempted'}
+        )
+        StateMachine.add(
+                'SET_DOCK_STATE_VARIABLE',
+                ServiceState('/docking/set_dock_state',
+                             SetDockState,
+                             request=SetDockStateRequest(state=False),
+                             response_cb=resp_cb),
+                transitions={'succeeded':'succeeded',
+                             'aborted': 'aborted',
+                             'preempted': 'preempted'})
     return sm
 
 def resp_cb(userdata, response):
@@ -598,8 +601,7 @@ def goToPosition(frame='/map', room='None', place='dock'):
         Sequence.add(
             'UNDOCK_IF_NEEDED',
             undock_if_needed(),
-            transitions={'succeeded': 'BACK_IF_NEEDED',
-                         'aborted': 'HEAD_UP'}
+            transitions={'aborted': 'BACK_IF_NEEDED'}
         )
         Sequence.add(
             'BACK_IF_NEEDED',
@@ -764,9 +766,7 @@ def goToPose():
         Sequence.add(
             'UNDOCK_IF_NEEDED',
             undock_if_needed(),
-            transitions={'succeeded': 'BACK_IF_NEEDED',
-                         'aborted': 'HEAD_UP'}
-        )
+            transitions={'aborted': 'BACK_IF_NEEDED'})
         Sequence.add(
             'BACK_IF_NEEDED',
             back_if_needed(),
@@ -889,9 +889,7 @@ def goToPoseSilent():
         Sequence.add(
             'UNDOCK_IF_NEEDED',
             undock_if_needed(),
-            transitions={'succeeded': 'BACK_IF_NEEDED',
-                         'aborted': 'HEAD_UP'}
-        )
+            transitions={'aborted': 'BACK_IF_NEEDED'})
         Sequence.add(
             'BACK_IF_NEEDED',
             back_if_needed(),
