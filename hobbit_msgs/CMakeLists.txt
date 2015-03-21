@@ -44,6 +44,7 @@ add_service_files(
   ChargeCheck.srv
   GetCloserState.srv
   GetDockState.srv
+  GetMoveState.srv
   GetCoordinates.srv
   GetName.srv
   GetNameOfRoom.srv
@@ -57,6 +58,7 @@ add_service_files(
   Request.srv
   SetCloserState.srv
   SetDockState.srv
+  SetMoveState.srv
   SingleShotPC.srv
   SwitchVision.srv
   Translate.srv
