@@ -158,8 +158,8 @@ class CheckArmAtHomePos(State):
             return 'preempted'
         # TODO: check if this sleep is needed
         rospy.sleep(1)
-        result = arm_client.GetArmIsEnabled()
-        rospy.loginfo("arm_client.GetArmIsEnabled: "+str(result))
+        result = arm_client.GetArmIsHomed()
+        rospy.loginfo("arm_client.GetArmIsHomed: "+str(result))
         if not result:
             rospy.loginfo("Arm is not enabled. Can not be sure that it is at the home position")
             return 'aborted'
