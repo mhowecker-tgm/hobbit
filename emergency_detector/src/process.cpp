@@ -338,7 +338,7 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
               //We are almost sure we have a fallen blob , but maybe the blob continues on the top side ( so it is a standing user after all
               unsigned int holesOverTemperatureArea=0;
 
-              lastState.scoreOverTop = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , lastState.topX1 , lastState.topY1-overHeight , lastState.topWidth , overHeight , maximums.scoreTop , 1 , &holesOverTemperatureArea );
+              lastState.scoreOverTop = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , lastState.topX1-overPlusWidth , lastState.topY1-overHeight , lastState.topWidth+(overPlusWidth*2) , overHeight , maximums.scoreTop , 1 , &holesOverTemperatureArea );
               lastState.holesPercentOverTop = (float) (100*holesOverTemperatureArea)/(lastState.topWidth*overHeight);
               if (lastState.holesPercentOverTop>100) {lastState.holesPercentOverTop=100;}
 

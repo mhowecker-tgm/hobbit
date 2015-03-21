@@ -9,6 +9,7 @@ unsigned int headIsMoving=0;
 
 unsigned int emergencyDetected=0;
 unsigned int overHeight=120;
+unsigned int overPlusWidth=40;
 
 //-----------------------------------------------------------------------
  //The following values are set by the launch file , so change them there..

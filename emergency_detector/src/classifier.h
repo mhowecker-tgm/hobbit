@@ -65,6 +65,7 @@ extern unsigned int emergencyDetected;
 extern unsigned int headIsMoving;
 
 extern unsigned int overHeight;
+extern unsigned int overPlusWidth;
 
 //-----------------------------------------------------------------------
  // Synchronization variables
