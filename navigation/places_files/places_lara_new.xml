@@ -27,7 +27,7 @@
         <pose y="-0.546" x="-1.0" theta="-1.57"/>
         <objects/>
       </place>
-       <place>
+      <place>
         <name>center</name>
         <type>goTo</type>
         <pose y="-0.546" x="-1.0" theta="-1.57"/>
