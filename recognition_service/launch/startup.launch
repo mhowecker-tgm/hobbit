@@ -2,6 +2,6 @@
     <node name="recognition_service"
     pkg="recognition_service"
     type="recognition_service"
-    args="-models_dir $(find recognition_service)/models -training_dir_sift $(find recognition_service)/sift_trained/ -recognizer_structure_sift $(find recognition_service)/recognition_structure/">
+    args="-models_dir $(find recognition_service)/models -training_dir_sift $(find recognition_service)/sift_trained/ -recognizer_structure_sift $(find recognition_service)/recognition_structure/ -chop_z 1.2">
     </node>
 </launch>
