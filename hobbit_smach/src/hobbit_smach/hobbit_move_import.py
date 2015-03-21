@@ -432,7 +432,9 @@ def get_full_stop():
         )
         Sequence.add(
             'HEAD_CENTER',
-            head_move.MoveTo(pose='littledown_center')
+            head_move.MoveTo(pose='littledown_center'),
+            transitions={'aborted': 'succeeded',
+                         'preempted': 'succeeded'}
         )
     return seq
 
