@@ -63,9 +63,9 @@ int visualizeTopCam(unsigned char * colorFrame,unsigned char * segmentedRGB,unsi
            {
                centerPt.x=fallDetectionContext.currentJoint2D[i].x;       centerPt.y=fallDetectionContext.currentJoint2D[i].y;
 
-               if (fallDetectionContext.currentJoint3D[i].z > farBorderZ ) {  jointColor=tempBColor;  } else
                if (fallDetectionContext.currentJoint3D[i].z < closeBorderZ ) {  jointColor=tempYColor;  } else
-               if (fallDetectionContext.currentJoint2D[i].y > lowBorderY)  {  jointColor=tempRColor;  }
+               if (fallDetectionContext.currentJoint3D[i].z > farBorderZ )   {  jointColor=tempBColor;  } else
+               if (fallDetectionContext.currentJoint2D[i].y > lowBorderY)    {  jointColor=tempRColor;  }
 
                circle(bgrMat,  centerPt , 15 , jointColor , -4, 8 , 0);
 
