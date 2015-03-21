@@ -49,7 +49,6 @@ def battery_cb(msg, ud):
         rospy.loginfo('I am outside of the docking station')
         return False
 
-
 def undock_if_needed():
     """
     Returns a SMACH StateMachine that check if it is needed to undock
@@ -572,7 +571,6 @@ def getPosition(room='none', place='dock'):
         print("Service did not process request: " + str(exc))
         return (0.0, 0.0, 0.0)
 
-
 def goToPosition(frame='/map', room='None', place='dock'):
     """
     Return a SMACH Sequence for navigation to a new position.
@@ -711,7 +709,6 @@ def goToPosition(frame='/map', room='None', place='dock'):
                          'failed': 'aborted'}
         )
     return seq
-
 
 def prepareMovement():
     """
@@ -870,7 +867,6 @@ def goToPose():
         )
     return seq
 
-
 def goToPoseSilent():
     """
     Returns a move_base.MoveBaseState
@@ -999,6 +995,7 @@ def goToPoseSilent():
                          'failed': 'aborted'}
         )
     return seq
+
 
 
 def getRobotPose():
