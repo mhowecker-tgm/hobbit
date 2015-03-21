@@ -296,20 +296,6 @@ def call_hobbit():
     )
 
     with sm:
-        #StateMachine.add(
-        #    'CHARGE_CHECK',
-        #    WaitForMsgState('/battery_state', BatteryState, msg_cb=battery_cb, input_keys=['params']),
-        #    transitions={'succeeded': 'UNDOCK',
-        #                 'aborted': 'EXTRACT_GOAL',
-        #                 'preempted': 'preempted'}
-        #)
-        #StateMachine.add(
-        #    'UNDOCK',
-        #    hobbit_move.get_undock(),
-        #    transitions={'succeeded': 'EXTRACT_GOAL',
-        #                 'aborted': 'aborted',
-        #                 'preempted': 'preempted'}
-        #)
         StateMachine.add_auto(
             'EXTRACT_GOAL',
             ExtractGoal(),
