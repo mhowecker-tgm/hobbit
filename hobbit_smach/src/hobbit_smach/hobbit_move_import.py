@@ -179,6 +179,24 @@ def get_undock_action():
                               )
     return state
 
+def move_discrete(in_motion=None, in_value=None):
+    sm = StateMachine(outcomes=['succeeded', 'aborted', 'preempted'])
+    with sm:
+        StateMachine.add(
+            'CHECK_ARM',
+            arm_move.check_and_inform_about_arm_not_referenced_or_at_home(),
+            transitions={'succeeded': 'MOVE',
+                         'preempted': 'preempted',
+                         'aborted': 'aborted'}
+        )
+        StateMachine.add(
+            'MOVE',
+            MoveDiscrete(motion=in_motion, value=in_value),
+            transitions={'succeeded': 'MOVED_BACK',
+                         'preempted': 'preempted',
+                         'aborted': 'aborted'}
+        )
+    return sm
 
 class SetObstacles(State):
     """
