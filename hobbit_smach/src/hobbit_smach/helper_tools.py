@@ -12,9 +12,29 @@ move_state = False
 arm_state = False
 
 import rospy
-from hobbit_msgs.srv import SetCloserState, GetCloserState, SetDockState, GetDockState, SetMoveState, GetMoveState
+from hobbit_msgs.srv import SetCloserState, GetCloserState, SetDockState, GetDockState, SetMoveState, GetMoveState, ChargeCheck
 from hobbit_msgs.srv import GetArmState, SetArmState
 from mira_msgs.msg import BatteryState
+
+def handle_charge_check(req):
+    response = False
+    rospy.loginfo("Charge check called")
+    if DEBUG:
+        return ChargeCheckResponse(response)
+    for x in xrange(1, RETRY):
+        rospy.sleep(1.0)
+        try:
+            msg = rospy.wait_for_message(
+                '/battery_state',
+                BatteryState,
+                timeout=5
+                )
+            if msg.charging:
+                response = True
+                break
+        except rospy.ROSException as e:
+                response = False
+    return ChargeCheckResponse(response)
 
 def set_closer_state(req):
     global state
@@ -85,6 +105,7 @@ def set_dock_state_true(msg):
 
 def charge_check_server():
     rospy.init_node('hobbit_helper_node')
+    s = rospy.Service('/hobbit/charge_check', ChargeCheck, handle_charge_check)
     s1 = rospy.Service('/came_closer/set_closer_state', SetCloserState, set_closer_state)
     s2 = rospy.Service('/came_closer/get_closer_state', GetCloserState, get_closer_state)
     s3 = rospy.Service('/docking/set_dock_state', SetDockState, set_dock_state)

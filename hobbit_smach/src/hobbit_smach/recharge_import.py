@@ -18,6 +18,7 @@ from hobbit_user_interaction import HobbitMMUI
 import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.logging_import as log
 from hobbit_msgs.srv import SetDockState, GetDockState, SetDockStateRequest, GetDockStateRequest
+from mira_msgs.msg import BatteryState
 
 def charge_response_cb(userdata, response):
     print(response.response)
@@ -249,11 +250,10 @@ def startDockProcedure():
                                       'preempted': 'preempted'}
                          )
         StateMachine.add('CHARGE_CHECK',
-                         ServiceState(
-                             '/docking/get_dock_state',
-                             GetDockState,
-                             request=GetDockStateRequest(state=True),
-                             response_cb=resp_cb),
+                         ServiceState('/hobbit/charge_check',
+                                      ChargeCheck,
+                                      response_cb=charge_response_cb,input_keys=['counter'],output_keys=['counter']
+                         ),
                          transitions={'succeeded': 'succeeded',
                                       'aborted': 'UNDOCK',
                                       'preempted': 'preempted'}
