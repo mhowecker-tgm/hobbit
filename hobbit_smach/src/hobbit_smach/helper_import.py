@@ -87,14 +87,6 @@ def get_hobbit_full_stop():
             transitions={'aborted': 'SAY_FULL_STOP'}
         )
         Sequence.add(
-            'SAY_FULL_STOP',
-            speech_output.sayText(
-                info='Doing a full stop as commanded by you.'),
-            transitions={'succeeded': 'WAIT',
-                         'preempted': 'LOG_PREEMPT',
-                         'failed': 'LOG_ABORTED'}
-        )
-        Sequence.add(
             'WAIT',
             SleepState(duration=3),
             transitions={'succeeded': 'MAIN_MENU',

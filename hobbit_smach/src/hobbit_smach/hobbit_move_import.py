@@ -6,8 +6,6 @@ NAME = 'hobbit_move'
 DEBUG = False
 TIMEOUT = 5
 
-import roslib
-roslib.load_manifest(PKG)
 import rospy
 import smach
 import uashh_smach.util as util
@@ -19,7 +17,6 @@ from mira_msgs.srv import UserNavMode, ObsNavMode, EmergencyStop
 from hobbit_msgs.srv import GetCoordinates, GetCoordinatesRequest, GetName, \
     SwitchVision, SwitchVisionRequest
 from move_base_msgs.msg import MoveBaseAction
-#from interfaces_mira.msg import MiraDockingAction, MiraDockingGoal
 from hobbit_msgs.msg import MiraDockingAction, MiraDockingGoal
 from std_msgs.msg import String
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
@@ -28,7 +25,6 @@ from actionlib import SimpleActionClient
 import uashh_smach.platform.move_base as move_base
 import head_move_import as head_move
 import speech_output_import as speech_output
-# import service_disable_import as service_disable
 import arm_move_import as arm_move
 from math import pi
 from hobbit_msgs.srv import SetCloserState, GetCloserState
@@ -222,7 +218,6 @@ def get_undock_action():
                          'preempted': 'preempted'})
     return sm
 
-
 def move_discrete(in_motion=None, in_value=None):
     sm = StateMachine(outcomes=['succeeded', 'aborted', 'preempted'])
     with sm:
@@ -264,7 +259,6 @@ class SetObstacles(State):
         else:
             self.obstacles.publish('inactive')
         return 'succeeded'
-
 
 class Undock(State):
     """
@@ -321,7 +315,6 @@ class MoveDiscrete(State):
 	rospy.sleep(2.5)
         return 'succeeded'
 
-
 class TestData(State):
     """
     """
@@ -337,7 +330,6 @@ class TestData(State):
             return 'preempted'
         rospy.loginfo('TEST_DATA: ' + str(ud.robots_room_name))
         return 'succeeded'
-
 
 class Dock(State):
     """
@@ -358,7 +350,6 @@ class Dock(State):
             return 'preempted'
         self.stop_pub.publish('docking_on')
         return 'succeeded'
-
 
 class Stop(State):
     """
@@ -391,7 +382,6 @@ class Stop(State):
             rospy.loginfo('Failed to reach actionserver@FULL STOP')
             return 'aborted'
 
-
 def get_full_stop():
     """
     Return a SMACH Sequence that cancels all goals on the movebase
@@ -415,7 +405,6 @@ def get_full_stop():
             head_move.MoveTo(pose='littledown_center')
         )
     return seq
-
 
 class SetRotationGoal(State):
     """
@@ -446,7 +435,6 @@ class SetRotationGoal(State):
         print('goal_y: %s' % ud.y)
         print('goal_yaw: %s' % ud.yaw)
         return 'succeeded'
-
 
 class SetNavigationGoal(ServiceState):
     """
@@ -502,7 +490,6 @@ class SetNavigationGoal(ServiceState):
         # ud.location_name = 'None'
         return 'succeeded'
 
-
 class SetNavGoal(State):
     """
     """
@@ -537,7 +524,6 @@ class SetNavGoal(State):
             return 'preempted'
         ud.x, ud.y, ud.yaw = (self.goalX, self.goalY, self.goalYAW)
         return 'succeeded'
-
 
 def getPosition(room='none', place='dock'):
     rospy.wait_for_service('get_coordinates')
@@ -626,7 +612,8 @@ def goToPosition(frame='/map', room='None', place='dock'):
             Sequence.add(
                 'MOVE_HOBBIT',
                 move_base.MoveBaseState(frame),
-                transitions={'aborted': 'HEAD_UP'}
+                transitions={'aborted': 'HEAD_UP',
+                             'preempted': 'SAY_FULL_STOP'}
             )
         Sequence.add(
             'PREPARE_STOP',
@@ -652,12 +639,6 @@ def goToPosition(frame='/map', room='None', place='dock'):
             transitions={'failed': 'aborted',
                          'succeeded': 'succeeded'}
         )
-        # Sequence.add(
-        #     'SHOW_MENU_MAIN',
-        #     HobbitMMUI.ShowMenu(menu='MAIN'),
-        #     transitions={'failed': 'HEAD_UP',
-        #                  'succeeded': 'succeeded'}
-        # )
         Sequence.add(
             'HEAD_UP',
             head_move.MoveTo(pose='littledown_center')
@@ -678,17 +659,19 @@ def goToPosition(frame='/map', room='None', place='dock'):
             ),
             transitions={'succeeded': 'aborted'}
         )
-        # Sequence.add(
-        #     'SHOW_MENU_MAIN_1',
-        #     HobbitMMUI.ShowMenu(menu='MAIN'),
-        #     transitions={'succeeded': 'aborted',
-        #                  'failed': 'aborted'}
-        # )
         Sequence.add(
             'SAY_ARM',
             speech_output.sayText(info='My arm is not in the home position. Will not move.'),
             transitions={'succeeded': 'aborted',
                          'failed': 'aborted'}
+        )
+        Sequence.add(
+            'SAY_FULL_STOP',
+            speech_output.sayText(
+                info='Doing a full stop as commanded by you.'),
+            transitions={'succeeded': 'preempted',
+                         'preempted': 'preempted',
+                         'failed': 'preempted'}
         )
     return seq
 
@@ -788,7 +771,8 @@ def goToPose():
                          remapping={'x': 'x',
                                     'y': 'y',
                                     'yaw': 'yaw'},
-                         transitions={'aborted': 'HEAD_UP'}
+                         transitions={'aborted': 'HEAD_UP',
+                                      'preempted': 'SAY_FULL_STOP'}
             )
         Sequence.add(
             'PREPARE_STOP',
@@ -846,6 +830,14 @@ def goToPose():
             speech_output.sayText(info='My arm is not in the home position. Will not move.'),
             transitions={'succeeded': 'aborted',
                          'failed': 'aborted'}
+        )
+        Sequence.add(
+            'SAY_FULL_STOP',
+            speech_output.sayText(
+                info='Doing a full stop as commanded by you.'),
+            transitions={'succeeded': 'preempted',
+                         'preempted': 'preempted',
+                         'failed': 'preempted'}
         )
     return seq
 
@@ -911,7 +903,8 @@ def goToPoseSilent():
                          remapping={'x': 'x',
                                     'y': 'y',
                                     'yaw': 'yaw'},
-                         transitions={'aborted': 'HEAD_UP'}
+                         transitions={'aborted': 'HEAD_UP',
+                                      'preempted': 'SAY_FULL_STOP'}
             )
         Sequence.add(
             'PREPARE_STOP',
@@ -964,6 +957,14 @@ def goToPoseSilent():
             speech_output.sayText(info='My arm is not in the home position. Will not move.'),
             transitions={'succeeded': 'aborted',
                          'failed': 'aborted'}
+        )
+        Sequence.add(
+            'SAY_FULL_STOP',
+            speech_output.sayText(
+                info='Doing a full stop as commanded by you.'),
+            transitions={'succeeded': 'preempted',
+                         'preempted': 'preempted',
+                         'failed': 'preempted'}
         )
     return seq
 
