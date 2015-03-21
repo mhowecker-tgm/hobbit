@@ -139,20 +139,15 @@ def detect_object():
         input_keys=['object_name'],
         output_keys=['object_pose', 'object_room', 'object_location']
     )
+    counter_it = smach.Iterator(outcomes = ['succeeded', 'preempted', 'aborted'],
+                              input_keys = [],
+                              output_keys = [],
+                              it = lambda: range(0, 3),
+                              it_label = 'index',
+                              exhausted_outcome = 'succeeded')
 
-    with sm:
-        smach.StateMachine.add(
-            'MOVE_HEAD',
-            head_move.MoveTo(pose='search_table'),
-            transitions={'succeeded': 'REC_COUNTER',
-                         'preempted': 'preempted',
-                         'aborted': 'aborted'})
-        smach.StateMachine.add(
-            'REC_COUNTER',
-            MoveCounter(),
-            transitions={'succeeded': 'GET_POINT_CLOUD',
-                         'preempted': 'preempted',
-                         'failure': 'aborted'})
+    container_sm = smach.StateMachine(outcomes = ['succeeded','aborted','preempted'])
+    with container_sm:
         smach.StateMachine.add(
             'GET_POINT_CLOUD',
             MonitorState(
@@ -161,20 +156,10 @@ def detect_object():
                 cond_cb=point_cloud_cb,
                 output_keys=['cloud']
             ),
-            transitions={'invalid': 'GET_POINT_CLOUD',
+            transitions={'invalid': 'aborted',
                          'valid': 'START_OBJECT_RECOGNITION',
                          'preempted': 'preempted'}
         )
-            # 'GET_POINT_CLOUD',
-            # util.WaitForMsgState(
-            #     '/headcam/depth_registered/points',
-            #     PointCloud2,
-            #     point_cloud_cb,
-            #     timeout=5,
-            #     output_keys=['cloud']),
-            # transitions={'succeeded': 'START_OBJECT_RECOGNITION',
-            #              'aborted': 'GET_POINT_CLOUD',
-            #              'preempted': 'preempted'})
         smach.StateMachine.add(
             'START_OBJECT_RECOGNITION',
             ServiceState(
@@ -182,9 +167,31 @@ def detect_object():
                 recognize,
                 request_slots=['cloud'],
                 response_slots=['ids', 'transforms']),
+            transitions={'succeeded': 'succeeded',
+                         'preempted': 'preempted',
+                         'aborted': 'aborted'})
+
+
+    with counter_it:
+        smach.Iterator.set_contained_state(
+            'CONTAINER_STATE',
+            container_sm,
+            loop_outcomes = ['succeeded']
+        )
+
+    with sm:
+        smach.StateMachine.add(
+            'MOVE_HEAD',
+            head_move.MoveTo(pose='search_table'),
+            transitions={'succeeded': 'OBJECT_RECOGNITION_ITERATOR',
+                         'preempted': 'preempted',
+                         'aborted': 'aborted'})
+        smach.StateMachine.add(
+            'OBJECT_RECOGNITION_ITERATOR',
+            counter_it,
             transitions={'succeeded': 'OBJECT_DETECTED',
                          'preempted': 'preempted',
-                         'aborted': 'REC_COUNTER'})
+                         'aborted': 'aborted'})
 
         smach.StateMachine.add(
             'OBJECT_DETECTED',
