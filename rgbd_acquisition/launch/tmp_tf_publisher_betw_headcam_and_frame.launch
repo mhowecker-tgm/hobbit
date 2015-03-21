@@ -16,7 +16,7 @@
 
   <!-- lowerd z-value for z-axis from 0.165 to 0.155 -->
   <node pkg="tf" type="static_transform_publisher" name="hobbit_neck_dynamic_to_headcam_link"
-        args="0.02 0.0 0.155 0 0 0 hobbit_neck_dynamic headcam_link 100" />
+        args="0.02 0.0 -0.155 0 0 0 hobbit_neck_dynamic headcam_link 100" />
 
   <!-- changed y-value from -0.045 to 0.025 -->
   <node pkg="tf" type="static_transform_publisher" name="$(arg camera)_base_link1"

@@ -76,6 +76,22 @@
           <object name="Häferl" probability="1.0"/>
         </objects>
       </place>
+      <place>
+        <name>side_table</name>
+        <type>searchable</type>
+        <pose y="1.16" x="-2.35" theta="-1.5"/>
+        <objects>
+          <object name="Häferl" probability="1.0"/>
+        </objects>
+      </place>
+      <place>
+        <name>workshop_table</name>
+        <type>searchable</type>
+        <pose y="-0.968" x="-0.85" theta="0.18997"/>
+        <objects>
+          <object name="Häferl" probability="1.0"/>
+        </objects>
+      </place>
     </places>
   </room>
   <room>
