@@ -132,7 +132,7 @@ def main():
         )
         StateMachine.add(
             'ROTATE_180',
-            hobbit_move.MoveDiscrete(motion='Rotate', value=180),
+            hobbit_move.move_discrete(in_motion='Turn', in_value=180),
             transitions={'succeeded': 'ENABLE_TRACKING',
                          'preempted': 'LOG_PREEMPT',
                          'aborted': 'LOG_ABORTED'}

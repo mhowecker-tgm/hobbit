@@ -206,7 +206,7 @@ def gesture_sm():
                 )
                 StateMachine.add(
                     'MOVE',
-                    hobbit_move.MoveDiscrete(motion='Move', value=0.1),
+                    hobbit_move.move_discrete(in_motion='Move', in_value=0.1)
                     transitions={'succeeded': 'MOVED_BACK',
                                  'preempted': 'preempted',
                                  'aborted': 'aborted'}
