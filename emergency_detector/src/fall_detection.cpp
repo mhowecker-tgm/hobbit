@@ -83,7 +83,7 @@ int isSkeletonFallenAndFar(struct fallState * fs)
 
    for (i=0; i<fs->numberOfJoints; i++)
    {
-    if (fs->currentJoint3D[i].z < closeBorderZ)      { ++closePoints;  } else
+    if ((fs->currentJoint2D[i].z!=0)&& (fs->currentJoint3D[i].z < closeBorderZ))      { ++closePoints;  } else
     if (fs->currentJoint3D[i].z > farBorderZ)        { ++farPoints;    }
     //-------
     if ( (fs->currentJoint2D[i].y!=0)&& (fs->currentJoint2D[i].y>=height) )    { ++lowPoints;  } else
