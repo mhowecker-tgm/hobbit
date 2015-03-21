@@ -21,6 +21,7 @@ import hobbit_smach.social_role_import as social_role
 import hobbit_smach.end_interaction_import as end_interaction
 import hobbit_smach.logging_import as log
 import uashh_smach.util as util
+from hobbit_msgs import MMUIInterface as MMUI
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 from hobbit_smach.bcolors import bcolors
 
@@ -63,6 +64,11 @@ def IsItNight(ud):
     else:
         return True
 
+def start_command():
+    mmui = MMUI.MMUIInterface()
+    mmui.remove_last_prompt()
+    rospy.loginfo('New task has higher priority. START IT.')
+    return True
 
 def command_cb(msg, ud):
     global new_command
@@ -97,14 +103,14 @@ def command_cb(msg, ud):
                     ud.parameters['active_task'] = 100
                     ud.command = 'master_reset'
                     new_command = ud.command
-                    rospy.loginfo('New task has higher priority. START IT.')
-                    return True
+                    #rospy.loginfo('New task has higher priority. START IT.')
+                    return start_command()
             elif item[0] == 'stop':
                 rospy.loginfo('Reset active_task value')
                 ud.parameters['active_task'] = 100
                 ud.command = 'stop'
                 new_command = ud.command
-                return True
+                return start_command()
             elif item[0] == 'call_hobbit':
                 ud.command = item[0]
                 for i, v in enumerate(msg.params):
@@ -113,25 +119,25 @@ def command_cb(msg, ud):
                         ud.parameters['active_task'] = 'emergency_bathroom'
                         ud.params = msg.params
                         new_params = ud.params
-                        rospy.loginfo('New task has higher priority. START IT.')
                         new_command = ud.command
-                        return True
+                        #rospy.loginfo('New task has higher priority. START IT.')
+                        return start_command()
                 ud.params = msg.params
                 new_params = ud.params
                 rospy.loginfo("CALL_HOBBIT: "+str(msg.params))
                 rospy.loginfo("CALL_HOBBIT: "+str(ud.params))
                 rospy.loginfo("CALL_HOBBIT: "+str(new_params))
                 ud.parameters['active_task'] = index
-                rospy.loginfo('New task has higher priority. START IT.')
                 new_command = ud.command
-                return True
+                #rospy.loginfo('New task has higher priority. START IT.')
+                return start_command()
             elif item[0] == 'emergency':
                 ud.parameters['active_task'] = index
                 ud.command = item[0]
                 ud.emergency = True
                 new_command = ud.command
-                rospy.loginfo('New task has higher priority. START IT.')
-                return True
+                #rospy.loginfo('New task has higher priority. START IT.')
+                return start_command()
             elif item[0] == 'away' or item[0] == 'sleep':
                 times = [1, 2, 4, 6, 12, 24]
                 # print(input_ce)
@@ -143,7 +149,7 @@ def command_cb(msg, ud):
                     ud.command = 'away'
                 new_params = str(times[index])
                 new_command = ud.command
-                return True
+                return start_command()
             # elif index == 1 and night and index + 1 <= active_task:
             elif item[0] == 'recharge' and not night and index < active_task:
                 rospy.loginfo('RECHARGING')
@@ -151,7 +157,7 @@ def command_cb(msg, ud):
                 ud.parameters['active_task'] = index
                 rospy.loginfo('New task has higher priority. START IT.')
                 new_command = ud.command
-                return True
+                return start_command()
             elif index + 1 >= active_task and not night:
                 rospy.loginfo('New task has lower priority. DO NOTHING')
                 print(bcolors.FAIL +
@@ -159,7 +165,7 @@ def command_cb(msg, ud):
                       + bcolors.ENDC)
                 return False
             else:
-                rospy.loginfo('New task has higher priority. START IT.')
+                #rospy.loginfo('New task has higher priority. START IT.')
                 print(bcolors.OKGREEN +
                       'New task has higher priority. Start it.'
                       + bcolors.ENDC)
@@ -173,7 +179,7 @@ def command_cb(msg, ud):
                 ud.params = msg.params
                 new_params = ud.params
                 new_command = ud.command
-                return True
+                return start_command()
     rospy.loginfo('Unknown event/command received %s' % input_ce)
     return False
 
