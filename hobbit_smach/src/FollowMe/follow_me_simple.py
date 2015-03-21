@@ -122,7 +122,7 @@ def main():
         StateMachine.add(
             'ARM_CHECK',
             arm_move.check_and_inform_about_arm_not_referenced_or_at_home(),
-            transitions={'succeeded': 'ENABLE_TRACKING',
+            transitions={'succeeded': 'UNDOCK_IF_NEEDED',
                          'aborted': 'LOG_ABORTED',
                          'preempted': 'LOG_PREEMPT'}
         )
@@ -130,18 +130,18 @@ def main():
             'UNDOCK_IF_NEEDED',
             hobbit_move.undock_if_needed(),
             transitions={'succeeded': 'BACK_IF_NEEDED',
-                         'aborted': 'LOG_ABORTED'}
+                         'aborted': 'BACK_IF_NEEDED'}
         )
         StateMachine.add(
             'BACK_IF_NEEDED',
             hobbit_move.back_if_needed(),
             transitions={'succeeded': 'ROTATE_180',
-                         'aborted': 'LOG_ABORTED'}
+                         'aborted': 'PREPARE_MOVEMENT'}
         )
         StateMachine.add(
             'ROTATE_180',
             hobbit_move.move_discrete(in_motion='Turn', in_value=180),
-            transitions={'succeeded': 'ENABLE_TRACKING',
+            transitions={'succeeded': 'PREPARE_MOVEMENT',
                          'preempted': 'LOG_PREEMPT',
                          'aborted': 'LOG_ABORTED'}
         )
