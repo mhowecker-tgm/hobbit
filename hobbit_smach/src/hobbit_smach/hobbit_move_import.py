@@ -634,7 +634,8 @@ def goToPosition(frame='/map', room='None', place='dock'):
         Sequence.add('SET_NAV_GOAL', SetNavigationGoal(room, place))
         Sequence.add(
             'CHECK_ARM',
-            arm_move.CheckArmAtHomePos(),
+            arm_move.check_and_inform_about_arm_not_referenced_or_at_home(),
+            #arm_move.CheckArmAtHomePos(),
             transitions={'aborted': 'SAY_ARM'}
         )
         Sequence.add(
@@ -796,7 +797,8 @@ def goToPose():
         if not DEBUG:
             Sequence.add(
                 'CHECK_ARM',
-                arm_move.CheckArmAtHomePos(),
+                arm_move.check_and_inform_about_arm_not_referenced_or_at_home(),
+                #arm_move.CheckArmAtHomePos(),
                 transitions={'aborted': 'SAY_ARM'}
             )
             Sequence.add(
