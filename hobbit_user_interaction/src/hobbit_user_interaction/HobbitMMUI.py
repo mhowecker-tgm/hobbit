@@ -519,6 +519,25 @@ class CheckSOSCall(util.WaitForMsgState):
         else:
             return 'aborted'
 
+class RemoveLastPrompt(smach.State):
+    """
+    Class to remove the last shown prompt on the MMUI
+    This helps keeping everything preemptable
+    """
+    def __init__(self, menu=None):
+        smach.State.__init__(
+            self,
+            outcomes=['succeeded', 'aborted', 'preempted']
+        )
+        self.menu = menu
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+        mmui = MMUI.MMUIInterface()
+        mmui.remove_last_prompt()
+        return 'succeeded'
+
 
 if __name__ == '__main__':
     print('You should not call this directly. Import the needed classes')
