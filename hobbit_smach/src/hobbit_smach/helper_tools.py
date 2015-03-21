@@ -12,7 +12,7 @@ move_state = False
 arm_state = False
 
 import rospy
-from hobbit_msgs.srv import SetCloserState, GetCloserState, SetDockState, GetDockState, SetMoveState, GetMoveState, ChargeCheck
+from hobbit_msgs.srv import SetCloserState, GetCloserState, SetDockState, GetDockState, SetMoveState, GetMoveState, ChargeCheck, ChargeCheckResponse
 from hobbit_msgs.srv import GetArmState, SetArmState
 from mira_msgs.msg import BatteryState
 import hobbit_smach.arm_move_import as arm_move
