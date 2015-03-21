@@ -566,6 +566,50 @@ void rostopic_pub(char * commandToRun,unsigned int maxCommandSize,char * topicNa
   snprintf(commandToRun,maxCommandSize,"/bin/bash -c \"rostopic pub %s %s %s -1\"",topicName,topicType,topicValue);
 }
 
+
+
+int rosservice_call_execute(char * rosservice)
+{
+  unsigned int cRLen=MAX_COMMAND_SIZE;
+  char * cR = (char*) malloc((MAX_COMMAND_SIZE+1) * sizeof(char));
+  if (cR!=0)
+  {
+   cR[0]=0;
+      rosservice_call(cR,cRLen,rosservice);
+      if ( strlen(cR)!=0 )
+         {
+           int i=system(cR);
+           if (i!=0) { AmmServer_Error("Command %s failed\n",cR); } else
+                     { AmmServer_Success("Command %s success\n",cR); }
+         }
+   free(cR);
+   return 1;
+  }
+ return 0;
+}
+
+
+
+int rostopic_pub_execute(char * topicName,char * topicType,char * topicValue)
+{
+  unsigned int cRLen=MAX_COMMAND_SIZE;
+  char * cR = (char*) malloc((MAX_COMMAND_SIZE+1) * sizeof(char));
+  if (cR!=0)
+  {
+   cR[0]=0;
+      rostopic_pub(cR,cRLen,topicName,topicType,topicValue);
+      if ( strlen(cR)!=0 )
+         {
+           int i=system(cR);
+           if (i!=0) { AmmServer_Error("Command %s failed\n",cR); } else
+                     { AmmServer_Success("Command %s success\n",cR); }
+         }
+   free(cR);
+   return 1;
+  }
+ return 0;
+}
+
 void MMUIExecute(char * command,char * param)
 {
   char * commandToRun = (char*) malloc((MAX_COMMAND_SIZE+1) * sizeof(char));
@@ -628,7 +672,8 @@ int shutdownArm()
 
 
 bool postMessage(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
-{ 
+{
+    rostopic_pub_execute( (char *) "/head/emo",(char *) "std_msgs/String",(char *) "\"HAPPY\"");
     MMUIExecute((char*) "say",(char*) "I am Ready!");
     return true;
 }
@@ -643,25 +688,6 @@ int executeSystem(char * what2Execute)
  return (i==0);
 }
 
-int rosservice_call_execute(char * rosservice)
-{
-  unsigned int cRLen=MAX_COMMAND_SIZE;
-  char * cR = (char*) malloc((MAX_COMMAND_SIZE+1) * sizeof(char));
-  if (cR!=0)
-  {
-   cR[0]=0;
-      rosservice_call(cR,cRLen,rosservice);
-      if ( strlen(cR)!=0 )
-         {
-           int i=system(cR);
-           if (i!=0) { AmmServer_Error("Command %s failed\n",cR); } else
-                    { AmmServer_Success("Command %s success\n",cR); }
-         }
-   free(cR);
-   return 1;
-  }
- return 0;
-}
 
 
 void execute(char * command,char * param)
@@ -1232,7 +1258,7 @@ int main(int argc, char **argv)
      ros::ServiceServer stopWebService             = nh.advertiseService("web_interface/terminate", terminate);
      ros::ServiceServer signalBaseCamOkService     = nh.advertiseService("web_interface/signalBaseCamIsOk", baseCamIsOk);
      ros::ServiceServer postMessageService         = nh.advertiseService("web_interface/postMessage", postMessage);
- 
+
 
 
      ros::Rate loop_rate(1); //  1hz should be our target spin time
