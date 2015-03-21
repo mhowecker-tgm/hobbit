@@ -225,7 +225,7 @@ def gesture_sm():
             with cc1:
                 Concurrence.add(
                     'YES_NO',
-                    HobbitMMUI.AskYesNo(question='Shall I come even closer?'),
+                    HobbitMMUI.AskYesNo(question='T_CLOSER_QUESTION'),
                 )
                 Concurrence.add(
                     'TOPIC',
