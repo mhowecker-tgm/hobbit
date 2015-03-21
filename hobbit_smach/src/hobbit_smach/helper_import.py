@@ -127,6 +127,7 @@ def get_hobbit_full_stop():
             return 'aborted'
 
     def resp_empty_cb(userdata, response):
+        rospy.loginfo('result was: '+str(response))
         return 'succeeded'
 
     with seq:
@@ -148,7 +149,7 @@ def get_hobbit_full_stop():
                          GetArmState,
                          request=GetArmStateRequest(state=True),
                          response_cb=resp_cb),
-            transitions={'aborted': 'CHECK_MOVEMENT_STORAGE'}
+            transitions={'aborted': 'STOP_ARM'}
         )
         Sequence.add(
             'STOP_ARM',
@@ -170,7 +171,7 @@ def get_hobbit_full_stop():
         Sequence.add(
             'SAY_STOP',
             speech_output.sayText(
-                info='You told me to stop'),
+                info='T_STOP_DETECTED'),
             transitions={'preempted': 'LOG_PREEMPT',
                          'failed': 'LOG_ABORTED'}
         )
