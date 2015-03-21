@@ -119,6 +119,13 @@ def get_dock_action():
     docking_goal = MiraDockingGoal(docking_task=0)
     with sm:
         StateMachine.add(
+            'CHECK_ARM',
+            arm_move.check_and_inform_about_arm_not_referenced_or_at_home(),
+            transitions={'succeeded': 'DOCK_ACTION',
+                         'preempted': 'preempted',
+                         'aborted': 'aborted'}
+        )
+        StateMachine.add(
             'DOCK_ACTION',
             SimpleActionState(
                 'docking_task',
@@ -196,6 +203,13 @@ def get_undock_action():
     sm = StateMachine(outcomes=['succeeded', 'preempted', 'aborted'])
     docking_goal = MiraDockingGoal(docking_task=1)
     with sm:
+        StateMachine.add(
+            'CHECK_ARM',
+            arm_move.check_and_inform_about_arm_not_referenced_or_at_home(),
+            transitions={'succeeded': 'UNDOCK_ACTION',
+                         'preempted': 'preempted',
+                         'aborted': 'aborted'}
+        )
         StateMachine.add(
             'UNDOCK_ACTION',
             SimpleActionState(
