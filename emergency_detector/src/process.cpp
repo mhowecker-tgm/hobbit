@@ -226,8 +226,6 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
 
   unsigned char * segmentedRGB = 0;
   unsigned short * segmentedDepth = 0;
-  lastState.topX1 = (unsigned int ) ((colorWidth-lastState.topWidth) / 2);
-  lastState.topY1 = (unsigned int ) ((colorHeight-lastState.topHeight) / 2);
 
   lastState.badContrastTop = detectHighContrastUnusableRGB(colorFrame,colorWidth,colorHeight,40.0);
 

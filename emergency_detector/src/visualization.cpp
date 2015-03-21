@@ -95,15 +95,15 @@ int visualizeTopCam(unsigned char * colorFrame,unsigned char * segmentedRGB,unsi
 
         pt1.x=lastState.topX1;                     pt1.y=lastState.topY1;
         pt2.x=lastState.topX1+lastState.topWidth;  pt2.y=lastState.topY1+lastState.topHeight;
-
         rectangle(bgrMat ,  pt1 , pt2 , color , 2, 8 , 0);
 
 
         if (fallDetectionContext.headLookingDirection==HEAD_LOOKING_DOWN)
         {
+         pt1.x=pt1.x-overPlusWidth;
          pt2.x=lastState.topX1+lastState.topWidth+overPlusWidth;  pt2.y=lastState.topY1-overHeight;
          rectangle(bgrMat ,  pt1 , pt2 , color , 1, 8 , 0);
-         pt2.x = pt1.x+15-50;
+         pt2.x = pt1.x+15;
          pt2.y += 24; snprintf(rectVal,123,"Over : %u ",lastState.scoreOverTop);
          putText(bgrMat , rectVal, pt2 , fontUsed , 0.5 , color , 2 , 8 );
          pt2.y += 24; snprintf(rectVal,123,"Holes : %0.2f %%",lastState.holesPercentOverTop);

@@ -49,6 +49,8 @@ int initializeClassifier()
 
   lastState.badContrastTop=0;
 
+
+
   lastState.baseWidth=440;
   lastState.baseHeight=160;
   lastState.baseX1=200;
@@ -56,6 +58,10 @@ int initializeClassifier()
 
   lastState.topWidth=300;
   lastState.topHeight=200;
+
+  lastState.topX1 = (unsigned int ) ((640-lastState.topWidth) / 2);
+  lastState.topY1 = (unsigned int ) ((480-lastState.topHeight) / 2);
+
 
   return 0;
 }
