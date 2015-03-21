@@ -84,7 +84,6 @@ def getRecharge():
             transitions={'aborted': 'LOG_ABORT',
                          'preempted': 'LOG_PREEMPT'}
         )
-
         Sequence.add(
             'CHECK_IF_CHARGING_ALREADY',
             ServiceState(
@@ -120,8 +119,20 @@ def getRecharge():
             Sequence.add(
                 'DOCKING',
                 startDockProcedure(),
-                transitions={'aborted': 'SET_NAV_GOAL',
+                transitions={'succeeded': 'MMUI_MAIN_MENU',
+                             'aborted': 'SAY_UNABLE_TO_DOCK',
                              'preempted': 'LOG_PREEMPT'})
+            Sequence.add(
+            'SAY_UNABLE_TO_DOCK',
+            speech_output.emo_say_something(
+                emo='SAD',
+                time=0,
+                text='Unable to detect the charging station. Please push me into it.'
+            ),
+            transitions={'succeeded': 'LOG_ABORT',
+                         'aborted': 'LOG_ABORT',
+                         'preempted': 'LOG_PREEMPT'}
+        )
         else:
             pass
         Sequence.add('MMUI_MAIN_MENU', HobbitMMUI.ShowMenu(menu='MAIN'),
