@@ -22,6 +22,11 @@ import hobbit_smach.head_move_import as head_move
 import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.locate_user_simple_import as locate_user
 import hobbit_smach.logging_import as log
+import hobbit_smach.call_hobbit_2_import as call_hobbit
+from hobbit_user_interaction import HobbitMMUI
+
+bring_origin = None
+bring_destination = None
 
 
 def switch_vision_cb(ud, response):
@@ -29,7 +34,6 @@ def switch_vision_cb(ud, response):
         return 'succeeded'
     else:
         return 'aborted'
-
 
 class MoveCounter(smach.State):
     def __init__(self):
@@ -47,7 +51,6 @@ class MoveCounter(smach.State):
         else:
             self.run_counter = -1
         return 'failure'
-
 
 class ObjectDetected(smach.State):
     def __init__(self):
@@ -74,13 +77,61 @@ class ObjectDetected(smach.State):
                 return 'succeeded'
         return 'aborted'
 
+class StoreOrigin(smach.State):
+    def __init__(self):
+        smach.State.__init__(
+            self,
+            outcomes=['succeeded', 'preempted', 'aborted'])
+
+    def execute(self, ud):
+        global bring_origin
+        bring_origin = util.get_current_robot_position(frame='/map')
+        rospy.loginfo("ORIGIN set to: "+str(bring_origin))
+        return 'succeeded'
+
+class GetOrigin(smach.State):
+    def __init__(self):
+        smach.State.__init__(
+            self,
+            outcomes=['succeeded', 'preempted', 'aborted'],
+            output_keys=['x', 'y', 'yaw'])
+
+    def execute(self, ud):
+        global bring_origin
+        x, y, yaw = bring_origin
+        rospy.loginfo('Set x,y,yaw to: '+str(x)+' ',+str(y)+' ',+str(yaw))
+        return 'succeeded'
+
+class GetDestination(smach.State):
+    def __init__(self):
+        smach.State.__init__(
+            self,
+            outcomes=['succeeded', 'preempted', 'aborted'],
+            output_keys=['x', 'y', 'yaw'])
+
+    def execute(self, ud):
+        global bring_destination
+        x, y, yaw = bring_destination
+        rospy.loginfo('Set x,y,yaw to: '+str(x)+' ',+str(y)+' ',+str(yaw))
+        return 'succeeded'
+
+class StoreDestination(smach.State):
+    def __init__(self):
+        smach.State.__init__(
+            self,
+            outcomes=['succeeded', 'preempted', 'aborted'])
+
+    def execute(self, ud):
+        global bring_destination
+        bring_destination = util.get_current_robot_position(frame='/map')
+        rospy.loginfo("DESTINATION set to: "+str(bring_destination))
+        return 'succeeded'
 
 #def point_cloud_cb(msg, ud):
 def point_cloud_cb(ud, msg):
     print('point cloud received')
     ud.cloud = msg
     return True
-
 
 def detect_object():
     sm = smach.StateMachine(
@@ -134,12 +185,18 @@ def detect_object():
             transitions={'succeeded': 'OBJECT_DETECTED',
                          'preempted': 'preempted',
                          'aborted': 'REC_COUNTER'})
+
         smach.StateMachine.add(
             'OBJECT_DETECTED',
             ObjectDetected(),
-            transitions={'succeeded': 'succeeded',
+            transitions={'succeeded': 'STORE_DESTINATION',
                          'aborted': 'MOVE_HEAD',
                          'preempted': 'preempted'})
+        smach.StateMachine.add(
+            'STORE_DESTINATION',
+            StoreDestination(),
+            transitions={'succeeded': 'succeeded'}
+        )
     return sm
 
 
@@ -407,12 +464,27 @@ def get_bring_object():
                 GetObjectLocations,
                 request_key='object_name',
                 response_key='response'),
-            transitions={'succeeded': 'GET_ROBOT_POSE',
+            transitions={'succeeded': 'UNDOCK_IF_NEEDED',
                          'aborted': 'CLEAN_UP'}
+        )
+        smach.StateMachine.add(
+            'UNDOCK_IF_NEEDED',
+            hobbit_move.undock_if_needed(),
+            transitions={'succeeded': 'BACK_IF_NEEDED'}
+        )
+        smach.StateMachine.add(
+            'BACK_IF_NEEDED',
+            hobbit_move.back_if_needed(),
+            transitions={'succeeded': 'GET_ROBOT_POSE'}
         )
         smach.StateMachine.add(
             'GET_ROBOT_POSE',
             move_base.ReadRobotPositionState(),
+            transitions={'succeeded': 'STORE_ORIGIN'}
+        )
+        smach.StateMachine.add(
+            'STORE_ORIGIN',
+            StoreOrigin(),
             transitions={'succeeded': 'CLEAN_POSITIONS'}
         )
         smach.StateMachine.add(
@@ -425,7 +497,7 @@ def get_bring_object():
             PlanPath(),
             transitions={'succeeded': 'MOVE_BASE',
                          'preempted': 'CLEAN_UP',
-                         'aborted': 'CLEAN_UP'}
+                         'aborted': 'BACK_TO_USER_ABORT'}
         )
         smach.StateMachine.add(
             'MOVE_BASE',
@@ -462,21 +534,58 @@ def get_bring_object():
         smach.StateMachine.add(
             'OBJECT_DETECTION',
             detect_object(),
-            transitions={'succeeded': 'GO_TO_USER',
+            transitions={'succeeded': 'BACK_TO_USER_SUCCESS',
                          'preempted': 'LOG_PREEMPT',
                          'aborted': 'PLAN_PATH'}
         )
         smach.StateMachine.add(
-            'GO_TO_USER',
-            locate_user.get_detect_user(),
-            transitions={'succeeded': 'TELL_USER',
+            'BACK_TO_USER_SUCCESS',
+            back_to_user(),
+            transitions={'succeeded': 'SAY_BRING_YOU_TO_OBJECT',
                          'preempted': 'LOG_PREEMPT',
-                         'aborted': 'PLAN_PATH'}
+                         'aborted': 'LOG_ABORTED'}
         )
         smach.StateMachine.add(
-            'TELL_USER',
-            speech_output.ShowInfoFoundObject(),
+            'SAY_BRING_YOU_TO_OBJECT',
+            HobbitMMUI.AskYesNo(question='Shall I come even closer?'),
+            transitions={'yes': 'SAY_FOLLOW_ME',
+                         'no': 'LOG_SUCCESS',
+                         'failed': 'LOG_ABORTED',
+                         'timeout': 'LOG_ABORTED',
+                         '3times': 'LOG_ABORTED'}
+        )
+        smach.StateMachine.add(
+            'SAY_FOLLOW_ME',
+            speech_output.sayText(info='Sorry, I could not find your object.'),
+            transitions={'succeeded': 'BACK_TO_OBJECT',
+                         'preempted': 'LOG_PREEMPT',
+                         'failed': 'LOG_ABORTED'}
+        )
+        smach.StateMachine.add(
+            'BACK_TO_OBJECT',
+            back_to_object(),
+            transitions={'succeeded': 'SAY_DETECTED_HERE',
+                         'preempted': 'LOG_PREEMPT',
+                         'aborted': 'LOG_ABORTED'}
+        )
+        smach.StateMachine.add(
+            'SAY_DETECTED_HERE',
+            speech_output.sayText(info='I found the object here.'),
             transitions={'succeeded': 'LOG_SUCCESS',
+                         'preempted': 'LOG_PREEMPT',
+                         'failed': 'LOG_ABORTED'}
+        )
+        smach.StateMachine.add(
+            'BACK_TO_USER_ABORT',
+            back_to_user(),
+            transitions={'succeeded': 'SAY_NOT_DETECTED',
+                         'preempted': 'LOG_PREEMPT',
+                         'aborted': 'LOG_ABORTED'}
+        )
+        smach.StateMachine.add(
+            'SAY_NOT_DETECTED',
+            speech_output.sayText(info='Sorry, I could not find your object.'),
+            transitions={'succeeded': 'LOG_ABORTED',
                          'preempted': 'LOG_PREEMPT',
                          'failed': 'LOG_ABORTED'}
         )
@@ -505,6 +614,47 @@ def get_bring_object():
             'CLEAN_UP',
             CleanUp(),
             transitions={'succeeded': 'preempted'}
+        )
+    return sm
+
+def back_to_user():
+    sm = smach.StateMachine(outcomes=['succeeded', 'aborted', 'preempted'])
+    with sm:
+        smach.StateMachine.add_auto(
+            'GET_ORIGIN',
+            GetOrigin(),
+            connector_outcomes=['succeeded']
+        )
+        smach.StateMachine.add(
+            'GOTO_ORIGIN',
+            hobbit_move.goToPose(),
+            transitions={'succeeded': 'COME_CLOSER',
+                         'preempted': 'preempted',
+                         'aborted': 'aborted'}
+        )
+        smach.StateMachine.add(
+            'COME_CLOSER',
+            call_hobbit.come_closer_from_everywhere(),
+            transitions={'succeeded': 'COME_CLOSER',
+                         'preempted': 'preempted',
+                         'aborted': 'aborted'}
+        )
+    return sm
+
+def back_to_object():
+    sm = smach.StateMachine(outcomes=['succeeded', 'aborted', 'preempted'])
+    with sm:
+        smach.StateMachine.add_auto(
+            'GET_DESTINATION',
+            GetDestination(),
+            connector_outcomes=['succeeded']
+        )
+        smach.StateMachine.add(
+            'GOTO_DESTINATION',
+            hobbit_move.goToPose(),
+            transitions={'succeeded': 'succeeded',
+                         'preempted': 'preempted',
+                         'aborted': 'aborted'}
         )
     return sm
 
