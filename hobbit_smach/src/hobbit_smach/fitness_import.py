@@ -113,16 +113,8 @@ def get_do_fitness():
         StateMachine.add(
             'INIT',
             Init(),
-            transitions={'succeeded': 'SAY_MOVING_TO_YOU',
-                         'canceled': 'LOG_ABORTED'}
-        )
-        StateMachine.add(
-            'SAY_MOVING_TO_YOU',
-            #speech_output.sayText(info='T_FI_MovingToYou'),
-            speech_output.sayText(info='T_CA_IAmComing'),
             transitions={'succeeded': 'MOVE_BASE',
-                         'failed': 'LOG_ABORTED',
-                         'preempted': 'LOG_PREEMPT'}
+                         'canceled': 'LOG_ABORTED'}
         )
         StateMachine.add(
             'MOVE_BASE',
