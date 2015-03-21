@@ -7,9 +7,10 @@ NAME = 'helper_node'
 DEBUG = False
 RETRY = 10
 state = False
+dock_state = True
 
 import rospy
-from hobbit_msgs.srv import ChargeCheck, ChargeCheckResponse, SetCloserState, GetCloserState
+from hobbit_msgs.srv import ChargeCheck, ChargeCheckResponse, SetCloserState, GetCloserState, SetDockState, GetDockState
 from mira_msgs.msg import BatteryState
 
 
@@ -48,11 +49,28 @@ def get_closer_state(req):
     rospy.loginfo("Get state is "+str(state))
     return state
 
+def set_dock_state(req):
+    global dock_state
+    response = False
+    rospy.loginfo("Set dock check called")
+    dock_state = req.state
+    rospy.loginfo("Set state to "+str(dock_state))
+    return True
+
+def get_dock_state(req):
+    global dock_state
+    response = True
+    rospy.loginfo("Get dock check called")
+    rospy.loginfo("Get state is "+str(dock_state))
+    return dock_state
+
 def charge_check_server():
     rospy.init_node('hobbit_helper_node')
     s = rospy.Service('/hobbit/charge_check', ChargeCheck, handle_charge_check)
     s1 = rospy.Service('/came_closer/set_closer_state', SetCloserState, set_closer_state)
     s2 = rospy.Service('/came_closer/get_closer_state', GetCloserState, get_closer_state)
+    s3 = rospy.Service('/docking/set_dock_state', SetDockState, set_dock_state)
+    s4 = rospy.Service('/docking/get_dock_state', GetDockState, get_dock_state)
 
     rospy.loginfo('Node started')
     rospy.spin()

@@ -43,6 +43,7 @@ add_service_files(
   ClustersOnPlane.srv
   ChargeCheck.srv
   GetCloserState.srv
+  GetDockState.srv
   GetCoordinates.srv
   GetName.srv
   GetNameOfRoom.srv
@@ -55,6 +56,7 @@ add_service_files(
   PointCloud2FeatureHistogram.srv
   Request.srv
   SetCloserState.srv
+  SetDockState.srv
   SingleShotPC.srv
   SwitchVision.srv
   Translate.srv
