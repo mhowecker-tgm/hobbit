@@ -2,3 +2,5 @@
 .ropeproject
 *.bak
 rgbd_acquisition/bin/*
+CATKIN_IGNORE
+.idea
