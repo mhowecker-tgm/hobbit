@@ -21,6 +21,10 @@ unsigned int receivedBaseImages=0;
 
 int initializeClassifier()
 {
+  unsigned int imageWidth=640;
+  unsigned int imageHeight=480;
+
+
   minimums.holesPercentOverTop=70;
   maximums.holesPercentOverTop=101;
   lastState.useHolesOverTop=1;
@@ -55,14 +59,15 @@ int initializeClassifier()
 
   lastState.baseWidth=440;
   lastState.baseHeight=160;
-  lastState.baseX1=200;
-  lastState.baseY1=200;
+  lastState.baseX1 = (unsigned int ) ((imageWidth-lastState.baseWidth) / 2);
+  lastState.baseY1 = 240;
+
 
   lastState.topWidth=300;
   lastState.topHeight=200;
 
-  lastState.topX1 = (unsigned int ) ((640-lastState.topWidth) / 2);
-  lastState.topY1 = (unsigned int ) ((480-lastState.topHeight) / 2);
+  lastState.topX1 = (unsigned int ) ((imageWidth-lastState.topWidth) / 2);
+  lastState.topY1 = (unsigned int ) ((imageHeight-lastState.topHeight) / 2);
 
 
 

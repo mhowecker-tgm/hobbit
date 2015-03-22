@@ -413,8 +413,6 @@ int runServicesBottomThatNeedColorAndDepth(unsigned char * colorFrame , unsigned
       if (doCalculations==0) { return 0; }
 
 
-      lastState.baseX1 = (unsigned int ) ((colorWidth-lastState.baseWidth) / 2);
-      lastState.baseY1 = 240;
 
 
 
