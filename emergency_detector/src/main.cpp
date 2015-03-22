@@ -546,7 +546,7 @@ int updateHeadPosition()
        double rollChange=roll-headLastRoll; if (rollChange<0) { rollChange = -1 * rollChange; }
        headLastRoll=roll;
 
-       if ( (pitchChange>0.2) || (rollChange>0.2) )  { headIsMoving=15; }
+       if ( (pitchChange>0.15) || (rollChange>0.15) )  { headIsMoving=15; }
 
 
        if ( (headIsMoving>0) )
@@ -864,7 +864,15 @@ int main(int argc, char **argv)
 
                  if (!paused)
                   {
-                   if(emergencyDetected)
+                   if ( (emergencyDetected) && (headIsMoving!=0) )
+                   {
+                     emergencyDetected=0;
+                     ROS_INFO("Border emergency , with moving head suppressed..!");
+                   }
+
+
+
+                   if ( (emergencyDetected) && (headIsMoving==0) )
                      {
                       if (autoRecordEmergencyTriggers)
                       {
