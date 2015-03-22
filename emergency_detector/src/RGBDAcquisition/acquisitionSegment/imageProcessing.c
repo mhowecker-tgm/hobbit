@@ -317,15 +317,14 @@ int detectHighContrastUnusableRGB(unsigned char * rgbFrame , unsigned int width 
 
 int detectNoDepth(unsigned short * depthFrame , unsigned int width , unsigned int height , float percentageHigh)
 {
-  unsigned char * depthPtr = depthFrame;
-  unsigned char * depthLimit = depthFrame + width * height ;
+  unsigned short * depthPtr = depthFrame;
+  unsigned short * depthLimit = depthFrame + width * height ;
 
   float tmp = percentageHigh / 100;
         tmp = tmp * width * height ;
   unsigned int targetHighContrastPixels = (unsigned int) tmp;
   unsigned int highContrastPixels = 0;
 
-  unsigned char r,g,b;
   while (depthPtr<depthLimit)
   {
     if (*depthPtr==0)
@@ -344,5 +343,37 @@ int detectNoDepth(unsigned short * depthFrame , unsigned int width , unsigned in
 
 
 
+int cutFurtherThanDepth(unsigned short * frame , unsigned int frameWidth , unsigned int frameHeight,
+                        unsigned int sX,unsigned int sY,unsigned int width,unsigned int height,
+                        unsigned maxDepth )
+{
+
+  if (frame==0)  { return 0; }
+  if ( (width==0)||(height==0) ) { return 0; }
+  if ( (frameWidth==0)||(frameWidth==0) ) { return 0; }
+
+  if (sX>=frameWidth) { return 0; }
+  if (sY>=frameHeight) { return 0;  }
+
+  //Check for bounds -----------------------------------------
+  if (sX+width>=frameWidth) { width=frameWidth-sX;  }
+  if (sY+height>=frameHeight) { height=frameHeight-sY;  }
+  //----------------------------------------------------------
+
+
+  unsigned short * sourcePTR      = frame+ MEMPLACE1(sX,sY,frameWidth);
+  unsigned short * sourceLimitPTR = frame+ MEMPLACE1((sX+width),(sY+height),frameWidth);
+  unsigned short sourceLineSkip = (frameWidth-width)  ;
+
+  while (sourcePTR < sourceLimitPTR)
+  {
+    if (*sourcePTR>=maxDepth)
+         { *sourcePTR=0; }
+
+    ++sourcePTR;
+  }
+
+   return 1;
+}
 
 

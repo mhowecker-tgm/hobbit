@@ -7,6 +7,7 @@
 
 
 #include "RGBDAcquisition/acquisitionSegment/AcquisitionSegment.h"
+#include "RGBDAcquisition/acquisitionSegment/imageProcessing.h"
 #include "RGBDAcquisition/processors/ViewpointChange/ViewpointChange.h"
 #include "tools.h"
 #include "visualization.h"
@@ -41,6 +42,7 @@
 using namespace std;
 using namespace cv;
 
+unsigned short tempDepthCutoff=0;
 struct SegmentationFeaturesRGB segConfRGB={0};
 struct SegmentationFeaturesDepth segConfDepth={0};
 struct SegmentationFeaturesDepth segConfBaseDepth={0};
@@ -83,6 +85,7 @@ int decreasePlane()
     segConfDepth.planeNormalOffset-=30.0;
     fprintf(stderr,"Plane Decreased to %0.2f ",segConfDepth.planeNormalOffset);
 }
+
 
 
 
@@ -290,6 +293,10 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
                                    combinationMode
                                 );
 
+         cutFurtherThanDepth(segmentedDepth , depthWidth , depthHeight,
+                             lastState.topX1 , lastState.topY1 , lastState.topWidth , lastState.topHeight,
+                             tempDepthCutoff );
+
       unsigned int holesTop=0;
       lastState.scoreTop = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , lastState.topX1 , lastState.topY1 , lastState.topWidth , lastState.topHeight , maximums.scoreTop , 1 , &holesTop );
       lastState.holesPercentTop = (float) (100*holesTop)/(lastState.topWidth*lastState.topHeight);
@@ -459,6 +466,7 @@ void initializeProcess(ros::NodeHandle * nh)
 #endif // USE_HOBBIT_MAP_DATA
 
  //Hobbit orientation according to camera
+ tempDepthCutoff=1600;
  segConfDepth.maxDepth=1800;
  segConfDepth.doNotGenerateNormalFrom3Points=0;
  segConfDepth.p1[0]=492.23; segConfDepth.p1[1]=615.87; segConfDepth.p1[2]=1757.00;

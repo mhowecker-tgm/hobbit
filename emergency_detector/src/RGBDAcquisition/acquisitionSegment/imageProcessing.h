@@ -28,6 +28,13 @@
         (a)[2] = (b)[2] - (c)[2];
 
 
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+
 float  angleOfNormals(float * p1, float * p2);
 
 void crossProductFrom3Points(float * p1 , float * p2  , float * p3  , float * normal);
@@ -55,5 +62,16 @@ int floodFillUShort(unsigned short * target , unsigned int width , unsigned int 
 int detectHighContrastUnusableRGB(unsigned char * rgbFrame , unsigned int width , unsigned int height , float percentageHigh);
 
 int detectNoDepth(unsigned short * depthFrame , unsigned int width , unsigned int height , float percentageHigh);
+
+
+
+int cutFurtherThanDepth(unsigned short * frame , unsigned int frameWidth , unsigned int frameHeight,
+                        unsigned int sX,unsigned int sY,unsigned int width,unsigned int height,
+                        unsigned maxDepth );
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // IMAGEPROCESSING_H_INCLUDED
