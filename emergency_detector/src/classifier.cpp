@@ -23,7 +23,7 @@ unsigned int receivedBaseImages=0;
 
 
 
-int appendClassifierData(const char * filename)
+int appendClassifierData(const char * filename,unsigned int frameTimestamp)
 {
   FILE * fp = fopen(filename,"a");
 
@@ -36,11 +36,12 @@ int appendClassifierData(const char * filename)
 
     for (i=0; i<3; i++)
     {
-      if (i==0)  { fprintf(fp,"MINIMUMS\n"); what2print = &minimums;  } else
-      if (i==1)  { fprintf(fp,"TRIGGER\n");  what2print = &lastState; } else
-      if (i==2)  { fprintf(fp,"MAXIMUMS\n"); what2print = &maximums;  }
+      if (i==0)  { fprintf(fp,"MINIMUMS "); what2print = &minimums;  } else
+      if (i==1)  { fprintf(fp,"TRIGGER ");  what2print = &lastState; } else
+      if (i==2)  { fprintf(fp,"MAXIMUMS "); what2print = &maximums;  }
 
-      fprintf(fp,"holesOverTop %0.2f , holesTop %0.2f , holesBase %0.2f , holesOverBase %0.2f\n" ,
+      fprintf(fp,"timestamp %u , " , frameTimestamp);
+      fprintf(fp,"holesOverTop %0.2f , holesTop %0.2f , holesBase %0.2f , holesOverBase %0.2f , " ,
                   what2print->holesPercentOverTop ,
                   what2print->holesPercentTop ,
                   what2print->holesPercentBase ,
@@ -48,7 +49,7 @@ int appendClassifierData(const char * filename)
 
 
 
-      fprintf(fp,"scoreOverTop %u , scoreTop %u , scoreBase %u , scoreOverBase %u\n" ,
+      fprintf(fp,"scoreOverTop %u , scoreTop %u , scoreBase %u , scoreOverBase %u , " ,
                   what2print->scoreOverTop ,
                   what2print->scoreTop ,
                   what2print->scoreOverBase ,

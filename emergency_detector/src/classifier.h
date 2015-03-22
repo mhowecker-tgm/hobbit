@@ -81,7 +81,7 @@ extern unsigned int headIsMoving;
 
 
 
-int appendClassifierData(const char * filename);
+int appendClassifierData(const char * filename,unsigned int frameTimestamp);
 
 
 

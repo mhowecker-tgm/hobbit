@@ -874,7 +874,7 @@ int main(int argc, char **argv)
                         saveNextTopFrame=1;
                         saveNextBottomFrame=1;
                       }
-                      appendClassifierData("../../web_interface/bin/emergencies/triggers/triggerlist.txt");
+                      appendClassifierData("../../web_interface/bin/emergencies/triggers/triggerlist.txt",frameTimestamp);
 
                       broadcastEmergency(frameTimestamp);
                      }
