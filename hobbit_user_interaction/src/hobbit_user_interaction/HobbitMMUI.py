@@ -27,7 +27,7 @@ class WaitforSoundEnd(util.WaitForMsgState):
         """
         msg = self.waitForMsg()
         if msg is not None:
-            rospy.loginfo('AAAAAAAAAAA'+str(msg))
+            #rospy.loginfo(str(msg))
             if msg == 'preempted':
                 return 'preempted'
             # call callback if there is one
