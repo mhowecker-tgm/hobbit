@@ -64,16 +64,17 @@ class ObjectDetected(smach.State):
         rospy.loginfo('Did we find the object?')
         print(ud.ids)
         print(type(ud.ids))
+        #return 'succeeded'
         if not ud.ids:
             return 'aborted'
         try:
             for index, item in enumerate(ud.ids):
                 if ud.object_name.data in item.data:
-                    #ud.object_pose = ud.transforms[index]
+                    ud.object_pose = ud.transforms[index]
                     return 'succeeded'
         except:
             if ud.object_name.data in ud.ids.data:
-                #ud.object_pose = ud.transforms
+                ud.object_pose = ud.transforms
                 return 'succeeded'
         return 'aborted'
 
@@ -138,11 +139,11 @@ def point_cloud_cb(msg, ud):
 def detect_object():
     sm = smach.StateMachine(
         outcomes=['succeeded', 'preempted', 'aborted'],
-        input_keys=['object_name'],
+        input_keys=['object_name', 'object_pose'],
         output_keys=['object_pose', 'object_room', 'object_location']
     )
     counter_it = smach.Iterator(outcomes = ['succeeded', 'preempted', 'aborted'],
-                              input_keys = ['object_name'],
+                              input_keys = ['object_name', 'object_pose'],
                               output_keys = [],
                               it = lambda: range(0, 3),
                               it_label = 'index',
@@ -150,16 +151,16 @@ def detect_object():
 
     container_sm = smach.StateMachine(
         outcomes = ['succeeded','aborted','preempted', 'continue'],
-        input_keys=['object_name'])
+        input_keys=['object_name', 'object_pose'])
     with container_sm:
-        smach.StateMachine.add(
-            'SAY_SOME',
-            #FIXME: hardcoded text
-            speech_output.sayText(info='Start looking'),
-            transitions={'succeeded': 'GET_POINT_CLOUD',
-                         'preempted': 'preempted',
-                         'failed': 'continue'}
-        )
+        #smach.StateMachine.add(
+        #    'SAY_SOME',
+        #    #FIXME: hardcoded text
+        #    speech_output.sayText(info='Start looking'),
+        #    transitions={'succeeded': 'GET_POINT_CLOUD',
+        #                 'preempted': 'preempted',
+        #                 'failed': 'continue'}
+        #)
         smach.StateMachine.add(
             'GET_POINT_CLOUD',
             util.WaitForMsgState(
@@ -531,7 +532,7 @@ def get_bring_object():
         )
         smach.StateMachine.add(
             'MOVE_BASE',
-            hobbit_move.goToPose(),
+            hobbit_move.goToPoseSilent(),
             transitions={'succeeded': 'SWITCH_VISION',
                          'preempted': 'CLEAN_UP',
                          'aborted': 'CLEAN_UP'},
@@ -571,13 +572,22 @@ def get_bring_object():
         smach.StateMachine.add(
             'BACK_TO_USER_SUCCESS',
             back_to_user(),
-            transitions={'succeeded': 'SAY_BRING_YOU_TO_OBJECT',
+            transitions={'succeeded': 'SAY_FOUND_OBJECT',
                          'preempted': 'LOG_PREEMPT',
-                         'aborted': 'SAY_BRING_YOU_TO_OBJECT'}
+                         'aborted': 'SAY_FOUND_OBJECT'}
+        )
+        smach.StateMachine.add(
+            'SAY_FOUND_OBJECT',
+            #FIXME: hardcoded text
+            speech_output.say_text_found_object(),
+            transitions={'succeeded': 'SAY_BRING_YOU_TO_OBJECT',
+                         'failed': 'LOG_ABORTED',
+                         'preempted': 'LOG_PREEMPT'}
         )
         smach.StateMachine.add(
             'SAY_BRING_YOU_TO_OBJECT',
-            HobbitMMUI.AskYesNo(question='T_CLOSER_QUESTION'),
+            #FIXME: hardcoded text
+            HobbitMMUI.AskYesNo(question='If you want I will guide you to the object.'),
             transitions={'yes': 'SAY_FOLLOW_ME',
                          'no': 'LOG_SUCCESS',
                          'failed': 'LOG_ABORTED',
@@ -587,7 +597,7 @@ def get_bring_object():
         smach.StateMachine.add(
             'SAY_FOLLOW_ME',
             #FIXME: hardcoded text
-            speech_output.sayText(info='If you want I will guide you to the object.'),
+            speech_output.sayText(info='Follow me to the object.'),
             transitions={'succeeded': 'BACK_TO_OBJECT',
                          'preempted': 'LOG_PREEMPT',
                          'failed': 'LOG_ABORTED'}
@@ -660,7 +670,7 @@ def back_to_user():
         )
         smach.StateMachine.add(
             'GOTO_ORIGIN',
-            hobbit_move.goToPose(),
+            hobbit_move.goToPoseSilent(),
             transitions={'succeeded': 'COME_CLOSER',
                          'preempted': 'preempted',
                          'aborted': 'aborted'}
