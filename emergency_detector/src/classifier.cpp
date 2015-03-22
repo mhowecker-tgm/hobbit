@@ -37,8 +37,8 @@ int appendClassifierData(const char * filename)
     for (i=0; i<3; i++)
     {
       if (i==0)  { fprintf(fp,"MINIMUMS\n"); what2print = &minimums;  } else
-      if (i==0)  { fprintf(fp,"TRIGGER\n");  what2print = &lastState; } else
-      if (i==0)  { fprintf(fp,"MAXIMUMS\n"); what2print = &maximums;  }
+      if (i==1)  { fprintf(fp,"TRIGGER\n");  what2print = &lastState; } else
+      if (i==2)  { fprintf(fp,"MAXIMUMS\n"); what2print = &maximums;  }
 
       fprintf(fp,"holesOverTop %0.2f , holesTop %0.2f , holesBase %0.2f , holesOverBase %0.2f\n" ,
                   what2print->holesPercentOverTop ,
