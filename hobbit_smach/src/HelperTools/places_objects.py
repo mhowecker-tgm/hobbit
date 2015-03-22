@@ -99,7 +99,7 @@ def readXml(inFile):
                     for obj in objects.findall('object'):
                         # this is not yet in the hobbit_msgs/Object definition
                         srv_place.objects.append(Object(String(obj.attrib.get('name')), float(obj.attrib.get('probability'))))
-                        # print obj.tag, obj.attrib
+                        #print obj.tag, obj.attrib
                 srv_room.places_vector.append(srv_place)
             rooms.rooms_vector.append(srv_room)
     # print rooms
@@ -130,7 +130,12 @@ def writeXml(inFile, rooms):
             i = ET.SubElement(f, 'pose', {'x': str(place.x), 'y': str(place.y), 'theta': str(place.theta)})
             j = ET.SubElement(f, 'objects')
             for obj in place.objects:
-                k = ET.SubElement(j, 'object', {'name': obj.name.data, 'probability': str(obj.probability)})
+                print(type(obj.name))
+                #print(get_unicode(obj.name))
+                if type(obj.name) is unicode:   
+                    k = ET.SubElement(j, 'object', {'name': obj.name, 'probability': str(obj.probability)})
+                else:
+                    k = ET.SubElement(j, 'object', {'name': obj.name.data, 'probability': str(obj.probability)})
     tree = ET.ElementTree(r)
     tree.write(outFile, encoding='UTF-8',  xml_declaration=True, pretty_print=True)
     print 'file:',outFile,'written.'
@@ -172,13 +177,14 @@ def updateProb(obj, location, room_name, rooms):
 
 
 def addObject(object_name, rooms):
+    #rospy.loginfo('START: addObject')
     object_name.data = get_unicode(object_name.data)
     locations = count_locations(rooms)
     added = False
     for room in rooms.rooms_vector:
         for place in (x for x in room.places_vector if x.place_type.lower() == 'searchable'):
             if not place.objects:
-                rospy.loginfo('Adding object')
+                rospy.loginfo('Adding object: '+ object_name.data)
                 place.objects.append(Object(object_name, 1.0/locations))
             else:
                 new = True
@@ -187,11 +193,12 @@ def addObject(object_name, rooms):
                         print('addObject: ' + object_name.data + ' is already stored.')
                         new = False
                 if new:
-                    rospy.loginfo('Adding object')
+                    rospy.loginfo('Adding object: '+ object_name.data)
                     place.objects.append(Object(object_name.data, 1.0/locations))
                     added = True
 
     # print rooms.rooms_vector
+    #rospy.loginfo('END: addObject')
     return added
 
 
@@ -206,6 +213,7 @@ def getObjectLocations(req):
     for room in rooms.rooms_vector:
         for place in (x for x in room.places_vector if x.place_type.lower() == 'searchable'):
             for ob in (z for z in place.objects if z.name.data.lower() == query.lower()):
+                print(room)
                 places.append({'room': room.room_name, 'location': place.place_name, 'probability': ob.probability})
     sorted_places = sorted(places, key=itemgetter('probability'), reverse=True)
     newlist = ObjectLocationVector()
@@ -293,7 +301,7 @@ def add_object_to_db(req):
     return addObject(String(req.object_name), rooms)
 
 
-def clean_up(h):
+def clean_up():
     rospy.loginfo(NAME + ' is shutting down. Saving places.xml')
     writeXml(FILE, rooms)
 
@@ -314,7 +322,8 @@ def main():
     if not rooms:
         rospy.signal_shutdown('No rooms were loaded. Check the input xml file')
     else:
-        addObject(String('Häferl'), rooms)
+        addObject(String('aspirin'), rooms)
+        #addObject(String('mug'), rooms)
         # updateProb('Häferl', 'side_desk', 'Küche', rooms)
         writeXml(FILE, rooms)
         mug = GetObjectLocationsRequest()
