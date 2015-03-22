@@ -43,7 +43,7 @@ int initializeClassifier()
 
 
   minimums.scoreTop = 1150;
-  maximums.scoreTop = 1400;
+  maximums.scoreTop = 1500;
   minimums.scoreOverTop = minimums.scoreTop;
   maximums.scoreOverTop = maximums.scoreTop;
 
