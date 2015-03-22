@@ -95,7 +95,7 @@ typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sens
 
 int autoRecordEmergencyTriggers=1;
 unsigned int lastEmergencyDetectionTimestamp=0;
-unsigned int emergencyDetectionCooldown=150; //This should be time , not frames
+unsigned int emergencyDetectionCooldown=250; //This should be time , not frames
 
 
 char emergencyDir[]="../../../web_interface/bin/emergencies/emergencies";
