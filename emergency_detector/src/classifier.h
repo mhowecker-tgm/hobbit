@@ -34,11 +34,14 @@ struct classifierData
   unsigned int useHolesOverTop;
   float holesPercentTop;
   unsigned int useHolesTop;
+  float holesPercentOverBase;
+  unsigned int useHolesOverBase;
   float holesPercentBase;
   unsigned int useHolesBase;
   //----------------------------------------
   unsigned int scoreOverTop;
   unsigned int scoreTop;
+  unsigned int scoreOverBase;
   unsigned int scoreBase;
   unsigned int useScoreBase;
   //----------------------------------------
@@ -50,8 +53,10 @@ struct classifierData
   //----------------------------------------
   //----------------------------------------
 
+  unsigned int overTopX1,overTopY1,overTopWidth,overTopHeight;
   unsigned int topX1,topY1,topWidth,topHeight;
   //-------
+  unsigned int overBaseX1,overBaseY1,overBaseWidth,overBaseHeight;
   unsigned int baseX1,baseY1,baseWidth,baseHeight;
   //-------
 
@@ -64,8 +69,6 @@ extern struct classifierData maximums;
 extern unsigned int emergencyDetected;
 extern unsigned int headIsMoving;
 
-extern unsigned int overHeight;
-extern unsigned int overPlusWidth;
 
 //-----------------------------------------------------------------------
  // Synchronization variables

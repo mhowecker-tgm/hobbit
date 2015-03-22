@@ -8,8 +8,6 @@ struct classifierData maximums={0};
 unsigned int headIsMoving=0;
 
 unsigned int emergencyDetected=0;
-unsigned int overHeight=120;
-unsigned int overPlusWidth=40;
 
 //-----------------------------------------------------------------------
  //The following values are set by the launch file , so change them there..
@@ -42,9 +40,13 @@ int initializeClassifier()
 
   minimums.scoreTop = 1150;
   maximums.scoreTop = 1500;
+  minimums.scoreOverTop = minimums.scoreTop;
+  maximums.scoreOverTop = maximums.scoreTop;
 
   minimums.scoreBase = 550;
   maximums.scoreBase = 1100;
+  minimums.scoreOverBase = minimums.scoreBase;
+  maximums.scoreOverBase = maximums.scoreBase;
   lastState.useScoreBase=1;
 
   lastState.badContrastTop=0;
@@ -62,6 +64,26 @@ int initializeClassifier()
   lastState.topX1 = (unsigned int ) ((640-lastState.topWidth) / 2);
   lastState.topY1 = (unsigned int ) ((480-lastState.topHeight) / 2);
 
+
+
+  unsigned int overHeight=120;
+  unsigned int overPlusWidth=40;
+
+  lastState.overTopX1=lastState.topX1-overPlusWidth;
+  lastState.overTopY1=lastState.topY1-overHeight;
+  lastState.overTopWidth=lastState.topWidth+(2*overPlusWidth);
+  lastState.overTopHeight=overHeight;
+
+  //-------
+
+
+  unsigned int overBaseHeight=120;
+  unsigned int overBasePlusWidth=40;
+
+  lastState.overBaseX1=lastState.baseX1-overBasePlusWidth;
+  lastState.overBaseY1=lastState.baseY1-overBaseHeight;
+  lastState.overBaseWidth=lastState.baseWidth+(2*overBasePlusWidth);
+  lastState.overBaseHeight=overBaseHeight;
 
   return 0;
 }

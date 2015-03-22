@@ -100,18 +100,17 @@ int visualizeTopCam(unsigned char * colorFrame,unsigned char * segmentedRGB,unsi
 
         if (fallDetectionContext.headLookingDirection==HEAD_LOOKING_DOWN)
         {
-         pt1.x=pt1.x-overPlusWidth;
-         pt2.x=lastState.topX1+lastState.topWidth+overPlusWidth;  pt2.y=lastState.topY1-overHeight;
+         pt1.x=lastState.overTopX1;                         pt1.y=lastState.overTopY1;
+         pt2.x=lastState.overTopX1+lastState.overTopWidth;  pt2.y=lastState.overTopY1+lastState.overTopHeight;
          rectangle(bgrMat ,  pt1 , pt2 , color , 1, 8 , 0);
-         pt2.x = pt1.x+15;
-         pt2.y += 24; snprintf(rectVal,123,"Over : %u ",lastState.scoreOverTop);
-         putText(bgrMat , rectVal, pt2 , fontUsed , 0.5 , color , 2 , 8 );
-         pt2.y += 24; snprintf(rectVal,123,"Holes : %0.2f %%",lastState.holesPercentOverTop);
-         putText(bgrMat , rectVal, pt2 , fontUsed , 0.5 , color , 2 , 8 );
+         pt1.x = pt1.x+15;
+         pt1.y += 24; snprintf(rectVal,123,"Over : %u ",lastState.scoreOverTop);
+         putText(bgrMat , rectVal, pt1 , fontUsed , 0.5 , color , 2 , 8 );
+         pt1.y += 24; snprintf(rectVal,123,"Holes : %0.2f %%",lastState.holesPercentOverTop);
+         putText(bgrMat , rectVal, pt1 , fontUsed , 0.5 , color , 2 , 8 );
 
-
-         pt2.y += 24; snprintf(rectVal,123,"Bord : %u ",lowBorderY);
-         putText(bgrMat , rectVal, pt2 , fontUsed , 0.5 , color , 2 , 8 );
+         pt1.y += 24; snprintf(rectVal,123,"Bord : %u ",lowBorderY);
+         putText(bgrMat , rectVal, pt1 , fontUsed , 0.5 , color , 2 , 8 );
         }
 
         centerPt.x=colorWidth/2;       centerPt.y=colorHeight/2;
@@ -223,15 +222,29 @@ int visualizeBaseCam(unsigned char * segmentedRGB,unsigned int colorWidth , unsi
 
  cv::cvtColor(rgbMat,bgrMat, CV_RGB2BGR);// opencv expects the image in BGR format
 
- Point ptIn1; ptIn1.x=lastState.baseX1;                          ptIn1.y=lastState.baseY1;
- Point ptIn2; ptIn2.x=lastState.baseX1+lastState.baseWidth;      ptIn2.y=lastState.baseY1+lastState.baseHeight;
+ int fontUsed=FONT_HERSHEY_SIMPLEX; //FONT_HERSHEY_SCRIPT_SIMPLEX;
+ char rectVal[256]={0};
  Scalar colorEmergency = Scalar ( 255 , 0 , 0 );
+
+ Point ptIn1; ptIn1.x=lastState.overBaseX1;                              ptIn1.y=lastState.overBaseY1;
+ Point ptIn2; ptIn2.x=lastState.overBaseX1+lastState.overBaseWidth;      ptIn2.y=lastState.overBaseY1+lastState.overBaseHeight;
+
+ rectangle(bgrMat ,  ptIn1 , ptIn2 , colorEmergency , 1, 8 , 0);
+  ptIn1.x = ptIn1.x+15;
+  ptIn1.y += 24; snprintf(rectVal,123,"Over : %u ",lastState.scoreOverBase);
+  putText(bgrMat , rectVal, ptIn1 , fontUsed , 0.5 , colorEmergency , 2 , 8 );
+  ptIn1.y += 24; snprintf(rectVal,123,"Holes : %0.2f %%",lastState.holesPercentOverBase);
+  putText(bgrMat , rectVal, ptIn1 , fontUsed , 0.5 , colorEmergency  , 2 , 8 );
+
+
+
+
+ ptIn1.x=lastState.baseX1;                          ptIn1.y=lastState.baseY1;
+ ptIn2.x=lastState.baseX1+lastState.baseWidth;      ptIn2.y=lastState.baseY1+lastState.baseHeight;
 
  rectangle(bgrMat ,  ptIn1 , ptIn2 , colorEmergency , 2, 8 , 0);
 
 
-  char rectVal[256]={0};
-        int fontUsed=FONT_HERSHEY_SIMPLEX; //FONT_HERSHEY_SCRIPT_SIMPLEX;
         Point txtPosition;  txtPosition.x = ptIn1.x+15; txtPosition.y = ptIn1.y;
 
 

@@ -343,8 +343,12 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
               //We are almost sure we have a fallen blob , but maybe the blob continues on the top side ( so it is a standing user after all
               unsigned int holesOverTemperatureArea=0;
 
-              lastState.scoreOverTop = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight , lastState.topX1-overPlusWidth , lastState.topY1-overHeight , lastState.topWidth+(overPlusWidth*2) , overHeight , maximums.scoreTop , 1 , &holesOverTemperatureArea );
-              lastState.holesPercentOverTop = (float) (100*holesOverTemperatureArea)/(lastState.topWidth*overHeight);
+              lastState.scoreOverTop = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight ,
+                                                                    lastState.overTopX1, lastState.overTopY1 ,
+                                                                    lastState.overTopWidth , lastState.overTopHeight ,
+                                                                    maximums.scoreOverTop , 1 , &holesOverTemperatureArea
+                                                                   );
+              lastState.holesPercentOverTop = (float) (100*holesOverTemperatureArea)/(lastState.overTopWidth*lastState.overTopHeight);
               if (lastState.holesPercentOverTop>100) {lastState.holesPercentOverTop=100;}
 
 
@@ -434,6 +438,19 @@ int runServicesBottomThatNeedColorAndDepth(unsigned char * colorFrame , unsigned
       lastState.holesPercentBase = (float) (100*holesBase)/(lastState.baseWidth*lastState.baseHeight);
       if (lastState.holesPercentBase>100) {lastState.holesPercentBase=100;}
       fprintf(stderr,"Bottom Avg Depth is %u mm , empty area is %0.2f %% \n",lastState.scoreBase , lastState.holesPercentBase );
+
+
+
+
+      lastState.scoreOverBase = viewPointChange_countDepths( segmentedDepth , colorWidth , colorHeight ,
+                                                             lastState.overBaseX1    , lastState.overBaseY1 ,
+                                                             lastState.overBaseWidth , lastState.overBaseHeight ,
+                                                             maximums.scoreOverBase , 1 , &holesBase );
+      lastState.holesPercentOverBase = (float) (100*holesBase)/(lastState.overBaseWidth*lastState.overBaseHeight);
+      if (lastState.holesPercentOverBase>100) {lastState.holesPercentOverBase=100;}
+
+
+      fprintf(stderr,MAGENTA "\n\n Over Bot  Avg is %u mm Holes are %0.2f %% \n\n" NORMAL , lastState.scoreOverTop, lastState.holesPercentTop  );
 
 
 
