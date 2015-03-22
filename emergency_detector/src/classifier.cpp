@@ -31,7 +31,7 @@ int initializeClassifier()
 
   minimums.holesPercentTop=15;
   maximums.holesPercentTop=75;
-  lastState.useHolesTop=0;
+  lastState.useHolesTop=1;
 
   minimums.holesPercentBase=3;
   maximums.holesPercentBase=60;

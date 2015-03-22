@@ -179,6 +179,8 @@ int visualizeTopCam(unsigned char * colorFrame,unsigned char * segmentedRGB,unsi
         //======================================================================================================
         txtPosition.y += 24; snprintf(rectVal,123,"Top : %u / Bot : %u ",lastState.scoreTop,lastState.scoreBase);
         putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , color , 2 , 8 );
+        txtPosition.y += 24; snprintf(rectVal,123,"Holes : %0.2f %% ",lastState.holesPercentTop);
+        putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , color , 2 , 8 );
         txtPosition.y += 24; snprintf(rectVal,123,"Temperature : %0.2f C",lastState.objectTemperature);
         putText(bgrMat , rectVal, txtPosition , fontUsed , 0.7 , color , 2 , 8 );
 
