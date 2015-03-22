@@ -31,7 +31,7 @@ class MMUIInterface:
         self.dostop = True  # has to be implemented => ISTU directly on MMUI
 
     def processCommand(self, msg):
-	print "david"
+	#print "david"
         if msg.command == "C_SPEAK":
             print "C_SPEAK"
             self.showMMUI_Info(msg.params[0].value)
@@ -41,7 +41,7 @@ class MMUIInterface:
 
 
     def showMMUI_Info(self, text, wait="1", prm="", prm2="", prm3="", audio=""):
-        print(prm)
+        #print(prm)
         parr = []
         p = Parameter('type', 'D_PLAIN')
         parr.append(p)
@@ -56,7 +56,7 @@ class MMUIInterface:
         p = Parameter('wait', wait)
         parr.append(p)
         if prm != "":
-            p = Parameter('Parameter', prm)
+            p = Parameter('parameter', prm)
             parr.append(p)
         if prm2 != "":
             p = Parameter('parameter', prm2)
@@ -67,7 +67,7 @@ class MMUIInterface:
         if audio != "":
             p = Parameter('play', audio)
             parr.append(p)
-        print(parr) 
+        #print(parr) 
         return self.callMMUIService('0', 'create', parr)
 
     def showMMUI_OK(self, text, prm=""):
@@ -189,7 +189,7 @@ class MMUIInterface:
             print('timeout exceeded while waiting for service %s' % e)
             rospy.loginfo('MMUI is not responding.')
             return None
-        print('Trying to call MMUIService')
+        #print('Trying to call MMUIService')
         try:
             h = Header()
             h.stamp = rospy.Time.now()
@@ -226,7 +226,7 @@ class MMUIInterface:
 def main(args):
     #MMUIIF = MMUIInterface()
     #MMUIIF.showMMUI_Info('test test test')
-    print "MMUIInterface"
+    #print "MMUIInterface"
     rospy.init_node('ActionSequencerLearnObject', anonymous=False)
     mmui = MMUIInterface()
     rospy.spin()
