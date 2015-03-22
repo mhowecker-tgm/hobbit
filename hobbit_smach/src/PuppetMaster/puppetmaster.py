@@ -396,12 +396,11 @@ def sleep_cb(ud, goal):
 def bring_cb(ud, goal):
     par = []
     #par.append({'object_name': ud.params[0].value})
-    par.append({'object_name': new_params[0].value})
-    # par.append(String(ud.params[0].value))
-    #rospy.loginfo('bring_cb: %s' % ud.params[0].value)
+    #par.append({'object_name': new_params[0].value})
+    par.append(String(new_params[0].value))
     rospy.loginfo('bring_cb: %s' % new_params[0].value)
     goal = GeneralHobbitGoal(command=String('bring_object'),
-                             previous_state=String('call_hobbit'),
+                             previous_state=String(''),
                              parameters=par)
     return goal
 
@@ -810,18 +809,18 @@ def main():
             )
         StateMachine.add(
             'BRING_OBJECT',
-            FakeForAllWithoutRunningActionSever(name='BRING_OBJECT'),
-            # SimpleActionState(
-            #     'bring_object',
-            #     GeneralHobbitAction,
-            #     goal_cb=bring_cb,
-            #     input_keys=['parameters', 'params'],
-            #     preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
-            #     server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
-            # ),
+            #FakeForAllWithoutRunningActionSever(name='BRING_OBJECT'),
+            SimpleActionState(
+                'bring_object',
+                GeneralHobbitAction,
+                goal_cb=bring_cb,
+                input_keys=['parameters', 'params'],
+                preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
+                server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
+            ),
             transitions={'succeeded': 'MAIN_MENU',
                          'aborted': 'RESET_ACTIVE_TASK',
-                         'failed': 'RESET_ACTIVE_TASK',
+                         #'failed': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
