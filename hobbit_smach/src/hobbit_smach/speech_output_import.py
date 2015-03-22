@@ -132,7 +132,7 @@ class ShowInfoObjectNotFound(State):
         mmui = MMUI.MMUIInterface()
         mmui.showMMUI_Info(
             text=self.info,
-            prm=ud.object_name,
+            prm=ud.object_name.data,
         )
         return 'succeeded'
 class ShowInfoFoundObject(State):
