@@ -8,7 +8,7 @@ import tf
 import math
 
 from hobbit_msgs.srv import SwitchVision, GetObjectLocations,\
-    SwitchVisionRequest
+    SwitchVisionRequest, GetCoordinates, GetCoordinatesRequest
 from std_msgs.msg import String
 from smach_ros import ServiceState, MonitorState
 from nav_msgs.srv import GetPlan, GetPlanRequest
@@ -289,25 +289,34 @@ class CleanPositions(smach.State):
     def __init__(self):
         smach.State.__init__(
             self,
-            outcomes=['succeeded', 'preempted'],
+            outcomes=['succeeded', 'preempted', 'aborted'],
             input_keys=['response', 'positions'],
             output_keys=['positions', 'plan'])
+        self.getCoordinates = rospy.ServiceProxy(
+            '/get_coordinates',
+            GetCoordinates,
+            persistent=True)
 
     def execute(self, ud):
         if self.preempt_requested():
             self.service_preempt()
+            self.getCoordinates.close()
             return 'preempted'
         ud.positions = []
-        for room in ud.response.rooms.rooms_vector:
-            for position in room.places_vector:
-                if 'default' in position.place_name:
-                    ud.positions.append(
-                        {'x': position.x,
-                         'y': position.y,
-                         'theta': position.theta,
-                         'distance': 'None',
-                         'room': room.room_name,
-                         'place_name': position.place_name})
+        for location in ud.response.object_locations.locations:
+            req = GetCoordinatesRequest(String(location.room), String(location.location))
+            try:
+                resp = self.getCoordinates(req)
+                ud.positions.append(
+                    {'x': resp.pose.x,
+                     'y': resp.pose.y,
+                     'theta': resp.pose.theta,
+                     'distance': 'None',
+                     'room': location.room,
+                     'place_name': location.location})
+            except rospy.ServiceException:
+                self.getCoordinates.close()
+                return 'aborted'
         ud.plan = None
         rospy.loginfo('CleanPositions: ' + str(len(ud.positions)))
         return 'succeeded'
@@ -467,7 +476,7 @@ def get_bring_object():
         smach.StateMachine.add(
             'GET_ALL_POSITIONS',
             ServiceState(
-                '/Hobbit/ObjectService/get_object_locations',
+                '/Hobbit/place_handler/get_object_locations',
                 GetObjectLocations,
                 request_key='object_name',
                 response_key='response'),
@@ -477,12 +486,14 @@ def get_bring_object():
         smach.StateMachine.add(
             'UNDOCK_IF_NEEDED',
             hobbit_move.undock_if_needed(),
-            transitions={'succeeded': 'BACK_IF_NEEDED'}
+            transitions={'succeeded': 'BACK_IF_NEEDED',
+                         'aborted': 'GET_ROBOT_POSE'}
         )
         smach.StateMachine.add(
             'BACK_IF_NEEDED',
             hobbit_move.back_if_needed(),
-            transitions={'succeeded': 'GET_ROBOT_POSE'}
+            transitions={'succeeded': 'GET_ROBOT_POSE',
+                         'aborted': 'GET_ROBOT_POSE'}
         )
         smach.StateMachine.add(
             'GET_ROBOT_POSE',
@@ -497,7 +508,8 @@ def get_bring_object():
         smach.StateMachine.add(
             'CLEAN_POSITIONS',
             CleanPositions(),
-            transitions={'succeeded': 'PLAN_PATH'}
+            transitions={'succeeded': 'PLAN_PATH',
+                         'aborted' : 'BACK_TO_USER_ABORT'}
         )
         smach.StateMachine.add(
             'PLAN_PATH',
