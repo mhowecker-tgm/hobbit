@@ -874,6 +874,8 @@ int main(int argc, char **argv)
                         saveNextTopFrame=1;
                         saveNextBottomFrame=1;
                       }
+                      appendClassifierData("../../../web_interface/bin/emergencies/triggers/triggerlist.txt");
+
                       broadcastEmergency(frameTimestamp);
                      }
                    if (personDetected)   { broadcastNewPerson(); }

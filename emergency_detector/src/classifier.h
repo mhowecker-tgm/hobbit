@@ -81,6 +81,7 @@ extern unsigned int headIsMoving;
 
 
 
+int appendClassifierData(const char * filename);
 
 
 

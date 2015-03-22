@@ -204,47 +204,6 @@ int weDetectAStandingPersonUsingTemperatureSensor(unsigned short * depthFrame  ,
 
 
 
-int appendClassifierData(const char * filename)
-{
-  FILE * fp = fopen(filename,"a");
-
-  if (fp!=0)
-  {
-
-    struct classifierData * what2print = &lastState;
-
-    unsigned int i=0;
-
-    for (i=0; i<3; i++)
-    {
-      if (i==0)  { fprintf(fp,"MINIMUMS\n"); what2print = &minimums;  } else
-      if (i==0)  { fprintf(fp,"TRIGGER\n");  what2print = &lastState; } else
-      if (i==0)  { fprintf(fp,"MAXIMUMS\n"); what2print = &maximums;  }
-
-      fprintf(fp,"holesOverTop %0.2f , holesTop %0.2f , holesBase %0.2f , holesOverBase %0.2f\n" ,
-                  what2print->holesPercentOverTop ,
-                  what2print->holesPercentTop ,
-                  what2print->holesPercentBase ,
-                  what2print->holesPercentOverBase   );
-
-
-
-      fprintf(fp,"scoreOverTop %u , scoreTop %u , scoreBase %u , scoreOverBase %u\n" ,
-                  what2print->scoreOverTop ,
-                  what2print->scoreTop ,
-                  what2print->scoreOverBase ,
-                  what2print->scoreBase   );
-
-
-      fprintf(fp,"temperature %0.2f\n" , what2print->objectTemperature);
-      fprintf(fp,"______________________________________________________\n\n\n");
-    }
-
-    fclose(fp);
-  }
-}
-
-
 
 
 int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int colorWidth , unsigned int colorHeight ,
@@ -404,7 +363,6 @@ int runServicesThatNeedColorAndDepth(unsigned char * colorFrame , unsigned int c
                {
                  fprintf(stderr,MAGENTA "\n\n  Already Fallen User Detected , EMERGENCY \n\n" NORMAL);
                  emergencyDetected=1;
-                 appendClassifierData("../../../web_interface/bin/emergencies/triggers/triggerlist.txt");
                }
             //}
           } else
