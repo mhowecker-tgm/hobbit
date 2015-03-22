@@ -60,8 +60,14 @@ int appendClassifierData(const char * filename)
     }
 
     fclose(fp);
+    return 1;
   }
+
+  fprintf(stderr,"Could not open file %s \n",filename);
+ return 0;
 }
+
+
 
 
 
