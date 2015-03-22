@@ -546,7 +546,7 @@ int updateHeadPosition()
        double rollChange=roll-headLastRoll; if (rollChange<0) { rollChange = -1 * rollChange; }
        headLastRoll=roll;
 
-       if ( (pitchChange>0.2) || (rollChange>0.2) )  { headIsMoving=12; }
+       if ( (pitchChange>0.2) || (rollChange>0.2) )  { headIsMoving=15; }
 
 
        if ( (headIsMoving>0) )
