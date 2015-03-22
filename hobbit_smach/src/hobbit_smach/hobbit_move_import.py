@@ -642,7 +642,7 @@ def goToPosition(frame='/map', room='None', place='dock'):
         )
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
                      head_move.MoveTo(pose='down_center'))
-        Sequence.add('WAIT', SleepState(duration=1))
+        #Sequence.add('WAIT', SleepState(duration=1))
         Sequence.add('ACTIVATE_OBSTACLES',
                      SetObstacles(active=True))
         Sequence.add('SET_NAV_GOAL', SetNavigationGoal(room, place))
@@ -739,7 +739,7 @@ def prepareMovement():
         #              service_disable.disable_gestures())
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
                      head_move.MoveTo(pose='down_center'))
-        Sequence.add('WAIT', SleepState(duration=1))
+        #Sequence.add('WAIT', SleepState(duration=1))
         Sequence.add(
             'PREPARE_MOVEMENT',
             ServiceState(
@@ -804,7 +804,7 @@ def goToPose():
         )
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
                      head_move.MoveTo(pose='down_center'))
-        Sequence.add('WAIT', SleepState(duration=1))
+        #Sequence.add('WAIT', SleepState(duration=1))
         Sequence.add('ACTIVATE_OBSTACLES',
                      SetObstacles(active=True))
         if not DEBUG:
@@ -895,12 +895,6 @@ def goToPoseSilent():
 
     with seq:
         Sequence.add(
-            'MMUI_SAY_IAmComing',
-            speech_output.sayText(info='T_CA_IAmComing'),
-            #transitions={'failed': 'aborted'}
-            transitions={'failed': 'HEAD_UP'}
-        )
-        Sequence.add(
             'UNDOCK_IF_NEEDED',
             undock_if_needed(),
             transitions={'aborted': 'BACK_IF_NEEDED'})
@@ -927,7 +921,7 @@ def goToPoseSilent():
         )
         Sequence.add('HEAD_DOWN_BEFORE_MOVEMENT',
                      head_move.MoveTo(pose='down_center'))
-        Sequence.add('WAIT', SleepState(duration=1))
+        #Sequence.add('WAIT', SleepState(duration=1))
         Sequence.add('ACTIVATE_OBSTACLES',
                      SetObstacles(active=True))
         if not DEBUG:
