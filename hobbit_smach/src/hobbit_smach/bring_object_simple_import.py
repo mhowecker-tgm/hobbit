@@ -69,11 +69,11 @@ class ObjectDetected(smach.State):
         try:
             for index, item in enumerate(ud.ids):
                 if ud.object_name.data in item.data:
-                    ud.object_pose = ud.transforms[index]
+                    #ud.object_pose = ud.transforms[index]
                     return 'succeeded'
         except:
             if ud.object_name.data in ud.ids.data:
-                ud.object_pose = ud.transforms
+                #ud.object_pose = ud.transforms
                 return 'succeeded'
         return 'aborted'
 
@@ -94,12 +94,13 @@ class GetOrigin(smach.State):
         smach.State.__init__(
             self,
             outcomes=['succeeded', 'preempted', 'aborted'],
+            input_keys=['x', 'y', 'yaw'],
             output_keys=['x', 'y', 'yaw'])
 
     def execute(self, ud):
         global bring_origin
-        x, y, yaw = bring_origin
-        rospy.loginfo('Set x,y,yaw to: '+str(x)+' ',+str(y)+' ',+str(yaw))
+        ud.x, ud.y, ud.yaw = bring_origin
+        rospy.loginfo('Set x, y, yaw to: '+str(ud.x)+' ,'+str(ud.y)+' ,'+str(ud.yaw))
         return 'succeeded'
 
 class GetDestination(smach.State):
@@ -107,12 +108,13 @@ class GetDestination(smach.State):
         smach.State.__init__(
             self,
             outcomes=['succeeded', 'preempted', 'aborted'],
+            input_keys=['x', 'y', 'yaw'],
             output_keys=['x', 'y', 'yaw'])
 
     def execute(self, ud):
         global bring_destination
-        x, y, yaw = bring_destination
-        rospy.loginfo('Set x,y,yaw to: '+str(x)+' ',+str(y)+' ',+str(yaw))
+        ud.x, ud.y, ud.yaw = bring_destination
+        rospy.loginfo('Set x, y, yaw to: '+str(ud.x)+' ,'+str(ud.y)+' ,'+str(ud.yaw))
         return 'succeeded'
 
 class StoreDestination(smach.State):
@@ -127,8 +129,8 @@ class StoreDestination(smach.State):
         rospy.loginfo("DESTINATION set to: "+str(bring_destination))
         return 'succeeded'
 
-#def point_cloud_cb(msg, ud):
-def point_cloud_cb(ud, msg):
+def point_cloud_cb(msg, ud):
+#def point_cloud_cb(ud, msg):
     print('point cloud received')
     ud.cloud = msg
     return True
@@ -140,24 +142,35 @@ def detect_object():
         output_keys=['object_pose', 'object_room', 'object_location']
     )
     counter_it = smach.Iterator(outcomes = ['succeeded', 'preempted', 'aborted'],
-                              input_keys = [],
+                              input_keys = ['object_name'],
                               output_keys = [],
                               it = lambda: range(0, 3),
                               it_label = 'index',
-                              exhausted_outcome = 'succeeded')
+                              exhausted_outcome = 'aborted')
 
-    container_sm = smach.StateMachine(outcomes = ['succeeded','aborted','preempted'])
+    container_sm = smach.StateMachine(
+        outcomes = ['succeeded','aborted','preempted', 'continue'],
+        input_keys=['object_name'])
     with container_sm:
         smach.StateMachine.add(
+            'SAY_SOME',
+            #FIXME: hardcoded text
+            speech_output.sayText(info='Start looking'),
+            transitions={'succeeded': 'GET_POINT_CLOUD',
+                         'preempted': 'preempted',
+                         'failed': 'continue'}
+        )
+        smach.StateMachine.add(
             'GET_POINT_CLOUD',
-            MonitorState(
+            util.WaitForMsgState(
                 '/headcam/depth_registered/points',
                 PointCloud2,
-                cond_cb=point_cloud_cb,
-                output_keys=['cloud']
+                point_cloud_cb,
+                output_keys=['cloud'],
+                timeout=2
             ),
-            transitions={'invalid': 'aborted',
-                         'valid': 'START_OBJECT_RECOGNITION',
+            transitions={'succeeded': 'START_OBJECT_RECOGNITION',
+                         'aborted': 'continue',
                          'preempted': 'preempted'}
         )
         smach.StateMachine.add(
@@ -167,16 +180,21 @@ def detect_object():
                 recognize,
                 request_slots=['cloud'],
                 response_slots=['ids', 'transforms']),
-            transitions={'succeeded': 'succeeded',
+            transitions={'succeeded': 'OBJECT_DETECTED',
                          'preempted': 'preempted',
-                         'aborted': 'aborted'})
-
+                         'aborted': 'continue'})
+        smach.StateMachine.add(
+            'OBJECT_DETECTED',
+            ObjectDetected(),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'continue',
+                         'preempted': 'preempted'})
 
     with counter_it:
         smach.Iterator.set_contained_state(
             'CONTAINER_STATE',
             container_sm,
-            loop_outcomes = ['succeeded']
+            loop_outcomes = ['continue']
         )
 
     with sm:
@@ -189,16 +207,9 @@ def detect_object():
         smach.StateMachine.add(
             'OBJECT_RECOGNITION_ITERATOR',
             counter_it,
-            transitions={'succeeded': 'OBJECT_DETECTED',
+            transitions={'succeeded': 'STORE_DESTINATION',
                          'preempted': 'preempted',
                          'aborted': 'aborted'})
-
-        smach.StateMachine.add(
-            'OBJECT_DETECTED',
-            ObjectDetected(),
-            transitions={'succeeded': 'STORE_DESTINATION',
-                         'aborted': 'MOVE_HEAD',
-                         'preempted': 'preempted'})
         smach.StateMachine.add(
             'STORE_DESTINATION',
             StoreDestination(),
@@ -562,7 +573,7 @@ def get_bring_object():
             back_to_user(),
             transitions={'succeeded': 'SAY_BRING_YOU_TO_OBJECT',
                          'preempted': 'LOG_PREEMPT',
-                         'aborted': 'LOG_ABORTED'}
+                         'aborted': 'SAY_BRING_YOU_TO_OBJECT'}
         )
         smach.StateMachine.add(
             'SAY_BRING_YOU_TO_OBJECT',
@@ -601,11 +612,12 @@ def get_bring_object():
             back_to_user(),
             transitions={'succeeded': 'SAY_NOT_DETECTED',
                          'preempted': 'LOG_PREEMPT',
-                         'aborted': 'LOG_ABORTED'}
+                         'aborted': 'SAY_NOT_DETECTED'}
         )
         smach.StateMachine.add(
             'SAY_NOT_DETECTED',
-            speech_output.sayText(info='T_BM_SORRY_NOT_ABLE_TO_FIND_OBJECT_O'),
+            speech_output.say_object_not_found(),
+            #speech_output.sayText(info='T_BM_SORRY_NOT_ABLE_TO_FIND_OBJECT_O'),
             transitions={'succeeded': 'LOG_ABORTED',
                          'preempted': 'LOG_PREEMPT',
                          'failed': 'LOG_ABORTED'}

@@ -87,7 +87,54 @@ def say_text_found_object():
                          'succeeded': 'succeeded'})
     return seq
 
+def say_object_not_found():
+    """
+    Return a SMACH Sequence that tells the user that thw object was not found 
+    """
 
+    seq = Sequence(
+        outcomes=['succeeded', 'preempted', 'failed'],
+        connector_outcome='succeeded',
+        input_keys=['object_name']
+    )
+
+    with seq:
+        Sequence.add(
+            'TALK',
+            ShowInfoObjectNotFound()
+        )
+        Sequence.add(
+            'WAIT_FOR_MMUI',
+            HobbitMMUI.WaitforSoundEnd('/Event', Event),
+            transitions={'aborted': 'WAIT_FOR_MMUI',
+                         'succeeded': 'succeeded'})
+    return seq
+
+class ShowInfoObjectNotFound(State):
+
+    """
+    Class to interact with the MMUI
+    """
+
+    def __init__(self):
+        State.__init__(
+            self,
+            input_keys=['object_name'],
+            outcomes=['succeeded', 'failed', 'preempted']
+        )
+        self.info = 'T_BM_SORRY_NOT_ABLE_TO_FIND_OBJECT_O'
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        rospy.loginfo('say object not found: '+str(ud.object_name))
+        mmui = MMUI.MMUIInterface()
+        mmui.showMMUI_Info(
+            text=self.info,
+            prm=ud.object_name,
+        )
+        return 'succeeded'
 class ShowInfoFoundObject(State):
 
     """

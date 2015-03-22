@@ -11,6 +11,7 @@ from smach import StateMachine
 from smach_ros import IntrospectionServer, ActionServerWrapper
 
 from hobbit_msgs.msg import GeneralHobbitAction
+from hobbit_user_interaction import HobbitMMUI
 import hobbit_smach.bring_object_simple_import as bring_object
 import hobbit_smach.logging_import as log
 
@@ -26,19 +27,40 @@ def main():
         StateMachine.add(
             'BRING_OBJECT',
             bring_object.get_bring_object(),
-            transitions={'succeeded': 'LOG_SUCCESS',
-                         'aborted': 'LOG_ABORTED',
-                         'preempted': 'LOG_PREEMPT'}
+            transitions={'succeeded': 'SHOW_MAIN_SUCCESS',
+                         'aborted': 'SHOW_MAIN_ABORT',
+                         'preempted': 'SHOW_MAIN_PREEMPT'}
+        )
+        StateMachine.add_auto(
+            'SHOW_MAIN_SUCCESS',
+            HobbitMMUI.ShowMenu(
+                menu='MAIN'
+            ),
+            connector_outcomes=['succeeded', 'failed', 'preempted']
         )
         StateMachine.add(
             'LOG_SUCCESS',
             log.DoLogSuccess(scenario='Bring object'),
             transitions={'succeeded': 'succeeded'}
         )
+        StateMachine.add_auto(
+            'SHOW_MAIN_PREEMPT',
+            HobbitMMUI.ShowMenu(
+                menu='MAIN'
+            ),
+            connector_outcomes=['succeeded', 'failed', 'preempted']
+        )
         StateMachine.add(
             'LOG_PREEMPT',
             log.DoLogPreempt(scenario='Bring object'),
             transitions={'succeeded': 'preempted'}
+        )
+        StateMachine.add_auto(
+            'SHOW_MAIN_ABORT',
+            HobbitMMUI.ShowMenu(
+                menu='MAIN'
+            ),
+            connector_outcomes=['succeeded', 'failed', 'preempted']
         )
         StateMachine.add(
             'LOG_ABORTED',
