@@ -390,7 +390,7 @@ def come_closer_from_everywhere():
             msg_timer_sm(),
             transitions={'succeeded': 'CLOSER',
                          'preempted': 'preempted',
-                         'aborted': 'SAY_NOT_DETECTED'}
+                         'aborted': 'aborted'}
         )
         StateMachine.add(
             'CLOSER',
@@ -415,14 +415,6 @@ def come_closer_from_everywhere():
             ),
             transitions={'succeeded': 'GESTURE_HANDLING',
                          'preempted': 'preempted',}
-        )
-        StateMachine.add(
-            'SAY_NOT_DETECTED',
-            speech_output.sayText(
-                info="T_NO_USER"),
-            transitions={'succeeded': 'aborted',
-                         'preempted': 'preempted',
-                         'failed': 'aborted'}
         )
         StateMachine.add(
             'GESTURE_HANDLING',
