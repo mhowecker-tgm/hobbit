@@ -757,6 +757,11 @@ void execute(char * command,char * param)
     if (strcmp(param,"nitePausePoint")==0)   {  rosservice_call(cR,cRLen,(char *) "/rgbd_acquisition/pause_pointing_gesture_messages");    } else
     if (strcmp(param,"niteResumePoint")==0)  {  rosservice_call(cR,cRLen,(char *) "/rgbd_acquisition/resume_pointing_gesture_messages");   } else
 
+
+    if (strcmp(param,"activateRecovery")==0)      {  rosservice_call(cR,cRLen,(char *) "/activate_recovery");   } else
+    if (strcmp(param,"deactivateRecovery")==0)    {  rosservice_call(cR,cRLen,(char *) "/deactivate_recovery");   } else
+
+
     if (strcmp(param,"vsPause")==0)                {  rosservice_call(cR,cRLen,(char *) "/vision_system/pauseEverything");   } else
     if (strcmp(param,"vsResume")==0)               {  rosservice_call(cR,cRLen,(char *) "/vision_system/resumeEverything");   } else
     if (strcmp(param,"vsFollowUser")==0)           {  rosservice_call(cR,cRLen,(char *) "/vision_system/followUser");   } else
