@@ -111,7 +111,8 @@ bool first=false;
 int key = 0;
 unsigned int frameTimestamp=emergencyDetectionCooldown+1; //not 0 so we can immediately trigger
 ros::NodeHandle * nhPtr=0;
-unsigned int paused=0;
+unsigned int muted=0;  //Start unmuted
+unsigned int paused=0; //Start resumed
 unsigned int dontPublishPersons=0;
 unsigned int printTFPosition=0;
 unsigned int useTFTree=1;
@@ -120,6 +121,7 @@ unsigned int fakeTemperatureActivated=0;
 void broadcastNewPerson()
 {
   if (dontPublishPersons) { return ; }
+  if (muted) { ROS_INFO("MUTED : Will not broadcast Person Detection"); return; }
   personDetected=0;
 
   emergency_detector::Person msg;
@@ -145,6 +147,7 @@ void broadcastNewPerson()
 void broadcastEmergency(unsigned int frameNumber)
 {
   if ( !emergencyDetected)  { return ; }
+  if (muted) { ROS_INFO("MUTED : Will not broadcast Emergency Detection"); return; }
 
 
   if ( frameNumber <= lastEmergencyDetectionTimestamp  + emergencyDetectionCooldown )
@@ -215,6 +218,21 @@ bool trigger(std_srvs::Empty::Request& request, std_srvs::Empty::Response& respo
     emergencyDetected=1;
     return true;
 }
+
+
+bool mute(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    muted=1;
+    return true;
+}
+
+
+bool unmute(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    muted=0;
+    return true;
+}
+
 
 bool pause(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
@@ -788,6 +806,11 @@ int main(int argc, char **argv)
 
      ros::ServiceServer clearRecordedService    = nh.advertiseService(name+"/clearRecorded", clearRecorded);
      ros::ServiceServer saveGestureRecognitionService    = nh.advertiseService(name+"/save", save);
+
+
+     ros::ServiceServer muteRecognitionService    = nh.advertiseService(name+"/mute", mute);
+     ros::ServiceServer unmuteRecognitionService   = nh.advertiseService(name+"/unmute", unmute);
+
      ros::ServiceServer pauseGestureRecognitionService    = nh.advertiseService(name+"/pause", pause);
      ros::ServiceServer resumeGestureRecognitionService   = nh.advertiseService(name+"/resume", resume);
      ros::ServiceServer stopGestureRecognitionService     = nh.advertiseService(name+"/terminate", terminate);

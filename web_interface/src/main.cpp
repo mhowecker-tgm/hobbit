@@ -785,6 +785,8 @@ void execute(char * command,char * param)
     if (strcmp(param,"emergencyTrigger")==0) {  rosservice_call(cR,cRLen,(char *) "/emergency_detector/trigger");    } else
     if (strcmp(param,"emergencyPause")==0)   {  rosservice_call(cR,cRLen,(char *) "/emergency_detector/pause");      } else
     if (strcmp(param,"emergencyResume")==0)  {  rosservice_call(cR,cRLen,(char *) "/emergency_detector/resume");     } else
+    if (strcmp(param,"emergencyMute")==0)    {  rosservice_call(cR,cRLen,(char *) "/emergency_detector/mute");       } else
+    if (strcmp(param,"emergencyUnmute")==0)  {  rosservice_call(cR,cRLen,(char *) "/emergency_detector/unmute");     } else
     if (strcmp(param,"emergencyClearRecording")==0)  {  rosservice_call(cR,cRLen,(char *) "/emergency_detector/clearRecorded");     } else
 
 
