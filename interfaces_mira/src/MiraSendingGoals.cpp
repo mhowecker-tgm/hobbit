@@ -219,7 +219,7 @@ void MiraSendingGoals::goal_pose_callback(const hobbit_msgs::Pose2DStamped::Cons
 	TaskPtr task(new Task());
 	task->addSubTask(SubTaskPtr(new PreferredDirectionTask(mira::navigation::PreferredDirectionTask::FORWARD, 1.0f)));
         task->addSubTask(SubTaskPtr(new mira::navigation::PositionTask(mira::Point2f(goal_pose->x, goal_pose->y), 0.1f, 0.1f)));
-	task->addSubTask(mira::navigation::SubTaskPtr(new mira::navigation::OrientationTask(goal_pose->theta, mira::deg2rad(10.0f))));
+	task->addSubTask(mira::navigation::SubTaskPtr(new mira::navigation::OrientationTask(goal_pose->theta, mira::deg2rad(5.0f))));
 
 	std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
 	robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
@@ -287,7 +287,7 @@ bool MiraSendingGoals::sendMiraGoal(hobbit_msgs::SendPose::Request  &req, hobbit
      std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
 
      mira::Pose2 new_goal_target(goal.pose.position.x, goal.pose.position.y, tf::getYaw(goal.pose.orientation));
-	  robot_->getMiraAuthority().callService<void>(navService, "setGoal", new_goal_target, 0.1f, mira::deg2rad(10.0f));
+	  robot_->getMiraAuthority().callService<void>(navService, "setGoal", new_goal_target, 0.1f, mira::deg2rad(5.0f));
 	  last_goal = goal;
 	
 }
@@ -365,7 +365,7 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
      TaskPtr goal_task(new Task());
      goal_task->addSubTask(SubTaskPtr(new PreferredDirectionTask(mira::navigation::PreferredDirectionTask::FORWARD, 1.0f)));
      goal_task->addSubTask(SubTaskPtr(new mira::navigation::PositionTask(mira::Point2f(goal.pose.position.x, goal.pose.position.y), 0.1f, 0.1f)));
-     goal_task->addSubTask(mira::navigation::SubTaskPtr(new mira::navigation::OrientationTask(tf::getYaw(goal.pose.orientation), mira::deg2rad(10.0f))));
+     goal_task->addSubTask(mira::navigation::SubTaskPtr(new mira::navigation::OrientationTask(tf::getYaw(goal.pose.orientation), mira::deg2rad(5.0f))));
 
      std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
      robot_->getMiraAuthority().callService<void>(navService, "setTask", goal_task);
@@ -403,12 +403,12 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
           TaskPtr new_goal_task(new Task());
 	  new_goal_task->addSubTask(SubTaskPtr(new PreferredDirectionTask(mira::navigation::PreferredDirectionTask::FORWARD, 1.0f)));
           new_goal_task->addSubTask(SubTaskPtr(new mira::navigation::PositionTask(mira::Point2f(goal.pose.position.x, goal.pose.position.y), 0.1f, 0.1f)));
-	  new_goal_task->addSubTask(mira::navigation::SubTaskPtr(new mira::navigation::OrientationTask(tf::getYaw(goal.pose.orientation), mira::deg2rad(10.0f))));
+	  new_goal_task->addSubTask(mira::navigation::SubTaskPtr(new mira::navigation::OrientationTask(tf::getYaw(goal.pose.orientation), mira::deg2rad(5.0f))));
 
 	  std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
 	  //robot_->getMiraAuthority().callService<void>(navService, "setTask", new_goal_task);
 	  mira::Pose2 new_goal_target(goal.pose.position.x, goal.pose.position.y, tf::getYaw(goal.pose.orientation));
-	  robot_->getMiraAuthority().callService<void>(navService, "setGoal", new_goal_target, 0.1f, mira::deg2rad(10.0f));
+	  robot_->getMiraAuthority().callService<void>(navService, "setGoal", new_goal_target, 0.1f, mira::deg2rad(5.0f));
 	  last_goal = goal;
 
 	  std::cout << "The new goal task has been set " << std::endl;
