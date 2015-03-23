@@ -361,7 +361,8 @@ def main():
             'POINTING_NOT_DETECTED_2',
             pickup.sayPointingGestureNotDetected2(),
             transitions={'succeeded': 'aborted',
-                         'failed': 'aborted'}
+                         'failed': 'aborted',
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'START_LOOKING',

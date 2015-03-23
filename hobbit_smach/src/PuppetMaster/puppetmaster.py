@@ -752,7 +752,7 @@ def main():
             ),
             transitions={'succeeded': 'MAIN_MENU',
                          'preempted': 'preempted',
-                         'aborted': 'RESET_ACTIVE_TASK'}
+                         'aborted': 'MAIN_MENU'}
         )
         StateMachine.add(
             'CALL',

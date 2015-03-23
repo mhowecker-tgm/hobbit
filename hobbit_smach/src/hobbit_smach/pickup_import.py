@@ -746,7 +746,9 @@ class DavidLookingPose(State):
         posRobot = [robot_x, robot_y] #Bajo, please fill in
         gpOnFloor = self.calcIntersectionPointingDirWithFloor(pspWCS, pvecWCS)
         if gpOnFloor == None:
-		return 'preempted'
+            #FIXME: David look into this one
+            rospy.loginfo('preempt is wrong. do failed')
+	    return 'failed'
 
 
 
