@@ -560,8 +560,8 @@ def main():
         )
         #df new 5.2.2015
         StateMachine.add(
-            'MOVE_ARM_TO_HOME_POSITION',  #VIA TRAY POSITION because maybe the checkgrasp result was wrong!
-            arm_move.goToTrayPosition(),
+            'MOVE_ARM_TO_HOME_POSITION',  # df change 23.3.2015: move arm directly to home position!!!!!!!!! ignore everything i wrote  in the comments!!!!!!!!!!! (after now) VIA TRAY POSITION because maybe the checkgrasp result was wrong!
+            arm_move.goToHomePosition(), #goToTrayPosition(),
             transitions={'succeeded': 'GET_POINT_CLOUD_FOR_GRASP',  #=> try to grasp again without changing position (assume: head is still lookingt to object"
                          'preempted': 'LOG_PREEMPT',
                          'failed': 'MOVE_ARM_TO_HOME_POSITION'}    # better failure handling appreciated
