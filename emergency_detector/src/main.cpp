@@ -121,7 +121,7 @@ unsigned int fakeTemperatureActivated=0;
 void broadcastNewPerson()
 {
   if (dontPublishPersons) { return ; }
-  if (muted) { ROS_INFO("MUTED : Will not broadcast Person Detection"); return; }
+  if (muted) { ROS_INFO("MUTED : Will not broadcast Person Detection"); personDetected=0; return; }
   personDetected=0;
 
   emergency_detector::Person msg;
@@ -147,7 +147,7 @@ void broadcastNewPerson()
 void broadcastEmergency(unsigned int frameNumber)
 {
   if ( !emergencyDetected)  { return ; }
-  if (muted) { ROS_INFO("MUTED : Will not broadcast Emergency Detection"); return; }
+  if (muted) { ROS_INFO("MUTED : Will not broadcast Emergency Detection"); emergencyDetected=0; return; }
 
 
   if ( frameNumber <= lastEmergencyDetectionTimestamp  + emergencyDetectionCooldown )
