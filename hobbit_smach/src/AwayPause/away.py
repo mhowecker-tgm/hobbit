@@ -301,7 +301,7 @@ def main():
         StateMachine.add(
             'CONFIRM_BRING_KEYS',
             HobbitMMUI.ConfirmInfo(info='T_BR_BringYourKeys'),
-            transitions={'succeeded': 'SEQ1',
+            transitions={'succeeded': 'SEQ2',
                          'failed': 'SET_FAILURE'}
         )
         StateMachine.add(
