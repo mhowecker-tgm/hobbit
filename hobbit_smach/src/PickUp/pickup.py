@@ -310,12 +310,15 @@ def main():
                 response_cb=switch_vision_cb
 
             ),
-            connector_outcomes=['succeeded', 'preempted', 'aborted']
+            connector_outcomes=['succeeded', 'aborted'],
+            transitions={'preempted': 'LOG_PREEMPT'}
+
         )
         smach.StateMachine.add_auto(
             'SAY_LOOK',
             speech_output.sayText(info='T_POINT_TO_OBJECT'),
-            connector_outcomes=['succeeded', 'preempted', 'failed']
+            connector_outcomes=['succeeded', 'failed'],
+            transitions={'preempted': 'LOG_PREEMPT'}
         )
         smach.StateMachine.add(
              'GET_POINTING_DIRECTION',
