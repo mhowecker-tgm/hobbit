@@ -394,8 +394,8 @@ def come_closer_from_everywhere():
         StateMachine.add(
             'USER_NAV',
             ServiceState(
-                '/obs_nav_mode',
-                ObsNavMode
+                '/user_nav_mode',
+                UserNavMode
             ),
             transitions={'succeeded': 'SWITCH_VISION',
                          'aborted': 'aborted',
