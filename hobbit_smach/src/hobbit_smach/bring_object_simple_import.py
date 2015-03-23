@@ -578,7 +578,6 @@ def get_bring_object():
         )
         smach.StateMachine.add(
             'SAY_FOUND_OBJECT',
-            #FIXME: hardcoded text
             speech_output.say_text_found_object(),
             transitions={'succeeded': 'SAY_BRING_YOU_TO_OBJECT',
                          'failed': 'LOG_ABORTED',
@@ -586,8 +585,7 @@ def get_bring_object():
         )
         smach.StateMachine.add(
             'SAY_BRING_YOU_TO_OBJECT',
-            #FIXME: hardcoded text
-            HobbitMMUI.AskYesNo(question='If you want I will guide you to the object.'),
+            HobbitMMUI.AskYesNo(question='T_BM_GUIDE_USER_TO_OBJECT'),
             transitions={'yes': 'SAY_FOLLOW_ME',
                          'no': 'LOG_SUCCESS',
                          'failed': 'LOG_ABORTED',
@@ -596,8 +594,7 @@ def get_bring_object():
         )
         smach.StateMachine.add(
             'SAY_FOLLOW_ME',
-            #FIXME: hardcoded text
-            speech_output.sayText(info='Follow me to the object.'),
+            speech_output.sayText(info='T_BM_FOLLOW_TO_OBJECT'),
             transitions={'succeeded': 'BACK_TO_OBJECT',
                          'preempted': 'LOG_PREEMPT',
                          'failed': 'LOG_ABORTED'}
@@ -611,8 +608,7 @@ def get_bring_object():
         )
         smach.StateMachine.add(
             'SAY_DETECTED_HERE',
-            #FIXME: hardcoded text
-            speech_output.sayText(info='I found the object here.'),
+            speech_output.sayText(info='T_BM_FOUND_OBJECT_HERE'),
             transitions={'succeeded': 'LOG_SUCCESS',
                          'preempted': 'LOG_PREEMPT',
                          'failed': 'LOG_ABORTED'}
