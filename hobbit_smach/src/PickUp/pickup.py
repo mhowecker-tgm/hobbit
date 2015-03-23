@@ -566,7 +566,7 @@ def main():
                          'preempted': 'LOG_PREEMPT',
                          'failed': 'MOVE_ARM_TO_HOME_POSITION'}    # better failure handling appreciated
         )
-        #df new 17.3.2015
+        #df new 17.3.2015a
         StateMachine.add(
             'MOVE_TO_BETTER_POSE_TO_REVIEW_OBJECT',        
             pickup.MoveRobotBackForBetterObjectView(),
@@ -594,8 +594,29 @@ def main():
             'MOVE_BLIND_BACK_COUNTER',
             MoveBackBlindCounter(),
             transitions={'first': 'MOVE_TO_BETTER_POSE_TO_REVIEW_OBJECT',
-                         'second': 'LOG_PREEMPT'}
+                         'second': 'EMO_SAY_PICKUP_FAILED'}
         )        
+        #df 23.3.2015
+        StateMachine.add(
+            'EMO_SAY_PICKUP_FAILED',
+            pickup.sayDidNotPickupObject2(),
+            transitions={'succeeded': 'SET_HEAD_CENTER_PICKUP_FAILED',
+                         'failed': 'EMO_SAY_PICKUP_FAILED'}
+        )
+        #df 23.3.2015
+        StateMachine.add(
+            'SET_HEAD_CENTER_PICKUP_FAILED',
+            head_move.MoveTo(pose='center_center'),
+            transitions={'succeeded': 'LOG_PREEMPT',
+                         'preempted': 'LOG_PREEMPT'}
+        )        
+        #df 23.3.2015
+        StateMachine.add(
+            'SET_HEAD_CENTER_PICKUP_SUCCEEDED',
+            head_move.MoveTo(pose='center_center'),
+            transitions={'succeeded': 'succeeded',
+                         'preempted': 'LOG_PREEMPT'}
+        )    
         StateMachine.add(
             'END_PICKUP_SEQ',
             pickup.getEndPickupSeq(),
@@ -641,7 +662,7 @@ def main():
         StateMachine.add(
             'LOG_SUCCESS',
             log.DoLogSuccess(scenario='Pickup'),
-            transitions={'succeeded': 'succeeded'}
+            transitions={'succeeded': 'SET_HEAD_CENTER_PICKUP_SUCCEEDED'}
         )
         StateMachine.add(
             'LOG_PREEMPT',
