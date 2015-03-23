@@ -155,14 +155,12 @@ class ShowInfoFoundObject(State):
             return 'preempted'
         print('ShowInfoFoundObject')
         print(ud.object_name)
-        print(ud.object_room)
-        print(ud.object_location)
+        #print(ud.object_room)
         mmui = MMUI.MMUIInterface()
         mmui.showMMUI_Info(
             text=self.info,
-            prm=ud.object_name,
-            prm2=ud.object_room,
-            prm3=ud.object_location
+            prm=ud.object_name
+            #prm2=ud.object_room,
         )
         return 'succeeded'
 
