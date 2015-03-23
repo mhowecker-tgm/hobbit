@@ -1632,12 +1632,14 @@ def getStartLooking():
         )
         Sequence.add(
             'CALCULATE_LOOKING_POSE',
-            DavidLookingPose()
+            DavidLookingPose(),
+            transitions={'preempted': 'preempted'}
         )
         Sequence.add(
             'MOVE_TO_POSE',
             hobbit_move.goToPoseSilent(),
-            transitions={'aborted': 'failed'},
+            transitions={'aborted': 'failed',
+                         'preempted': 'preempted'},
             remapping={'x':'goal_position_x',
                        'y':'goal_position_y',
                        'yaw':'goal_position_yaw'}

@@ -120,10 +120,12 @@ class PointingCounter(smach.State):
     Just a counter in a SMACH State.
     """
     def __init__(self):
-        smach.State.__init__(self, outcomes=['first', 'second'])
+        smach.State.__init__(self, outcomes=['first', 'second', 'preempted'])
         self._counter = 0
 
     def execute(self, ud):
+        if self.preempt_requested():
+            return 'preempted'
         self._counter += 1
         print('self._counter: %d' % self._counter)
         if self._counter > 1:
@@ -138,10 +140,12 @@ class GraspCounter(smach.State):
     Just a counter in a SMACH State.
     """
     def __init__(self):
-        smach.State.__init__(self, outcomes=['first', 'second'])
+        smach.State.__init__(self, outcomes=['first', 'second', 'preempted'])
         self._counter = 0
 
     def execute(self, ud):
+        if self.preempt_requested():
+            return 'preempted'
         self._counter += 1
         print('self._counter: %d' % self._counter)
         if self._counter > 1:
@@ -156,10 +160,12 @@ class MoveCounter(smach.State):
     Just a counter in a SMACH State.
     """
     def __init__(self):
-        smach.State.__init__(self, outcomes=['first', 'second'])
+        smach.State.__init__(self, outcomes=['first', 'second', 'preempted'])
         self._counter = 0
 
     def execute(self, ud):
+        if self.preempt_requested():
+            return 'preempted'
         self._counter += 1
         print('self._counter: %d' % self._counter)
         if self._counter > 1:
@@ -178,6 +184,8 @@ class MoveBackBlindCounter(smach.State):
         self._counter = 0
 
     def execute(self, ud):
+        if self.preempt_requested():
+            return 'preempted'
         self._counter += 1
         print('self._counter: %d' % self._counter)
         if self._counter > 1:
@@ -192,7 +200,7 @@ class Init(smach.State):
     def __init__(self):
         smach.State.__init__(
             self,
-            outcomes=['succeeded', 'canceled'],
+            outcomes=['succeeded', 'canceled', 'preempted'],
             output_keys=['social_role'])
 
     def execute(self, ud):
@@ -299,7 +307,8 @@ def main():
             'INIT',
             Init(),
             transitions={'succeeded': 'SWITCH_VISION',
-                         'canceled': 'CLEAN_UP'}
+                         'canceled': 'CLEAN_UP',
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add_auto(
             'SWITCH_VISION',
@@ -337,7 +346,8 @@ def main():
             'POINTING_COUNTER',
             PointingCounter(),
             transitions={'first': 'POINTING_NOT_DETECTED_1',
-                         'second': 'POINTING_NOT_DETECTED_2'}
+                         'second': 'POINTING_NOT_DETECTED_2',
+                         'preempted': 'preempted'}
         )
         StateMachine.add(
             'POINTING_NOT_DETECTED_1',
@@ -357,7 +367,8 @@ def main():
             'START_LOOKING',
             pickup.getStartLooking(),
             transitions={'succeeded': 'HEAD_TO_SEARCH',
-                         'failed': 'EMO_SAY_OBJECT_NOT_DETECTED'}
+                         'failed': 'EMO_SAY_OBJECT_NOT_DETECTED',
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'HEAD_TO_SEARCH',
@@ -408,7 +419,8 @@ def main():
             #transitions={'succeeded': 'MOVE_TO_GRASP_POSE',
             #                         'failed': 'MOVE_TO_GRASP_POSE'}
             transitions={'succeeded': 'MOVE_TO_GRASP_POSE_REL_MOVEMENT_BLIND',
-                         'failed': 'MOVE_TO_GRASP_POSE_REL_MOVEMENT_BLIND'}
+                         'failed': 'MOVE_TO_GRASP_POSE_REL_MOVEMENT_BLIND',
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'MOVE_TO_GRASP_POSE',
@@ -446,7 +458,8 @@ def main():
             'MOVE_COUNTER',
             MoveCounter(),
             transitions={'first': 'EMO_SAY_UNABLE_TO_GRASP',
-                         'second': 'EMO_SAY_TRY_TO_REMOVE_OBJECT'}
+                         'second': 'EMO_SAY_TRY_TO_REMOVE_OBJECT',
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'EMO_SAY_UNABLE_TO_GRASP',
@@ -510,7 +523,8 @@ def main():
             'SAY_CHECK_GRASP',
             speech_output.sayText(info='T_PU_CheckingGrasp'),
             transitions={'succeeded': 'MOVE_ARM_TO_CHECK_GRASP_POSITION',
-                         'failed': 'EMO_SAY_DID_NOT_PICKUP'}
+                         'failed': 'EMO_SAY_DID_NOT_PICKUP',
+                         'preempted': 'LOG_PREEMPT'}
         )
         
         
@@ -547,19 +561,22 @@ def main():
             'CHECK_GRASP',
             pickup.DavidCheckGrasp(),
             transitions={'succeeded': 'END_PICKUP_SEQ',
-                         'aborted': 'COUNTER_GRASP_CHECK'}  #aborted <=> check result: no object grasped
+                         'aborted': 'COUNTER_GRASP_CHECK',
+                         'preempted': 'LOG_PREEMPT'}  #aborted <=> check result: no object grasped
         )
         StateMachine.add(
             'COUNTER_GRASP_CHECK',
             GraspCounter(),
             transitions={'first': 'EMO_SAY_DID_NOT_PICKUP',
-                         'second': 'EMO_SAY_DID_NOT_PICKUP_2'}
+                         'second': 'EMO_SAY_DID_NOT_PICKUP_2',
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'EMO_SAY_DID_NOT_PICKUP',
             pickup.sayDidNotPickupObject1(),
             transitions={'succeeded': 'MOVE_ARM_TO_HOME_POSITION',
-                         'failed': 'aborted'}
+                         'failed': 'aborted',
+                         'preempted': 'LOG_PREEMPT'}
         )
         #df new 5.2.2015
         StateMachine.add(
@@ -582,7 +599,8 @@ def main():
             'EMO_SAY_DID_NOT_PICKUP_2',
             pickup.sayDidNotPickupObjectTwoTimes(),
             transitions={'succeeded': 'MOVE_ARM_TO_HOME_POSITION_AFTER_FAILED',
-                         'failed': 'EMO_SAY_DID_NOT_PICKUP_2'}
+                         'failed': 'EMO_SAY_DID_NOT_PICKUP_2',
+                         'preempted': 'LOG_PREEMPT'}
         )
         #df new 25.2.2015
         StateMachine.add(
@@ -597,14 +615,16 @@ def main():
             'MOVE_BLIND_BACK_COUNTER',
             MoveBackBlindCounter(),
             transitions={'first': 'MOVE_TO_BETTER_POSE_TO_REVIEW_OBJECT',
-                         'second': 'EMO_SAY_PICKUP_FAILED'}
+                         'second': 'EMO_SAY_PICKUP_FAILED',
+                         'preempted': 'LOG_PREEMPT'}
         )        
         #df 23.3.2015
         StateMachine.add(
             'EMO_SAY_PICKUP_FAILED',
             pickup.sayDidNotPickupObject2(),
             transitions={'succeeded': 'SET_HEAD_CENTER_PICKUP_FAILED',
-                         'failed': 'EMO_SAY_PICKUP_FAILED'}
+                         'failed': 'EMO_SAY_PICKUP_FAILED',
+                         'preempted': 'LOG_PREEMPT'}
         )
         #df 23.3.2015
         StateMachine.add(
