@@ -580,7 +580,7 @@ def main():
         #df enf 17.3.2015
         StateMachine.add(
             'EMO_SAY_DID_NOT_PICKUP_2',
-            pickup.sayDidNotPickupObject2(),
+            pickup.sayDidNotPickupObjectTwoTimes(),
             transitions={'succeeded': 'MOVE_ARM_TO_HOME_POSITION_AFTER_FAILED',
                          'failed': 'EMO_SAY_DID_NOT_PICKUP_2'}
         )
