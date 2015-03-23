@@ -660,7 +660,11 @@ int shutdownRaspberryPi()
 
 int shutdownArm()
 {
-     int i=system("python /opt/ros/hobbit_hydro/src/hobbit_smach/src/hobbit_smach/ArmActionClientShutDownPLC.py&");
+    int i=system("rosnode kill /sos_monitor");
+    if (i!=0)  { AmmServer_Error("Shutting down sos monitor failed\n"); }
+         else  { AmmServer_Success("Shutting down sos monitor succeeded\n"); }
+
+     i=system("python /opt/ros/hobbit_hydro/src/hobbit_smach/src/hobbit_smach/ArmActionClientShutDownPLC.py&");
      if (i!=0) { AmmServer_Error("Shutting down the arm appears to have failed\n"); }
          else  {
                  AmmServer_Success("Shutting down the arm appears to have succeeded , waiting a little for it to shutdown before returning \n");
