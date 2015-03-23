@@ -26,6 +26,7 @@ from hobbit_msgs.msg import Event
 from hobbit_msgs.srv import SetCloserStateRequest
 from hobbit_msgs.srv import SwitchVision, SwitchVisionRequest, SetCloserState
 from hobbit_msgs import MMUIInterface as MMUI
+from mira_msgs.srv import UserNavMode, ObsNavMode
 
 def closer_cb(ud, goal):
     params=[]
@@ -159,7 +160,7 @@ def gesture_sm():
         counter_it = Iterator(outcomes = ['succeeded', 'preempted', 'aborted'],
                               input_keys = [],
                               output_keys = [],
-                              it = lambda: range(0, 2),
+                              it = lambda: range(0, 3),
                               it_label = 'index',
                               exhausted_outcome = 'succeeded')
 
@@ -273,6 +274,13 @@ def call_hobbit():
             connector_outcomes=['succeeded']
         )
         StateMachine.add(
+            'SAY_COMING',
+            speech_output.sayText(info='T_CA_IAmComing'),
+            transitions={'succeeded': 'MOVE_TO_GOAL',
+                         'failed': 'LOG_ABORT',
+                         'preempted': 'LOG_PREEMPT'}
+        )
+        StateMachine.add(
             'MOVE_TO_GOAL',
             hobbit_move.goToPoseSilent(),
             transitions={'succeeded': 'SWITCH_VISION',
@@ -366,6 +374,33 @@ def call_hobbit():
 def come_closer_from_everywhere():
     sm = StateMachine(outcomes=['succeeded', 'aborted', 'preempted'])
     with sm:
+        StateMachine.add(
+            'OBS_NAV',
+            ServiceState(
+                '/obs_nav_mode',
+                ObsNavMode
+            ),
+            transitions={'succeeded': 'HEAD_DOWN',
+                         'aborted': 'aborted',
+                         'preempted': 'preempted'}
+        )
+        StateMachine.add(
+            'HEAD_DOWN',
+            head_move.MoveTo(pose='down_center'),
+            transitions={'succeeded': 'USER_NAV',
+                         'preempted': 'preempted',
+                         'aborted': 'aborted'}
+        )
+        StateMachine.add(
+            'USER_NAV',
+            ServiceState(
+                '/obs_nav_mode',
+                ObsNavMode
+            ),
+            transitions={'succeeded': 'SWITCH_VISION',
+                         'aborted': 'aborted',
+                         'preempted': 'preempted'}
+        )
         StateMachine.add(
             'SWITCH_VISION',
             ServiceState(

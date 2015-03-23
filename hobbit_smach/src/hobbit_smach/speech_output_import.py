@@ -159,7 +159,7 @@ class ShowInfoFoundObject(State):
         mmui = MMUI.MMUIInterface()
         mmui.showMMUI_Info(
             text=self.info,
-            prm=ud.object_name
+            prm=ud.object_name.data
             #prm2=ud.object_room,
         )
         return 'succeeded'

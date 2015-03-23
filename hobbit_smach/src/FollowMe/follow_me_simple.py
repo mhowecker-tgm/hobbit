@@ -174,7 +174,7 @@ def main():
         StateMachine.add(
             'SAY_START',
             speech_output.sayText(
-                info='T_STAND_IN_FRONT'),
+                info='T_FM_StandInFrontOfMe'),
             transitions={'succeeded': 'GET_USER',
                          'failed': 'LOG_ABORTED'}
         )
@@ -193,7 +193,7 @@ def main():
         StateMachine.add(
             'SAY_FOUND_YOU',
             speech_output.sayText(
-                info="T_FOLLOW_YOU"),
+                info="T_FM_FollowingYou"),
             transitions={'succeeded': 'HEAD_DOWN',
                          'failed': 'LOG_ABORTED'}
         )
@@ -221,7 +221,7 @@ def main():
         StateMachine.add(
             'SAY_CANT_SEE',
             speech_output.sayText(
-                info="T_STOP_FOLLOWING"),
+                info="T_FM_T_STOP_FOLLOWING"),
             transitions={'succeeded': 'LOG_ABORTED',
                          'failed': 'LOG_ABORTED'}
         )
@@ -240,14 +240,14 @@ def main():
         StateMachine.add(
             'SAY_STOP',
             speech_output.sayText(
-                info="T_STOP_FOLLOWING"),
+                info="T_FM_FollowingYou"),
             transitions={'succeeded': 'LOG_SUCCESS',
                          'failed': 'LOG_ABORTED'}
         )
         StateMachine.add(
             'SAY_STOP1',
             speech_output.sayText(
-                info="T_STOP_FOLLOWING"),
+                info="T_FM_FollowingYou"),
             transitions={'succeeded': 'LOG_SUCCESS',
                          'failed': 'LOG_ABORTED'}
         )

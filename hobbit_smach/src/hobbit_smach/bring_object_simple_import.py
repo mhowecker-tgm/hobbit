@@ -62,18 +62,16 @@ class ObjectDetected(smach.State):
 
     def execute(self, ud):
         rospy.loginfo('Did we find the object?')
-        print(ud.ids)
-        print(type(ud.ids))
-        #return 'succeeded'
-        if not ud.ids:
-            return 'aborted'
+        rospy.loginfo(str(ud.ids))
+        #if not ud.ids:
+        #    return 'aborted'
         try:
             for index, item in enumerate(ud.ids):
-                if ud.object_name.data in item.data:
+                if ud.object_name.data.lower() in item.data.lower():
                     ud.object_pose = ud.transforms[index]
                     return 'succeeded'
         except:
-            if ud.object_name.data in ud.ids.data:
+            if ud.object_name.data.lower() in ud.ids.data.lower():
                 ud.object_pose = ud.transforms
                 return 'succeeded'
         return 'aborted'
@@ -498,8 +496,8 @@ def get_bring_object():
         smach.StateMachine.add(
             'UNDOCK_IF_NEEDED',
             hobbit_move.undock_if_needed(),
-            transitions={'succeeded': 'BACK_IF_NEEDED',
-                         'aborted': 'GET_ROBOT_POSE'}
+            transitions={'aborted': 'BACK_IF_NEEDED',
+                         'succeeded': 'GET_ROBOT_POSE'}
         )
         smach.StateMachine.add(
             'BACK_IF_NEEDED',
