@@ -98,16 +98,16 @@ void cComeCloser::motion_state_callback(const std_msgs::String::ConstPtr& msg)
 	started_movement = true;
   if (started_movement && !finished_movement && current_motion_state.data == "Idle")
   {
-	/*bool dist_mode = true;
+	bool dist_mode = true;
 	mira_msgs::GetBoolValue get_nav_mode_srv;
   	if (get_nav_mode_client.call(get_nav_mode_srv))
 	{	
 		dist_mode = get_nav_mode_srv.response.value;
 	}
 	else
-		ROS_INFO("Failed to call service get_nav_mode");*/
+		ROS_INFO("Failed to call service get_nav_mode");
 		
-	//if (!dist_mode)
+	if (!dist_mode)
 	{
 		finished_movement = true;
 		std::cout << "finished movement " << std::endl;
