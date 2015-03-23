@@ -180,7 +180,7 @@ class MoveBackBlindCounter(smach.State):
     Just a counter in a SMACH State.
     """
     def __init__(self):
-        smach.State.__init__(self, outcomes=['first', 'second'])
+        smach.State.__init__(self, outcomes=['first', 'second', 'preempted'])
         self._counter = 0
 
     def execute(self, ud):
