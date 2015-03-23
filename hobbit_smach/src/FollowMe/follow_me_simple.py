@@ -129,7 +129,7 @@ def main():
         StateMachine.add(
             'UNDOCK_IF_NEEDED',
             hobbit_move.undock_if_needed(),
-            transitions={'succeeded': 'BACK_IF_NEEDED',
+            transitions={'succeeded': 'ROTATE_180',
                          'aborted': 'BACK_IF_NEEDED'}
         )
         StateMachine.add(
