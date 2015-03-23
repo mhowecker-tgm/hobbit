@@ -30,7 +30,7 @@
       <place>
         <name>center</name>
         <type>goTo</type>
-        <pose y="-0.546" x="-1.0" theta="-1.57"/>
+        <pose y="-0.246" x="-2.0" theta="-0.52"/>
         <objects/>
       </place>
       <place>
@@ -50,7 +50,17 @@
         <type>searchable</type>
         <pose y="0.811" x="0.85097" theta="0.506"/>
         <objects>
-          <object name="Häferl" probability="1.0"/>
+          <object name="Haferl" probability="1.0"/>
+          <object name="aspirin" probability="0.5"/>
+        </objects>
+      </place>
+      <place>
+        <name>table</name>
+        <type>searchable</type>
+        <pose y="-0.09" x="-0.978" theta="1.036"/>
+        <objects>
+          <object name="Haferl" probability="1.0"/>
+          <object name="aspirin" probability="0.5"/>
         </objects>
       </place>
       <place>
