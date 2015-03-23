@@ -14,6 +14,7 @@ arm_state = False
 import rospy
 from hobbit_msgs.srv import SetCloserState, GetCloserState, SetDockState, GetDockState, SetMoveState, GetMoveState, ChargeCheck, ChargeCheckResponse
 from hobbit_msgs.srv import GetArmState, SetArmState
+from hobbit_msgs.msg import Event, Command
 from mira_msgs.msg import BatteryState
 import hobbit_smach.arm_move_import as arm_move
 
@@ -102,7 +103,35 @@ def set_dock_state_true(msg):
     if msg.charging:
         #rospy.loginfo("Set docked to TRUE")
         dock_state = True
-     
+
+def events_to_commands(msg):
+    rospy.loginfo("i heard: "+str(msg.event))
+    pub = rospy.Publisher('/Command', Command, queue_size=10)
+    command = Command()
+    if msg.event.lower() == 'A_learn'.lower():
+        command.command = 'C_LEARN'
+    elif msg.event.lower() == 'A_follow'.lower():
+        command.command = 'C_FOLLOW'
+    elif msg.event.lower() == 'A_sleep'.lower():
+        command.command = 'C_SLEEP6'
+    elif msg.event.lower() in ['A_stop'.lower(), 'A_cancel'.lower()]:
+        command.command = 'C_STOP'
+    elif msg.event.lower() == 'A_help'.lower():
+        command.command = 'C_HELP'
+    elif msg.event.lower() in ['A_pickup'.lower(), 'A_cleanup'.lower()]:
+        command.command = 'C_PICKUP'
+    elif msg.event.lower() == 'A_welldone'.lower():
+        command.command = 'C_REWARD'
+    elif msg.event.lower() == 'A_surprise'.lower():
+        command.command = 'C_SURPRISE'
+    elif msg.event.lower() == 'A_recharge'.lower():
+        command.command = 'C_RECHARGE'
+    else:
+        rospy.loginfo('Event ignored')
+        return
+    rospy.loginfo("will publish"+str(command))
+    pub.publish(command)
+
 
 def charge_check_server():
     rospy.init_node('hobbit_helper_node')
@@ -116,6 +145,7 @@ def charge_check_server():
     s7 = rospy.Service('/arm/set_move_state', SetArmState, set_arm_state)
     s8 = rospy.Service('/arm/get_move_state', GetArmState, get_arm_state)
     rospy.Subscriber('battery_state', BatteryState, set_dock_state_true)
+    rospy.Subscriber('Event', Event, events_to_commands)
 
     rospy.loginfo('Node started')
     rospy.spin()
