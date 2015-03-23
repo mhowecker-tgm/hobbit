@@ -1546,6 +1546,27 @@ def sayDidNotPickupObject2():
     return cc
 
 
+def sayDidNotPickupObjectTwoTimes():
+    cc = Concurrence(
+        outcomes=['succeeded', 'preempted', 'failed'],
+        default_outcome='failed',
+        child_termination_cb=child_term_cb,
+        outcome_map={'succeeded': {'EMO_SAD': 'succeeded',
+                                   'SAY_DID_NOT_PICKUP_OBJECT': 'succeeded'}}
+    )
+
+    with cc:
+        Concurrence.add(
+            'EMO_SAD',
+            HobbitEmotions.ShowEmotions(emotion='SAD', emo_time=4)
+        )
+        Concurrence.add(
+            'SAY_DID_NOT_PICKUP_OBJECT',
+            speech_output.sayText(info='T_PU_DidNotPickupObjectTwoTimes')
+        )
+    return cc
+
+
 def sayPickedUpObject():
     cc = Concurrence(
         outcomes=['succeeded', 'preempted', 'failed'],
