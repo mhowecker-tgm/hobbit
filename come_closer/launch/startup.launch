@@ -1,7 +1,7 @@
 <launch>
   <node pkg="come_closer" type="come_closer" name="come_closer" output="screen">
 
-  	<param name="margin" value="0.05"/>
+  	<param name="margin" value="0.10"/>
 	<param name="front_dis" value="0.18"/>
 	<param name="x_sensor" value="0.135"/>
 	<param name="time_limit_secs" value="120.0"/>
