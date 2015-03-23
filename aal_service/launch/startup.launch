@@ -1,6 +1,6 @@
 <launch>
 
-	<param name="ENV/ObjectList" type="string" value="aspirin+++mug" />
+	<param name="ENV/ObjectList" type="string" value="Aspirin+++Mug" />
 	<param name="ENV/Place/Callbutton1/name" type="string" value="kitchen table" />
 	<param name="ENV/Place/Callbutton1/th" type="string" value="7" />
 	<param name="ENV/Place/Callbutton1/x" type="string" value="3" />
