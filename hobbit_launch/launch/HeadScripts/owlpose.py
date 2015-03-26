@@ -59,7 +59,7 @@ def set_head_orientation(msg):
 		#br.sendTransform((0, 0, 0), (0.35 ,0.0, 0.0, 1), rospy.Time.now(), base_tf,head_tf)
 
 	elif msg.data == "littledown_center":
-		herkulex.setAngles(pitch=20, yaw=0, playtime=170)
+		herkulex.setAngles(pitch=16, yaw=0, playtime=170)
 		#br.sendTransform((0, 0, 0), (0.20 ,0.0, 0.0, 1), rospy.Time.now(), base_tf,head_tf)
 
 	elif msg.data == "center_right":
