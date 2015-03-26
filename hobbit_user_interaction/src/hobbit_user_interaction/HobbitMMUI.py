@@ -199,12 +199,12 @@ class AskYesNo(smach.State):
         if self.timeout_count > 2:
             self.timeout_count = 0
             return '3times'
+        mmui = MMUI.MMUIInterface()
+        resp = mmui.showMMUI_YESNO(text=self.question)
         if self.preempt_requested():
             ud.answer = String('preempted')
             self.service_preempt()
             return 'preempted'
-        mmui = MMUI.MMUIInterface()
-        resp = mmui.showMMUI_YESNO(text=self.question)
         if resp:
             for i, v in enumerate(resp.params):
                 print i, v
