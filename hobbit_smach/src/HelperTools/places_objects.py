@@ -130,12 +130,10 @@ def writeXml(inFile, rooms):
             i = ET.SubElement(f, 'pose', {'x': str(place.x), 'y': str(place.y), 'theta': str(place.theta)})
             j = ET.SubElement(f, 'objects')
             for obj in place.objects:
-                print(type(obj.name))
-                #print(get_unicode(obj.name))
                 if type(obj.name) is unicode:   
-                    k = ET.SubElement(j, 'object', {'name': obj.name, 'probability': str(obj.probability)})
+                    k = ET.SubElement(j, 'object', {'name': obj.name.title(), 'probability': str(obj.probability)})
                 else:
-                    k = ET.SubElement(j, 'object', {'name': obj.name.data, 'probability': str(obj.probability)})
+                    k = ET.SubElement(j, 'object', {'name': obj.name.data.title(), 'probability': str(obj.probability)})
     tree = ET.ElementTree(r)
     tree.write(outFile, encoding='UTF-8',  xml_declaration=True, pretty_print=True)
     print 'file:',outFile,'written.'
@@ -178,24 +176,23 @@ def updateProb(obj, location, room_name, rooms):
 
 def addObject(object_name, rooms):
     #rospy.loginfo('START: addObject')
-    object_name.data = get_unicode(object_name.data).title()
+    object_name.data = object_name.data.title()
     locations = count_locations(rooms)
     added = False
     for room in rooms.rooms_vector:
         for place in (x for x in room.places_vector if x.place_type.lower() == 'searchable'):
-            if not place.objects:
+            new = True
+            for obj in place.objects:
+                if object_name.data.lower() in obj.name.data.lower():
+                    print('addObject: ' + object_name.data + ' is already stored.')
+                    new = False
+                    break
+            if new:
                 rospy.loginfo('Adding object: '+ object_name.data)
-                place.objects.append(Object(object_name, 1.0/locations))
+                place.objects.append(Object(String(object_name.data), 1.0/locations))
+                added = True
             else:
-                new = True
-                for obj in place.objects:
-                    if object_name.data.lower() in obj.name.data.lower():
-                        print('addObject: ' + object_name.data + ' is already stored.')
-                        new = False
-                if new:
-                    rospy.loginfo('Adding object: '+ object_name.data)
-                    place.objects.append(Object(object_name.data, 1.0/locations))
-                    added = True
+                break
     if added:
         if rospy.has_param('ENV/ObjectList'):
             tmp_list = rospy.get_param('ENV/ObjectList')
@@ -305,8 +302,7 @@ def add_object_to_db(req):
     Add the given object to the database
     """
     global rooms
-    rospy.loginfo('/add_object_to_db: Request received')
-    print(req)
+    #rospy.loginfo('/add_object_to_db: Request received')
     return addObject(String(req.object_name), rooms)
 
 
