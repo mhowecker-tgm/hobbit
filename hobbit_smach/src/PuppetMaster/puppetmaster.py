@@ -69,6 +69,9 @@ def start_command():
     mmui = MMUI.MMUIInterface()
     mmui.remove_last_prompt()
     rospy.loginfo('New task has higher priority. START IT.')
+    print(bcolors.OKGREEN +
+          'New task has higher priority. Start it.'
+          + bcolors.ENDC)
     return True
 
 def command_cb(msg, ud):
@@ -96,7 +99,6 @@ def command_cb(msg, ud):
         if first and active_task < 100:
             rospy.loginfo('GOT COMMAND: '+str(input_ce))
             rospy.loginfo('CURRENTLY RUNNING TASK LEVEL: '+ str(active_task)+' '+commands[active_task][0]+' or similar')
-            #HobbitMMUI.ShowInfo(info=str(commands[active_task][0]))
             first = False
         if input_ce in item:
             if item[0] == 'master_reset':
@@ -104,14 +106,11 @@ def command_cb(msg, ud):
                     ud.parameters['active_task'] = 100
                     ud.command = 'master_reset'
                     new_command = ud.command
-                    #rospy.loginfo('New task has higher priority. START IT.')
                     return start_command()
             elif item[0] == 'stop':
                 rospy.loginfo('Reset active_task value')
                 ud.parameters['active_task'] = 100
                 ud.command = 'stop'
-                #pub = rospy.Publisher('/arm/commands', String, queue_size=5)
-                #pub.publish('SetStopArmMove')
                 arm_move.do_stop()
                 new_command = ud.command
                 return start_command()
@@ -124,27 +123,20 @@ def command_cb(msg, ud):
                         ud.params = msg.params
                         new_params = ud.params
                         new_command = ud.command
-                        #rospy.loginfo('New task has higher priority. START IT.')
                         return start_command()
                 ud.params = msg.params
                 new_params = ud.params
-                rospy.loginfo("CALL_HOBBIT: "+str(msg.params))
-                rospy.loginfo("CALL_HOBBIT: "+str(ud.params))
-                rospy.loginfo("CALL_HOBBIT: "+str(new_params))
                 ud.parameters['active_task'] = index
                 new_command = ud.command
-                #rospy.loginfo('New task has higher priority. START IT.')
                 return start_command()
-            elif item[0] == 'emergency':
+            elif item[0] == 'emergency' and active_task < 0:
                 ud.parameters['active_task'] = index
                 ud.command = item[0]
                 ud.emergency = True
                 new_command = ud.command
-                #rospy.loginfo('New task has higher priority. START IT.')
                 return start_command()
             elif item[0] == 'away' or item[0] == 'sleep':
                 times = [1, 2, 4, 6, 12, 24]
-                # print(input_ce)
                 index = int(input_ce[-1:]) - 1
                 print(times[index])
                 if input_ce[:-1] == 'SLEEP':
@@ -154,12 +146,10 @@ def command_cb(msg, ud):
                 new_params = str(times[index])
                 new_command = ud.command
                 return start_command()
-            # elif index == 1 and night and index + 1 <= active_task:
             elif item[0] == 'recharge' and not night and index < active_task:
                 rospy.loginfo('RECHARGING')
                 ud.command = 'recharge'
                 ud.parameters['active_task'] = index
-                rospy.loginfo('New task has higher priority. START IT.')
                 new_command = ud.command
                 return start_command()
             elif index + 1 >= active_task and not night:
@@ -169,11 +159,6 @@ def command_cb(msg, ud):
                       + bcolors.ENDC)
                 return False
             else:
-                #rospy.loginfo('New task has higher priority. START IT.')
-                print(bcolors.OKGREEN +
-                      'New task has higher priority. Start it.'
-                      + bcolors.ENDC)
-                # if index == 7:
                 if item[0] == 'pickup':
                     i = item.index(input_ce)
                     ud.command = item[i - 6]
@@ -337,7 +322,6 @@ class SelectTask(State):
         if new_command == 'IDLE':
             return 'none'
         ret = new_command
-        #ud.command = ''
         return ret
 
 
@@ -395,8 +379,6 @@ def sleep_cb(ud, goal):
 
 def bring_cb(ud, goal):
     par = []
-    #par.append({'object_name': ud.params[0].value})
-    #par.append({'object_name': new_params[0].value})
     par.append(String(new_params[0].value))
     rospy.loginfo('bring_cb: %s' % new_params[0].value)
     goal = GeneralHobbitGoal(command=String('bring_object'),
@@ -425,13 +407,6 @@ def patrol_cb(ud, goal):
 
 
 def follow_cb(ud, goal):
-    #room, place = ud.params[0].value.lower().split(' ')
-    #if not room or not place:
-    #    room = 'corridor'
-    #    place = 'default'
-    par = []
-    #par.append(String(room))
-    #par.append(String(place))
     goal = GeneralHobbitGoal(command=String('follow'),
                              previous_state=String('previous_task'),
                              parameters=par)
@@ -439,7 +414,6 @@ def follow_cb(ud, goal):
 
 
 def goto_cb(ud, goal):
-    #room, place = ud.params[0].value.lower().split(' ')
     room, place = new_params[0].value.lower().split(' ')
     par = []
     par.append(String(room))
@@ -508,9 +482,7 @@ def main():
         input_keys=['command', 'active_task', 'params', 'parameters'],
         output_keys=['command', 'params', 'parameters'],
         child_termination_cb=child_cb,
-        outcome_cb=cc_out_cb,
-        # outcome_map={'succeeded': {'Event_Listener': 'succeeded'},
-        #             'aborted': {'Event_Listener': 'aborted'}}
+        outcome_cb=cc_out_cb
     )
 
     cc1 = Concurrence(
@@ -756,8 +728,10 @@ def main():
         )
         StateMachine.add(
             'CALL',
-            # There is nothing to do during a phone call,
-            # so we just wait and do nothing.
+            """
+            There is nothing to do during a phone call,
+            so we just wait and do nothing.
+            """
             FakeForAllWithoutRunningActionSever(name='CALL'),
             transitions={'succeeded': 'MAIN_MENU',
                          'preempted': 'preempted',
@@ -809,7 +783,6 @@ def main():
             )
         StateMachine.add(
             'BRING_OBJECT',
-            #FakeForAllWithoutRunningActionSever(name='BRING_OBJECT'),
             SimpleActionState(
                 'bring_object',
                 GeneralHobbitAction,
@@ -820,14 +793,12 @@ def main():
             ),
             transitions={'succeeded': 'MAIN_MENU',
                          'aborted': 'RESET_ACTIVE_TASK',
-                         #'failed': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
             'RECHARGE',
             recharge.getRecharge(),
             transitions={'succeeded': 'MAIN_MENU',
-                         # 'failed': 'failed',
                          'aborted': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted'}
         )
