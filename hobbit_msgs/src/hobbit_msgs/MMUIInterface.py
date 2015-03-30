@@ -167,6 +167,16 @@ class MMUIInterface:
         parr.append(p)
         return self.callMMUIService('-1', 'create', parr)
 
+    def request_mmui_update(self):
+        """
+        send an update request to the mmui.
+        only known use case is the update for the object list. maybe something else as well
+        """
+        parr=[]
+        p = Parameter('type', 'F_UPDATE')
+        parr.append(p)
+        return self.callMMUIService('-1', 'create', parr)
+
     def GoToMenu(self, menu='F_MAIN'):
         parr = []
         p = Parameter('type', 'F_GOTOMENU')
@@ -200,11 +210,7 @@ class MMUIInterface:
             print "Service did not process request: %s" % str(e)
             return None
 
-    def askForName(
-        self,
-        text='What is the name of this object?',
-        timeout='30'
-    ):
+    def askForName(self, text='What is the name of this object?', timeout='30'):
         parr = []
         p = Parameter('type', 'D_NAME')
         parr.append(p)

@@ -11,7 +11,6 @@ NAME = 'place_handler'
 PROJECT = 'Hobbit'
 update_diff = 0.5
 
-# FILE = 'places.xml'
 # FILE = '/home/bajo/work/development/catkin/src/navigation/places.xml'
 FILE = '/opt/ros/hobbit_hydro/src/navigation/places.xml'
 
@@ -27,6 +26,7 @@ from operator import itemgetter
 from std_msgs.msg import String
 from xml.dom import minidom
 import uashh_smach.util as util
+from hobbit_msgs import MMUIInterface as MMUI
 
 
 try:
@@ -178,7 +178,7 @@ def updateProb(obj, location, room_name, rooms):
 
 def addObject(object_name, rooms):
     #rospy.loginfo('START: addObject')
-    object_name.data = get_unicode(object_name.data)
+    object_name.data = get_unicode(object_name.data).title()
     locations = count_locations(rooms)
     added = False
     for room in rooms.rooms_vector:
@@ -189,14 +189,23 @@ def addObject(object_name, rooms):
             else:
                 new = True
                 for obj in place.objects:
-                    if object_name.data in obj.name.data:
+                    if object_name.data.lower() in obj.name.data.lower():
                         print('addObject: ' + object_name.data + ' is already stored.')
                         new = False
                 if new:
                     rospy.loginfo('Adding object: '+ object_name.data)
                     place.objects.append(Object(object_name.data, 1.0/locations))
                     added = True
-
+    if added:
+        if rospy.has_param('ENV/ObjectList'):
+            tmp_list = rospy.get_param('ENV/ObjectList')
+            if not object_name.data.lower() in tmp_list.lower():
+                tmp_list = tmp_list+"+++"+object_name.data
+                rospy.set_param('ENV/ObjectList', tmp_list)
+            else:
+                rospy.set_param('ENV/ObjectList', object_name.data)
+            mmui = MMUI.MMUIInterface()
+            mmui.request_mmui_update()
     # print rooms.rooms_vector
     #rospy.loginfo('END: addObject')
     return added
