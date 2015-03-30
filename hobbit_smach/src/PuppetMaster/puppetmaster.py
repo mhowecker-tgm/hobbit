@@ -129,7 +129,8 @@ def command_cb(msg, ud):
                 ud.parameters['active_task'] = index
                 new_command = ud.command
                 return start_command()
-            elif item[0] == 'emergency' and active_task < 0:
+            elif item[0] == 'emergency' and active_task > 0:
+                rospy.loginfo('emergency. active_task = ' + str(active_task))
                 ud.parameters['active_task'] = index
                 ud.command = item[0]
                 ud.emergency = True
