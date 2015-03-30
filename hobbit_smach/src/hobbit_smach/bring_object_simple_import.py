@@ -24,6 +24,7 @@ import hobbit_smach.locate_user_simple_import as locate_user
 import hobbit_smach.logging_import as log
 import hobbit_smach.call_hobbit_2_import as call_hobbit
 from hobbit_user_interaction import HobbitMMUI
+from rospy.exceptions import TransportTerminated
 
 bring_origin = None
 bring_destination = None
@@ -389,7 +390,7 @@ class PlanPath(smach.State):
 
             try:
                 resp = self.getPlan(req)
-            except rospy.ServiceException:
+            except (rospy.ServiceException, TransportTerminated):
                 self.getPlan.close()
                 return 'aborted'
 
