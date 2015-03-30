@@ -175,7 +175,7 @@ class MMUIInterface:
         parr=[]
         p = Parameter('type', 'F_UPDATE')
         parr.append(p)
-        return self.callMMUIService('-1', 'create', parr)
+        return self.callMMUIService('0', 'create', parr)
 
     def GoToMenu(self, menu='F_MAIN'):
         parr = []
