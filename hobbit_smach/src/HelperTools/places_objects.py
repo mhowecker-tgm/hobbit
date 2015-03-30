@@ -65,7 +65,7 @@ def readXml(inFile):
     except IOError as e:
         print("I/O error({0}):\n\' {1} \': {2}"
               .format(e.errno, inFile, e.strerror))
-        return None
+        raise IOError
 
     rooms = RoomsVector()
 
@@ -312,8 +312,8 @@ def add_object_to_db(req):
     return addObject(String(req.object_name), rooms)
 
 
-def clean_up():
-    rospy.loginfo(NAME + ' is shutting down. Saving places.xml')
+def clean_up(reason):
+    rospy.loginfo(NAME + ' is shutting down. Saving places.xml. Reason: '+reason)
     writeXml(FILE, rooms)
 
 
@@ -329,18 +329,13 @@ def update_object_prob(req):
 def main():
     rospy.init_node(NAME)
     global rooms
-    rooms = readXml(FILE)
-    if not rooms:
-        rospy.signal_shutdown('No rooms were loaded. Check the input xml file')
-    else:
+    try:
+        rooms = readXml(FILE)
         addObject(String('aspirin'), rooms)
-        #addObject(String('mug'), rooms)
-        # updateProb('Häferl', 'side_desk', 'Küche', rooms)
         writeXml(FILE, rooms)
         update_object_list(rooms)
         mug = GetObjectLocationsRequest()
         mug.object_name = String('mug')
-        # print(getObjectLocations(mug))
         rospy.Service(PROJECT+'/'+NAME+'/get_object_locations', GetObjectLocations, getObjectLocations)
         rospy.Service(PROJECT+'/'+NAME+'/get_room_name', GetRoomName, get_room_name)
         rospy.Service('/get_coordinates', GetCoordinates, getCoordinates)
@@ -348,9 +343,12 @@ def main():
         rospy.Service('/get_robots_current_room', GetName, get_robots_current_room)
         rospy.Service('/add_object_to_db', AddObject, add_object_to_db)
         rospy.Service('/update_object_probabilities', UpdateObject, update_object_prob)
+    except IOError:
+        rospy.loginfo(NAME+": No input files (places.xml) was loaded. Shutting down.")
+        return
 
     # spin() keeps Python from exiting until node is shutdown
-    rospy.on_shutdown(clean_up)
+    rospy.on_shutdown(clean_up(reason='shutdown received'))
     rospy.spin()
 
 if __name__ == "__main__":
