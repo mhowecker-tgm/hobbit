@@ -451,7 +451,6 @@ def main():
     )
 
     sm1 = StateMachine(
-        # input_keys=['command', 'params', 'parameters', 'active_task'],
         outcomes=['succeeded',
                   'preempted',
                   'failed']
@@ -728,10 +727,8 @@ def main():
         )
         StateMachine.add(
             'CALL',
-            """
-            There is nothing to do during a phone call,
-            so we just wait and do nothing.
-            """
+            # There is nothing to do during a phone call,
+            # so we just wait and do nothing.
             FakeForAllWithoutRunningActionSever(name='CALL'),
             transitions={'succeeded': 'MAIN_MENU',
                          'preempted': 'preempted',
