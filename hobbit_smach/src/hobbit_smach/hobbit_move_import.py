@@ -13,7 +13,7 @@ import math
 
 from smach import State, Sequence, StateMachine
 from smach_ros import ServiceState, SimpleActionState
-from mira_msgs.srv import UserNavMode, ObsNavMode, EmergencyStop
+from mira_msgs.srv import UserNavMode, ObsNavMode, EmergencyStop, ResetMotorStop
 from hobbit_msgs.srv import GetCoordinates, GetCoordinatesRequest, GetName, \
     SwitchVision, SwitchVisionRequest
 from move_base_msgs.msg import MoveBaseAction
@@ -244,6 +244,16 @@ def resp_cb(userdata, response):
 def move_discrete(in_motion=None, in_value=None):
     sm = StateMachine(outcomes=['succeeded', 'aborted', 'preempted'])
     with sm:
+        StateMachine.add(
+            'RESET_MOTOR_STOP',
+            ServiceState(
+                '/reset_motorstop',
+                ResetMotorStop
+            ),
+            transitions={'succeeded': 'CHECK_ARM',
+                         'preempted': 'preempted',
+                         'aborted': 'aborted'}
+        )
         StateMachine.add(
             'CHECK_ARM',
             arm_move.check_and_inform_about_arm_not_referenced_or_at_home(),
