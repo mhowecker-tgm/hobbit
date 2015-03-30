@@ -175,7 +175,6 @@ def updateProb(obj, location, room_name, rooms):
 
 
 def addObject(object_name, rooms):
-    #rospy.loginfo('START: addObject')
     object_name.data = object_name.data.title()
     locations = count_locations(rooms)
     added = False
@@ -194,19 +193,26 @@ def addObject(object_name, rooms):
             else:
                 break
     if added:
-        if rospy.has_param('ENV/ObjectList'):
-            tmp_list = rospy.get_param('ENV/ObjectList')
-            if not object_name.data.lower() in tmp_list.lower():
-                tmp_list = tmp_list+"+++"+object_name.data
-                rospy.set_param('ENV/ObjectList', tmp_list)
-            else:
-                rospy.set_param('ENV/ObjectList', object_name.data)
-            mmui = MMUI.MMUIInterface()
-            mmui.request_mmui_update()
-    # print rooms.rooms_vector
-    #rospy.loginfo('END: addObject')
+        update_object_list(rooms)
     return added
 
+
+def update_object_list(rooms):
+    if rospy.has_param('ENV/ObjectList'):
+            tmp_list = rospy.get_param('ENV/ObjectList')
+
+    for room in rooms.rooms_vector:
+        for place in (x for x in room.places_vector if x.place_type.lower() == 'searchable'):
+            for obj in place.objects:
+                if not obj.name.data.lower() in tmp_list.lower():
+                    tmp_list = tmp_list+"+++"+obj.name.data.title()
+                else:
+                    rospy.loginfo("no need to change /ENV/ObjectList. "+str(obj.name.data.title())+" is already included")
+    rospy.set_param('ENV/ObjectList', tmp_list)
+    mmui = MMUI.MMUIInterface()
+    mmui.request_mmui_update()
+    return
+            
 
 def getObjectLocations(req):
     """ Given the name of an object its positions (room and location) are returned.
@@ -331,6 +337,7 @@ def main():
         #addObject(String('mug'), rooms)
         # updateProb('Häferl', 'side_desk', 'Küche', rooms)
         writeXml(FILE, rooms)
+        update_object_list(rooms)
         mug = GetObjectLocationsRequest()
         mug.object_name = String('mug')
         # print(getObjectLocations(mug))
