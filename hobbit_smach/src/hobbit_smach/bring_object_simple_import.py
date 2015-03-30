@@ -36,23 +36,6 @@ def switch_vision_cb(ud, response):
     else:
         return 'aborted'
 
-class MoveCounter(smach.State):
-    def __init__(self):
-        smach.State.__init__(
-            self,
-            outcomes=['succeeded', 'preempted', 'failure'])
-        self.run_counter = -1
-
-    def execute(self, ud):
-        print('Recognizer counter: ' + str(self.run_counter))
-        if self.run_counter < 3:
-            rospy.loginfo('Recognition run: #%d' % (self.run_counter + 2))
-            self.run_counter += 1
-            return 'succeeded'
-        else:
-            self.run_counter = -1
-        return 'failure'
-
 class ObjectDetected(smach.State):
     def __init__(self):
         smach.State.__init__(
@@ -228,13 +211,12 @@ class Init(smach.State):
             self,
             outcomes=['succeeded', 'canceled'],
             input_keys=['command', 'parameters'],
-            output_keys=['social_role', 'object_name'])
+            output_keys=['social_role', 'object_name', 'visited_places'])
 
     def execute(self, ud):
         ud.object_name = ud.parameters[0]
+        ud.visited_places = []
 
-        if rospy.has_param('/hobbit/social_role'):
-            ud.social_role = rospy.get_param('/hobbit/social_role')
         if ud.command.data == 'cancel':
             return 'canceled'
         return 'succeeded'
@@ -482,7 +464,7 @@ def get_bring_object():
             'INIT',
             Init(),
             transitions={'succeeded': 'GET_ALL_POSITIONS',
-                         'canceled': 'CLEAN_UP'}
+                         'canceled': 'LOG_ABORTED'}
         )
         smach.StateMachine.add(
             'GET_ALL_POSITIONS',
@@ -492,7 +474,7 @@ def get_bring_object():
                 request_key='object_name',
                 response_key='response'),
             transitions={'succeeded': 'UNDOCK_IF_NEEDED',
-                         'aborted': 'CLEAN_UP'}
+                         'aborted': 'LOG_ABORTED'}
         )
         smach.StateMachine.add(
             'UNDOCK_IF_NEEDED',
@@ -526,15 +508,15 @@ def get_bring_object():
             'PLAN_PATH',
             PlanPath(),
             transitions={'succeeded': 'MOVE_BASE',
-                         'preempted': 'CLEAN_UP',
+                         'preempted': 'LOG_PREEMPT',
                          'aborted': 'BACK_TO_USER_ABORT'}
         )
         smach.StateMachine.add(
             'MOVE_BASE',
             hobbit_move.goToPoseSilent(),
             transitions={'succeeded': 'SWITCH_VISION',
-                         'preempted': 'CLEAN_UP',
-                         'aborted': 'CLEAN_UP'},
+                         'preempted': 'LOG_PREEMPT',
+                         'aborted': 'LOG_ABORTED'},
             remapping={'x': 'goal_position_x',
                        'y': 'goal_position_y',
                        'yaw': 'goal_position_yaw'}
@@ -553,7 +535,7 @@ def get_bring_object():
             'MOVE_HEAD_UP',
             head_move.MoveTo(pose='littledown_center'),
             transitions={'succeeded': 'WAIT',
-                         'preempted': 'CLEAN_UP',
+                         'preempted': 'LOG_PREEMPT',
                          'aborted': 'WAIT'}
         )
         smach.StateMachine.add(
@@ -622,7 +604,6 @@ def get_bring_object():
         smach.StateMachine.add(
             'SAY_NOT_DETECTED',
             speech_output.say_object_not_found(),
-            #speech_output.sayText(info='T_BM_SORRY_NOT_ABLE_TO_FIND_OBJECT_O'),
             transitions={'succeeded': 'LOG_ABORTED',
                          'preempted': 'LOG_PREEMPT',
                          'failed': 'LOG_ABORTED'}
@@ -646,12 +627,7 @@ def get_bring_object():
             'SET_SUCCESS',
             SetSuccess(),
             transitions={'succeeded': 'succeeded',
-                         'preempted': 'CLEAN_UP'}
-        )
-        smach.StateMachine.add(
-            'CLEAN_UP',
-            CleanUp(),
-            transitions={'succeeded': 'preempted'}
+                         'preempted': 'LOG_PREEMPT'}
         )
     return sm
 
