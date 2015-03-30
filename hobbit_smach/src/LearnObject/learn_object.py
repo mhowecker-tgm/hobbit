@@ -221,10 +221,6 @@ def main():
             head_move.MoveTo(pose='littledown_center'),
             transitions={'aborted': 'failed'}
         )
-        # if not DEBUG:
-        #     Sequence.add(
-        #         'MOVE_BACK',
-        #         hobbit_move.Move(goal='back', distance=0.25))
         Sequence.add(
             'HEAD_MOVE_2',
             head_move.MoveTo(pose='down_center'),
@@ -232,23 +228,10 @@ def main():
         Sequence.add(
             'MMUI_SAY_GRASPING',
             speech_output.sayText(info='T_LO_GRASPING_THE_TURNTABLE'))
-        # Sequence.add(
-        #     'ARM_MOVE_TT_POSE',
-        #     arm_move.goToPosition(pose='storage'))
-        # Sequence.add(
-        #     'Close_GRIPPER',
-        #     arm_move.CloseGripper())
-        # Sequence.add(
-        #     'ARM_MOVE_LEARN_POSE',
-        #     arm_move.goToPosition(pose='learn'))
         Sequence.add(
             'MOVE_TT_LEARN_POSITION',
             arm_move.goToLearnPosition()
         )
-        # if not DEBUG:
-        #     Sequence.add(
-        #         'MOVE_FRONT',
-        #         hobbit_move.Move(goal='front', distance=0.25))
         Sequence.add(
             'HEAD_MOVE_3',
             head_move.MoveTo(pose='to_turntable'),
@@ -536,14 +519,8 @@ def main():
                         'parameters': 'parameters'}
     )
 
-    #sis = IntrospectionServer(
-    #    'smach_server',
-    #    learn_object_sm,
-    #    '/HOBBIT/LEARN_OBJECT_SM_ROOT')
-    #sis.start()
     asw.run_server()
     rospy.spin()
-    #sis.stop()
 
 if __name__ == '__main__':
     main()
