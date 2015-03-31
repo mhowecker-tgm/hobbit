@@ -191,6 +191,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 	if (angles::shortest_angular_distance(init_ang, orientation) < 0)
 	{
 		std::cout << "user pose out of field of view, aborting " << std::endl;
+		ROS_INFO ("user pose out of field of view, aborting ");
 		as_->setAborted(hobbit_msgs::GeneralHobbitResult(), "aborted, user pose out of fov");
 		return;
 
@@ -226,6 +227,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 	{
 		as_->setAborted(hobbit_msgs::GeneralHobbitResult(), "aborted, no detection"); //FIXME, should it move anyway?
 		std::cout << "aborted, no detection" << std::endl; 
+		ROS_INFO ("aborted, no detection ");
 		return;
 	}
 
@@ -240,6 +242,9 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 				
 		std::cout << "angle2turn " << angle2turn * 180/M_PI << std::endl;
 		std::cout << "distance2move " << dis2move << std::endl;
+
+		ROS_INFO ("angle2turn %f ", angle2turn * 180/M_PI);
+		ROS_INFO ("distance2move %f ", dis2move);
 
 		//first rotate to face the detected user (should already be quite close to current orientation...)
 
@@ -259,6 +264,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 			{
 				finished_rotation=true;
 				std::cout << "no rotation " << std::endl;
+				ROS_INFO ("no rotation ");
 			}
 		
 		}
@@ -280,7 +286,8 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 	else
 	{
 		as_->setAborted(hobbit_msgs::GeneralHobbitResult(), "aborted, too close");
-		std::cout << "aborted, too close" << std::endl; 
+		std::cout << "aborted, too close" << std::endl;
+		ROS_INFO ("aborted, too close "); 
 		return;
 
 	}
@@ -313,6 +320,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 			
 			as_->setSucceeded(hobbit_msgs::GeneralHobbitResult(), "succeded");
 			std::cout << "discrete motion finished, succeeded " << std::endl; 
+			ROS_INFO ("discrete motion finished, succeeded ");
 			return;
 
 		}
@@ -321,6 +329,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 		if(as_->isPreemptRequested())
       		{
 			std::cout << "preempt requested" << std::endl;
+			ROS_INFO ("preempt requested ");
 			
 			stop();
 
@@ -335,7 +344,8 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 		{
 			
 			as_->setAborted(hobbit_msgs::GeneralHobbitResult(), "aborted, it's taking too long, something went wrong?");
-			std::cout << "aborted, it's taking too long, something went wrong?" << std::endl; 
+			std::cout << "aborted, it's taking too long, something went wrong?" << std::endl;
+			ROS_INFO ("aborted, it's taking too long, something went wrong? "); 
 			return;
 
 		}
