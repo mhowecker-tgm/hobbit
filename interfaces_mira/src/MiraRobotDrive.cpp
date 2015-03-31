@@ -87,6 +87,7 @@ void MiraRobotDrive::discrete_motion_cmd_callback(const std_msgs::String::ConstP
   {
 
 	std::cout << "cmd Move " << std::endl;
+	ROS_INFO("cmd Move");
 	// Get the desired distance 
         float MotionValue = atof(&CmdBuf[5]);
 
@@ -117,6 +118,7 @@ void MiraRobotDrive::discrete_motion_cmd_callback(const std_msgs::String::ConstP
    else if (strncmp((const char *)(&CmdBuf[0]), "Turn", 4) == 0)
   {
 	std::cout << "cmd Turn " << std::endl;
+	ROS_INFO("cmd Turn");
 	// Get the desired angle and check if it's within the allowed limits - if not ignore command.
         float MotionValue = atof(&CmdBuf[5]);
 

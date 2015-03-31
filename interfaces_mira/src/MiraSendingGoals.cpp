@@ -102,6 +102,7 @@ bool MiraSendingGoals::user_nav_mode(mira_msgs::UserNavMode::Request &req, mira_
 {
 
 	std::cout << "user_mode_received, should only be used for small distances and simple motions " << std::endl;
+	ROS_INFO("user_mode_received, should only be used for small distances and simple motions ");
 
 	mira::RPCFuture<void> r1 = robot_->getMiraAuthority().callService<void>("/navigation/laser/GridMapperLaser#builtin", std::string("setProperty"), std::string("MaxRange"), std::string("0.1"));
         r1.timedWait(mira::Duration::seconds(1));
@@ -118,6 +119,7 @@ bool MiraSendingGoals::obs_nav_mode(mira_msgs::ObsNavMode::Request &req, mira_ms
 {
 
 	std::cout << "obs_mode_received " << std::endl;
+	ROS_INFO("obs_mode_received");
 
 	mira::RPCFuture<void> r1 = robot_->getMiraAuthority().callService<void>("/navigation/laser/GridMapperLaser#builtin", std::string("setProperty"), std::string("MaxRange"), std::string(max_range_value));
         r1.timedWait(mira::Duration::seconds(1));
@@ -253,6 +255,7 @@ void MiraSendingGoals::cancelGoal()
 
 	goal_status.data = "canceled";
 	std::cout << "Goal cancelled, status is canceled" << std::endl;
+	ROS_INFO("Goal cancelled, status is canceled");
 	goal_status_pub.publish(goal_status);	
 
 }
@@ -299,6 +302,7 @@ void MiraSendingGoals::bumper_callback(const std_msgs::Bool::ConstPtr& msg)
 	if (msg->data && !is_bumper_pressed) //bumper was hit
 	{
 		std::cout << "bumper was hit, cancelling goal " << std::endl;
+		ROS_INFO("bumper was hit, cancelling goal");
 		cancelGoal();
 	}
 
@@ -349,6 +353,7 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
     {
       as2_->setAborted(move_base_msgs::MoveBaseResult(), "Aborting on goal because it was sent with an invalid quaternion");
       std::cout << "Aborted, invalid quaternion " << std::endl;
+	
       return;
     }
 
@@ -361,6 +366,8 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
     last_goal = goal;
 
     std::cout << "goal actionlib x:" << goal.pose.position.x << " y: " << goal.pose.position.y << " theta " << tf::getYaw(goal.pose.orientation)*180/M_PI << std::endl;
+
+     ROS_INFO("goal actionlib: x=%f, y=%f, theta=%f", goal.pose.position.x, goal.pose.position.y, tf::getYaw(goal.pose.orientation)*180/M_PI);
 
      TaskPtr goal_task(new Task());
      goal_task->addSubTask(SubTaskPtr(new PreferredDirectionTask(mira::navigation::PreferredDirectionTask::FORWARD, 1.0f)));
@@ -378,6 +385,7 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
       if(as2_->isPreemptRequested())
       {
 	std::cout << "preempt requested" << std::endl;
+	ROS_INFO("preempt requested");
 
         if(as2_->isNewGoalAvailable())
 	{
@@ -395,6 +403,8 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
 
           goal = new_goal.target_pose;
 	  std::cout << "goal actionlib loop, x: " << goal.pose.position.x << " y: " << goal.pose.position.y << " theta " << tf::getYaw(goal.pose.orientation)*180/M_PI<< std::endl;
+
+	  ROS_INFO("goal actionlib loop: x=%f, y=%f, theta=%f", goal.pose.position.x, goal.pose.position.y, tf::getYaw(goal.pose.orientation)*180/M_PI);
 
 	  cancel_received = false;
 	  goal_status.data = "idle";
@@ -442,6 +452,7 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
      if(done)
      {
 	std::cout << "done " << std::endl;
+	ROS_INFO("goal reached suceeded");
 	as2_->setSucceeded(move_base_msgs::MoveBaseResult(), "Goal reached.");
 	is_goal_active = false;
         return;
@@ -450,6 +461,7 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
      if (goal_status.data == "preempted")
      {
 	std::cout << "goal preempted, path temporarily lost" << std::endl;
+	ROS_INFO("goal preempted, path temporarily lost");
 	//as2_->setPreempted();
 	//is_goal_active = false;
 	//return;
@@ -459,6 +471,7 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
      {
 	as2_->setAborted(move_base_msgs::MoveBaseResult(), "Goal cancelled");
 	std::cout << "goal canceled, by request, aborted" << std::endl;
+	ROS_INFO("goal canceled, by request, aborted");
 	is_goal_active = false;
 	return;
      }
@@ -467,6 +480,7 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
      {
      	as2_->setAborted(move_base_msgs::MoveBaseResult(), "Aborting on goal, probably because the path is blocked");
 	std::cout << "goal aborted, probably because the path is blocked" << std::endl;
+	ROS_INFO("goal aborted, probably because the path is blocked");
 	is_goal_active = false;
 	return;
      }

@@ -29,6 +29,7 @@ void MiraGetPose::initialize() {
    if (!result) 
    {
         std::cout << "Xml stations file missing!! " << std::endl;
+	ROS_INFO ("Xml stations file missing!! ");
         //assert(0);
         //return false;
 
