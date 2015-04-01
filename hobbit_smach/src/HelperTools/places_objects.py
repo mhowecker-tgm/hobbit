@@ -11,8 +11,8 @@ NAME = 'place_handler'
 PROJECT = 'Hobbit'
 update_diff = 0.5
 
-# FILE = '/home/bajo/work/development/catkin/src/navigation/places.xml'
 FILE = '/opt/ros/hobbit_hydro/src/navigation/places.xml'
+#FILE = '/home/bajo/projects/hobbit/devel/catkin_ws/src/navigation/places_files/places_GH25_new.xml'
 
 import sys
 import rospy
@@ -199,7 +199,9 @@ def addObject(object_name, rooms):
 
 def update_object_list(rooms):
     if rospy.has_param('ENV/ObjectList'):
-            tmp_list = rospy.get_param('ENV/ObjectList')
+        tmp_list = rospy.get_param('ENV/ObjectList')
+    else:
+        tmp_list = ''
 
     for room in rooms.rooms_vector:
         for place in (x for x in room.places_vector if x.place_type.lower() == 'searchable'):
@@ -209,9 +211,11 @@ def update_object_list(rooms):
                 else:
                     rospy.loginfo("no need to change /ENV/ObjectList. "+str(obj.name.data.title())+" is already included")
     rospy.set_param('ENV/ObjectList', tmp_list)
-    mmui = MMUI.MMUIInterface()
-    mmui.request_mmui_update()
-    return
+    try:
+        mmui = MMUI.MMUIInterface()
+        mmui.request_mmui_update()
+    except (rospy.ROSException, rospy.ServiceException):
+        rospy.loginfo(NAME+': unable to call MMUI service')
             
 
 def getObjectLocations(req):
@@ -312,8 +316,8 @@ def add_object_to_db(req):
     return addObject(String(req.object_name), rooms)
 
 
-def clean_up(reason):
-    rospy.loginfo(NAME + ' is shutting down. Saving places.xml. Reason: '+reason)
+def clean_up():
+    rospy.loginfo(NAME + ' is shutting down. Saving places.xml.')
     writeXml(FILE, rooms)
 
 
@@ -348,7 +352,7 @@ def main():
         return
 
     # spin() keeps Python from exiting until node is shutdown
-    rospy.on_shutdown(clean_up(reason='shutdown received'))
+    rospy.on_shutdown(clean_up)
     rospy.spin()
 
 if __name__ == "__main__":
