@@ -5,7 +5,7 @@
 
 # This script checks if a given list of ROS nodes are running.
 
-nodes=( "place_handler" "learn_object" "goto" "emergency_user"
+nodes=( "places_objects" "learn_object" "goto" "emergency_user"
 "emergency_bathroom" "battery_monitor" "recharge" "sos_monitor"
 "follow_me_simple" "pickup" "away" "puppetmaster" "arm_action_server"
 "bring_object" "fitness" )

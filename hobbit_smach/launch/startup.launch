@@ -1,6 +1,6 @@
 <launch>
 <env name="PYTHONIOENCODING" value="UTF-8" />
-<node name="place_handler" pkg="hobbit_smach" type="places_objects.py" output="log" />
+<node name="places_objects" pkg="hobbit_smach" type="places_objects.py" output="log" />
 <node name="learn_object" pkg="hobbit_smach" type="learn_object.py" output="log" />
 <node name="goto" pkg="hobbit_smach" type="goto.py" output="log" />
 <node name="emergency_user" pkg="hobbit_smach" type="emergency_user.py" output="log" />
