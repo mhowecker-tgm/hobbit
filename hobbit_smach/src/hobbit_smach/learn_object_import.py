@@ -75,11 +75,9 @@ class SetName(State):
         else:
             directory2 = directory + 'object-' +\
                 random.choice("abcdefghijklmnopqrstuvwxyz")
-        if not os.path.exists(directory2):
-            os.makedirs(directory2)
-        else:
-            os.makedirs(directory2+\
-                random.choice("abcdefghijklmnopqrstuvwxyz"))
+        if os.path.exists(directory2):
+            directory2 = directory2+random.choice("abcdefghijklmnopqrstuvwxyz")
+        os.makedirs(directory2)
         shutil.move(directory + 'up', directory2)
         shutil.move(directory + 'down', directory2)
         return 'succeeded'
