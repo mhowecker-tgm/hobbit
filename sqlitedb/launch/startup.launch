@@ -1,6 +1,6 @@
 <launch>
 
-<node pkg="sqlitedb" type="sqlitedb.py" name="sqlitedb" cwd="node" output="screen" args=
+<node pkg="sqlitedb" type="sqlitedb.py" name="sqlitedb" cwd="node" output="log" args=
 ""></node>
 
 </launch>

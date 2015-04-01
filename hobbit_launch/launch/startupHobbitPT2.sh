@@ -15,7 +15,7 @@ cd "$DIR"
 
 THEDATETAG=`date +"%y-%m-%d_%H-%M-%S"`
 echo $THEDATETAG > ~/.startup.txt
-env >> ~/.startup.tx
+env >> ~/.startup.txt
 
 #Make sure we have our stuff sourced
 source ~/.bashrc
@@ -26,7 +26,7 @@ roscore&
 #ros core takes ages to start
 sleep $DELAY_BETWEEN_STEPS
 sleep $DELAY_BETWEEN_STEPS
-
+roslaunch sqlitedb startup.launch&
 
 /opt/ros/hobbit_hydro/src/rgbd_acquisition/scripts/workAroundUSB.sh
 sleep $DELAY_BETWEEN_STEPS
