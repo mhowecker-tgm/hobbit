@@ -387,6 +387,14 @@ def bring_cb(ud, goal):
                              parameters=par)
     return goal
 
+def emergency_bathroom_cb(ud, goal):
+    rospy.loginfo('emergency_bathroom_cb')
+    par = []
+    par.append(String('bathroom sos button'))
+    goal = GeneralHobbitGoal(
+        command=String('Emergency'),
+        parameters=par)
+
 
 def away_cb(ud, goal):
     par = []
@@ -703,7 +711,7 @@ def main():
             SimpleActionState(
                 'emergency_bathroom',
                 GeneralHobbitAction,
-                goal_cb=away_cb,
+                goal_cb=emergency_bathroom_cb,
                 input_keys=['parameters', 'params'],
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
