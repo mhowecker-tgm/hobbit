@@ -13,7 +13,6 @@
 <node name="pickup" pkg="hobbit_smach" type="pickup.py" output="log" />
 <rosparam file="/opt/ros/hobbit_hydro/src/hobbit_params.yaml" command="load"/>
 <node name="away_break" pkg="hobbit_smach" type="away.py" output="log" />
-<node name="puppetmaster" pkg="hobbit_smach" type="puppetmaster.py" output="log"/>
 <node name="arm_action_server" pkg="hobbit_smach" type="ArmActionServer.py" output="log" />
 <node name="bring_object" pkg="hobbit_smach" type="bring_object_simple.py" output="log" />
 <node name="helper_node" pkg="hobbit_smach" type="helper_tools.py" output="log" />
