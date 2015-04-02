@@ -65,7 +65,7 @@ sleep $DELAY_BETWEEN_STEPS
 
 
 # Start the virtual laser
-cd /opt/ros/hobbit_hydro/src/virtual_laser/launch
+cd /opt/ros/hobbit_hydro/src/virtual_laser2/launch
 roslaunch startup.launch&
 
 sleep $DELAY_BETWEEN_STEPS
@@ -82,6 +82,7 @@ roslaunch aal_service startup.launch&
 # 
 # # Start SMACH handling of rooms, places, objects.
 roslaunch hobbit_smach startup.launch&
+roslaunch hobbit_smach startup_master.launch&
 roslaunch recognition_service startup.launch&
 sleep $DELAY_BETWEEN_STEPS
 # roslaunch hobbit_smach startup_master.launch&
