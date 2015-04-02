@@ -50,7 +50,7 @@
         <type>searchable</type>
         <pose y="0.811" x="0.85097" theta="0.506"/>
         <objects>
-          <object name="Haferl" probability="1.0"/>
+          <object name="mug" probability="1.0"/>
           <object name="aspirin" probability="0.5"/>
         </objects>
       </place>
@@ -59,7 +59,7 @@
         <type>searchable</type>
         <pose y="-0.09" x="-0.978" theta="1.036"/>
         <objects>
-          <object name="Haferl" probability="1.0"/>
+          <object name="mug" probability="1.0"/>
           <object name="aspirin" probability="0.5"/>
         </objects>
       </place>

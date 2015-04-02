@@ -74,7 +74,7 @@
         <pose y="0.541957" x="-0.989167" theta="-3.038372"/>
         <objects>
           <object name="Haeferl" probability="1.0"/>
-          <object name="aspirin" probability="0.333333333333"/>
+          <object name="Aspirin" probability="0.333333333333"/>
         </objects>
       </place>
       <place>
@@ -83,7 +83,7 @@
         <pose y="1.16" x="-2.35" theta="-1.5"/>
         <objects>
           <object name="Haeferl" probability="1.0"/>
-          <object name="aspirin" probability="0.333333333333"/>
+          <object name="Aspirin" probability="0.333333333333"/>
         </objects>
       </place>
       <place>
@@ -92,7 +92,7 @@
         <pose y="-0.968" x="-0.85" theta="0.18997"/>
         <objects>
           <object name="Haeferl" probability="1.0"/>
-          <object name="aspirin" probability="0.333333333333"/>
+          <object name="Aspirin" probability="0.333333333333"/>
         </objects>
       </place>
     </places>
