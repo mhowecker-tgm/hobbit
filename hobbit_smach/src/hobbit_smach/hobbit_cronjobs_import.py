@@ -73,14 +73,14 @@ class SleepAway(State):
         State.__init__(
             self,
             outcomes=['succeeded', 'preempted', 'aborted'],
-            input_keys=['timeframe']
+            input_keys=['interval']
         )
 
     def execute(self, ud):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
-        next_time = get_next_time(interval=ud.timeframe)
+        next_time = get_next_time(interval=ud.interval)
         cron.remove_all(comment='3hours')
         cron.remove_all(comment='sleep_away')
         if check_sleep_times(next_time):

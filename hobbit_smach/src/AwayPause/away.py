@@ -100,7 +100,7 @@ class ParameterCheck(State):
         State.__init__(self,
                        outcomes=['yes', 'no', 'preempted', 'failure'],
                        input_keys=['command', 'parameters'],
-                       output_keys=['question', 'timeframe']
+                       output_keys=['question', 'interval', 'timeframe']
                        )
 
     def execute(self, ud):
@@ -223,12 +223,12 @@ def main():
     seq1 = Sequence(
         outcomes=['succeeded', 'failed', 'preempted'],
         connector_outcome='succeeded',
-        input_keys=['timeframe']
+        input_keys=['interval']
     )
     seq2 = Sequence(
         outcomes=['succeeded', 'failed', 'preempted'],
         connector_outcome='succeeded',
-        input_keys=['timeframe']
+        input_keys=['interval']
     )
 
     away_sm.userdata.result = String('started')
