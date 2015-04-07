@@ -90,6 +90,9 @@ class SleepAway(State):
             )
             job.hour.on(next_time[0])
             job.minute.on(next_time[1])
+            rospy.loginfo("setting cronjob for patrol to: "+str(next_time[0])+":"+str(next_time[1]))
+            cron.write()
+            rospy.loginfo(str(cron.render()))
         else:
             return 'aborted'
         return 'succeeded'
@@ -120,6 +123,9 @@ class ThreeHours(State):
             )
             job.hour.on(next_time[0])
             job.minute.on(next_time[1])
+            rospy.loginfo("setting cronjob for patrol to: "+str(next_time[0])+":"+str(next_time[1]))
+            cron.write()
+            rospy.loginfo(str(cron.render()))
         else:
             return 'aborted'
         return 'succeeded'
@@ -149,8 +155,8 @@ def check_sleep_times(next_time):
     sleep = sleep_time.split(':')
     wakeup = wakeup_time.split(':')
     if time(int(wakeup[0]), int(wakeup[1]))\
-            <= next_time\
-            <= time(sleep[0], sleep[1]):
+            <= time(next_time[0], next_time[1])\
+            <= time(int(sleep[0]), int(sleep[1])):
         return True
     else:
         False

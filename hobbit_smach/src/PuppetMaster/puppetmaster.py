@@ -88,6 +88,8 @@ def command_cb(msg, ud):
         rospy.loginfo(str(msg.event))
         input_ce = msg.event.upper()
         rospy.loginfo('/Event data received:')
+        if msg.event == 'E_WATCHDOG':
+            rospy.loginfo(str(msg.header))
     except AttributeError, e:
         print("command_cb: Event: "+str(e))
         pass

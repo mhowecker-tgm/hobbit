@@ -109,6 +109,7 @@ class ParameterCheck(State):
             return 'preempted'
         print(ud.command)
         for i in ud.parameters:
+            ud.interval = int(i.data)
             if int(i.data) < 6:
                 ud.timeframe = '03:00'
                 return 'no'
