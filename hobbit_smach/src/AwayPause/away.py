@@ -222,11 +222,13 @@ def main():
 
     seq1 = Sequence(
         outcomes=['succeeded', 'failed', 'preempted'],
-        connector_outcome='succeeded'
+        connector_outcome='succeeded',
+        input_keys=['timeframe']
     )
     seq2 = Sequence(
         outcomes=['succeeded', 'failed', 'preempted'],
-        connector_outcome='succeeded'
+        connector_outcome='succeeded',
+        input_keys=['timeframe']
     )
 
     away_sm.userdata.result = String('started')
@@ -338,17 +340,7 @@ def main():
                 recharge.getRecharge(),
                 transitions={'aborted': 'failed'}
             )
-            #Sequence.add(
-            #    'SET_NAV_GOAL',
-            #    hobbit_move.SetNavGoal(room='dock', place='dock')
-            #)
-            #Sequence.add(
-            #    'MOVE_TO_DOCK',
-            #    hobbit_move.goToPose(),
-            #    transitions={'aborted': 'failed'})
-
             seq2.userdata.text = 'Tell me when you are back/awake again.'
-            # TODO: menu='MAIN' has to be changed to the 'User is back menu'
             Sequence.add(
                 'MMUI_SHOW_MENU_ME_BACK_AWAKE',
                 HobbitMMUI.ShowMenu(menu='AWAY'))
