@@ -60,7 +60,6 @@ class sqlitedb:
         mylock.acquire()
         yourdate=int(time.time()*1000)
         for par in params:
-          #print par
           if par.name == "Name":
             evt = evt + ";" + par.value 
           if par.name == "sensor":
@@ -71,6 +70,12 @@ class sqlitedb:
             evt = evt + ";" + par.value 
           if par.name == "value":
             evt = evt + ";" + par.value 
+          if par.name == "":
+            evt = evt + ";" + par.value 
+          elif "E_LOG" in evt.upper():
+            rospy.loginfo(str(par.name))
+            rospy.loginfo(str(par.value))
+            evt = evt + ";" + par.name + ";" + par.value 
         d=int(time.time()*1000)
         evtcon = sqlite3.connect('hobbit.db')
         evtcur=evtcon.cursor()
