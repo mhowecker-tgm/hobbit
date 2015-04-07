@@ -161,8 +161,11 @@ class Init(smach.State):
         self.pub_obstacle.publish('active')
         if rospy.has_param('/hobbit/social_role'):
             ud.social_role = rospy.get_param('/hobbit/social_role')
-        if ud.command.data == 'cancel':
-            return 'canceled'
+        try:
+            if ud.command.data == 'cancel':
+                return 'canceled'
+        except KeyError:
+            pass
         return 'succeeded'
 
 
