@@ -64,14 +64,14 @@ class sqlitedb:
           self.zz.append(mpl.dates.epoch2num(time.time()))
           self.fx.vlines(self.zz, pos, pos+.01, color=color, label=what)
 
-    def __init__(self):
+    def __init__(self, filename='hobbit.db'):
         #self.cSub = rospy.Subscriber("/ActionSequence", Command, self.processCommand, queue_size=1)
         #self.stopSub = rospy.Subscriber("/PriorityStop", String, self.processStop, queue_size=1)
 
         #self.subC = rospy.Subscriber("/Command", Command, self.commandCallback )
         #self.subE = rospy.Subscriber("/Event", Event, self.eventCallback )
         #self.subA = rospy.Subscriber("/AALEvent", Event, self.eventAALCallback )
-        self.con = sqlite3.connect('hobbit.db')
+        self.con = sqlite3.connect(filename)
         self.cur=self.con.cursor()
         #self.cur.execute("DROP TABLE IF EXISTS Hobbit")
         self.cur.execute("CREATE TABLE IF NOT EXISTS Hobbit(timestamp INTEGER NOT NULL, typCode TEXT, value FLOAT, event TEXT, ref INTEGER)")
@@ -175,7 +175,11 @@ class sqlitedb:
     
 def main(args):        
     #rospy.init_node('sqlitedb', anonymous=False)
-    c = sqlitedb()
+    if len(sys.argv) > 1:
+        file = sys.argv[1]
+    else:
+        file = 'hobbit.db'
+    c = sqlitedb(file)
 
     #rospy.spin()
 
