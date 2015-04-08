@@ -120,7 +120,7 @@ def getRecharge():
             Sequence.add(
                 'DOCKING',
                 startDockProcedure(),
-                transitions={'succeeded': 'MMUI_MAIN_MENU',
+                transitions={'succeeded': 'SAY_SUCCESS',
                              'aborted': 'SAY_UNABLE_TO_DOCK',
                              'preempted': 'LOG_PREEMPT'})
             Sequence.add(
@@ -136,6 +136,17 @@ def getRecharge():
         )
         else:
             pass
+        Sequence.add(
+            'SAY_SUCCESS',
+            speech_output.emo_say_something(
+                emo='HAPPY',
+                time=0,
+                text='T_CH_DockingComplete'
+            ),
+            transitions={'aborted': 'LOG_ABORT',
+                         'succeeded': 'MMUI_MAIN_MENU',
+                         'preempted': 'LOG_PREEMPT'}
+        )
         Sequence.add('MMUI_MAIN_MENU', HobbitMMUI.ShowMenu(menu='MAIN'),
                      transitions={'failed': 'LOG_ABORT',
                                   'succeeded': 'LOG_SUCCESS',
