@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include <QInputDialog>
+
 MyDialog::MyDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::MyDialog)
@@ -25,7 +27,13 @@ MyDialog::~MyDialog()
     if (ui->default_place->isChecked()) current_place_type = "default";
     if (ui->call_button->isChecked()) 
     {
+
+	bool ok;
+	QString text_input = QInputDialog::getText(this,("Enter button id number"),(""),QLineEdit::Normal,QString::null,&ok);
+    	std::string utf8_button_number = text_input.toUtf8().constData();
+
 	current_place_type = "call_button_";
+	current_place_type+= utf8_button_number;
         //std::ostringstream oss;
         //oss<<n;
 	//current_place_type += oss.str();
