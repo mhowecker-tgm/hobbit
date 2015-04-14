@@ -58,6 +58,7 @@ ros::Subscriber fitnessTabletSubscriber;
 ros::ServiceServer askForUserDistance;
 
 #define divisor 1000
+#define MIN_TIME_SEC_BETWEEN_GESTURE_BROADCAST 2
 //ros::Publisher gestureBroadcaster;
 
 volatile int paused = 0;
@@ -83,6 +84,8 @@ unsigned int isSkeletonCloseEnoughForInteractionInt=0;
 unsigned char * colorFrameCopy=0;   unsigned int colorCopyWidth = 0; unsigned int colorCopyHeight = 0;
 unsigned short * depthFrameCopy =0; unsigned int depthCopyWidth = 0; unsigned int depthCopyHeight = 0;
 
+
+ros::Time lastGestureTrigger;
 
 
 
@@ -396,12 +399,46 @@ void fitnessRecvMessage(const hobbit_msgs::Fitness & msg)
 }
 
 
+void testerGesture(struct handGesture * gesture)
+{
+  int payload=0;
+  char command[512]={0};
+    switch (gesture->gestureID)
+    {
+     case GESTURE_NONE   :   break;
+     case GESTURE_CANCEL : payload=1; snprintf(command,512,"wget -q O http://127.0.0.1:8080/index.html?RIGHT=1&"); break;
+     case GESTURE_HELP   : payload=1; snprintf(command,512,"eject &");  break;
+     case GESTURE_YES    : payload=1; snprintf(command,512,"wget -q O http://127.0.0.1:8080/index.html?RIGHT=1&");   break;
+     case GESTURE_NO     : payload=1; snprintf(command,512,"wget -q O http://127.0.0.1:8080/index.html?LEFT=1&");    break;
+     case GESTURE_REWARD : payload=1; snprintf(command,512,"wget -q O http://127.0.0.1:8080/index.html?STARS=1&");    break;
+     case GESTURE_POINT  : break;
+     case GESTURE_COME   : break;
+     case GESTURE_WAVE   : return; /*disabled*/ break;
+     default :              break;
+    };
+
+
+ if (payload)
+ {
+   int i=system(command);
+
+   if (i==0) { fprintf(stderr,"Success executing `%s`\n",command); } else
+             { fprintf(stderr,"Failed executing `%s`\n",command); }
+ }
+
+}
+
+
+
+
+
 
 
 
 void broadcastNewGesture(unsigned int frameNumber,struct handGesture * gesture)
 {
     if (gesture==0)  { return ; }
+    //testerGesture(gesture); , simple tester function for debugging
 
     hobbit_msgs::Event evt;
     std::stringstream ss;
@@ -420,9 +457,13 @@ void broadcastNewGesture(unsigned int frameNumber,struct handGesture * gesture)
      }
     }
 
-
-
-
+    evt.header.stamp = ros::Time::now();
+    ros::Duration elapsedTimeSinceLastGesture = evt.header.stamp - lastGestureTrigger;
+    if (elapsedTimeSinceLastGesture.toSec()<=MIN_TIME_SEC_BETWEEN_GESTURE_BROADCAST)
+    {
+      fprintf(stderr,YELLOW "Received Gesture before timeout , not broadcasting it.\n" NORMAL);
+      return;
+    }
 
 
     switch (gesture->gestureID)
@@ -443,13 +484,14 @@ void broadcastNewGesture(unsigned int frameNumber,struct handGesture * gesture)
     evt.event=ss.str();
     evt.header.seq = frameNumber;
     evt.header.frame_id = "skeleton_detector";
-    evt.header.stamp = ros::Time::now();
     evt.sessionID  = "SessionID";
     evt.confidence = 1.0;
     evt.params.resize(0);
     fprintf(stderr,"Publishing a new Event ( %u ) \n",gesture->gestureID);
     gestureEventBroadcaster.publish(evt);
 
+
+    lastGestureTrigger=evt.header.stamp;
 
     return ;
 }
@@ -711,6 +753,8 @@ int registerServices(ros::NodeHandle * nh,unsigned int width,unsigned int height
   hobbitFitnessFunction_RegisterExerciseRepetitionErrorDetected((void *) &broadcastNewRepetitionError);
   //hobbitFitnessFunction_RegisterExerciseRepetitionBatchCompleted(void * callback)
 
+
+  lastGestureTrigger = ros::Time::now();
 
 
   fprintf(stderr,"Advertising ROS Topics..\n");
