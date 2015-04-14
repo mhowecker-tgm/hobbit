@@ -6,6 +6,10 @@ if [ "$#" -ne 1 ]; then
     echo "Illegal number of parameters, valid modes are learning,mapping,navigation"
 fi
 
+if [ -f /opt/ros/hobbit_hydro/src/hobbit_launch/scripts/.bash_hobbit_config ]; then
+    . /opt/ros/hobbit_hydro/src/hobbit_launch/scripts/.bash_hobbit_config
+fi
+
 if [ "$1" == "mapping" ]
 then
  echo "Mapping"
