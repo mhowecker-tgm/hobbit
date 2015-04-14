@@ -131,6 +131,11 @@ class WaitForMsgState(smach.State):
         if self.timeout is not None:
             timeout_time = rospy.Time.now() + rospy.Duration.from_sec(self.timeout)
         while self.timeout is None or rospy.Time.now() < timeout_time:
+            if self.preempt_requested():
+                self.service_preempt()
+                rospy.loginfo('waitForMsg is preempted!')
+                return 'preempted'
+            
             self.mutex.acquire()
             if self.msg is not None:
                 rospy.loginfo('Got message.')
@@ -142,11 +147,6 @@ class WaitForMsgState(smach.State):
                 self.mutex.release()
                 return message
             self.mutex.release()
-
-            if self.preempt_requested():
-                self.service_preempt()
-                rospy.loginfo('waitForMsg is preempted!')
-                return 'preempted'
 
             rospy.sleep(.1)
 
