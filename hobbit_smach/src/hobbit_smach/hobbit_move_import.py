@@ -274,9 +274,19 @@ def move_discrete(in_motion=None, in_value=None):
         StateMachine.add(
             'MOVE',
             MoveDiscrete(motion=in_motion, value=in_value),
-            transitions={'succeeded': 'SET_NOT_MOVING',
+            transitions={'succeeded': 'SET_DOCK_STATE_VAR',
                          'preempted': 'preempted',
                          'aborted': 'aborted'}
+        )
+        StateMachine.add(
+            'SET_DOCK_STATE_VAR',
+            ServiceState('/docking/set_dock_state',
+                         SetDockState,
+                         request=SetDockStateRequest(state=False),
+                         response_cb=resp_cb),
+            transitions={'succeeded':'SET_NOT_MOVING',
+                         'aborted': 'aborted',
+                         'preempted': 'preempted'}
         )
         StateMachine.add(
             'SET_NOT_MOVING',
@@ -663,10 +673,17 @@ def goToPosition(frame='/map', room='None', place='dock'):
             transitions={'aborted': 'SAY_ARM'}
         )
         Sequence.add(
+            'SET_DOCK_STATE_VAR',
+            ServiceState('/docking/set_dock_state',
+                         SetDockState,
+                         request=SetDockStateRequest(state=False),
+                         response_cb=resp_cb)
+        )
+        Sequence.add(
             'SET_MOVING',
             ServiceState('/moving/set_move_state',
-                         SetDockState,
-                         request=SetDockStateRequest(state=True),
+                         SetMoveState,
+                         request=SetMoveStateRequest(state=True),
                          response_cb=resp_cb),
         )
         if not DEBUG:
@@ -825,10 +842,17 @@ def goToPose():
                 transitions={'aborted': 'SAY_ARM'}
             )
             Sequence.add(
+            'SET_DOCK_STATE_VAR',
+            ServiceState('/docking/set_dock_state',
+                         SetDockState,
+                         request=SetDockStateRequest(state=False),
+                         response_cb=resp_cb)
+            )
+            Sequence.add(
             'SET_MOVING',
             ServiceState('/moving/set_move_state',
-                         SetDockState,
-                         request=SetDockStateRequest(state=True),
+                         SetMoveState,
+                         request=SetMoveStateRequest(state=True),
                          response_cb=resp_cb),
             )
             Sequence.add('MOVE_BASE_GOAL', move_base.MoveBaseState(frame),
@@ -941,10 +965,17 @@ def goToPoseSilent():
                 transitions={'aborted': 'SAY_ARM'}
             )
             Sequence.add(
+            'SET_DOCK_STATE_VAR',
+            ServiceState('/docking/set_dock_state',
+                         SetDockState,
+                         request=SetDockStateRequest(state=False),
+                         response_cb=resp_cb)
+            )
+            Sequence.add(
             'SET_MOVING',
             ServiceState('/moving/set_move_state',
-                         SetDockState,
-                         request=SetDockStateRequest(state=True),
+                         SetMoveState,
+                         request=SetMoveStateRequest(state=True),
                          response_cb=resp_cb),
             )
             Sequence.add('MOVE_BASE_GOAL', move_base.MoveBaseState(frame),
@@ -1014,8 +1045,6 @@ def goToPoseSilent():
         )
     return seq
 
-
-
 def getRobotPose():
     """
     Returns a move_base.ReadRobotPositionState
@@ -1026,7 +1055,6 @@ def getRobotPose():
 
     frame = '/map'
     return move_base.ReadRobotPositionState(frame)
-
 
 def rotateRobot(angle=0, frame='/map'):
     """
@@ -1048,7 +1076,6 @@ def rotateRobot(angle=0, frame='/map'):
         Sequence.add('SET_ROT_GOAL', SetRotationGoal(angle=angle))
         Sequence.add('ROTATE_ROBOT', move_base.MoveBaseState(frame))
         return seq
-
 
 class HasMovedFromPreDock(State):
     """
@@ -1112,7 +1139,6 @@ class HasMovedFromPreDock(State):
             else:
                 self.counter += 1
                 return 'movement_within_distance'
-
 
 def get_set_nav_goal_state(room_name=None, location_name='dock'):
     return SetNavigationGoal(room=None, place='dock')
