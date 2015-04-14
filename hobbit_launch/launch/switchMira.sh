@@ -6,9 +6,15 @@ if [ "$#" -ne 1 ]; then
     echo "Illegal number of parameters, valid modes are learning,mapping,navigation"
 fi
 
-if [ -f /opt/ros/hobbit_hydro/src/hobbit_launch/scripts/.bash_hobbit_config ]; then
-    . /opt/ros/hobbit_hydro/src/hobbit_launch/scripts/.bash_hobbit_config
-fi
+MIRA_PATH=/localhome/demo/mira/mira-base
+LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/localhome/demo/mira/mira-base/lib
+PATH=${PATH}:/localhome/demo/mira/mira-base/bin
+source /localhome/demo/mira/mira-base/scripts/mirabash
+
+MIRA_PATH=${MIRA_PATH}:/localhome/demo/mira/mira-commercial
+LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/localhome/demo/mira/mira-commercial/lib
+MIRA_PATH=$MIRA_PATH:/localhome/demo/mira/mira-hobbit
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/localhome/demo/mira/mira-hobbit/lib
 
 if [ "$1" == "mapping" ]
 then
