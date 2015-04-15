@@ -49,7 +49,7 @@ MainWindow::~MainWindow()
 void MainWindow::LoadMap()
 {
     //
-    map_file_name = QFileDialog::getOpenFileName(this,tr("Open map image"), "/home", tr("Image files (*.pgm)"));
+    map_file_name = QFileDialog::getOpenFileName(this,tr("Open map image"), "/opt/ros/hobbit_hydro/src/navigation/share", tr("Image files (*.pgm)"));
 
     if (!map_file_name.isEmpty())
     {
@@ -250,7 +250,7 @@ void MainWindow::on_connect_clicked()
     qnode.init();
     bConnected = true;
 
-    map_file_name = QFileDialog::getOpenFileName(this,tr("Open rooms file"), "/home", tr("All files (*)"));
+    map_file_name = QFileDialog::getOpenFileName(this,tr("Open rooms file"), "/opt/ros/hobbit_hydro/src/navigation/places_files", tr("All files (*)"));
 
     if (!map_file_name.isEmpty())
     {
@@ -387,7 +387,7 @@ int MainWindow::on_save_file_clicked()
 
     // open dialog for the user to enter the file name
     QString file_name = QFileDialog::getSaveFileName(this,
-             tr("Save to file"), "",
+             tr("Save to file"), "/opt/ros/hobbit_hydro/src/navigation/places_files",
              tr("All Files (*)"));
 
     string file_name_str = file_name.toStdString();
