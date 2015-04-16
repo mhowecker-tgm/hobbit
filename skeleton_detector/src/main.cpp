@@ -416,6 +416,7 @@ int main(int argc, char **argv)
      std::cerr<<"skeleton detector , Depth feed "<<fromDepthTopic<<" \n";
      std::cerr<<"skeleton detector , Depth Info "<<fromDepthTopicInfo<<" \n";
 
+
 	 depth_img_sub = new message_filters::Subscriber<sensor_msgs::Image>(nh,fromDepthTopic,1);
 	 depth_cam_info_sub = new message_filters::Subscriber<sensor_msgs::CameraInfo>(nh,fromDepthTopicInfo,1);
 
@@ -426,9 +427,11 @@ int main(int argc, char **argv)
 
 
      #if USE_NONDEFAULT_CALIBRATIONS
-	   sync = new message_filters::Synchronizer<RgbdSyncPolicy>(RgbdSyncPolicy(rate), *rgb_img_sub, *depth_img_sub,*depth_cam_info_sub); //*rgb_cam_info_sub,
+       std::cerr<<"Also subscribing to the camera info topics\n";
+ 	   sync = new message_filters::Synchronizer<RgbdSyncPolicy>(RgbdSyncPolicy(rate), *rgb_img_sub, *depth_img_sub,*depth_cam_info_sub); //*rgb_cam_info_sub,
  	   sync->registerCallback(rgbdCallback);
      #else
+       std::cerr<<"Ignoring camera info topics\n";
        sync = new message_filters::Synchronizer<RgbdSyncPolicy>(RgbdSyncPolicy(rate), *rgb_img_sub, *depth_img_sub); //*rgb_cam_info_sub,
 	   sync->registerCallback(rgbdCallbackNoCalibration);
     #endif
