@@ -112,7 +112,7 @@ class sqlitedb:
         self.putInDB("CMD",msg.command,1,msg.params)
     
     def eventCallback(self,msg):
-       if msg.event != "SAPIEND":
+       if msg.event not in ["SAPIEND", "E_WATCHDOG"]:
         self.putInDB("EVT",msg.event,msg.confidence,msg.params)
 
     def eventAALCallback(self,msg):
