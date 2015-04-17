@@ -34,6 +34,12 @@
         <objects/>
       </place>
       <place>
+        <name>locate_user_corridor</name>
+        <type>default</type>
+        <pose y="1.75" x="3.2" theta="-2.969487"/>
+        <objects/>
+      </place>
+      <place>
         <name>call3</name>
         <type>call_button_3</type>
         <pose y="2.94814968109" x="2.6463496685" theta="-2.23138425"/>
@@ -75,6 +81,7 @@
         <objects>
           <object name="Haeferl" probability="1.0"/>
           <object name="Aspirin" probability="0.333333333333"/>
+          <object name="Button" probability="0.333333333333"/>
         </objects>
       </place>
       <place>
@@ -84,6 +91,7 @@
         <objects>
           <object name="Haeferl" probability="1.0"/>
           <object name="Aspirin" probability="0.333333333333"/>
+          <object name="Button" probability="0.333333333333"/>
         </objects>
       </place>
       <place>
@@ -93,6 +101,7 @@
         <objects>
           <object name="Haeferl" probability="1.0"/>
           <object name="Aspirin" probability="0.333333333333"/>
+          <object name="Button" probability="0.333333333333"/>
         </objects>
       </place>
     </places>
@@ -109,6 +118,12 @@
       <place>
         <name>center</name>
         <type>goTo</type>
+        <pose y="4.124871" x="-0.8459" theta="0.171305"/>
+        <objects/>
+      </place>
+      <place>
+        <name>locate_user_entrance</name>
+        <type>default</type>
         <pose y="4.124871" x="-0.8459" theta="0.171305"/>
         <objects/>
       </place>

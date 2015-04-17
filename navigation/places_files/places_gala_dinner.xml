@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <rooms>
   <room>
-    <name>living_room</name>
+    <name>livingroom</name>
     <vertices>
       <vertex y="6.5" x="-3.699999"/>
       <vertex y="-3.5" x="-6.7"/>
