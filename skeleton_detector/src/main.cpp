@@ -35,6 +35,7 @@
 //This will make this node also register to color/depth calibrations and
 //pass them to the gesture node instead of the defaults
 #define USE_NONDEFAULT_CALIBRATIONS 1
+#define USE_COMPRESSED_STREAMS 0
 #define MAX_RECORDED_FRAMES 1000
 
 
@@ -60,11 +61,6 @@ struct calibrationHobbit calib={0};
  typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image> RgbdSyncPolicy;
 #endif
 
-//RGB/DEPTH Subscribers
-message_filters::Subscriber<sensor_msgs::Image> *rgb_img_sub;
-message_filters::Subscriber<sensor_msgs::CameraInfo> *rgb_cam_info_sub;
-message_filters::Subscriber<sensor_msgs::Image> *depth_img_sub;
-message_filters::Subscriber<sensor_msgs::CameraInfo> *depth_cam_info_sub;
 
 //----------------------------------------------------------
 
@@ -417,17 +413,38 @@ int main(int argc, char **argv)
      std::cerr<<"skeleton detector , Depth Info "<<fromDepthTopicInfo<<" \n";
 
 
-	 depth_img_sub = new message_filters::Subscriber<sensor_msgs::Image>(nh,fromDepthTopic,1);
-	 depth_cam_info_sub = new message_filters::Subscriber<sensor_msgs::CameraInfo>(nh,fromDepthTopicInfo,1);
 
-	 rgb_img_sub = new  message_filters::Subscriber<sensor_msgs::Image>(nh,fromRGBTopic, 1);
-	 rgb_cam_info_sub = new message_filters::Subscriber<sensor_msgs::CameraInfo>(nh,fromRGBTopicInfo,1);
+
+     #if USE_COMPRESSED_STREAMS
+      message_filters::Subscriber<sensor_msgs::Image> *depth_img_sub;
+      image_transport::TransportHints hintsDepth("compressedDepth");
+ 	  depth_img_sub = new image_transport::SubscriberFilter(nh,fromDepthTopic,1,hintsDepth);
+     #else
+	  message_filters::Subscriber<sensor_msgs::Image> *depth_img_sub;
+      depth_img_sub = new message_filters::Subscriber<sensor_msgs::Image>(nh,fromDepthTopic,1);
+     #endif // USE_COMPRESSED_STREAMS
+
+
+     #if USE_COMPRESSED_STREAMS
+      message_filters::Subscriber<sensor_msgs::Image> *rgb_img_sub;
+      image_transport::TransportHints hints("compressed");
+      rgb_img_sub = new  image_transport::SubscriberFilter(nh,fromRGBTopic, 1 , hints);
+     #else
+      message_filters::Subscriber<sensor_msgs::Image> *rgb_img_sub;
+      rgb_img_sub = new  message_filters::Subscriber<sensor_msgs::Image>(nh,fromRGBTopic, 1);
+     #endif // USE_COMPRESSED_STREAMS
 
      std::cerr<<"Done\n";
 
 
      #if USE_NONDEFAULT_CALIBRATIONS
        std::cerr<<"Also subscribing to the camera info topics\n";
+       message_filters::Subscriber<sensor_msgs::CameraInfo> *depth_cam_info_sub;
+       message_filters::Subscriber<sensor_msgs::CameraInfo> *rgb_cam_info_sub;
+
+	   depth_cam_info_sub = new message_filters::Subscriber<sensor_msgs::CameraInfo>(nh,fromDepthTopicInfo,1);
+	   rgb_cam_info_sub = new message_filters::Subscriber<sensor_msgs::CameraInfo>(nh,fromRGBTopicInfo,1);
+
  	   sync = new message_filters::Synchronizer<RgbdSyncPolicy>(RgbdSyncPolicy(rate), *rgb_img_sub, *depth_img_sub,*depth_cam_info_sub); //*rgb_cam_info_sub,
  	   sync->registerCallback(rgbdCallback);
      #else
@@ -465,9 +482,14 @@ int main(int argc, char **argv)
 	   stopServices();
 
 	   delete depth_img_sub;
-	   delete depth_cam_info_sub;
 	   delete rgb_img_sub;
+
+
+     #if USE_NONDEFAULT_CALIBRATIONS
+       delete depth_cam_info_sub;
 	   delete rgb_cam_info_sub;
+     #endif // USE_NONDEFAULT_CALIBRATIONS
+
 	   delete sync;
 	}
 	catch(std::exception &e) { ROS_ERROR("Exception: %s", e.what()); return 1; }
