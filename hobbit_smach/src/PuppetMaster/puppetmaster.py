@@ -25,6 +25,7 @@ from hobbit_msgs import MMUIInterface as MMUI
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 from hobbit_smach.bcolors import bcolors
 import hobbit_smach.arm_move_import as arm_move
+import hobbit_smach.phone_call_import as phone_call
 
 new_command = None
 new_params = None
@@ -738,9 +739,7 @@ def main():
         )
         StateMachine.add(
             'CALL',
-            # There is nothing to do during a phone call,
-            # so we just wait and do nothing.
-            FakeForAllWithoutRunningActionSever(name='CALL'),
+            phone_call.wait_for_end_of_call(),
             transitions={'succeeded': 'MAIN_MENU',
                          'preempted': 'preempted',
                          'aborted': 'RESET_ACTIVE_TASK'}
