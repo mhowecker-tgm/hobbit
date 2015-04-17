@@ -1,0 +1,6 @@
+# This file contains the cronjobs that hobbit will use
+
+0 2 * * * /opt/ros/hobbit_hydro/src/hobbit_smach/src/LearnObject/model_cronjob.sh
+*/1 * * * * /opt/ros/hobbit_hydro/src/hobbit_smach/scripts/watchdog.sh >/dev/null 2>&1
+55 23 * * * /opt/ros/hobbit_hydro/src/sqlitedb/src/keepsql.sh
+49 19 * * * /opt/ros/hobbit_hydro/src/hobbit_smach/scripts/cron_P.sh # sleep_away
