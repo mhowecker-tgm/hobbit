@@ -669,7 +669,7 @@ def main():
         StateMachine.add(
             'PATROL',
             SimpleActionState(
-                'locate_user',
+                'locate_user_simple',
                 GeneralHobbitAction,
                 goal_cb=patrol_cb,
                 input_keys=['parameters', 'params'],
