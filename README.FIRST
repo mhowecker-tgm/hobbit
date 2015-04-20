@@ -69,6 +69,18 @@ SETUP HOBBIT WORKSPACE FOR PT2
   Finally to enable auto-start scripts , and set-up several things that need super user powers (i.e. restarting the XPC through webinterface , etc  )
   you can run src/hobbit_launch/launch/initializeHobbitInstallation.sh
 
+- OpenRAVE is needed for the calculation of the arm movement. 
+  INSTALL OPENRAVE:
+  >> sudo add-apt-repository ppa:openrave/release
+  >> sudo apt-get update
+  >> sudo apt-get install openrave
+  if there is libbullet missing or in conflict with HACD library:
+  >> sudo mv /usr/lib/libHACD.so.2.80 /usr/lib/libHACD_OLD.so.2.80 
+  >> sudo dpkg -i --force-overwrite /var/cache/apt/archives/libbullet2.80_2.80.2-ubuntu1~precise1_amd64.deb
+  >> sudo apt-get install -f
+  type 
+  >> openrave
+  to see if installation was succesful
 
 
 ENABLING PERMANENT PASSWORD/CERTIFICATE STORAGE FOR SVN
