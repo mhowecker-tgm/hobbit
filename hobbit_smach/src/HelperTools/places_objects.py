@@ -198,6 +198,7 @@ def addObject(object_name, rooms):
 
 
 def update_object_list(rooms):
+    added = False
     if rospy.has_param('ENV/ObjectList'):
         tmp_list = rospy.get_param('ENV/ObjectList')
     else:
@@ -208,8 +209,11 @@ def update_object_list(rooms):
             for obj in place.objects:
                 if not obj.name.data.lower() in tmp_list.lower():
                     tmp_list = tmp_list+"+++"+obj.name.data.title()
+                    added = True
                 else:
                     rospy.loginfo("no need to change /ENV/ObjectList. "+str(obj.name.data.title())+" is already included")
+    if not added:
+        return
     rospy.set_param('ENV/ObjectList', tmp_list)
     try:
         mmui = MMUI.MMUIInterface()
