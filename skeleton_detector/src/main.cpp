@@ -25,6 +25,7 @@
 #include <sensor_msgs/image_encodings.h>
 #include <sensor_msgs/CameraInfo.h>
 #include <image_transport/image_transport.h>
+#include <image_transport/subscriber_filter.h>
 
 #include "services.h"
 
@@ -416,22 +417,22 @@ int main(int argc, char **argv)
 
 
      #if USE_COMPRESSED_STREAMS
-      message_filters::Subscriber<sensor_msgs::Image> *depth_img_sub;
+      std::string depth_topic = std::string(fromDepthTopic);
       image_transport::TransportHints hintsDepth("compressedDepth");
- 	  depth_img_sub = new image_transport::SubscriberFilter(nh,fromDepthTopic,1,hintsDepth);
+ 	  image_transport::SubscriberFilter *depth_img_sub;
+      depth_img_sub = new image_transport::SubscriberFilter(nh,depth_topic,1,hintsDepth);
      #else
-	  message_filters::Subscriber<sensor_msgs::Image> *depth_img_sub;
-      depth_img_sub = new message_filters::Subscriber<sensor_msgs::Image>(nh,fromDepthTopic,1);
+	  message_filters::Subscriber<sensor_msgs::Image> *depth_img_sub  = new message_filters::Subscriber<sensor_msgs::Image>(nh,fromDepthTopic,1);
      #endif // USE_COMPRESSED_STREAMS
 
 
      #if USE_COMPRESSED_STREAMS
-      message_filters::Subscriber<sensor_msgs::Image> *rgb_img_sub;
+      std::string color_topic = std::string(fromRGBTopic);
       image_transport::TransportHints hints("compressed");
-      rgb_img_sub = new  image_transport::SubscriberFilter(nh,fromRGBTopic, 1 , hints);
+      image_transport::SubscriberFilter *rgb_img_sub;
+      rgb_img_sub = new  image_transport::SubscriberFilter(nh,color_topic, 1 , hints);
      #else
-      message_filters::Subscriber<sensor_msgs::Image> *rgb_img_sub;
-      rgb_img_sub = new  message_filters::Subscriber<sensor_msgs::Image>(nh,fromRGBTopic, 1);
+      message_filters::Subscriber<sensor_msgs::Image> *rgb_img_sub = new  message_filters::Subscriber<sensor_msgs::Image>(nh,fromRGBTopic, 1);
      #endif // USE_COMPRESSED_STREAMS
 
      std::cerr<<"Done\n";
