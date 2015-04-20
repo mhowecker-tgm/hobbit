@@ -2,7 +2,6 @@
 
 DELAY_BETWEEN_STEPS="5"
 
-rosnode kill localization_monitor
 sleep $DELAY_BETWEEN_STEPS
 roslaunch localization_monitor startup.launch&
 sleep $DELAY_BETWEEN_STEPS
