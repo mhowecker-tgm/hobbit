@@ -375,7 +375,7 @@ class MoveDiscrete(State):
             self.init = True
             rospy.sleep(1.0)
         self.motion_pub.publish(String(self._motion +' '+self._value))
-	rospy.sleep(2.5)
+        rospy.sleep(1)
         return 'succeeded'
 
 class TestData(State):
