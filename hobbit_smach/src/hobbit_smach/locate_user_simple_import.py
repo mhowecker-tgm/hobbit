@@ -84,11 +84,11 @@ def msg_timer_sm():
             rospy.loginfo('Person data is too old. Ignore.')
             return False
         if msg.source == 6:
-            #print('Do not use this data')
+            #rospy.loginfo('Do not use this data')
             return False
         ud.person_x = msg.x
         ud.person_z = msg.z
-        #print("OK. Use it.")
+        #rospy.loginfo("OK. Use it.")
         return True
 
     cc = smach.Concurrence(outcomes=['aborted', 'succeeded', 'preempted'],
@@ -496,12 +496,25 @@ def get_detect_user():
             transitions={'succeeded': 'USER_DETECTION'}
         )
         smach.StateMachine.add(
+            'ROTATE',
+            hobbit_move.MoveDiscrete(motion='Turn', value='355'),
+            transitions={'succeeded': 'USER_DETECTION',
+                         'preempted': 'LOG_PREEMPT',
+                         'aborted': 'USER_DETECTION'}
+        )
+        smach.StateMachine.add(
             'USER_DETECTION',
             msg_timer_sm(),
-            transitions={'succeeded': 'CLOSER',
+            transitions={'succeeded': 'STOP_ROTATION',
                          'preempted': 'LOG_PREEMPT',
-                         'aborted': 'PREPARE_MOVEMENT'},
-
+                         'aborted': 'STOP_ROTATION'}
+        )
+        smach.StateMachine.add(
+            'STOP_ROTATION',
+            hobbit_move.Stop(),
+            transitions={'succeeded': 'PREPARE_MOVEMENT',
+                         'preempted': 'LOG_PREEMPT',
+                         'aborted': 'PREPARE_MOVEMENT'}
         )
         smach.StateMachine.add(
             'PREPARE_MOVEMENT',
