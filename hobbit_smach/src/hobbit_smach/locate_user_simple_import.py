@@ -240,7 +240,7 @@ class CleanPositions(smach.State):
         ud.positions = []
         for room in ud.response.rooms.rooms_vector:
             for position in room.places_vector:
-                if 'default' in position.place_name:
+                if 'default' in position.place_type:
                     ud.positions.append(
                         {'x': position.x,
                          'y': position.y,
