@@ -21,12 +21,12 @@ env >> ~/.startup.txt
 source ~/.bashrc
 source /opt/ros/hobbit_hydro/devel/setup.bash
 
-roscore&
+#roscore&
+roslaunch sqlitedb startup.launch&
 
 #ros core takes ages to start
 sleep $DELAY_BETWEEN_STEPS
 sleep $DELAY_BETWEEN_STEPS
-roslaunch sqlitedb startup.launch&
 
 /opt/ros/hobbit_hydro/src/rgbd_acquisition/scripts/workAroundUSB.sh
 sleep $DELAY_BETWEEN_STEPS
