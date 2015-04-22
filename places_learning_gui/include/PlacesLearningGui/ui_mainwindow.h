@@ -112,7 +112,7 @@ public:
         save_place->setText(QApplication::translate("MainWindow", "Save place", 0, QApplication::UnicodeUTF8));
         save_file->setText(QApplication::translate("MainWindow", "Save file", 0, QApplication::UnicodeUTF8));
         delete_place->setText(QApplication::translate("MainWindow", "Delete place", 0, QApplication::UnicodeUTF8));
-        connect->setText(QApplication::translate("MainWindow", "Connect", 0, QApplication::UnicodeUTF8));
+        connect->setText(QApplication::translate("MainWindow", "Load rooms", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };
