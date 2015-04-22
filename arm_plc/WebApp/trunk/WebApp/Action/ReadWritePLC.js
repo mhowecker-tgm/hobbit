@@ -41,7 +41,7 @@
         ".stCommands.ArmState.AT_PREGRASPFROMTABLE_POS",
         ".stCommands.ArmState.AT_CCW_POS",
         ".stCommands.ArmState.AT_CW_POS",
-		".stCommands.ArmState.AT_CANDLE_POS",
+        ".stCommands.ArmState.AT_CANDLE_POS",
 
         // Actual Position:
         ".stCommands.GetActualPos",
@@ -57,12 +57,13 @@
         ".bHomeRefAxis5",
         ".bHomeRefAxis6",
         
-        //referende Dialog
+        //reference Dialog
         ".stReferenceDialog.bActive",
-        ".stReferenceDialog.nJoint"
+        ".stReferenceDialog.nJoint",
+        ".stStartRefDialog.bShow"
     ];
     
-    var SizeOfReadValues =  27*1 + 6*8 + 1*2; // 28 BOOL + 6 LREAL Values + 1 INT Value
+    var SizeOfReadValues =  28*1 + 6*8 + 1*2; // 28 BOOL + 6 LREAL Values + 1 INT Value
         
     
     var handlesVarNamesWrite = [
@@ -138,6 +139,7 @@
     var hHomeRefAxis6 = null;
     var hReferenceDialogActive = null;
     var hReferenceDialogNumber = null;    
+    var hStartReferenceDialogActive = null;
     // Commands
     var handlesWrite = [];
 
@@ -173,6 +175,7 @@
     var bHomeRefAxis6 = null;
     var bReferenceDialogActive = null;
     var nJointNo = null;
+    var bStartReferenceDialogActive = null;
 
     // Base64 encoded binary data strings for write requests;
     var switchTrueBase64 = null;
@@ -212,7 +215,6 @@
             handleswriter.writeDINT(4); // Expected size; A handle has a size of 4 byte;
             handleswriter.writeDINT(handlesVarNamesWrite[i].length); // The length of the symbol name string;
         }
-
 
         // Write symbol names after the general information to the TcAdsWebService.DataWriter object;
         for (var i = 0; i < handlesVarNamesRead.length; i++) {
@@ -290,7 +292,7 @@
                 var len = reader.readDWORD();
 
                 if (err != 0) {
-                    document.getElementById("div_log").innerHTML = "Handle error!";
+                    document.getElementById("div_log").innerHTML = "Handle error: " +err+"!";
                     return;
                 }
 
@@ -331,6 +333,7 @@
             hHomeRefAxis6 = reader.readDWORD();
             hReferenceDialogActive = reader.readDWORD();
             hReferenceDialogNumber = reader.readDWORD();
+            hStartReferenceDialogActive = reader.readDWORD();
             // Commands
             for (var i = 0; i < handlesVarNamesWrite.length; i++) {
                 handlesWrite[i] = reader.readDWORD();        
@@ -479,6 +482,10 @@
             readSymbolValuesWriter.writeDINT(hReferenceDialogNumber); // IndexOffset = The target handle
             readSymbolValuesWriter.writeDINT(2); // size to read
                                     
+            readSymbolValuesWriter.writeDINT(TcAdsWebService.TcAdsReservedIndexGroups.SymbolValueByHandle); // IndexGroup
+            readSymbolValuesWriter.writeDINT(hStartReferenceDialogActive); // IndexOffset = The target handle
+            readSymbolValuesWriter.writeDINT(1); // size to read
+            //
             // Get Base64 encoded data from TcAdsWebService.DataWriter;
             readSymbolValuesData = readSymbolValuesWriter.getBase64EncodedData();
 
@@ -674,7 +681,7 @@
             for (var i = 0; i < handlesVarNamesRead.length; i++) {
                 var err = reader.readDWORD();
                 if (err != 0) {
-                    document.getElementById("div_log").innerHTML = "Symbol error!";
+                    document.getElementById("div_log").innerHTML = "ErrID: " + err + " at symbol " + handlesVarNamesRead[i] + "! " + hStartReferenceDialogActive ;
                     return;
                 }
             }
@@ -763,6 +770,7 @@
             //  ".stReferenceDialog.bActive"
             bReferenceDialogActive = reader.readBOOL();
             nJointNo = reader.readINT();
+            bStartReferenceDialogActive = reader.readBOOL();
 
             // Variables for Picture location:
             var PicMoving = "<img src='WebApp/Design/Img/Moving.png'>";
@@ -780,6 +788,7 @@
             var PicJoint4 = "<img src='WebApp/Design/img/Joint4.png' width='100%'>";
             var PicJoint5 = "<img src='WebApp/Design/img/Joint5.png' width='100%'>";
             var PicJoint6 = "<img src='WebApp/Design/img/Joint6.png' width='100%'>";
+            var PicHome = "<img src='WebApp/Design/img/Home.jpg' width = '100%'>";
             
             // Write data to the "Actual Arm States" interface;
             if (bArmInPosArea) {
@@ -1192,16 +1201,24 @@
                         break;
                         
                 }
-            }
+            }            
             else
             {
                 document.getElementById("_ReferencingDialog").style.display= 'none';
             }
             
-            
-            
-            
-            
+            if (bStartReferenceDialogActive)
+            {
+                document.getElementById("_ReferencingStartDialog").style.display= 'block';  
+                var caption = "Is arm in home-position?";              
+                document.getElementById("_StartRefDialogCaption").innerHTML = caption; 
+                document.getElementById("_HomePos").innerHTML = PicHome;                   
+            }
+            else
+            {
+                document.getElementById("_ReferencingStartDialog").style.display = 'none';
+            }
+                                               
         } else {
 
             if (e.error.getTypeString() == "TcAdsWebService.ResquestError") {
