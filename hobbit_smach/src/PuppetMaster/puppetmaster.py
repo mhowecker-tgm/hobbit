@@ -421,7 +421,7 @@ def patrol_cb(ud, goal):
 def follow_cb(ud, goal):
     goal = GeneralHobbitGoal(command=String('follow'),
                              previous_state=String('previous_task'),
-                             parameters=par)
+                             parameters=[])
     return goal
 
 

@@ -341,7 +341,7 @@ def main():
         rooms = readXml(FILE)
         addObject(String('aspirin'), rooms)
         writeXml(FILE, rooms)
-        update_object_list(rooms)
+        #update_object_list(rooms)
         mug = GetObjectLocationsRequest()
         mug.object_name = String('mug')
         rospy.Service(PROJECT+'/'+NAME+'/get_object_locations', GetObjectLocations, getObjectLocations)

@@ -70,7 +70,7 @@ def main():
         output_keys=['result'])
 
     def child_term_cb(outcome_map):
-        print(outcome_map)
+        rospy.loginfo(str(outcome_map))
         #return True
         if outcome_map['GET_USER'] == 'succeeded':
             return True
@@ -89,7 +89,7 @@ def main():
 
 
     def msg_cb(msg, ud):
-        print('person (x,y) {}, {}'.format(msg.x, msg.y))
+        rospy.loginfo(str('person (x,y) {}, {}'.format(msg.x, msg.y)))
         rospy.loginfo('person (x,y) {}, {}'.format(msg.x, msg.y))
         if msg.x: 
             return True
@@ -240,14 +240,14 @@ def main():
         StateMachine.add(
             'SAY_STOP',
             speech_output.sayText(
-                info="T_FM_FollowingYou"),
+                info="T_FM_LostYouComeBack"),
             transitions={'succeeded': 'LOG_SUCCESS',
                          'failed': 'LOG_ABORTED'}
         )
         StateMachine.add(
             'SAY_STOP1',
             speech_output.sayText(
-                info="T_FM_FollowingYou"),
+                info="T_FM_LostYouComeBack"),
             transitions={'succeeded': 'LOG_SUCCESS',
                          'failed': 'LOG_ABORTED'}
         )
