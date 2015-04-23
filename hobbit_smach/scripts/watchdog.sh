@@ -26,7 +26,7 @@ eval $__resultvar="'$myresult'"
 
 function get_file_name {
 local __resultvar=$1
-local __name="/puppetmaster-1.log"
+local __name="/puppetmaster-32.log"
 local myresult=`roscd log && pwd`
 eval $__resultvar="'$myresult${__name}'"
 }
@@ -38,7 +38,7 @@ do
   echo ${i}
   kill -9 ${i}&
 done
-roslaunch hobbit_smach startup_master.launch&
+roslaunch hobbit_smach puppetmaster.launch&
 send_event ${timestamp} 'E_MASTER_RESTART'
 }
 
@@ -60,9 +60,22 @@ else
 fi
 }
 
+function check_uptime {
+local __resultvar=$1
+uptime=$(</proc/uptime)
+uptime=${uptime%%.*}
+local minutes=$(( uptime/60%60 ))
+eval $__resultvar="'$minutes'"
+}
+
 timestamp=`date +%s|bc`
 date
 FILE='/home/bajo/.ros/log/puppetmaster.log'
+check_uptime TIME
+if [[ TIME -lt 10 ]]; then
+  exit
+fi
+
 get_file_name FILE 
 if [[ -e ${FILE} ]]; then
   get_line_numbers before ${FILE}
