@@ -11,20 +11,23 @@ LIMIT = False
 
 
 def talker(level):
+    global LIMIT
     data = Event()
     data.header = Header()
     data.header.stamp = rospy.Time.now()
     data.event = level
     pub = rospy.Publisher('/Event', Event, queue_size=10)
     if LIMIT:
-        rospy.loginfo('do not publish E_RECHARGE')
+        #rospy.loginfo('do not publish E_RECHARGE')
         return
     LIMIT = True
+    rospy.sleep(2)
     pub.publish(data)
     rospy.loginfo('publish E_RECHARGE')
 
 
 def battery_cb(msg):
+    global LIMIT
     if msg.charging:
         LIMIT = False
     if msg.voltage < VOLT_LIMIT and msg.charging is False:
