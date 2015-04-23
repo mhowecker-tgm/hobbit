@@ -1,0 +1,14 @@
+<launch>
+<include file="$(find sqlitedb)/launch/startup.launch" />
+<include file="$(find virtual_laser2)/launch/startup.launch" />
+<include file="$(find aal_service)/launch/startup.launch" />
+<include file="$(find table_object_detector)/launch/startup.launch" />
+<include file="$(find top_scan_points)/launch/startup.launch" />
+<include file="$(find localization_monitor)/launch/startup.launch" />
+<include file="$(find distance_to_obstacle)/launch/distance_to_obstacle.launch" />
+<include file="$(find person_following)/launch/startup.launch" />
+<include file="$(find come_closer)/launch/startup.launch" />
+<include file="$(find hobbit_smach)/launch/startup.launch" />
+<include file="$(find recognition_service)/launch/startup.launch" />
+<include file="$(find joy2twist)/launch/startup.launch" />
+</launch>
