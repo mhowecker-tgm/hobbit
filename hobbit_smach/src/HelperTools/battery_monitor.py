@@ -5,9 +5,9 @@ from hobbit_msgs.msg import Event
 from std_msgs.msg import Header
 from mira_msgs.msg import BatteryState
 
-LIMIT = 1
 NAME = 'battery_monitor'
 VOLT_LIMIT = 24.5
+LIMIT = False
 
 
 def talker(level):
@@ -16,22 +16,20 @@ def talker(level):
     data.header.stamp = rospy.Time.now()
     data.event = level
     pub = rospy.Publisher('/Event', Event, queue_size=10)
-    r = rospy.Rate(10)
-    i = 0
-    while i < LIMIT:
-        # rospy.loginfo(str(data))
-        pub.publish(data)
-        r.sleep()
-        i += 1
+    if LIMIT:
+        rospy.loginfo('do not publish E_RECHARGE')
+        return
+    LIMIT = True
+    pub.publish(data)
+    rospy.loginfo('publish E_RECHARGE')
 
 
 def battery_cb(msg):
+    if msg.charging:
+        LIMIT = False
     if msg.voltage < VOLT_LIMIT and msg.charging is False:
         rospy.loginfo('Battery level is low')
         talker('E_RECHARGE')
-    else:
-        pass
-        # rospy.loginfo('Do not go charging.')
 
 
 def main():
