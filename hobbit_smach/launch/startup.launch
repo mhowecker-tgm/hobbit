@@ -20,6 +20,7 @@
 <node name="safety_check" pkg="hobbit_smach" type="safety_check.py" output="log" />
 <node name="reminder" pkg="hobbit_smach" type="reminder.py" output="log" />
 <include file="$(find hobbit_smach)/launch/SavePCD.launch" />
+<include file="$(find hobbit_smach)/launch/puppetmaster.launch" />
 <!-- 
 <rosparam file="/opt/ros/hobbit_hydro/src/vienna_user1.yaml" command="load"/>
 <node name="bring_object" pkg="hobbit_smach" type="bring_object_latest.py" output="log" />

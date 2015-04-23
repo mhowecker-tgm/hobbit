@@ -1,0 +1,3 @@
+<launch>
+<node name="puppetmaster" pkg="hobbit_smach" type="puppetmaster.py" output="log"/>
+</launch>
