@@ -84,11 +84,11 @@ def msg_timer_sm():
             rospy.loginfo('Person data is too old. Ignore.')
             return False
         if msg.source == 6:
-            #rospy.loginfo('Do not use this data')
+            rospy.loginfo('Do not use this data')
             return False
         ud.person_x = msg.x
         ud.person_z = msg.z
-        #rospy.loginfo("OK. Use it.")
+        rospy.loginfo("OK. Use it.")
         return True
 
     cc = smach.Concurrence(outcomes=['aborted', 'succeeded', 'preempted'],
@@ -347,6 +347,46 @@ class PlanPath(smach.State):
         self.reset(ud)
         return 'succeeded'
 
+def rotate_and_detect():
+    sm = smach.StateMachine(outcomes=['succeeded', 'aborted', 'preempted'])
+    with sm:
+        smach.StateMachine.add(
+            'ROTATE',
+            hobbit_move.MoveDiscrete(motion='Turn', value='45'),
+            transitions={'succeeded': 'USER_DETECTION',
+                         'preempted': 'preempted',
+                         'aborted': 'USER_DETECTION'}
+        )
+        smach.StateMachine.add(
+            'USER_DETECTION',
+            msg_timer_sm(),
+            transitions={'succeeded': 'STOP_ROTATION',
+                         'preempted': 'preempted',
+                         'aborted': 'STOP_ROTATION'}
+        )
+        smach.StateMachine.add(
+            'STOP_ROTATION',
+            hobbit_move.Stop(),
+            transitions={'succeeded': 'succeeded',
+                         'preempted': 'preempted',
+                         'aborted': 'aborted'}
+        )
+    it = smach.Iterator(
+        outcomes = ['succeeded', 'preempted', 'aborted'],
+        input_keys = [],
+        output_keys = [],
+        it = lambda: range(0, 7),
+        it_label = 'index',
+        exhausted_outcome = 'aborted'
+    )
+    with it:
+        smach.Iterator.set_contained_state(
+            'CONTAINER_SM',
+            sm,
+            loop_outcomes = ['aborted']
+        )
+    return it
+
 
 class Counter(smach.State):
     def __init__(self):
@@ -422,12 +462,6 @@ def get_detect_user():
             transitions={'succeeded': 'GET_ALL_POSITIONS',
                          'canceled': 'LOG_ABORT'}
         )
-        # smach.StateMachine.add(
-        #     'DOCK_CHECK',
-        #     hobbit_move.undock_if_needed(),
-        #     transitions={'succeeded': 'GET_ALL_POSITIONS',
-        #                  'canceled': 'CLEAN_UP'}
-        # )
         smach.StateMachine.add(
             'GET_ALL_POSITIONS',
             ServiceState('getRooms',
@@ -493,26 +527,12 @@ def get_detect_user():
         smach.StateMachine.add(
             'WAIT',
             util.SleepState(duration=0.1),
-            transitions={'succeeded': 'USER_DETECTION'}
+            transitions={'succeeded': 'ROTATE_AND_DETECT'}
         )
         smach.StateMachine.add(
-            'ROTATE',
-            hobbit_move.MoveDiscrete(motion='Turn', value='355'),
-            transitions={'succeeded': 'USER_DETECTION',
-                         'preempted': 'LOG_PREEMPT',
-                         'aborted': 'USER_DETECTION'}
-        )
-        smach.StateMachine.add(
-            'USER_DETECTION',
-            msg_timer_sm(),
-            transitions={'succeeded': 'STOP_ROTATION',
-                         'preempted': 'LOG_PREEMPT',
-                         'aborted': 'STOP_ROTATION'}
-        )
-        smach.StateMachine.add(
-            'STOP_ROTATION',
-            hobbit_move.Stop(),
-            transitions={'succeeded': 'PREPARE_MOVEMENT',
+            'ROTATE_AND_DETECT',
+            rotate_and_detect(),
+            transitions={'succeeded': 'CLOSER',
                          'preempted': 'LOG_PREEMPT',
                          'aborted': 'PREPARE_MOVEMENT'}
         )
