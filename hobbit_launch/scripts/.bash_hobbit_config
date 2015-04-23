@@ -69,6 +69,7 @@ alias tfs="gnome-open frames.pdf"
 
 alias smach="/opt/ros/hobbit_hydro/src/hobbit_smach/scripts/check_smach_nodes.sh"
 alias killros="/opt/ros/hobbit_hydro/src/hobbit_launch/scripts/killros.sh"
+alias connections="lsof -nl | grep rosmaster | wc -l"
 
 export PYTHONPATH=$PYTHONPATH:/opt/ros/hobbit_hydro/src/hobbit_smach/src/hobbit_smach
 
