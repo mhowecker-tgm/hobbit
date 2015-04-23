@@ -38,6 +38,7 @@ rm /opt/ros/hobbit_hydro/src/configuration/active.yaml
 ln -s /opt/ros/hobbit_hydro/src/configuration/$hobbit_id.yaml  /opt/ros/hobbit_hydro/src/configuration/active.yaml
 rosparam load /opt/ros/hobbit_hydro/src/configuration/active.yaml
 sleep $DELAY_BETWEEN_STEPS
+roslaunch sqlitedb startup.launch&
 
 #Trying to start basecam
 /opt/ros/hobbit_hydro/src/rgbd_acquisition/scripts/startBaseCameraPT2.sh
@@ -82,7 +83,7 @@ roslaunch aal_service startup.launch&
 # 
 # # Start SMACH handling of rooms, places, objects.
 roslaunch hobbit_smach startup.launch&
-roslaunch hobbit_smach startup_master.launch&
+sleep $DELAY_BETWEEN_STEPS
 roslaunch recognition_service startup.launch&
 sleep $DELAY_BETWEEN_STEPS
 # roslaunch hobbit_smach startup_master.launch&
