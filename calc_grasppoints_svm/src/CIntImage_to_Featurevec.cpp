@@ -2,7 +2,7 @@
  * David Fischinger -TUW
  * 18.11.2011
  *
- * CLASS for calculating Feature Vector from Integral images
+ * CLASS for calculating Feature Vector from Integral Images
  *
  * OUTDATED!!!!
  *
@@ -24,7 +24,7 @@
  *
  *    HEIGHT 15 (14+1)
  *    WIDTH 15 (14+1)
- *    pathout = "/home/grasp/David/GPDatabase/badgps/twocams/featurevec/";
+ *    pathout = "/home/grasp/David/GPDatabase/badgps/twocams/featurevec/"; => not used anymore, comes from grasp action server now
  *    goodgps		indicates if features for good or bad GPs are calculated => label +1/-1 in output .txt
  *	  path =    "/opt/ros/privat/stacks/toolsdf/CeditFeatures_input.txt";       //file with Haar-Features
  */
@@ -43,14 +43,13 @@ using namespace cv;
 
 CIntImage_to_Featurevec::CIntImage_to_Featurevec(){
 	currentfeature = new CHaarFeature(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1.1,1.0,1.0,2.0);
-	pathout = "/home/grasp/David/GPDatabase/badgps/twocams/featurevec/";
 }
 
 
-void CIntImage_to_Featurevec::read_features()
+void CIntImage_to_Featurevec::read_features(string packagepath)
 {
 	//PARAMETERS
-	string path =    "data/Features.txt";
+	string path = packagepath+"/data/Features.txt";
 
  	ifstream file_features;
  	file_features.open(path.c_str());	//file_features: file with all features

@@ -469,8 +469,9 @@ void CCalc_Grasppoints::calc_featurevectors(int roll, int tilt)
 	//create object for calculating features
 	CIntImage_to_Featurevec * ii_to_fv = new CIntImage_to_Featurevec();
 
+	string pkg_path = ros::package::getPath("calc_grasppoints_svm");
 	//read all features (saved in external file)
-	ii_to_fv->read_features();
+	ii_to_fv->read_features(pkg_path);
 
 	//silly way to delete file
 	ofstream output_fv_file(outputpath_full.c_str());
