@@ -85,7 +85,6 @@ class DavidLookForObject(State):
         self.listener = tf.TransformListener()
         self.pubClust = rospy.Publisher("/objectclusters", PointCloud2)
         self.rec = TD()
-        self.restrictfind = False
         self.robotDistFromGraspPntForGrasping = 0.51
         self.robotOffsetRotationForGrasping = 0.06+math.pi/2.0
         self.graspable_center_of_cluster_wcs = None
@@ -120,7 +119,6 @@ class DavidLookForObject(State):
         try:
             distance_to_obstacle_service = rospy.ServiceProxy('distance_to_obstacle', distance_to_obstacle)
             input = distance_to_obstacle()  #data type for this service
-            #input.p = self.graspable_center_of_cluster_wcs
             response = distance_to_obstacle_service(self.graspable_center_of_cluster_wcs.point)
             print "===> pickup_import.py: isObjectAwayFromMapBoarders(): object distance to map boarder: ", response.d
             dist = response.d
@@ -284,16 +282,6 @@ class DavidLookForObject(State):
         z_min = 0.0
         z_max = 0.25	#only that high because of buggy camera
 
-        if (self.restrictfind): #only search for objects where grasped object was lying
-            x_min = 0.15
-            x_max = 0.45
-            y_min = -0.45
-            y_max = -0.17
-            z_min = 0.01
-            z_max = 0.25	#only that high because of buggy camera
-
-        #print "pnt.point.x: ", pnt.point.x
-        #print "pnt.point.x *2: ", 2*pnt.point.x
         if (pnt.point.x > x_min and pnt.point.x < x_max and pnt.point.y > y_min and pnt.point.y < y_max and pnt.point.z > z_min and pnt.point.z < z_max):
             print "===> ispossibleobject(): object ACCEPTED"
             return True
