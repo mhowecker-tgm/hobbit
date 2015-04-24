@@ -123,8 +123,9 @@ cd /opt/ros/hobbit_hydro/src/hobbit_launch/launch
 
 sleep $DELAY_BETWEEN_STEPS
 #start action server node for calculating grasps (with HAF)
-cd /opt/ros/hobbit_hydro/src/calc_grasppoints_svm
-rosrun calc_grasppoints_svm calc_grasppoints_action_server&
+#cd /opt/ros/hobbit_hydro/src/calc_grasppoints_svm
+#rosrun calc_grasppoints_svm calc_grasppoints_action_server&
+roslaunch calc_grasppoints_svm calc_grasppoints_svm.launch&
 
 sleep $DELAY_BETWEEN_STEPS
 #cd /opt/ros/hobbit_hydro/src/top_scan_points/launch
