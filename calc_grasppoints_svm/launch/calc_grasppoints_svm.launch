@@ -1,5 +1,5 @@
 <launch>
-	<node name="calc_grasppoints_svm" pkg="calc_grasppoints_svm" type="calc_grasppoints">        
+	<node name="calc_grasppoints_svm" pkg="calc_grasppoints_svm" type="calc_grasppoints_action_server">        
     </node>
 </launch>
 
