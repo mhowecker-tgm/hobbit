@@ -1451,7 +1451,8 @@ def sayObjectFoundRepositioning():
     return cc
 
 
-def sayUnableToGraspObject():
+#movement of robot did not work as it should. user is asked if robot should try to find better position
+def sayUnableToMove():
     cc = Concurrence(
         outcomes=['yes', 'no', 'preempted', 'failed'],
         default_outcome='failed',
@@ -1473,13 +1474,13 @@ def sayUnableToGraspObject():
     return cc
 
 
-def sayTryToRemoveObject():
+def sayMoveIssuePUstopped():
     cc = Concurrence(
         outcomes=['succeeded', 'preempted', 'failed'],
         default_outcome='failed',
         child_termination_cb=child_term_cb,
         outcome_map={'succeeded': {'EMO_SAD': 'succeeded',
-                                   'SAY_TRY_TO_REMOVE_OBJECT': 'succeeded'}}
+                                   'SAY_MOVE_ISSUE_PU_STOPPED': 'succeeded'}}
     )
 
     with cc:
@@ -1488,8 +1489,8 @@ def sayTryToRemoveObject():
             HobbitEmotions.ShowEmotions(emotion='SAD', emo_time=4)
         )
         Concurrence.add(
-            'SAY_TRY_TO_REMOVE_OBJECT',
-            speech_output.sayText(info='T_PU_TryToRemoveObject')
+            'SAY_MOVE_ISSUE_PU_STOPPED',
+            speech_output.sayText(info='T_PU_MoveIssuePUStopped')
         )
     return cc
 

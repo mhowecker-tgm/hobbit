@@ -174,6 +174,27 @@ class MoveCounter(smach.State):
         else:
             return 'first'
         
+#df 27.4.2015 counter how often it is searched for a graspable object (if arm has space, trajectory found for grasp, grasp point evaluation reasonable, object graspable)
+# alternately returns "first" and "second"
+class SearchGraspableObjectCounter(smach.State):
+    """
+    Just a counter in a SMACH State.
+    """
+    def __init__(self):
+        smach.State.__init__(self, outcomes=['first', 'second', 'preempted'])
+        self._counter = 0
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            return 'preempted'
+        self._counter += 1
+        print('self._counter: %d' % self._counter)
+        if self._counter > 1:
+            self._counter = 0
+            return 'second'
+        else:
+            return 'first'
+        
 #df 20.3.2015: count how often robot should move to other grasping position (1 time overall <=> blind backwards move))
 class MoveBackBlindCounter(smach.State):
     """
@@ -458,32 +479,32 @@ def main():
         StateMachine.add(
             'MOVE_COUNTER',
             MoveCounter(),
-            transitions={'first': 'EMO_SAY_UNABLE_TO_GRASP',
-                         'second': 'EMO_SAY_TRY_TO_REMOVE_OBJECT',
+            transitions={'first': 'EMO_SAY_UNABLE_TO_MOVE',
+                         'second': 'EMO_SAY_MOVE_ISSUE_PU_STOPPED',
                          'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
-            'EMO_SAY_UNABLE_TO_GRASP',
-            pickup.sayUnableToGraspObject(),
+            'EMO_SAY_UNABLE_TO_MOVE',
+            pickup.sayUnableToMove(),
             transitions={'yes': 'MOVE_TO_GRASP_POSE',
-                         'no': 'EMO_SAY_TRY_TO_REMOVE_OBJECT',
-                         'failed': 'EMO_SAY_TRY_TO_REMOVE_OBJECT',
+                         'no': 'EMO_SAY_MOVE_ISSUE_PU_STOPPED',
+                         'failed': 'EMO_SAY_MOVE_ISSUE_PU_STOPPED',
                          'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
-            'EMO_SAY_TRY_TO_REMOVE_OBJECT',
-            pickup.sayTryToRemoveObject(),
+            'EMO_SAY_MOVE_ISSUE_PU_STOPPED',
+            pickup.sayMoveIssuePUstopped(),
             transitions={'succeeded': 'aborted',
                          'failed': 'aborted',
                          'preempted': 'LOG_PREEMPT'}
         )
-        StateMachine.add(   #not used anymore!! df: 6.2.2015, done in pickup_import
-            'SAY_PICKING_UP',
-            speech_output.sayText(info='T_PU_PickingUpObject'),
-            transitions={'succeeded': 'GET_POINT_CLOUD_FOR_GRASP',
-                         'failed': 'EMO_SAY_DID_NOT_PICKUP',
-                         'preempted': 'LOG_PREEMPT'}
-        )
+        #StateMachine.add(   #not used anymore!! df: 6.2.2015, done in pickup_import
+        #    'NO_GRASPABLE_OBJECT_FOUND',
+        #    speech_output.sayText(info='T_PU_PickingUpObject'),
+        #    transitions={'succeeded': 'GET_POINT_CLOUD_FOR_GRASP',
+        #                 'failed': 'EMO_SAY_DID_NOT_PICKUP',
+        #                 'preempted': 'LOG_PREEMPT'}
+        #)
         
         #================> NEW 10.12.2014
         smach.StateMachine.add(
@@ -514,12 +535,35 @@ def main():
             #pickup.DavidPickingUp(),
             transitions={'succeeded': 'SAY_CHECK_GRASP',
                          'preempted': 'LOG_PREEMPT',
-                         'failed': 'EMO_SAY_DID_NOT_PICKUP',
-                         'failed_arm_not_moved': 'SAY_PICKING_UP' #not moved away from home position
+                         'failed': 'SEARCH_GRASPABLE_OBJECT_COUNTER',
+                         'failed_arm_not_moved': 'SEARCH_GRASPABLE_OBJECT_COUNTER' #not moved away from home position
                         }
-                         
-        #================> NEW 10.12.2014  ENDE                         
-        )
+        )  
+        #================> NEW 10.12.2014  ENDE      
+        # counts (binary) how often the system searches for graspable objects
+        StateMachine.add(
+            'SEARCH_GRASPABLE_OBJECT_COUNTER',
+            SearchGraspableObjectCounter(),
+            transitions={'first': 'SAY_SEARCH_GRASPABLE_OBJECT_NEXT_TRY',
+                         'second': 'SAY_SEARCH_GRASPABLE_OBJECT_FAILED',
+                         'preempted': 'LOG_PREEMPT'}
+        )       
+        
+        StateMachine.add(
+            'SAY_SEARCH_GRASPABLE_OBJECT_NEXT_TRY',
+            speech_output.sayText(info='T_PU_SAY_SEARCH_GRASPABLE_OBJECT_NEXT_TRY'),
+            transitions={'succeeded': 'GET_POINT_CLOUD_FOR_GRASP',
+                         'failed': 'GET_POINT_CLOUD_FOR_GRASP',
+                         'preempted': 'LOG_PREEMPT'}
+        ) 
+
+        StateMachine.add(
+            'SAY_SEARCH_GRASPABLE_OBJECT_FAILED',
+            speech_output.sayText(info='T_PU_SAY_SEARCH_GRASPABLE_OBJECT_FAILED'),
+            transitions={'succeeded': 'aborted',
+                         'failed': 'aborted',
+                         'preempted': 'LOG_PREEMPT'}
+        ) 
         StateMachine.add(
             'SAY_CHECK_GRASP',
             speech_output.sayText(info='T_PU_CheckingGrasp'),
@@ -537,6 +581,7 @@ def main():
                          'failed': 'MOVE_ARM_TO_CHECK_GRASP_POSITION'}    # better failure handling appreciated
         )
         #================> NEW 29.1.2015 df
+        # still missing: timeout procedure
         smach.StateMachine.add(
             'GET_POINT_CLOUD_FOR_GRASPCHECK',
             MonitorState(
@@ -644,34 +689,24 @@ def main():
         StateMachine.add(
             'END_PICKUP_SEQ',
             pickup.getEndPickupSeq(),
-            transitions={'succeeded': 'CHECK_HELP',
+            transitions={'succeeded': 'SAY_THANK_YOU',
                          'failed': 'EMO_SAY_DID_NOT_PICKUP',
-                         'preempted': 'LOG_PREEMPT'}
-        )
-        StateMachine.add(
-            'CHECK_HELP',
-            CheckHelpAccepted(),
-            transitions={'yes': 'SAY_THANK_YOU',
-                         #'no': 'GO_TO_USER',
-                         'no': 'SET_SUCCESS',
                          'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'SAY_THANK_YOU',
             speech_output.sayText(info='T_PU_ThankYouPointing'),
-#            transitions={'succeeded': 'GO_TO_USER',
-#                         'failed': 'GO_TO_USER',
             transitions={'succeeded': 'SET_SUCCESS',
                          'failed': 'SET_SUCCESS',
                          'preempted': 'LOG_PREEMPT'}
         )
-        StateMachine.add(
-            'GO_TO_USER',
-            locate_user.get_detect_user(),
-            transitions={'succeeded': 'SET_SUCCESS',
-                         'preempted': 'LOG_PREEMPT',
-                         'aborted': 'LOG_PREEMPT'}
-        )
+        #StateMachine.add(
+        #    'GO_TO_USER',
+        #    locate_user.get_detect_user(),
+        #    transitions={'succeeded': 'SET_SUCCESS',
+        #                 'preempted': 'LOG_PREEMPT',
+        #                 'aborted': 'LOG_PREEMPT'}
+        #)
         StateMachine.add(
             'SET_SUCCESS',
             SetSuccess(),
