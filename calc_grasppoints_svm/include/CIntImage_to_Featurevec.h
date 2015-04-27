@@ -66,7 +66,7 @@ public:
 
 
 	void print_heights();
-	void read_features();
+	void read_features(string packagepath);
 	void print_features();
 	void write_featurevector(string outputpath);
 	float calc_featurevalue(int nr_feat);
