@@ -150,6 +150,7 @@ sleep $DELAY_BETWEEN_STEPS
 cd /opt/ros/hobbit_hydro/src/hobbit_launch/launch
 ./switchMira.sh navigation
 
+sleep $DELAY_BETWEEN_STEPS
 #We have finally gone through this hole procedure , lets signal that hobbit is ready..
 rosservice call /web_interface/postMessage
 
