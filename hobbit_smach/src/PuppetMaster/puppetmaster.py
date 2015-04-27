@@ -4,7 +4,7 @@ PKG = 'hobbit_smach'
 NAME = 'puppetmaster'
 PREEMPT_TIMEOUT = 5
 SERVER_TIMEOUT = 5
-MUC_ENABLED = True
+global MUC_ENABLED
 
 import rospy
 from datetime import datetime, time
@@ -768,9 +768,9 @@ def main():
         StateMachine.add(
             'MAIN_MENU',
             HobbitMMUI.ShowMenu(menu='MAIN'),
-            transitions={'succeeded': 'RESET_ACTIVE_TASK',
+            transitions={'succeeded': 'END_USER_INTERACTION',
                          'preempted': 'preempted',
-                         'failed': 'RESET_ACTIVE_TASK'}
+                         'failed': 'END_USER_INTERACTION'}
         )
         if MUC_ENABLED:
             StateMachine.add(
@@ -904,6 +904,7 @@ def main():
 if __name__ == '__main__':
     global wakeup_time
     global sleep_time
+    global MUC_ENABLED
     wakeup_time = "09:00"
     sleep_time = "22:00"
 
@@ -916,4 +917,8 @@ if __name__ == '__main__':
         wakeup_tmp = rospy.get_param('/Hobbit/wakeup_time')
         if type(wakeup_tmp) is not int:
             wakeup_time = wakeup_tmp
+    if rospy.has_param('/Hobbit/enable_muc'):
+        MUC_ENABLED = rospy.get_param('/Hobbit/enable_muc')
+    else:
+        MUC_ENABLED = False
     main()
