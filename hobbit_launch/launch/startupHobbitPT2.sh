@@ -109,11 +109,6 @@ cp params"$ROBOTNUMBER".yaml params.yaml
 #Startup Joystick node , ( it allows webinterface joystick emulation also )
 #roslaunch joy2twist startup.launch&
 
-sleep $DELAY_BETWEEN_STEPS
-#Switch Mira stuff to navigation mode ( default )
-cd /opt/ros/hobbit_hydro/src/hobbit_launch/launch
-./switchMira.sh navigation
-
 #sleep $DELAY_BETWEEN_STEPS
 #roslaunch localization_monitor startup.launch&
 
@@ -149,6 +144,11 @@ rosrun dynamic_reconfigure dynparam set /basecam/driver data_skip 1&
 
 sleep $DELAY_BETWEEN_STEPS
 roslaunch hobbit_launch hobbit.launch&
+
+sleep $DELAY_BETWEEN_STEPS
+#Switch Mira stuff to navigation mode ( default )
+cd /opt/ros/hobbit_hydro/src/hobbit_launch/launch
+./switchMira.sh navigation
 
 #We have finally gone through this hole procedure , lets signal that hobbit is ready..
 rosservice call /web_interface/postMessage
