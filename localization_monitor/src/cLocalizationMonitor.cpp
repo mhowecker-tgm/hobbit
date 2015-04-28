@@ -121,9 +121,6 @@ void cLocalizationMonitor::open(ros::NodeHandle & n)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 	// logging
-	log_output.open("/opt/ros/hobbit_hydro/src/localization_monitor/localization_log.txt",std::ios::out);
-        log_output << "Localization monitor "  << std::endl;
-
 	time_t rawtime;
   	struct tm * timeinfo;
   	char buffer[80];
@@ -133,6 +130,13 @@ void cLocalizationMonitor::open(ros::NodeHandle & n)
 
   	strftime(buffer,80,"%d-%m-%Y %I:%M:%S",timeinfo);
   	std::string str(buffer);
+
+	std::string log_file_name("/opt/ros/hobbit_hydro/src/localization_monitor/localization_log_");
+	log_file_name += str;
+	log_file_name += ".txt";
+
+	log_output.open(log_file_name.c_str(),std::ios::out);
+        log_output << "Localization monitor "  << std::endl;
 
 	log_output << str  << std::endl;
 	log_output << "scan_score "<< '\t' << "sq_area " << '\t' << "ok_rate " << '\t' << "rotation " << '\t' << "recovered " << std::endl;
@@ -349,6 +353,7 @@ bool cLocalizationMonitor::checkScan()
 	{
 		log_output << std::setprecision(4) << std::fixed << double(-1)   << '\t';
 		std::cout << "scan_score " << -1 << std::endl;
+		ROS_INFO("scan_score %lf", -1.0);
 		return true; //open space, we cannot tell if the robot is lost yet
 	}
 
@@ -357,6 +362,7 @@ bool cLocalizationMonitor::checkScan()
 	
 	log_output << std::setprecision(5) << std::fixed << rel_score   << '\t';
 	std::cout << "scan_score " << rel_score << std::endl;
+	ROS_INFO("scan_score %lf", rel_score);
 	if (rel_score > score_thres)
 		return true;
 	else 
@@ -387,6 +393,7 @@ bool cLocalizationMonitor::checkUncertainty()
 	  //std::cout << " sq_area_estimate " << sq_area_estimate << " thres " << axes_prod*axes_prod << std::endl;
 	  
 	  log_output << std::setprecision(9) << std::fixed << sq_area_estimate << '\t';
+	  ROS_INFO("sq_area %lf", sq_area_estimate);
 	
           if (sq_area_estimate < axes_prod*axes_prod)
 	     return true;
@@ -513,6 +520,7 @@ void cLocalizationMonitor::Run(void)
 		}
 		
 		std::cout << "loc_ok_rate " << rate << std::endl; 
+		ROS_INFO("loc_ok_rate %lf", rate);
 		log_output << std::setprecision(4) << std::fixed << rate << '\t';
 		loc_ok = (rate > rate_thres); //default 50%
 		ok_count = 0;
