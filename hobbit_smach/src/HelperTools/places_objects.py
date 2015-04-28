@@ -7,7 +7,7 @@
 #
 
 PKG = 'hobbit_msgs'  # this package name
-NAME = 'place_handler'
+NAME = 'places_object'
 PROJECT = 'Hobbit'
 update_diff = 0.5
 
