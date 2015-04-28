@@ -136,10 +136,12 @@ def get_next_time(interval):
     if int(interval) == 12:
         return (22, 00)
     elif int(interval == 24):
-        return (07, 00)
+        return (09, 00)
     now = datetime.now()
     hour = now.hour + interval
     minute = now.minute
+    if hour >= 22:
+        return (09, 00)
     return (hour, minute)
 
 
