@@ -7,6 +7,9 @@ if [ "$#" -ne 1 ]; then
 fi
 
 rosnode kill places_objects
+sleep $DELAY_BETWEEN_STEPS
+rosnode kill place_handler
+sleep $DELAY_BETWEEN_STEPS
 cd /opt/ros/hobbit_hydro/src/navigation
 rm places.xml
 ln -s "$1" places.xml
