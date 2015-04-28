@@ -8,6 +8,7 @@ import hobbit_smach.hobbit_move_import as hobbit_move
 import hobbit_smach.social_role_import as social_role
 import hobbit_smach.hobbit_cronjobs_import as cronjobs
 import hobbit_smach.logging_import as log
+import hobbit_smach.recharge_import as recharge
 from hobbit_user_interaction import HobbitMMUI
 from uashh_smach.util import SleepState
 
@@ -83,16 +84,12 @@ def move_away():
             social_role.GetSocialRole(),
             transitions={'tool': 'MOVE_TO_DOCK',
                          'butler': 'MOVE_TO_DOCK',
-                         'companion': 'GET_CURRENT_ROOM_NAME'}
+                         'companion': 'SET_3_HOURS_TIMER'}
         )
         StateMachine.add(
             'MOVE_TO_DOCK',
-            hobbit_move.goToPosition(
-                frame='/map',
-                room='dock',
-                place='dock'
-            ),
-            transitions={'succeeded': 'succeeded',
+            recharge.getRecharge(),
+            transitions={'succeeded': 'SET_3_HOURS_TIMER',
                          'aborted': 'aborted',
                          'preempted': 'preempted'}
         )
@@ -102,7 +99,10 @@ def move_away():
                 'get_robots_current_room',
                 GetName,
                 response_key='room_name'
-            )
+            ),
+            transitions={'succeeded': 'SET_GOAL',
+                         'aborted': 'aborted',
+                         'preempted': 'preempted'}
         )
         StateMachine.add(
             'SET_GOAL',

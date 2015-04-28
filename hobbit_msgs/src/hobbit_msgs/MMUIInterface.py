@@ -198,8 +198,8 @@ class MMUIInterface:
         except rospy.ROSException, e:
             print('timeout exceeded while waiting for service %s' % e)
             rospy.loginfo('MMUI is not responding.')
-            #return None
-            raise rospy.ServiceException
+            return None
+            #raise rospy.ServiceException
         #print('Trying to call MMUIService')
         try:
             h = Header()
