@@ -98,6 +98,26 @@ class SleepAway(State):
         return 'succeeded'
 
 
+
+def check_sleep_times(next_time):
+    if rospy.has_param('/Hobbit/sleep_time'):
+        sleep_time = rospy.get_param('/Hobbit/sleep_time')
+    else:
+        sleep_time = '22:00'
+    if rospy.has_param('/Hobbit/wakeup_time'):
+        wakeup_time = rospy.get_param('/Hobbit/wakeup_time')
+    else:
+        wakeup_time = '08:00'
+    sleep = sleep_time.split(':')
+    wakeup = wakeup_time.split(':')
+    if time(int(wakeup[0]), int(wakeup[1]))\
+            <= time(next_time[0], next_time[1])\
+            <= time(int(sleep[0]), int(sleep[1])):
+        return True
+    else:
+        False
+
+
 class ThreeHours(State):
     """
     Remove the current cronjob for patrol from the crontab,
@@ -136,29 +156,8 @@ def get_next_time(interval):
     if int(interval) == 12:
         return (22, 00)
     elif int(interval == 24):
-        return (09, 00)
+        return (9, 00)
     now = datetime.now()
     hour = now.hour + interval
     minute = now.minute
-    if hour >= 22:
-        return (09, 00)
     return (hour, minute)
-
-
-def check_sleep_times(next_time):
-    if rospy.has_param('/Hobbit/sleep_time'):
-        sleep_time = rospy.get_param('/Hobbit/sleep_time')
-    else:
-        sleep_time = '22:00'
-    if rospy.has_param('/Hobbit/wakeup_time'):
-        wakeup_time = rospy.get_param('/Hobbit/wakeup_time')
-    else:
-        wakeup_time = '06:30'
-    sleep = sleep_time.split(':')
-    wakeup = wakeup_time.split(':')
-    if time(int(wakeup[0]), int(wakeup[1]))\
-            <= time(next_time[0], next_time[1])\
-            <= time(int(sleep[0]), int(sleep[1])):
-        return True
-    else:
-        False
