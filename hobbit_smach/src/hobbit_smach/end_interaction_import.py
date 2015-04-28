@@ -9,6 +9,7 @@ import hobbit_smach.social_role_import as social_role
 import hobbit_smach.hobbit_cronjobs_import as cronjobs
 import hobbit_smach.logging_import as log
 from hobbit_user_interaction import HobbitMMUI
+from uashh_smach.util import SleepState
 
 
 def end_interaction_muc():
@@ -71,6 +72,12 @@ def move_away():
     )
 
     with sm:
+        StateMachine.add(
+            'WAIT_60',
+            SleepState(duration=60),
+            transitions={'succeeded': 'SOCIAL_ROLE_CHECK',
+                         'preempted': 'preempted'}
+        )
         StateMachine.add(
             'SOCIAL_ROLE_CHECK',
             social_role.GetSocialRole(),
