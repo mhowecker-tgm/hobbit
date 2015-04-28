@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rooms>
+  <room>
+    <name>livingroom</name>
+    <vertices>
+      <vertex y="4.3" x="-2.299999"/>
+      <vertex y="-2.6" x="-2.4"/>
+      <vertex y="-3.4" x="4.0"/>
+      <vertex y="4.599999" x="3.4"/>
+    </vertices>
+    <places>
+      <place>
+        <name>call1</name>
+        <type>call_button_1</type>
+        <pose y="-0.245399" x="0.239211" theta="0.828818"/>
+        <objects/>
+      </place>
+      <place>
+        <name>call2</name>
+        <type>call_button_2</type>
+        <pose y="1.044954" x="0.193554" theta="1.845027"/>
+        <objects/>
+      </place>
+      <place>
+        <name>default</name>
+        <type>default</type>
+        <pose y="0.383385" x="-0.078511" theta="-0.016847"/>
+        <objects/>
+      </place>
+      <place>
+        <name>pickup_place</name>
+        <type>goTo</type>
+        <pose y="-0.361937" x="-0.285772" theta="0.744052"/>
+        <objects/>
+      </place>
+      <place>
+        <name>table</name>
+        <type>searchable</type>
+        <pose y="-0.788528" x="0.851553" theta="-2.437924"/>
+        <objects>
+          <object name="Aspirin" probability="0.5"/>
+        </objects>
+      </place>
+      <place>
+        <name>desk</name>
+        <type>searchable</type>
+        <pose y="0.695543" x="0.271617" theta="0.774426"/>
+        <objects>
+          <object name="Aspirin" probability="0.5"/>
+        </objects>
+      </place>
+      <place>
+        <name>fitness</name>
+        <type>fitness</type>
+        <pose y="0.229062" x="0.149519" theta="-1.504911"/>
+        <objects/>
+      </place>
+      <place>
+        <name>dock</name>
+        <type>docking_base_point</type>
+        <pose y="-0.504" x="0.881" theta="-0.031"/>
+        <objects/>
+      </place>
+    </places>
+  </room>
+</rooms>
