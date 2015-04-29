@@ -67,8 +67,10 @@ function check_file_content {
 }
 function loop_files {
   count=0
+  files=0
   path=`roscd log && pwd`
   for i in `ls ${path}/puppetmaster-*[0-9].log`; do
+    files=$((files + 1))
     if [[ -e ${i} ]]; then
       tmp=$(check_file_content $i)
       count=$((count + tmp))
@@ -77,7 +79,7 @@ function loop_files {
       echo "puppetmaster may not be running or was not started via a launch file"
     fi
   done
-  if [[ $count -gt 1 ]]; then
+  if [[ $count -ge files ]]; then
     echo -e "\e[31m Puppetmaster is not receiving the watchdog events. We have to restart it.\e[0m";
     restart_master
   else
