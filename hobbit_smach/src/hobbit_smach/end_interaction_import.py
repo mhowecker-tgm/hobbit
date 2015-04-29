@@ -75,7 +75,7 @@ def move_away():
     with sm:
         StateMachine.add(
             'WAIT_60',
-            SleepState(duration=60),
+            SleepState(duration=1800), #30*60 seconds
             transitions={'succeeded': 'SOCIAL_ROLE_CHECK',
                          'preempted': 'preempted'}
         )
