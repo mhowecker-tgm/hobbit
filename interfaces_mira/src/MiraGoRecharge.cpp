@@ -352,6 +352,8 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 				std::cout << "task succeeded, template found but no feedback received" << std::endl;
 				ROS_INFO("task succeeded, template found but no feedback received");
 				as_->setSucceeded(interfaces_mira::MiraDockingResult(), "Task succeeded, template found but no feedback received");
+				status_updated = false;
+				return;
 				
 			}	
 
