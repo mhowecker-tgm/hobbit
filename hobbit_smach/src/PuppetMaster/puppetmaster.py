@@ -614,7 +614,7 @@ def main():
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
-            transitions={'succeeded': 'MAIN_MENU',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
@@ -627,7 +627,7 @@ def main():
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
-            transitions={'succeeded': 'MAIN_MENU',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
@@ -641,14 +641,14 @@ def main():
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
-            transitions={'succeeded': 'MAIN_MENU',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'CLEAR_FLOOR',
             FakeForAllWithoutRunningActionSever(name='CLEAR_FLOOR'),
-            transitions={'succeeded': 'MAIN_MENU',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted'}
         )
@@ -662,7 +662,7 @@ def main():
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
-            transitions={'succeeded': 'MAIN_MENU',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
@@ -676,7 +676,7 @@ def main():
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
-            transitions={'succeeded': 'MAIN_MENU',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
@@ -691,23 +691,23 @@ def main():
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
-            transitions={'succeeded': 'MAIN_MENU',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'STOP',
             helper.get_hobbit_full_stop(),
-            transitions={'succeeded': 'MAIN_MENU',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'CALL_HOBBIT',
             call_hobbit.call_hobbit(),
-            transitions={'succeeded': 'MAIN_MENU',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted',
-                         'aborted': 'MAIN_MENU'}
+                         'aborted': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'EMERGENCY_BATHROOM',
@@ -719,7 +719,7 @@ def main():
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
-            transitions={'succeeded': 'MAIN_MENU',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
@@ -733,14 +733,14 @@ def main():
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
-            transitions={'succeeded': 'MAIN_MENU',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted',
-                         'aborted': 'MAIN_MENU'}
+                         'aborted': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'CALL',
             phone_call.wait_for_end_of_call(),
-            transitions={'succeeded': 'MAIN_MENU',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
@@ -761,32 +761,32 @@ def main():
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
-            transitions={'succeeded': 'MAIN_MENU',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted',
-                         'aborted': 'MAIN_MENU'}
+                         'aborted': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'MAIN_MENU',
             HobbitMMUI.ShowMenu(menu='MAIN'),
-            transitions={'succeeded': 'END_USER_INTERACTION',
+            transitions={'succeeded': 'EMOTION',
                          'preempted': 'preempted',
-                         'failed': 'END_USER_INTERACTION'}
+                         'failed': 'EMOTION'}
         )
         if MUC_ENABLED:
             StateMachine.add(
                 'REWARD',
                 social_role.get_reward_muc(),
-                transitions={'succeeded': 'MAIN_MENU',
+                transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted',
-                         'aborted': 'MAIN_MENU'}
+                         'aborted': 'RESET_ACTIVE_TASK'}
             )
         else:
             StateMachine.add(
                 'REWARD',
                 social_role.get_reward(),
-                transitions={'succeeded': 'MAIN_MENU',
+                transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted',
-                         'aborted': 'MAIN_MENU'}
+                         'aborted': 'RESET_ACTIVE_TASK'}
             )
         StateMachine.add(
             'BRING_OBJECT',
@@ -798,21 +798,21 @@ def main():
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
-            transitions={'succeeded': 'MAIN_MENU',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
             'RECHARGE',
             recharge.getRecharge(),
-            transitions={'succeeded': 'MAIN_MENU',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'aborted': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
             'SILENT_RECHARGE',
             recharge.getRecharge(),
-            transitions={'succeeded': 'MAIN_MENU',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
@@ -826,7 +826,7 @@ def main():
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
-            transitions={'succeeded': 'MAIN_MENU',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
@@ -840,21 +840,21 @@ def main():
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
-            transitions={'succeeded': 'MAIN_MENU',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'SOCIAL_ROLE',
             social_role.get_social_role_change(),
-            transitions={'succeeded': 'MAIN_MENU',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'RESET_ACTIVE_TASK',
             ResetActiveTask(),
-            transitions={'succeeded': 'EMOTION',
+            transitions={'succeeded': 'END_USER_INTERACTION',
                          'preempted': 'preempted',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
