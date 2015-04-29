@@ -16,8 +16,20 @@
         <objects/>
       </place>
       <place>
+        <name>oma_stuhl</name>
+        <type>goTo</type>
+        <pose y="-0.245399" x="0.239211" theta="0.835"/>
+        <objects/>
+      </place>
+      <place>
         <name>call3</name>
         <type>call_button_3</type>
+        <pose y="1.044954" x="0.193554" theta="1.845027"/>
+        <objects/>
+      </place>
+      <place>
+        <name>sabine_sessel</name>
+        <type>goTo</type>
         <pose y="1.044954" x="0.193554" theta="1.845027"/>
         <objects/>
       </place>
@@ -60,7 +72,7 @@
       <place>
         <name>fitness</name>
         <type>fitness</type>
-        <pose y="0.229062" x="0.149519" theta="-1.504911"/>
+        <pose y="0.45062" x="0.149519" theta="-1.504911"/>
         <objects/>
       </place>
       <place>
