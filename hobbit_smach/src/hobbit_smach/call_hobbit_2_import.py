@@ -62,10 +62,11 @@ class ExtractGoal(State):
             return 'preempted'
         if len(ud.params) == 0:
             return 'aborted'
+        rospy.loginfo('ud.params in call hobbit: ' +str(ud.params))
         ud.room_name  = ud.params[0].name.lower()
         ud.location_name = ud.params[0].value.lower()
-        rospy.loginfo(ud.room_name)
-        rospy.loginfo(ud.location_name)
+        rospy.loginfo('ud.room_name in call hobbit: ' +ud.room_name)
+        rospy.loginfo('ud.location_name in call hobbit: ' +ud.location_name)
         return 'succeeded'
 
 class Count(State):
