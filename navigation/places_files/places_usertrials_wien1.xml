@@ -54,6 +54,12 @@
         </objects>
       </place>
       <place>
+        <name>call4</name>
+        <type>call_button_4</type>
+        <pose y="-0.788528" x="0.851553" theta="-2.437924"/>
+        <objects/>
+      </place>
+      <place>
         <name>table</name>
         <type>searchable</type>
         <pose y="-0.788528" x="0.851553" theta="-2.437924"/>
