@@ -274,8 +274,8 @@ def getCoordinates(req):
         gen = (x for x in rooms.rooms_vector)
     else:
         gen = (x for x in rooms.rooms_vector if req_room in x.room_name)
-    if not 'dock' in req_location or not 'call' in req_location:
-    	rospy.loginfo('/get_coordinates: Returned empty coordinates')
+    if not 'dock' in req_location and not 'call' in req_location:
+    	rospy.loginfo('/get_coordinates: Empty room name and not dock or call button')
     	return (Pose2D(float(0.0), float(0.0), float(0.0)))
     for x in gen:
         gen1 = (k for k in x.places_vector if req_location in k.place_name)
@@ -284,7 +284,7 @@ def getCoordinates(req):
             rospy.loginfo(str(pose))
             rospy.loginfo('/get_coordinates: Returned coordinates')
             return pose
-    rospy.loginfo('/get_coordinates: Returned empty coordinates')
+    rospy.loginfo('/get_coordinates: No matching place found.')
     return (Pose2D(float(0.0), float(0.0), float(0.0)))
 
 
