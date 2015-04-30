@@ -263,7 +263,7 @@ def getCoordinates(req):
     """ Given the name of the room and of the location their Pose is retrieved
     and returned
     """
-    rospy.loginfo('/get_coordinates: Request received for: '+str(req.location_name.data))
+    rospy.loginfo('/get_coordinates: Request received for: '+str(req))
     global rooms
     req_room = get_unicode(req.room_name.data)
     req_location = get_unicode(req.location_name.data)
@@ -274,9 +274,6 @@ def getCoordinates(req):
         gen = (x for x in rooms.rooms_vector)
     else:
         gen = (x for x in rooms.rooms_vector if req_room in x.room_name)
-    if not 'dock' in req_location and not 'call' in req_location:
-    	rospy.loginfo('/get_coordinates: Empty room name and not dock or call button')
-    	return (Pose2D(float(0.0), float(0.0), float(0.0)))
     for x in gen:
         gen1 = (k for k in x.places_vector if req_location in k.place_name)
         for k in gen1:

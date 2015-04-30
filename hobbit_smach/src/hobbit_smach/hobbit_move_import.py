@@ -542,7 +542,7 @@ class SetNavigationGoal(ServiceState):
         # request.header.stamp = rospy.Time.now()
         request.room_name.data = self.room
         request.location_name.data = self.place
-        print(request)
+        rospy.loginfo(str(request))
         return request
 
     def __response_cb(self, ud, response):
