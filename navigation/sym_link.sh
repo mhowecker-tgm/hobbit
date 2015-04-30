@@ -8,7 +8,7 @@ fi
 
 rosnode kill places_objects
 sleep $DELAY_BETWEEN_STEPS
-rosnode kill place_handler
+rosnode kill places_object
 sleep $DELAY_BETWEEN_STEPS
 cd /opt/ros/hobbit_hydro/src/navigation
 rm places.xml
