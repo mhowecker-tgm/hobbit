@@ -66,10 +66,11 @@ def IsItNight(ud):
     else:
         return True
 
-def start_command():
+def start_command(ud):
     mmui = MMUI.MMUIInterface()
     mmui.remove_last_prompt()
     rospy.loginfo('New task has higher priority. START IT.')
+    rospy.loginfo('start_command: '+str(ud.params))
     print(bcolors.OKGREEN +
           'New task has higher priority. Start it.'
           + bcolors.ENDC)
@@ -109,15 +110,17 @@ def command_cb(msg, ud):
                     ud.parameters['active_task'] = 100
                     ud.command = 'master_reset'
                     new_command = ud.command
-                    return start_command()
+                    return start_command(ud)
             elif item[0] == 'stop':
                 rospy.loginfo('Reset active_task value')
                 ud.parameters['active_task'] = 100
                 ud.command = 'stop'
                 arm_move.do_stop()
                 new_command = ud.command
-                return start_command()
+                return start_command(ud)
             elif item[0] == 'call_hobbit':
+                rospy.loginfo('CALL_BUTTON msg: '+str(msg))
+                rospy.loginfo('CALL_BUTTON msg params: '+str(msg.params))
                 ud.command = item[0]
                 for i, v in enumerate(msg.params):
                     if v.name == 'bathroom' and v.value == 'true':
@@ -126,19 +129,24 @@ def command_cb(msg, ud):
                         ud.params = msg.params
                         new_params = ud.params
                         new_command = ud.command
-                        return start_command()
+                        return start_command(ud)
+                rospy.loginfo('before setting ud.params from msg.params')
+                rospy.loginfo('ud.params: '+str(ud.params)+' msg.params: '+str(msg.params))
                 ud.params = msg.params
                 new_params = ud.params
+                rospy.loginfo('setting ud.params from msg.params')
+                rospy.loginfo('ud.params: '+str(ud.params)+' msg.params: '+str(msg.params))
+                rospy.loginfo('new_params: '+str(new_params))
                 ud.parameters['active_task'] = index
                 new_command = ud.command
-                return start_command()
+                return start_command(ud)
             elif item[0] == 'emergency' and active_task > 0:
                 rospy.loginfo('emergency. active_task = ' + str(active_task))
                 ud.parameters['active_task'] = index
                 ud.command = item[0]
                 ud.emergency = True
                 new_command = ud.command
-                return start_command()
+                return start_command(ud)
             elif item[0] == 'away' or item[0] == 'sleep':
                 times = [1, 2, 4, 6, 12, 24]
                 index = int(input_ce[-1:]) - 1
@@ -149,13 +157,13 @@ def command_cb(msg, ud):
                     ud.command = 'away'
                 new_params = str(times[index])
                 new_command = ud.command
-                return start_command()
+                return start_command(ud)
             elif item[0] == 'recharge' and not night and index < active_task:
                 rospy.loginfo('RECHARGING')
                 ud.command = 'recharge'
                 ud.parameters['active_task'] = index
                 new_command = ud.command
-                return start_command()
+                return start_command(ud)
             elif index + 1 >= active_task and not night:
                 rospy.loginfo('New task has lower priority. DO NOTHING')
                 print(bcolors.FAIL +
@@ -172,7 +180,7 @@ def command_cb(msg, ud):
                 ud.params = msg.params
                 new_params = ud.params
                 new_command = ud.command
-                return start_command()
+                return start_command(ud)
     rospy.loginfo('Unknown event/command received %s' % input_ce)
     return False
 
@@ -287,7 +295,7 @@ class SelectTask(State):
         State.__init__(
             self,
             input_keys=['command', 'params', 'active_task', 'parameters', 'emergency'],
-            output_keys=['command'],
+            output_keys=['command', 'params'],
             outcomes=['emergency',
                       'recharge',
                       'reminder',
@@ -314,9 +322,13 @@ class SelectTask(State):
                       'none'])
 
     def execute(self, ud):
-        rospy.loginfo('Task Selection')
+        rospy.loginfo('Task Selection'+str(ud.params))
         global new_command
-        print('Task Selection: '+str(new_command))
+        global new_params
+        rospy.loginfo('Task Selection: '+str(new_command))
+        rospy.loginfo('Task Selection: '+str(new_params))
+        ud.params = new_params
+        rospy.loginfo('Task Selection'+str(ud.params))
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
@@ -469,7 +481,7 @@ def main():
     )
     sm1.userdata.command = 'IDLE'
     sm1.userdata.active_task = 'CALL'
-    sm1.userdata.params = []
+    #sm1.userdata.params = []
 
     sm2 = StateMachine(
         outcomes=['succeeded',
@@ -871,7 +883,7 @@ def main():
             StateMachine.add(
                 'END_USER_INTERACTION',
                 end_interaction.end_interaction_muc(),
-                transitions={'succeeded': 'MAIN_MENU',
+                transitions={'succeeded': 'succeeded',
                              'aborted': 'SURPRISE',
                              'preempted': 'preempted'}
             )
@@ -879,7 +891,7 @@ def main():
             StateMachine.add(
                 'END_USER_INTERACTION',
                 end_interaction.move_away(),
-                transitions={'succeeded': 'MAIN_MENU',
+                transitions={'succeeded': 'succeeded',
                              'aborted': 'RESET_ACTIVE_TASK',
                              'preempted': 'preempted'}
             )
