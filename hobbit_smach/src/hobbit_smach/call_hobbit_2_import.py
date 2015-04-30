@@ -60,12 +60,12 @@ class ExtractGoal(State):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
-        print('NAME: ', ud.params[0].name)
-        print('VALUE: ', ud.params[0].value)
+        if len(ud.params) == 0:
+            return 'aborted'
         ud.room_name  = ud.params[0].name.lower()
         ud.location_name = ud.params[0].value.lower()
-        print(ud.room_name)
-        print(ud.location_name)
+        rospy.loginfo(ud.room_name)
+        rospy.loginfo(ud.location_name)
         return 'succeeded'
 
 class Count(State):
