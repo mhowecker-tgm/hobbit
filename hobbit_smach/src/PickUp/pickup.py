@@ -6,6 +6,7 @@ PROJECT = 'Hobbit'
 NAME = 'pickup_object'
 LASTPNTDIR = None #last saved pointing direction
 MAXPNTDIRDIF = 20.0 # maximal difference between two pointing directions
+pubEvent = None
 
 import roslib
 roslib.load_manifest(PKG)
@@ -23,6 +24,7 @@ from hobbit_msgs.srv import SwitchVision, SwitchVisionRequest
 from sensor_msgs.msg import PointCloud2
 from geometry_msgs.msg import PoseStamped
 from rgbd_acquisition.msg import PointEvents
+from hobbit_msgs.msg import Event, Parameter
 import hobbit_smach.hobbit_move_import as hobbit_move
 import hobbit_smach.head_move_import as head_move
 import hobbit_smach.arm_move_import as arm_move
@@ -89,6 +91,24 @@ def pointevents_cb(ud, msg):
 
 def diff_pointing_directions(dir_new):
     return abs(LASTPNTDIR.vectorX - dir_new.vectorX) + abs(LASTPNTDIR.vectorY - dir_new.vectorY) + abs(LASTPNTDIR.vectorZ - dir_new.vectorZ)
+
+#df: logging of parameter string for PickUp
+def log(data):
+    global pubEvent
+    scenario = "PickUp"
+    rospy.loginfo('LOG: scenario: %s: %s' % (scenario, data))
+    message = Event()
+    message.event = 'E_LOG'
+    params = []
+    par = Parameter(name='SCENARIO',
+                    value=scenario)
+    params.append(par)
+    par = Parameter(name='DATA',
+                    value=data)
+    params.append(par)
+    message.params = params
+    pubEvent.publish(message)
+    return True
 
 
 #def point_cloud_cb(msg, ud):
@@ -228,6 +248,7 @@ class Init(smach.State):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
+        log("1001PUS   PickUp Started") #Pickup Started
         if rospy.has_param('/hobbit/social_role'):
             ud.social_role = rospy.get_param('/hobbit/social_role')
         return 'succeeded'
@@ -304,6 +325,9 @@ def get_robot_pose_cb(msg, ud):
 def main():
     rospy.init_node(NAME)
 
+    pubEvent = rospy.Publisher('Event', Event, queue_size=50)
+
+
     pickup_sm = smach.StateMachine(
         outcomes=['succeeded', 'aborted', 'preempted'],
         output_keys=['result'])
@@ -318,12 +342,12 @@ def main():
             transitions={'succeeded': 'INIT',
                          'preempted': 'LOG_PREEMPT'}
         )
-        StateMachine.add(
-            'SET_HEAD_SKIP_VISION_STATES',
-            head_move.MoveTo(pose='center_center'),
-            transitions={'succeeded': 'SAY_LOOK',
-                         'preempted': 'LOG_PREEMPT'}
-        )
+        #StateMachine.add(
+        #    'SET_HEAD_SKIP_VISION_STATES',
+        #    head_move.MoveTo(pose='center_center'),
+        #    transitions={'succeeded': 'SAY_LOOK',
+        #                 'preempted': 'LOG_PREEMPT'}
+        #)
         StateMachine.add(
             'INIT',
             Init(),
@@ -368,28 +392,35 @@ def main():
             PointingCounter(),
             transitions={'first': 'POINTING_NOT_DETECTED_1',
                          'second': 'POINTING_NOT_DETECTED_2',
-                         'preempted': 'preempted'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'POINTING_NOT_DETECTED_1',
             pickup.sayPointingGestureNotDetected1(),
             transitions={'yes': 'GET_POINTING_DIRECTION',
-                         'no': 'POINTING_NOT_DETECTED_2',
+                         'no': 'POINTING_DECLINED_BY_USER',
                          'preempted': 'LOG_PREEMPT',
                          'failed': 'POINTING_NOT_DETECTED_2'}
         )
         StateMachine.add(
             'POINTING_NOT_DETECTED_2',
             pickup.sayPointingGestureNotDetected2(),
-            transitions={'succeeded': 'aborted',
-                         'failed': 'aborted',
+            transitions={'succeeded': 'LOG_ABORT',
+                         'failed': 'LOG_ABORT',
+                         'preempted': 'LOG_PREEMPT'}
+        )
+        StateMachine.add(
+            'POINTING_DECLINED_BY_USER',
+            pickup.sayPointingDeclinedByUser(),
+            transitions={'succeeded': 'LOG_ABORT',
+                         'failed': 'LOG_ABORT',
                          'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'START_LOOKING',
             pickup.getStartLooking(),
             transitions={'succeeded': 'HEAD_TO_SEARCH',
-                         'failed': 'EMO_SAY_OBJECT_NOT_DETECTED',
+                         'failed': 'EMO_SAY_MOVE_ISSUE_PU_STOPPED',
                          'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
@@ -429,11 +460,10 @@ def main():
         )
         StateMachine.add(
             'EMO_SAY_OBJECT_NOT_DETECTED',
-            pickup.sayObjectNotDetected1(),
-            transitions={'yes': 'SET_HEAD_SKIP_VISION_STATES', 
-                         'no': 'POINTING_NOT_DETECTED_2',
+            pickup.sayObjectNotDetected(),
+            transitions={'succeeded': 'SET_HEAD_CENTER_PICKUP_FAILED',
                          'preempted': 'LOG_PREEMPT',
-                         'failed': 'POINTING_NOT_DETECTED_2'}
+                         'failed': 'SET_HEAD_CENTER_PICKUP_FAILED'}
         )
         StateMachine.add(
             'EMO_SAY_OBJECT_FOUND',
@@ -494,8 +524,8 @@ def main():
         StateMachine.add(
             'EMO_SAY_MOVE_ISSUE_PU_STOPPED',
             pickup.sayMoveIssuePUstopped(),
-            transitions={'succeeded': 'aborted',
-                         'failed': 'aborted',
+            transitions={'succeeded': 'SET_HEAD_CENTER_PICKUP_FAILED',
+                         'failed': 'SET_HEAD_CENTER_PICKUP_FAILED',
                          'preempted': 'LOG_PREEMPT'}
         )
         #StateMachine.add(   #not used anymore!! df: 6.2.2015, done in pickup_import
@@ -560,8 +590,8 @@ def main():
         StateMachine.add(
             'SAY_SEARCH_GRASPABLE_OBJECT_FAILED',
             speech_output.sayText(info='T_PU_SAY_SEARCH_GRASPABLE_OBJECT_FAILED'),
-            transitions={'succeeded': 'aborted',
-                         'failed': 'aborted',
+            transitions={'succeeded': 'SET_HEAD_CENTER_PICKUP_FAILED',
+                         'failed': 'SET_HEAD_CENTER_PICKUP_FAILED',
                          'preempted': 'LOG_PREEMPT'}
         ) 
         StateMachine.add(
@@ -621,13 +651,13 @@ def main():
             'EMO_SAY_DID_NOT_PICKUP',
             pickup.sayDidNotPickupObject1(),
             transitions={'succeeded': 'MOVE_ARM_TO_HOME_POSITION',
-                         'failed': 'aborted',
+                         'failed': 'MOVE_ARM_TO_HOME_POSITION',
                          'preempted': 'LOG_PREEMPT'}
         )
         #df new 5.2.2015
         StateMachine.add(
-            'MOVE_ARM_TO_HOME_POSITION',  # df change 23.3.2015: move arm directly to home position!!!!!!!!! ignore everything i wrote  in the comments!!!!!!!!!!! (after now) VIA TRAY POSITION because maybe the checkgrasp result was wrong!
-            arm_move.goToHomePosition(), #goToTrayPosition(),
+            'MOVE_ARM_TO_HOME_POSITION',
+            arm_move.goToHomePosition(),
             transitions={'succeeded': 'GET_POINT_CLOUD_FOR_GRASP',  #=> try to grasp again without changing position (assume: head is still lookingt to object"
                          'preempted': 'LOG_PREEMPT',
                          'failed': 'MOVE_ARM_TO_HOME_POSITION'}    # better failure handling appreciated
@@ -650,7 +680,7 @@ def main():
         )
         #df new 25.2.2015
         StateMachine.add(
-            'MOVE_ARM_TO_HOME_POSITION_AFTER_FAILED',  #done after 2 times unsucessful grasped
+            'MOVE_ARM_TO_HOME_POSITION_AFTER_FAILED',  #done after 2 times unsuccessful grasped
             arm_move.goToHomePosition(),
             transitions={'succeeded': 'MOVE_BLIND_BACK_COUNTER',  #do this only ones
                          'preempted': 'LOG_PREEMPT',
@@ -676,7 +706,7 @@ def main():
         StateMachine.add(
             'SET_HEAD_CENTER_PICKUP_FAILED',
             head_move.MoveTo(pose='center_center'),
-            transitions={'succeeded': 'LOG_PREEMPT',
+            transitions={'succeeded': 'LOG_ABORT',
                          'preempted': 'LOG_PREEMPT'}
         )        
         #df 23.3.2015
