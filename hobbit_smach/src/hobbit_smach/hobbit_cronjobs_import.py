@@ -103,13 +103,22 @@ def check_sleep_times(next_time):
     if rospy.has_param('/Hobbit/sleep_time'):
         sleep_time = rospy.get_param('/Hobbit/sleep_time')
     else:
-        sleep_time = '22:00'
+        sleep_time = '21:00'
     if rospy.has_param('/Hobbit/wakeup_time'):
         wakeup_time = rospy.get_param('/Hobbit/wakeup_time')
     else:
-        wakeup_time = '08:00'
-    sleep = sleep_time.split(':')
-    wakeup = wakeup_time.split(':')
+        wakeup_time = '09:00'
+    if type(wakeup_time) is int or ':' not in wakeup_time:
+         wakeup_time = '09:00'
+    if type(sleep_time) is int or ':' not in sleep_time:
+         sleep_time = '21:00'
+    try:
+        sleep = sleep_time.split(':')
+        wakeup = wakeup_time.split(':')
+    except Exception:
+        rospy.loginfo("Exception thrown while trying to use sleep/wakeup time. Using default values.")
+        wakeup = [9, 00]
+        sleep = [21, 00]
     if time(int(wakeup[0]), int(wakeup[1]))\
             <= time(next_time[0], next_time[1])\
             <= time(int(sleep[0]), int(sleep[1])):
@@ -136,6 +145,7 @@ class ThreeHours(State):
             return 'preempted'
         next_time = get_next_time(interval=3)
         cron.remove_all(comment='3hours')
+        cron.remove_all(comment='sleep_away')
         if check_sleep_times(next_time):
             job = cron.new(
                 command=PATH+'cron_P.sh',

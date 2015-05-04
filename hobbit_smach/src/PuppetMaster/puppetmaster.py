@@ -55,10 +55,18 @@ commands = [
 def IsItNight(ud):
     global wakeup_time
     global sleep_time
+    try:
+        sleep = sleep_time.split(':')
+        wakeup = wakeup_time.split(':')
+    except Exception:
+        rospy.loginfo("Exception thrown while trying to use sleep/wakeup time in puppetmaster. Using default values.")
+        wakeup = [9, 00]
+        sleep = [21, 00]
 
     wake = wakeup_time.split(':')
     sleep = sleep_time.split(':')
     now = datetime.now()
+
     if time(int(wake[0]), int(wake[1]))\
             <= now.time()\
             <= time(int(sleep[0]), int(sleep[1])):
@@ -929,6 +937,7 @@ if __name__ == '__main__':
         wakeup_tmp = rospy.get_param('/Hobbit/wakeup_time')
         if type(wakeup_tmp) is not int:
             wakeup_time = wakeup_tmp
+
     if rospy.has_param('/Hobbit/enable_muc'):
         MUC_ENABLED = rospy.get_param('/Hobbit/enable_muc')
     else:
