@@ -9,36 +9,6 @@ from uashh_smach.util import WaitForMsgState
 from mira_msgs.msg import BatteryState
 from std_msgs.msg import String
 
-class DoLogScenarioAndData(): #scenario, data: string
-
-    """
-    The logging to the Event topic can be done from here for scenario and data given as string
-    """
-
-    def __init__(self):
-
-        self.scenario = None
-        self.data = None
-        self.pubEvent = rospy.Publisher('Event', Event, queue_size=50)
-
-    def log(self, scenario=None, data=None):
-        print("DoLog: ")
-        print "scenario: ", scenario
-        print "data: ", data
-        #rospy.loginfo('LOG: scenario: %s: %s' % (scenario, data))
-        message = Event()
-        message.event = 'E_LOG'
-        params = []
-        par = Parameter(name='SCENARIO',
-                        value=scenario)
-        params.append(par)
-        par = Parameter(name='DATA',
-                        value=data)
-        params.append(par)
-        message.params = params
-        self.pubEvent.publish(message)
-        return True
-
 
 class DoLog(State):
 
@@ -239,6 +209,37 @@ class DoLogSocialRoleChange(DoLog):
         return 'succeeded'
 
 
+class DoLogScenarioAndData(): #scenario, data: string
+
+    """
+    The logging to the Event topic can be done from here for scenario and data given as string
+    """
+
+    def __init__(self):
+
+        self.scenario = None
+        self.data = None
+        self.pubEvent = rospy.Publisher('Event', Event, queue_size=50)
+
+    def log(self, scenario=None, data=None):
+        print("DoLog: ")
+        print "scenario: ", scenario
+        print "data: ", data
+        #rospy.loginfo('LOG: scenario: %s: %s' % (scenario, data))
+        message = Event()
+        message.event = 'E_LOG'
+        params = []
+        par = Parameter(name='SCENARIO',
+                        value=scenario)
+        params.append(par)
+        par = Parameter(name='DATA',
+                        value=data)
+        params.append(par)
+        message.params = params
+        self.pubEvent.publish(message)
+        return True
+    
+    
 def battery_log_cb(msg, ud):
     pubEvent = rospy.Publisher('Event', Event, queue_size=1)
     message = Event()
