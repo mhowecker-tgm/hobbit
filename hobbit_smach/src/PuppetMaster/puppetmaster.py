@@ -792,22 +792,6 @@ def main():
                          'preempted': 'preempted',
                          'failed': 'EMOTION'}
         )
-        if MUC_ENABLED:
-            StateMachine.add(
-                'REWARD',
-                social_role.get_reward_muc(),
-                transitions={'succeeded': 'RESET_ACTIVE_TASK',
-                         'preempted': 'preempted',
-                         'aborted': 'RESET_ACTIVE_TASK'}
-            )
-        else:
-            StateMachine.add(
-                'REWARD',
-                social_role.get_reward(),
-                transitions={'succeeded': 'RESET_ACTIVE_TASK',
-                         'preempted': 'preempted',
-                         'aborted': 'RESET_ACTIVE_TASK'}
-            )
         StateMachine.add(
             'BRING_OBJECT',
             SimpleActionState(
@@ -883,9 +867,9 @@ def main():
             HobbitEmotions.ShowEmotions(
                 emotion='NEUTRAL',
                 emo_time=0),
-            transitions={'succeeded': 'succeeded',
-                         'preempted': 'succeeded',
-                         'failed': 'succeeded'}
+            transitions={'succeeded': 'MUC_RESET_ACTIVE_TASK',
+                         'preempted': 'MUC_RESET_ACTIVE_TASK',
+                         'failed': 'MUC_RESET_ACTIVE_TASK'}
         )
         if MUC_ENABLED:
             StateMachine.add(
@@ -895,6 +879,13 @@ def main():
                              'aborted': 'SURPRISE',
                              'preempted': 'preempted'}
             )
+            StateMachine.add(
+                'REWARD',
+                social_role.get_reward_muc(),
+                transitions={'succeeded': 'RESET_ACTIVE_TASK',
+                         'preempted': 'preempted',
+                         'aborted': 'RESET_ACTIVE_TASK'}
+            )
         else:
             StateMachine.add(
                 'END_USER_INTERACTION',
@@ -903,6 +894,20 @@ def main():
                              'aborted': 'RESET_ACTIVE_TASK',
                              'preempted': 'preempted'}
             )
+            StateMachine.add(
+                'REWARD',
+                social_role.get_reward(),
+                transitions={'succeeded': 'MAIN_MENU',
+                         'preempted': 'preempted',
+                         'aborted': 'RESET_ACTIVE_TASK'}
+            )
+        StateMachine.add(
+            'MUC_RESET_ACTIVE_TASK',
+            ResetActiveTask(),
+            transitions={'succeeded': 'succeeded',
+                         'preempted': 'preempted',
+                         'aborted': 'aborted'}
+        )
         StateMachine.add(
             'PREEMPT_RESET_ACTIVE_TASK',
             ResetActiveTask(),

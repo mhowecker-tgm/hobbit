@@ -24,7 +24,6 @@ def end_interaction_muc():
     )
 
     with sm:
-
         StateMachine.add(
             'OFFER_RETURN_OF_FAVOUR',
             HobbitMMUI.AskYesNo(question='T_OfferReturnOfFavour'),

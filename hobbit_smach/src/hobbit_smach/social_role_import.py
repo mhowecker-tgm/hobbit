@@ -371,12 +371,22 @@ def get_reward_muc():
             'REWARD',
             speech_output.emo_say_something(
                 emo='HAPPY',
-                time=4,
+                time=10,
                 text='T_RW_YouAreWelcome'
             ),
-            transitions={'succeeded': 'LOG_SUCCESS',
+            transitions={'succeeded': 'ANYTHING_ELSE',
                          'aborted': 'LOG_ABORTED',
                          'preempted': 'LOG_PREEMPT'}
+        )
+        StateMachine.add(
+            'ANYTHING_ELSE',
+            HobbitMMUI.AskYesNo(question='T_AnythingElse'),
+            transitions={'yes': 'LOG_SUCCESS',
+                         'no': 'LOG_ABORTED',
+                         'timeout': 'ANYTHING_ELSE',
+                         '3times': 'LOG_ABORTED',
+                         'preempted': 'LOG_PREEMPT',
+                         'failed': 'ANYTHING_ELSE'}
         )
         StateMachine.add(
             'LOG_SUCCESS',
@@ -410,7 +420,7 @@ def get_reward():
             speech_output.emo_say_something(
                 emo='NEUTRAL',
                 time=4,
-                text='T_AnythingElse'
+                text='T_RW_YouAreWelcome'
             ),
             transitions={'succeeded': 'LOG_SUCCESS',
                          'aborted': 'LOG_ABORTED',
