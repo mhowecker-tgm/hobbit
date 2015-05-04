@@ -72,7 +72,7 @@ function loop_files {
   for i in `ls ${path}/puppetmaster-*[0-9].log`; do
     files=$((files + 1))
     if [[ -e ${i} ]]; then
-      tmp=$(check_file_content $i)
+      tmp=$(check_file_content ${i})
       count=$((count + tmp))
     else
       echo "logfile does not exist in `roscd log && pwd`"
