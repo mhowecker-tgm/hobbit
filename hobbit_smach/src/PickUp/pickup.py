@@ -93,7 +93,7 @@ def diff_pointing_directions(dir_new):
     return abs(LASTPNTDIR.vectorX - dir_new.vectorX) + abs(LASTPNTDIR.vectorY - dir_new.vectorY) + abs(LASTPNTDIR.vectorZ - dir_new.vectorZ)
 
 #df: logging of parameter string for PickUp
-def log(data):
+def logdata(data):
     global pubEvent
     scenario = "PickUp"
     rospy.loginfo('LOG: scenario: %s: %s' % (scenario, data))
@@ -248,7 +248,7 @@ class Init(smach.State):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
-        log("1001PUS   PickUp Started") #Pickup Started
+        logdata("1001PUS   PickUp Started") #Pickup Started
         if rospy.has_param('/hobbit/social_role'):
             ud.social_role = rospy.get_param('/hobbit/social_role')
         return 'succeeded'
