@@ -324,7 +324,7 @@ def get_robot_pose_cb(msg, ud):
 
 def main():
     rospy.init_node(NAME)
-
+    global pubEvent
     pubEvent = rospy.Publisher('Event', Event, queue_size=50)
 
 
