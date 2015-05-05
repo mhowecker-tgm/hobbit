@@ -561,6 +561,13 @@ void rosparam_set(char * commandToRun,unsigned int maxCommandSize,char * paramNa
 }
 
 
+void rosparam_setAbsolute(char * commandToRun,unsigned int maxCommandSize,char * paramName,char * paramValue)
+{
+  snprintf(commandToRun,maxCommandSize,"/bin/bash -c \"rosparam set %s \"'%s'\" \"",paramName,paramValue);
+}
+
+
+
 void rostopic_pub(char * commandToRun,unsigned int maxCommandSize,char * topicName,char * topicType,char * topicValue)
 {
   snprintf(commandToRun,maxCommandSize,"/bin/bash -c \"rostopic pub %s %s %s -1\"",topicName,topicType,topicValue);
@@ -723,8 +730,8 @@ void execute(char * command,char * param)
   if (strcmp(command,"askForSocialRole")==0)      { rostopic_pub(cR,cRLen,(char *) "/Command", (char *) "hobbit_msgs/Command", (char *) "\\\"{command: 'C_SOCIALROLE' , params: [ {name: 'facilitator' , value: 'true'} ] }\\\"" );   }  else
   if (strcmp(command,"setUserAway")==0)           { rosparam_set(cR,cRLen,(char *) "/Hobbit/user_away",param);       }  else
   if (strcmp(command,"setCurrentEmotion")==0)     { rosparam_set(cR,cRLen,(char *) "/Hobbit/current_emotion",param); }  else
-  if (strcmp(command,"setLatestWakingUpTime")==0) { rosparam_set(cR,cRLen,(char *) "/Hobbit/wakeup_time",param);     }  else
-  if (strcmp(command,"setLatestSleepingTime")==0) { rosparam_set(cR,cRLen,(char *) "/Hobbit/sleep_time",param);      }  else
+  if (strcmp(command,"setLatestWakingUpTime")==0) { rosparam_setAbsolute(cR,cRLen,(char *) "/Hobbit/wakeup_time",param);     }  else
+  if (strcmp(command,"setLatestSleepingTime")==0) { rosparam_setAbsolute(cR,cRLen,(char *) "/Hobbit/sleep_time",param);      }  else
   //---------------
   if (strcmp(command,"LuiBackgroundSelector")==0) {
                                                     char hexValue[32]={0};
