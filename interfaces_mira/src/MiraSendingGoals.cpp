@@ -151,7 +151,13 @@ bool MiraSendingGoals::applyRotation(hobbit_msgs::SendValue::Request  &req, hobb
 
 	ftr.get(); // 
 
-	while (goal_status.data == "rotation_request" || goal_status.data == "active"){;}
+	ros::Time timeout = ros::Time::now() + ros::Duration(120);
+	ros::Duration time_left = timeout - ros::Time::now();
+
+	while ((goal_status.data == "rotation_request" || goal_status.data == "active") && time_left > ros::Duration(0,0)) //Give it a maximum of 2 min to rotate
+	{
+		time_left = timeout - ros::Time::now();
+	}
 
 	ROS_INFO("status %s", goal_status.data.c_str());
 
