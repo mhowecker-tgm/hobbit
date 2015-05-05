@@ -175,8 +175,8 @@ def set_head_orientation(msg):
 				lr_angle = current_yaw + lr_shift
 				ud_angle = current_pitch + ud_shift
 				if ( angleLimitsOK(lr_angle, ud_angle) ):
-					print "6 set yaw=: ", ud_angle
-		                        print "6 set pitch=: ", lr_angle
+					print "6 set yaw=: ", lr_angle
+		                        print "6 set pitch=: ", ud_angle
 		                        set_angles(pitch=ud_angle, yaw=lr_angle)
 					rospy.sleep(2.0)
 				
