@@ -100,7 +100,7 @@ def set_head_orientation(msg):
 		set_angles(pitch=35, yaw=0)
 
 	elif msg.data == "littledown_center":
-		set_angles(pitch=20, yaw=0)
+		set_angles(pitch=16, yaw=0)
 
 	elif msg.data == "center_right":
 		set_angles(pitch=0, yaw=-90)
