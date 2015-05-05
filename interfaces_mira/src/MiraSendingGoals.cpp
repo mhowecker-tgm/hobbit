@@ -142,22 +142,14 @@ bool MiraSendingGoals::applyRotation(hobbit_msgs::SendValue::Request  &req, hobb
 	const float rotTolerance = 0.075; // Tolerance in radians 
 
 	goal_status.data = "rotation_request";
-
-	boost::shared_ptr<Task> task(new Task());
+ 
+	TaskPtr task(new Task());
 	task->addSubTask(SubTaskPtr(new OrientationTask(phi, rotTolerance)));
 
 	std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
   	auto ftr = robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
 
-	ftr.get(); // 
-
-	ros::Time timeout = ros::Time::now() + ros::Duration(120);
-	ros::Duration time_left = timeout - ros::Time::now();
-
-	while ((goal_status.data == "rotation_request" || goal_status.data == "active") && time_left > ros::Duration(0,0)) //Give it a maximum of 2 min to rotate
-	{
-		time_left = timeout - ros::Time::now();
-	}
+	//ftr.get(); // 
 
 	ROS_INFO("status %s", goal_status.data.c_str());
 
