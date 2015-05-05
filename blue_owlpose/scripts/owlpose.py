@@ -47,6 +47,10 @@ pan_pub = None
 tilt_pub = None
 # indicate whether we want to debug print current angles
 debugPrintAngles = False
+#df: angles as they were set
+current_yaw_as_set = 0
+current_tilt_as_set = 0
+
 
 # This sets angles for a pan/tilt neck. Angles are in degrees.
 # There are 2 angles to set: pitch (=up/down) and yaw (= left/right).
@@ -55,6 +59,10 @@ def set_angles(pitch, yaw):
 	global pitch_offset
 	global pan_pub
 	global tilt_pub
+	global current_yaw_as_set
+	global current_tilt_as_set
+	current_yaw_as_set = yaw
+	current_tilt_as_set = pitch
 	print "moving to yaw [deg] ", yaw
 	print "moving to pitch [yaw] ", pitch
 	# add the calibration offsets
@@ -76,6 +84,8 @@ def set_angles(pitch, yaw):
 def set_head_orientation(msg):
 	global current_yaw
 	global current_pitch
+	global current_yaw_as_set
+	global current_tilt_as_set
 
 	print "current angles (pitch, yaw) [deg]:", current_pitch, " ", current_yaw
 	print "Move to", msg.data
@@ -172,13 +182,15 @@ def set_head_orientation(msg):
 
 				print "lr_shift: ", lr_shift
 		                print "ud_shift: ", ud_shift
-				lr_angle = current_yaw + lr_shift
-				ud_angle = current_pitch + ud_shift
+				#df: new 5.5.2015
+				lr_angle = current_yaw_as_set + lr_shift  	#lr_angle = current_yaw + lr_shift
+				ud_angle = current_tilt_as_set + ud_shift	#ud_angle = current_pitch + ud_shift
+	
 				if ( angleLimitsOK(lr_angle, ud_angle) ):
 					print "6 set yaw=: ", lr_angle
 		                        print "6 set pitch=: ", ud_angle
 		                        set_angles(pitch=ud_angle, yaw=lr_angle)
-					rospy.sleep(2.0)
+					#rospy.sleep(2.0)
 				
 		except:
 			print "===============================================> owlpose.py: ERROR during relative setting of HEAD: ", sys.exc_info()[0]
