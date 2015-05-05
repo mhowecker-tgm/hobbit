@@ -153,7 +153,7 @@ bool MiraSendingGoals::applyRotation(hobbit_msgs::SendValue::Request  &req, hobb
 
 	while (goal_status.data == "rotation_request" || goal_status.data == "active"){;}
 
-	std::cout << "status " << goal_status.data << std::endl;
+	ROS_INFO("status %s", goal_status.data.c_str());
 
 	if (goal_status.data == "reached")
 		res.state = true;
