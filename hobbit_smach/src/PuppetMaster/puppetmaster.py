@@ -906,7 +906,7 @@ def main():
             ResetActiveTask(),
             transitions={'succeeded': 'succeeded',
                          'preempted': 'preempted',
-                         'aborted': 'aborted'}
+                         'aborted': 'MUC_RESET_ACTIVE_TASK'}
         )
         StateMachine.add(
             'PREEMPT_RESET_ACTIVE_TASK',
