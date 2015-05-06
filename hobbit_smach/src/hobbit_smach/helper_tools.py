@@ -161,7 +161,7 @@ def charge_check_server():
     s7 = rospy.Service('/arm/set_move_state', SetArmState, set_arm_state)
     s8 = rospy.Service('/arm/get_move_state', GetArmState, get_arm_state)
     s9 = rospy.Service('/user/set_away_state', SetAwayState, set_away_state)
-    s10 = rospy.Service('/user/get_away_state', GetAwaytate, get_away_state())
+    s10 = rospy.Service('/user/get_away_state', GetAwayState, get_away_state)
     rospy.Subscriber('battery_state', BatteryState, set_dock_state_true)
     rospy.Subscriber('Event', Event, events_to_commands)
 
