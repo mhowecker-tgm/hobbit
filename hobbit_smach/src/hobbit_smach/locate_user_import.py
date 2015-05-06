@@ -30,6 +30,7 @@ from hobbit_msgs.msg import GeneralHobbitAction
 import hobbit_smach.logging_import as log
 import hobbit_smach.speech_output_import as speech_output
 from hobbit_user_interaction import HobbitMMUI
+import hobbit_smach.sos_call_import as sos_call
 
 
 def switch_vision_cb(ud, response):
@@ -692,21 +693,23 @@ def call_for_the_user():
     )
 
     def child_term_cb(outcome_map):
-                rospy.loginfo('cc1: child_term_cb: ')
-                rospy.loginfo(str(outcome_map))
-                return True
-            def out_cb(outcome_map):
-                rospy.loginfo(str(outcome_map))
-                if outcome_map['YES_NO'] == 'yes':
-                    return 'succeeded'
-                elif outcome_map['WAIT'] == 'succeeded':
-                    return 'succeeded'
-                elif outcome_map['WAIT'] == 'aborted':
-                    return 'aborted'
-                elif outcome_map['YES_NO'] in ['no', 'timeout', '3times', 'failed']:
-                    return 'aborted'
-                else:
-                    return 'preempted'
+        rospy.loginfo('cc1: child_term_cb: ')
+        rospy.loginfo(str(outcome_map))
+        return True
+
+    def out_cb(outcome_map):
+        rospy.loginfo(str(outcome_map))
+        if outcome_map['YES_NO'] == 'yes':
+            return 'succeeded'
+        elif outcome_map['WAIT'] == 'succeeded':
+            return 'succeeded'
+        elif outcome_map['WAIT'] == 'aborted':
+            return 'aborted'
+        elif outcome_map['YES_NO'] in ['no', 'timeout', '3times', 'failed']:
+            return 'aborted'
+        else:
+            return 'preempted'
+
     with first_it:
         Iterator.set_contained_state(
             'FIRST_SM',
@@ -743,6 +746,19 @@ def call_for_the_user():
             util.SleepState(duration=15)
         )
 
+    with second_loop:
+        StateMachine.add(
+            'CALL_USER',
+            cc1,
+            transitions={'succeeded': 'WAIT_15SEC',
+                         'aborted': 'WAIT_15SEC',
+                         'preempted': 'preempted'}
+        )
+        StateMachine.add(
+            'WAIT_15SEC',
+            util.SleepState(duration=15)
+        )
+
     with second_it:
         Iterator.set_contained_state(
             'SECOND_SM',
@@ -758,12 +774,33 @@ def call_for_the_user():
                          'aborted':'aborted'}
         )
         StateMachine.add(
+            'SET_VOLUME',
+            HobbitMMUI.SetAbsVolume(volume='100'),
+            transitions={'succeeded':'CALL_FOR_THE_USER_LOUDER',
+                         'preempted':'preempted',
+                         'aborted':'aborted'}
+        )
+        StateMachine.add(
+            'CALL_FOR_THE_USER_LOUDER',
+            second_it,
+            transitions={'succeeded':'RESET_VOLUME',
+                         'preempted':'preempted',
+                         'aborted':'aborted'}
+        )
+        StateMachine.add(
             'RESET_VOLUME',
             HobbitMMUI.SetAbsVolume(volume='30'),
             transitions={'succeeded':'succeeded',
                          'preempted':'preempted',
                          'aborted':'aborted'}
         )
+        StateMachine.add(
+            'EMERGENCY_CALL',
+            sos_call.get_call_sos_simple(),
+            transitions={'succeeded': 'succeeded',
+                         'failed': 'aborted',
+                         'preempted': 'preempted',
+                         'aborted': 'aborted'}
     return sm
 
 
