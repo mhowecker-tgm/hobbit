@@ -1749,8 +1749,8 @@ def getStartLooking():
     object could be detected.
     """
     
-    logger = logging.DoLogScenarioAndData()
-    logger.log(SCENARIO, "1102PDA   Pointing Direction Accepted")    #log that pointing direction was accepted (otherwise the state calling this function wouldn't have reached)
+    #logger = logging.DoLogScenarioAndData()
+    #logger.log(SCENARIO, "1102PDA   Pointing Direction Accepted")    #log that pointing direction was accepted (otherwise the state calling this function wouldn't have reached)
     
     seq = Sequence(
         outcomes=['succeeded', 'preempted', 'failed'],
