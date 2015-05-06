@@ -20,8 +20,8 @@ class DoLog(State):
         State.__init__(
             self,
             outcomes=['succeeded', 'aborted'],
-            input_keys=['scenario', 'data', 'command'] #if
-            #(scenario is not None and data is not None) else ['command']
+            input_keys=['scenario', 'data', 'command'] if
+            (scenario is not None and data is not None) else ['command']
         )
         self.scenario = scenario
         self.data = data
@@ -29,13 +29,12 @@ class DoLog(State):
 
     def execute(self, ud):
         print("DoLog: ")
-        print ud.scenario
         print self.scenario
-        print ud.command
-        if ud.scenario == 'IDLE' and ud.command == 'IDLE':
-            return 'aborted'
+        
         scenario = ud.scenario if self.scenario is not None else ud.command
         data = ud.data if self.data is None else self.data
+        if scenario == 'IDLE':
+            return 'aborted'
         rospy.loginfo('LOG: scenario: %s: %s' % (scenario, data))
         message = Event()
         message.event = 'E_LOG'
