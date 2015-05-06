@@ -20,8 +20,8 @@ class DoLog(State):
         State.__init__(
             self,
             outcomes=['succeeded', 'aborted'],
-            input_keys=['scenario', 'data', 'command'] if
-            (scenario is not None and data is not None) else ['command']
+            input_keys=['scenario', 'data', 'command'] #if
+            #(scenario is not None and data is not None) else ['command']
         )
         self.scenario = scenario
         self.data = data
