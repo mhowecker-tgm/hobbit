@@ -100,7 +100,7 @@ def is_the_user_away():
 def the_user_is_back():
     set_user_state = rospy.ServiceProxy(
             '/user/set_user_state',
-            GetAwayState,
+            SetAwayState,
             persistent=False)
     try:
         request=SetAwayStateRequest(state=False)
