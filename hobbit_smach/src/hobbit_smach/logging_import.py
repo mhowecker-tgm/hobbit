@@ -222,7 +222,7 @@ class DoLogScenarioAndData(): #scenario, data: string
         self.pubEvent = rospy.Publisher('Event', Event, queue_size=50)
 
     def log(self, scenario=None, data=None):
-        print("DoLog: ")
+        print("DoLogScenarioAndData(): ")
         print "scenario: ", scenario
         print "data: ", data
         #rospy.loginfo('LOG: scenario: %s: %s' % (scenario, data))
