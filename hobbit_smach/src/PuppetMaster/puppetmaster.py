@@ -87,7 +87,7 @@ def start_command(ud):
 
 def is_the_user_away():
     get_user_state = rospy.ServiceProxy(
-            '/user/get_user_state',
+            '/user/get_away_state',
             GetAwayState,
             persistent=False)
     try:
@@ -99,7 +99,7 @@ def is_the_user_away():
 
 def the_user_is_back():
     set_user_state = rospy.ServiceProxy(
-            '/user/set_user_state',
+            '/user/set_away_state',
             SetAwayState,
             persistent=False)
     try:
