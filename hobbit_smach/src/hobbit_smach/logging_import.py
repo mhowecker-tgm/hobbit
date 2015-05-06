@@ -21,7 +21,7 @@ class DoLog(State):
             self,
             outcomes=['succeeded', 'aborted'],
             input_keys=['scenario', 'data', 'command'] if
-            (scenario is None and data is None) else ['command']
+            (scenario is not None and data is not None) else ['command']
         )
         self.scenario = scenario
         self.data = data
