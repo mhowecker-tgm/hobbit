@@ -1622,8 +1622,8 @@ def sayMoveIssuePUstopped():
                                    'SAY_MOVE_ISSUE_PU_STOPPED': 'succeeded'}}
     )
     
-    logger = logging.DoLogScenarioAndData()
-    logger.log(SCENARIO, "2205MPF Moving to (Pregrasp)pos Failed" )
+    #logger = logging.DoLogScenarioAndData()
+    #logger.log(SCENARIO, "2205MPF Moving to (Pregrasp)pos Failed" )
 
     with cc:
         Concurrence.add(

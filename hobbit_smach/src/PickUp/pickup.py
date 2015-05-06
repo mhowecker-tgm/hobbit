@@ -534,9 +534,14 @@ def main():
         StateMachine.add(
             'EMO_SAY_MOVE_ISSUE_PU_STOPPED',
             pickup.sayMoveIssuePUstopped(),
-            transitions={'succeeded': 'SET_HEAD_CENTER_PICKUP_FAILED',
-                         'failed': 'SET_HEAD_CENTER_PICKUP_FAILED',
+            transitions={'succeeded': 'LOG_MOVE_ISSUE_PU_STOPPED',
+                         'failed': 'LOG_MOVE_ISSUE_PU_STOPPED',
                          'preempted': 'LOG_PREEMPT'}
+        )
+        StateMachine.add(
+            'LOG_MOVE_ISSUE_PU_STOPPED',
+            log.DoLogScenarioAndData(scenario='Pickup', data="2205MPF Moving to (Pregrasp)pos Failed"),
+            transitions={'succeeded': 'SET_HEAD_CENTER_PICKUP_FAILED'}
         )
         #StateMachine.add(   #not used anymore!! df: 6.2.2015, done in pickup_import
         #    'NO_GRASPABLE_OBJECT_FOUND',
