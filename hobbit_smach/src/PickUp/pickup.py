@@ -396,7 +396,7 @@ def main():
         )
         StateMachine.add(
             'LOG_POINTING_NOT_DETECTED_1',
-            log.DoLogScenarioAndData(scenario='Pickup', data='1203PDR   Pointing Direction Rejected'),
+            log.DoLog(scenario='Pickup', data='1203PDR   Pointing Direction Rejected'),
             transitions={'succeeded': 'POINTING_NOT_DETECTED_1'}
         )
         StateMachine.add(
