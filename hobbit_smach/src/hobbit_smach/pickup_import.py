@@ -1449,12 +1449,16 @@ def sayPointingGestureNotDetected1():
     )
 
     logger = logging.DoLogScenarioAndData()
-    logger.log(SCENARIO, "1203PDR   Pointing Direction Rejected")    #log that pointing direction was rejected (otherwise the state calling this function wouldn't have reached)    
+    #logger.log(SCENARIO, "1203PDR   Pointing Direction Rejected")    #log that pointing direction was rejected (otherwise the state calling this function wouldn't have reached)    
 
     with cc:
         Concurrence.add(
             'EMO_SAD',
             HobbitEmotions.ShowEmotions(emotion='SAD', emo_time=4)
+        )
+        Concurrence.add(
+            'LOG_POINTING_DIRECTION_REJECTED',
+            logger.log(SCENARIO, "1203PDR   Pointing Direction Rejected")    #log that pointing direction was rejected (otherwise the state calling this function wouldn't have reached)
         )
         Concurrence.add(
             'SAY_POINTING_NOT_DETECTED',
