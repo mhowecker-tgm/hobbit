@@ -11,8 +11,8 @@ import smach
 
 from std_msgs.msg import String
 from hobbit_msgs.msg import GeneralHobbitAction, Event
-from hobbit_msgs.srv import GetCoordinates
-from smach_ros import ActionServerWrapper, IntrospectionServer
+from hobbit_msgs.srv import GetCoordinates, SetAwayStateRequest, SetAwayState
+from smach_ros import ActionServerWrapper, IntrospectionServer, ServiceState
 from smach import StateMachine, State, Sequence
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 import hobbit_smach.hobbit_move_import as hobbit_move
@@ -212,6 +212,11 @@ def set_nav_goal_cb(userdata, request):
     nav_request.room_name = String(userdata.room_name)
     return nav_request
 
+def resp_cb(userdata, response):
+    if response.result:
+        return 'succeeded'
+    else:
+        return 'aborted'
 
 def main():
     rospy.init_node(NAME)
@@ -363,6 +368,16 @@ def main():
             SetSuccess(),
             transitions={'succeeded': 'LOG_SUCCESS',
                          'preempted': 'CLEAN_UP'}
+        )
+        StateMachine.add(
+            'USER_IS_AWAY',
+            ServiceState('/user/set_away_state',
+                         SetAwayState,
+                         request=SetAwayStateRequest(state=True),
+                         response_cb=resp_cb),
+            transitions={'succeeded': 'LOG_SUCCESS',
+                         'aborted': 'LOG_ABORTED',
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'SET_FAILURE',

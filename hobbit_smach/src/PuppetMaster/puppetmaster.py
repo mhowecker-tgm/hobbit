@@ -13,6 +13,7 @@ from smach import StateMachine, Concurrence, State
 from std_msgs.msg import String
 from hobbit_msgs.msg import Command, Event, GeneralHobbitAction,\
     GeneralHobbitGoal
+from hobbit_msgs.srv import GetAwayState, SetAwayState, GetAwayStateRequest, SetAwayStateRequest
 import hobbit_smach.helper_import as helper
 import hobbit_smach.recharge_import as recharge
 import hobbit_smach.call_hobbit_2_import as call_hobbit
@@ -79,10 +80,34 @@ def start_command(ud):
     mmui.remove_last_prompt()
     rospy.loginfo('New task has higher priority. START IT.')
     rospy.loginfo('start_command: '+str(ud.params))
-    print(bcolors.OKGREEN +
-          'New task has higher priority. Start it.'
-          + bcolors.ENDC)
+    # print(bcolors.OKGREEN +
+    #       'New task has higher priority. Start it.'
+    #       + bcolors.ENDC)
     return True
+
+def is_the_user_away():
+    get_user_state = rospy.ServiceProxy(
+            '/user/get_user_state',
+            GetAwayState,
+            persistent=False)
+    try:
+        request=GetAwayStateRequest(state=True)
+        resp = get_user_state(request)
+        return resp
+    except rospy.ServiceException:
+        return False
+
+def the_user_is_back():
+    set_user_state = rospy.ServiceProxy(
+            '/user/set_user_state',
+            GetAwayState,
+            persistent=False)
+    try:
+        request=SetAwayStateRequest(state=False)
+        resp = set_user_state(request)
+        return resp
+    except rospy.ServiceException:
+        return False
 
 def command_cb(msg, ud):
     global new_command
@@ -92,7 +117,7 @@ def command_cb(msg, ud):
         input_ce = msg.command.upper()
         rospy.loginfo('/Command data received:')
     except AttributeError, e:
-        print("command_cb: Command: "+str(e))
+        rospy.loginfo("command_cb: Command: "+str(e))
         pass
     try:
         rospy.loginfo(str(msg.event))
@@ -101,12 +126,17 @@ def command_cb(msg, ud):
         if msg.event == 'E_WATCHDOG':
             rospy.loginfo(str(msg.header))
     except AttributeError, e:
-        print("command_cb: Event: "+str(e))
+        rospy.loginfo("command_cb: Event: "+str(e))
         pass
 
     night = IsItNight(ud)
+    away = is_the_user_away()
     active_task = ud.parameters['active_task']
     first = True
+    if away and input_ce not in ['E_HELP', 'C_CALLHOBBIT', 'E_CALLHOBBIT', 'C_MASTER_RESET', 'E_WAKEUP']:
+        rospy.loginfo('The user is away and the command is not there to wake up Hobbit.')
+        return False
+    the_user_is_back()
     for index, item in enumerate(commands):
         if first and active_task < 100:
             rospy.loginfo('GOT COMMAND: '+str(input_ce))

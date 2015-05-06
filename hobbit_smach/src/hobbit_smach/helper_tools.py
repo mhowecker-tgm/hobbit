@@ -10,10 +10,11 @@ state = False
 dock_state = False
 move_state = False
 arm_state = False
+user_away = False
 
 import rospy
 from hobbit_msgs.srv import SetCloserState, GetCloserState, SetDockState, GetDockState, SetMoveState, GetMoveState, ChargeCheck, ChargeCheckResponse
-from hobbit_msgs.srv import GetArmState, SetArmState
+from hobbit_msgs.srv import GetArmState, SetArmState, GetAwayState, SetAwayState
 from hobbit_msgs.msg import Event, Command
 from mira_msgs.msg import BatteryState
 import hobbit_smach.arm_move_import as arm_move
@@ -98,6 +99,21 @@ def get_arm_state(req):
     rospy.loginfo("Get state is "+str(arm_state))
     return arm_state
 
+def set_away_state(req):
+    global user_away
+    response = False
+    rospy.loginfo("Set user away state called")
+    user_away = req.state
+    rospy.loginfo("Set state to "+str(user_away))
+    return True
+
+def get_away_state(req):
+    global user_away
+    response = True
+    rospy.loginfo("Get user away state called")
+    rospy.loginfo("Get state is "+str(user_away))
+    return user_away
+
 def set_dock_state_true(msg):
     global dock_state
     if msg.charging:
@@ -144,6 +160,8 @@ def charge_check_server():
     s6 = rospy.Service('/moving/get_move_state', GetMoveState, get_move_state)
     s7 = rospy.Service('/arm/set_move_state', SetArmState, set_arm_state)
     s8 = rospy.Service('/arm/get_move_state', GetArmState, get_arm_state)
+    s9 = rospy.Service('/user/set_away_state', SetAwayState, set_away_state)
+    s10 = rospy.Service('/user/get_away_state', GetAwaytate, get_away_state())
     rospy.Subscriber('battery_state', BatteryState, set_dock_state_true)
     rospy.Subscriber('Event', Event, events_to_commands)
 
