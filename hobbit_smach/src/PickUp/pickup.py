@@ -384,7 +384,7 @@ def main():
                  output_keys=['pointing_msg']
              ),
              transitions={'valid': 'POINTING_COUNTER',
-                          'invalid': 'START_LOOKING',   
+                          'invalid': 'LOG_POINTING_DIRECTION_ACCEPTED',   
                           'preempted': 'LOG_PREEMPT'}
          )
         StateMachine.add(
@@ -420,6 +420,11 @@ def main():
             transitions={'succeeded': 'LOG_ABORT',
                          'failed': 'LOG_ABORT',
                          'preempted': 'LOG_PREEMPT'}
+        )
+        StateMachine.add(
+            'LOG_POINTING_DIRECTION_ACCEPTED',
+            log.DoLogScenarioAndData(scenario='Pickup', data="1102PDA   Pointing Direction Accepted"),
+            transitions={'succeeded': 'START_LOOKING'}
         )
         StateMachine.add(
             'START_LOOKING',
