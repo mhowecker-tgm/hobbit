@@ -214,7 +214,7 @@ def set_head_orientation(msg):
 		except:
 			print "===============================================> owlpose.py: ERROR during relative setting of HEAD: ", sys.exc_info()[0]
 
-	rospy.sleep(0.5)
+	rospy.sleep(0.1)
 
 # Set torque limit for dynamixel servos
 def setTorqueLimit(torque):
