@@ -476,7 +476,7 @@ class SetAbsVolume(smach.State):
     def __init__(self, volume):
         smach.State.__init__(
             self,
-            outcomes=['succeeded', 'preempted', 'failed'],
+            outcomes=['succeeded', 'preempted', 'aborted'],
             input_keys=['call_state']
         )
         self.volume = volume
@@ -491,16 +491,15 @@ class SetAbsVolume(smach.State):
         return 'succeeded'
 
 
-class SetVolumeLouder(smach.State):
+class SetVolumeHigher(smach.State):
     """
     """
-    def __init__(self, volume):
+    def __init__(self):
         smach.State.__init__(
             self,
-            outcomes=['succeeded', 'preempted', 'failed'],
+            outcomes=['succeeded', 'preempted', 'aborted'],
             input_keys=['call_state']
         )
-        self.volume = volume
 
     def execute(self, ud):
         if self.preempt_requested():
@@ -518,7 +517,7 @@ class SetVolumeLower(smach.State):
     def __init__(self):
         smach.State.__init__(
             self,
-            outcomes=['succeeded', 'preempted', 'failed'],
+            outcomes=['succeeded', 'preempted', 'aborted'],
             input_keys=['call_state']
         )
 
