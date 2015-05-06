@@ -43,6 +43,7 @@ add_service_files(
   ClustersOnPlane.srv
   ChargeCheck.srv
   GetArmState.srv
+  GetAwayState.srv
   GetCloserState.srv
   GetDockState.srv
   GetMoveState.srv
@@ -58,6 +59,7 @@ add_service_files(
   PointCloud2FeatureHistogram.srv
   Request.srv
   SetArmState.srv
+  SetAwayState.srv
   SetCloserState.srv
   SetDockState.srv
   SetMoveState.srv
