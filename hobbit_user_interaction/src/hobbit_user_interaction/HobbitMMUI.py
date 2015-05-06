@@ -470,6 +470,68 @@ class CallEnded(smach.State):
         return 'succeeded'
 
 
+class SetAbsVolume(smach.State):
+    """
+    """
+    def __init__(self, volume):
+        smach.State.__init__(
+            self,
+            outcomes=['succeeded', 'preempted', 'failed'],
+            input_keys=['call_state']
+        )
+        self.volume = volume
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        mmui = MMUI.MMUIInterface()
+        resp = mmui.set_abs_volume(volume=self.volume)
+        rospy.loginfo('F_ABSVOLUME: '+str(resp))
+        return 'succeeded'
+
+
+class SetVolumeLouder(smach.State):
+    """
+    """
+    def __init__(self, volume):
+        smach.State.__init__(
+            self,
+            outcomes=['succeeded', 'preempted', 'failed'],
+            input_keys=['call_state']
+        )
+        self.volume = volume
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        mmui = MMUI.MMUIInterface()
+        resp = mmui.set_volume_louder()
+        rospy.loginfo('F_LOUDER: '+str(resp))
+        return 'succeeded'
+
+
+class SetVolumeLower(smach.State):
+    """
+    """
+    def __init__(self):
+        smach.State.__init__(
+            self,
+            outcomes=['succeeded', 'preempted', 'failed'],
+            input_keys=['call_state']
+        )
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        mmui = MMUI.MMUIInterface()
+        resp = mmui.set_volume_quieter()
+        rospy.loginfo('F_QUIETER: '+str(resp))
+        return 'succeeded'
+
+
 class CheckSOSCall(util.WaitForMsgState):
     """
     Inherit from util.WaitForMsgState to wait

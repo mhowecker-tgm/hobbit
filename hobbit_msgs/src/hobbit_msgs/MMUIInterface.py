@@ -185,6 +185,27 @@ class MMUIInterface:
         parr.append(p)
         return self.callMMUIService('0', txt='Go to menu' + menu[2:], params=parr)
 
+    def set_abs_volume(self, volume='30'):
+        parr = []
+        p = Parameter('type', 'F_ABSVOLUME')
+        parr.append(p)
+        p = Parameter('Value', volume)
+        parr.append(p)
+        return self.callMMUIService('0', txt='Set volume to' + volume, params=parr)
+
+
+    def set_volume_louder(self):
+        parr = []
+        p = Parameter('type', 'F_LOUDER')
+        parr.append(p)
+        return self.callMMUIService('0', txt='Set volume 10% higher', params=parr)
+
+    def set_volume_quieter(self):
+        parr = []
+        p = Parameter('type', 'F_QUIETER')
+        parr.append(p)
+        return self.callMMUIService('0', txt='Set volume 10% lower', params=parr)
+
     def sendMMUI_Function(self, f):
         parr = []
         p = Parameter('type', f)
