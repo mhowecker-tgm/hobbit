@@ -222,8 +222,8 @@ class DoLogScenarioAndData(State): #scenario, data: string
             input_keys=['scenario', 'data', 'command'] if
             (scenario is not None) else []
         )
-        self.scenario = None
-        self.data = None
+        self.scenario = scenario
+        self.data = data
         self.pubEvent = rospy.Publisher('Event', Event, queue_size=50)
 
     def execute(self, scenario=None, data=None):
