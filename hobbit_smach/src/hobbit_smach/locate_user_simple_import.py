@@ -597,7 +597,7 @@ def get_detect_user():
             PlanPath(),
             transitions={'succeeded': 'MOVE_BASE',
                          'preempted': 'LOG_PREEMPT',
-                         'aborted': 'LOG_ABORT'}
+                         'aborted': 'CALL_FOR_THE_USER'}
         )
         StateMachine.add(
             'MOVE_BASE',
@@ -685,7 +685,7 @@ def get_detect_user():
         StateMachine.add(
             'GESTURE_HANDLING',
             gesture_sm(),
-            transitions={'succeeded': 'CALL_FOR_THE_USER',
+            transitions={'succeeded': 'LOG_SUCCESS',
                          'preempted': 'LOG_PREEMPT',
                          'aborted': 'LOG_ABORT'}
         )
@@ -745,7 +745,7 @@ def call_for_the_user():
         if outcome_map['YES_NO'] == 'yes':
             return 'succeeded'
         elif outcome_map['WAIT'] == 'succeeded':
-            return 'succeeded'
+            return 'aborted'
         elif outcome_map['WAIT'] == 'aborted':
             return 'aborted'
         elif outcome_map['YES_NO'] in ['no', 'timeout', '3times', 'failed']:
@@ -798,11 +798,25 @@ def call_for_the_user():
 
     with second_loop:
         StateMachine.add(
+            'SET_VOLUME',
+            HobbitMMUI.SetAbsVolume(volume='100'),
+            transitions={'succeeded':'CALL_USER',
+                         'preempted':'preempted',
+                         'aborted':'CALL_USER'}
+        )
+        StateMachine.add(
             'CALL_USER',
             cc1,
-            transitions={'succeeded': 'WAIT_15SEC',
-                         'aborted': 'WAIT_15SEC',
+            transitions={'succeeded': 'RESET_VOLUME',
+                         'aborted': 'RESET_VOLUME',
                          'preempted': 'preempted'}
+        )
+        StateMachine.add(
+            'RESET_VOLUME',
+            HobbitMMUI.SetAbsVolume(volume='20'),
+            transitions={'succeeded':'WAIT_15SEC',
+                         'preempted':'preempted',
+                         'aborted':'WAIT_15SEC'}
         )
         StateMachine.add(
             'WAIT_15SEC',
@@ -815,18 +829,12 @@ def call_for_the_user():
             second_loop,
             loop_outcomes = ['succeeded']
         )
+
     with sm:
         StateMachine.add(
             'CALL_FOR_THE_USER',
             first_it,
             transitions={'succeeded':'RESET_VOLUME',
-                         'preempted':'preempted',
-                         'aborted':'aborted'}
-        )
-        StateMachine.add(
-            'SET_VOLUME',
-            HobbitMMUI.SetAbsVolume(volume='100'),
-            transitions={'succeeded':'CALL_FOR_THE_USER_LOUDER',
                          'preempted':'preempted',
                          'aborted':'aborted'}
         )
@@ -839,10 +847,10 @@ def call_for_the_user():
         )
         StateMachine.add(
             'RESET_VOLUME',
-            HobbitMMUI.SetAbsVolume(volume='30'),
+            HobbitMMUI.SetAbsVolume(volume='20'),
             transitions={'succeeded':'succeeded',
                          'preempted':'preempted',
-                         'aborted':'aborted'}
+                         'aborted':'EMERGENCY_CALL'}
         )
         StateMachine.add(
             'EMERGENCY_CALL',
