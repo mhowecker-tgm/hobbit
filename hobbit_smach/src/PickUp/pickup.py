@@ -396,7 +396,7 @@ def main():
         )
         StateMachine.add(
             'LOG_POINTING_NOT_DETECTED_1',
-            log.DoLogScenarioAndData(scenario='Pickup', data="1203PDR   Pointing Direction Rejected"),
+            log.DoLogScenarioAndData(scenario='Pickup', data='1203PDR   Pointing Direction Rejected'),
             transitions={'succeeded': 'POINTING_NOT_DETECTED_1'}
         )
         StateMachine.add(
@@ -423,7 +423,7 @@ def main():
         )
         StateMachine.add(
             'LOG_POINTING_DIRECTION_ACCEPTED',
-            log.DoLogScenarioAndData(scenario='Pickup', data="1102PDA   Pointing Direction Accepted"),
+            log.DoLogScenarioAndData(scenario='Pickup', data='1102PDA   Pointing Direction Accepted'),
             transitions={'succeeded': 'START_LOOKING'}
         )
         StateMachine.add(
