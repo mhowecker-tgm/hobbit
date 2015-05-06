@@ -2,6 +2,7 @@
 # ROS node to access the Dynamixel servos in the neck.
 # Also can take IMU pitch angles to replace the angles returned by the pitch servo,
 # if these should not be accurate.
+# NOTE: the Dynamixel RX-28 servos used in Hobbit have a resolution of 0.29 deg
 #
 # @author Tobias Ferner (some), Andreas Baldinger (some more), Michael Zillich (final)
 # @date April 2015
@@ -19,10 +20,20 @@ from geometry_msgs.msg import Quaternion
 from dynamixel_msgs.msg import *
 
 # angle limits, in degrees
+# mechanical stops are
+# -90
+# 90
+# -28.075
+# 63.598
 min_lr_angle_deg = -90
 max_lr_angle_deg = 90
-min_ud_angle_deg = -22
-max_ud_angle_deg = 58
+min_ud_angle_deg = -25
+max_ud_angle_deg = 60
+
+# torque limit for dynamixel servos
+# NOTE that typical load in the Hobbit neck is at most 0.5 for the tilt joint, but can also reach > 0.8
+# if the joint is blocked
+torque_limit = 0.9
 
 # transforms from angles
 br = tf.TransformBroadcaster()
@@ -40,16 +51,19 @@ yaw_offset = 0
 # indicate whether we are using the IMU
 haveImu = False
 imu_pitch_offset = 0
+# current yaw and pitch as read by the servos' sensors
 current_yaw = 0
 current_pitch = 0
+# currently set goal positions for the servos
+# NOTE: these will typically be different from the currently measured values, especially if the servo is
+# under high load
+current_yaw_as_set = 0
+current_pitch_as_set = 0
 # publishers to the dynamixel topics
 pan_pub = None
 tilt_pub = None
 # indicate whether we want to debug print current angles
 debugPrintAngles = False
-#df: angles as they were set
-current_yaw_as_set = 0
-current_tilt_as_set = 0
 
 
 # This sets angles for a pan/tilt neck. Angles are in degrees.
@@ -59,15 +73,20 @@ def set_angles(pitch, yaw):
 	global pitch_offset
 	global pan_pub
 	global tilt_pub
-	global current_yaw_as_set
-	global current_tilt_as_set
-	current_yaw_as_set = yaw
-	current_tilt_as_set = pitch
 	print "moving to yaw [deg] ", yaw
 	print "moving to pitch [yaw] ", pitch
 	# add the calibration offsets
 	pitch = pitch + pitch_offset
 	yaw = yaw + yaw_offset
+	# clamp to limits
+	if (yaw < min_lr_angle_deg):
+		yaw = min_lr_angle_deg
+	if (yaw > max_lr_angle_deg):
+		yaw = max_lr_angle_deg
+	if (pitch < min_ud_angle_deg):
+		pitch = min_ud_angle_deg
+	if (pitch > max_ud_angle_deg):
+		pitch = max_ud_angle_deg
 	# convert to rad
 	pitch = pitch*math.pi/180
 	yaw = yaw*math.pi/180
@@ -85,7 +104,7 @@ def set_head_orientation(msg):
 	global current_yaw
 	global current_pitch
 	global current_yaw_as_set
-	global current_tilt_as_set
+	global current_pitch_as_set
 
 	print "current angles (pitch, yaw) [deg]:", current_pitch, " ", current_yaw
 	print "Move to", msg.data
@@ -133,8 +152,7 @@ def set_head_orientation(msg):
 				input = msg.data.split()
 				lr_angle = int(input[1])
 				ud_angle = int(input[2])
-				if ( angleLimitsOK(lr_angle, ud_angle) ):
-					set_angles(pitch=ud_angle, yaw=lr_angle)
+				set_angles(pitch=ud_angle, yaw=lr_angle)
 				
 			if (msg.data[0]) in ("r", "l", "u", "d"):	#incremental head move
 				print "==> set relative values"
@@ -143,6 +161,10 @@ def set_head_orientation(msg):
 
 				print "current angles (pitch, yaw):",current_pitch, " ", current_yaw
 
+				# NOTE: the Dynamixel RX-28 servos used in Hobbit have a resolution of 0.29 deg
+				# So if you set a relative angle of 1 deg, it will typically move 0.87 = approx. 1 - 0.29/2
+				# NOTE: when moving e.g. left, then right, there is a hysteresis. E.g. when moving in 1 deg
+				# increments: ... l l r (not moving) r (not moving) r (moving) r (moving) ...
 				if msg.data[0] == "r":
 					lr_shift = -1	#default value for move head right
 					if (len(msg.data) > 1) and (int(msg.data[1]) > 0) and (int(msg.data[1]) < 10):
@@ -182,38 +204,40 @@ def set_head_orientation(msg):
 
 				print "lr_shift: ", lr_shift
 		                print "ud_shift: ", ud_shift
-				#df: new 5.5.2015
-				lr_angle = current_yaw_as_set + lr_shift  	#lr_angle = current_yaw + lr_shift
-				ud_angle = current_tilt_as_set + ud_shift	#ud_angle = current_pitch + ud_shift
+				lr_angle = current_yaw_as_set + lr_shift
+				ud_angle = current_pitch_as_set + ud_shift
 	
-				if ( angleLimitsOK(lr_angle, ud_angle) ):
-					print "6 set yaw=: ", lr_angle
-		                        print "6 set pitch=: ", ud_angle
-		                        set_angles(pitch=ud_angle, yaw=lr_angle)
-					#rospy.sleep(2.0)
+				print "6 set yaw=: ", lr_angle
+		                print "6 set pitch=: ", ud_angle
+		                set_angles(pitch=ud_angle, yaw=lr_angle)
 				
 		except:
 			print "===============================================> owlpose.py: ERROR during relative setting of HEAD: ", sys.exc_info()[0]
 
 	rospy.sleep(0.5)
-	
-#checks if left/right and up/down angle are in limits
-def angleLimitsOK(lr_angle, ud_angle):
-	print "lr_angle: ", lr_angle
-	print "ud_angle: ", ud_angle
-	if (lr_angle >= min_lr_angle_deg) and (lr_angle <= max_lr_angle_deg) and (ud_angle >= min_ud_angle_deg) and (ud_angle <= max_ud_angle_deg):
-		return True
-	else:
-		return False
+
+# Set torque limit for dynamixel servos
+def setTorqueLimit(torque):
+    rospy.wait_for_service('/pan_controller/set_torque_limit')
+    rospy.wait_for_service('/tilt_controller/set_torque_limit')
+    try:
+        set_pan_torque = rospy.ServiceProxy('/pan_controller/set_torque_limit', SetTorqueLimit)
+        set_tilt_torque = rospy.ServiceProxy('/tilt_controller/set_torque_limit', SetTorqueLimit)
+	set_pan_torque(torque)
+	set_tilt_torque(torque)
+    except rospy.ServiceException, e:
+        print "Service call failed: %s"%e
 
 def command(msg):
 	if msg.data == "restart":
-	        print "'restart' command has no effect"
+	        print "Restarting servos. Setting torque limit to: ", torque_limit
+		setTorqueLimit(torque_limit)
 	if msg.data == "torque":
-	        print "'torque' command has no effect"
+	        print "Setting torque limit to: ", torque_limit
+		setTorqueLimit(torque_limit)
 	if msg.data == "startup":
+		print "Moving to center_center"
 		set_angles(pitch=0, yaw=0)
-		print "Move to center_center"
 
 # get an IMU message and store pitch angle
 # NOTE: this assumes a specific mounting of the IMU inside the head:
@@ -251,25 +275,34 @@ def movementUpdate(msg):
 def panJointStateUpdate(msg):
 	global current_yaw
 	global yaw_offset
+	global current_yaw_as_set
 	# HACK: this also needs a mutex or something.
 	current_yaw = msg.current_pos
+	current_yaw_as_set = msg.goal_pos
 	# transform to degrees
 	current_yaw = current_yaw*180/math.pi
+	current_yaw_as_set = current_yaw_as_set*180/math.pi
 	# subtract offet
 	current_yaw = current_yaw - yaw_offset
+	current_yaw_as_set = current_yaw_as_set - yaw_offset
 
 # get current pitch (tilt) angle from dynamixel joint state topic
 def tiltJointStateUpdate(msg):
 	global current_pitch
 	global pitch_offset
+	global current_pitch_as_set
 	# HACK: this also needs a mutex or something.
 	current_pitch = msg.current_pos
+	current_pitch_as_set = msg.goal_pos
 	# Hobbit down is +, Dynamixel down is -
 	current_pitch = -current_pitch
+	current_pitch_as_set = -current_pitch_as_set
 	# transform to degrees
 	current_pitch = current_pitch*180/math.pi
+	current_pitch_as_set = current_pitch_as_set*180/math.pi
 	# subtract offet
 	current_pitch = current_pitch - pitch_offset
+	current_pitch_as_set = current_pitch_as_set - pitch_offset
 
 # read offsets from parameter server and set them
 def read_and_set_offsets():
