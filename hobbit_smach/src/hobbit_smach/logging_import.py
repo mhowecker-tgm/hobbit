@@ -209,23 +209,29 @@ class DoLogSocialRoleChange(DoLog):
         return 'succeeded'
 
 
-class DoLogScenarioAndData(): #scenario, data: string
+class DoLogScenarioAndData(State): #scenario, data: string
 
     """
     The logging to the Event topic can be done from here for scenario and data given as string
     """
 
-    def __init__(self):
-
+    def __init__(self, scenario=None, data=None):
+        State.__init__(
+            self,
+            outcomes=['succeeded'],
+            input_keys=['scenario', 'data', 'command'] if
+            (scenario is not None) else []
+        )
         self.scenario = None
         self.data = None
         self.pubEvent = rospy.Publisher('Event', Event, queue_size=50)
 
-    def log(self, scenario=None, data=None):
+    def execute(self, scenario=None, data=None):
+        
         print("DoLogScenarioAndData(): ")
         print "scenario: ", scenario
         print "data: ", data
-        #rospy.loginfo('LOG: scenario: %s: %s' % (scenario, data))
+        
         message = Event()
         message.event = 'E_LOG'
         params = []
@@ -237,9 +243,10 @@ class DoLogScenarioAndData(): #scenario, data: string
         params.append(par)
         message.params = params
         self.pubEvent.publish(message)
-        return True
+        return 'succeeded'
     
     
+
 def battery_log_cb(msg, ud):
     pubEvent = rospy.Publisher('Event', Event, queue_size=1)
     message = Event()

@@ -390,9 +390,14 @@ def main():
         StateMachine.add(
             'POINTING_COUNTER',
             PointingCounter(),
-            transitions={'first': 'POINTING_NOT_DETECTED_1',
+            transitions={'first': 'LOG_POINTING_NOT_DETECTED_1',
                          'second': 'POINTING_NOT_DETECTED_2',
                          'preempted': 'LOG_PREEMPT'}
+        )
+        StateMachine.add(
+            'LOG_POINTING_NOT_DETECTED_1',
+            log.DoLogScenarioAndData(scenario='Pickup', data="1203PDR   Pointing Direction Rejected"),
+            transitions={'succeeded': 'POINTING_NOT_DETECTED_1'}
         )
         StateMachine.add(
             'POINTING_NOT_DETECTED_1',
