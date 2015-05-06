@@ -396,7 +396,7 @@ def main():
         )
         StateMachine.add(
             'LOG_POINTING_NOT_DETECTED_1',
-            log.DoLog(scenario='Pickup', data='1203PDR   Pointing Direction Rejected'),
+            log.DoLogScenarioAndData(data='1203PDR   Pointing Direction Rejected'),
             transitions={'succeeded': 'POINTING_NOT_DETECTED_1'}
         )
         StateMachine.add(
@@ -423,7 +423,7 @@ def main():
         )
         StateMachine.add(
             'LOG_POINTING_DIRECTION_ACCEPTED',
-            log.DoLogScenarioAndData(scenario='Pickup', data='1102PDA   Pointing Direction Accepted'),
+            log.DoLogScenarioAndData(data='1102PDA   Pointing Direction Accepted'),
             transitions={'succeeded': 'START_LOOKING'}
         )
         StateMachine.add(
@@ -540,7 +540,7 @@ def main():
         )
         StateMachine.add(
             'LOG_MOVE_ISSUE_PU_STOPPED',
-            log.DoLogScenarioAndData(scenario='Pickup', data="2205MPF Moving to (Pregrasp)pos Failed"),
+            log.DoLogScenarioAndData(data="2205MPF Moving to (Pregrasp)pos Failed"),
             transitions={'succeeded': 'SET_HEAD_CENTER_PICKUP_FAILED'}
         )
         #StateMachine.add(   #not used anymore!! df: 6.2.2015, done in pickup_import
