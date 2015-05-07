@@ -98,7 +98,6 @@ class SleepAway(State):
         return 'succeeded'
 
 
-
 def check_sleep_times(next_time):
     if rospy.has_param('/Hobbit/sleep_time'):
         sleep_time = rospy.get_param('/Hobbit/sleep_time')

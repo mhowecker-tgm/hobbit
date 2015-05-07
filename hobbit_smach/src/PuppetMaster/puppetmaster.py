@@ -27,6 +27,7 @@ from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 from hobbit_smach.bcolors import bcolors
 import hobbit_smach.arm_move_import as arm_move
 import hobbit_smach.phone_call_import as phone_call
+import hobbit_smach.safety_check_import as safety_check
 
 new_command = None
 new_params = None
@@ -755,6 +756,30 @@ def main():
         StateMachine.add(
             'CALL_HOBBIT',
             call_hobbit.call_hobbit(),
+            transitions={'succeeded': 'CHECK_SAFETY_CHECK',
+                         'preempted': 'preempted',
+                         'aborted': 'RESET_ACTIVE_TASK'}
+        )
+        StateMachine.add(
+            'CHECK_SAFETY_CHECK',
+            safety_check.CheckFinished(),
+            transitions={'succeeded': 'RESET_ACTIVE_TASK',
+                         'preempted': 'preempted',
+                         'aborted': 'SAFETY_CHECK'}
+        )
+        sf_goal = GeneralHobbitGoal(command=String('safety_check'),
+                             previous_state=String('call_hobbit'),
+                             parameters=[])
+        StateMachine.add(
+            'SAFETY_CHECK',
+            SimpleActionState(
+                'safety_check',
+                GeneralHobbitAction,
+                goal=sf_goal,
+                input_keys=['parameters', 'params'],
+                preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
+                server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
+            ),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted',
                          'aborted': 'RESET_ACTIVE_TASK'}
