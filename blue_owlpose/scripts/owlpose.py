@@ -18,6 +18,7 @@ import numpy as np
 from sensor_msgs.msg import *
 from geometry_msgs.msg import Quaternion
 from dynamixel_msgs.msg import *
+from dynamixel_controllers.srv import TorqueEnable, SetTorqueLimit, SetSpeed
 
 # angle limits, in degrees
 # mechanical stops are
