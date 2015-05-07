@@ -274,19 +274,27 @@ def move_discrete(in_motion=None, in_value=None):
                          'aborted': 'aborted',
                          'preempted': 'preempted'}
         )
-        StateMachine.add(
-            'MOVE',
-            ServiceState(
-                '/apply_rotation',
-                SendValue,
-                request=SendValueRequest(value=in_value),
-                response_cb=send_value_resp_cb
-            ),
-            #MoveDiscrete(motion=in_motion, value=in_value),
-            transitions={'succeeded': 'SET_DOCK_STATE_VAR',
-                         'preempted': 'preempted',
-                         'aborted': 'aborted'}
-        )
+        if in_motion.lower() == 'turn':
+            StateMachine.add(
+                'MOVE',
+                ServiceState(
+                    '/apply_rotation',
+                    SendValue,
+                    request=SendValueRequest(value=in_value),
+                    response_cb=send_value_resp_cb
+                ),
+                transitions={'succeeded': 'SET_DOCK_STATE_VAR',
+                             'preempted': 'preempted',
+                             'aborted': 'aborted'}
+            )
+        else:
+            StateMachine.add(
+                'MOVE',
+                MoveDiscrete(motion=in_motion, value=in_value),
+                transitions={'succeeded': 'SET_DOCK_STATE_VAR',
+                             'preempted': 'preempted',
+                             'aborted': 'aborted'}
+            )
         StateMachine.add(
             'SET_DOCK_STATE_VAR',
             ServiceState('/docking/set_dock_state',
