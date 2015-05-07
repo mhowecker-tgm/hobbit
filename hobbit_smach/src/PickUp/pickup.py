@@ -140,16 +140,19 @@ class PointingCounter(smach.State):
     Just a counter in a SMACH State.
     """
     def __init__(self):
-        smach.State.__init__(self, outcomes=['first', 'second', 'preempted'])
-        self._counter = 0
+        smach.State.__init__(self, outcomes=['first', 'second', 'preempted'],
+                             input_keys=['pointing_counter'],
+                             output_keys=['pointing_counter'])
+        #self._counter = 0
 
     def execute(self, ud):
         if self.preempt_requested():
             return 'preempted'
-        self._counter += 1
-        print('self._counter: %d' % self._counter)
-        if self._counter > 1:
-            self._counter = 0
+        ud.pointing_counter += 1
+        #self._counter += 1
+        print('ud.pointing_counter: %d' % ud.pointing_counter)
+        if ud.pointing_counter > 1:
+            ud.pointing_counter = 0
             return 'second'
         else:
             return 'first'
@@ -262,12 +265,13 @@ class CleanUp(smach.State):
         smach.State.__init__(
             self,
             outcomes=['succeeded'],
-            input_keys=['command', 'visited_places'],
-            output_keys=['result', 'command', 'visited_places'])
+            input_keys=['command', 'visited_places','pointing_counter'],
+            output_keys=['result', 'command', 'visited_places','pointing_counter'])
 
     def execute(self, ud):
         ud.visited_places = []
-        ud.result = String('object not found')
+        ud.result = String('Cleanup done for Pickup')
+        ud.pointing_counter = 0
         return 'succeeded'
 
 
@@ -334,6 +338,7 @@ def main():
 
     pickup_sm.userdata.result = String('started')
     pickup_sm.userdata.detection = False
+    pickup_sm.userdata.pointing_counter = 0
 
     with pickup_sm:
         StateMachine.add(
@@ -728,7 +733,7 @@ def main():
         StateMachine.add(
             'SET_HEAD_CENTER_PICKUP_SUCCEEDED',
             head_move.MoveTo(pose='center_center'),
-            transitions={'succeeded': 'succeeded',
+            transitions={'succeeded': 'CLEAN_UP_SUCCESS',
                          'preempted': 'LOG_PREEMPT'}
         )    
         StateMachine.add(
@@ -756,12 +761,7 @@ def main():
             'SET_SUCCESS',
             SetSuccess(),
             transitions={'succeeded': 'LOG_SUCCESS',
-                         'preempted': 'CLEAN_UP'}
-        )
-        StateMachine.add(
-            'CLEAN_UP',
-            CleanUp(),
-            transitions={'succeeded': 'LOG_PREEMPT'}
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'LOG_SUCCESS',
@@ -771,14 +771,33 @@ def main():
         StateMachine.add(
             'LOG_PREEMPT',
             log.DoLogPreempt(scenario='Pickup'),
-            transitions={'succeeded': 'preempted'}
+            transitions={'succeeded': 'CLEAN_UP_PREEMPT'}
         )
         StateMachine.add(
             'LOG_ABORT',
             log.DoLogAborted(scenario='Pickup'),
+            transitions={'succeeded': 'CLEAN_UP_ABORT'}
+        )
+        StateMachine.add(
+            'CLEAN_UP',
+            CleanUp(),
+            transitions={'succeeded': 'LOG_PREEMPT'}
+        )
+        StateMachine.add(
+            'CLEAN_UP_ABORT',
+            CleanUp(),
             transitions={'succeeded': 'aborted'}
         )
-
+        StateMachine.add(
+            'CLEAN_UP_PREEMPT',
+            CleanUp(),
+            transitions={'succeeded': 'preempted'}
+        )
+        StateMachine.add(
+            'CLEAN_UP_SUCCESS',
+            CleanUp(),
+            transitions={'succeeded': 'succeeded'}
+        )
     asw = ActionServerWrapper(
         'pickup', GeneralHobbitAction, pickup_sm,
         ['succeeded'], ['aborted'], ['preempted'],
