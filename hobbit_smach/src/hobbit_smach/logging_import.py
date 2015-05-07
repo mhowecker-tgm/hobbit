@@ -114,7 +114,7 @@ class DoLogSuccess(State):
 
 class DoLogAborted(State):
     """
-    Inherit from DoLog but specialize in logging of aborted
+    logging: aborted
     """
 
     def __init__(self, scenario=None):
@@ -143,6 +143,35 @@ class DoLogAborted(State):
         self.pubEvent.publish(message)
         return 'succeeded'
 
+class DoLogFail(State):
+    """
+    Logging of overall fail (4 failed grasps) for pickup
+    """
+
+    def __init__(self, scenario='PickUp'):
+        State.__init__(
+            self,
+            outcomes=['succeeded'],
+            input_keys=['scenario', 'data']
+        )
+        self.scenario = scenario
+        self.data = 'Pickup has failed all 4 times to grasp.'
+        self.pubEvent = rospy.Publisher('Event', Event, queue_size=50)
+
+    def execute(self, ud):
+        rospy.loginfo('LOG: scenario: %s: %s' % (self.scenario, self.data))
+        message = Event()
+        message.event = 'E_LOG'
+        params = []
+        par = Parameter(name='SCENARIO',
+                        value=self.scenario)
+        params.append(par)
+        par = Parameter(name='DATA',
+                        value=self.data)
+        params.append(par)
+        message.params = params
+        self.pubEvent.publish(message)
+        return 'succeeded'
 
 class DoLogStart(DoLog):
     """

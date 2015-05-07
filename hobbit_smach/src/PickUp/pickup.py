@@ -728,7 +728,7 @@ def main():
         StateMachine.add(
             'EMO_SAY_PICKUP_FAILED',
             pickup.sayDidNotPickupObject2(),
-            transitions={'succeeded': 'SET_HEAD_CENTER_PICKUP_FAILED',
+            transitions={'succeeded': 'LOG_FAIL',
                          'failed': 'EMO_SAY_PICKUP_FAILED',
                          'preempted': 'LOG_PREEMPT'}
         )
@@ -787,6 +787,12 @@ def main():
             'LOG_ABORT',
             log.DoLogAborted(scenario='Pickup'),
             transitions={'succeeded': 'CLEAN_UP_ABORT'}
+        )
+        #additional to LOG_ABORT (redundant): logs a real fail after robot failed 4 times to grasp
+        StateMachine.add(
+            'LOG_FAIL',
+            log.DoLogFail(scenario='Pickup'),
+            transitions={'succeeded': 'SET_HEAD_CENTER_PICKUP_FAILED'}
         )
         StateMachine.add(
             'CLEAN_UP',

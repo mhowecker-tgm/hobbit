@@ -229,7 +229,7 @@ class DavidLookForObject(State):
         print "===> center of cluster in wcs:                    : ", pnt_wcs
         
         #log object data: center pnt in wcs, center_pnt in rcs, segmented point cloud size
-        self.logger.execute("3308ODSPP Object Data per Segmented Object (prepos): " + "Object center in WCS: " + pnt_wcs + " Object center in RCS: "+pnt_rcs + "Number points of segmented objects: " + self.pc.height*self.pc.width)
+        self.logger.execute("3308ODSPP Object Data per Segmented Object (prepos): " + "Object center in WCS: " + str(pnt_wcs) + " Object center in RCS: "+ str(pnt_rcs) + " Number points of segmented objects: " + str(self.pc.height*self.pc.width))
 
         isgraspable = self.ispossibleobject(pnt_rcs)
         if isgraspable:
