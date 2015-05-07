@@ -319,20 +319,6 @@ def main():
                          'failed': 'SET_FAILURE',
                          'preempted': 'LOG_PREEMPT'}
         )
-        #StateMachine.add(
-        #    'EMO_HAPPY',
-        #    HobbitEmotions.ShowEmotions(),
-        #    transitions={'preempted': 'preempted',
-        #                 'succeeded': 'MMUI_CONFIRM',
-        #                 'failed': 'SET_FAILURE'}
-        #)
-        #StateMachine.add(
-        #    'MMUI_CONFIRM',
-        #    HobbitMMUI.AskYesNo(),
-        #    transitions={'yes': 'SET_NAV_GOAL',
-        #                 'no': 'SET_FAILURE',
-        #                 'preempted': 'preempted'}
-        #)
         with seq2:
             Sequence.add(
                 'EMO_HAPPY',
