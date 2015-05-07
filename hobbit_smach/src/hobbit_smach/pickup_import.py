@@ -109,7 +109,7 @@ class DavidLookForObject(State):
         clusters = self.rec.findObjectsOnFloorSmall(pointcloud, [0,0,0,0])
         print "===> pickup_import.py: findobect():number of object clusters on floor found: ", len(clusters)
         
-        self.logger.execute("3106NOSPP Nr of Objects Segmented (prepos): "+len(clusters))  #log nr of object segmented at pregrasp position
+        self.logger.execute("3106NOSPP Nr of Objects Segmented (prepos): "+str(len(clusters)))  #log nr of object segmented at pregrasp position
 
         nr_objects_segmented = len(clusters)
         i = 0
@@ -120,15 +120,15 @@ class DavidLookForObject(State):
             #self.pubClust.publish(cluster)
             if self.isGraspableObject():
                     self.pubClust.publish(cluster)
-                    self.logger.execute("3799OPPPP Object passed position check. Segmented Object Nr: " + i + "/" + nr_objects_segmented)  #log nr of object that passed position check in prepos
+                    self.logger.execute("3799OPPPP Object passed position check. Segmented Object Nr: " + str(i) + "/" + str(nr_objects_segmented))  #log nr of object that passed position check in prepos
                     #self.showMMUI_Info("T_CF_I_FOUND_OBJECT_ON_FLOOR","1")
                     #print "findobject(): cluster saved and published"
                     return True
             else:
-                self.logger.execute("3698OFPPP Object failed position check. Segmented Object Nr: " + i + "/" + nr_objects_segmented)  #log nr of object that passed position check
+                self.logger.execute("3698OFPPP Object failed position check. Segmented Object Nr: " + str(i) + "/" + str(nr_objects_segmented))  #log nr of object that passed position check
 
         print "===> pickup_import.py: findobect(): no graspable object found"
-        self.logger.execute("3207RORPP Reason why Object(s) not accepted (prepos): " + "All " + nr_objects_segmented + " segmented objects did not pass position check")
+        self.logger.execute("3207RORPP Reason why Object(s) not accepted (prepos): " + "All " + str(nr_objects_segmented) + " segmented objects did not pass position check")
         return False
 
     def isObjectAwayFromMapBoarders(self):
@@ -1153,7 +1153,7 @@ class DavidPickingUp(State):
         #df 19.3.2015 => changed for smaller objects dfdfdfdf
         clusters = self.rec.findObjectsOnFloorSmall(pc_ccs, [0,0,0,0]) #before: pointcloud instead of pc_ccs
         print "===> pickup_import.py: DavidPickingUp.findobject(): number of object clusters on floor found: ", len(clusters)
-        self.logger.execute("5113NOSGP Nr of Objects segmented (grasppos): "+len(clusters))  #log nr of object segmented at pregrasp position
+        self.logger.execute("5113NOSGP Nr of Objects segmented (grasppos): "+str(len(clusters)))  #log nr of object segmented at pregrasp position
         
         nr_objects_segmented = len(clusters)
         i = 0
@@ -1163,14 +1163,14 @@ class DavidPickingUp(State):
             print "===> pickup_import.py: DavidPickingUp.findobject(): publish cluster"
             self.pubClust.publish(cluster)
             if self.isGraspableObject():
-                self.logger.execute("5719OPPGP Object passed position check. Segmented Object Nr: " + i + "/" + nr_objects_segmented)  #log nr of object that passed position check
+                self.logger.execute("5719OPPGP Object passed position check. Segmented Object Nr: " + str(i) + "/" + str(nr_objects_segmented))  #log nr of object that passed position check
                 self.pubGraspableObjectCCS.publish(cluster)
                 return True
             else:
-                self.logger.execute("5618OFPGP Object failed position check. Segmented Object Nr: " + i + "/" + nr_objects_segmented)  #log nr of object that passed position check
+                self.logger.execute("5618OFPGP Object failed position check. Segmented Object Nr: " + str(i) + "/" + str(nr_objects_segmented))  #log nr of object that passed position check
 
         print "===> pickup_import.py: DavidPickingUp.findobject(): NO GRASPABLE OBJECT FOUND"
-        self.logger.execute("5214RORGP Reason why Object(s) not accepted (grasppos): " + "All " + nr_objects_segmented + " segmented objects did not pass position check")
+        self.logger.execute("5214RORGP Reason why Object(s) not accepted (grasppos): " + "All " + str(nr_objects_segmented) + " segmented objects did not pass position check")
         return False
 
 
