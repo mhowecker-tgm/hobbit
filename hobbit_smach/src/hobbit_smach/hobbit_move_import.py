@@ -15,7 +15,7 @@ from smach import State, Sequence, StateMachine
 from smach_ros import ServiceState, SimpleActionState
 from mira_msgs.srv import UserNavMode, ObsNavMode, EmergencyStop, ResetMotorStop
 from hobbit_msgs.srv import GetCoordinates, GetCoordinatesRequest, GetName, \
-    SwitchVision, SwitchVisionRequest
+    SwitchVision, SwitchVisionRequest, SendValueRequest, SendValue
 from move_base_msgs.msg import MoveBaseAction
 from hobbit_msgs.msg import MiraDockingAction, MiraDockingGoal
 from std_msgs.msg import String
@@ -236,7 +236,13 @@ def get_undock_action():
     return sm
 
 def resp_cb(userdata, response):
-        if response.result:
+        if response.result is True:
+            return 'succeeded'
+        else:
+            return 'aborted'
+
+def send_value_resp_cb(userdata, response):
+        if response.result is True:
             return 'succeeded'
         else:
             return 'aborted'
@@ -273,7 +279,13 @@ def move_discrete(in_motion=None, in_value=None):
         )
         StateMachine.add(
             'MOVE',
-            MoveDiscrete(motion=in_motion, value=in_value),
+            ServiceState(
+                '/apply_rotation',
+                SendValue,
+                request=SendValueRequest(value=in_value),
+                response_cb=send_value_resp_cb
+            ),
+            #MoveDiscrete(motion=in_motion, value=in_value),
             transitions={'succeeded': 'SET_DOCK_STATE_VAR',
                          'preempted': 'preempted',
                          'aborted': 'aborted'}
