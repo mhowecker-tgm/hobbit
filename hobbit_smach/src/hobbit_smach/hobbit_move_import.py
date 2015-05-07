@@ -242,10 +242,7 @@ def resp_cb(userdata, response):
             return 'aborted'
 
 def send_value_resp_cb(userdata, response):
-        if response.result is True:
-            return 'succeeded'
-        else:
-            return 'aborted'
+    return 'succeeded'
 
 def move_discrete(in_motion=None, in_value=None):
     sm = StateMachine(outcomes=['succeeded', 'aborted', 'preempted'])
