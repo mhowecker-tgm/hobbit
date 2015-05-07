@@ -102,13 +102,13 @@ void cVirtualLaser::FillGrids(float *pCloud)
   MinAng = MinAngle - (0.5f * DeltaAngle);
   AngFactor = 1.0f / DeltaAngle;
 
-  int init_row = 120;
-  int end_row = 360;
+  int init_row = DEPTH_DATA_HEIGHT/4;  //We only consider points in the central rows of the point cloud
+  int end_row = DEPTH_DATA_HEIGHT*3/4;
   int size_float = sizeof(float);
   int num_elements_row = row_step/size_float;
   //std::cout << "num " << num_elements_row << std::endl;
 ////////////////////////////////////////////////////////////////////////////////////////
-//debugging
+//debugging, the original vesion only included points above the sensor's height
        /*pcl::PointCloud<pcl::PointXYZ> pcl_cloud;
 	
 	for (int x = (init_row-1)*num_elements_row; x < (end_row*num_elements_row-2); x+=4)
