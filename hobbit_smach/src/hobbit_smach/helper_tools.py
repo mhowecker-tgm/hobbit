@@ -101,15 +101,13 @@ def get_arm_state(req):
 
 def set_away_state(req):
     global user_away
-    response = False
-    rospy.loginfo("Set user away state called")
+    rospy.loginfo("Set user away state called with request: "+str(req.state))
     user_away = req.state
     rospy.loginfo("Set state to "+str(user_away))
     return True
 
 def get_away_state(req):
     global user_away
-    response = True
     rospy.loginfo("Get user away state called")
     rospy.loginfo("Get state is "+str(user_away))
     return user_away

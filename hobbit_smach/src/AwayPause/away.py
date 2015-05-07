@@ -352,7 +352,7 @@ def main():
         StateMachine.add(
             'SET_SUCCESS',
             SetSuccess(),
-            transitions={'succeeded': 'LOG_SUCCESS',
+            transitions={'succeeded': 'USER_IS_AWAY',
                          'preempted': 'CLEAN_UP'}
         )
         StateMachine.add(

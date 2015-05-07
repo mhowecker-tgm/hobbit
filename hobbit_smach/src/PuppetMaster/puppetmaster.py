@@ -94,7 +94,8 @@ def is_the_user_away():
     try:
         request=GetAwayStateRequest(state=True)
         resp = get_user_state(request)
-        return resp
+        rospy.loginfo("/user/get_away_status returned: "+str(type(resp.result))+", "+str(resp.result))
+        return resp.result
     except rospy.ServiceException:
         return False
 
@@ -106,7 +107,7 @@ def the_user_is_back():
     try:
         request=SetAwayStateRequest(state=False)
         resp = set_user_state(request)
-        return resp
+        return resp.result
     except rospy.ServiceException:
         return False
 
@@ -134,7 +135,7 @@ def command_cb(msg, ud):
     away = is_the_user_away()
     active_task = ud.parameters['active_task']
     first = True
-    if away and input_ce not in ['E_HELP', 'C_CALLHOBBIT', 'E_CALLHOBBIT', 'C_MASTER_RESET', 'E_WAKEUP']:
+    if away and input_ce not in ['E_HELP', 'C_CALLHOBBIT', 'E_CALLHOBBIT', 'C_MASTER_RESET', 'E_WAKEUP', 'C_GOTOPOINT']:
         rospy.loginfo('The user is away and the command is not there to wake up Hobbit.')
         return False
     the_user_is_back()
