@@ -143,13 +143,11 @@ class PointingCounter(smach.State):
         smach.State.__init__(self, outcomes=['first', 'second', 'preempted'],
                              input_keys=['pointing_counter'],
                              output_keys=['pointing_counter'])
-        #self._counter = 0
 
     def execute(self, ud):
         if self.preempt_requested():
             return 'preempted'
         ud.pointing_counter += 1
-        #self._counter += 1
         print('ud.pointing_counter: %d' % ud.pointing_counter)
         if ud.pointing_counter > 1:
             ud.pointing_counter = 0
@@ -163,16 +161,17 @@ class GraspCounter(smach.State):
     Just a counter in a SMACH State.
     """
     def __init__(self):
-        smach.State.__init__(self, outcomes=['first', 'second', 'preempted'])
-        self._counter = 0
+        smach.State.__init__(self, outcomes=['first', 'second', 'preempted'],
+                                   input_keys=['grasp_check_counter'],
+                                   output_keys=['grasp_check_counter'])
 
     def execute(self, ud):
         if self.preempt_requested():
             return 'preempted'
-        self._counter += 1
-        print('self._counter: %d' % self._counter)
-        if self._counter > 1:
-            self._counter = 0
+        ud.grasp_check_counter += 1
+        print('ud.grasp_check_counter: %d' % ud.grasp_check_counter)
+        if ud.grasp_check_counter > 1:
+            ud.grasp_check_counter = 0
             return 'second'
         else:
             return 'first'
@@ -183,16 +182,17 @@ class MoveCounter(smach.State):
     Just a counter in a SMACH State.
     """
     def __init__(self):
-        smach.State.__init__(self, outcomes=['first', 'second', 'preempted'])
-        self._counter = 0
+        smach.State.__init__(self, outcomes=['first', 'second', 'preempted'],
+                                   input_keys=['move_counter'],
+                                   output_keys=['move_counter'])
 
     def execute(self, ud):
         if self.preempt_requested():
             return 'preempted'
-        self._counter += 1
-        print('self._counter: %d' % self._counter)
-        if self._counter > 1:
-            self._counter = 0
+        ud.move_counter += 1
+        print('ud.move_counter: %d' % ud.move_counter)
+        if ud.move_counter > 1:
+            ud.move_counter = 0
             return 'second'
         else:
             return 'first'
@@ -204,16 +204,17 @@ class SearchGraspableObjectCounter(smach.State):
     Just a counter in a SMACH State.
     """
     def __init__(self):
-        smach.State.__init__(self, outcomes=['first', 'second', 'preempted'])
-        self._counter = 0
+        smach.State.__init__(self, outcomes=['first', 'second', 'preempted'],
+                                   input_keys=['search_object_counter'],
+                                   output_keys=['search_object_counter'])
 
     def execute(self, ud):
         if self.preempt_requested():
             return 'preempted'
-        self._counter += 1
-        print('self._counter: %d' % self._counter)
-        if self._counter > 1:
-            self._counter = 0
+        ud.search_object_counter += 1
+        print('ud.search_object_counter: %d' % ud.search_object_counter)
+        if ud.search_object_counter > 1:
+            ud.search_object_counter = 0
             return 'second'
         else:
             return 'first'
@@ -224,16 +225,17 @@ class MoveBackBlindCounter(smach.State):
     Just a counter in a SMACH State.
     """
     def __init__(self):
-        smach.State.__init__(self, outcomes=['first', 'second', 'preempted'])
-        self._counter = 0
+        smach.State.__init__(self, outcomes=['first', 'second', 'preempted'],
+                                   input_keys=['move_blind_back_counter'],
+                                   output_keys=['move_blind_back_counter'])
 
     def execute(self, ud):
         if self.preempt_requested():
             return 'preempted'
-        self._counter += 1
-        print('self._counter: %d' % self._counter)
-        if self._counter > 1:
-            self._counter = 0
+        ud.move_blind_back_counter += 1
+        print('ud.move_blind_back_counter: %d' % ud.move_blind_back_counter)
+        if ud.move_blind_back_counter > 1:
+            ud.move_blind_back_counter = 0
             return 'second'
         else:
             return 'first'
@@ -265,13 +267,17 @@ class CleanUp(smach.State):
         smach.State.__init__(
             self,
             outcomes=['succeeded'],
-            input_keys=['command', 'visited_places','pointing_counter'],
-            output_keys=['result', 'command', 'visited_places','pointing_counter'])
+            input_keys=['command', 'visited_places','pointing_counter','move_counter','search_object_counter','grasp_check_counter','move_back_blind_counter'],
+            output_keys=['result', 'command', 'visited_places','pointing_counter','move_counter','search_object_counter','grasp_check_counter','move_back_blind_counter'])
 
     def execute(self, ud):
         ud.visited_places = []
         ud.result = String('Cleanup done for Pickup')
         ud.pointing_counter = 0
+        ud.move_counter = 0
+        ud.search_object_counter = 0
+        ud.grasp_check_counter = 0
+        ud.move_back_blind_counter = 0
         return 'succeeded'
 
 
@@ -339,6 +345,10 @@ def main():
     pickup_sm.userdata.result = String('started')
     pickup_sm.userdata.detection = False
     pickup_sm.userdata.pointing_counter = 0
+    pickup_sm.userdata.move_counter = 0
+    pickup_sm.userdata.search_object_counter = 0
+    pickup_sm.userdata.grasp_check_counter = 0
+    pickup_sm.userdata.move_back_blind_counter = 0
 
     with pickup_sm:
         StateMachine.add(
