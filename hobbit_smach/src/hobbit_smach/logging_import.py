@@ -205,7 +205,7 @@ class DoLogSocialRoleChange(DoLog):
         return 'succeeded'
 
 #df
-class DoLogScenarioAndData(State): #scenario, data: string
+class DoLogScenarioAndData(State): #scenario=Pickup!, data: string
 
     """
     The logging to the Event topic can be done from here for Pickup scenario and data given as string
