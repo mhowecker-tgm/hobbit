@@ -16,7 +16,7 @@ import rospy
 import time, sys
 #from std_msgs.msg import String
 from sensor_msgs.msg import PointCloud2
-from hobbit_msgs.srv import SingleShotPC
+from hobbit_msgs.srv import SingleShotPC, SingleShotPCRequest, SingleShotPCResponse
 
 
 pc_sub = None
