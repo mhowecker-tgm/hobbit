@@ -28,8 +28,8 @@ from dynamixel_controllers.srv import TorqueEnable, SetTorqueLimit, SetSpeed
 # 63.598
 min_lr_angle_deg = -90
 max_lr_angle_deg = 90
-min_ud_angle_deg = -25
-max_ud_angle_deg = 60
+min_ud_angle_deg = -22
+max_ud_angle_deg = 58
 
 # torque limit for dynamixel servos
 # NOTE that typical load in the Hobbit neck is at most 0.5 for the tilt joint, but can also reach > 0.8
@@ -365,7 +365,7 @@ def init():
 
     # Send geometry/tf constantly with 5hz
     r = rospy.Rate(5) # 5 Hz
-    i = 0
+    #i = 0
     while not rospy.is_shutdown():
         if haveImu:
             # ignore the servo pitch angle (0) and use pitch from IMU instead
@@ -380,9 +380,9 @@ def init():
         # NOTE: sometimes the tilt servo goes into torque limitation. Setting the torque limit again typically
         # wakes it up again. So we regularly set the limit, every second. So the neck should recover quickly
         # from a torque limit situation.
-        if (i == 5):
-            setTorqueLimit(torque_limit)
-            i = 0
+        #if (i == 5):
+        #    #setTorqueLimit(torque_limit)
+        #    i = 0
         r.sleep()
 
 # NOTE: Apparently this is not sent anymore. It seems ROS connections are already terminated at that point.
