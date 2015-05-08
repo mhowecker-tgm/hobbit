@@ -535,15 +535,21 @@ class GoToFinalGraspPose(State):
             print "robot has to move by d_O_RG (m)", d_O_RG
             
             if not self.moveRobotRelative(turn_degree, d_O_RG):
+                print "61"
                 self.logger.execute("4212FPF   Fine Positioning failed")    #log that fine positioning failed
+                print "62"
                 return 'aborted'
             
+            print "63"
             self.logger.execute("4111FPS   Fine Positioning successful")    #log that fine positioning succeeded
+            print "64"
             return 'succeeded'
     
         except:
             print "===> GoToFinalGraspPose: Error "
+            print "65"
             self.logger.execute("4212FPF   Fine Positioning failed")    #log that fine positioning failed
+            print "66"
             return 'aborted'
 
     def moveRobotRelative(self, turn_degree, distance_m):
@@ -583,11 +589,14 @@ class GoToFinalGraspPose(State):
             if turn_degree > 0:
                 turn_degree = 10
         
+        print "0.1"
         #if (abs of) turn_degree greater then 10 degree, use topic for Hobbit rotation
         if (abs(turn_degree) >= min_turn_deg_for_discretemotion): 
+            print "0.2"
             turn = String("Turn "+str(turn_degree))
             print "turn (String): ", turn
             self.move_robot_relative_pub.publish(turn)      # T U R N
+            print "0.3"
         
         print "1"
         rospy.sleep(5)  #wait until head moved to down_center position AND robot has turned (if it turns)
