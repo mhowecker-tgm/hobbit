@@ -32,7 +32,7 @@ def trigger_ss_srv():
     rospy.spin()
 
 #triggers the process for getting pc 
-def start_shot(self, req):
+def start_shot(req):
     global pc_sub
     global pc_
     global t
