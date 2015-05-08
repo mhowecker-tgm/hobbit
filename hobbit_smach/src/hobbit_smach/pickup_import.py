@@ -553,17 +553,14 @@ class GoToFinalGraspPose(State):
             return 'aborted'
 
     def moveRobotRelative(self, turn_degree, distance_m):
-        print "d0"
         #turns the robot, then moves the robot to perfect grasp position
         min_turn_deg = 3    # minimal angles that rotation is executed (otherwise it is ignored)
         max_turn_deg_for_service = 7            # if not the discretemotion (with min 10 deg) is used
         min_turn_deg_for_discretemotion = 10    #fixed value, below nothing would be done by plattform (at least in the past)
         
         #turn head to navigation positon (without smach-stuff and without turning of emergency for head-motion (should not look up before anyway)
-        print "d1"
-        #head_pose = String("Turn "+str(turn_degree))
         self.move_head_pub.publish(String('down_center'))
-        print "d2"
+
         if (abs(turn_degree) < min_turn_deg):
             print "abs(turn_degree) < ", min_turn_deg, " => no turn executed"
         elif (abs(turn_degree) < max_turn_deg_for_service):
@@ -638,13 +635,13 @@ class GoToFinalGraspPose(State):
         print "12"
         try:
             print "13"
-            get_single_shot = rospy.ServiceProxy('/CloudSegmenthor/getSingleShot', SingleShotPC)
+            get_single_shot = rospy.ServiceProxy('CloudSegmenthor/getSingleShot', SingleShotPC)
             print "14"
             req = SingleShotPC()
             print "15"
             req.ss = String("getshot")
             print "16"
-            res = get_single_shot(req)
+            res = get_single_shot(req.ss)
             print "17"
             return res.point_cloud
         except rospy.ServiceException, e:
