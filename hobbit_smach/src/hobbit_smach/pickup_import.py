@@ -436,6 +436,7 @@ class GoToFinalGraspPose(State):
             output_keys=[]
         )
         self.move_robot_relative_pub = rospy.Publisher('/DiscreteMotionCmd', String)
+        self.move_head_pub = rospy.Publisher('/head/move', String, queue_size=50)
         self.logger = logging.DoLogScenarioAndData()
         self.fms_x1 = 0.2  #free move space x_min (rcs)
         #self.fms_x2 =   variable due to distance the robot should move
@@ -551,8 +552,8 @@ class GoToFinalGraspPose(State):
         max_turn_deg_for_service = 7            # if not the discretemotion (with min 10 deg) is used
         min_turn_deg_for_discretemotion = 10    #fixed value, below nothing would be done by plattform (at least in the past)
         
-        #turn head to navigation positon
-        head_move.MoveTo(pose='down_center')
+        #turn head to navigation positon (without smach-stuff and without turning of emergency for head-motion (should not look up before anyway)
+        self.move_head_pub.publish(pose='down_center')
         
         if (abs(turn_degree) < min_turn_deg):
             print "abs(turn_degree) < ", min_turn_deg, " => no turn executed"
@@ -586,7 +587,7 @@ class GoToFinalGraspPose(State):
         if (abs(turn_degree) >= min_turn_deg_for_discretemotion): 
             turn = String("Turn "+str(turn_degree))
             print "turn (String): ", turn
-            self.move_robot_relative_pub.publish(turn)
+            self.move_robot_relative_pub.publish(turn)      # T U R N
         
         print "1"
         rospy.sleep(5)  #wait until head moved to down_center position AND robot has turned (if it turns)
@@ -594,7 +595,7 @@ class GoToFinalGraspPose(State):
         #check if there is enough space to move forward
         #!!!!!!!!!!!!!!!!!!!!!!missing: get point cloud!!
         #get point cloud
-        ss_point_cloud = self.get_point_cloud_ss()
+        ss_point_cloud = self.get_point_cloud_ss()  #DDDDDDDDDDDDDDD does not work
         print "3"
         if ss_point_cloud == None:
             print "4"
@@ -612,24 +613,27 @@ class GoToFinalGraspPose(State):
         move = String("Move "+str(distance_m))
         print "8"
         print "move (String): ", move
-        self.move_robot_relative_pub.publish(move)
-        #move head back to grasp position
-        head_move.MoveTo(pose='to_grasp')
-        rospy.sleep(7)
-        
-        #here we hope that it works without any control (of obstacles, odometry, or whatever)
+        self.move_robot_relative_pub.publish(move)  # M O V E   F O R W A R D
+        #move head back to grasp position 
         
         return True
 # new 27.2.2015 = end ==
 
     #function to get single shot point cloud from head camera 
     def get_point_cloud_ss(self):
+        print "11"
         rospy.wait_for_service('/CloudSegmenthor/getSingleShot')
+        print "12"
         try:
+            print "13"
             get_single_shot = rospy.ServiceProxy('/CloudSegmenthor/getSingleShot', SingleShotPC)
+            print "14"
             req = SingleShotPC()
+            print "15"
             req.ss = String("getshot")
+            print "16"
             res = get_single_shot(req)
+            print "17"
             return res.point_cloud
         except rospy.ServiceException, e:
             print "Service call in get_point_cloud_ss() failed: %s"%e
@@ -713,10 +717,8 @@ class MoveRobotBackForBetterObjectView(State): # !!!done without seeing backward
         try:        
             if not self.moveRobotRelative(turn_degree, dis_m):
                 return 'aborted'
-            
-            
     
-    
+        
             return 'succeeded'
     
         except:
@@ -790,7 +792,6 @@ class DavidLookingPose(State):
         if self.preempt_requested():
             return 'preempted'
         print "===> DavidLookingPose.execute: pointing message received: ",ud.pointing_msg
-        # TODO: David please put the pose calculations in here
 
 
     #def savePointingDirection(self, msg):
@@ -927,32 +928,6 @@ class DavidLookingPose(State):
             return None
         gpOnFloor = [pspWCS.point.x+k*pvecWCS[0],pspWCS.point.y+k*pvecWCS[1],0]
         return gpOnFloor
-
-
-#class DavidCalcGraspPose(State):
-#    """
-#    This state should handle the following task.
-#    Given the Pose data given in the object_pose a Pose is calculated to
-#    which the robot will then navigate. This pose has to be stored inside
-#    the userdata output keys.
-#    """
-#    def __init__(self):
-#        State.__init__(
-#            self,
-#            outcomes=['succeeded', 'aborted', 'preempted'],
-#            input_keys=['object_pose', 'goal_position_x', 'goal_position_y', 'goal_position_yaw'],
-#            output_keys=['goal_position_x', 'goal_position_y', 'goal_position_yaw']
-#        )
-#    def execute(self, ud):
-#        if self.preempt_requested():
-#            return 'preempted'
-#        print(ud.object_pose)
-#        # TODO: David please put the pose calculations in here
-#
-#        ud.goal_position_x = 0
-#        ud.goal_position_y = 0
-#        ud.goal_position_yaw = 0
-#        return 'succeeded'
 
 
 
