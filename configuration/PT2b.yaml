@@ -5,4 +5,4 @@ hobbit_id: 'PT2b'
 hobbit/head/pitch_offset: 19
 hobbit/head/yaw_offset: -4
 hobbit/head/imu_pitch_offset: 17
-hobbit/head/have_imu: true
+hobbit/head/have_imu: false
