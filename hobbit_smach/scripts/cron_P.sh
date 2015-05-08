@@ -11,3 +11,5 @@ sessionID: ''
 confidence: 0.0
 params:
 - {name: '', value: ''}"
+
+exit 0
