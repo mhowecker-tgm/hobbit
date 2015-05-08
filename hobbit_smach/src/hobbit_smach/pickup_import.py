@@ -561,7 +561,8 @@ class GoToFinalGraspPose(State):
         
         #turn head to navigation positon (without smach-stuff and without turning of emergency for head-motion (should not look up before anyway)
         print "d1"
-        self.move_head_pub.publish(pose='down_center')
+        #head_pose = String("Turn "+str(turn_degree))
+        self.move_head_pub.publish(String('down_center'))
         print "d2"
         if (abs(turn_degree) < min_turn_deg):
             print "abs(turn_degree) < ", min_turn_deg, " => no turn executed"
