@@ -8,12 +8,13 @@ global MUC_ENABLED
 
 import rospy
 from datetime import datetime, time
-from smach_ros import SimpleActionState, IntrospectionServer
+from smach_ros import SimpleActionState, IntrospectionServer, ServiceState
 from smach import StateMachine, Concurrence, State
 from std_msgs.msg import String
 from hobbit_msgs.msg import Command, Event, GeneralHobbitAction,\
     GeneralHobbitGoal
-from hobbit_msgs.srv import GetAwayState, SetAwayState, GetAwayStateRequest, SetAwayStateRequest
+from hobbit_msgs.srv import GetAwayState, SetAwayState, GetAwayStateRequest, SetAwayStateRequest, \
+    GetSafetycheckStateRequest, GetSafetycheckState
 import hobbit_smach.helper_import as helper
 import hobbit_smach.recharge_import as recharge
 import hobbit_smach.call_hobbit_2_import as call_hobbit
@@ -503,6 +504,9 @@ def pickup_cb(ud, goal):
     goal = GeneralHobbitGoal(command=String('pickup'))
     return goal
 
+def sf_resp_cb(resp):
+    if resp:
+        return True
 
 def main():
     rospy.init_node(NAME)
@@ -763,7 +767,10 @@ def main():
         )
         StateMachine.add(
             'CHECK_SAFETY_CHECK',
-            safety_check.CheckFinished(),
+            ServiceState('/user/get_safetycheck_state',
+                         GetSafetycheckState,
+                         request=GetSafetycheckStateRequest(state=True),
+                         response_cb=sf_resp_cb),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted',
                          'aborted': 'SAFETY_CHECK'}

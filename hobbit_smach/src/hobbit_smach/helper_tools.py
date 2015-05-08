@@ -13,8 +13,9 @@ arm_state = False
 user_away = False
 
 import rospy
+import os.path
 from hobbit_msgs.srv import SetCloserState, GetCloserState, SetDockState, GetDockState, SetMoveState, GetMoveState, ChargeCheck, ChargeCheckResponse
-from hobbit_msgs.srv import GetArmState, SetArmState, GetAwayState, SetAwayState
+from hobbit_msgs.srv import GetArmState, SetArmState, GetAwayState, SetAwayState, SetSafetycheckState, GetSafetycheckState
 from hobbit_msgs.msg import Event, Command
 from mira_msgs.msg import BatteryState
 import hobbit_smach.arm_move_import as arm_move
@@ -112,6 +113,24 @@ def get_away_state(req):
     rospy.loginfo("Get state is "+str(user_away))
     return user_away
 
+def set_safetycheck_state(req):
+    rospy.loginfo("Set safety check state called with request: "+str(req.state))
+    try:
+        if not os.path.isfile('/localhome/demo/safety_check_finished'):
+            with open('/localhome/demo/safety_check_finished', "w+") as f:
+                f.write("True")
+    except:
+        rospy.loginfo('unable to write /localhome/demo/safety_check_finished')
+        return False
+    rospy.loginfo("Set state to "+str(True))
+    return True
+
+def get_safetycheck_state(req):
+    rospy.loginfo("Get safety check state called")
+    safety_check_finished = os.path.isfile('/localhome/demo/safety_check_finished')
+    rospy.loginfo("Get state is "+str(safety_check_finished))
+    return safety_check_finished
+
 def set_dock_state_true(msg):
     global dock_state
     if msg.charging:
@@ -146,7 +165,6 @@ def events_to_commands(msg):
     rospy.loginfo("will publish"+str(command))
     pub.publish(command)
 
-
 def charge_check_server():
     rospy.init_node('hobbit_helper_node')
     s = rospy.Service('/hobbit/charge_check', ChargeCheck, handle_charge_check)
@@ -160,6 +178,8 @@ def charge_check_server():
     s8 = rospy.Service('/arm/get_move_state', GetArmState, get_arm_state)
     s9 = rospy.Service('/user/set_away_state', SetAwayState, set_away_state)
     s10 = rospy.Service('/user/get_away_state', GetAwayState, get_away_state)
+    s11 = rospy.Service('/user/get_safetycheck_state', GetSafetycheckState, get_safetycheck_state)
+    s12 = rospy.Service('/user/set_safetycheck_state', SetSafetycheckState, set_safetycheck_state)
     rospy.Subscriber('battery_state', BatteryState, set_dock_state_true)
     rospy.Subscriber('Event', Event, events_to_commands)
 

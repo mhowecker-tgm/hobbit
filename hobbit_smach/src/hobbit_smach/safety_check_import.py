@@ -6,48 +6,7 @@ from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 import hobbit_smach.logging_import as log
 import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.sos_call_import as sos_call
-
-check_finished = False
-
-class CheckFinished(State):
-    """
-    Check if the safety check has been executed.
-    """
-    def __init__(self):
-        State.__init__(
-            self,
-            outcomes=['succeeded', 'preempted', 'aborted']
-        )
-
-    def execute(self, ud):
-        global check_finished
-        if self.preempt_requested():
-            self.service_preempt()
-            return 'preempted'
-        if check_finished:
-            return 'succeeded'
-        else:
-            return 'aborted'
-
-class SetCheckFinished(State):
-    """
-    Set safety check variable.
-    """
-    def __init__(self):
-        State.__init__(
-            self,
-            outcomes=['succeeded', 'preempted', 'aborted']
-        )
-
-    def execute(self, ud):
-        global check_finished
-        if self.preempt_requested():
-            self.service_preempt()
-            return 'preempted'
-        check_finished = True
-        return 'succeeded'
-
-
+from hobbit_msgs.srv import SetSafetycheckStateRequest, SetSafetycheckState
 
 def get_safety_check():
     sm = StateMachine(
@@ -283,7 +242,10 @@ def get_safety_check():
         )
         StateMachine.add_auto(
             'SET_CHECK_FINISHED_TO_TRUE',
-            CheckFinished(),
+            ServiceState('/user/set_safetycheck_state',
+                         SetSafetycheckState,
+                         request=SetSafetycheckStateRequest(state=True)
+            ),
             connector_outcomes=['succeeded', 'aborted'],
             transitions={'preempted': 'LOG_PREEMPT'}
         )

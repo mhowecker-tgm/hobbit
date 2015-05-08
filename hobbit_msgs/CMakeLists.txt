@@ -54,6 +54,7 @@ add_service_files(
   GetRobotsCurrentRoom.srv
   GetRoomName.srv
   GetRooms.srv
+  GetSafetycheckState.srv
   GetUsersCurrentRoom.srv
   LeftJoyStickPressed.srv
   PointCloud2FeatureHistogram.srv
@@ -63,6 +64,7 @@ add_service_files(
   SetCloserState.srv
   SetDockState.srv
   SetMoveState.srv
+  SetSafetycheckState.srv
   SingleShotPC.srv
   SwitchVision.srv
   Translate.srv
