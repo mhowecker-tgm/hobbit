@@ -45,6 +45,8 @@ add_service_files(
   CheckFreeSpace.srv
   CheckMeanValuesForDefinedSpace.srv
   CheckCameraDistanceCenter.srv
+  ChangeFrameIDForPntCloud.srv
+  SingleShotPC.srv
 )
 
 ## Generate added messages and services
