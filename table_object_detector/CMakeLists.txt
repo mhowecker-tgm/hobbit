@@ -45,7 +45,7 @@ add_service_files(
   CheckFreeSpace.srv
   CheckMeanValuesForDefinedSpace.srv
   CheckCameraDistanceCenter.srv
-  ChangeFrameIDForPntCloud.srv
+  #ChangeFrameIDForPntCloud.srv
   #SingleShotPC.srv
 )
 
