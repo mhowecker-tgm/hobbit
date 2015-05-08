@@ -31,6 +31,8 @@ def trigger_ss_srv():
     s = rospy.Service('/table_object_detector/get_single_shot', SingleShotPC, start_shot)        
     rospy.spin()
 
+
+
 #triggers the process for getting pc 
 def start_shot(req):
     global pc_sub
@@ -39,30 +41,14 @@ def start_shot(req):
     print "start shot in trigger_ss_srv"
     t = None
     #start subscriber
-    pc_sub = rospy.Subscriber("/headcam/depth_registered/points", PointCloud2, pc_callback, queue_size=1)
+    pc_ = rospy.wait_for_message("/headcam/depth_registered/points", PointCloud2, timeout=5)
     
-
-#starts method to publish point cloud for camera1; unregisters subscriber camera1
-def pc_callback(msg):
-    global pc_sub
-    global pc_
-    global t
-    pc_ = msg
-    pc_sub.unregister()
     print "return single shot point cloud for trigger_ss_srv service (from headcam)"
-    do_publish_cam1()
-        
 
-#publishes pc for cam1
-def do_publish_cam1():
-    global pc_sub
-    global pc_
-    global t
-    print "return single shot for headcam"
     t = rospy.Time.now()
     if pc_ == None:
         print "trigger_ss_srv: no point cloud received - should never happen"
-        return
+        #return
     pc_.header.stamp = t
     
     return SingleShotPCResponse(pc_)
