@@ -588,24 +588,29 @@ class GoToFinalGraspPose(State):
             print "turn (String): ", turn
             self.move_robot_relative_pub.publish(turn)
         
+        print "1"
         rospy.sleep(5)  #wait until head moved to down_center position AND robot has turned (if it turns)
-        
+        print "2"
         #check if there is enough space to move forward
         #!!!!!!!!!!!!!!!!!!!!!!missing: get point cloud!!
         #get point cloud
         ss_point_cloud = self.get_point_cloud_ss()
+        print "3"
         if ss_point_cloud == None:
+            print "4"
             return False
         
-        
+        print "5"
         nr_points_before_robot = self.check_free_space_for_moving_to_grasp_pos(ss_point_cloud, self.fms_x1, self.fms_x1+distance_m,self.fms_y1,self.fms_y2, self.fms_z1, self.fms_z2)
+        print "6"
         if (nr_points_before_robot > 0):
             print "=> moveRobotRelative() ==> move forward could not be executed due to obstacles on the way"
             print "=> nr_points_before_robot: ", nr_points_before_robot
             return False
-        
+        print "7"
         #move Hobbit forward (discrete Motion)
         move = String("Move "+str(distance_m))
+        print "8"
         print "move (String): ", move
         self.move_robot_relative_pub.publish(move)
         #move head back to grasp position
