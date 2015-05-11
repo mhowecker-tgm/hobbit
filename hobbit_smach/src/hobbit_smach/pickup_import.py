@@ -1193,7 +1193,7 @@ class DavidPickingUp(State):
         print "===> pickup_import.py: DavidPickingUp.isGraspableObject(): center of cluster in RCS:                    : ", pnt_rcs
 
         #log object data: center pnt in wcs, center_pnt in rcs, segmented point cloud size
-        self.logger.execute("5315ODSGP Object Data per Segmented Object (grasppos): " + "Object center in WCS: " + pnt_wcs + " Object center in RCS: "+pnt_rcs + "Number points of segmented objects: " + self.pc.height*self.pc.width)
+        self.logger.execute("5315ODSGP Object Data per Segmented Object (grasppos): " + "Object center in WCS: " + str(pnt_wcs) + " Object center in RCS: "+ str(pnt_rcs) + "Number points of segmented objects: " + str(self.pc.height*self.pc.width))
 
 
         isgraspable = self.ispossibleobject(pnt_rcs)
