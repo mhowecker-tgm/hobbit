@@ -184,7 +184,7 @@ class GraspTrajectoryActionServerFromFloor():
                     
                     if (EXECUTE_ARM_MOVEMENT):
                         #raw_input("press enter to send trajectory to arm_action_server and physically execute the grasp action")
-                        resp = mmui.showMMUI_Info(text='T_PU_PickingUpObject')
+                        resp = self.mmui.showMMUI_Info(text='T_PU_PickingUpObject')
                         
                         print "press enter to send trajectory to arm_action_server and physically execute the grasp action"
                         #EXECUTE arm movement for grasping from floor
