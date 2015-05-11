@@ -63,6 +63,8 @@ current_pitch_as_set = 0
 # publishers to the dynamixel topics
 pan_pub = None
 tilt_pub = None
+# indicates whether tilt motor is currently turned on or off (= in resting position)
+tiltMotorIsOn = True
 # indicate whether we want to debug print current angles
 debugPrintAngles = False
 
@@ -106,9 +108,14 @@ def set_head_orientation(msg):
 	global current_pitch
 	global current_yaw_as_set
 	global current_pitch_as_set
+	global tiltMotorIsOn
 
 	print "current angles (pitch, yaw) [deg]:", current_pitch, " ", current_yaw
 	print "Move to", msg.data
+
+	if (not tiltMotorIsOn):
+		turnTiltMotorOnOff(True)
+		tiltMotorIsOn = True
 
 	if msg.data == "up_center":
 		set_angles(pitch=-20, yaw=0)
@@ -133,6 +140,11 @@ def set_head_orientation(msg):
 
 	elif msg.data == "to_grasp":
 		set_angles(pitch=58, yaw=-65)
+		# NOTE: this is a hacky way of letting the tilt servo rest without power in its mechanical
+		# end stop position
+		rospy.sleep(5.0)
+		turnTiltMotorOnOff(False)
+		tiltMotorIsOn = False
 
 	elif msg.data == "center_left":
 		set_angles(pitch=0, yaw=90)
@@ -216,6 +228,18 @@ def set_head_orientation(msg):
 			print "===============================================> owlpose.py: ERROR during relative setting of HEAD: ", sys.exc_info()[0]
 
 	rospy.sleep(0.1)
+
+# enable/disable torque to tilt servo
+# NOTE: this is a hacky solution to allow the servo to rest on its mechanical stop
+# @param on  True or False
+def turnTiltMotorOnOff(on):
+    print "tilt motor en/disable: ", on
+    rospy.wait_for_service('/tilt_controller/torque_enable')
+    try:
+        torque_enable = rospy.ServiceProxy('/tilt_controller/torque_enable', TorqueEnable)
+        torque_enable(on)
+    except rospy.ServiceException, e:
+        print "Service call failed: %s"%e
 
 # Set torque limit for dynamixel servos
 def setTorqueLimit(torque):
