@@ -96,7 +96,6 @@ class DavidLookForObject(State):
         self.graspable_center_of_cluster_wcs = None
         self.graspable_center_of_cluster_rcs = None
         self.min_obj_to_mapboarder_distance = 0.30 #object has to be at least self.min_obj_to_mapboarder_distance cm away from next boarder in navigation map
-        self.logger = logging.DoLogScenarioAndData()
         self.pubEvent = rospy.Publisher('Event', Event, queue_size=50)
         
 
@@ -120,15 +119,15 @@ class DavidLookForObject(State):
             #self.pubClust.publish(cluster)
             if self.isGraspableObject():
                     self.pubClust.publish(cluster)
-                    self.logger.execute("3799OPPPP Object passed position check. Segmented Object Nr: " + str(i) + "/" + str(nr_objects_segmented))  #log nr of object that passed position check in prepos
+                    logging.do_log_data("3799OPPPP Object passed position check. Segmented Object Nr: " + str(i) + "/" + str(nr_objects_segmented))  #log nr of object that passed position check in prepos
                     #self.showMMUI_Info("T_CF_I_FOUND_OBJECT_ON_FLOOR","1")
                     #print "findobject(): cluster saved and published"
                     return True
             else:
-                self.logger.execute("3698OFPPP Object failed position check. Segmented Object Nr: " + str(i) + "/" + str(nr_objects_segmented))  #log nr of object that passed position check
+                logging.do_log_data("3698OFPPP Object failed position check. Segmented Object Nr: " + str(i) + "/" + str(nr_objects_segmented))  #log nr of object that passed position check
 
         print "===> pickup_import.py: findobect(): no graspable object found"
-        self.logger.execute("3207RORPP Reason why Object(s) not accepted (prepos): " + "All " + str(nr_objects_segmented) + " segmented objects did not pass position check")
+        logging.do_log_data("3207RORPP Reason why Object(s) not accepted (prepos): " + "All " + str(nr_objects_segmented) + " segmented objects did not pass position check")
         return False
 
     def isObjectAwayFromMapBoarders(self):
@@ -164,7 +163,7 @@ class DavidLookForObject(State):
 
         if self.findobject(ud):
             #object was found, is graspable (has correct dimension; is not near to fixed obstacle such as a wall)
-            self.logger.execute("3409GOFPP Graspable Object found (prepos)")  #graspable object found (in preposition)
+            logging.do_log_data("3409GOFPP Graspable Object found (prepos)")  #graspable object found (in preposition)
             
             (robot_x, robot_y, robot_yaw) = util.get_current_robot_position(frame='/map')
             posRobot = [robot_x, robot_y] #Bajo, please fill in
@@ -192,7 +191,7 @@ class DavidLookForObject(State):
 
             return 'succeeded'
         else:
-            self.logger.execute("3510NOFPP No Graspable Object found (prepos)")  #log: no graspable object found (preposition)
+            logging.do_log_data("3510NOFPP No Graspable Object found (prepos)")  #log: no graspable object found (preposition)
             return 'failed' #object not found
 
 
@@ -229,7 +228,7 @@ class DavidLookForObject(State):
         print "===> center of cluster in wcs:                    : ", pnt_wcs
         
         #log object data: center pnt in wcs, center_pnt in rcs, segmented point cloud size
-        self.logger.execute("3308ODSPP Object Data per Segmented Object (prepos): " + "Object center in WCS: " + str(pnt_wcs) + " Object center in RCS: "+ str(pnt_rcs) + " Number points of segmented objects: " + str(self.pc.height*self.pc.width))
+        logging.do_log_data("3308ODSPP Object Data per Segmented Object (prepos): " + "Object center in WCS: " + str(pnt_wcs) + " Object center in RCS: "+ str(pnt_rcs) + " Number points of segmented objects: " + str(self.pc.height*self.pc.width))
 
         isgraspable = self.ispossibleobject(pnt_rcs)
         if isgraspable:
@@ -239,7 +238,7 @@ class DavidLookForObject(State):
             if self.isObjectAwayFromMapBoarders():
                 return True
             else:
-                self.logger.execute("3897OFDPP Object failed position check (prepos). Distance to wall to small.")
+                logging.do_log_data("3897OFDPP Object failed position check (prepos). Distance to wall to small.")
                 return False #object to near to map boarder
 
         
@@ -437,7 +436,6 @@ class GoToFinalGraspPose(State):
         )
         self.move_robot_relative_pub = rospy.Publisher('/DiscreteMotionCmd', String)
         self.move_head_pub = rospy.Publisher('/head/move', String, queue_size=50)
-        self.logger = logging.DoLogScenarioAndData()
         self.fms_x1 = 0.2  #free move space x_min (rcs)
         #self.fms_x2 =   variable due to distance the robot should move
         self.fms_y1 = -0.4  #free move space x_min (rcs)
@@ -535,21 +533,15 @@ class GoToFinalGraspPose(State):
             print "robot has to move by d_O_RG (m)", d_O_RG
             
             if not self.moveRobotRelative(turn_degree, d_O_RG):
-                print "61"
-                self.logger.execute("4212FPF   Fine Positioning failed")    #log that fine positioning failed
-                print "62"
+                logging.do_log_data("4212FPF   Fine Positioning failed")    #log that fine positioning failed
                 return 'aborted'
             
-            print "63"
-            self.logger.execute("4111FPS   Fine Positioning successful")    #log that fine positioning succeeded
-            print "64"
+            logging.do_log_data("4111FPS   Fine Positioning successful")    #log that fine positioning succeeded
             return 'succeeded'
     
         except:
             print "===> GoToFinalGraspPose: Error "
-            print "65"
-            self.logger.execute("4212FPF   Fine Positioning failed")    #log that fine positioning failed
-            print "66"
+            logging.do_log_data("4212FPF   Fine Positioning failed")    #log that fine positioning failed
             return 'aborted'
 
     def moveRobotRelative(self, turn_degree, distance_m):
@@ -849,7 +841,7 @@ class DavidLookingPose(State):
 
 
 	(robot_x, robot_y, robot_yaw) = util.get_current_robot_position(frame='/map')
-        posRobot = [robot_x, robot_y] #Bajo, please fill in
+        posRobot = [robot_x, robot_y]
         gpOnFloor = self.calcIntersectionPointingDirWithFloor(pspWCS, pvecWCS)
         if gpOnFloor == None:
             #FIXME: David look into this one
@@ -1012,7 +1004,6 @@ class DavidPickingUp(State):
         self.rec = TD()
         self.restrictfind = True
         self.calc_graspoints_client = CalcGrasppointsActionClient()
-        self.logger = logging.DoLogScenarioAndData()
         #define limits for checking free space for grasping (ccs)
         self.limit_x1 = -0.5
         self.limit_x2 = 0.4
@@ -1047,12 +1038,12 @@ class DavidPickingUp(State):
             print "=======================================================================================================>"
             print "===> DavidPickingUp.execute: check_free_space_for_arm_pickup_movement: pnt_in_space: ", pnt_in_space
             if (pnt_in_space > 0):
-                self.logger.execute("6219NFSG No Free Space to grasp")
-                self.logger.execute("5214RORGP Reason why Object(s) not accepted (grasppos): " + "No Free Space to grasp")
+                logging.do_log_data("6219NFSG No Free Space to grasp")
+                logging.do_log_data("5214RORGP Reason why Object(s) not accepted (grasppos): " + "No Free Space to grasp")
                 print "===> DavidPickingUp.execute: arm not able to move savely for picking up => PICKING UP WAS STOPPED"
                 return 'failed_no_space_to_move_arm'
             else:
-                self.logger.execute("6118FSG   Free Space to grasp")
+                logging.do_log_data("6118FSG   Free Space to grasp")
 
             # 2) call calc_grasppoints_action_server/client (calc_aS(self.pc_rcs)) and receive a grasp_representation in the format (string):
             # "(0)eval_val (1)gp1_x (2)gp1_y (3)gp1_z (4)gp2_x (5)gp2_y (6)gp2_z (7)ap_vec_x (8)ap_vec_y (9)ap_vec_z (10)gp_center_x (11)gp_center_y (12)gp_center_z (13)roll"
@@ -1062,7 +1053,7 @@ class DavidPickingUp(State):
             gp_eval = int(gp_pres_str[0:2])
             if (gp_eval < 2):
                 print "===> DavidPickingUp.execute: GRASP EVALUATION WAS TO BAD FOR RELIABLE GRASPING - GRASPING STOPPED"
-                self.logger.execute("5214RORGP Reason why Object(s) not accepted (grasppos): " + "Grasp point evaluation was too bad")
+                logging.do_log_data("5214RORGP Reason why Object(s) not accepted (grasppos): " + "Grasp point evaluation was too bad")
                 return 'failed_no_sufficient_grasp_detected'
             # 3) (and 4)) call GraspFromFloorTrajectoryActionServer/Client to receive a trajectory (that will be directly executed) by calling the ArmActionServer/client
             grasp_traj_ac = arm_simulation.GraspTrajectoryActionClient.GraspTrajectoryActionClient()
@@ -1076,10 +1067,10 @@ class DavidPickingUp(State):
             
             if res.result.data:
                 #trajectory was found and object was grasped
-                self.logger.execute("5416GOFGP Graspable Object found (grasppos)")
+                logging.do_log_data("5416GOFGP Graspable Object found (grasppos)")
                 #pass    
             else:
-                self.logger.execute("5214RORGP Reason why Object(s) not accepted (grasppos): " + "No Arm Trajectory for Grasping found")
+                logging.do_log_data("5214RORGP Reason why Object(s) not accepted (grasppos): " + "No Arm Trajectory for Grasping found")
                 return 'failed_no_trajectory_for_grasping_found'
                         
             #move object to tray and move arm back to home position
@@ -1141,7 +1132,7 @@ class DavidPickingUp(State):
         #df 19.3.2015 => changed for smaller objects dfdfdfdf
         clusters = self.rec.findObjectsOnFloorSmall(pc_ccs, [0,0,0,0]) #before: pointcloud instead of pc_ccs
         print "===> pickup_import.py: DavidPickingUp.findobject(): number of object clusters on floor found: ", len(clusters)
-        self.logger.execute("5113NOSGP Nr of Objects segmented (grasppos): "+str(len(clusters)))  #log nr of object segmented at pregrasp position
+        logging.do_log_data("5113NOSGP Nr of Objects segmented (grasppos): "+str(len(clusters)))  #log nr of object segmented at pregrasp position
         
         nr_objects_segmented = len(clusters)
         i = 0
@@ -1151,14 +1142,14 @@ class DavidPickingUp(State):
             print "===> pickup_import.py: DavidPickingUp.findobject(): publish cluster"
             self.pubClust.publish(cluster)
             if self.isGraspableObject():
-                self.logger.execute("5719OPPGP Object passed position check. Segmented Object Nr: " + str(i) + "/" + str(nr_objects_segmented))  #log nr of object that passed position check
+                logging.do_log_data("5719OPPGP Object passed position check. Segmented Object Nr: " + str(i) + "/" + str(nr_objects_segmented))  #log nr of object that passed position check
                 self.pubGraspableObjectCCS.publish(cluster)
                 return True
             else:
-                self.logger.execute("5618OFPGP Object failed position check. Segmented Object Nr: " + str(i) + "/" + str(nr_objects_segmented))  #log nr of object that passed position check
+                logging.do_log_data("5618OFPGP Object failed position check. Segmented Object Nr: " + str(i) + "/" + str(nr_objects_segmented))  #log nr of object that passed position check
 
         print "===> pickup_import.py: DavidPickingUp.findobject(): NO GRASPABLE OBJECT FOUND"
-        self.logger.execute("5214RORGP Reason why Object(s) not accepted (grasppos): " + "All " + str(nr_objects_segmented) + " segmented objects did not pass position check")
+        logging.do_log_data("5214RORGP Reason why Object(s) not accepted (grasppos): " + "All " + str(nr_objects_segmented) + " segmented objects did not pass position check")
         return False
 
 
@@ -1192,7 +1183,7 @@ class DavidPickingUp(State):
         print "===> pickup_import.py: DavidPickingUp.isGraspableObject(): center of cluster in RCS:                    : ", pnt_rcs
 
         #log object data: center pnt in wcs, center_pnt in rcs, segmented point cloud size
-        self.logger.execute("5315ODSGP Object Data per Segmented Object (grasppos): " + "Object center in WCS: " + str(pnt_wcs) + " Object center in RCS: "+ str(pnt_rcs) + "Number points of segmented objects: " + str(self.pc.height*self.pc.width))
+        logging.do_log_data("5315ODSGP Object Data per Segmented Object (grasppos): " + "Object center in WCS: " + str(pnt_wcs) + " Object center in RCS: "+ str(pnt_rcs) + "Number points of segmented objects: " + str(self.pc.height*self.pc.width))
 
 
         isgraspable = self.ispossibleobject(pnt_rcs)
@@ -1345,7 +1336,6 @@ class DavidCheckGrasp(State):
         self.limit_y2 = -0.44
         self.limit_z1 = 0.03
         self.limit_z2 = 0.15
-        self.logger = logging.DoLogScenarioAndData()
         
     def execute(self, ud):
         if self.preempt_requested():
@@ -1356,10 +1346,10 @@ class DavidCheckGrasp(State):
         pnt_in_space = self.check_free_space_for_arm_pickup_movement(ud.cloud)
         print "===> DavidCheckGrasp.execute: number of points found in grasping area: ", pnt_in_space
         if (pnt_in_space > 20):
-            self.logger.execute("7221GFA   Grasp Failed")    #log grasp has failed (according to check grasp)
+            logging.do_log_data("7221GFA   Grasp Failed")    #log grasp has failed (according to check grasp)
             return 'aborted'    #aborted <=> point found, hence an object still on floor => (assumed that) object grasping failed
         else:
-            self.logger.execute("7120GSF   Grasp successful")    #log grasp has failed (according to check grasp)
+            logging.do_log_data("7120GSF   Grasp successful")    #log grasp has failed (according to check grasp)
             return 'succeeded'  #succedded <=> no object on floor (in grasping area) => (assumed that) object grasping succeeded
             
 
