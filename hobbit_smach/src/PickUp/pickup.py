@@ -90,6 +90,7 @@ def pointevents_cb(ud, msg):
     return False    
 
 def diff_pointing_directions(dir_new):
+    global LASTPNTDIR
     return abs(LASTPNTDIR.vectorX - dir_new.vectorX) + abs(LASTPNTDIR.vectorY - dir_new.vectorY) + abs(LASTPNTDIR.vectorZ - dir_new.vectorZ)
 
 #df: logging of parameter string for PickUp
@@ -145,6 +146,8 @@ class PointingCounter(smach.State):
                              output_keys=['pointing_counter'])
 
     def execute(self, ud):
+        global LASTPNTDIR
+        LASTPNTDIR = None
         if self.preempt_requested():
             return 'preempted'
         ud.pointing_counter += 1
@@ -271,6 +274,8 @@ class CleanUp(smach.State):
             output_keys=['result', 'command', 'visited_places','pointing_counter','move_counter','search_object_counter','grasp_check_counter','move_back_blind_counter'])
 
     def execute(self, ud):
+        global LASTPNTDIR
+        LASTPNTDIR = None
         ud.visited_places = []
         ud.result = String('Cleanup done for Pickup')
         ud.pointing_counter = 0
