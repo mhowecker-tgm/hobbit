@@ -761,7 +761,7 @@ def main():
         )
         StateMachine.add(
             'SAY_THANK_YOU',
-            speech_output.sayText(info='T_PU_ThankYouPointing'),
+            speech_output.sayText(info='T_PU_ThankYouPointingSurprise'),
             transitions={'succeeded': 'SET_SUCCESS',
                          'failed': 'SET_SUCCESS',
                          'preempted': 'LOG_PREEMPT'}
