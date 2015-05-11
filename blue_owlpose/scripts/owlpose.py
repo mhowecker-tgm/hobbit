@@ -376,7 +376,7 @@ def init():
             br.sendTransform( (0,0,0), tf.transformations.quaternion_from_euler(0, current_pitch/180.0*math.pi, current_yaw/180.0*math.pi), rospy.Time.now(), base_tf, head_tf)
             if debugPrintAngles:
                 print "owlpose pitch yaw [deg]: " + str(current_pitch) + "  " + str(current_yaw)
-        i = i + 1
+        #i = i + 1
         # NOTE: sometimes the tilt servo goes into torque limitation. Setting the torque limit again typically
         # wakes it up again. So we regularly set the limit, every second. So the neck should recover quickly
         # from a torque limit situation.
