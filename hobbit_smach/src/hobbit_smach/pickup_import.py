@@ -631,11 +631,11 @@ class GoToFinalGraspPose(State):
     #function to get single shot point cloud from head camera 
     def get_point_cloud_ss(self):
         print "11"
-        rospy.wait_for_service('/CloudSegmenthor/getSingleShot')
+        rospy.wait_for_service('/table_object_detector/get_single_shot')
         print "12"
         try:
             print "13"
-            get_single_shot = rospy.ServiceProxy('CloudSegmenthor/getSingleShot', SingleShotPC)
+            get_single_shot = rospy.ServiceProxy('/table_object_detector/get_single_shot', SingleShotPC)
             print "14"
             req = SingleShotPC()
             print "15"
