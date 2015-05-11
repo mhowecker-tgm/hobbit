@@ -641,6 +641,10 @@ class GoToFinalGraspPose(State):
             print "15"
             req.ss = String("getshot")
             print "16"
+            print "req.ss: ", req.ss
+            print "req: ", req
+            res = get_single_shot(req)
+            print "16.5"
             res = get_single_shot(req.ss)
             print "17"
             return res.point_cloud
