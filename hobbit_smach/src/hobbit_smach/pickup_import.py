@@ -109,7 +109,7 @@ class DavidLookForObject(State):
         clusters = self.rec.findObjectsOnFloorSmall(pointcloud, [0,0,0,0])
         print "===> pickup_import.py: findobect():number of object clusters on floor found: ", len(clusters)
         
-        self.logger.execute("3106NOSPP Nr of Objects Segmented (prepos): "+str(len(clusters)))  #log nr of object segmented at pregrasp position
+        logging.do_log_data("3106NOSPP Nr of Objects Segmented (prepos): "+str(len(clusters)))  #log nr of object segmented at pregrasp position
 
         nr_objects_segmented = len(clusters)
         i = 0

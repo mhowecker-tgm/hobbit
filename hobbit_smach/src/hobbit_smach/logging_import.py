@@ -270,7 +270,22 @@ class DoLogScenarioAndData(State): #scenario=Pickup!, data: string
         return 'succeeded'
    
     
-        
+    
+def do_log_data(data):
+    pubEvent = rospy.Publisher('Event', Event, queue_size=1)
+    message = Event()
+    message.event = 'E_LOG'
+    params = []
+    par = Parameter(name='SCENARIO',
+                    value='Pickup')
+    params.append(par)
+    par = Parameter(name='DATA',
+                    value=data)
+    params.append(par)
+    message.params = params
+    pubEvent.publish(message)
+    return True
+
 
 def battery_log_cb(msg, ud):
     pubEvent = rospy.Publisher('Event', Event, queue_size=1)
