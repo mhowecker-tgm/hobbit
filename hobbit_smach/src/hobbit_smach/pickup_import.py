@@ -1069,8 +1069,7 @@ class DavidPickingUp(State):
             print "===> DavidPickingUp.execute: grasp trajectory action client generated: ",grasp_traj_ac
             #calculate grasp grajectory (way points)
             cmd = gp_representation.result #String ("81 0.04 -0.45 0.127266 0.04 -0.51 0.127266 0 0 1 0.04 -0.48 0.127266 0") #input (=> = output from calc_grasppoints_svm_action_server)
-            #df new 6.2.2015: 
-            resp = mmui.showMMUI_Info(text='T_PU_PickingUpObject')
+
             res = grasp_traj_ac.grasp_trajectory_action_client(cmd)
             print "pickup_import.py: DavidPickingUp -> execute: res of grasp_traj_ac.grasp_trajectory_action_client(cmd): ", res
             print "pickup_import.py: DavidPickingUp -> execute: res.result.data of grasp_traj_ac.grasp_trajectory_action_client(cmd): ", res.result.data
