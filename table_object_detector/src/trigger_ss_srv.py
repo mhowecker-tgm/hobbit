@@ -13,16 +13,10 @@
 PKG = 'hobbit_smach'
 import roslib; roslib.load_manifest(PKG)
 import rospy
-import time, sys
-#from std_msgs.msg import String
+#import time, sys
 from sensor_msgs.msg import PointCloud2
 from hobbit_msgs.srv import SingleShotPC, SingleShotPCRequest, SingleShotPCResponse
 
-
-pc_sub = None
-pc_ = None
-t = None
-    
     
     
 def trigger_ss_srv():
@@ -32,15 +26,10 @@ def trigger_ss_srv():
     rospy.spin()
 
 
-
 #triggers the process for getting pc 
 def start_shot(req):
-    global pc_sub
-    global pc_
-    global t
     print "start shot in trigger_ss_srv"
-    t = None
-    #start subscriber
+    #get point cloud
     pc_ = rospy.wait_for_message("/headcam/depth_registered/points", PointCloud2, timeout=5)
     
     print "return single shot point cloud for trigger_ss_srv service (from headcam)"
