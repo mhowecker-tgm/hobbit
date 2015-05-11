@@ -41,6 +41,7 @@ import actionlib
 from hobbit_msgs.msg import *
 from hobbit_smach.ArmActionClient import ArmActionClient    #new!!! (21.10.2014)
 from std_msgs.msg import String, Bool
+from hobbit_msgs import MMUIInterface as MMUI
 
 import time
 import math
@@ -79,6 +80,7 @@ class GraspTrajectoryActionServerFromFloor():
         self.iv_model_sub = rospy.Subscriber("/pc_to_iv/generated_ivfilename", String, self.insert_iv_object)
         print "GraspTrajectoryServer was started"
         self.gp_pnt_xy = None
+        self.mmui = MMUI.MMUIInterface()
         
         # create arm_action_client
         #self.arm_action_client = actionlib.SimpleActionClient("arm_action_server", hobbit_msgs.msg.ArmServerAction)   #"arm_action_server" has to be nodename of ArmActionServer(.py)
@@ -182,6 +184,8 @@ class GraspTrajectoryActionServerFromFloor():
                     
                     if (EXECUTE_ARM_MOVEMENT):
                         #raw_input("press enter to send trajectory to arm_action_server and physically execute the grasp action")
+                        resp = mmui.showMMUI_Info(text='T_PU_PickingUpObject')
+                        
                         print "press enter to send trajectory to arm_action_server and physically execute the grasp action"
                         #EXECUTE arm movement for grasping from floor
                         if (self.ArmClient.SetMoveToPreGraspFromFloorPos()):
