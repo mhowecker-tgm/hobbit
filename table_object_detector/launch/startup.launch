@@ -17,6 +17,14 @@
 		respawn="true">        
 	</node>
 
+	<node   name="trigger_ss_srv" 
+		pkg="table_object_detector" 
+	 	type="trigger_ss_srv.py" 
+		args= "" 
+		output="screen" 
+		respawn="true">        
+	</node>
+
 	<node 	name="point_cloud_edit" 
 		pkg="table_object_detector" 
 		type="pc_merge" 
