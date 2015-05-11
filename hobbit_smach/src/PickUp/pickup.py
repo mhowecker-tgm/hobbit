@@ -747,6 +747,12 @@ def main():
                          'preempted': 'LOG_PREEMPT'}
         )    
         StateMachine.add(
+            'SET_HEAD_CENTER_PICKUP_PREEMPT',
+            head_move.MoveTo(pose='center_center'),
+            transitions={'succeeded': 'CLEAN_UP_PREEMPT',
+                         'preempted': 'CLEAN_UP_PREEMPT'}
+        )        
+        StateMachine.add(
             'END_PICKUP_SEQ',
             pickup.getEndPickupSeq(),
             transitions={'succeeded': 'SAY_THANK_YOU',
@@ -760,6 +766,7 @@ def main():
                          'failed': 'SET_SUCCESS',
                          'preempted': 'LOG_PREEMPT'}
         )
+        
         #StateMachine.add(
         #    'GO_TO_USER',
         #    locate_user.get_detect_user(),
@@ -781,7 +788,7 @@ def main():
         StateMachine.add(
             'LOG_PREEMPT',
             log.DoLogPreempt(scenario='Pickup'),
-            transitions={'succeeded': 'CLEAN_UP_PREEMPT'}
+            transitions={'succeeded': 'SET_HEAD_CENTER_PICKUP_PREEMPT'}
         )
         StateMachine.add(
             'LOG_ABORT',
