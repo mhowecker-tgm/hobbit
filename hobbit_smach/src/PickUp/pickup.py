@@ -226,16 +226,16 @@ class MoveBackBlindCounter(smach.State):
     """
     def __init__(self):
         smach.State.__init__(self, outcomes=['first', 'second', 'preempted'],
-                                   input_keys=['move_blind_back_counter'],
-                                   output_keys=['move_blind_back_counter'])
+                                   input_keys=['move_back_blind_counter'],
+                                   output_keys=['move_back_blind_counter'])
 
     def execute(self, ud):
         if self.preempt_requested():
             return 'preempted'
-        ud.move_blind_back_counter += 1
-        print('ud.move_blind_back_counter: %d' % ud.move_blind_back_counter)
-        if ud.move_blind_back_counter > 1:
-            ud.move_blind_back_counter = 0
+        ud.move_back_blind_counter += 1
+        print('ud.move_back_blind_counter: %d' % ud.move_back_blind_counter)
+        if ud.move_back_blind_counter > 1:
+            ud.move_back_blind_counter = 0
             return 'second'
         else:
             return 'first'
@@ -712,13 +712,13 @@ def main():
         StateMachine.add(
             'MOVE_ARM_TO_HOME_POSITION_AFTER_FAILED',  #done after 2 times unsuccessful grasped
             arm_move.goToHomePosition(),
-            transitions={'succeeded': 'MOVE_BLIND_BACK_COUNTER',  #do this only ones
+            transitions={'succeeded': 'MOVE_BACK_BLIND_COUNTER',  #do this only ones
                          'preempted': 'LOG_PREEMPT',
                          'failed': 'MOVE_ARM_TO_HOME_POSITION_AFTER_FAILED'}    # better failure handling appreciated
         )   
         #new 20.3.2015: only move back blind once
         StateMachine.add(
-            'MOVE_BLIND_BACK_COUNTER',
+            'MOVE_BACK_BLIND_COUNTER',
             MoveBackBlindCounter(),
             transitions={'first': 'MOVE_TO_BETTER_POSE_TO_REVIEW_OBJECT',
                          'second': 'EMO_SAY_PICKUP_FAILED',
