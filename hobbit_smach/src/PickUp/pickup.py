@@ -422,10 +422,16 @@ def main():
         StateMachine.add(
             'POINTING_NOT_DETECTED_1',
             pickup.sayPointingGestureNotDetected1(),
-            transitions={'yes': 'GET_POINTING_DIRECTION',
+            transitions={'yes': 'WAIT_BEFORE_POINTING_SECOND_TIME',
                          'no': 'POINTING_DECLINED_BY_USER',
                          'preempted': 'LOG_PREEMPT',
                          'failed': 'POINTING_NOT_DETECTED_2'}
+        )
+        StateMachine.add(
+            'WAIT_BEFORE_POINTING_SECOND_TIME',
+            SleepState(duration=3),
+            transitions={'succeeded': 'GET_POINTING_DIRECTION',
+                         'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
             'POINTING_NOT_DETECTED_2',
@@ -466,7 +472,7 @@ def main():
             SleepState(duration=5),
             transitions={'succeeded': 'GET_POINT_CLOUD',
                          'preempted': 'LOG_PREEMPT'}
-            )
+        )
         # df END
         smach.StateMachine.add(
             'GET_POINT_CLOUD',
