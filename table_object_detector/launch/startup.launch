@@ -4,7 +4,7 @@
 		pkg="table_object_detector" 
 		type="thor" 
 		args= "" 
-		output="screen">        
+		output="log">        
 		<remap from="~input" to="/SS/points2" />
 	    	<remap from="~caminfo" to="/SS/rgb/camera_info" />
 	</node>
@@ -13,7 +13,7 @@
 		pkg="table_object_detector" 
 	 	type="trigger.py" 
 		args= "" 
-		output="screen" 
+		output="log" 
 		respawn="true">        
 	</node>
 
@@ -28,7 +28,7 @@
 	<node 	name="point_cloud_edit" 
 		pkg="table_object_detector" 
 		type="pc_merge" 
-		output="screen" 
+		output="log" 
 		respawn="false">        
     	</node>
 
@@ -36,7 +36,7 @@
         pkg="table_object_detector" 
         type="pc_to_iv" 
         args= "" 
-        output="screen" 
+        output="log" 
         respawn="true">        
     </node>
 
