@@ -788,7 +788,7 @@ def call_for_the_user():
             'CALL_USER',
             cc1,
             transitions={'succeeded': 'WAIT_15SEC',
-                         'aborted': 'WAIT_15SEC',
+                         'aborted': 'aborted',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
@@ -808,7 +808,7 @@ def call_for_the_user():
             'CALL_USER',
             cc1,
             transitions={'succeeded': 'RESET_VOLUME',
-                         'aborted': 'RESET_VOLUME',
+                         'aborted': 'aborted',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
@@ -834,23 +834,23 @@ def call_for_the_user():
         StateMachine.add(
             'CALL_FOR_THE_USER',
             first_it,
-            transitions={'succeeded':'RESET_VOLUME',
+            transitions={'succeeded':'CALL_FOR_THE_USER_LOUDER',
                          'preempted':'preempted',
-                         'aborted':'CALL_FOR_THE_USER_LOUDER'}
+                         'aborted':'RESET_VOLUME'}
         )
         StateMachine.add(
             'CALL_FOR_THE_USER_LOUDER',
             second_it,
-            transitions={'succeeded':'RESET_VOLUME',
+            transitions={'succeeded':'EMERGENCY_CALL',
                          'preempted':'preempted',
-                         'aborted':'EMERGENCY_CALL'}
+                         'aborted':'RESET_VOLUME'}
         )
         StateMachine.add(
             'RESET_VOLUME',
             HobbitMMUI.SetAbsVolume(volume='20'),
             transitions={'succeeded':'succeeded',
                          'preempted':'preempted',
-                         'aborted':'EMERGENCY_CALL'}
+                         'aborted':'aborted'}
         )
         StateMachine.add(
             'EMERGENCY_CALL',
