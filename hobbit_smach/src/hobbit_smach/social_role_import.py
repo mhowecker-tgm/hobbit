@@ -34,8 +34,8 @@ class GetSocialRole(State):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
-        if rospy.has_param('social_role'):
-            social_role = rospy.get_param('social_role')
+        if rospy.has_param('/Hobbit/social_role'):
+            social_role = rospy.get_param('/Hobbit/social_role')
         else:
             social_role = 2
         if social_role == 0:
@@ -63,10 +63,10 @@ class SetSocialRole(State):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
-        if rospy.has_param('social_role'):
-            social_role = rospy.get_param('social_role')
+        if rospy.has_param('/Hobbit/social_role'):
+            social_role = rospy.get_param('/Hobbit/social_role')
             social_role += self.change
-            rospy.set_param('social_role', social_role)
+            rospy.set_param('/Hobbit/social_role', social_role)
             return 'succeeded'
         else:
             return 'aborted'
