@@ -836,14 +836,14 @@ def call_for_the_user():
             first_it,
             transitions={'succeeded':'RESET_VOLUME',
                          'preempted':'preempted',
-                         'aborted':'aborted'}
+                         'aborted':'CALL_FOR_THE_USER_LOUDER'}
         )
         StateMachine.add(
             'CALL_FOR_THE_USER_LOUDER',
             second_it,
             transitions={'succeeded':'RESET_VOLUME',
                          'preempted':'preempted',
-                         'aborted':'aborted'}
+                         'aborted':'EMERGENCY_CALL'}
         )
         StateMachine.add(
             'RESET_VOLUME',
