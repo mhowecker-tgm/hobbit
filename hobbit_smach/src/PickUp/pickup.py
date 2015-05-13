@@ -422,14 +422,14 @@ def main():
         StateMachine.add(
             'POINTING_NOT_DETECTED_1',
             pickup.sayPointingGestureNotDetected1(),
-            transitions={'yes': 'WAIT_BEFORE_POINTING_SECOND_TIME',
+            transitions={'yes': 'SAY_LOOK',
                          'no': 'POINTING_DECLINED_BY_USER',
                          'preempted': 'LOG_PREEMPT',
                          'failed': 'POINTING_NOT_DETECTED_2'}
         )
         StateMachine.add(
             'WAIT_BEFORE_POINTING_SECOND_TIME',
-            SleepState(duration=3),
+            SleepState(duration=2),
             transitions={'succeeded': 'GET_POINTING_DIRECTION',
                          'preempted': 'LOG_PREEMPT'}
         )
