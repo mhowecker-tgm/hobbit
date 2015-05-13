@@ -119,6 +119,7 @@ def the_user_is_back():
 def command_cb(ud, msg):
     global new_command
     global new_params
+    rospy.loginfo('command_cb, msg: '+str(msg))
     try:
         rospy.loginfo(str(msg.command))
         input_ce = msg.command.upper()
@@ -132,9 +133,13 @@ def command_cb(ud, msg):
         rospy.loginfo('/Event data received:')
         if msg.event == 'E_WATCHDOG':
             rospy.loginfo(str(msg.header))
+            return False
     except AttributeError, e:
         rospy.loginfo("command_cb: Event: "+str(e))
         pass
+    if input_ce in ['S_MMUI']:
+        rospy.loginfo('command_cb, input_ce: '+str(input_ce))
+        return False
 
     night = IsItNight(ud)
     away = is_the_user_away()
@@ -143,8 +148,10 @@ def command_cb(ud, msg):
     if away and input_ce not in ['E_HELP', 'C_CALLHOBBIT', 'E_CALLHOBBIT', 'C_MASTER_RESET', 'E_WAKEUP', 'C_GOTOPOINT']:
         rospy.loginfo('The user is away and the command is not there to wake up Hobbit.')
         return False
+    rospy.loginfo('aaaa')
     the_user_is_back()
     for index, item in enumerate(commands):
+        rospy.loginfo('looop')
         if first and active_task < 100:
             rospy.loginfo('GOT COMMAND: '+str(input_ce))
             rospy.loginfo('CURRENTLY RUNNING TASK LEVEL: '+ str(active_task)+' '+commands[active_task][0]+' or similar')
@@ -540,6 +547,7 @@ def main():
     )
 
     def cc_out_cb(outcome_map):
+        rospy.loginfo('outcome_map: ' +str(outcome_map))
         if outcome_map['Event_Listener'] == 'valid':
             return 'succeeded'
         elif outcome_map['Command_Listener'] == 'valid':
