@@ -1,90 +1,136 @@
-<?xml version="1.0"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <rooms>
-	<room>
-		<name>sovrum</name>
-		<vertices>
-			<vertex x="0.400000" y="2.600000" />
-			<vertex x="0.500000" y="-2.900000" />
-			<vertex x="-3.000000" y="-2.800001" />
-			<vertex x="-2.900000" y="2.600000" />
-		</vertices>
-		<places>
-			<place>
-				<name>säng</name>
-				<type>call_button_call1</type>
-				<pose x="-1.222674" y="-1.504658" theta="-2.367910" />
-			</place>
-			<place>
-				<name>sovrummet</name>
-				<type>goTo</type>
-				<pose x="-0.643169" y="0.148657" theta="0.042773" />
-			</place>
-		</places>
-	</room>
-	<room>
-		<name>vardagsrum</name>
-		<vertices>
-			<vertex x="4.299999" y="-3.100000" />
-			<vertex x="0.799999" y="-2.500000" />
-			<vertex x="0.700001" y="2.799999" />
-			<vertex x="4.600000" y="0.500000" />
-		</vertices>
-		<places>
-			<place>
-				<name>fåtölj</name>
-				<type>call_button_call3</type>
-				<pose x="2.885632" y="-1.405250" theta="-2.534017" />
-			</place>
-			<place>
-				<name>fåtöljen</name>
-				<type>goTo</type>
-				<pose x="2.886192" y="-1.390974" theta="-2.531930" />
-			</place>
-			<place>
-				<name>digitalahörnet</name>
-				<type>goTo</type>
-				<pose x="3.772967" y="0.690512" theta="1.074343" />
-			</place>
-			<place>
-				<name>soffa</name>
-				<type>call_button_call2</type>
-				<pose x="1.731657" y="0.297318" theta="-2.588896" />
-			</place>
-		</places>
-	</room>
-	<room>
-		<name>hall</name>
-		<vertices>
-			<vertex x="5.200001" y="0.699999" />
-			<vertex x="2.299999" y="2.299999" />
-			<vertex x="2.400000" y="5.099999" />
-			<vertex x="5.500000" y="5.099999" />
-		</vertices>
-	</room>
-	<room>
-		<name>kök</name>
-		<vertices>
-			<vertex x="4.799999" y="0.699999" />
-			<vertex x="6.799999" y="0.699999" />
-			<vertex x="6.900000" y="-3.000000" />
-			<vertex x="4.500000" y="-2.800001" />
-		</vertices>
-		<places>
-			<place>
-				<name>matbord</name>
-				<type>call_button_call4</type>
-				<pose x="5.910602" y="-1.352662" theta="-1.945151" />
-			</place>
-			<place>
-				<name>köket</name>
-				<type>goTo</type>
-				<pose x="5.662523" y="-0.355541" theta="1.590002" />
-			</place>
-<place>
-				<name>dock</name>
-				<type>docking_base_point</type>
-				<pose x="-0.4238" y="0.0315" theta="0.01446" />
-			</place>
-		</places>
-	</room>
+  <room>
+    <name>sovrum</name>
+    <vertices>
+      <vertex y="2.6" x="0.4"/>
+      <vertex y="-2.9" x="0.5"/>
+      <vertex y="-2.800001" x="-3.0"/>
+      <vertex y="2.6" x="-2.9"/>
+    </vertices>
+    <places>
+      <place>
+        <name>call1</name>
+        <type>call_button_1</type>
+        <pose y="-1.43" x="-1.12" theta="-2.26"/>
+        <objects/>
+      </place>
+      <place>
+        <name>sovrummet</name>
+        <type>goTo</type>
+        <pose y="0.091867" x="-0.798" theta="0.042773"/>
+        <objects/>
+      </place>
+      <place>
+        <name>dock</name>
+        <type>docking_base_point</type>
+        <pose y="0.0315" x="-0.4238" theta="0.01446"/>
+        <objects/>
+      </place>
+    </places>
+  </room>
+  <room>
+    <name>hallen</name>
+    <vertices/>
+    <places>
+      <place>
+        <name>centrum</name>
+        <type>goTo</type>
+        <pose y="2.43" x="4.09" theta="1.5"/>
+        <objects/>
+      </place>
+    </places>
+  </room>
+  <room>
+    <name>vardagsrum</name>
+    <vertices>
+      <vertex y="-3.1" x="4.299999"/>
+      <vertex y="-2.5" x="0.799999"/>
+      <vertex y="2.799999" x="0.700001"/>
+      <vertex y="0.5" x="4.6"/>
+    </vertices>
+    <places>
+      <place>
+        <name>call3</name>
+        <type>call_button_3</type>
+        <pose y="-1.39" x="2.958" theta="-2.523"/>
+        <objects/>
+      </place>
+      <place>
+        <name>fåtöljen</name>
+        <type>goTo</type>
+        <pose y="-1.390974" x="2.886192" theta="-2.53193"/>
+        <objects/>
+      </place>
+      <place>
+        <name>digitalahörnet</name>
+        <type>goTo</type>
+        <pose y="0.773" x="4.04" theta="1.074343"/>
+        <objects/>
+      </place>
+      <place>
+        <name>centrum</name>
+        <type>goTo</type>
+        <pose y="-0.678" x="3.2" theta="3.056598"/>
+        <objects/>
+      </place>
+      <place>
+        <name>centrum</name>
+        <type>goTo</type>
+        <pose y="-1.09" x="3.42" theta="1.48"/>
+        <objects/>
+      </place>
+      <place>
+        <name>search1</name>
+        <type>searchable</type>
+        <pose y="0.0528" x="3.26" theta="-2.64"/>
+        <objects>
+          <object name="Aspirin" probability="0.5"/>
+        </objects>
+      </place>
+      <place>
+        <name>search2</name>
+        <type>searchable</type>
+        <pose y="-0.52" x="3.96" theta="0.889"/>
+        <objects>
+          <object name="Aspirin" probability="0.5"/>
+        </objects>
+      </place>
+      <place>
+        <name>call2</name>
+        <type>call_button_2</type>
+        <pose y="0.42" x="1.83" theta="-2.442"/>
+        <objects/>
+      </place>
+      <place>
+        <name>fitness</name>
+        <type>fitness</type>
+        <pose y="0.00379" x="3.6" theta="0.8007"/>
+        <objects/>
+      </place>
+    </places>
+  </room>
+  <room>
+    <name>kök</name>
+    <vertices>
+      <vertex y="0.699999" x="4.799999"/>
+      <vertex y="0.699999" x="6.799999"/>
+      <vertex y="-3.0" x="6.9"/>
+      <vertex y="-2.800001" x="4.5"/>
+    </vertices>
+    <places>
+      <place>
+        <name>call4</name>
+        <type>call_button_4</type>
+        <pose y="-1.3298" x="6.0116" theta="-2.1"/>
+        <objects/>
+      </place>
+      <place>
+        <name>köket</name>
+        <type>goTo</type>
+        <pose y="-0.17633" x="5.9366" theta="1.590002"/>
+        <objects/>
+      </place>
+    </places>
+  </room>
 </rooms>
