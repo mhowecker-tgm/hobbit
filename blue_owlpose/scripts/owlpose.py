@@ -60,6 +60,8 @@ current_pitch = 0
 # under high load
 current_yaw_as_set = 0
 current_pitch_as_set = 0
+yaw_temperature = 0
+pitch_temperature = 0
 # publishers to the dynamixel topics
 pan_pub = None
 tilt_pub = None
@@ -308,9 +310,11 @@ def panJointStateUpdate(msg):
 	global current_yaw
 	global yaw_offset
 	global current_yaw_as_set
+	global yaw_temperature
 	# HACK: this also needs a mutex or something.
 	current_yaw = msg.current_pos
 	current_yaw_as_set = msg.goal_pos
+	yaw_temperature = msg.motor_temps[0]
 	# transform to degrees
 	current_yaw = current_yaw*180/math.pi
 	current_yaw_as_set = current_yaw_as_set*180/math.pi
@@ -323,9 +327,12 @@ def tiltJointStateUpdate(msg):
 	global current_pitch
 	global pitch_offset
 	global current_pitch_as_set
+	global pitch_temperature
 	# HACK: this also needs a mutex or something.
 	current_pitch = msg.current_pos
 	current_pitch_as_set = msg.goal_pos
+	pitch_temperature = msg.motor_temps[0]
+	print "pitch temp", pitch_temperature
 	# Hobbit down is +, Dynamixel down is -
 	current_pitch = -current_pitch
 	current_pitch_as_set = -current_pitch_as_set
@@ -351,6 +358,13 @@ def read_and_set_offsets():
 
 def trigger_read_and_set_offsets(msg):
     read_and_set_offsets()
+
+# check if servos are alive or have shut off due to torque or temperature
+# thresholds
+#def checkServosAlive():
+#    if (pitch_temperature < 75)
+#        setTorqueLimit(torque_limit)
+
 
 def init():
     global imuPitch
