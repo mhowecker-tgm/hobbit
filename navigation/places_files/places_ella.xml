@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<rooms>
+	<room>
+		<name>sovrum</name>
+		<vertices>
+			<vertex x="0.400000" y="2.600000" />
+			<vertex x="0.500000" y="-2.900000" />
+			<vertex x="-3.000000" y="-2.800001" />
+			<vertex x="-2.900000" y="2.600000" />
+		</vertices>
+		<places>
+			<place>
+				<name>säng</name>
+				<type>call_button_call1</type>
+				<pose x="-1.222674" y="-1.504658" theta="-2.367910" />
+			</place>
+			<place>
+				<name>sovrummet</name>
+				<type>goTo</type>
+				<pose x="-0.643169" y="0.148657" theta="0.042773" />
+			</place>
+		</places>
+	</room>
+	<room>
+		<name>vardagsrum</name>
+		<vertices>
+			<vertex x="4.299999" y="-3.100000" />
+			<vertex x="0.799999" y="-2.500000" />
+			<vertex x="0.700001" y="2.799999" />
+			<vertex x="4.600000" y="0.500000" />
+		</vertices>
+		<places>
+			<place>
+				<name>fåtölj</name>
+				<type>call_button_call3</type>
+				<pose x="2.885632" y="-1.405250" theta="-2.534017" />
+			</place>
+			<place>
+				<name>fåtöljen</name>
+				<type>goTo</type>
+				<pose x="2.886192" y="-1.390974" theta="-2.531930" />
+			</place>
+			<place>
+				<name>digitalahörnet</name>
+				<type>goTo</type>
+				<pose x="3.772967" y="0.690512" theta="1.074343" />
+			</place>
+			<place>
+				<name>soffa</name>
+				<type>call_button_call2</type>
+				<pose x="1.731657" y="0.297318" theta="-2.588896" />
+			</place>
+		</places>
+	</room>
+	<room>
+		<name>hall</name>
+		<vertices>
+			<vertex x="5.200001" y="0.699999" />
+			<vertex x="2.299999" y="2.299999" />
+			<vertex x="2.400000" y="5.099999" />
+			<vertex x="5.500000" y="5.099999" />
+		</vertices>
+	</room>
+	<room>
+		<name>kök</name>
+		<vertices>
+			<vertex x="4.799999" y="0.699999" />
+			<vertex x="6.799999" y="0.699999" />
+			<vertex x="6.900000" y="-3.000000" />
+			<vertex x="4.500000" y="-2.800001" />
+		</vertices>
+		<places>
+			<place>
+				<name>matbord</name>
+				<type>call_button_call4</type>
+				<pose x="5.910602" y="-1.352662" theta="-1.945151" />
+			</place>
+			<place>
+				<name>köket</name>
+				<type>goTo</type>
+				<pose x="5.662523" y="-0.355541" theta="1.590002" />
+			</place>
+<place>
+				<name>dock</name>
+				<type>docking_base_point</type>
+				<pose x="-0.4238" y="0.0315" theta="0.01446" />
+			</place>
+		</places>
+	</room>
+</rooms>
