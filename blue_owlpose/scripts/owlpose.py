@@ -29,7 +29,7 @@ from dynamixel_controllers.srv import TorqueEnable, SetTorqueLimit, SetSpeed
 min_lr_angle_deg = -90
 max_lr_angle_deg = 90
 min_ud_angle_deg = -22
-max_ud_angle_deg = 58
+max_ud_angle_deg = 60
 
 # torque limit for dynamixel servos
 # NOTE that typical load in the Hobbit neck is at most 0.5 for the tilt joint, but can also reach > 0.8
@@ -139,7 +139,7 @@ def set_head_orientation(msg):
 		set_angles(pitch=40, yaw=-61)
 
 	elif msg.data == "to_grasp":
-		set_angles(pitch=58, yaw=-65)
+		set_angles(pitch=60, yaw=-65)
 		# NOTE: this is a hacky way of letting the tilt servo rest without power in its mechanical
 		# end stop position
 		rospy.sleep(5.0)
@@ -228,6 +228,13 @@ def set_head_orientation(msg):
 			print "===============================================> owlpose.py: ERROR during relative setting of HEAD: ", sys.exc_info()[0]
 
 	rospy.sleep(0.1)
+
+# Wait until dynamixel manager node has come up
+def waitForServosReady():
+    # just wait for any of the services provided by the dynamixel manager
+    rospy.wait_for_service('/tilt_controller/torque_enable')
+    # and wait a bit longer, for good measure
+    rospy.sleep(1.)
 
 # enable/disable torque to tilt servo
 # NOTE: this is a hacky solution to allow the servo to rest on its mechanical stop
@@ -382,8 +389,7 @@ def init():
     tilt_pub = rospy.Publisher('/tilt_controller/command', std_msgs.msg.Float64)
 
     # Initialize Servos:
-    # NOTE: For some strange reason the sleep seems to be necessary to make sure publishers are set up already.
-    rospy.sleep(1.0)
+    waitForServosReady()
     print "Moving to center_center"
     set_angles(pitch=0, yaw=0)
 
