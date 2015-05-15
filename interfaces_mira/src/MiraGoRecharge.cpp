@@ -192,6 +192,7 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 		{
 		    std::cout << "no providers for IDockingProcess" << std::endl;
 		    ROS_INFO("no providers for IDockingProcess ");
+		    as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting, no providers");
 		    return;
 		}
 
@@ -257,6 +258,7 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 				{
 				    std::cout << "no providers for IDockingProcess" << std::endl;
 				    ROS_INFO("no providers for IDockingProcess ");
+				    as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting, no providers");
 				    return;
 				}
 
@@ -284,6 +286,7 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 				{
 				    std::cout << "no providers for IDockingProcess" << std::endl;
 				    ROS_INFO("no providers for IDockingProcess ");
+				    as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting, no providers");
 				    return;
 				}
 
