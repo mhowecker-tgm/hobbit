@@ -4,8 +4,6 @@
 PKG = 'hobbit_smach'
 NAME = 'Emergency'
 
-import roslib
-roslib.load_manifest(PKG)
 import rospy
 
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
@@ -333,14 +331,14 @@ def main():
                         'parameters': 'parameters'}
     )
 
-    sis = IntrospectionServer(
-        'smach_server',
-        sos_sm,
-        '/HOBBIT/sos_sm_ROOT')
-    sis.start()
+    #sis = IntrospectionServer(
+    #    'smach_server',
+    #    sos_sm,
+    #    '/HOBBIT/sos_sm_ROOT')
+    #sis.start()
     asw.run_server()
     rospy.spin()
-    sis.stop()
+    #sis.stop()
 
 if __name__ == '__main__':
     main()

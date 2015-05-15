@@ -4,8 +4,6 @@
 PKG = 'hobbit_smach'
 NAME = 'locate_user'
 
-import roslib
-roslib.load_manifest(PKG)
 import rospy
 from smach import StateMachine
 from smach_ros import IntrospectionServer, ActionServerWrapper
@@ -52,15 +50,15 @@ def main():
         result_slots_map={'result': 'result'},
         goal_slots_map={'command': 'command'})
 
-    sis = IntrospectionServer(
-        'smach_server',
-        lu_sm,
-        '/HOBBIT/LU_SM_ROOT')
+    #sis = IntrospectionServer(
+    #    'smach_server',
+    #    lu_sm,
+    #    '/HOBBIT/LU_SM_ROOT')
 
-    sis.start()
+    #sis.start()
     asw.run_server()
     rospy.spin()
-    sis.stop()
+    #sis.stop()
 
 if __name__ == '__main__':
     main()

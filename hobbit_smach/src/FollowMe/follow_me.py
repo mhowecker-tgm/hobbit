@@ -431,12 +431,12 @@ def main():
                         'parameters': 'parameters'}
     )
 
-    sis = IntrospectionServer(
+    #sis = IntrospectionServer(
         'smach_server', follow_me_sm, '/HOBBIT/follow_me_sm_ROOT')
-    sis.start()
+    #sis.start()
     asw.run_server()
     rospy.spin()
-    sis.stop()
+    #sis.stop()
 
 if __name__ == '__main__':
     main()

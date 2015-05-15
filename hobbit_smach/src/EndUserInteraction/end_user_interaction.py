@@ -4,8 +4,6 @@
 PKG = 'hobbit_smach'
 NAME = 'end_user_interaction'
 
-import roslib
-roslib.load_manifest(PKG)
 import rospy
 import smach
 import smach_ros
@@ -296,12 +294,12 @@ def main():
                               result_slots_map={'result': 'result'},
                               goal_slots_map={'command': 'command'})
 
-    sis = smach_ros.IntrospectionServer('smach_server', eui_sm,
-                                        '/HOBBIT/EUI_SM_ROOT')
-    sis.start()
+    #sis = smach_ros.IntrospectionServer('smach_server', eui_sm,
+    #                                    '/HOBBIT/EUI_SM_ROOT')
+    #sis.start()
     asw.run_server()
     rospy.spin()
-    sis.stop()
+    #sis.stop()
 
 if __name__ == '__main__':
     main()

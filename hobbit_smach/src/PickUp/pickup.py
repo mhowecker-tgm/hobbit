@@ -8,8 +8,6 @@ LASTPNTDIR = None #last saved pointing direction
 MAXPNTDIRDIF = 20.0 # maximal difference between two pointing directions
 pubEvent = None
 
-import roslib
-roslib.load_manifest(PKG)
 import rospy
 import smach
 import uashh_smach.util as util
@@ -838,14 +836,14 @@ def main():
         result_slots_map={'result': 'result'}
     )
 
-    sis = IntrospectionServer(
-        'smach_server',
-        pickup_sm,
-        '/HOBBIT/PICKUP_SM_ROOT')
-    sis.start()
+    #sis = IntrospectionServer(
+    #    'smach_server',
+    #    pickup_sm,
+    #    '/HOBBIT/PICKUP_SM_ROOT')
+    #sis.start()
     asw.run_server()
     rospy.spin()
-    sis.stop()
+    #sis.stop()
 
 if __name__ == '__main__':
     main()

@@ -100,6 +100,7 @@ date
 FILE='/home/bajo/.ros/log/puppetmaster.log'
 check_uptime TIME
 if [[ TIME -lt 10 ]]; then
+  echo -e "\e[32m Uptime limit not reached.\e[0m";
   exit
 fi
 

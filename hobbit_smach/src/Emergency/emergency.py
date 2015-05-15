@@ -4,8 +4,6 @@
 PKG = 'hobbit_smach'
 NAME = 'Emergency'
 
-import roslib
-roslib.load_manifest(PKG)
 import rospy
 import smach
 import smach_ros
@@ -207,14 +205,14 @@ def main():
         goal_slots_map={'command': 'command'}
     )
 
-    sis = smach_ros.IntrospectionServer(
-        'smach_server',
-        em_sm,
-        '/HOBBIT/EM_SM_ROOT')
-    sis.start()
+    #sis = smach_ros.IntrospectionServer(
+    #    'smach_server',
+    #    em_sm,
+    #    '/HOBBIT/EM_SM_ROOT')
+    #sis.start()
     asw.run_server()
     rospy.spin()
-    sis.stop()
+    #sis.stop()
 
 if __name__ == '__main__':
     main()

@@ -6,8 +6,6 @@ NAME = 'reminder'
 DEBUG = False
 
 import rospy
-#import smach
-#import uashh_smach.util as util
 import uashh_smach.platform.move_base as move_base
 
 from std_msgs.msg import String
@@ -353,11 +351,11 @@ def main():
                         'parameters': 'parameters'}
     )
 
-    sis = IntrospectionServer('smach_server', empa_sm, '/HOBBIT/EMPA_SM_ROOT')
-    sis.start()
+    #sis = IntrospectionServer('smach_server', empa_sm, '/HOBBIT/EMPA_SM_ROOT')
+    #sis.start()
     asw.run_server()
     rospy.spin()
-    sis.stop()
+    #sis.stop()
 
 if __name__ == '__main__':
     main()

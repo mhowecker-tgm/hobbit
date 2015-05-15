@@ -6,8 +6,6 @@ NAME = 'away_break'
 
 import rospy
 import smach
-#import uashh_smach.util as util
-#import uashh_smach.platform.move_base as move_base
 
 from std_msgs.msg import String
 from hobbit_msgs.msg import GeneralHobbitAction, Event
@@ -402,11 +400,11 @@ def main():
                         'parameters': 'parameters'}
     )
 
-    sis = IntrospectionServer('smach_server', away_sm, '/HOBBIT/away_sm_ROOT')
-    sis.start()
+    #sis = IntrospectionServer('smach_server', away_sm, '/HOBBIT/away_sm_ROOT')
+    #sis.start()
     asw.run_server()
     rospy.spin()
-    sis.stop()
+    #sis.stop()
 
 if __name__ == '__main__':
     main()

@@ -69,16 +69,16 @@ def main():
         result_slots_map={'result': 'result'}
     )
 
-    sis = IntrospectionServer(
-        'smach_server',
-        sc_sm,
-        '/HOBBIT/safety_check_SM_ROOT'
-    )
+    #sis = IntrospectionServer(
+    #    'smach_server',
+    #    sc_sm,
+    #    '/HOBBIT/safety_check_SM_ROOT'
+    #)
 
-    sis.start()
+    #sis.start()
     asw.run_server()
     rospy.spin()
-    sis.stop()
+    #sis.stop()
 
 
 class SetSuccess(State):

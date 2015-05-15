@@ -6,8 +6,6 @@ NAME = 'recharge'
 
 DEBUG = False
 
-import roslib
-roslib.load_manifest(PKG)
 import rospy
 
 from hobbit_msgs.msg import GeneralHobbitAction

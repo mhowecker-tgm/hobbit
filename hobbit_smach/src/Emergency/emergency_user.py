@@ -5,8 +5,6 @@ PKG = 'hobbit_smach'
 NAME = 'emergency_user'
 DEBUG = False
 
-import roslib
-roslib.load_manifest(PKG)
 import rospy
 
 from std_msgs.msg import String
@@ -344,11 +342,11 @@ def main():
                         'parameters': 'parameters'}
     )
 
-    sis = IntrospectionServer('smach_server', emus_sm, '/HOBBIT/emus_sm_ROOT')
-    sis.start()
+    #sis = IntrospectionServer('smach_server', emus_sm, '/HOBBIT/emus_sm_ROOT')
+    #sis.start()
     asw.run_server()
     rospy.spin()
-    sis.stop()
+    #sis.stop()
 
 if __name__ == '__main__':
     main()

@@ -36,15 +36,15 @@ def main():
         goal_slots_map={'command': 'command',
                         'parameters': 'parameters'})
 
-    sis = IntrospectionServer(
-        'smach_server',
-        fit_sm,
-        '/HOBBIT/FIT_SM_ROOT')
+    #sis = IntrospectionServer(
+    #    'smach_server',
+    #    fit_sm,
+    #    '/HOBBIT/FIT_SM_ROOT')
 
-    sis.start()
+    #sis.start()
     asw.run_server()
     rospy.spin()
-    sis.stop()
+    #sis.stop()
 
 if __name__ == '__main__':
     main()

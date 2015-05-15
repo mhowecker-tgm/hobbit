@@ -4,8 +4,6 @@
 PKG = 'hobbit_smach'
 NAME = 'reminder'
 
-import roslib
-roslib.load_manifest(PKG)
 import rospy
 from uashh_smach.util import SleepState
 
@@ -238,11 +236,11 @@ def main():
                         'parameters': 'parameters'}
     )
 
-    sis = IntrospectionServer('smach_server', rem_sm, '/HOBBIT/REM_SM_ROOT')
-    sis.start()
+    #sis = IntrospectionServer('smach_server', rem_sm, '/HOBBIT/REM_SM_ROOT')
+    #sis.start()
     asw.run_server()
     rospy.spin()
-    sis.stop()
+    #sis.stop()
 
 if __name__ == '__main__':
     main()

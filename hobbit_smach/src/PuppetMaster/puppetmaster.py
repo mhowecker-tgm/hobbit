@@ -8,7 +8,7 @@ global MUC_ENABLED
 
 import rospy
 from datetime import datetime, time
-from smach_ros import SimpleActionState, IntrospectionServer, ServiceState
+from smach_ros import SimpleActionState, IntrospectionServer, ServiceState, MonitorState
 from smach import StateMachine, Concurrence, State
 from std_msgs.msg import String
 from hobbit_msgs.msg import Command, Event, GeneralHobbitAction,\
@@ -40,7 +40,7 @@ commands = [
     ['reminder', 'E_REMINDER'],
     ['stop', 'C_STOP', 'G_STOP', 'E_STOP', 'B_CANCEL', 'E_CANCEL', 'P_E_CANCEL', 'A_stop', 'A_cancel'], #'E_FITNESS_CLOSED'],
     ['call_hobbit', 'C_CALLHOBBIT', 'E_CALLHOBBIT'],
-    ['call', 'E_CALLRING', 'E_CALLESTABLISHED', 'E_CALLENDED', 'C_MAKECALL'],
+    ['call', 'E_CALLRING', 'E_CALLESTABLISHED', 'C_MAKECALL'],
     ['away', 'C_AWAY1', 'C_AWAY2', 'C_AWAY3', 'C_AWAY4', 'C_AWAY5', 'C_AWAY6',
      'C_SLEEP1', 'C_SLEEP2', 'C_SLEEP3', 'C_SLEEP4', 'C_SLEEP5', 'C_SLEEP6'],
     ['clear_floor', 'E_CLEARFLOOR'],
@@ -95,7 +95,7 @@ def is_the_user_away():
     try:
         request=GetAwayStateRequest(state=True)
         resp = get_user_state(request)
-        rospy.loginfo("/user/get_away_status returned: "+str(type(resp.result))+", "+str(resp.result))
+        #rospy.loginfo("/user/get_away_status returned: "+str(type(resp.result))+", "+str(resp.result))
         return resp.result
     except rospy.ServiceException:
         return False
@@ -112,31 +112,36 @@ def the_user_is_back():
     except rospy.ServiceException:
         return False
 
-def command_cb(msg, ud):
+def command_cb(ud, msg):
+    res = command_cb2(msg, ud)
+    return not res
+
+def command_cb2(msg, ud):
     global new_command
     global new_params
     try:
         rospy.loginfo(str(msg.command))
         input_ce = msg.command.upper()
-        rospy.loginfo('/Command data received:')
+        #rospy.loginfo('/Command data received:')
     except AttributeError, e:
-        rospy.loginfo("command_cb: Command: "+str(e))
+        #rospy.loginfo("command_cb: Command: "+str(e))
         pass
     try:
         rospy.loginfo(str(msg.event))
         input_ce = msg.event.upper()
-        rospy.loginfo('/Event data received:')
+        #rospy.loginfo('/Event data received:')
         if msg.event == 'E_WATCHDOG':
-            rospy.loginfo(str(msg.header))
+            pass
+            #rospy.loginfo(str(msg.header))
     except AttributeError, e:
-        rospy.loginfo("command_cb: Event: "+str(e))
+        #rospy.loginfo("command_cb: Event: "+str(e))
         pass
 
     night = IsItNight(ud)
     away = is_the_user_away()
     active_task = ud.parameters['active_task']
     first = True
-    if away and input_ce not in ['E_HELP', 'C_CALLHOBBIT', 'E_CALLHOBBIT', 'C_MASTER_RESET', 'E_WAKEUP', 'C_GOTOPOINT']:
+    if away and input_ce not in ['E_HELP', 'C_CALLHOBBIT', 'E_CALLHOBBIT', 'C_MASTER_RESET', 'E_WAKEUP', 'C_GOTOPOINT', 'E_WATCHDOG']:
         rospy.loginfo('The user is away and the command is not there to wake up Hobbit.')
         return False
     the_user_is_back()
@@ -363,19 +368,19 @@ class SelectTask(State):
                       'none'])
 
     def execute(self, ud):
-        rospy.loginfo('Task Selection'+str(ud.params))
+        #rospy.loginfo('Task Selection' +str(ud.params))
         global new_command
         global new_params
-        rospy.loginfo('Task Selection: '+str(new_command))
-        rospy.loginfo('Task Selection: '+str(new_params))
+        #rospy.loginfo('Task Selection: '+str(new_command))
+        #rospy.loginfo('Task Selection: '+str(new_params))
         ud.params = new_params
-        rospy.loginfo('Task Selection'+str(ud.params))
+        #rospy.loginfo('Task Selection'+str(ud.params))
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
         if not new_command:
             return 'none'
-        print("SelectTask: "+str(new_command))
+        rospy.loginfo("SelectTask: "+str(new_command))
         if new_command == 'IDLE':
             return 'none'
         ret = new_command
@@ -536,9 +541,9 @@ def main():
     )
 
     def cc_out_cb(outcome_map):
-        if outcome_map['Event_Listener'] == 'succeeded':
+        if outcome_map['Event_Listener'] == 'invalid':
             return 'succeeded'
-        elif outcome_map['Command_Listener'] == 'succeeded':
+        elif outcome_map['Command_Listener'] == 'invalid':
             return 'succeeded'
         else:
             return 'aborted'
@@ -565,20 +570,24 @@ def main():
     with cc:
         Concurrence.add(
             'Event_Listener',
-            util.WaitForMsgState(
+            MonitorState(
+            #util.WaitForMsgState(
                 '/Event',
                 Event,
-                msg_cb=command_cb,
+                command_cb,
+                #msg_cb=command_cb,
                 input_keys=['parameters', 'params', 'command', 'active_task'],
                 output_keys=['parameters', 'params', 'command', 'active_task', 'emergency']
             )
         )
         Concurrence.add(
             'Command_Listener',
-            util.WaitForMsgState(
+            MonitorState(
+            #util.WaitForMsgState(
                 '/Command',
                 Command,
-                msg_cb=command_cb,
+                command_cb,
+                #msg_cb=command_cb,
                 input_keys=['parameters', 'params', 'command', 'active_task'],
                 output_keys=['parameters', 'params', 'command', 'active_task', 'emergency']
             )
@@ -983,11 +992,11 @@ def main():
     Now we actually start the IntrospectionServer to visualize the StateMachine
     as a dot graph, and execute the main StateMachine.
     """
-    sis = IntrospectionServer('master', sm1, '/MASTER')
-    sis.start()
+    #sis = IntrospectionServer('master', sm1, '/MASTER')
+    #sis.start()
     sm1.execute()
     rospy.spin()
-    sis.stop()
+    #sis.stop()
 
 if __name__ == '__main__':
     global wakeup_time

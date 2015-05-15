@@ -273,12 +273,12 @@ def main():
         ['succeeded'], ['aborted'], ['preempted'],
         #result_slots_map={'result': 'result'},
         goal_slots_map={'command': 'command'})
-    sis = IntrospectionServer(
-        'smach_server', fm_sm, '/HOBBIT/follow_me_simple_sm_ROOT')
-    sis.start()
+    #sis = IntrospectionServer(
+    #    'smach_server', fm_sm, '/HOBBIT/follow_me_simple_sm_ROOT')
+    #sis.start()
     asw.run_server()
     rospy.spin()
-    sis.stop()
+    #sis.stop()
 
 
 if __name__ == '__main__':
