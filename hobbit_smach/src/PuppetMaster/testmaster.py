@@ -8,7 +8,7 @@ global MUC_ENABLED
 
 import rospy
 from datetime import datetime, time
-from smach_ros import SimpleActionState, IntrospectionServer, MonitorState, ServiceState
+from smach_ros import SimpleActionState, IntrospectionServer, ServiceState, MonitorState
 from smach import StateMachine, Concurrence, State
 from std_msgs.msg import String
 from hobbit_msgs.msg import Command, Event, GeneralHobbitAction,\
@@ -77,7 +77,6 @@ def IsItNight(ud):
     else:
         return True
 
-
 def start_command(ud):
     mmui = MMUI.MMUIInterface()
     mmui.remove_last_prompt()
@@ -87,7 +86,6 @@ def start_command(ud):
     #       'New task has higher priority. Start it.'
     #       + bcolors.ENDC)
     return True
-
 
 def is_the_user_away():
     get_user_state = rospy.ServiceProxy(
@@ -102,7 +100,6 @@ def is_the_user_away():
     except rospy.ServiceException:
         return False
 
-
 def the_user_is_back():
     set_user_state = rospy.ServiceProxy(
             '/user/set_away_state',
@@ -115,11 +112,13 @@ def the_user_is_back():
     except rospy.ServiceException:
         return False
 
-
 def command_cb(ud, msg):
+    res = command_cb2(msg, ud)
+    return not res
+
+def command_cb2(msg, ud):
     global new_command
     global new_params
-    rospy.loginfo('command_cb, msg: '+str(msg))
     try:
         rospy.loginfo(str(msg.command))
         input_ce = msg.command.upper()
@@ -133,25 +132,19 @@ def command_cb(ud, msg):
         rospy.loginfo('/Event data received:')
         if msg.event == 'E_WATCHDOG':
             rospy.loginfo(str(msg.header))
-            return False
     except AttributeError, e:
         rospy.loginfo("command_cb: Event: "+str(e))
         pass
-    if input_ce in ['S_MMUI']:
-        rospy.loginfo('command_cb, input_ce: '+str(input_ce))
-        return False
 
     night = IsItNight(ud)
     away = is_the_user_away()
     active_task = ud.parameters['active_task']
     first = True
-    if away and input_ce not in ['E_HELP', 'C_CALLHOBBIT', 'E_CALLHOBBIT', 'C_MASTER_RESET', 'E_WAKEUP', 'C_GOTOPOINT']:
+    if away and input_ce not in ['E_HELP', 'C_CALLHOBBIT', 'E_CALLHOBBIT', 'C_MASTER_RESET', 'E_WAKEUP', 'C_GOTOPOINT', 'E_WATCHDOG']:
         rospy.loginfo('The user is away and the command is not there to wake up Hobbit.')
         return False
-    rospy.loginfo('aaaa')
     the_user_is_back()
     for index, item in enumerate(commands):
-        rospy.loginfo('looop')
         if first and active_task < 100:
             rospy.loginfo('GOT COMMAND: '+str(input_ce))
             rospy.loginfo('CURRENTLY RUNNING TASK LEVEL: '+ str(active_task)+' '+commands[active_task][0]+' or similar')
@@ -547,10 +540,9 @@ def main():
     )
 
     def cc_out_cb(outcome_map):
-        rospy.loginfo('outcome_map: ' +str(outcome_map))
-        if outcome_map['Event_Listener'] == 'valid':
+        if outcome_map['Event_Listener'] == 'invalid':
             return 'succeeded'
-        elif outcome_map['Command_Listener'] == 'valid':
+        elif outcome_map['Command_Listener'] == 'invalid':
             return 'succeeded'
         else:
             return 'aborted'
@@ -578,9 +570,11 @@ def main():
         Concurrence.add(
             'Event_Listener',
             MonitorState(
+            #util.WaitForMsgState(
                 '/Event',
                 Event,
-                cond_cb=command_cb,
+                command_cb,
+                #msg_cb=command_cb,
                 input_keys=['parameters', 'params', 'command', 'active_task'],
                 output_keys=['parameters', 'params', 'command', 'active_task', 'emergency']
             )
@@ -588,9 +582,11 @@ def main():
         Concurrence.add(
             'Command_Listener',
             MonitorState(
+            #util.WaitForMsgState(
                 '/Command',
                 Command,
-                cond_cb=command_cb,
+                command_cb,
+                #msg_cb=command_cb,
                 input_keys=['parameters', 'params', 'command', 'active_task'],
                 output_keys=['parameters', 'params', 'command', 'active_task', 'emergency']
             )
