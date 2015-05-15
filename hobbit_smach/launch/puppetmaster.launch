@@ -1,6 +1,6 @@
 <launch>
 <rosparam command="delete" param="/Hobbit/enable_muc" />
 <rosparam command="delete" param="/Hobbit/social_role" />
-<rosparam command="load" file="$(find hobbit_smach)/muc.yaml" />
+<rosparam command="load" file="$(find hobbit_smach)/no_muc.yaml" />
 <node name="puppetmaster" pkg="hobbit_smach" type="puppetmaster.py" output="log"/>
 </launch>
