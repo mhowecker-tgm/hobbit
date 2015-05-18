@@ -63,6 +63,10 @@ ros::Publisher personBroadcaster;
 
 int rate=DEFAULT_FRAME_RATE;
 
+ tf::TransformListener listener;
+ tf::StampedTransform transformS;
+
+
 
 float MinMaxHumanTemperatures[]= {
                                     0 , 0  ,       //DEV MACHINE
@@ -527,8 +531,12 @@ int updateHeadPosition()
 {
  if (!useTFTree) { return 0; }
 
+
+ /* This causes reconnections ?
  tf::TransformListener listener;
  tf::StampedTransform transformS;
+ */
+
  try
      {
       //using /headcam_rgb_optical_frame and /base_link: , thanks David :)
