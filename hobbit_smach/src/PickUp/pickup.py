@@ -683,7 +683,7 @@ def main():
             'COUNTER_GRASP_CHECK',
             GraspCounter(),
             transitions={'first': 'EMO_SAY_DID_NOT_PICKUP',
-                         'second': 'EMO_SAY_DID_NOT_PICKUP_2',
+                         'second': 'MOVE_ARM_TO_HOME_POSITION_AFTER_FAILED',
                          'preempted': 'LOG_PREEMPT'}
         )
         StateMachine.add(
@@ -713,7 +713,7 @@ def main():
         StateMachine.add(
             'EMO_SAY_DID_NOT_PICKUP_2',
             pickup.sayDidNotPickupObjectTwoTimes(),
-            transitions={'succeeded': 'MOVE_ARM_TO_HOME_POSITION_AFTER_FAILED',
+            transitions={'succeeded': 'MOVE_TO_BETTER_POSE_TO_REVIEW_OBJECT',
                          'failed': 'EMO_SAY_DID_NOT_PICKUP_2',
                          'preempted': 'LOG_PREEMPT'}
         )
@@ -729,7 +729,7 @@ def main():
         StateMachine.add(
             'MOVE_BACK_BLIND_COUNTER',
             MoveBackBlindCounter(),
-            transitions={'first': 'MOVE_TO_BETTER_POSE_TO_REVIEW_OBJECT',
+            transitions={'first': 'EMO_SAY_DID_NOT_PICKUP_2',
                          'second': 'EMO_SAY_PICKUP_FAILED',
                          'preempted': 'LOG_PREEMPT'}
         )        
