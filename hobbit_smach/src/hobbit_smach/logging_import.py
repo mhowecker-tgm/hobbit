@@ -155,7 +155,7 @@ class DoLogFail(State):
             input_keys=['scenario', 'data']
         )
         self.scenario = scenario
-        self.data = 'Pickup has failed all 4 times to grasp.'
+        self.data = '8122PUF   Pickup has failed all 4 times to grasp.'
         self.pubEvent = rospy.Publisher('Event', Event, queue_size=50)
 
     def execute(self, ud):
