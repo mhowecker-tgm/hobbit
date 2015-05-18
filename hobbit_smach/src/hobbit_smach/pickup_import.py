@@ -97,6 +97,7 @@ class DavidLookForObject(State):
         self.graspable_center_of_cluster_rcs = None
         self.min_obj_to_mapboarder_distance = 0.30 #object has to be at least self.min_obj_to_mapboarder_distance cm away from next boarder in navigation map
         self.pubEvent = rospy.Publisher('Event', Event, queue_size=50)
+        self.last_dist_to_obstacle = -1000
         
 
     def findobject(self, ud):
@@ -143,10 +144,12 @@ class DavidLookForObject(State):
                 return True
             else:
                 print "===> pickup_import.py: isObjectAwayFromMapBoarder(): object is to near to map obstacle! OBJECT DENIED"
+                self.last_dist_to_obstacle = dist
                 return False
             
         except rospy.ServiceException, e:
             print "===> pickup_import.py: isObjectAwayFromMapBoarder(): Service call distance_to_obstacle failed: %s"%e
+            self.last_dist_to_obstacle = -9999
             return False
                 
                                 
@@ -238,7 +241,7 @@ class DavidLookForObject(State):
             if self.isObjectAwayFromMapBoarders():
                 return True
             else:
-                logging.do_log_data("3897OFDPP Object failed position check (prepos). Distance to wall to small.")
+                logging.do_log_data("3897OFDPP Object failed position check (prepos). Distance to wall to small. Estimated distance (m): " + str(self.last_dist_to_obstacle) )
                 return False #object to near to map boarder
 
         
