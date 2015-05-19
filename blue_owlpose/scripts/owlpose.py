@@ -21,6 +21,7 @@ from sensor_msgs.msg import *
 from geometry_msgs.msg import Quaternion
 from dynamixel_msgs.msg import *
 from dynamixel_controllers.srv import TorqueEnable, SetTorqueLimit, SetSpeed
+from hobbit_msgs.srv import HeadSleep
 
 # angle limits, in degrees
 # mechanical stops are
@@ -31,7 +32,7 @@ from dynamixel_controllers.srv import TorqueEnable, SetTorqueLimit, SetSpeed
 min_lr_angle_deg = -90
 max_lr_angle_deg = 90
 min_ud_angle_deg = -22
-max_ud_angle_deg = 60
+max_ud_angle_deg = 61
 
 # torque limit for dynamixel servos
 # NOTE that typical load in the Hobbit neck is at most 0.5 for the tilt joint, but can also reach > 0.8
@@ -152,7 +153,7 @@ def set_head_orientation(msg):
 		set_angles(pitch=40, yaw=-61)
 
 	elif msg.data == "to_grasp":
-		set_angles(pitch=60, yaw=-65)
+		set_angles(pitch=61, yaw=-65)
 		# NOTE: this is a hacky way of letting the tilt servo rest without power in its mechanical
 		# end stop position
 		rospy.sleep(5.0)
@@ -245,14 +246,14 @@ def set_head_orientation(msg):
 
 # This is called periodically and checks if the head is idle.
 # If there has not been any command in some time the head is put to sleep.
-def checkHeadIdle():
+def checkHeadIdle(event):
     global whenLastCommandSent
     global motorsAreOn
 
     if (motorsAreOn):
         now = rospy.get_time()
         if (now - whenLastCommandSent > idleDuration):
-            driveServosToSleep()	
+            driveServosToSleep()
 
 # Wait until dynamixel manager node has come up
 def waitForServosReady():
@@ -284,9 +285,16 @@ def turnPanMotorOnOff(on):
     except rospy.ServiceException, e:
         print "Service call failed: %s"%e
 
+# callback for sleep service
+def sleepCallback(msg):
+    driveServosToSleep()
+    return std_msgs.msg.Empty
+
 # Drive the servos to a resting position and turn torque off
 def driveServosToSleep():
     global motorsAreOn
+
+    print "putting servos to sleep"
     set_angles(pitch=max_ud_angle_deg, yaw=0)
     rospy.sleep(5.0)
     turnPanMotorOnOff(False)
@@ -379,7 +387,6 @@ def tiltJointStateUpdate(msg):
 	current_pitch = msg.current_pos
 	current_pitch_as_set = msg.goal_pos
 	pitch_temperature = msg.motor_temps[0]
-	print "pitch temp", pitch_temperature
 	# Hobbit down is +, Dynamixel down is -
 	current_pitch = -current_pitch
 	current_pitch_as_set = -current_pitch_as_set
@@ -450,7 +457,7 @@ def init():
     tilt_pub = rospy.Publisher('/tilt_controller/command', std_msgs.msg.Float64)
 
     # Services
-    s = rospy.Service('/head/sleep', std_msgs.msg.Empty, driveServosToSleep)
+    s = rospy.Service('/head/sleep', HeadSleep, sleepCallback)
 
     # Initialize Servos:
     waitForServosReady()
