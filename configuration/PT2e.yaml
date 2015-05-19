@@ -1,4 +1,4 @@
-Hobbit: {current_emotion: EMO_HAPPY, social_role: 1, user_away: false}
+Hobbit: {current_emotion: EMO_HAPPY, user_away: false}
 checkalive: 1
 rosdistro: 'hydro'
 hobbit_id: 'PT2e'
