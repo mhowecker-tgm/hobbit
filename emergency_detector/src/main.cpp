@@ -63,8 +63,6 @@ ros::Publisher personBroadcaster;
 
 int rate=DEFAULT_FRAME_RATE;
 
- tf::TransformListener listener;
- tf::StampedTransform transformS;
 
 
 
@@ -527,7 +525,7 @@ void joints2D3DReceived(const emergency_detector::Skeleton2D3D & msg)
 }
 
 
-int updateHeadPosition()
+int updateHeadPosition(tf::TransformListener & listener , tf::StampedTransform & transformS )
 {
  if (!useTFTree) { return 0; }
 
@@ -887,6 +885,11 @@ int main(int argc, char **argv)
      fallDetectionContext.lastJointsTimestamp=100000;
      initializeProcess(nhPtr);
 
+
+
+   tf::TransformListener listener;
+   tf::StampedTransform transformS;
+
       //Create our context
       //---------------------------------------------------------------------------------------------------
 	  //////////////////////////////////////////////////////////////////////////
@@ -918,7 +921,7 @@ int main(int argc, char **argv)
                       broadcastEmergency(frameTimestamp);
                      }
                    if (personDetected)   { broadcastNewPerson(); }
-                   updateHeadPosition();
+                   updateHeadPosition(listener , transformS );
                   }
 
 
