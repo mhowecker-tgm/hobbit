@@ -3,6 +3,8 @@
 # Also can take IMU pitch angles to replace the angles returned by the pitch servo,
 # if these should not be accurate.
 # NOTE: the Dynamixel RX-28 servos used in Hobbit have a resolution of 0.29 deg
+# NOTE: This uses a lot of global variables which are being accessed from different parts
+# of the code WITHOUT a mutex or something. So there could be race conditions lurking.
 #
 # @author Tobias Ferner (some), Andreas Baldinger (some more), Michael Zillich (final)
 # @date April 2015
@@ -66,10 +68,15 @@ pitch_temperature = 0
 pan_pub = None
 tilt_pub = None
 # indicates whether tilt motor is currently turned on or off (= in resting position)
-tiltMotorIsOn = True
+motorsAreOn = True
 # indicate whether we want to debug print current angles
 debugPrintAngles = False
 
+# time when last command was sent
+whenLastCommandSent = 0
+
+# duration (in seconds) after which the head is sent to sleep if no command was sent
+idleDuration = 30
 
 # This sets angles for a pan/tilt neck. Angles are in degrees.
 # There are 2 angles to set: pitch (=up/down) and yaw (= left/right).
@@ -110,14 +117,18 @@ def set_head_orientation(msg):
 	global current_pitch
 	global current_yaw_as_set
 	global current_pitch_as_set
-	global tiltMotorIsOn
+	global motorsAreOn
+	global whenLastCommandSent
+
+	whenLastCommandSent = rospy.get_time()
 
 	print "current angles (pitch, yaw) [deg]:", current_pitch, " ", current_yaw
 	print "Move to", msg.data
 
-	if (not tiltMotorIsOn):
+	if (not motorsAreOn):
 		turnTiltMotorOnOff(True)
-		tiltMotorIsOn = True
+		turnPanMotorOnOff(True)
+		motorsAreOn = True
 
 	if msg.data == "up_center":
 		set_angles(pitch=-20, yaw=0)
@@ -146,7 +157,8 @@ def set_head_orientation(msg):
 		# end stop position
 		rospy.sleep(5.0)
 		turnTiltMotorOnOff(False)
-		tiltMotorIsOn = False
+		turnPanMotorOnOff(False)
+		motorsAreOn = False
 
 	elif msg.data == "center_left":
 		set_angles(pitch=0, yaw=90)
@@ -231,6 +243,17 @@ def set_head_orientation(msg):
 
 	rospy.sleep(0.1)
 
+# This is called periodically and checks if the head is idle.
+# If there has not been any command in some time the head is put to sleep.
+def checkHeadIdle():
+    global whenLastCommandSent
+    global motorsAreOn
+
+    if (motorsAreOn):
+        now = rospy.get_time()
+        if (now - whenLastCommandSent > idleDuration):
+            driveServosToSleep()	
+
 # Wait until dynamixel manager node has come up
 def waitForServosReady():
     # just wait for any of the services provided by the dynamixel manager
@@ -250,6 +273,26 @@ def turnTiltMotorOnOff(on):
     except rospy.ServiceException, e:
         print "Service call failed: %s"%e
 
+# enable/disable torque to pan servo
+# @param on  True or False
+def turnPanMotorOnOff(on):
+    print "pan motor en/disable: ", on
+    rospy.wait_for_service('/pan_controller/torque_enable')
+    try:
+        torque_enable = rospy.ServiceProxy('/pan_controller/torque_enable', TorqueEnable)
+        torque_enable(on)
+    except rospy.ServiceException, e:
+        print "Service call failed: %s"%e
+
+# Drive the servos to a resting position and turn torque off
+def driveServosToSleep():
+    global motorsAreOn
+    set_angles(pitch=max_ud_angle_deg, yaw=0)
+    rospy.sleep(5.0)
+    turnPanMotorOnOff(False)
+    turnTiltMotorOnOff(False)
+    motorsAreOn = False
+
 # Set torque limit for dynamixel servos
 def setTorqueLimit(torque):
     rospy.wait_for_service('/pan_controller/set_torque_limit')
@@ -263,6 +306,10 @@ def setTorqueLimit(torque):
         print "Service call failed: %s"%e
 
 def command(msg):
+	global whenLastCommandSent
+
+	whenLastCommandSent = rospy.get_time()
+
 	if msg.data == "restart":
 	        print "Restarting servos. Setting torque limit to: ", torque_limit
 		setTorqueLimit(torque_limit)
@@ -402,10 +449,16 @@ def init():
     pan_pub = rospy.Publisher('/pan_controller/command', std_msgs.msg.Float64)
     tilt_pub = rospy.Publisher('/tilt_controller/command', std_msgs.msg.Float64)
 
+    # Services
+    s = rospy.Service('/head/sleep', std_msgs.msg.Empty, driveServosToSleep)
+
     # Initialize Servos:
     waitForServosReady()
     print "Moving to center_center"
     set_angles(pitch=0, yaw=0)
+
+    # Set timer for putting idle head to sleep
+    rospy.Timer(rospy.Duration(idleDuration), checkHeadIdle)
 
     # Send geometry/tf constantly with 5hz
     r = rospy.Rate(5) # 5 Hz
