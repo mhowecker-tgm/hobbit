@@ -20,16 +20,15 @@ class DoLog(State):
         State.__init__(
             self,
             outcomes=['succeeded', 'aborted'],
-            input_keys=['scenario', 'data', 'command'] if
-            (scenario is None and data is None) else ['command']
+            input_keys=['scenario', 'data', 'command']
         )
         self.scenario = scenario
         self.data = data
         self.pubEvent = rospy.Publisher('Event', Event, queue_size=50)
 
-    def execute(self, ud):               
-        scenario = ud.scenario if self.scenario is not None else ud.command
-        data = ud.data if self.data is None else self.data
+    def execute(self, ud):
+        scenario = self.scenario
+        data = self.data
         if scenario == 'IDLE':
             return 'aborted'
         rospy.loginfo('LOG: scenario: %s: %s' % (scenario, data))
