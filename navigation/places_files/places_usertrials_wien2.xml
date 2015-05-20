@@ -1,79 +1,75 @@
-<?xml version="1.0"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <rooms>
-	<room>
-		<name>essenzimmer</name>
-		<vertices>
-			<vertex x="-4.200000" y="2.699999" />
-			<vertex x="-4.000000" y="-3.400000" />
-			<vertex x="0.500000" y="-2.800001" />
-			<vertex x="0.500000" y="3.699999" />
-		</vertices>
-		<places>
-			<place>
-				<name>call1</name>
-				<type>call_button_1</type>
-				<pose x="-0.878858" y="-0.751198" theta="-2.701646" />
-			</place>
-			<place>
-				<name>call2</name>
-				<type>call_button_2</type>
-				<pose x="-2.079277" y="-1.808365" theta="-2.301188" />
-			</place>
-			<place>
-				<name>dock</name>
-				<type>docking_base_point</type>
-				<pose y="-0.0259" x="0.0546" theta="0.028957778"/>
-				<objects/>
-		        </place>
-		</places>
-	</room>
-	<room>
-		<name>wohnezimmer</name>
-		<vertices>
-			<vertex x="1.000000" y="8.200000" />
-			<vertex x="1.500000" y="0.400000" />
-			<vertex x="9.799999" y="0.400000" />
-			<vertex x="7.500000" y="8.500000" />
-		</vertices>
-		<places>
-			<place>
-				<name>call3</name>
-				<type>call_button_3</type>
-				<pose x="3.111219" y="1.868873" theta="0.477691" />
-			</place>
-			<place>
-				<name>aufhebeposition</name>
-				<type>goTo</type>
-				<pose x="3.004988" y="3.696067" theta="0.779273" />
-			</place>
-			<place>
-				<name>call4</name>
-				<type>call_button_4</type>
-				<pose x="4.978136" y="5.696994" theta="2.003953" />
-			</place>
-			<place>
-				<name>cupboard</name>
-				<type>searchable</type>
-				<pose x="2.573266" y="1.267094" theta="-1.150442" />
-			</place>
-		</places>
-	</room>
-	<room>
-		<name>ganng</name>
-		<vertices>
-			<vertex x="0.400000" y="0.299999" />
-			<vertex x="0.500000" y="-1.400000" />
-			<vertex x="2.799999" y="-1.500000" />
-			<vertex x="2.900000" y="0.299999" />
-		</vertices>
-	</room>
-	<room>
-		<name>hall</name>
-		<vertices>
-			<vertex x="2.799999" y="0.400000" />
-			<vertex x="3.000000" y="-3.400000" />
-			<vertex x="9.100000" y="-3.500000" />
-			<vertex x="9.000000" y="0.100000" />
-		</vertices>
-	</room>
+  <room>
+    <name>essenzimmer</name>
+    <vertices>
+      <vertex y="2.699999" x="-4.2"/>
+      <vertex y="-3.4" x="-4.0"/>
+      <vertex y="-2.800001" x="0.5"/>
+      <vertex y="3.699999" x="0.5"/>
+    </vertices>
+    <places>
+      <place>
+        <name>call1</name>
+        <type>call_button_1</type>
+        <pose y="-0.751198" x="-0.878858" theta="-2.701646"/>
+        <objects/>
+      </place>
+      <place>
+        <name>call2</name>
+        <type>call_button_2</type>
+        <pose y="-2.12" x="-1.78" theta="-2.507"/>
+        <objects/>
+      </place>
+      <place>
+        <name>dock</name>
+        <type>docking_base_point</type>
+        <pose y="-0.0259" x="0.0546" theta="0.028957778"/>
+        <objects/>
+      </place>
+      <place>
+        <name>fitness</name>
+        <type>fitness</type>
+        <pose y="0.309" x="-0.054" theta="3.22"/>
+        <objects/>
+      </place>
+    </places>
+  </room>
+  <room>
+    <name>wohnezimmer</name>
+    <vertices>
+      <vertex y="8.2" x="1.0"/>
+      <vertex y="0.4" x="1.5"/>
+      <vertex y="0.4" x="9.799999"/>
+      <vertex y="8.5" x="7.5"/>
+    </vertices>
+    <places>
+      <place>
+        <name>call3</name>
+        <type>call_button_3</type>
+        <pose y="1.868873" x="3.111219" theta="0.477691"/>
+        <objects/>
+      </place>
+      <place>
+        <name>aufhebeposition</name>
+        <type>goTo</type>
+        <pose y="3.696067" x="3.004988" theta="0.779273"/>
+        <objects/>
+      </place>
+      <place>
+        <name>call4</name>
+        <type>call_button_4</type>
+        <pose y="5.696994" x="4.978136" theta="2.003953"/>
+        <objects/>
+      </place>
+      <place>
+        <name>cupboard</name>
+        <type>searchable</type>
+        <pose y="1.267094" x="2.573266" theta="-1.150442"/>
+        <objects>
+          <object name="Aspirin" probability="1.0"/>
+        </objects>
+      </place>
+    </places>
+  </room>
 </rooms>
