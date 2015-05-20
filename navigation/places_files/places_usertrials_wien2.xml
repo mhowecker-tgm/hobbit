@@ -19,6 +19,12 @@
 				<type>call_button_2</type>
 				<pose x="-2.079277" y="-1.808365" theta="-2.301188" />
 			</place>
+			<place>
+				<name>dock</name>
+				<type>docking_base_point</type>
+				<pose y="-0.0259" x="0.0546" theta="0.028957778"/>
+				<objects/>
+		        </place>
 		</places>
 	</room>
 	<room>
