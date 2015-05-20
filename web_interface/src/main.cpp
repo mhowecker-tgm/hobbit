@@ -685,7 +685,7 @@ int shutdownArm()
 bool postMessage(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
     rostopic_pub_execute( (char *) "/head/emo",(char *) "std_msgs/String",(char *) "\"HAPPY\"");
-    MMUIExecute((char*) "say",(char*) "I am Ready!");
+    //MMUIExecute((char*) "say",(char*) "I am Ready!"); //This is commented out so that there is no interference with MMUI timeouts etc
     return true;
 }
 
