@@ -8,6 +8,18 @@
 			<vertex x="0.500000" y="-2.800001" />
 			<vertex x="0.500000" y="3.699999" />
 		</vertices>
+		<places>
+			<place>
+				<name>call1</name>
+				<type>call_button_1</type>
+				<pose x="-0.878858" y="-0.751198" theta="-2.701646" />
+			</place>
+			<place>
+				<name>call2</name>
+				<type>call_button_2</type>
+				<pose x="-2.079277" y="-1.808365" theta="-2.301188" />
+			</place>
+		</places>
 	</room>
 	<room>
 		<name>wohnezimmer</name>
@@ -17,6 +29,28 @@
 			<vertex x="9.799999" y="0.400000" />
 			<vertex x="7.500000" y="8.500000" />
 		</vertices>
+		<places>
+			<place>
+				<name>call3</name>
+				<type>call_button_3</type>
+				<pose x="3.111219" y="1.868873" theta="0.477691" />
+			</place>
+			<place>
+				<name>aufhebeposition</name>
+				<type>goTo</type>
+				<pose x="3.004988" y="3.696067" theta="0.779273" />
+			</place>
+			<place>
+				<name>call4</name>
+				<type>call_button_4</type>
+				<pose x="4.978136" y="5.696994" theta="2.003953" />
+			</place>
+			<place>
+				<name>cupboard</name>
+				<type>searchable</type>
+				<pose x="2.573266" y="1.267094" theta="-1.150442" />
+			</place>
+		</places>
 	</room>
 	<room>
 		<name>ganng</name>
