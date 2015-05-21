@@ -77,7 +77,7 @@ debugPrintAngles = False
 whenLastCommandSent = 0
 
 # duration (in seconds) after which the head is sent to sleep if no command was sent
-idleDuration = 30
+idleDuration = 26000
 
 # This sets angles for a pan/tilt neck. Angles are in degrees.
 # There are 2 angles to set: pitch (=up/down) and yaw (= left/right).
@@ -465,7 +465,7 @@ def init():
     set_angles(pitch=0, yaw=0)
 
     # Set timer for putting idle head to sleep
-    rospy.Timer(rospy.Duration(idleDuration), checkHeadIdle)
+    #rospy.Timer(rospy.Duration(idleDuration), checkHeadIdle)
 
     # Send geometry/tf constantly with 5hz
     r = rospy.Rate(5) # 5 Hz
