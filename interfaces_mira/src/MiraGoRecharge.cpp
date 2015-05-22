@@ -223,8 +223,19 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 			ROS_INFO("preempt requested ");
 			template_found = false;
 		
-			TaskPtr task(new Task());
 			//cancel the task
+			auto providers_c = robot_->getMiraAuthority().queryServicesForInterface("IDockingProcess");
+			if(providers_c.empty()) 
+			{
+			    std::cout << "no providers for IDockingProcess to cancel the task" << std::endl;
+			    ROS_INFO("no providers for IDockingProcess ");
+			    as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting, no providers");
+			    return;
+			}
+			const std::string service_c = providers_c.front();
+			auto rpcFuture_c = robot_->getMiraAuthority().callService<void>(service_c, "interrupt");
+			std::cout << "interrupted " << std::endl;
+			rpcFuture_c.get();
 
 			if(as_->isNewGoalAvailable())
 			{
