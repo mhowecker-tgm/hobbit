@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <MapConfigurationFile version="2">
+    <!--Maps.-->
+    <Maps>
+      <key>map</key>
+      <item version="2">
+        <!--Project or map name for these files.-->
+        <MapName>map</MapName>
+        <!--Description of the static map.-->
+        <StaticMap>static.xml</StaticMap>
+        <!--Description of the nogo map.-->
+        <NogoMap>nogo.xml</NogoMap>
+        <!--Description of the speed map.-->
+        <SpeedMap>speed.xml</SpeedMap>
+        <!--Descriptive primitives to represent the nogo areas.-->
+        <NoGoAreas>
+          <!--Rectangular nogo areas.-->
+          <RectAreas/>
+          <!--Polygonal nogo areas.-->
+          <PolygonAreas>
+            <item>
+              <!--Polygon describing this area in map coordinates.-->
+              <Polygon>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>-1.08444023132</X>
+                  <!--The y-coordinate-->
+                  <Y>2.80474042892</Y>
+                </item>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>-0.141608595848</X>
+                  <!--The y-coordinate-->
+                  <Y>2.92259430885</Y>
+                </item>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>-0.0237546414137</X>
+                  <!--The y-coordinate-->
+                  <Y>2.59849596024</Y>
+                </item>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>-1.05497682095</X>
+                  <!--The y-coordinate-->
+                  <Y>2.48064184189</Y>
+                </item>
+              </Polygon>
+              <!--Descriptive text for this area.-->
+              <Text/>
+            </item>
+            <item>
+              <!--Polygon describing this area in map coordinates.-->
+              <Polygon>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>0.653905630112</X>
+                  <!--The y-coordinate-->
+                  <Y>1.18424844742</Y>
+                </item>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>0.771759569645</X>
+                  <!--The y-coordinate-->
+                  <Y>0.506588160992</Y>
+                </item>
+              </Polygon>
+              <!--Descriptive text for this area.-->
+              <Text/>
+            </item>
+            <item>
+              <!--Polygon describing this area in map coordinates.-->
+              <Polygon>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>0.624442100525</X>
+                  <!--The y-coordinate-->
+                  <Y>1.2137118578</Y>
+                </item>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>0.742296099663</X>
+                  <!--The y-coordinate-->
+                  <Y>0.418197691441</Y>
+                </item>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>0.919077038765</X>
+                  <!--The y-coordinate-->
+                  <Y>0.418197691441</Y>
+                </item>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>0.830686569214</X>
+                  <!--The y-coordinate-->
+                  <Y>1.27263891697</Y>
+                </item>
+              </Polygon>
+              <!--Descriptive text for this area.-->
+              <Text/>
+            </item>
+            <item>
+              <!--Polygon describing this area in map coordinates.-->
+              <Polygon>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>-1.02551329136</X>
+                  <!--The y-coordinate-->
+                  <Y>-4.26649713516</Y>
+                </item>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>0.418197691441</X>
+                  <!--The y-coordinate-->
+                  <Y>-4.17810678482</Y>
+                </item>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>0.742296099663</X>
+                  <!--The y-coordinate-->
+                  <Y>-5.32718276978</Y>
+                </item>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>-0.878195822239</X>
+                  <!--The y-coordinate-->
+                  <Y>-5.38610982895</Y>
+                </item>
+              </Polygon>
+              <!--Descriptive text for this area.-->
+              <Text/>
+            </item>
+            <item>
+              <!--Polygon describing this area in map coordinates.-->
+              <Polygon>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>2.33332443237</X>
+                  <!--The y-coordinate-->
+                  <Y>-4.06025266647</Y>
+                </item>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>3.04044818878</X>
+                  <!--The y-coordinate-->
+                  <Y>-4.06025266647</Y>
+                </item>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>3.5413274765</X>
+                  <!--The y-coordinate-->
+                  <Y>-3.35312891006</Y>
+                </item>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>4.42523241043</X>
+                  <!--The y-coordinate-->
+                  <Y>-3.17634797096</Y>
+                </item>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>4.98503828049</X>
+                  <!--The y-coordinate-->
+                  <Y>-4.73791313171</Y>
+                </item>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>2.98152136803</X>
+                  <!--The y-coordinate-->
+                  <Y>-4.79683971405</Y>
+                </item>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>2.42171502113</X>
+                  <!--The y-coordinate-->
+                  <Y>-4.47274160385</Y>
+                </item>
+              </Polygon>
+              <!--Descriptive text for this area.-->
+              <Text/>
+            </item>
+            <item>
+              <!--Polygon describing this area in map coordinates.-->
+              <Polygon>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>0.1923109442</X>
+                  <!--The y-coordinate-->
+                  <Y>-1.66716253757</Y>
+                </item>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>0.716106295586</X>
+                  <!--The y-coordinate-->
+                  <Y>-1.61478304863</Y>
+                </item>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>0.820865392685</X>
+                  <!--The y-coordinate-->
+                  <Y>-2.71475338936</Y>
+                </item>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>0.349449545145</X>
+                  <!--The y-coordinate-->
+                  <Y>-2.79332256317</Y>
+                </item>
+              </Polygon>
+              <!--Descriptive text for this area.-->
+              <Text/>
+            </item>
+            <item>
+              <!--Polygon describing this area in map coordinates.-->
+              <Polygon>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>-2.37428665161</X>
+                  <!--The y-coordinate-->
+                  <Y>2.10416340828</Y>
+                </item>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>-1.14336764812</X>
+                  <!--The y-coordinate-->
+                  <Y>2.26130223274</Y>
+                </item>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>-1.0647983551</X>
+                  <!--The y-coordinate-->
+                  <Y>1.81607604027</Y>
+                </item>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>-2.2957174778</X>
+                  <!--The y-coordinate-->
+                  <Y>1.63274765015</Y>
+                </item>
+              </Polygon>
+              <!--Descriptive text for this area.-->
+              <Text/>
+            </item>
+            <item>
+              <!--Polygon describing this area in map coordinates.-->
+              <Polygon>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>-0.175964236259</X>
+                  <!--The y-coordinate-->
+                  <Y>-0.610520362854</Y>
+                </item>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>0.838000059128</X>
+                  <!--The y-coordinate-->
+                  <Y>-0.631213486195</Y>
+                </item>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>0.838000059128</X>
+                  <!--The y-coordinate-->
+                  <Y>-1.14854216576</Y>
+                </item>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>-0.134577929974</X>
+                  <!--The y-coordinate-->
+                  <Y>-1.18992853165</Y>
+                </item>
+              </Polygon>
+              <!--Descriptive text for this area.-->
+              <Text/>
+            </item>
+          </PolygonAreas>
+          <!--Elliptical nogo areas.-->
+          <EllipseAreas/>
+        </NoGoAreas>
+        <!--Descriptive primitives to represent the speed areas.-->
+        <SpeedAreas>
+          <!--Rectangular speed areas.-->
+          <RectAreas/>
+          <!--Polygonal speed areas.-->
+          <PolygonAreas/>
+          <!--Elliptical speed areas.-->
+          <EllipseAreas/>
+        </SpeedAreas>
+        <!--Reference points in this map-->
+        <ReferencePoints/>
+        <!--Map offset to the global coordinate system (i.e., the MapFrame)-->
+        <Offset>
+          <!--The translational part of the transform-->
+          <X>0</X>
+          <!--The translational part of the transform-->
+          <Y>0</Y>
+          <!--The orientation in degrees-->
+          <Phi>0</Phi>
+        </Offset>
+      </item>
+    </Maps>
+  </MapConfigurationFile>
+</root>
