@@ -1,0 +1,103 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rooms>
+  <room>
+    <name>hall</name>
+    <vertices>
+      <vertex y="1.799999" x="-4.7"/>
+      <vertex y="2.799999" x="0.1"/>
+      <vertex y="-0.1" x="0.700001"/>
+      <vertex y="-0.6" x="-2.1"/>
+      <vertex y="0.5" x="-2.6"/>
+      <vertex y="0.6" x="-4.6"/>
+    </vertices>
+    <places>
+      <place>
+        <name>bathroom</name>
+        <type>call_button_5</type>
+        <pose y="1.4484688" x="-0.546568" theta="1.74343867"/>
+        <objects/>
+      </place>
+      <place>
+        <name>call3</name>
+        <type>call_button_3</type>
+        <pose y="0.824099" x="-0.936836" theta="-2.850253"/>
+        <objects/>
+      </place>
+      <place>
+        <name>kanapes</name>
+        <type>goTo</type>
+        <pose y="1.2889466" x="-1.51688" theta="2.09998"/>
+        <objects/>
+      </place>
+      <place>
+        <name>default2</name>
+        <type>default</type>
+        <pose y="0.824099" x="-0.936836" theta="-2.850253"/>
+        <objects/>
+      </place>
+      <place>
+        <name>dock</name>
+        <type>docking_base_point</type>
+        <pose y="-0.061075" x="-0.2787" theta="0.1013"/>
+        <objects/>
+      </place>
+    </places>
+  </room>
+  <room>
+    <name>trapezaria</name>
+    <vertices>
+      <vertex y="-0.300001" x="-1.9"/>
+      <vertex y="-0.200001" x="0.200001"/>
+      <vertex y="-2.800001" x="0.4"/>
+      <vertex y="-5.6" x="1.299999"/>
+      <vertex y="-5.5" x="-0.9"/>
+    </vertices>
+    <places>
+      <place>
+        <name>fitness</name>
+        <type>fitness</type>
+        <pose y="-2.125709" x="-0.30861" theta="-1.454775"/>
+        <objects/>
+      </place>
+      <place>
+        <name>kanapes</name>
+        <type>goTo</type>
+        <pose y="-2.3740918" x="-0.2816498" theta="0.045585603"/>
+        <objects/>
+      </place>
+    </places>
+  </room>
+  <room>
+    <name>saloni</name>
+    <vertices>
+      <vertex y="-0.4" x="1.4"/>
+      <vertex y="0.299999" x="4.299999"/>
+      <vertex y="-4.700001" x="4.799999"/>
+      <vertex y="-5.200001" x="1.1"/>
+      <vertex y="-3.0" x="0.4"/>
+      <vertex y="-2.700001" x="2.200001"/>
+      <vertex y="-1.0" x="2.200001"/>
+      <vertex y="-1.1" x="1.4"/>
+    </vertices>
+    <places>
+      <place>
+        <name>default1</name>
+        <type>default</type>
+        <pose y="-3.636379" x="1.514088" theta="-0.474564"/>
+        <objects/>
+      </place>
+      <place>
+        <name>kanapes</name>
+        <type>goTo</type>
+        <pose y="-1.9701259" x="2.7840409" theta="3.16154186"/>
+        <objects/>
+      </place>
+      <place>
+        <name>call1</name>
+        <type>call_button_1</type>
+        <pose y="-3.636379" x="1.514088" theta="-0.474564"/>
+        <objects/>
+      </place>
+    </places>
+  </room>
+</rooms>
