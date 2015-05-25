@@ -48,7 +48,7 @@ ros::Publisher personBroadcaster;
 #endif
 
 
-#define HEAD_MOVING_TIMEOUT 40
+#define HEAD_MOVING_TIMEOUT 60
 #define USE_PERSON_AGGREGATOR 1
 
 #if USE_PERSON_AGGREGATOR
