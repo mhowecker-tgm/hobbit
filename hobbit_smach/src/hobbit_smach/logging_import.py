@@ -27,22 +27,25 @@ class DoLog(State):
         self.pubEvent = rospy.Publisher('Event', Event, queue_size=50)
 
     def execute(self, ud):
-        scenario = self.scenario
-        data = self.data
-        if scenario == 'IDLE':
-            return 'aborted'
-        rospy.loginfo('LOG: scenario: %s: %s' % (scenario, data))
-        message = Event()
-        message.event = 'E_LOG'
-        params = []
-        par = Parameter(name='SCENARIO',
-                        value=scenario)
-        params.append(par)
-        par = Parameter(name='DATA',
-                        value=data)
-        params.append(par)
-        message.params = params
-        self.pubEvent.publish(message)
+	try:
+            scenario = self.scenario
+            data = self.data
+            if scenario == 'IDLE':
+                return 'aborted'
+            rospy.loginfo('LOG: scenario: %s: %s' % (scenario, data))
+            message = Event()
+            message.event = 'E_LOG'
+            params = []
+            par = Parameter(name='SCENARIO',
+                            value=scenario)
+            params.append(par)
+            par = Parameter(name='DATA',
+                            value=data)
+            params.append(par)
+            message.params = params
+            self.pubEvent.publish(message)
+	except:
+	    return 'aborted'
         return 'succeeded'
 
 
