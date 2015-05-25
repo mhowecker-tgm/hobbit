@@ -150,15 +150,27 @@ void broadcastNewPerson()
 void broadcastEmergency(unsigned int frameNumber)
 {
   if ( !emergencyDetected)  { return ; }
-  if (muted) { ROS_INFO("MUTED : Will not broadcast Emergency Detection"); emergencyDetected=0; return; }
-
-
   if ( frameNumber <= lastEmergencyDetectionTimestamp  + emergencyDetectionCooldown )
   {
     emergencyDetected=0;
     fprintf(stderr,"Throttling Emergency Event this frame %u , last detection at %u , cooldown %u  \n" , frameNumber , lastEmergencyDetectionTimestamp , emergencyDetectionCooldown);
     return ;
   }
+
+ if (autoRecordEmergencyTriggers)
+                      {
+	                    ROS_INFO("Recording Emergency Snapshot, this should be disabled on production");
+	                    fprintf(stderr, "\n\n\n\nRecording emergency event this should be disabled on production\n\n\n\n" );
+                        imageDir=triggersDir;
+                        saveNextTopFrame=1;
+                        saveNextBottomFrame=1;
+                      }
+  appendClassifierData("../../web_interface/bin/emergencies/triggers/triggerlist.txt",frameTimestamp);
+
+
+
+  if (muted) { ROS_INFO("MUTED : Will not broadcast Emergency Detection"); emergencyDetected=0; return; }
+
 
 
   #if BROADCAST_HOBBIT
@@ -913,15 +925,6 @@ int main(int argc, char **argv)
 
                    if ( (emergencyDetected) && (headIsMoving==0) )
                      {
-                      if (autoRecordEmergencyTriggers)
-                      {
-	                    ROS_INFO("Recording Emergency Snapshot, this should be disabled on production");
-	                    fprintf(stderr, "\n\n\n\nRecording emergency event this should be disabled on production\n\n\n\n" );
-                        imageDir=triggersDir;
-                        saveNextTopFrame=1;
-                        saveNextBottomFrame=1;
-                      }
-                      appendClassifierData("../../web_interface/bin/emergencies/triggers/triggerlist.txt",frameTimestamp);
 
                       broadcastEmergency(frameTimestamp);
                      }

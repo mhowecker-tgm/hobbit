@@ -34,6 +34,13 @@ int appendClassifierData(const char * filename,unsigned int frameTimestamp)
 
     unsigned int i=0;
 
+
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+
+    fprintf(fp,"EMERGENCY %02d-%02d-%02d %02d:%02d:%02d\n",tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900,   tm.tm_hour, tm.tm_min, tm.tm_sec);
+    fprintf(fp,"______________________________________________________\n");
+
     for (i=0; i<3; i++)
     {
       if (i==0)  { fprintf(fp,"MINIMUMS "); what2print = &minimums;  } else
@@ -74,7 +81,7 @@ int appendClassifierData(const char * filename,unsigned int frameTimestamp)
 
 
 int initializeClassifier()
-{
+{1
   unsigned int imageWidth=640;
   unsigned int imageHeight=480;
 
