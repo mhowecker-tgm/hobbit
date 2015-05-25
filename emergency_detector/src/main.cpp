@@ -48,7 +48,7 @@ ros::Publisher personBroadcaster;
 #endif
 
 
-
+#define HEAD_MOVING_TIMEOUT 30
 #define USE_PERSON_AGGREGATOR 1
 
 #if USE_PERSON_AGGREGATOR
@@ -587,7 +587,7 @@ int updateHeadPosition(tf::TransformListener & listener , tf::StampedTransform &
        double rollChange=roll-headLastRoll; if (rollChange<0) { rollChange = -1 * rollChange; }
        headLastRoll=roll;
 
-       if ( (pitchChange>0.15) || (rollChange>0.15) )  { headIsMoving=15; }
+       if ( (pitchChange>0.15) || (rollChange>0.15) )  { headIsMoving=HEAD_MOVING_TIMEOUT; }
 
 
        if ( (headIsMoving>0) )
