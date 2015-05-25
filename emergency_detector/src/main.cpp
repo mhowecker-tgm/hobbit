@@ -225,6 +225,7 @@ bool trigger(std_srvs::Empty::Request& request, std_srvs::Empty::Response& respo
 
 bool mute(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
+    ROS_INFO("Emergency Detector is now muted..");
     muted=1;
     return true;
 }
@@ -232,6 +233,7 @@ bool mute(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response
 
 bool unmute(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
+    ROS_INFO("Emergency Detector is now unmuted..");
     muted=0;
     return true;
 }
@@ -239,12 +241,14 @@ bool unmute(std_srvs::Empty::Request& request, std_srvs::Empty::Response& respon
 
 bool pause(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
+    ROS_INFO("Emergency Detector is now paused..");
     paused=1;
     return true;
 }
 
 bool resume(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
+    ROS_INFO("Emergency Detector is now resuming..");
     paused=0;
     return true;
 }
@@ -931,9 +935,10 @@ int main(int argc, char **argv)
                   if (doCVOutput) { vis_loop_rate.sleep(); } else
                                   { loop_rate.sleep();     }
 
-
+                 if (!paused)
+                 {
                   if (frameTimestamp%30) { fprintf(stderr,"."); }
-
+                 }
 		 }
 
 
