@@ -83,7 +83,7 @@ int appendClassifierData(const char * filename,unsigned int frameTimestamp)
 
 
 int initializeClassifier()
-{1
+{
   unsigned int imageWidth=640;
   unsigned int imageHeight=480;
 
