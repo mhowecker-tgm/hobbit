@@ -4,7 +4,7 @@
 PKG = 'hobbit_smach'
 NAME = 'hobbit_move'
 DEBUG = False
-PATH = '/opt/ros/hobbit_hydro/src/hobbit_smach/scripts/'
+PATH = '. $HOME/.profile; /opt/ros/hobbit_hydro/src/hobbit_smach/scripts/'
 
 from datetime import datetime, time
 import rospy
@@ -118,7 +118,9 @@ def check_sleep_times(next_time):
         rospy.loginfo("Exception thrown while trying to use sleep/wakeup time. Using default values.")
         wakeup = [9, 00]
         sleep = [21, 00]
-    if time(int(wakeup[0]), int(wakeup[1]))\
+    if next_time[0] <= 24:
+	    return False
+    elif time(int(wakeup[0]), int(wakeup[1]))\
             <= time(next_time[0], next_time[1])\
             <= time(int(sleep[0]), int(sleep[1])):
         return True
