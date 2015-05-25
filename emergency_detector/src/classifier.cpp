@@ -66,8 +66,9 @@ int appendClassifierData(const char * filename,unsigned int frameTimestamp)
 
 
       fprintf(fp,"temperature %0.2f\n" , what2print->objectTemperature);
-      fprintf(fp,"______________________________________________________\n\n\n");
     }
+
+    fprintf(fp,"______________________________________________________\n\n\n");
 
     fclose(fp);
     return 1;
