@@ -48,7 +48,7 @@ ros::Publisher personBroadcaster;
 #endif
 
 
-#define HEAD_MOVING_TIMEOUT 30
+#define HEAD_MOVING_TIMEOUT 40
 #define USE_PERSON_AGGREGATOR 1
 
 #if USE_PERSON_AGGREGATOR
@@ -58,7 +58,7 @@ ros::Publisher personBroadcaster;
 #endif // USE_PERSON_AGGREGATOR
 
 
-#define DEFAULT_FRAME_RATE 5
+#define DEFAULT_FRAME_RATE 7
 #define HEAD_POSITION_LOOKUP_DURATION 1.5
 
 int rate=DEFAULT_FRAME_RATE;
