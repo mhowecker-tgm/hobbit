@@ -943,7 +943,7 @@ int main(int argc, char **argv)
                   if (frameTimestamp%30) { fprintf(stderr,"."); }
                  } else
                  {
-                  if (frameTimestamp%100) { fprintf(stderr," paused "); }
+                  if (frameTimestamp%3000) { fprintf(stderr," paused "); }
                  }
 		 }
 
