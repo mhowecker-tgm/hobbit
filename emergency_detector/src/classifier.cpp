@@ -89,12 +89,12 @@ int initializeClassifier()
   unsigned int imageHeight=480;
 
 
-  minimums.holesPercentOverTop=70;
+  minimums.holesPercentOverTop=71;
   maximums.holesPercentOverTop=101;
   lastState.useHolesOverTop=1;
 
   minimums.holesPercentTop=15;
-  maximums.holesPercentTop=75;
+  maximums.holesPercentTop=70;
   lastState.useHolesTop=1;
 
   minimums.holesPercentBase=3;
