@@ -104,7 +104,7 @@ def set_angles(pitch, yaw):
 	pitch = pitch*math.pi/180
 	yaw = yaw*math.pi/180
 	# Hobbit down is +, Dynamixel down is -
-	pitch = -pitch
+	#pitch = -pitch
 	# publish to Dynamixel topics
 	# NOTE: we don't care if the movemnts are synchronised, we would need
 	# a special joint controller for that (see ros dynamixel wiki)
@@ -373,7 +373,7 @@ def panJointStateUpdate(msg):
 	# transform to degrees
 	current_yaw = current_yaw*180/math.pi
 	current_yaw_as_set = current_yaw_as_set*180/math.pi
-	# subtract offet
+	# subtract offset
 	current_yaw = current_yaw - yaw_offset
 	current_yaw_as_set = current_yaw_as_set - yaw_offset
 
@@ -388,8 +388,8 @@ def tiltJointStateUpdate(msg):
 	current_pitch_as_set = msg.goal_pos
 	pitch_temperature = msg.motor_temps[0]
 	# Hobbit down is +, Dynamixel down is -
-	current_pitch = -current_pitch
-	current_pitch_as_set = -current_pitch_as_set
+	#current_pitch = -current_pitch
+	#current_pitch_as_set = -current_pitch_as_set
 	# transform to degrees
 	current_pitch = current_pitch*180/math.pi
 	current_pitch_as_set = current_pitch_as_set*180/math.pi
