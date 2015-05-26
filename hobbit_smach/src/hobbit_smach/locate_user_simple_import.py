@@ -727,13 +727,13 @@ def call_for_the_user():
                               output_keys = [],
                               it = lambda: range(0, 3),
                               it_label = 'index',
-                              exhausted_outcome = 'succeeded')
+                              exhausted_outcome = 'aborted')
     second_it = Iterator(outcomes = ['succeeded', 'preempted', 'aborted'],
                               input_keys = [],
                               output_keys = [],
                               it = lambda: range(0, 3),
                               it_label = 'index',
-                              exhausted_outcome = 'succeeded')
+                              exhausted_outcome = 'aborted')
 
     def child_term_cb(outcome_map):
         rospy.loginfo('cc1: child_term_cb: ')
@@ -763,7 +763,7 @@ def call_for_the_user():
         Iterator.set_contained_state(
             'FIRST_SM',
             first_loop,
-            loop_outcomes = ['succeeded']
+            loop_outcomes = ['aborted']
         )
 
     with cc1:
@@ -787,13 +787,14 @@ def call_for_the_user():
         StateMachine.add(
             'CALL_USER',
             cc1,
-            transitions={'succeeded': 'WAIT_15SEC',
-                         'aborted': 'aborted',
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'WAIT_15SEC',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
             'WAIT_15SEC',
-            util.SleepState(duration=15)
+            util.SleepState(duration=15),
+            transitions={'succeeded': 'aborted'}
         )
 
     with second_loop:
@@ -807,8 +808,8 @@ def call_for_the_user():
         StateMachine.add(
             'CALL_USER',
             cc1,
-            transitions={'succeeded': 'RESET_VOLUME',
-                         'aborted': 'aborted',
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'RESET_VOLUME',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
@@ -820,30 +821,31 @@ def call_for_the_user():
         )
         StateMachine.add(
             'WAIT_15SEC',
-            util.SleepState(duration=15)
+            util.SleepState(duration=15),
+            transitions={'succeeded': 'aborted'}
         )
 
     with second_it:
         Iterator.set_contained_state(
             'SECOND_SM',
             second_loop,
-            loop_outcomes = ['succeeded']
+            loop_outcomes = ['aborted']
         )
 
     with sm:
         StateMachine.add(
-            'CALL_FOR_THE_USER',
+            'CALL_FOR_THE_USER_NORMAL_VOLUME',
             first_it,
-            transitions={'succeeded':'CALL_FOR_THE_USER_LOUDER',
+            transitions={'succeeded':'RESET_VOLUME',
                          'preempted':'preempted',
-                         'aborted':'RESET_VOLUME'}
+                         'aborted':'CALL_FOR_THE_USER_LOUDER'}
         )
         StateMachine.add(
             'CALL_FOR_THE_USER_LOUDER',
             second_it,
-            transitions={'succeeded':'EMERGENCY_CALL',
+            transitions={'succeeded':'RESET_VOLUME',
                          'preempted':'preempted',
-                         'aborted':'RESET_VOLUME'}
+                         'aborted':'EMERGENCY_CALL'}
         )
         StateMachine.add(
             'RESET_VOLUME',
