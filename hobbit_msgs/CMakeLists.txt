@@ -76,6 +76,7 @@ add_service_files(
   GetPose.srv
   SendPose.srv
   SendValue.srv
+  HeadSleep.srv
 )
 
 add_action_files(
