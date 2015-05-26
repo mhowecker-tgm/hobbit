@@ -282,7 +282,7 @@ class WaitForMsgState(State):
         while self.timeout is None or rospy.Time.now() < timeout_time:
             self.mutex.acquire()
             if self.msg is not None:
-                rospy.loginfo('Got message.')
+                rospy.loginfo('WaitForMsgState: Got message.')
                 message = self.msg
 
                 if not self.latch:
