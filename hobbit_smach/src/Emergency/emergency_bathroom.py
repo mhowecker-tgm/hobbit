@@ -266,7 +266,13 @@ def main():
                              'failed': 'SET_FAILURE',
                              'preempted': 'LOG_PREEMPT'}
             )
-        # TODO: Change volume to maximum
+        StateMachine.add(
+            'SET_MAX_VOLUME',
+            HobbitMMUI.SetAbsVolume(volume='100'),
+            transitions={'succeeded':'MMUI_CONFIRM_DoYouNeedHelp',
+                         'preempted':'preempted',
+                         'aborted':'MMUI_CONFIRM_DoYouNeedHelp'}
+        )
         StateMachine.add(
             'MMUI_CONFIRM_DoYouNeedHelp',
             HobbitMMUI.AskYesNo(question='T_HM_DoYouNeedHelp'),
@@ -276,15 +282,21 @@ def main():
                          '3times': 'EMERGENCY_CALL',
                          'failed': 'SET_FAILURE'}
         )
-        # TODO: Change volume to maximum
         StateMachine.add(
             'MMUI_CONFIRM_ShallICallHelp',
             HobbitMMUI.AskYesNo(question='T_HM_StayCalmShallICallHelp'),
-            transitions={'yes': 'EMERGENCY_CALL',
+            transitions={'yes': 'RESET_VOLUME',
                          'no': 'EMO_NEUTRAL',
                          'timeout': 'MMUI_CONFIRM_ShallICallHelp',
-                         '3times': 'EMERGENCY_CALL',
+                         '3times': 'RESET_VOLUME',
                          'failed': 'SET_FAILURE'}
+        )
+        StateMachine.add(
+            'RESET_VOLUME',
+            HobbitMMUI.SetAbsVolume(volume='20'),
+            transitions={'succeeded':'EMERGENCY_CALL',
+                         'preempted':'preempted',
+                         'aborted':'EMERGENCY_CALL'}
         )
         StateMachine.add(
             'EMERGENCY_CALL',
