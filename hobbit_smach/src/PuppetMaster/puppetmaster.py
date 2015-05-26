@@ -948,7 +948,7 @@ def main():
                 'END_USER_INTERACTION',
                 end_interaction.end_interaction_muc(),
                 transitions={'succeeded': 'succeeded',
-                             'aborted': 'SURPRISE',
+                             'aborted': 'MUC_RESET_ACTIVE_TASK',
                              'preempted': 'preempted'}
             )
             StateMachine.add(

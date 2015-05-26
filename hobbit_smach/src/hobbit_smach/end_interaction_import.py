@@ -40,6 +40,11 @@ def end_interaction_muc():
                 #scenario='Return of favour',
                 data='User accepted return of favour'
             ),
+            transitions={'succeeded': 'SURPRISE_MUC'}
+        )
+        StateMachine.add(
+            'SURPRISE_MUC',
+            social_role.get_surprise(),
             transitions={'succeeded': 'succeeded'}
         )
         StateMachine.add(
