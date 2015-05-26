@@ -36,16 +36,16 @@ def end_interaction_muc():
         )
         StateMachine.add(
             'LOG_ACCEPT_ROF',
-            log.DoLog(
-                scenario='Return of favour',
+            log.DoLogROF(
+                #scenario='Return of favour',
                 data='User accepted return of favour'
             ),
             transitions={'succeeded': 'succeeded'}
         )
         StateMachine.add(
             'LOG_DID_NOT_ACCEPT_ROF',
-            log.DoLog(
-                scenario='Return of favour',
+            log.DoLogROF(
+               # scenario='Return of favour',
                 data='User did not accept return of favour'
             ),
             transitions={'succeeded': 'aborted'}

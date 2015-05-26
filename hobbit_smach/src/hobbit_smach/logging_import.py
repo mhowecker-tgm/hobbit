@@ -27,7 +27,7 @@ class DoLog(State):
         self.pubEvent = rospy.Publisher('Event', Event, queue_size=50)
 
     def execute(self, ud):
-	try:
+        try:
             scenario = self.scenario
             data = self.data
             if scenario == 'IDLE':
@@ -44,9 +44,10 @@ class DoLog(State):
             params.append(par)
             message.params = params
             self.pubEvent.publish(message)
-	except:
-	    return 'aborted'
-        return 'succeeded'
+            return 'succeeded'
+        except:
+            return 'aborted'
+
 
 
 class DoLogPreempt(State):
@@ -79,6 +80,36 @@ class DoLogPreempt(State):
         message.params = params
         self.pubEvent.publish(message)
         return 'succeeded'
+
+
+class DoLogROF(State):
+    """
+    """
+
+    def __init__(self, data=None):
+        State.__init__(
+            self,
+            outcomes=['succeeded']
+        )
+        self.scenario = "Return of favour"
+        self.data = data
+        self.pubEvent = rospy.Publisher('Event', Event, queue_size=50)
+
+    def execute(self, ud):
+        rospy.loginfo('LOG: scenario: %s: %s' % (self.scenario, self.data))
+        message = Event()
+        message.event = 'E_LOG'
+        params = []
+        par = Parameter(name='SCENARIO',
+                        value=self.scenario)
+        params.append(par)
+        par = Parameter(name='DATA',
+                        value=self.data)
+        params.append(par)
+        message.params = params
+        self.pubEvent.publish(message)
+        return 'succeeded'
+
 
 class DoLogSuccess(State):
     """
