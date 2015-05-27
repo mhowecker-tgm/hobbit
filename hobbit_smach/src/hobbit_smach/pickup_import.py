@@ -614,7 +614,7 @@ class GoToFinalGraspPose(State):
             return False
         print "7"
         #move Hobbit forward (discrete Motion)
-        move = String("Move "+str(distance_m))
+        move = String("Move "+str(distance_m-0.03))
         print "8"
         print "move (String): ", move
         self.move_robot_relative_pub.publish(move)  # M O V E   F O R W A R D
