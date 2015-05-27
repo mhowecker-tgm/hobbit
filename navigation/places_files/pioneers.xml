@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<rooms>
+	<room>
+		<name>hall</name>
+		<vertices>
+			<vertex x="-5.600000" y="4.700000" />
+			<vertex x="-6.000000" y="-2.700001" />
+			<vertex x="2.400000" y="-3.100000" />
+			<vertex x="2.100000" y="4.500000" />
+		</vertices>
+		<places>
+			<place>
+				<name>call1</name>
+				<type>call_button_1</type>
+				<pose x="-0.019483" y="0.032276" theta="-2.006253" />
+			</place>
+			<place>
+				<name>call3</name>
+				<type>call_button_3</type>
+				<pose x="0.171586" y="1.344156" theta="2.619301" />
+			</place>
+			<place>
+				<name>pickup</name>
+				<type>goTo</type>
+				<pose x="0.290565" y="-0.623861" theta="1.602636" />
+			</place>
+			<place>
+				<name>table</name>
+				<type>goTo</type>
+				<pose x="-0.519394" y="0.983220" theta="2.930751" />
+			</place>
+			<place>
+				<name>fitness</name>
+				<type>fitness</type>
+				<pose x="-0.158429" y="0.890307" theta="2.077096" />
+			</place>
+			<place>
+				<name>dock</name>
+				<type>docking_base_point</type>
+				<pose y="0.0315" x="-0.4238" theta="0.01446"/>
+				<objects/>
+		      </place>
+		</places>
+	</room>
+</rooms>
