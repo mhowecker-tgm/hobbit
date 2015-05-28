@@ -322,7 +322,21 @@ bool cLocalizationMonitor::checkScan()
 		geometry_msgs::Point glob_point;
 		glob_point.x = global_x;
 		glob_point.y = global_y;
-		int index = occupancy_grid_utils::pointIndex(static_map_modified.info,glob_point);
+
+		int index;
+		try{
+			index = occupancy_grid_utils::pointIndex(static_map_modified.info,glob_point);
+		}
+		 catch( const std::exception& e ) 
+		{ 
+		     std::cout << "out of bounds " << std::endl;
+		     std::cout << e.what() << std::endl; // information from length_error printed
+		     
+		     log_output << std::setprecision(4) << std::fixed << double(-2)   << '\t';
+		     std::cout << "scan_score " << -2 << std::endl;
+		     ROS_INFO("scan_score %lf", -2.0);
+		     return false; //out of map bounds
+		}
 
  		//int point_ok;
 
