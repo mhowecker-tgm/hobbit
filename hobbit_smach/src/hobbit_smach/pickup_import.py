@@ -608,7 +608,7 @@ class GoToFinalGraspPose(State):
         print "5"
         nr_points_before_robot = self.check_free_space_for_moving_to_grasp_pos(ss_point_cloud, self.fms_x1, self.fms_x1+distance_m,self.fms_y1,self.fms_y2, self.fms_z1, self.fms_z2)
         print "6"
-        if (nr_points_before_robot > 0):
+        if (nr_points_before_robot > 800):
             print "=> moveRobotRelative() ==> move forward could not be executed due to obstacles on the way"
             print "=> nr_points_before_robot: ", nr_points_before_robot
             return False
