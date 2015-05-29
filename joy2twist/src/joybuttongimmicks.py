@@ -36,15 +36,26 @@ import rospy
 def execute_left_joystick_pressed(req):
     #do stuff
     #print "Returning [%s + %s = %s]"%(req.a, req.b, (req.a + req.b))
-    print "==> execute_left_joystick_pressed() started"
     
-    # ==== SPEAK   ====
-    mmui.showMMUI_Info("Are you Sarah Connor?")
+    pioneers = True
+    if pioneers:
+        mmui.showMMUI_Info("Feel free to take a drink!")
     
-    # ==== EMOTION ====
-    pubEmo.publish(String("REDEYE"))
-    rospy.sleep(4)
-    pubEmo.publish(String("NEUTRAL"))
+        # ==== EMOTION ====
+        pubEmo.publish(String("HAPPY"))
+        rospy.sleep(4)
+        pubEmo.publish(String("NEUTRAL"))
+        
+    else:
+        print "==> execute_left_joystick_pressed() started"
+    
+        # ==== SPEAK   ====
+        mmui.showMMUI_Info("Are you Sarah Connor?")
+    
+        # ==== EMOTION ====
+        pubEmo.publish(String("REDEYE"))
+        rospy.sleep(4)
+        pubEmo.publish(String("NEUTRAL"))
     
     # ==== SEND EVENT ====
     e = Event()
