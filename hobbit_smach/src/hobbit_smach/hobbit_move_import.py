@@ -18,7 +18,7 @@ from hobbit_msgs.srv import GetCoordinates, GetCoordinatesRequest, GetName, \
     SwitchVision, SwitchVisionRequest, SendValueRequest, SendValue
 from move_base_msgs.msg import MoveBaseAction
 from hobbit_msgs.msg import MiraDockingAction, MiraDockingGoal
-from std_msgs.msg import String
+from std_msgs.msg import String, Float32
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 from uashh_smach.util import SleepState, WaitForMsgState
 from actionlib import SimpleActionClient
@@ -280,7 +280,7 @@ def move_discrete(in_motion=None, in_value=None):
                 ServiceState(
                     '/apply_rotation',
                     SendValue,
-                    request=SendValueRequest(value=in_value),
+                    request=SendValueRequest(value=Float32(in_value)),
                     response_cb=send_value_resp_cb
                 ),
                 transitions={'succeeded': 'SET_DOCK_STATE_VAR',
