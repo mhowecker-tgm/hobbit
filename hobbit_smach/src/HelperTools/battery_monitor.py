@@ -27,26 +27,25 @@ def talker(level):
     pub.publish(data)
     rospy.loginfo('publish E_RECHARGE')
 
-def call_service():
+def call_service(event):
     global LIMIT2
+    if LIMIT2 is False:
+        return 
     rospy.loginfo("called call_service in battery_monitor")
     rospy.wait_for_service('/head/sleep')
     head_sleep = rospy.ServiceProxy('/head/sleep', HeadSleep)
     try:
         resp = head_sleep()
         rospy.loginfo("called /head/sleep")
-        LIMIT2 = True
     except rospy.ServiceException as exc:
         print("Service did not process request: " + str(exc))
 
 def battery_cb(msg):
     global LIMIT
     global LIMIT2
-    #rospy.loginfo("called battery_cb in battery_monitor")
     if msg.charging is True:
         LIMIT = False
-        if not LIMIT2:
-            call_service()
+        LIMIT2 = True
     else:
         LIMIT2 = False
     if msg.voltage < VOLT_LIMIT and msg.charging is False:
@@ -56,6 +55,7 @@ def battery_cb(msg):
 def main():
     rospy.init_node(NAME, anonymous=False)
     rospy.Subscriber('battery_state', BatteryState, battery_cb)
+    rospy.Timer(rospy.Duration(60), call_service)
     rospy.spin()
 
 
