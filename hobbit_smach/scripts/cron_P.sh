@@ -1,6 +1,7 @@
 #!/bin/bash
 
-source /localhome/demo/.bashrc
+source /opt/ros/hobbit_hydro/devel/setup.sh
+
 
 rostopic pub -1 /Event hobbit_msgs/Event "header:
   seq: 0
