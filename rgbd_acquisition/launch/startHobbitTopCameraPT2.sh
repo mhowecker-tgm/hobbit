@@ -74,8 +74,10 @@
 <!-- static transformation for head camera AND!!! bottom camera -->
   <node pkg="tf" type="static_transform_publisher" name="loc_link_to_basecam_link"
         args="0.0 0.0 0.0 0 0 0 loc_link basecam_link 100" />
+  <!--node pkg="tf" type="static_transform_publisher" name="base_link_to_hobbit_neck"
+        args="-0.26 0 1.09 0 0 0 base_link hobbit_neck 100" /-->
   <node pkg="tf" type="static_transform_publisher" name="base_link_to_hobbit_neck"
-        args="-0.26 0 1.09 0 0 0 base_link hobbit_neck 100" />
+        args="-0.28 0.07 1.02 0 0 0 base_link hobbit_neck 100" />
   <node pkg="tf" type="static_transform_publisher" name="hobbit_neck_dynamic_to_headcam_link"
         args="0.02 0.0 0.155 0 0 0 hobbit_neck_dynamic headcam_link 100" />
   <node pkg="tf" type="static_transform_publisher" name="$(arg camera)_base_link"
