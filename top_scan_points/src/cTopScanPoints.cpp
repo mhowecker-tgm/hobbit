@@ -71,6 +71,12 @@ cTopScanPoints::cTopScanPoints(int argc, char **argv) : init_argc(argc), init_ar
     	obstacle_trans.transform.rotation.z = 0.0;
     	obstacle_trans.transform.rotation.w = 1.0;
 
+	ros::NodeHandle nh("~");
+	nh.param("robot_front", robot_front, 0.22);
+	nh.param("robot_width", robot_width, 0.44);
+	nh.param("min_height", min_height_, 0.15);
+	nh.param("max_height", max_height_, 1.4);
+
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Destructor. Shuts down ROS, ends the thread and released allocated
@@ -194,14 +200,8 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 		const float &y = it->y;
 		const float &z = it->z;
 
-		float robot_front = 0.22;
-		float robot_width = 0.44;
-
-		float cam_disp_x = -0.248;
-		float cam_disp_y = -0.208;
-
-		float min_height_ = 0.15;
-        	float max_height_ = 1.4; //FIXME
+		/*float cam_disp_x = -0.248;
+		float cam_disp_y = -0.208;*/
 
 
 		if (!std::isfinite(x) || !std::isfinite(y) || !std::isfinite(z) )
@@ -237,14 +237,9 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 		if (output.ranges[index] * output.ranges[index] > range_sq)
 		{
 			output.ranges[index] = sqrt(range_sq);
-			//std::cout << "index " << index << std::endl;
-			//std::cout << "dis " << output.ranges[index] << std::endl;
-			//std::cout << "Point " << x << " " << y << " " << z << std::endl;
-			//std::cout << "angle " << angle * 180/M_PI << std::endl;
+
 		}
-	} //for it
-	//std::cout << "************************************************ " << std::endl;
-	//std::cout << "min_height " << min_height << std::endl;
+	} 
 
 	output.header.stamp = ros::Time::now ();
 	laserPublisher.publish(output);

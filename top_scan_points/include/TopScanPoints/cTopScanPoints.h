@@ -45,6 +45,12 @@ private:
   tf::TransformListener listener;
   tf::StampedTransform transform;
 
+double robot_front;
+double robot_width;
+
+double min_height_;
+double max_height_;
+
 };
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #endif

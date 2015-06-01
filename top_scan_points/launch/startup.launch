@@ -1,4 +1,10 @@
 <launch>
-  <node pkg="top_scan_points" type="top_scan_points" name="top_scan_points" output="screen"/>
-</launch>
+  <node pkg="top_scan_points" type="top_scan_points" name="top_scan_points" output="screen">
 
+  <param name="robot_front" value="0.22"/>
+  <param name="robot_width" value="0.44"/>
+  <param name="min_height" value="0.15"/>
+  <param name="max_height" value="1.4"/>
+
+  </node>
+</launch>
