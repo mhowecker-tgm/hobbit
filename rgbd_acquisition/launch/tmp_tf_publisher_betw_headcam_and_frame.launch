@@ -5,13 +5,11 @@
 
 <!-- original -->
 <!--node pkg="tf" type="static_transform_publisher" name="base_link_to_hobbit_neck"
-        args="-0.26 0 1.09 0 0 0 base_link hobbit_neck 100" /-->
+        THIS LINE IS NOT USED    args="-0.26 0 1.09 0 0 0 base_link hobbit_neck 100" /-->
 
   <node pkg="tf" type="static_transform_publisher" name="base_link_to_hobbit_neck"
         args="-0.28 0.07 1.02 0 0 0 base_link hobbit_neck 100" />
 
-
-ro
 </launch>
 
 
