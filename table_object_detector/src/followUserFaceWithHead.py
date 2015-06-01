@@ -45,9 +45,9 @@ class CFollowUserHead():
             
         #headMove_pub = rospy.Publisher('head/move', std_msgs.msg.String,queue_size=1)
 
-        rate = rospy.Rate(1.0)
+        rate = rospy.Rate(5)
         try:
-            self.listener.waitForTransform("/frame", "/head", rospy.Time(), rospy.Duration(4.0))
+            self.listener.waitForTransform("/frame", "/head", rospy.Time(), rospy.Duration(0.5))
         except:
             print "initially no tf transform (/frame - /head) found"
             
@@ -64,20 +64,20 @@ class CFollowUserHead():
     
                 strHeadMoveTmp = ""
                 #check up/down head position    
-                if trans[1] > 0.25:
+                if trans[1] > 0.10:
                     print "head should move down"
-                    strHeadMoveTmp = "d9 "
-                elif trans[1] < -0.25:
+                    strHeadMoveTmp = "d3 "
+                elif trans[1] < -0.15:
                     print "head should move up"
-                    strHeadMoveTmp = "u9 "              #!!!!!!!!!! ignores this up/down movement if it should also go right or left!!!!!!!!!!!!!!
+                    strHeadMoveTmp = "u3 "              #!!!!!!!!!! ignores this up/down movement if it should also go right or left!!!!!!!!!!!!!!
                 
                 #check left/right head position
-                if trans[0] > 0.3:
+                if trans[0] > 0.15:
                     print "head should move right"
-                    strHeadMoveTmp = strHeadMoveTmp + "r9"
-                elif trans[0] < -0.3:
+                    strHeadMoveTmp = strHeadMoveTmp + "r4"
+                elif trans[0] < -0.15:
                     print "head should move left"
-                    strHeadMoveTmp = strHeadMoveTmp + "l9"
+                    strHeadMoveTmp = strHeadMoveTmp + "l4"
     
                 if (len(strHeadMoveTmp) > 0):       #head move should be executed
                     self.headMove_pub.publish(String(strHeadMoveTmp))
