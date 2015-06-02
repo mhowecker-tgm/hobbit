@@ -24,7 +24,7 @@
       <place>
         <name>dock</name>
         <type>docking_base_point</type>
-        <pose y="0.0315" x="-0.4238" theta="0.01446"/>
+        <pose y="0.0417" x="-0.42" theta="0.02"/>
         <objects/>
       </place>
     </places>
@@ -105,7 +105,7 @@
       <place>
         <name>fitness</name>
         <type>fitness</type>
-        <pose y="0.00379" x="3.6" theta="0.8007"/>
+        <pose y="-0.083" x="3.409" theta="-0.69"/>
         <objects/>
       </place>
     </places>
