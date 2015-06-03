@@ -12,43 +12,25 @@
       <place>
         <name>dock</name>
         <type>docking_base_point</type>
-        <pose y="0.02152" x="-0.378" theta="0.0422138"/>
+        <pose y="0.215" x="-0.29" theta="0.000872"/>
         <objects/>
       </place>
       <place>
         <name>datorbordet</name>
         <type>goTo</type>
-        <pose y="-0.228089" x="-0.272985" theta="2.742959"/>
+        <pose y="0.38" x="-0.89" theta="2.16"/>
         <objects/>
       </place>
       <place>
         <name>mitten</name>
         <type>goTo</type>
-        <pose y="-0.47148" x="0.225378" theta="-0.664013"/>
+        <pose y="-0.099" x="-0.63" theta="-1.2"/>
         <objects/>
       </place>
       <place>
         <name>call1</name>
         <type>call_button_1</type>
         <pose y="0.599791" x="-0.862117" theta="1.648076"/>
-        <objects/>
-      </place>
-      <place>
-        <name>call1</name>
-        <type>call_button_1</type>
-        <pose y="0.599791" x="-0.862117" theta="1.648076"/>
-        <objects/>
-      </place>
-      <place>
-        <name>call1</name>
-        <type>call_button_1</type>
-        <pose y="0.495981" x="-0.789205" theta="1.761132"/>
-        <objects/>
-      </place>
-      <place>
-        <name>call1</name>
-        <type>call_button_1</type>
-        <pose y="0.495981" x="-0.789205" theta="1.761132"/>
         <objects/>
       </place>
     </places>
@@ -66,20 +48,8 @@
     <places>
       <place>
         <name>call2</name>
-        <type>call_button_hallen</type>
-        <pose y="-1.039599" x="2.660196" theta="-1.338274"/>
-        <objects/>
-      </place>
-      <place>
-        <name>call2</name>
-        <type>call_button_hallen</type>
-        <pose y="-1.597021" x="2.021669" theta="-1.703644"/>
-        <objects/>
-      </place>
-      <place>
-        <name>call2</name>
         <type>call_button_2</type>
-        <pose y="-1.597021" x="2.021669" theta="-1.703644"/>
+        <pose y="-1.74" x="3.93" theta="-1.67"/>
         <objects/>
       </place>
     </places>
@@ -93,18 +63,6 @@
       <vertex y="2.5" x="5.1"/>
     </vertices>
     <places>
-      <place>
-        <name>call4</name>
-        <type>call_button_köksstolen</type>
-        <pose y="0.656512" x="4.62673" theta="1.014285"/>
-        <objects/>
-      </place>
-      <place>
-        <name>call4</name>
-        <type>call_button_4</type>
-        <pose y="0.656512" x="4.62673" theta="1.014285"/>
-        <objects/>
-      </place>
       <place>
         <name>call4</name>
         <type>call_button_4</type>
@@ -135,30 +93,16 @@
         <objects/>
       </place>
       <place>
-        <name>call3</name>
-        <type>call_button_3</type>
-        <pose y="-1.438977" x="6.218821" theta="-0.926715"/>
-        <objects/>
-      </place>
-      <place>
         <name>fåtölj</name>
         <type>goTo</type>
-        <pose y="-0.280996" x="6.309492" theta="0.069658"/>
+        <pose y="-0.380996" x="6.7" theta="0.069658"/>
         <objects/>
       </place>
       <place>
-        <name>Sittgympa</name>
+        <name>fitness</name>
         <type>fitness</type>
-        <pose y="-1.036543" x="5.617274" theta="1.421605"/>
+        <pose y="-1.43" x="5.96" theta="1.46"/>
         <objects/>
-      </place>
-      <place>
-        <name>matbordet</name>
-        <type>searchable</type>
-        <pose y="-0.464389" x="5.719725" theta="1.599344"/>
-        <objects>
-          <object name="Aspirin" probability="0.5"/>
-        </objects>
       </place>
       <place>
         <name>matbordet</name>
