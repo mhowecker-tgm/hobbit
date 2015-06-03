@@ -1,0 +1,522 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <MapConfigurationFile version="2">
+    <!--Maps.-->
+    <Maps>
+      <key>map</key>
+      <item version="2">
+        <!--Project or map name for these files.-->
+        <MapName>map</MapName>
+        <!--Description of the static map.-->
+        <StaticMap>static.xml</StaticMap>
+        <!--Description of the nogo map.-->
+        <NogoMap>nogo.xml</NogoMap>
+        <!--Description of the speed map.-->
+        <SpeedMap>speed.xml</SpeedMap>
+        <!--Descriptive primitives to represent the nogo areas.-->
+        <NoGoAreas>
+          <!--Rectangular nogo areas.-->
+          <RectAreas>
+            <item>
+              <!--Rect describing this area in map coordinates.-->
+              <Rect>
+                <!--The minimum corner-->
+                <MinCorner>
+                  <!--The x-coordinate-->
+                  <X>-4.29311704636</X>
+                  <!--The y-coordinate-->
+                  <Y>-3.21774959564</Y>
+                </MinCorner>
+                <!--The maximum corner-->
+                <MaxCorner>
+                  <!--The x-coordinate-->
+                  <X>-2.63118553162</X>
+                  <!--The y-coordinate-->
+                  <Y>-0.187168493867</Y>
+                </MaxCorner>
+              </Rect>
+              <!--Descriptive text for this area.-->
+              <Text/>
+            </item>
+            <item>
+              <!--Rect describing this area in map coordinates.-->
+              <Rect>
+                <!--The minimum corner-->
+                <MinCorner>
+                  <!--The x-coordinate-->
+                  <X>-8.65976142883</X>
+                  <!--The y-coordinate-->
+                  <Y>-3.31551027298</Y>
+                </MinCorner>
+                <!--The maximum corner-->
+                <MaxCorner>
+                  <!--The x-coordinate-->
+                  <X>-5.43365859985</X>
+                  <!--The y-coordinate-->
+                  <Y>0.46456938982</Y>
+                </MaxCorner>
+              </Rect>
+              <!--Descriptive text for this area.-->
+              <Text/>
+            </item>
+            <item>
+              <!--Rect describing this area in map coordinates.-->
+              <Rect>
+                <!--The minimum corner-->
+                <MinCorner>
+                  <!--The x-coordinate-->
+                  <X>-3.90207433701</X>
+                  <!--The y-coordinate-->
+                  <Y>0.953372836113</Y>
+                </MinCorner>
+                <!--The maximum corner-->
+                <MaxCorner>
+                  <!--The x-coordinate-->
+                  <X>1.01854658127</X>
+                  <!--The y-coordinate-->
+                  <Y>2.02874040604</Y>
+                </MaxCorner>
+              </Rect>
+              <!--Descriptive text for this area.-->
+              <Text/>
+            </item>
+            <item>
+              <!--Rect describing this area in map coordinates.-->
+              <Rect>
+                <!--The minimum corner-->
+                <MinCorner>
+                  <!--The x-coordinate-->
+                  <X>-5.69435358047</X>
+                  <!--The y-coordinate-->
+                  <Y>1.80063211918</Y>
+                </MinCorner>
+                <!--The maximum corner-->
+                <MaxCorner>
+                  <!--The x-coordinate-->
+                  <X>-3.60879230499</X>
+                  <!--The y-coordinate-->
+                  <Y>2.35460925102</Y>
+                </MaxCorner>
+              </Rect>
+              <!--Descriptive text for this area.-->
+              <Text/>
+            </item>
+            <item>
+              <!--Rect describing this area in map coordinates.-->
+              <Rect>
+                <!--The minimum corner-->
+                <MinCorner>
+                  <!--The x-coordinate-->
+                  <X>-6.41126537323</X>
+                  <!--The y-coordinate-->
+                  <Y>0.43198248744</Y>
+                </MinCorner>
+                <!--The maximum corner-->
+                <MaxCorner>
+                  <!--The x-coordinate-->
+                  <X>-5.40107154846</X>
+                  <!--The y-coordinate-->
+                  <Y>1.86580586433</Y>
+                </MaxCorner>
+              </Rect>
+              <!--Descriptive text for this area.-->
+              <Text/>
+            </item>
+            <item>
+              <!--Rect describing this area in map coordinates.-->
+              <Rect>
+                <!--The minimum corner-->
+                <MinCorner>
+                  <!--The x-coordinate-->
+                  <X>-1.16477537155</X>
+                  <!--The y-coordinate-->
+                  <Y>-2.85929393768</Y>
+                </MinCorner>
+                <!--The maximum corner-->
+                <MaxCorner>
+                  <!--The x-coordinate-->
+                  <X>1.86580586433</X>
+                  <!--The y-coordinate-->
+                  <Y>-2.14238214493</Y>
+                </MaxCorner>
+              </Rect>
+              <!--Descriptive text for this area.-->
+              <Text/>
+            </item>
+            <item>
+              <!--Rect describing this area in map coordinates.-->
+              <Rect>
+                <!--The minimum corner-->
+                <MinCorner>
+                  <!--The x-coordinate-->
+                  <X>1.80063211918</X>
+                  <!--The y-coordinate-->
+                  <Y>-2.89188075066</Y>
+                </MinCorner>
+                <!--The maximum corner-->
+                <MaxCorner>
+                  <!--The x-coordinate-->
+                  <X>2.77823901176</X>
+                  <!--The y-coordinate-->
+                  <Y>1.70287144184</Y>
+                </MaxCorner>
+              </Rect>
+              <!--Descriptive text for this area.-->
+              <Text/>
+            </item>
+            <item>
+              <!--Rect describing this area in map coordinates.-->
+              <Rect>
+                <!--The minimum corner-->
+                <MinCorner>
+                  <!--The x-coordinate-->
+                  <X>-4.35829114914</X>
+                  <!--The y-coordinate-->
+                  <Y>-5.43365859985</Y>
+                </MinCorner>
+                <!--The maximum corner-->
+                <MaxCorner>
+                  <!--The x-coordinate-->
+                  <X>-2.46825098991</X>
+                  <!--The y-coordinate-->
+                  <Y>-4.32570409775</Y>
+                </MaxCorner>
+              </Rect>
+              <!--Descriptive text for this area.-->
+              <Text/>
+            </item>
+            <item>
+              <!--Rect describing this area in map coordinates.-->
+              <Rect>
+                <!--The minimum corner-->
+                <MinCorner>
+                  <!--The x-coordinate-->
+                  <X>-5.10778951645</X>
+                  <!--The y-coordinate-->
+                  <Y>-6.83489513397</Y>
+                </MinCorner>
+                <!--The maximum corner-->
+                <MaxCorner>
+                  <!--The x-coordinate-->
+                  <X>-4.32570409775</X>
+                  <!--The y-coordinate-->
+                  <Y>-4.09759569168</Y>
+                </MaxCorner>
+              </Rect>
+              <!--Descriptive text for this area.-->
+              <Text/>
+            </item>
+            <item>
+              <!--Rect describing this area in map coordinates.-->
+              <Rect>
+                <!--The minimum corner-->
+                <MinCorner>
+                  <!--The x-coordinate-->
+                  <X>-8.75752162933</X>
+                  <!--The y-coordinate-->
+                  <Y>-6.90006875992</Y>
+                </MinCorner>
+                <!--The maximum corner-->
+                <MaxCorner>
+                  <!--The x-coordinate-->
+                  <X>-7.74732780457</X>
+                  <!--The y-coordinate-->
+                  <Y>-3.21774959564</Y>
+                </MaxCorner>
+              </Rect>
+              <!--Descriptive text for this area.-->
+              <Text/>
+            </item>
+            <item>
+              <!--Rect describing this area in map coordinates.-->
+              <Rect>
+                <!--The minimum corner-->
+                <MinCorner>
+                  <!--The x-coordinate-->
+                  <X>-8.23613166809</X>
+                  <!--The y-coordinate-->
+                  <Y>-6.86748170853</Y>
+                </MinCorner>
+                <!--The maximum corner-->
+                <MaxCorner>
+                  <!--The x-coordinate-->
+                  <X>-5.56400585175</X>
+                  <!--The y-coordinate-->
+                  <Y>-6.02022266388</Y>
+                </MaxCorner>
+              </Rect>
+              <!--Descriptive text for this area.-->
+              <Text/>
+            </item>
+            <item>
+              <!--Rect describing this area in map coordinates.-->
+              <Rect>
+                <!--The minimum corner-->
+                <MinCorner>
+                  <!--The x-coordinate-->
+                  <X>-5.69435358047</X>
+                  <!--The y-coordinate-->
+                  <Y>-6.2809176445</Y>
+                </MinCorner>
+                <!--The maximum corner-->
+                <MaxCorner>
+                  <!--The x-coordinate-->
+                  <X>-5.07520246506</X>
+                  <!--The y-coordinate-->
+                  <Y>-4.16276979446</Y>
+                </MaxCorner>
+              </Rect>
+              <!--Descriptive text for this area.-->
+              <Text/>
+            </item>
+            <item>
+              <!--Rect describing this area in map coordinates.-->
+              <Rect>
+                <!--The minimum corner-->
+                <MinCorner>
+                  <!--The x-coordinate-->
+                  <X>1.57252383232</X>
+                  <!--The y-coordinate-->
+                  <Y>-7.16076374054</Y>
+                </MinCorner>
+                <!--The maximum corner-->
+                <MaxCorner>
+                  <!--The x-coordinate-->
+                  <X>2.41978311539</X>
+                  <!--The y-coordinate-->
+                  <Y>-3.38068413734</Y>
+                </MaxCorner>
+              </Rect>
+              <!--Descriptive text for this area.-->
+              <Text/>
+            </item>
+            <item>
+              <!--Rect describing this area in map coordinates.-->
+              <Rect>
+                <!--The minimum corner-->
+                <MinCorner>
+                  <!--The x-coordinate-->
+                  <X>-1.19736218452</X>
+                  <!--The y-coordinate-->
+                  <Y>-3.64137935638</Y>
+                </MinCorner>
+                <!--The maximum corner-->
+                <MaxCorner>
+                  <!--The x-coordinate-->
+                  <X>2.35460925102</X>
+                  <!--The y-coordinate-->
+                  <Y>-2.66377258301</Y>
+                </MaxCorner>
+              </Rect>
+              <!--Descriptive text for this area.-->
+              <Text/>
+            </item>
+            <item>
+              <!--Rect describing this area in map coordinates.-->
+              <Rect>
+                <!--The minimum corner-->
+                <MinCorner>
+                  <!--The x-coordinate-->
+                  <X>0.366808712482</X>
+                  <!--The y-coordinate-->
+                  <Y>-4.61898612976</Y>
+                </MinCorner>
+                <!--The maximum corner-->
+                <MaxCorner>
+                  <!--The x-coordinate-->
+                  <X>1.99615347385</X>
+                  <!--The y-coordinate-->
+                  <Y>-3.60879230499</Y>
+                </MaxCorner>
+              </Rect>
+              <!--Descriptive text for this area.-->
+              <Text/>
+            </item>
+            <item>
+              <!--Rect describing this area in map coordinates.-->
+              <Rect>
+                <!--The minimum corner-->
+                <MinCorner>
+                  <!--The x-coordinate-->
+                  <X>-3.02222824097</X>
+                  <!--The y-coordinate-->
+                  <Y>-6.70454740524</Y>
+                </MinCorner>
+                <!--The maximum corner-->
+                <MaxCorner>
+                  <!--The x-coordinate-->
+                  <X>-1.26253604889</X>
+                  <!--The y-coordinate-->
+                  <Y>-5.36848449707</Y>
+                </MaxCorner>
+              </Rect>
+              <!--Descriptive text for this area.-->
+              <Text/>
+            </item>
+            <item>
+              <!--Rect describing this area in map coordinates.-->
+              <Rect>
+                <!--The minimum corner-->
+                <MinCorner>
+                  <!--The x-coordinate-->
+                  <X>-1.32770979404</X>
+                  <!--The y-coordinate-->
+                  <Y>-6.24833106995</Y>
+                </MinCorner>
+                <!--The maximum corner-->
+                <MaxCorner>
+                  <!--The x-coordinate-->
+                  <X>1.60511064529</X>
+                  <!--The y-coordinate-->
+                  <Y>-5.56400585175</Y>
+                </MaxCorner>
+              </Rect>
+              <!--Descriptive text for this area.-->
+              <Text/>
+            </item>
+            <item>
+              <!--Rect describing this area in map coordinates.-->
+              <Rect>
+                <!--The minimum corner-->
+                <MinCorner>
+                  <!--The x-coordinate-->
+                  <X>0.985959708691</X>
+                  <!--The y-coordinate-->
+                  <Y>1.24665486813</Y>
+                </MinCorner>
+                <!--The maximum corner-->
+                <MaxCorner>
+                  <!--The x-coordinate-->
+                  <X>2.77823901176</X>
+                  <!--The y-coordinate-->
+                  <Y>1.93097960949</Y>
+                </MaxCorner>
+              </Rect>
+              <!--Descriptive text for this area.-->
+              <Text/>
+            </item>
+            <item>
+              <!--Rect describing this area in map coordinates.-->
+              <Rect>
+                <!--The minimum corner-->
+                <MinCorner>
+                  <!--The x-coordinate-->
+                  <X>-0.838906407356</X>
+                  <!--The y-coordinate-->
+                  <Y>-1.19736218452</Y>
+                </MinCorner>
+                <!--The maximum corner-->
+                <MaxCorner>
+                  <!--The x-coordinate-->
+                  <X>0.236461132765</X>
+                  <!--The y-coordinate-->
+                  <Y>-0.643384993076</Y>
+                </MaxCorner>
+              </Rect>
+              <!--Descriptive text for this area.-->
+              <Text/>
+            </item>
+            <item>
+              <!--Rect describing this area in map coordinates.-->
+              <Rect>
+                <!--The minimum corner-->
+                <MinCorner>
+                  <!--The x-coordinate-->
+                  <X>0.203874245286</X>
+                  <!--The y-coordinate-->
+                  <Y>-2.24014282227</Y>
+                </MinCorner>
+                <!--The maximum corner-->
+                <MaxCorner>
+                  <!--The x-coordinate-->
+                  <X>2.06132721901</X>
+                  <!--The y-coordinate-->
+                  <Y>-0.708558797836</Y>
+                </MaxCorner>
+              </Rect>
+              <!--Descriptive text for this area.-->
+              <Text/>
+            </item>
+            <item>
+              <!--Rect describing this area in map coordinates.-->
+              <Rect>
+                <!--The minimum corner-->
+                <MinCorner>
+                  <!--The x-coordinate-->
+                  <X>-8.39906597137</X>
+                  <!--The y-coordinate-->
+                  <Y>-3.60879230499</Y>
+                </MinCorner>
+                <!--The maximum corner-->
+                <MaxCorner>
+                  <!--The x-coordinate-->
+                  <X>-6.50902605057</X>
+                  <!--The y-coordinate-->
+                  <Y>-3.1525759697</Y>
+                </MaxCorner>
+              </Rect>
+              <!--Descriptive text for this area.-->
+              <Text/>
+            </item>
+          </RectAreas>
+          <!--Polygonal nogo areas.-->
+          <PolygonAreas>
+            <item>
+              <!--Polygon describing this area in map coordinates.-->
+              <Polygon>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>-2.66377258301</X>
+                  <!--The y-coordinate-->
+                  <Y>-2.01203465462</Y>
+                </item>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>-2.10979533195</X>
+                  <!--The y-coordinate-->
+                  <Y>-2.07720828056</Y>
+                </item>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>-2.04462146759</X>
+                  <!--The y-coordinate-->
+                  <Y>-3.1199889183</Y>
+                </item>
+                <item>
+                  <!--The x-coordinate-->
+                  <X>-2.69635939598</X>
+                  <!--The y-coordinate-->
+                  <Y>-3.21774959564</Y>
+                </item>
+              </Polygon>
+              <!--Descriptive text for this area.-->
+              <Text/>
+            </item>
+          </PolygonAreas>
+          <!--Elliptical nogo areas.-->
+          <EllipseAreas/>
+        </NoGoAreas>
+        <!--Descriptive primitives to represent the speed areas.-->
+        <SpeedAreas>
+          <!--Rectangular speed areas.-->
+          <RectAreas/>
+          <!--Polygonal speed areas.-->
+          <PolygonAreas/>
+          <!--Elliptical speed areas.-->
+          <EllipseAreas/>
+        </SpeedAreas>
+        <!--Reference points in this map-->
+        <ReferencePoints/>
+        <!--Map offset to the global coordinate system (i.e., the MapFrame)-->
+        <Offset>
+          <!--The translational part of the transform-->
+          <X>0</X>
+          <!--The translational part of the transform-->
+          <Y>0</Y>
+          <!--The orientation in degrees-->
+          <Phi>0</Phi>
+        </Offset>
+      </item>
+    </Maps>
+  </MapConfigurationFile>
+</root>
