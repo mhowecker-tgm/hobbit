@@ -118,7 +118,7 @@ def check_sleep_times(next_time):
         rospy.loginfo("Exception thrown while trying to use sleep/wakeup time. Using default values.")
         wakeup = [9, 00]
         sleep = [21, 00]
-    if next_time[0] <= 24:
+    if next_time[0] >= 24:
 	    return False
     elif time(int(wakeup[0]), int(wakeup[1]))\
             <= time(next_time[0], next_time[1])\

@@ -211,6 +211,7 @@ def set_nav_goal_cb(userdata, request):
     return nav_request
 
 def resp_cb(userdata, response):
+    rospy.loginfo(response)
     if response.result:
         return 'succeeded'
     else:
@@ -376,7 +377,7 @@ def main():
         )
         StateMachine.add(
             'LOG_SUCCESS',
-            log.DoLogPreempt(scenario='away/sleep'),
+            log.DoLogSuccess(scenario='away/sleep'),
             transitions={'succeeded': 'succeeded'}
         )
         StateMachine.add(
@@ -386,7 +387,7 @@ def main():
         )
         StateMachine.add(
             'LOG_ABORTED',
-            log.DoLogPreempt(scenario='away/sleep'),
+            log.DoLogAborted(scenario='away/sleep'),
             transitions={'succeeded': 'failure'}
         )
     asw = ActionServerWrapper(
