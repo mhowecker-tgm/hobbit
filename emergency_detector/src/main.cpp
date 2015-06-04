@@ -342,6 +342,11 @@ bool visualizeOff(std_srvs::Empty::Request& request, std_srvs::Empty::Response& 
 }
 
 
+bool signalHeadIsMoving(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+ headIsMoving=HEAD_MOVING_TIMEOUT;
+}
+
 bool autoPlaneSegmentation(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
     autoPlaneSegmentationFlag=1;
@@ -854,8 +859,10 @@ int main(int argc, char **argv)
      ros::ServiceServer tfPrintService        = nh.advertiseService(name+"/toggleTFPrinting" , toggleTFPrinting);
 
 
-     ros::ServiceServer startHeadMotionService    = nh.advertiseService(name+"/startHeadMotion", pause);
-     ros::ServiceServer stopHeadMotionService     = nh.advertiseService(name+"/stopHeadMotion", resume);
+     ros::ServiceServer signalHeadIsMovingService    = nh.advertiseService(name+"/signalHeadIsMoving", signalHeadIsMoving);
+
+//     ros::ServiceServer startHeadMotionService    = nh.advertiseService(name+"/startHeadMotion", pause);
+//     ros::ServiceServer stopHeadMotionService     = nh.advertiseService(name+"/stopHeadMotion", resume);
 
 
      ros::ServiceServer increasePlaneDistanceService = nh.advertiseService(name+"/increasePlaneDistance" , increasePlaneDistance);
