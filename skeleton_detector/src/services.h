@@ -17,7 +17,7 @@ extern unsigned int actualTimestamp;
 
 int triggerAttentionInternal();
 
-
+int logStartExerciseTime();
 int hasExerciseTimedOut();
 
 int registerServices(ros::NodeHandle * nh,unsigned int width,unsigned int height);

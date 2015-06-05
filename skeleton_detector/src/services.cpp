@@ -92,7 +92,10 @@ unsigned char * colorFrameCopy=0;   unsigned int colorCopyWidth = 0; unsigned in
 unsigned short * depthFrameCopy =0; unsigned int depthCopyWidth = 0; unsigned int depthCopyHeight = 0;
 
 
-
+int logStartExerciseTime()
+{
+    lastExerciseStartTime = ros::Time::now();
+}
 
 int hasExerciseTimedOut()
 {
@@ -311,7 +314,9 @@ void broadcast2DBBox(struct skeletonHuman * skeletonFound)
 void broadcastNewRepetition(unsigned int frameNumber,struct exerciseData * exercise)
 {
   //Repetition means exercise is not idle
-  lastExerciseStartTime = ros::Time::now();
+  //lastExerciseStartTime = ros::Time::now();
+  logStartExerciseTime();
+
 
 
   hobbit_msgs::Fitness msg;
@@ -407,7 +412,8 @@ void fitnessRecvMessage(const hobbit_msgs::Fitness & msg)
      }
 
      //Starting new exercise
-     lastExerciseStartTime = ros::Time::now();
+     //lastExerciseStartTime = ros::Time::now();
+     logStartExerciseTime();
 
      hobbitFitnessFunction_StartExercise(actualTimestamp,exerciseID,isLeftHand,exerciseRepetitions);
     }

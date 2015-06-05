@@ -218,6 +218,7 @@ bool resumeBodylessGestures(std_srvs::Empty::Request& request, std_srvs::Empty::
 bool startDualElbowBendSyncExercise(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
     ROS_INFO("Skeleton Detector is now starting startDualElbowBendSyncExercise");
+    logStartExerciseTime();
     hobbitFitnessFunction_StartExercise(frameTimestamp,DUAL_ELBOW_BEND_SYNC_EXERCISE,0/*isLeftHand*/,5);
     return true;
 }
@@ -225,6 +226,7 @@ bool startDualElbowBendSyncExercise(std_srvs::Empty::Request& request, std_srvs:
 bool startDualElbowBendAsyncExercise(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
     ROS_INFO("Skeleton Detector is now starting Exercise Batch");
+    logStartExerciseTime();
     hobbitFitnessFunction_StartExercise(frameTimestamp,DUAL_ELBOW_BEND_ASYNC_EXERCISE,0/*isLeftHand*/,5);
     return true;
 }
@@ -233,6 +235,7 @@ bool startDualElbowBendAsyncExercise(std_srvs::Empty::Request& request, std_srvs
 bool startLeftFlapExercise(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
     ROS_INFO("Skeleton Detector is now starting Exercise Batch");
+    logStartExerciseTime();
     hobbitFitnessFunction_StartExercise(frameTimestamp,LEFT_FLAP_EXERCISE,1/*isLeftHand*/,5);
     return true;
 }
@@ -240,6 +243,7 @@ bool startLeftFlapExercise(std_srvs::Empty::Request& request, std_srvs::Empty::R
 bool startRightFlapExercise(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
     ROS_INFO("Skeleton Detector is now starting Exercise Batch");
+    logStartExerciseTime();
     hobbitFitnessFunction_StartExercise(frameTimestamp,RIGHT_FLAP_EXERCISE,0/*isLeftHand*/,5);
     return true;
 }
@@ -248,6 +252,7 @@ bool startRightFlapExercise(std_srvs::Empty::Request& request, std_srvs::Empty::
 bool startLeftArmPumpExercise(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
     ROS_INFO("Skeleton Detector is now starting Exercise Batch");
+    logStartExerciseTime();
     hobbitFitnessFunction_StartExercise(frameTimestamp,LEFT_ARM_PUMP_EXERCISE,1/*isLeftHand*/,5);
     return true;
 }
@@ -255,6 +260,7 @@ bool startLeftArmPumpExercise(std_srvs::Empty::Request& request, std_srvs::Empty
 bool startRightArmPumpExercise(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
     ROS_INFO("Skeleton Detector is now starting Exercise Batch");
+    logStartExerciseTime();
     hobbitFitnessFunction_StartExercise(frameTimestamp,RIGHT_ARM_PUMP_EXERCISE,1/*isLeftHand*/,5);
     return true;
 }
