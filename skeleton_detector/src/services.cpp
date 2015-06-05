@@ -59,6 +59,7 @@ ros::ServiceServer askForUserDistance;
 
 #define divisor 1000
 #define MIN_TIME_SEC_BETWEEN_GESTURE_BROADCAST 2
+#define MAX_TIME_SEC_TO_SHUTDOWN_IDLE_EXERCISE 10*60
 //ros::Publisher gestureBroadcaster;
 
 volatile int paused = 0;
@@ -67,6 +68,12 @@ unsigned char dontPublishPointEvents=0;
 unsigned char dontPublishPersons=0;
 
 unsigned int processingMode = PROCESSING_MODE_UPPER_GESTURE_BODY_TRACKER;//PROCESSING_MODE_SIMPLE_PERSON_DETECTOR;
+
+
+
+ros::Time lastExerciseStartTime;
+ros::Time lastGestureTrigger;
+
 
 
 unsigned int frameTimestamp =0;
@@ -85,8 +92,24 @@ unsigned char * colorFrameCopy=0;   unsigned int colorCopyWidth = 0; unsigned in
 unsigned short * depthFrameCopy =0; unsigned int depthCopyWidth = 0; unsigned int depthCopyHeight = 0;
 
 
-ros::Time lastGestureTrigger;
 
+
+int hasExerciseTimedOut()
+{
+    ros::Time currentExerciseStartTime;
+    currentExerciseStartTime = ros::Time::now();
+    ros::Duration elapsedTimeSinceLastGesture = currentExerciseStartTime - lastGestureTrigger;
+
+    fprintf(stderr,YELLOW "Exercise idle time %u/%u \n" NORMAL, elapsedTimeSinceLastGesture.toSec() , MAX_TIME_SEC_TO_SHUTDOWN_IDLE_EXERCISE );
+
+    if (elapsedTimeSinceLastGesture.toSec()<=MAX_TIME_SEC_TO_SHUTDOWN_IDLE_EXERCISE)
+    {
+      fprintf(stderr,YELLOW "Exercise function has been idle for too long it has been forgotten on ? Switching it off\n\n" NORMAL);
+      ROS_INFO("Exercise function has been idle for too long it has been forgotten on ? Switching it off");
+      return;
+    }
+
+}
 
 
 int triggerAttentionInternal()
@@ -287,6 +310,10 @@ void broadcast2DBBox(struct skeletonHuman * skeletonFound)
 
 void broadcastNewRepetition(unsigned int frameNumber,struct exerciseData * exercise)
 {
+  //Repetition means exercise is not idle
+  lastExerciseStartTime = ros::Time::now();
+
+
   hobbit_msgs::Fitness msg;
   std::stringstream ss;
   ss<<"C_EXERCISE_REPETITION";
@@ -378,6 +405,9 @@ void fitnessRecvMessage(const hobbit_msgs::Fitness & msg)
      {
       isLeftHand=1;
      }
+
+     //Starting new exercise
+     lastExerciseStartTime = ros::Time::now();
 
      hobbitFitnessFunction_StartExercise(actualTimestamp,exerciseID,isLeftHand,exerciseRepetitions);
     }

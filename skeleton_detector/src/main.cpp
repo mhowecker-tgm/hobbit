@@ -49,6 +49,8 @@ int key = 0;
 int recording=0;
 int recordedFrames=0;
 
+
+
 unsigned int framesForHeightenedAttention=30;
 unsigned int runFullSpeed=0;
 unsigned int runMaxSpeed=0;
@@ -64,7 +66,6 @@ struct calibrationHobbit calib={0};
 
 
 //----------------------------------------------------------
-
 
 
 
@@ -478,6 +479,17 @@ int main(int argc, char **argv)
                          {  loop_rate_ultra_low.sleep();  /*Face Detector using a lot of CPU , so let's go slow */    }
             } else
             {  loop_rate.sleep(); }
+
+
+
+            if ( hobbitFitnessFunction_AreWeDoingAnExercise() )
+              {
+                  if (hasExerciseTimedOut())
+                  {
+                    ROS_INFO("Skeleton Detector is now auto-stopping Exercise");
+                    hobbitFitnessFunction_StopExercise(frameTimestamp);
+                  }
+              }
 
 		 }
 
