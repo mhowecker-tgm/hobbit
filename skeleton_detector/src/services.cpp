@@ -59,7 +59,7 @@ ros::ServiceServer askForUserDistance;
 
 #define divisor 1000
 #define MIN_TIME_SEC_BETWEEN_GESTURE_BROADCAST 2
-#define MAX_TIME_SEC_TO_SHUTDOWN_IDLE_EXERCISE 10*60
+#define MAX_TIME_SEC_TO_SHUTDOWN_IDLE_EXERCISE 20*60
 //ros::Publisher gestureBroadcaster;
 
 volatile int paused = 0;
@@ -98,7 +98,7 @@ int hasExerciseTimedOut()
 {
     ros::Time currentExerciseStartTime;
     currentExerciseStartTime = ros::Time::now();
-    ros::Duration elapsedTimeSinceLastGesture = currentExerciseStartTime - lastGestureTrigger;
+    ros::Duration elapsedTimeSinceLastGesture = currentExerciseStartTime - lastExerciseStartTime;
 
     fprintf(stderr,YELLOW "Exercise idle time %0.2f/%u \n" NORMAL, elapsedTimeSinceLastGesture.toSec() , MAX_TIME_SEC_TO_SHUTDOWN_IDLE_EXERCISE );
 
