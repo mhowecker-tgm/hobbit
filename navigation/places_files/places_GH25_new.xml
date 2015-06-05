@@ -57,12 +57,6 @@
         <pose y="6.157151" x="1.621403" theta="1.762173"/>
         <objects/>
       </place>
-      <place>
-        <name>locate_user_corridor</name>
-        <type>default</type>
-        <pose y="6.157151" x="1.621403" theta="1.762173"/>
-        <objects/>
-      </place>
     </places>
   </room>
   <room>
@@ -124,6 +118,12 @@
       <place>
         <name>center</name>
         <type>goTo</type>
+        <pose y="4.124871" x="-0.8459" theta="0.171305"/>
+        <objects/>
+      </place>
+      <place>
+        <name>locate_user_entrance</name>
+        <type>default</type>
         <pose y="4.124871" x="-0.8459" theta="0.171305"/>
         <objects/>
       </place>
