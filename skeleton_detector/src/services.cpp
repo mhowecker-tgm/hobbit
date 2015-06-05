@@ -100,7 +100,7 @@ int hasExerciseTimedOut()
     currentExerciseStartTime = ros::Time::now();
     ros::Duration elapsedTimeSinceLastGesture = currentExerciseStartTime - lastGestureTrigger;
 
-    fprintf(stderr,YELLOW "Exercise idle time %u/%u \n" NORMAL, elapsedTimeSinceLastGesture.toSec() , MAX_TIME_SEC_TO_SHUTDOWN_IDLE_EXERCISE );
+    fprintf(stderr,YELLOW "Exercise idle time %0.2f/%u \n" NORMAL, elapsedTimeSinceLastGesture.toSec() , MAX_TIME_SEC_TO_SHUTDOWN_IDLE_EXERCISE );
 
     if (elapsedTimeSinceLastGesture.toSec()<=MAX_TIME_SEC_TO_SHUTDOWN_IDLE_EXERCISE)
     {
