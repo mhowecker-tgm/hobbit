@@ -106,9 +106,9 @@ int hasExerciseTimedOut()
     {
       fprintf(stderr,YELLOW "Exercise function has been idle for too long it has been forgotten on ? Switching it off\n\n" NORMAL);
       ROS_INFO("Exercise function has been idle for too long it has been forgotten on ? Switching it off");
-      return;
+      return 1;
     }
-
+  return 0;
 }
 
 
