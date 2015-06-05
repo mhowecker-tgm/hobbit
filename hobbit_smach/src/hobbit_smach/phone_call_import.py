@@ -16,14 +16,15 @@ def event_cb(msg, userdata):
 
 def wait_for_end_of_call():
     sm = StateMachine(outcomes=['succeeded', 'aborted', 'preempted'])
-    StateMachine.add(
-        'WAIT_FOR_END_OF_CALL',
-        util.WaitForMsgState(
-            '/Event',
-            Event,
-            msg_cb=event_cb),
-        transitions={'succeeded': 'succeeded',
-                     'aborted': 'WAIT_FOR_END_OF_CALL',
-                     'preempted': 'preempted'}
-    )
+    with sm:
+        StateMachine.add(
+            'WAIT_FOR_END_OF_CALL',
+            util.WaitForMsgState(
+                '/Event',
+                Event,
+                msg_cb=event_cb),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'WAIT_FOR_END_OF_CALL',
+                         'preempted': 'preempted'}
+        )
     return sm
