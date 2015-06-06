@@ -33,6 +33,12 @@
         <pose y="0.599791" x="-0.862117" theta="1.648076"/>
         <objects/>
       </place>
+      <place>
+        <name>default</name>
+        <type>default</type>
+        <pose y="0.599791" x="-0.862117" theta="1.648076"/>
+        <objects/>
+      </place>
     </places>
   </room>
   <room>
@@ -70,6 +76,12 @@
         <objects/>
       </place>
       <place>
+        <name>default</name>
+        <type>default</type>
+        <pose y="0.656512" x="4.62673" theta="1.014285"/>
+        <objects/>
+      </place>
+      <place>
         <name>mitten</name>
         <type>goTo</type>
         <pose y="0.486007" x="4.575231" theta="-0.665555"/>
@@ -89,6 +101,12 @@
       <place>
         <name>call3</name>
         <type>call_button_3</type>
+        <pose y="-1.440832" x="6.219569" theta="-0.919715"/>
+        <objects/>
+      </place>
+      <place>
+        <name>default</name>
+        <type>default</type>
         <pose y="-1.440832" x="6.219569" theta="-0.919715"/>
         <objects/>
       </place>
