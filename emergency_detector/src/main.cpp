@@ -861,8 +861,8 @@ int main(int argc, char **argv)
 
      ros::ServiceServer signalHeadIsMovingService    = nh.advertiseService(name+"/signalHeadIsMoving", signalHeadIsMoving);
 
-//     ros::ServiceServer startHeadMotionService    = nh.advertiseService(name+"/startHeadMotion", pause);
-//     ros::ServiceServer stopHeadMotionService     = nh.advertiseService(name+"/stopHeadMotion", resume);
+     ros::ServiceServer startHeadMotionService    = nh.advertiseService(name+"/startHeadMotion", pause);
+     ros::ServiceServer stopHeadMotionService     = nh.advertiseService(name+"/stopHeadMotion", resume);
 
 
      ros::ServiceServer increasePlaneDistanceService = nh.advertiseService(name+"/increasePlaneDistance" , increasePlaneDistance);
