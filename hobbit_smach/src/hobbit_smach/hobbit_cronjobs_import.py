@@ -81,9 +81,13 @@ class SleepAway(State):
             self.service_preempt()
             return 'preempted'
         next_time = get_next_time(interval=ud.interval)
+        rospy.loginfo("Remove old cronjobs")
         cron.remove_all(comment='3hours')
         cron.remove_all(comment='sleep_away')
+        cron.write()
+        rospy.loginfo(str(cron.render()))
         if check_sleep_times(next_time):
+            rospy.loginfo("Setting cronjob.")
             job = cron.new(
                 command=PATH+'cron_P.sh',
                 comment='sleep_away'
@@ -119,12 +123,14 @@ def check_sleep_times(next_time):
         wakeup = [9, 00]
         sleep = [21, 00]
     if next_time[0] >= 24:
-	    return False
+        rospy.loginfo("cronjob not set. Reason: after midnight")
+	return False
     elif time(int(wakeup[0]), int(wakeup[1]))\
             <= time(next_time[0], next_time[1])\
             <= time(int(sleep[0]), int(sleep[1])):
         return True
     else:
+        rospy.loginfo("cronjob not set. Reason: no within time limits")
         False
 
 

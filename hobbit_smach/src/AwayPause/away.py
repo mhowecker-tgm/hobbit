@@ -338,7 +338,8 @@ def main():
             Sequence.add(
                 'SET_CRONJOB',
                 cronjobs.SleepAway(),
-                transitions={'aborted': 'failed'}
+                #transitions={'aborted': 'failed'}
+                transitions={'aborted': 'succeeded'}
             )
         StateMachine.add(
             'SEQ2',
