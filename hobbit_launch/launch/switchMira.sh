@@ -54,6 +54,11 @@ then
  rosnode kill interfaces_node&
  sleep $DELAY_BETWEEN_STEPS
  rosnode kill slam_gmapping&
+sleep $DELAY_BETWEEN_STEPS
+rosnode kill places_objects&
+sleep $DELAY_BETWEEN_STEPS
+rosnode kill places_object&
+
 
  sleep $DELAY_BETWEEN_STEPS
  cd /opt/ros/hobbit_hydro/src/interfaces_mira/resources
