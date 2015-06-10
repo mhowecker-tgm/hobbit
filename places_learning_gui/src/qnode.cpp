@@ -232,7 +232,10 @@ bool QNode::savePlaces(std::string fileName)
 		{
 			//cout << "Room found " << room_name << endl;
 			if (!rooms.rooms_vector[i].places_vector.size() > 0) continue;
-			// add places
+			//delete previous places
+			room.remove_child("places");
+			
+			// add the updated places
 			pugi::xml_node places_i = room.append_child();
 		 	places_i.set_name("places");
 

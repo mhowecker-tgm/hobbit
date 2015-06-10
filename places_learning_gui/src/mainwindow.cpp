@@ -211,6 +211,23 @@ bool MainWindow::LoadFile(std::string placesFileName)
 
             room_msg.vertices_vector.push_back(vertex_msg);
         }
+
+	//Places
+        pugi::xml_node places = room.child("places");
+        for(pugi::xml_node place = places.child("place"); place; place = place.next_sibling("place"))
+        {
+	    hobbit_msgs::Place place_msg;
+	
+	    place_msg.place_name = place.child_value("name");
+	    place_msg.place_type = place.child_value("type");
+
+	    pugi::xml_node pose=place.child("pose");
+	    place_msg.x = atof(pose.attribute("x").value());
+	    place_msg.y = atof(pose.attribute("y").value());
+	    place_msg.theta = atof(pose.attribute("theta").value());
+
+            room_msg.places_vector.push_back(place_msg);
+        }
         
         
         qnode.rooms.rooms_vector.push_back(room_msg);
