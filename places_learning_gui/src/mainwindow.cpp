@@ -171,6 +171,11 @@ void MainWindow::LoadMap()
 bool MainWindow::LoadFile(std::string placesFileName)
 {
 
+   //kill required nodes
+
+   std::string sys_file("/opt/ros/hobbit_hydro/src/navigation/kill_nodes.sh ");
+   system(sys_file.c_str());
+
 // Open the file.
 
 
