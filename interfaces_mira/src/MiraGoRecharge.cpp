@@ -329,7 +329,7 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 
 	  	} // end of preempt requested
 
-		if (!status_updated) continue;
+		//if (!status_updated) continue;
 
 		interfaces_mira::MiraDockingFeedback feedback;
 		feedback.feedback = status.data.c_str();
@@ -345,7 +345,7 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 			std::cout << "task succeeded, template found and robot stoppped moving forwards " << std::endl;
 			ROS_INFO("task succeeded, template found and robot stoppped moving forwards ");
 			as_->setSucceeded(interfaces_mira::MiraDockingResult(), "Task succeeded, robot stoppped moving forwards");
-			status_updated = false;
+			//status_updated = false;
 			return;
 		}
 
@@ -354,7 +354,7 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 			std::cout << "task succeeded, robot undocked " << std::endl;
 			ROS_INFO("task succeeded, robot undocked ");
 			as_->setSucceeded(interfaces_mira::MiraDockingResult(), "Task succeeded, robot stopped moving backwards");
-			status_updated = false;
+			//status_updated = false;
 			return;
 		}
 
@@ -366,7 +366,7 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 				std::cout << "task succeeded, template found but no feedback received" << std::endl;
 				ROS_INFO("task succeeded, template found but no feedback received");
 				as_->setSucceeded(interfaces_mira::MiraDockingResult(), "Task succeeded, template found but no feedback received");
-				status_updated = false;
+				//status_updated = false;
 				return;
 				
 			}	
@@ -385,7 +385,7 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 			std::cout << "task aborted, template not foundd " << std::endl;
 			ROS_INFO("task aborted, template not found");
 			as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting, template not found");
-			status_updated = false;
+			//status_updated = false;
 			return;
 		}  
 
@@ -409,7 +409,7 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 				as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting because task failed");
 			}
 
-			status_updated = false;
+			//status_updated = false;
 			return;
 		}
 		
