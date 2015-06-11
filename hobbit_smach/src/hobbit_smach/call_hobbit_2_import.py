@@ -351,7 +351,7 @@ def call_hobbit():
             gesture_sm(),
             transitions={'succeeded': 'LOG_SUCCESS',
                          'preempted': 'LOG_PREEMPT',
-                         'aborted': 'LOG_ABORT'}
+                         'aborted': 'LOG_SUCCESS'}
         )
         StateMachine.add(
             'LOG_PREEMPT',

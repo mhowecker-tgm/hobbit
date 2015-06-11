@@ -168,8 +168,7 @@ class RandomMenu(State):
             'M_Audio, M_Entertain', 'M_Game',
             'M_Memory', 'M_Solitaire', 'M_Chess',
             'M_Simon', 'M_Sudoku', 'M_Muehle',
-            'M_eBook', 'M_Picture', 'M_Internet',
-            'M_Social']
+            'M_Picture', 'M_Internet', 'M_Social']
 
     def execute(self, ud):
         if self.preempt_requested():
@@ -371,7 +370,7 @@ def get_reward_muc():
             'REWARD',
             speech_output.emo_say_something(
                 emo='HAPPY',
-                time=10,
+                time=4,
                 text='T_RW_YouAreWelcome'
             ),
             transitions={'succeeded': 'ANYTHING_ELSE',

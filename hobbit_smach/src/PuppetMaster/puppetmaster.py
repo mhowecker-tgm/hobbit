@@ -510,8 +510,10 @@ def pickup_cb(ud, goal):
     return goal
 
 def sf_resp_cb(resp):
-    if resp:
+    if resp.result == True:
         return True
+    else:
+        return False
 
 def main():
     rospy.init_node(NAME)
@@ -756,9 +758,9 @@ def main():
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
-            transitions={'succeeded': 'RESET_ACTIVE_TASK',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK_SILENT',
                          'preempted': 'preempted',
-                         'aborted': 'RESET_ACTIVE_TASK'}
+                         'aborted': 'RESET_ACTIVE_TASK_SILENT'}
         )
         StateMachine.add(
             'STOP',
@@ -772,7 +774,7 @@ def main():
             call_hobbit.call_hobbit(),
             transitions={'succeeded': 'CHECK_SAFETY_CHECK',
                          'preempted': 'preempted',
-                         'aborted': 'RESET_ACTIVE_TASK'}
+                         'aborted': 'CHECK_SAFETY_CHECK'}
         )
         StateMachine.add(
             'CHECK_SAFETY_CHECK',
@@ -780,7 +782,7 @@ def main():
                          GetSafetycheckState,
                          request=GetSafetycheckStateRequest(state=True),
                          response_cb=sf_resp_cb),
-            transitions={'succeeded': 'RESET_ACTIVE_TASK',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK_SILENT',
                          'preempted': 'preempted',
                          'aborted': 'SAFETY_CHECK'}
         )
@@ -839,9 +841,9 @@ def main():
         StateMachine.add(
             'SURPRISE',
             social_role.get_surprise(),
-            transitions={'succeeded': 'RESET_ACTIVE_TASK',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK_SILENT',
                          'preempted': 'preempted',
-                         'aborted': 'RESET_ACTIVE_TASK'}
+                         'aborted': 'RESET_ACTIVE_TASK_SILENT'}
         )
         StateMachine.add(
             'FOLLOW',
