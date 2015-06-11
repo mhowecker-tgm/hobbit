@@ -741,7 +741,7 @@ def main():
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
-            transitions={'succeeded': 'RESET_ACTIVE_TASK',
+            transitions={'succeeded': 'SURPRISE',
                          'preempted': 'preempted',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
@@ -881,16 +881,16 @@ def main():
         StateMachine.add(
             'RECHARGE',
             recharge.getRecharge(),
-            transitions={'succeeded': 'RESET_ACTIVE_TASK',
-                         'aborted': 'RESET_ACTIVE_TASK',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK_SILENT',
+                         'aborted': 'RESET_ACTIVE_TASK_SILENT',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
             'SILENT_RECHARGE',
             recharge.getRecharge(),
-            transitions={'succeeded': 'RESET_ACTIVE_TASK',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK_SILENT',
                          'preempted': 'preempted',
-                         'aborted': 'RESET_ACTIVE_TASK'}
+                         'aborted': 'RESET_ACTIVE_TASK_SILENT'}
         )
         StateMachine.add(
             'AWAY',
@@ -902,9 +902,9 @@ def main():
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
-            transitions={'succeeded': 'RESET_ACTIVE_TASK',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK_SILENT',
                          'preempted': 'preempted',
-                         'aborted': 'RESET_ACTIVE_TASK'}
+                         'aborted': 'RESET_ACTIVE_TASK_SILENT'}
         )
         StateMachine.add(
             'SLEEP',
@@ -916,9 +916,9 @@ def main():
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
-            transitions={'succeeded': 'RESET_ACTIVE_TASK',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK_SILENT',
                          'preempted': 'preempted',
-                         'aborted': 'RESET_ACTIVE_TASK'}
+                         'aborted': 'RESET_ACTIVE_TASK_SILENT'}
         )
         StateMachine.add(
             'SOCIAL_ROLE',
@@ -926,6 +926,13 @@ def main():
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted',
                          'aborted': 'RESET_ACTIVE_TASK'}
+        )
+        StateMachine.add(
+            'RESET_ACTIVE_TASK_SILENT',
+            ResetActiveTask(),
+            transitions={'succeeded': 'succeeded',
+                         'preempted': 'preempted',
+                         'aborted': 'RESET_ACTIVE_TASK_SILENT'}
         )
         StateMachine.add(
             'RESET_ACTIVE_TASK',
