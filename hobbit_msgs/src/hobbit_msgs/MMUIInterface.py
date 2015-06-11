@@ -106,7 +106,7 @@ class MMUIInterface:
 
     def showMMUI_Calendar(
         self,
-        text='show calendar entries',
+        text='T_BR_RemindersToday',
         timespan='03:00',
         # cat=['drinking', 'drug', 'meeting', 'checklist']
         cat = 'meeting'
