@@ -23,10 +23,9 @@ import hobbit_smach.arm_move_import as arm_move
 def handle_charge_check(req):
     response = False
     rospy.loginfo("Charge check called")
-    if DEBUG:
-        return ChargeCheckResponse(response)
     for x in xrange(1, RETRY):
         rospy.sleep(1.0)
+        rospy.loginfo("Charge check loop: "+str(x))
         try:
             msg = rospy.wait_for_message(
                 '/battery_state',
