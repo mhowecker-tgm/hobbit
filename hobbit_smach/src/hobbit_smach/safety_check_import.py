@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from smach import StateMachine, State
+from smach_ros import ServiceState
 from hobbit_user_interaction import HobbitMMUI, HobbitEmotions
 import hobbit_smach.logging_import as log
 import hobbit_smach.speech_output_import as speech_output
