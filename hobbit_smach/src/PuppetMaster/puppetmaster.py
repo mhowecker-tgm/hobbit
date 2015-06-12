@@ -509,7 +509,7 @@ def pickup_cb(ud, goal):
     goal = GeneralHobbitGoal(command=String('pickup'))
     return goal
 
-def sf_resp_cb(resp):
+def sf_resp_cb(ud, resp):
     if resp.result == True:
         return True
     else:
