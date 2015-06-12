@@ -511,9 +511,9 @@ def pickup_cb(ud, goal):
 
 def sf_resp_cb(ud, resp):
     if resp.result == True:
-        return True
+        return 'succeeded' 
     else:
-        return False
+        return 'aborted'
 
 def main():
     rospy.init_node(NAME)
