@@ -338,20 +338,6 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 		feedback.feedback = status.data.c_str();
 		as_->publishFeedback(feedback);
 
-		if (is_charging)
-		{
-			mira::RPCFuture<void> r2 = robot_->getMiraAuthority().callService<void>("/robot/Robot#builtin", std::string("setProperty"), std::string("MainControlUnit.Force"), std::string("60"));
-        		r2.timedWait(mira::Duration::seconds(1));
-        		r2.get();			
-	
-			std::cout << "task succeeded, robot is charging " << std::endl;
-			ROS_INFO("task succeeded, robot is charging ");
-			as_->setSucceeded(interfaces_mira::MiraDockingResult(), "Task succeeded, robot is charging");
-			status_updated = false;
-			return;
-
-		}
-
 		if (status.data.compare("docked") == 0)
 		{
 
@@ -364,6 +350,20 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 			as_->setSucceeded(interfaces_mira::MiraDockingResult(), "Task succeeded, robot stoppped moving forwards");
 			status_updated = false;
 			return;
+		}
+
+		if (is_charging)
+		{
+			mira::RPCFuture<void> r2 = robot_->getMiraAuthority().callService<void>("/robot/Robot#builtin", std::string("setProperty"), std::string("MainControlUnit.Force"), std::string("60"));
+        		r2.timedWait(mira::Duration::seconds(1));
+        		r2.get();			
+	
+			std::cout << "task succeeded, robot is charging " << std::endl;
+			ROS_INFO("task succeeded, robot is charging ");
+			as_->setSucceeded(interfaces_mira::MiraDockingResult(), "Task succeeded, robot is charging");
+			status_updated = false;
+			return;
+
 		}
 
 		if (status.data.compare("undocked") == 0)
