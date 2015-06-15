@@ -16,6 +16,12 @@
         <objects/>
       </place>
       <place>
+        <name>default</name>
+        <type>default</type>
+        <pose y="3.63" x="-0.91" theta="0.39"/>
+        <objects/>
+      </place>
+      <place>
         <name>dock</name>
         <type>docking_base_point</type>
         <pose y="0.04299" x="-0.355" theta="-0.117625"/>
@@ -33,6 +39,12 @@
         <pose y="0.98" x="-2.25" theta="-0.02"/>
         <objects/>
       </place>
+      <place>
+        <name>default</name>
+        <type>default</type>
+        <pose y="0.98" x="-2.25" theta="-0.02"/>
+        <objects/>
+      </place>
     </places>
   </room>
   <room>
@@ -47,42 +59,25 @@
       <place>
         <name>call2</name>
         <type>call_button_2</type>
-        <pose y="-2.42" x="-0.49" theta="-2.79"/>
+        <pose y="-2.35" x="-0.71" theta="-2.79"/>
+        <objects/>
+      </place>
+      <place>
+        <name>default</name>
+        <type>default</type>
+        <pose y="-2.35" x="-0.71" theta="-2.79"/>
         <objects/>
       </place>
       <place>
         <name>mitten</name>
         <type>goTo</type>
-        <pose y="-2.115805" x="-1.225827" theta="1.708464"/>
+        <pose y="-1.59" x="-1.12" theta="-1.67"/>
         <objects/>
       </place>
       <place>
         <name>fitness</name>
         <type>fitness</type>
         <pose y="-1.05" x="-1.1" theta="-1.57"/>
-        <objects/>
-      </place>
-    </places>
-  </room>
-  <room>
-    <name>sovrum</name>
-    <vertices>
-      <vertex y="5.0" x="-6.9"/>
-      <vertex y="2.1" x="-6.8"/>
-      <vertex y="2.1" x="-3.9"/>
-      <vertex y="5.3" x="-4.2"/>
-    </vertices>
-    <places>
-      <place>
-        <name>call4</name>
-        <type>call_button_4</type>
-        <pose y="2.92" x="-5.11" theta="-3.0"/>
-        <objects/>
-      </place>
-      <place>
-        <name>mitten</name>
-        <type>goTo</type>
-        <pose y="3.505755" x="-4.678764" theta="-1.46609"/>
         <objects/>
       </place>
     </places>
@@ -97,8 +92,8 @@
     </vertices>
     <places>
       <place>
-        <name>mitten</name>
-        <type>goTo</type>
+        <name>call6</name>
+        <type>call_button_6</type>
         <pose y="-0.064771" x="-4.274988" theta="-0.086638"/>
         <objects/>
       </place>
