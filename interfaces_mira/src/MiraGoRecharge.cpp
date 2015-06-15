@@ -19,12 +19,15 @@ void MiraGoRecharge::initialize()
   robot_->getMiraAuthority().subscribe<std::string>("/localization/TemplateLocalizationEvent", &MiraGoRecharge::template_channel_callback, this);
   robot_->getMiraAuthority().subscribe<std::string>("/docking/DockingStatus", &MiraGoRecharge::status_channel_callback, this);
 
+  batterySubs = robot_->getRosNode().subscribe<mira_msgs::BatteryState>("battery_state", 1, &MiraGoRecharge::battery_state_callback, this);
+
   status.data = "idle";
 
   as_ = new actionlib::SimpleActionServer<interfaces_mira::MiraDockingAction>(robot_->getRosNode(), "docking_task", boost::bind(&MiraGoRecharge::executeCb, this, _1), false);
   as_->start();
 
   status_updated = false;
+  is_charging = false;
 
 }
 
@@ -335,6 +338,20 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 		feedback.feedback = status.data.c_str();
 		as_->publishFeedback(feedback);
 
+		if (is_charging)
+		{
+			mira::RPCFuture<void> r2 = robot_->getMiraAuthority().callService<void>("/robot/Robot#builtin", std::string("setProperty"), std::string("MainControlUnit.Force"), std::string("60"));
+        		r2.timedWait(mira::Duration::seconds(1));
+        		r2.get();			
+	
+			std::cout << "task succeeded, robot is charging " << std::endl;
+			ROS_INFO("task succeeded, robot is charging ");
+			as_->setSucceeded(interfaces_mira::MiraDockingResult(), "Task succeeded, robot is charging");
+			status_updated = false;
+			return;
+
+		}
+
 		if (status.data.compare("docked") == 0)
 		{
 
@@ -420,5 +437,12 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 
 
 
+}
+
+
+void MiraGoRecharge::battery_state_callback(const mira_msgs::BatteryState::ConstPtr& msg)
+{
+  is_charging = (*msg).charging;
+    
 }
 
