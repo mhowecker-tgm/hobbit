@@ -26,6 +26,7 @@
 #include <actionlib/server/simple_action_server.h>
 #include <interfaces_mira/MiraDockingAction.h>
 
+#include <mira_msgs/BatteryState.h>
 
 class MiraGoRecharge: public MiraRobotModule {
 public:
@@ -42,6 +43,10 @@ public:
         void status_channel_callback(mira::ChannelRead<std::string> data);
 	void template_channel_callback(mira::ChannelRead<std::string> data);
 
+	ros::Subscriber batterySubs;
+
+	void battery_state_callback(const mira_msgs::BatteryState::ConstPtr& msg);
+
 private:
         MiraGoRecharge();
 
@@ -56,6 +61,8 @@ private:
 	bool template_found;
 
 	ros::Time timeout;
+
+	bool is_charging;
 };
 
 
