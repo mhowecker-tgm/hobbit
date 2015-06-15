@@ -743,9 +743,9 @@ def main():
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
-            transitions={'succeeded': 'SURPRISE',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK_SILENT',
                          'preempted': 'preempted',
-                         'aborted': 'RESET_ACTIVE_TASK'}
+                         'aborted': 'RESET_ACTIVE_TASK_SILENT'}
         )
         StateMachine.add(
             'GOTO',
