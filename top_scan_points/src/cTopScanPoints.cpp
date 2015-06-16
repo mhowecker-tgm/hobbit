@@ -100,9 +100,13 @@ cTopScanPoints::~cTopScanPoints()
 
 void cTopScanPoints::open(ros::NodeHandle & n)
 {
-	cloudSubscriber = n.subscribe<sensor_msgs::PointCloud2>("/headcam/depth_registered/points", 1, &cTopScanPoints::callback, this);
+	cloudSubscriber.subscribe(n,"/headcam/depth_registered/points", 1);
 
         laserPublisher = n.advertise<sensor_msgs::LaserScan>("obstacle_scan", 1); 
+
+	tfFilter = new tf::MessageFilter<sensor_msgs::PointCloud2>(cloudSubscriber, listener, target_link, 1);
+	tfFilter->registerCallback(boost::bind(&cTopScanPoints::callback, this, _1));
+	tfFilter->setTolerance(ros::Duration(0.05));
 
 }
 
@@ -255,7 +259,7 @@ void cTopScanPoints::callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 //run
 void cTopScanPoints::Run(void)
 {
-	try 
+	/*try 
 	{
 	    listener.waitForTransform(origin_link, target_link, ros::Time(0), ros::Duration(10.0));
 	    listener.lookupTransform(origin_link, target_link, ros::Time(0), transform);
@@ -263,7 +267,7 @@ void cTopScanPoints::Run(void)
 	catch (tf::TransformException ex) 
 	{
     	     ROS_ERROR("%s",ex.what());
-	}
+	}*/
 
 }
 

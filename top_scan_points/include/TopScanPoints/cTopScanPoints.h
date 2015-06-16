@@ -9,6 +9,9 @@
 #include "tf/transform_broadcaster.h"
 #include "tf/transform_listener.h"
 
+#include "tf/message_filter.h"
+#include "message_filters/subscriber.h"
+
 
 #define DEPTH_DATA_WIDTH	640
 #define DEPTH_DATA_HEIGHT	480
@@ -34,7 +37,7 @@ private:
   std::string laserFrame; //pan frame simulating projected laser
   bool result;
 
-  ros::Subscriber cloudSubscriber;
+  //ros::Subscriber cloudSubscriber;
 
   sensor_msgs::LaserScan output;
   ros::Publisher laserPublisher;
@@ -42,8 +45,12 @@ private:
   int init_argc;
   char **init_argv;
 
-  tf::TransformListener listener;
-  tf::StampedTransform transform;
+tf::StampedTransform transform;
+
+tf::TransformListener listener;
+message_filters::Subscriber<sensor_msgs::PointCloud2> cloudSubscriber;
+tf::MessageFilter<sensor_msgs::PointCloud2> *tfFilter;
+
 
 double robot_front;
 double robot_width;
