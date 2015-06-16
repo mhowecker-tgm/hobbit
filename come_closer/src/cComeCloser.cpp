@@ -286,8 +286,8 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 	else
 	{
 		as_->setAborted(hobbit_msgs::GeneralHobbitResult(), "aborted, too close");
-		std::cout << "aborted, too close" << std::endl;
-		ROS_INFO ("aborted, too close "); 
+		std::cout << "aborted, too close to obstacle" << std::endl;
+		ROS_INFO ("aborted, too close to obstacle"); 
 		return;
 
 	}
@@ -301,6 +301,18 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 	{
 
 		//laserPublisher.publish(scan);  //FIXME, to be removed, only for visualization purposes
+
+		if(as_->isPreemptRequested())
+      		{
+			std::cout << "preempt requested" << std::endl;
+			ROS_INFO ("preempt requested ");
+			
+			stop();
+
+			as_->setPreempted();
+			return;
+
+		}
 
 		if (finished_rotation && !started_movement && !movement_cmd_sent)
 		{
@@ -325,18 +337,6 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 
 		}
 		
-
-		if(as_->isPreemptRequested())
-      		{
-			std::cout << "preempt requested" << std::endl;
-			ROS_INFO ("preempt requested ");
-			
-			stop();
-
-			as_->setPreempted();
-			return;
-
-		}
 
 		//check the time
 		ros::Duration time_left = timeout - ros::Time::now();
