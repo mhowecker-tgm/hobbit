@@ -7,7 +7,7 @@ from mira_msgs.msg import BatteryState
 from hobbit_msgs.srv import HeadSleep
 
 NAME = 'battery_monitor'
-VOLT_LIMIT = 24.5
+VOLT_LIMIT = 25.0
 LIMIT = False
 LIMIT2 = False
 

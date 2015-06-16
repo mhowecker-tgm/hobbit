@@ -100,6 +100,16 @@ def getRecharge():
             'SAY_TIRED',
             speech_output.emo_say_something(
                 emo='TIRED',
+                time=4,
+                text='T_CH_VeryTiredRelax'
+            ),
+            transitions={'aborted': 'LOG_ABORT',
+                         'preempted': 'LOG_PREEMPT'}
+        )
+        Sequence.add(
+            'SAY_MOVE_TO_DOCK',
+            speech_output.emo_say_something(
+                emo='TIRED',
                 time=0,
                 text='T_CH_MovingToChargingStation'
             ),
