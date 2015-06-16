@@ -352,8 +352,17 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 			return;
 		}
 
-		if (is_charging)
+		if (task == 0 && is_charging)
 		{
+
+			//cancel the task
+			auto providers_ = robot_->getMiraAuthority().queryServicesForInterface("IDockingProcess");
+
+			const std::string service_ = providers_.front();
+			auto rpcFuture_ = robot_->getMiraAuthority().callService<void>(service_, "interrupt");
+			std::cout << "interrupted " << std::endl;
+			rpcFuture_.get();
+
 			mira::RPCFuture<void> r2 = robot_->getMiraAuthority().callService<void>("/robot/Robot#builtin", std::string("setProperty"), std::string("MainControlUnit.Force"), std::string("60"));
         		r2.timedWait(mira::Duration::seconds(1));
         		r2.get();			
