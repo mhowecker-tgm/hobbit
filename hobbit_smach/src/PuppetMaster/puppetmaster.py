@@ -710,13 +710,13 @@ def main():
             ),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted',
-                         'aborted': 'RESET_ACTIVE_TASK'}
+                         'aborted': 'RESET_ACTIVE_TASK_SILENT'}
         )
         StateMachine.add(
             'CLEAR_FLOOR',
             FakeForAllWithoutRunningActionSever(name='CLEAR_FLOOR'),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
-                         'aborted': 'RESET_ACTIVE_TASK',
+                         'aborted': 'RESET_ACTIVE_TASK_SILENT',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
@@ -731,7 +731,7 @@ def main():
             ),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted',
-                         'aborted': 'RESET_ACTIVE_TASK'}
+                         'aborted': 'RESET_ACTIVE_TASK_SILENT'}
         )
         StateMachine.add(
             'PATROL',
@@ -767,7 +767,7 @@ def main():
             helper.get_hobbit_full_stop(),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted',
-                         'aborted': 'RESET_ACTIVE_TASK'}
+                         'aborted': 'RESET_ACTIVE_TASK_SILENT'}
         )
         StateMachine.add(
             'CALL_HOBBIT',
@@ -801,7 +801,7 @@ def main():
             ),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted',
-                         'aborted': 'RESET_ACTIVE_TASK'}
+                         'aborted': 'RESET_ACTIVE_TASK_SILENT'}
         )
         StateMachine.add(
             'EMERGENCY_BATHROOM',
@@ -815,7 +815,7 @@ def main():
             ),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted',
-                         'aborted': 'RESET_ACTIVE_TASK'}
+                         'aborted': 'RESET_ACTIVE_TASK_SILENT'}
         )
         StateMachine.add(
             'PICKUP',
@@ -829,7 +829,7 @@ def main():
             ),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted',
-                         'aborted': 'RESET_ACTIVE_TASK'}
+                         'aborted': 'RESET_ACTIVE_TASK_SILENT'}
         )
         StateMachine.add(
             'CALL',
@@ -857,7 +857,7 @@ def main():
             ),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted',
-                         'aborted': 'RESET_ACTIVE_TASK'}
+                         'aborted': 'RESET_ACTIVE_TASK_SILENT'}
         )
         StateMachine.add(
             'MAIN_MENU',
@@ -877,7 +877,7 @@ def main():
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
-                         'aborted': 'RESET_ACTIVE_TASK',
+                         'aborted': 'RESET_ACTIVE_TASK_SILENT',
                          'preempted': 'preempted'}
         )
         StateMachine.add(
@@ -927,7 +927,7 @@ def main():
             social_role.get_social_role_change(),
             transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted',
-                         'aborted': 'RESET_ACTIVE_TASK'}
+                         'aborted': 'RESET_ACTIVE_TASK_SILENT'}
         )
         StateMachine.add(
             'RESET_ACTIVE_TASK_SILENT',
@@ -941,7 +941,7 @@ def main():
             ResetActiveTask(),
             transitions={'succeeded': 'END_USER_INTERACTION',
                          'preempted': 'preempted',
-                         'aborted': 'RESET_ACTIVE_TASK'}
+                         'aborted': 'RESET_ACTIVE_TASK_SILENT'}
         )
         StateMachine.add(
             'EMOTION',
@@ -965,14 +965,14 @@ def main():
                 social_role.get_reward_muc(),
                 transitions={'succeeded': 'RESET_ACTIVE_TASK',
                          'preempted': 'preempted',
-                         'aborted': 'RESET_ACTIVE_TASK'}
+                         'aborted': 'RESET_ACTIVE_TASK_SILENT'}
             )
         else:
             StateMachine.add(
                 'END_USER_INTERACTION',
                 end_interaction.move_away(),
                 transitions={'succeeded': 'succeeded',
-                             'aborted': 'RESET_ACTIVE_TASK',
+                             'aborted': 'RESET_ACTIVE_TASK_SILENT',
                              'preempted': 'preempted'}
             )
             StateMachine.add(
@@ -980,7 +980,7 @@ def main():
                 social_role.get_reward(),
                 transitions={'succeeded': 'MAIN_MENU',
                          'preempted': 'preempted',
-                         'aborted': 'RESET_ACTIVE_TASK'}
+                         'aborted': 'RESET_ACTIVE_TASK_SILENT'}
             )
         StateMachine.add(
             'MUC_RESET_ACTIVE_TASK',
@@ -994,7 +994,7 @@ def main():
             ResetActiveTask(),
             transitions={'succeeded': 'preempted',
                          'preempted': 'preempted',
-                         'aborted': 'RESET_ACTIVE_TASK'}
+                         'aborted': 'RESET_ACTIVE_TASK_SILENT'}
         )
 
     """
