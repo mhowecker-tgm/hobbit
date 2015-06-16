@@ -51,6 +51,9 @@ double robot_width;
 double min_height_;
 double max_height_;
 
+std::string origin_link;
+std::string target_link;
+
 };
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #endif

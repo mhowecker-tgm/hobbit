@@ -77,6 +77,9 @@ cTopScanPoints::cTopScanPoints(int argc, char **argv) : init_argc(argc), init_ar
 	nh.param("min_height", min_height_, 0.15);
 	nh.param("max_height", max_height_, 1.4);
 
+	nh.param<std::string>("origin_link", origin_link, "base_link");
+	nh.param<std::string>("target_link", target_link, "headcam_rgb_optical_frame");
+
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Destructor. Shuts down ROS, ends the thread and released allocated
@@ -254,8 +257,8 @@ void cTopScanPoints::Run(void)
 {
 	try 
 	{
-	    listener.waitForTransform("base_link", "headcam_rgb_optical_frame", ros::Time(0), ros::Duration(10.0));
-	    listener.lookupTransform("base_link", "headcam_rgb_optical_frame", ros::Time(0), transform);
+	    listener.waitForTransform(origin_link, target_link, ros::Time(0), ros::Duration(10.0));
+	    listener.lookupTransform(origin_link, target_link, ros::Time(0), transform);
 	} 
 	catch (tf::TransformException ex) 
 	{
