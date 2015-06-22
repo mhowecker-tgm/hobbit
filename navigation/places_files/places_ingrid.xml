@@ -1,0 +1,97 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rooms>
+  <room>
+    <name>kök</name>
+    <vertices>
+      <vertex y="-0.4" x="1.5"/>
+      <vertex y="-0.6" x="-4.6"/>
+      <vertex y="-3.200001" x="-4.7"/>
+      <vertex y="-3.0" x="1.5"/>
+    </vertices>
+    <places>
+      <place>
+        <name>call3</name>
+        <type>call_button_3</type>
+        <pose y="-2.01" x="-2.21" theta="-3.120214"/>
+        <objects/>
+      </place>
+      <place>
+        <name>default</name>
+        <type>default</type>
+        <pose y="-2.01" x="-2.21" theta="-3.120214"/>
+        <objects/>
+      </place>
+      <place>
+        <name>mitten</name>
+        <type>goTo</type>
+        <pose y="-1.376967" x="-0.152509" theta="-3.082726"/>
+        <objects/>
+      </place>
+    </places>
+  </room>
+  <room>
+    <name>rum</name>
+    <vertices>
+      <vertex y="3.299999" x="1.0"/>
+      <vertex y="0.1" x="0.799999"/>
+      <vertex y="0.199999" x="-4.6"/>
+      <vertex y="3.799999" x="-4.9"/>
+    </vertices>
+    <places>
+      <place>
+        <name>call1</name>
+        <type>call_button_1</type>
+        <pose y="0.700796" x="-1.765826" theta="2.012699"/>
+        <objects/>
+      </place>
+      <place>
+        <name>default</name>
+        <type>default</type>
+        <pose y="0.700796" x="-1.765826" theta="2.012699"/>
+        <objects/>
+      </place>
+      <place>
+        <name>dock</name>
+        <type>docking_base_point</type>
+        <pose y="0.0744" x="-0.3766" theta="-0.0223"/>
+        <objects/>
+      </place>
+      <place>
+        <name>call2</name>
+        <type>call_button_2</type>
+        <pose y="2.061896" x="-0.042482" theta="1.733936"/>
+        <objects/>
+      </place>
+      <place>
+        <name>default</name>
+        <type>default</type>
+        <pose y="2.061896" x="-0.042482" theta="1.733936"/>
+        <objects/>
+      </place>
+      <place>
+        <name>soffan</name>
+        <type>goTo</type>
+        <pose y="0.97644" x="-1.662781" theta="2.165767"/>
+        <objects/>
+      </place>
+      <place>
+        <name>fåtöljen</name>
+        <type>goTo</type>
+        <pose y="2.131445" x="-0.256537" theta="1.581738"/>
+        <objects/>
+      </place>
+      <place>
+        <name>fitness</name>
+        <type>fitness</type>
+        <pose y="0.533131" x="-1.510647" theta="-1.673283"/>
+        <objects/>
+      </place>
+      <place>
+        <name>balkong</name>
+        <type>goTo</type>
+        <pose y="0.418011" x="-2.331407" theta="2.38586"/>
+        <objects/>
+      </place>
+    </places>
+  </room>
+</rooms>
