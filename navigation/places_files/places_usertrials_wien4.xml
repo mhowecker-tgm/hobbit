@@ -1,32 +1,90 @@
-<?xml version="1.0"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <rooms>
-	<room>
-		<name>wohnzimmer</name>
-		<vertices>
-			<vertex x="-5.500000" y="-6.500000" />
-			<vertex x="-5.500000" y="-10.200001" />
-			<vertex x="0.500000" y="-10.300001" />
-			<vertex x="0.900000" y="-6.100000" />
-		</vertices>
-	</room>
-	<room>
-		<name>schlafzimmer</name>
-		<vertices>
-			<vertex x="-1.500000" y="-3.200001" />
-			<vertex x="-1.900000" y="1.699999" />
-			<vertex x="1.799999" y="1.699999" />
-			<vertex x="1.299999" y="-3.100000" />
-		</vertices>
-	</room>
-	<room>
-		<name>korridor</name>
-		<vertices>
-			<vertex x="-2.199999" y="-1.900000" />
-			<vertex x="-2.100000" y="-3.500000" />
-			<vertex x="-3.199999" y="-3.400000" />
-			<vertex x="-2.900000" y="-5.800001" />
-			<vertex x="-5.000000" y="-5.900000" />
-			<vertex x="-5.000000" y="-2.100000" />
-		</vertices>
-	</room>
+  <room>
+    <name>wohnzimmer</name>
+    <vertices>
+      <vertex y="-6.5" x="-5.5"/>
+      <vertex y="-10.200001" x="-5.5"/>
+      <vertex y="-10.300001" x="0.5"/>
+      <vertex y="-6.1" x="0.9"/>
+    </vertices>
+    <places>
+      <place>
+        <name>fitness</name>
+        <type>fitness</type>
+        <pose y="-8.098165" x="-3.612685" theta="-1.663932"/>
+        <objects/>
+      </place>
+      <place>
+        <name>call3</name>
+        <type>call_button_3</type>
+        <pose y="-7.814869" x="-3.379089" theta="-0.05424"/>
+        <objects/>
+      </place>
+      <place>
+        <name>tisch</name>
+        <type>searchable</type>
+        <pose y="-7.817764" x="-3.382768" theta="-0.619366"/>
+        <objects>
+          <object name="Aspirin" probability="0.5"/>
+        </objects>
+      </place>
+    </places>
+  </room>
+  <room>
+    <name>schlafzimmer</name>
+    <vertices>
+      <vertex y="-3.200001" x="-1.5"/>
+      <vertex y="1.699999" x="-1.9"/>
+      <vertex y="1.699999" x="1.799999"/>
+      <vertex y="-3.1" x="1.299999"/>
+    </vertices>
+    <places>
+      <place>
+        <name>call1</name>
+        <type>call_button_1</type>
+        <pose y="-0.419122" x="0.156148" theta="2.274771"/>
+        <objects/>
+      </place>
+      <place>
+        <name>mitte</name>
+        <type>goTo</type>
+        <pose y="-1.69958" x="0.052463" theta="1.544874"/>
+        <objects/>
+      </place>
+      <place>
+        <name>tisch</name>
+        <type>searchable</type>
+        <pose y="-1.886356" x="-0.596328" theta="2.378765"/>
+        <objects>
+          <object name="Aspirin" probability="0.5"/>
+        </objects>
+      </place>
+      <place>
+        <name>dock</name>
+        <type>docking_base_point</type>
+        <pose y="0.21" x="0.44597" theta="0.037"/>
+        <objects/>
+      </place>
+    </places>
+  </room>
+  <room>
+    <name>korridor</name>
+    <vertices>
+      <vertex y="-1.9" x="-2.199999"/>
+      <vertex y="-3.5" x="-2.1"/>
+      <vertex y="-3.4" x="-3.199999"/>
+      <vertex y="-5.800001" x="-2.9"/>
+      <vertex y="-5.9" x="-5.0"/>
+      <vertex y="-2.1" x="-5.0"/>
+    </vertices>
+    <places>
+      <place>
+        <name>mitte</name>
+        <type>goTo</type>
+        <pose y="-5.049905" x="-3.892417" theta="-1.600043"/>
+        <objects/>
+      </place>
+    </places>
+  </room>
 </rooms>

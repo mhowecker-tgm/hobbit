@@ -24,7 +24,7 @@
       <place>
         <name>call1</name>
         <type>call_button_1</type>
-        <pose y="0.041913" x="-0.473035" theta="-2.150062"/>
+        <pose y="0.02" x="-1.1" theta="-1.57"/>
         <objects/>
       </place>
       <place>
