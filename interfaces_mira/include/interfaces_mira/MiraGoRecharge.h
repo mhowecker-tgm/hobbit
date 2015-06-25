@@ -36,8 +36,6 @@ public:
 
         void initialize();
 
-	void docking_task_callback(const std_msgs::String::ConstPtr& msg);
-
         //void stop_request_callback(const std_msgs::String::ConstPtr& msg);  //FIXME?
 
         void status_channel_callback(mira::ChannelRead<std::string> data);
