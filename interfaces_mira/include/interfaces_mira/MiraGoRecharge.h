@@ -47,7 +47,7 @@ public:
 
 private:
         MiraGoRecharge();
-
+	~MiraGoRecharge();
 
 	std_msgs::String status;
 
