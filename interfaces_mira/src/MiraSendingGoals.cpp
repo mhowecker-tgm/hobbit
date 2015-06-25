@@ -36,7 +36,6 @@ MiraSendingGoals::~MiraSendingGoals()
 
 void MiraSendingGoals::initialize() {
         
-  goal_pose_subscriber = robot_->getRosNode().subscribe("/goal_pose", 1000, &MiraSendingGoals::goal_pose_callback, this);
   //stop_sub = robot_->getRosNode().subscribe("/stop_request", 2, &MiraSendingGoals::stop_request_callback, this);
 
   bumper_subs = robot_->getRosNode().subscribe("/bumper", 2, &MiraSendingGoals::bumper_callback, this);
@@ -213,18 +212,6 @@ void MiraSendingGoals::goal_status_channel_callback(mira::ChannelRead<std::strin
 
 }
 
-void MiraSendingGoals::goal_pose_callback(const hobbit_msgs::Pose2DStamped::ConstPtr& goal_pose) 
-{
-
-	TaskPtr task(new Task());
-	task->addSubTask(SubTaskPtr(new PreferredDirectionTask(mira::navigation::PreferredDirectionTask::FORWARD, 1.0f)));
-        task->addSubTask(SubTaskPtr(new mira::navigation::PositionTask(mira::Point2f(goal_pose->x, goal_pose->y), 0.1f, 0.1f)));
-	task->addSubTask(mira::navigation::SubTaskPtr(new mira::navigation::OrientationTask(goal_pose->theta, mira::deg2rad(5.0f))));
-
-	std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
-	robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
-
-}
 
 /*void MiraSendingGoals::stop_request_callback(const std_msgs::String::ConstPtr& msg)
 {
