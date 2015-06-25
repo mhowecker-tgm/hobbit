@@ -31,6 +31,13 @@ void MiraGoRecharge::initialize()
 
 }
 
+MiraGoRecharge::~MiraGoRecharge()
+{
+  if(as_ != NULL)
+  	delete as_;
+ 
+}
+
 void MiraGoRecharge::template_channel_callback(mira::ChannelRead<std::string> data) 
 {
 
