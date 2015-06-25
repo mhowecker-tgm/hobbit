@@ -80,66 +80,6 @@ void MiraGoRecharge::status_channel_callback(mira::ChannelRead<std::string> data
 	status_updated = true;
 }
 
-void MiraGoRecharge::docking_task_callback(const std_msgs::String::ConstPtr& msg)
-{
-
-	//if (msg->data.compare("docking_station") || msg->data.compare("DockingStation") || msg->data.compare("Recharge") || msg->data.compare("recharge"))
-
-	std::cout << "data " << msg->data << std::endl;
-	
-	if (msg->data.compare("docking_on") == 0)
-	{
-		unsigned int s = 1; //FIXME
-
-		std::cout << "Docking on" << std::endl;
-		ROS_INFO("Docking on ");
-
-		// Get docking service
-		auto providers = robot_->getMiraAuthority().queryServicesForInterface("IDockingProcess");
-		if(providers.empty()) 
-		{
-		    std::cout << "no providers for IDockingProcess" << std::endl;
-		    ROS_INFO("no providers for IDockingProcess ");
-		    return;
-		}
-
-		// Assume that our DockingProcess is the first and only available IDockingProcess provider.
-		const std::string service = providers.front();
-
-		// Let the robot dock on
-		auto rpcFuture = robot_->getMiraAuthority().callService<void>(service, "dockOn", s);
-
-		// Get the result, even though it is void. If an exception has occurred, this will throw as well.
-		rpcFuture.get();
-	}
-	else if (msg->data.compare("docking_off") == 0)
-	{
-		unsigned int s = 1; //FIXME
-
-		std::cout << "Docking off" << std::endl;
-		ROS_INFO("Docking off ");
-
-		// Get docking service
-		auto providers = robot_->getMiraAuthority().queryServicesForInterface("IDockingProcess");
-		if(providers.empty()) 
-		{
-		    std::cout << "no providers for IDockingProcess" << std::endl;
-		    ROS_INFO("no providers for IDockingProcess ");
-		    return;
-		}
-
-		// Assume that our DockingProcess is the first and only available IDockingProcess provider.
-		const std::string service = providers.front();
-
-		//docking_off
-		auto rpcFuture = robot_->getMiraAuthority().callService<void>(service, "dockOff", s);
-
-		rpcFuture.get();
-
-	}
-
-}
-
 void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& docking_action)
 {
 
