@@ -167,7 +167,8 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 		{
 		    std::cout << "no providers for IDockingProcess" << std::endl;
 		    ROS_INFO("no providers for IDockingProcess ");
-		    as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting, no providers");
+		    //as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting, no providers");
+		    as_->setPreempted();
 		    return;
 		}
 
@@ -195,7 +196,8 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 		{
 		    std::cout << "no providers for IDockingProcess" << std::endl;
 		    ROS_INFO("no providers for IDockingProcess ");
-		    as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting, no providers");
+		    //as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting, no providers");
+		    as_->setPreempted();
 		    return;
 		}
 
@@ -210,7 +212,8 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 	}
 	else
 	{
-	 	as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting because no proper task was received");
+	 	//as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting because no proper task was received");
+		as_->setPreempted();
 		return;
 	}
 
@@ -232,7 +235,8 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 			{
 			    std::cout << "no providers for IDockingProcess to cancel the task" << std::endl;
 			    ROS_INFO("no providers for IDockingProcess ");
-			    as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting, no providers");
+			    //as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting, no providers");
+			    as_->setPreempted();
 			    return;
 			}
 			const std::string service_c = providers_c.front();
@@ -248,7 +252,8 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 
 			  if(new_task.docking_task != 0 && new_task.docking_task != 1)
 			  {
-			    as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting because the new task is not valid");
+			    //as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting because the new task is not valid");
+			    as_->setPreempted();
 			    return;
 			  }
 
@@ -272,7 +277,8 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 				{
 				    std::cout << "no providers for IDockingProcess" << std::endl;
 				    ROS_INFO("no providers for IDockingProcess ");
-				    as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting, no providers");
+				    //as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting, no providers");
+				    as_->setPreempted();
 				    return;
 				}
 
@@ -300,7 +306,8 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 				{
 				    std::cout << "no providers for IDockingProcess" << std::endl;
 				    ROS_INFO("no providers for IDockingProcess ");
-				    as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting, no providers");
+				    //as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting, no providers");
+				    as_->setPreempted();
 				    return;
 				}
 

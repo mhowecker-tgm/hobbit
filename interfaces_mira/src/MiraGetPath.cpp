@@ -27,12 +27,13 @@ void MiraGetPath::path_channel_callback(mira::ChannelRead<std::vector<mira::Poin
   global_plan = data;
   new_plan = true;
 
-  //std::cout << "path size " << global_plan.size() << std::endl;
-
 }
 
 bool MiraGetPath::get_path(nav_msgs::GetPlan::Request &req, nav_msgs::GetPlan::Response &resp) 
 {
+
+  new_plan = false;
+  global_plan.clear();
 
   // convert target pose to Mira format
   mira::Point2f goal_pose_mira(req.goal.pose.position.x, req.goal.pose.position.y);
@@ -58,17 +59,16 @@ bool MiraGetPath::get_path(nav_msgs::GetPlan::Request &req, nav_msgs::GetPlan::R
 
  //std::cout << "before waiting" << std::endl;
   
-  // wait for new data on the "navigation/Path" channel  
-  //FIXME
-  int max_t = 1000000;
-  int t = 0;
-  while(!new_plan && t < max_t) t++;
+  // wait for new data on the "navigation/Path" channel  for a given duration (40 secs)
 
-  //if (t>=max_t) return false;
+  ros::Time timeout = ros::Time::now() + ros::Duration(40);
+  while(!new_plan)
+  {
+	ros::Duration time_left = timeout - ros::Time::now();
+	if (time_left <= ros::Duration(0,0))  //the timeout has been reached
+		break;
+  }
 
-  sleep (2);
-
-  //std::cout << "after waiting" << std::endl;
 
   // Extract the planned path, copy the path into the response
   resp.plan.poses.resize(global_plan.size());
@@ -99,9 +99,9 @@ bool MiraGetPath::get_path(nav_msgs::GetPlan::Request &req, nav_msgs::GetPlan::R
   r3.timedWait(mira::Duration::seconds(1));
   r3.get();
 
-  std::cout << "pilot is back" << std::endl;
+  sleep (2);
 
-  global_plan.clear();
+  std::cout << "pilot is back" << std::endl;
 
   return true;
 }
