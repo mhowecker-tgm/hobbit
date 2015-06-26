@@ -681,7 +681,7 @@ def main():
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
-            transitions={'succeeded': 'RESET_ACTIVE_TASK',
+            transitions={'succeeded': 'END_USER_INTERACTION_LEARN',
                          'preempted': 'preempted',
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
@@ -694,9 +694,9 @@ def main():
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
-            transitions={'succeeded': 'RESET_ACTIVE_TASK',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK_SILENT',
                          'preempted': 'preempted',
-                         'aborted': 'RESET_ACTIVE_TASK'}
+                         'aborted': 'RESET_ACTIVE_TASK_SILENT'}
         )
         StateMachine.add(
             'EMERGENCY',
@@ -708,14 +708,14 @@ def main():
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
-            transitions={'succeeded': 'RESET_ACTIVE_TASK',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK_SILENT',
                          'preempted': 'preempted',
                          'aborted': 'RESET_ACTIVE_TASK_SILENT'}
         )
         StateMachine.add(
             'CLEAR_FLOOR',
             FakeForAllWithoutRunningActionSever(name='CLEAR_FLOOR'),
-            transitions={'succeeded': 'RESET_ACTIVE_TASK',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK_SILENT',
                          'aborted': 'RESET_ACTIVE_TASK_SILENT',
                          'preempted': 'preempted'}
         )
@@ -729,7 +729,7 @@ def main():
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
-            transitions={'succeeded': 'RESET_ACTIVE_TASK',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK_SILENT',
                          'preempted': 'preempted',
                          'aborted': 'RESET_ACTIVE_TASK_SILENT'}
         )
@@ -765,7 +765,7 @@ def main():
         StateMachine.add(
             'STOP',
             helper.get_hobbit_full_stop(),
-            transitions={'succeeded': 'RESET_ACTIVE_TASK',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK_SILENT',
                          'preempted': 'preempted',
                          'aborted': 'RESET_ACTIVE_TASK_SILENT'}
         )
@@ -827,16 +827,16 @@ def main():
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
-            transitions={'succeeded': 'RESET_ACTIVE_TASK',
+            transitions={'succeeded': 'END_USER_INTERACTION_PICKUP',
                          'preempted': 'preempted',
                          'aborted': 'RESET_ACTIVE_TASK_SILENT'}
         )
         StateMachine.add(
             'CALL',
             phone_call.wait_for_end_of_call(),
-            transitions={'succeeded': 'RESET_ACTIVE_TASK',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK_SILENT',
                          'preempted': 'preempted',
-                         'aborted': 'RESET_ACTIVE_TASK'}
+                         'aborted': 'RESET_ACTIVE_TASK_SILENT'}
         )
         StateMachine.add(
             'SURPRISE',
@@ -855,7 +855,7 @@ def main():
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
-            transitions={'succeeded': 'RESET_ACTIVE_TASK',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK_SILENT',
                          'preempted': 'preempted',
                          'aborted': 'RESET_ACTIVE_TASK_SILENT'}
         )
@@ -876,7 +876,7 @@ def main():
                 preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
                 server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
             ),
-            transitions={'succeeded': 'RESET_ACTIVE_TASK',
+            transitions={'succeeded': 'RESET_ACTIVE_TASK_SILENT',
                          'aborted': 'RESET_ACTIVE_TASK_SILENT',
                          'preempted': 'preempted'}
         )
@@ -889,7 +889,7 @@ def main():
         )
         StateMachine.add(
             'SILENT_RECHARGE',
-            recharge.getRecharge(),
+            recharge.getSilentRecharge(),
             transitions={'succeeded': 'RESET_ACTIVE_TASK_SILENT',
                          'preempted': 'preempted',
                          'aborted': 'RESET_ACTIVE_TASK_SILENT'}
@@ -954,8 +954,8 @@ def main():
         )
         if MUC_ENABLED:
             StateMachine.add(
-                'END_USER_INTERACTION',
-                end_interaction.end_interaction_muc(),
+                'END_USER_INTERACTION_REWARD',
+                end_interaction.end_interaction_muc_reward(),
                 transitions={'succeeded': 'succeeded',
                              'aborted': 'MUC_RESET_ACTIVE_TASK',
                              'preempted': 'preempted'}
@@ -963,9 +963,23 @@ def main():
             StateMachine.add(
                 'REWARD',
                 social_role.get_reward_muc(),
-                transitions={'succeeded': 'RESET_ACTIVE_TASK',
+                transitions={'succeeded': 'END_USER_INTERACTION_REWARD',
                          'preempted': 'preempted',
                          'aborted': 'RESET_ACTIVE_TASK_SILENT'}
+            )
+            StateMachine.add(
+                'END_USER_INTERACTION_LEARN',
+                end_interaction.end_interaction_muc_learn(),
+                transitions={'succeeded': 'succeeded',
+                             'aborted': 'MUC_RESET_ACTIVE_TASK',
+                             'preempted': 'preempted'}
+            )
+            StateMachine.add(
+                'END_USER_INTERACTION_PICKUP',
+                end_interaction.end_interaction_muc_pickup(),
+                transitions={'succeeded': 'succeeded',
+                             'aborted': 'MUC_RESET_ACTIVE_TASK',
+                             'preempted': 'preempted'}
             )
         else:
             StateMachine.add(
@@ -978,7 +992,7 @@ def main():
             StateMachine.add(
                 'REWARD',
                 social_role.get_reward(),
-                transitions={'succeeded': 'MAIN_MENU',
+                transitions={'succeeded': 'END_USER_INTERACTION_REWARD',
                          'preempted': 'preempted',
                          'aborted': 'RESET_ACTIVE_TASK_SILENT'}
             )
