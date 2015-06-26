@@ -7,6 +7,8 @@ SETUP HOBBIT WORKSPACE FOR PT2
   >> sudo apt-get install ros-hydro-xdot
 - Netcat6 is needed for the head's startup procedure
   >> sudo apt-get install netcat6
+- Install packages for new head servos
+  >> sudo apt-get install ros-hydro-dynamixel-msgs ros-hydro-dynamixel-controllers
 
   In order to install openni2 camera drivers etc ( needed for RGBDAcquisition node ) and in order for the openni2 camera service 
   >> sudo apt-get install ros-hydro-openni2-camera ros-hydro-openni2-launch imagemagick
