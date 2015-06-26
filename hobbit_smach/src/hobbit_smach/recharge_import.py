@@ -65,6 +65,28 @@ def resp_cb(userdata, response):
             return 'aborted'
 
 def getRecharge():
+    """Make the recharge verbose to the user
+    """
+    seq = Sequence(
+        outcomes=['succeeded', 'aborted', 'preempted'],
+        connector_outcome='succeeded')
+
+    with seq:
+        Sequence.add(
+            'SAY_TIRED',
+            speech_output.emo_say_something(
+                emo='TIRED',
+                time=4,
+                text='T_CH_VeryTiredRelax')
+        )
+        Sequence.add(
+            'RECHARGE_SEQUENCE',
+            getSilentRecharge()
+        )
+    return seq
+
+
+def getSilentRecharge():
     """This function handles the autonomous charging sequence.
     It is without the user interaction and is mainly used during
     the night or as part of the recharging scenario.
@@ -72,7 +94,7 @@ def getRecharge():
 
     seq = Sequence(
         outcomes=['succeeded', 'aborted', 'preempted'],
-        connector_outcome='succeeded',
+        connector_outcome='succeeded'
     )
     seq.userdata.room_name = 'dock'
     seq.userdata.location_name = 'dock'
@@ -96,16 +118,7 @@ def getRecharge():
                          'aborted': 'SAY_TIRED',
                          'preempted': 'LOG_PREEMPT'}
         )
-        Sequence.add(
-            'SAY_TIRED',
-            speech_output.emo_say_something(
-                emo='TIRED',
-                time=4,
-                text='T_CH_VeryTiredRelax'
-            ),
-            transitions={'aborted': 'LOG_ABORT',
-                         'preempted': 'LOG_PREEMPT'}
-        )
+
         Sequence.add(
             'SAY_MOVE_TO_DOCK',
             speech_output.emo_say_something(
