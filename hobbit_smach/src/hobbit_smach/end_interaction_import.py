@@ -13,7 +13,7 @@ from hobbit_user_interaction import HobbitMMUI
 from uashh_smach.util import SleepState
 
 
-def end_interaction_muc():
+def end_interaction_muc_pickup():
     """
     Returns a SMACH StateMachine that will ask the user if they want to give
     a new command. If not the robot goes to the docking station.
@@ -26,7 +26,57 @@ def end_interaction_muc():
     with sm:
         StateMachine.add(
             'OFFER_RETURN_OF_FAVOUR',
-            HobbitMMUI.AskYesNo(question='T_OfferReturnOfFavour'),
+            HobbitMMUI.AskYesNo(question='T_PU_OfferReturnOfFavour_2'),
+            transitions={'yes': 'LOG_ACCEPT_ROF',
+                         'timeout': 'OFFER_RETURN_OF_FAVOUR',
+                         '3times': 'LOG_DID_NOT_ACCEPT_ROF',
+                         'no': 'LOG_DID_NOT_ACCEPT_ROF',
+                         'preempted': 'preempted',
+                         'failed': 'aborted'}
+        )
+        StateMachine.add(
+            'LOG_ACCEPT_ROF',
+            log.DoLogROF(
+                #scenario='Return of favour',
+                data='User accepted return of favour'
+            ),
+            transitions={'succeeded': 'MUSIC'}
+        )
+        StateMachine.add(
+            'MUSIC',
+            HobbitMMUI.ShowMenu(menu='Audio'),
+            transitions={'succeeded': 'succeeded'}
+        )
+        StateMachine.add(
+            'LOG_DID_NOT_ACCEPT_ROF',
+            log.DoLogROF(
+               # scenario='Return of favour',
+                data='User did not accept return of favour'
+            ),
+            transitions={'succeeded': 'aborted'}
+        )
+        StateMachine.add(
+            'MOVE_AWAY',
+            move_away(),
+            transitions={'succeeded': 'aborted'}
+
+        )
+    return sm
+
+def end_interaction_muc_reward():
+    """
+    Returns a SMACH StateMachine that will ask the user if they want to give
+    a new command. If not the robot goes to the docking station.
+    """
+
+    sm = StateMachine(
+        outcomes=['succeeded', 'preempted', 'aborted']
+    )
+
+    with sm:
+        StateMachine.add(
+            'OFFER_RETURN_OF_FAVOUR',
+            HobbitMMUI.AskYesNo(question='T_CA_OfferReturnOfFavour_2'),
             transitions={'yes': 'LOG_ACCEPT_ROF',
                          'timeout': 'OFFER_RETURN_OF_FAVOUR',
                          '3times': 'LOG_DID_NOT_ACCEPT_ROF',
@@ -44,6 +94,57 @@ def end_interaction_muc():
         )
         StateMachine.add(
             'SURPRISE_MUC',
+            social_role.get_surprise(),
+            transitions={'succeeded': 'succeeded'}
+        )
+        StateMachine.add(
+            'LOG_DID_NOT_ACCEPT_ROF',
+            log.DoLogROF(
+               # scenario='Return of favour',
+                data='User did not accept return of favour'
+            ),
+            transitions={'succeeded': 'aborted'}
+        )
+        StateMachine.add(
+            'MOVE_AWAY',
+            move_away(),
+            transitions={'succeeded': 'aborted'}
+
+        )
+    return sm
+
+def end_interaction_muc_learn():
+    """
+    Returns a SMACH StateMachine that will ask the user if they want to give
+    a new command. If not the robot goes to the docking station.
+    """
+
+    sm = StateMachine(
+        outcomes=['succeeded', 'preempted', 'aborted']
+    )
+
+    with sm:
+        StateMachine.add(
+            'OFFER_RETURN_OF_FAVOUR',
+            HobbitMMUI.AskYesNo(question='T_LO_OfferReturnOfFavour_2'),
+            transitions={'yes': 'LOG_ACCEPT_ROF',
+                         'timeout': 'OFFER_RETURN_OF_FAVOUR',
+                         '3times': 'LOG_DID_NOT_ACCEPT_ROF',
+                         'no': 'LOG_DID_NOT_ACCEPT_ROF',
+                         'preempted': 'preempted',
+                         'failed': 'aborted'}
+        )
+        StateMachine.add(
+            'LOG_ACCEPT_ROF',
+            log.DoLogROF(
+                #scenario='Return of favour',
+                data='User accepted return of favour'
+            ),
+            transitions={'succeeded': 'SOLITAIRE'}
+        )
+        StateMachine.add(
+            'SOLITAIRE',
+            HobbitMMUI.ShowMenu(menu='Solitaire'),
             social_role.get_surprise(),
             transitions={'succeeded': 'succeeded'}
         )
