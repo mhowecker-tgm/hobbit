@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<rooms>
+	<room>
+		<name>matplatsen</name>
+		<vertices>
+			<vertex x="-2.699999" y="-5.300001" />
+			<vertex x="-2.799999" y="-7.500000" />
+			<vertex x="0.700001" y="-7.900000" />
+			<vertex x="1.000000" y="-5.400000" />
+		</vertices>
+	</room>
+	<room>
+		<name>kök</name>
+		<vertices>
+			<vertex x="-2.799999" y="-8.000000" />
+			<vertex x="-3.199999" y="-9.700001" />
+			<vertex x="0.100000" y="-9.700001" />
+			<vertex x="0.700001" y="-8.000000" />
+		</vertices>
+	</room>
+	<room>
+		<name>hallen</name>
+		<vertices>
+			<vertex x="-2.199999" y="-3.100000" />
+			<vertex x="-2.600000" y="-4.800001" />
+			<vertex x="-1.400000" y="-4.800001" />
+			<vertex x="-0.900000" y="-3.300001" />
+		</vertices>
+	</room>
+	<room>
+		<name>entre'</name>
+		<vertices>
+			<vertex x="-2.000000" y="-1.500000" />
+			<vertex x="1.900000" y="-1.500000" />
+			<vertex x="1.700001" y="-3.100000" />
+			<vertex x="-2.400000" y="-2.700001" />
+		</vertices>
+	</room>
+	<room>
+		<name>pianorummet</name>
+		<vertices>
+			<vertex x="-2.600000" y="1.699999" />
+			<vertex x="-2.199999" y="-1.000000" />
+			<vertex x="2.299999" y="-0.900000" />
+			<vertex x="2.000000" y="1.699999" />
+		</vertices>
+	</room>
+	<room>
+		<name>tvrummet</name>
+		<vertices>
+			<vertex x="-5.500000" y="2.199999" />
+			<vertex x="-6.700000" y="-3.200001" />
+			<vertex x="-2.900000" y="-3.500000" />
+			<vertex x="-3.000000" y="1.699999" />
+		</vertices>
+	</room>
+</rooms>
