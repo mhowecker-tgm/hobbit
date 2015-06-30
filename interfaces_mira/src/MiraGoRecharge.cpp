@@ -310,12 +310,13 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 		{
 
 			//cancel the task
-			auto providers_ = robot_->getMiraAuthority().queryServicesForInterface("IDockingProcess");
-
+			/*auto providers_ = robot_->getMiraAuthority().queryServicesForInterface("IDockingProcess");
 			const std::string service_ = providers_.front();
 			auto rpcFuture_ = robot_->getMiraAuthority().callService<void>(service_, "interrupt");
 			std::cout << "interrupted " << std::endl;
-			rpcFuture_.get();
+			rpcFuture_.get();*/
+
+			interrupt();
 
 			mira::RPCFuture<void> r2 = robot_->getMiraAuthority().callService<void>("/robot/Robot#builtin", std::string("setProperty"), std::string("MainControlUnit.Force"), std::string("60"));
         		r2.timedWait(mira::Duration::seconds(1));
@@ -343,6 +344,12 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 			ros::Duration time_left = timeout - ros::Time::now();
 			if (time_left <= ros::Duration(0,0))  //the timeout has been reached
 			{
+				interrupt();
+
+				mira::RPCFuture<void> r2 = robot_->getMiraAuthority().callService<void>("/robot/Robot#builtin", std::string("setProperty"), std::string("MainControlUnit.Force"), std::string("60"));
+        			r2.timedWait(mira::Duration::seconds(1));
+        			r2.get();
+
 				std::cout << "task succeeded, template found but no feedback received" << std::endl;
 				ROS_INFO("task succeeded, template found but no feedback received");
 				as_->setSucceeded(interfaces_mira::MiraDockingResult(), "Task succeeded, template found but no feedback received");
@@ -400,6 +407,23 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 
 
 
+}
+
+void MiraGoRecharge::interrupt()
+{
+	auto providers_c = robot_->getMiraAuthority().queryServicesForInterface("IDockingProcess");
+	if(providers_c.empty()) 
+	{
+	    std::cout << "no providers for IDockingProcess to cancel the task" << std::endl;
+	    ROS_INFO("no providers for IDockingProcess ");
+	    //as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting, no providers");
+	    as_->setPreempted();
+	    return;
+	}
+	const std::string service_c = providers_c.front();
+	auto rpcFuture_c = robot_->getMiraAuthority().callService<void>(service_c, "interrupt");
+	std::cout << "interrupted " << std::endl;
+	rpcFuture_c.get();
 }
 
 
