@@ -115,7 +115,7 @@ def getSilentRecharge():
                 request=GetDockStateRequest(state=True),
                 response_cb=resp_cb),
             transitions={'succeeded': 'LOG_SUCCESS',
-                         'aborted': 'SAY_TIRED',
+                         'aborted': 'SAY_MOVE_TO_DOCK',
                          'preempted': 'LOG_PREEMPT'}
         )
 
