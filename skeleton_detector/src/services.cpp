@@ -16,6 +16,7 @@
 #define GREEN "\033[32m" /* Green */
 #define YELLOW "\033[33m" /* Yellow */
 
+#define DO_NOT_BROADCAST_COME_CLOSER 1
 
 #define BROADCAST_HOBBIT 1
 #define MAXIMUM_DISTANCE_FOR_POINTING 400
@@ -478,6 +479,16 @@ void broadcastNewGesture(unsigned int frameNumber,struct handGesture * gesture)
 
     hobbit_msgs::Event evt;
     std::stringstream ss;
+
+
+    #if DO_NOT_BROADCAST_COME_CLOSER
+       if (gesture->gestureID == GESTURE_COME )
+       {
+          fprintf(stderr,YELLOW "Compiled using DO_NOT_BROADCAST_COME_CLOSER , filtering gesture\n" NORMAL);
+         return;
+       }
+    #endif
+
 
 
     if ( hobbitFitnessFunction_AreWeDoingAnExercise() )
