@@ -61,6 +61,8 @@ private:
 	ros::Time timeout;
 
 	bool is_charging;
+
+	void interrupt();
 };
 
 
