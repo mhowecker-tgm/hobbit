@@ -673,19 +673,6 @@ def main():
                          'none': 'succeeded'}
         )
         StateMachine.add(
-            'LEARN_OBJECT',
-            SimpleActionState(
-                'learn_object',
-                GeneralHobbitAction,
-                goal_cb=task_lo_cb,
-                preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
-                server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
-            ),
-            transitions={'succeeded': 'END_USER_INTERACTION_LEARN',
-                         'preempted': 'preempted',
-                         'aborted': 'RESET_ACTIVE_TASK'}
-        )
-        StateMachine.add(
             'REMINDER',
             SimpleActionState(
                 'reminder',
@@ -818,20 +805,6 @@ def main():
                          'aborted': 'RESET_ACTIVE_TASK_SILENT'}
         )
         StateMachine.add(
-            'PICKUP',
-            SimpleActionState(
-                'pickup',
-                GeneralHobbitAction,
-                goal_cb=pickup_cb,
-                input_keys=['parameters', 'params'],
-                preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
-                server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
-            ),
-            transitions={'succeeded': 'END_USER_INTERACTION_PICKUP',
-                         'preempted': 'preempted',
-                         'aborted': 'RESET_ACTIVE_TASK_SILENT'}
-        )
-        StateMachine.add(
             'CALL',
             phone_call.wait_for_end_of_call(),
             transitions={'succeeded': 'RESET_ACTIVE_TASK_SILENT',
@@ -954,6 +927,33 @@ def main():
         )
         if MUC_ENABLED:
             StateMachine.add(
+            'LEARN_OBJECT',
+            SimpleActionState(
+                'learn_object',
+                GeneralHobbitAction,
+                goal_cb=task_lo_cb,
+                preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
+                server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
+            ),
+            transitions={'succeeded': 'END_USER_INTERACTION_LEARN',
+                         'preempted': 'preempted',
+                         'aborted': 'RESET_ACTIVE_TASK'}
+        )
+            StateMachine.add(
+            'PICKUP',
+            SimpleActionState(
+                'pickup',
+                GeneralHobbitAction,
+                goal_cb=pickup_cb,
+                input_keys=['parameters', 'params'],
+                preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
+                server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
+            ),
+            transitions={'succeeded': 'END_USER_INTERACTION_PICKUP',
+                         'preempted': 'preempted',
+                         'aborted': 'RESET_ACTIVE_TASK_SILENT'}
+        )
+            StateMachine.add(
                 'END_USER_INTERACTION_REWARD',
                 end_interaction.end_interaction_muc_reward(),
                 transitions={'succeeded': 'succeeded',
@@ -983,6 +983,19 @@ def main():
             )
         else:
             StateMachine.add(
+            'LEARN_OBJECT',
+            SimpleActionState(
+                'learn_object',
+                GeneralHobbitAction,
+                goal_cb=task_lo_cb,
+                preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
+                server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
+            ),
+            transitions={'succeeded': 'END_USER_INTERACTION',
+                         'preempted': 'preempted',
+                         'aborted': 'RESET_ACTIVE_TASK'}
+        )
+            StateMachine.add(
                 'END_USER_INTERACTION',
                 end_interaction.move_away(),
                 transitions={'succeeded': 'succeeded',
@@ -992,10 +1005,24 @@ def main():
             StateMachine.add(
                 'REWARD',
                 social_role.get_reward(),
-                transitions={'succeeded': 'END_USER_INTERACTION_REWARD',
+                transitions={'succeeded': 'END_USER_INTERACTION',
                          'preempted': 'preempted',
                          'aborted': 'RESET_ACTIVE_TASK_SILENT'}
             )
+            StateMachine.add(
+            'PICKUP',
+            SimpleActionState(
+                'pickup',
+                GeneralHobbitAction,
+                goal_cb=pickup_cb,
+                input_keys=['parameters', 'params'],
+                preempt_timeout=rospy.Duration(PREEMPT_TIMEOUT),
+                server_wait_timeout=rospy.Duration(SERVER_TIMEOUT)
+            ),
+            transitions={'succeeded': 'END_USER_INTERACTION',
+                         'preempted': 'preempted',
+                         'aborted': 'RESET_ACTIVE_TASK_SILENT'}
+        )
         StateMachine.add(
             'MUC_RESET_ACTIVE_TASK',
             ResetActiveTask(),
