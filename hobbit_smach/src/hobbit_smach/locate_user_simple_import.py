@@ -4,11 +4,11 @@
 PREEMPT_TIMEOUT = 5
 SERVER_TIMEOUT = 5
 
+import sys
 import rospy
 import uashh_smach.util as util
 import tf
 import math
-
 from hobbit_msgs.srv import SwitchVision, SwitchVisionRequest
 from std_msgs.msg import String
 from smach_ros import ServiceState, SimpleActionState
@@ -16,7 +16,6 @@ from smach import State, StateMachine, Concurrence, Iterator
 from mira_msgs.srv import UserNavMode, ObsNavMode
 from nav_msgs.srv import GetPlan, GetPlanRequest
 from geometry_msgs.msg import PoseStamped, Point, Quaternion
-# from hobbit_smach.bcolors import bcolors
 from rgbd_acquisition.msg import Person
 from hobbit_msgs.srv import GetRooms
 import hobbit_smach.hobbit_move_import as hobbit_move
@@ -29,6 +28,7 @@ from hobbit_msgs.msg import GeneralHobbitAction, GeneralHobbitGoal, Event
 import hobbit_smach.logging_import as log
 from hobbit_user_interaction import HobbitMMUI
 import hobbit_smach.sos_call_import as sos_call
+
 first = True
 
 
@@ -374,10 +374,6 @@ class PlanPath(State):
             '/headcam/active',
             String,
             queue_size=50)
-        self.getPlan = rospy.ServiceProxy(
-            'make_plan',
-            GetPlan,
-            persistent=True)
         self.shortest_path = 99999.99
         self.index = 0
         self.first = True
@@ -414,12 +410,21 @@ class PlanPath(State):
             rospy.loginfo('index of positions: '+str(index))
             end_pose = get_pose_from_xytheta(
                 position['x'], position['y'], position['theta'])
-            req = GetPlanRequest(robot_pose, end_pose, 0.01)
+            try:
+                rospy.wait_for_service('make_plan', timeout=30)
+                self.getPlan = rospy.ServiceProxy('make_plan', GetPlan)
+                req = GetPlanRequest(robot_pose, end_pose, 0.01)
+            except rospy.ROSException:
+                rospy.loginfo('Service make_plan is not available. Aborting.')
+                return 'aborted'
 
             try:
                 resp = self.getPlan(req)
             except rospy.ServiceException:
-                self.getPlan.close()
+                return 'aborted'
+            except:
+                # just to make sure all exceptions, even the once that should never occur are handled
+                rospy.loginfo(str(sys.exc_info()))
                 return 'aborted'
 
             if resp.plan.poses:
