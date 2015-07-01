@@ -24,7 +24,7 @@
       <place>
         <name>default</name>
         <type>default</type>
-        <pose y="-6.257603" x="-0.721973" theta="0.338234"/>
+        <pose y="-6.87773" x="-1.496864" theta="-0.121977"/>
         <objects/>
       </place>
       <place>
@@ -76,13 +76,13 @@
       <place>
         <name>default</name>
         <type>default</type>
-        <pose y="-2.670307" x="-1.546614" theta="1.426279"/>
+        <pose y="-2.6" x="0.43" theta="-1.65"/>
         <objects/>
       </place>
       <place>
         <name>mitten</name>
         <type>goTo</type>
-        <pose y="-2.1" x="0.43" theta="-1.65"/>
+        <pose y="-2.6" x="0.43" theta="-1.65"/>
         <objects/>
       </place>
     </places>
@@ -103,9 +103,15 @@
         <objects/>
       </place>
       <place>
+        <name>default</name>
+        <type>default</type>
+        <pose y="0.224125" x="-0.048396" theta="-1.580274"/>
+        <objects/>
+      </place>
+      <place>
         <name>dock</name>
         <type>docking_base_point</type>
-        <pose y="-0.135845" x="0.62401" theta="-0.048817"/>
+        <pose y="0.05" x="0.62401" theta="-0.048817"/>
         <objects/>
       </place>
     </places>
@@ -122,6 +128,12 @@
       <place>
         <name>mitten</name>
         <type>goTo</type>
+        <pose y="-2.208022" x="-4.657774" theta="0.642584"/>
+        <objects/>
+      </place>
+      <place>
+        <name>default</name>
+        <type>default</type>
         <pose y="-2.208022" x="-4.657774" theta="0.642584"/>
         <objects/>
       </place>
