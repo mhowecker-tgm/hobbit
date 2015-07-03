@@ -45,7 +45,8 @@ def end_interaction_muc_pickup():
         StateMachine.add(
             'MUSIC',
             HobbitMMUI.ShowMenu(menu='Audio'),
-            transitions={'succeeded': 'succeeded'}
+            transitions={'succeeded': 'succeeded',
+                         'failed': 'aborted'}
         )
         StateMachine.add(
             'LOG_DID_NOT_ACCEPT_ROF',
@@ -145,8 +146,8 @@ def end_interaction_muc_learn():
         StateMachine.add(
             'SOLITAIRE',
             HobbitMMUI.ShowMenu(menu='Solitaire'),
-            social_role.get_surprise(),
-            transitions={'succeeded': 'succeeded'}
+            transitions={'succeeded': 'succeeded',
+                         'failed': 'aborted'}
         )
         StateMachine.add(
             'LOG_DID_NOT_ACCEPT_ROF',
