@@ -996,13 +996,6 @@ def main():
                          'aborted': 'RESET_ACTIVE_TASK'}
         )
             StateMachine.add(
-                'END_USER_INTERACTION',
-                end_interaction.move_away(),
-                transitions={'succeeded': 'succeeded',
-                             'aborted': 'RESET_ACTIVE_TASK_SILENT',
-                             'preempted': 'preempted'}
-            )
-            StateMachine.add(
                 'REWARD',
                 social_role.get_reward(),
                 transitions={'succeeded': 'END_USER_INTERACTION',
@@ -1038,6 +1031,13 @@ def main():
                          'aborted': 'RESET_ACTIVE_TASK_SILENT'}
         )
 
+        StateMachine.add(
+            'END_USER_INTERACTION',
+            end_interaction.move_away(),
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'RESET_ACTIVE_TASK_SILENT',
+                         'preempted': 'preempted'}
+        )
     """
     Now we actually start the IntrospectionServer to visualize the StateMachine
     as a dot graph, and execute the main StateMachine.
