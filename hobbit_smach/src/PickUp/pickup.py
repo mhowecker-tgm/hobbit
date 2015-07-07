@@ -30,6 +30,7 @@ import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.pickup_import as pickup
 import hobbit_smach.logging_import as log
 import hobbit_smach.locate_user_simple_import as locate_user
+import hobbit_smach.record_data_import as record_data
 # from hobbit_smach.helper_import import WaitForMsgState
 # import tf
 # import math
@@ -675,9 +676,25 @@ def main():
         StateMachine.add(
             'CHECK_GRASP',
             pickup.DavidCheckGrasp(),
-            transitions={'succeeded': 'END_PICKUP_SEQ',
-                         'aborted': 'COUNTER_GRASP_CHECK',
+            transitions={'succeeded': 'STORE_DATA_SUCCESS',
+                         'aborted': 'STORE_DATA_FAILURE',
                          'preempted': 'LOG_PREEMPT'}  #aborted <=> check result: no object grasped
+        )
+        smach.StateMachine.add(
+            'STORE_DATA_FAILURE',
+            record_data.GrabAndSendData(topic_in='/headcam/depth_registered/points',
+                                        topic_out='/pickup/top_failure/points'),
+            transitions={'succeeded': 'COUNTER_GRASP_CHECK',
+                         'aborted': 'COUNTER_GRASP_CHECK',
+                         'preempted': 'preempted'}
+        )
+        smach.StateMachine.add(
+            'STORE_DATA_SUCCESS',
+            record_data.GrabAndSendData(topic_in='/headcam/depth_registered/points',
+                                        topic_out='/pickup/top_success/points'),
+            transitions={'succeeded': 'END_PICKUP_SEQ',
+                         'aborted': 'END_PICKUP_SEQ',
+                         'preempted': 'preempted'}
         )
         StateMachine.add(
             'COUNTER_GRASP_CHECK',
