@@ -36,7 +36,8 @@ new_params = None
 commands = [
     ['emergency', 'G_FALL', 'E_SOSBUTTON', 'C_HELP', 'E_HELP',
      'G_HELP', 'A_HELP', 'C_HELP', 'F_CALLSOS', 'G_EMERGENCY'],
-    ['recharge', 'E_RECHARGE', 'C_RECHARGE', 'A_Recharge'],
+    ['recharge', 'E_RECHARGE', 'A_Recharge'],
+    ['silent_recharge', 'C_RECHARGE'],
     ['reminder', 'E_REMINDER'],
     ['stop', 'C_STOP', 'G_STOP', 'E_STOP', 'B_CANCEL', 'E_CANCEL', 'P_E_CANCEL', 'A_stop', 'A_cancel'], #'E_FITNESS_CLOSED'],
     ['call_hobbit', 'C_CALLHOBBIT', 'E_CALLHOBBIT'],
