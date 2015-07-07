@@ -1,0 +1,6 @@
+<launch>
+<param name="~prefix" type="str" value="/localhome/demo/error/bottom_error_" />
+<param name="/hobbit/pcd_path" type="str" value="/localhome/demo/error/" />
+<arg name="input" value="input:=/bottom/error/points" />
+<node name="pointcloud_to_pcd" pkg="pcl_ros" type="pointcloud_to_pcd" args="$(arg input)" output="log"/>
+</launch>
