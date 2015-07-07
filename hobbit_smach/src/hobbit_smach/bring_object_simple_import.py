@@ -162,7 +162,7 @@ def detect_object():
         smach.StateMachine.add(
             'STORE_DATA_FAILURE',
             record_data.GrabAndSendData(topic_in='/headcam/depth_registered/points',
-                                        topic_out='/top/error/points'),
+                                        topic_out='/bringobject/top_failure/points'),
             transitions={'succeeded': 'continue',
                          'aborted': 'continue',
                          'preempted': 'preempted'}
@@ -170,7 +170,7 @@ def detect_object():
         smach.StateMachine.add(
             'STORE_DATA_SUCCESS',
             record_data.GrabAndSendData(topic_in='/headcam/depth_registered/points',
-                                        topic_out='/top/success/points'),
+                                        topic_out='/bringobject/top_success/points'),
             transitions={'succeeded': 'OBJECT_DETECTED',
                          'aborted': 'OBJECT_DETECTED',
                          'preempted': 'preempted'}
