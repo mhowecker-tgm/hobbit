@@ -23,6 +23,7 @@ import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.locate_user_simple_import as locate_user
 import hobbit_smach.logging_import as log
 import hobbit_smach.call_hobbit_2_import as call_hobbit
+import hobbit_smach.record_data_import as record_data
 from hobbit_user_interaction import HobbitMMUI
 from rospy.exceptions import TransportTerminated
 
@@ -135,14 +136,6 @@ def detect_object():
         outcomes = ['succeeded','aborted','preempted', 'continue'],
         input_keys=['object_name', 'object_pose'])
     with container_sm:
-        #smach.StateMachine.add(
-        #    'SAY_SOME',
-        #    #FIXME: hardcoded text
-        #    speech_output.sayText(info='Start looking'),
-        #    transitions={'succeeded': 'GET_POINT_CLOUD',
-        #                 'preempted': 'preempted',
-        #                 'failed': 'continue'}
-        #)
         smach.StateMachine.add(
             'GET_POINT_CLOUD',
             util.WaitForMsgState(
@@ -163,9 +156,25 @@ def detect_object():
                 recognize,
                 request_slots=['cloud'],
                 response_slots=['ids', 'transforms']),
-            transitions={'succeeded': 'OBJECT_DETECTED',
+            transitions={'succeeded': 'STORE_DATA_SUCCESS',
                          'preempted': 'preempted',
-                         'aborted': 'continue'})
+                         'aborted': 'STORE_DATA_FAILURE'})
+        smach.StateMachine.add(
+            'STORE_DATA_FAILURE',
+            record_data.GrabAndSendData(topic_in='/headcam/depth_registered/points',
+                                        topic_out='/top/error/points'),
+            transitions={'succeeded': 'continue',
+                         'aborted': 'continue',
+                         'preempted': 'preempted'}
+        )
+        smach.StateMachine.add(
+            'STORE_DATA_SUCCESS',
+            record_data.GrabAndSendData(topic_in='/headcam/depth_registered/points',
+                                        topic_out='/top/success/points'),
+            transitions={'succeeded': 'OBJECT_DETECTED',
+                         'aborted': 'OBJECT_DETECTED',
+                         'preempted': 'preempted'}
+        )
         smach.StateMachine.add(
             'OBJECT_DETECTED',
             ObjectDetected(),
