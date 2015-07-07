@@ -1,0 +1,5 @@
+<launch>
+<param name="~prefix" type="str" value="/localhome/demo/recordings/pickup_top_failure_" />
+<arg name="input" value="input:=/pickup/top_failure/points" />
+<node name="pickup_top_failure_datarecord" pkg="pcl_ros" type="pointcloud_to_pcd" args="$(arg input)" output="log"/>
+</launch>

@@ -1,0 +1,5 @@
+<launch>
+<param name="~prefix" type="str" value="/localhome/demo/recordings/predock_bottom_" />
+<arg name="input" value="input:=/predock/bottom/points" />
+<node name="predock_bottom_datarecord" pkg="pcl_ros" type="pointcloud_to_pcd" args="$(arg input)" output="log"/>
+</launch>

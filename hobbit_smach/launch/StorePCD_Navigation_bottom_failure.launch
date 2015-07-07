@@ -1,0 +1,5 @@
+<launch>
+<param name="~prefix" type="str" value="/localhome/demo/recordings/navigation_bottom_failure_" />
+<arg name="input" value="input:=/navigation/bottom_failure/points" />
+<node name="navigation_bottom_failure_datarecord" pkg="pcl_ros" type="pointcloud_to_pcd" args="$(arg input)" output="log"/>
+</launch>

@@ -1,0 +1,10 @@
+<launch>
+<include file="$(find hobbit_smach)/launch/StorePCD_BO_top_failure.launch" />
+<include file="$(find hobbit_smach)/launch/StorePCD_BO_top_success.launch" />
+<include file="$(find hobbit_smach)/launch/StorePCD_Pickup_top_failure.launch" />
+<include file="$(find hobbit_smach)/launch/StorePCD_Pickup_top_success.launch" />
+<include file="$(find hobbit_smach)/launch/StorePCD_Navigation_bottom_failure.launch" />
+<include file="$(find hobbit_smach)/launch/StorePCD_Navigation_top_failure.launch" />
+<include file="$(find hobbit_smach)/launch/StorePCD_Predock_bottom_.launch" />
+<include file="$(find hobbit_smach)/launch/StorePCD_Predock_top_.launch" />
+</launch>

@@ -1,0 +1,5 @@
+<launch>
+<param name="~prefix" type="str" value="/localhome/demo/recordings/bringobject_top_success_" />
+<arg name="input" value="input:=/bringobject/bottom_success/points" />
+<node name="bringobject_success_datarecord" pkg="pcl_ros" type="pointcloud_to_pcd" args="$(arg input)" output="log"/>
+</launch>
