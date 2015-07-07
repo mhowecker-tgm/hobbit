@@ -1,4 +1,4 @@
-SavePCD.launch<launch>
+<launch>
 <param name="~prefix" type="str" value="/localhome/demo/data/object_" />
 <param name="/hobbit/pcd_path" type="str" value="/localhome/demo/data/" />
 <arg name="input" value="input:=/hobbit/object/points" /> 
