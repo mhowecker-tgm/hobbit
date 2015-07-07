@@ -1,6 +1,6 @@
-<launch>
+SavePCD.launch<launch>
 <param name="~prefix" type="str" value="/localhome/demo/data/object_" />
 <param name="/hobbit/pcd_path" type="str" value="/localhome/demo/data/" />
 <arg name="input" value="input:=/hobbit/object/points" /> 
-<node name="pointcloud_to_pcd" pkg="pcl_ros" type="pointcloud_to_pcd" args="$(arg input)" output="screen"/>
+<node name="pointcloud_to_pcd" pkg="pcl_ros" type="pointcloud_to_pcd" args="$(arg input)" output="log"/>
 </launch>
