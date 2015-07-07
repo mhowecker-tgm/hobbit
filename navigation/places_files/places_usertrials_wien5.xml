@@ -1,44 +1,117 @@
-<?xml version="1.0"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <rooms>
-	<room>
-		<name>wohnzimmer</name>
-		<vertices>
-			<vertex x="-2.400000" y="2.299999" />
-			<vertex x="-2.500000" y="-2.500000" />
-			<vertex x="2.400000" y="-2.400000" />
-			<vertex x="2.299999" y="2.600000" />
-		</vertices>
-	</room>
-	<room>
-		<name>schlafzimmer</name>
-		<vertices>
-			<vertex x="0.900000" y="5.000000" />
-			<vertex x="2.799999" y="5.200000" />
-			<vertex x="3.000000" y="9.599999" />
-			<vertex x="1.000000" y="9.800000" />
-		</vertices>
-	</room>
-	<room>
-		<name>gang</name>
-		<vertices>
-			<vertex x="0.600000" y="5.099999" />
-			<vertex x="-1.000000" y="5.200000" />
-			<vertex x="-0.900000" y="4.400000" />
-			<vertex x="0.700001" y="4.099999" />
-			<vertex x="0.600000" y="3.000000" />
-			<vertex x="1.799999" y="2.900000" />
-			<vertex x="1.700001" y="4.200000" />
-			<vertex x="3.000000" y="4.200000" />
-			<vertex x="3.200001" y="5.200000" />
-		</vertices>
-	</room>
-	<room>
-		<name>kuche</name>
-		<vertices>
-			<vertex x="-1.799999" y="9.200000" />
-			<vertex x="-0.100000" y="9.099999" />
-			<vertex x="0.400000" y="5.500000" />
-			<vertex x="-1.799999" y="5.700000" />
-		</vertices>
-	</room>
+  <room>
+    <name>wohnzimmer</name>
+    <vertices>
+      <vertex y="2.299999" x="-2.4"/>
+      <vertex y="-2.5" x="-2.5"/>
+      <vertex y="-2.4" x="2.4"/>
+      <vertex y="2.6" x="2.299999"/>
+    </vertices>
+    <places>
+      <place>
+        <name>mitte</name>
+        <type>goTo</type>
+        <pose y="0.255453" x="0.730677" theta="-1.551312"/>
+        <objects/>
+      </place>
+      <place>
+        <name>default</name>
+        <type>default</type>
+        <pose y="0.255453" x="0.730677" theta="-1.551312"/>
+        <objects/>
+      </place>
+      <place>
+        <name>tisch</name>
+        <type>searchable</type>
+        <pose y="-0.333233" x="-0.181485" theta="2.429473"/>
+        <objects>
+          <object name="Aspirin" probability="0.5"/>
+        </objects>
+      </place>
+      <place>
+        <name>call1</name>
+        <type>call_button_1</type>
+        <pose y="-0.421991" x="0.060759" theta="-2.702017"/>
+        <objects/>
+      </place>
+      <place>
+        <name>call3</name>
+        <type>call_button_3</type>
+        <pose y="0.947503" x="0.573551" theta="2.571864"/>
+        <objects/>
+      </place>
+      <place>
+        <name>fitness</name>
+        <type>fitness</type>
+        <pose y="-0.489586" x="0.400486" theta="1.536401"/>
+        <objects/>
+      </place>
+      <place>
+        <name>schrank</name>
+        <type>searchable</type>
+        <pose y="-0.442797" x="0.890954" theta="-0.044137"/>
+        <objects>
+          <object name="Aspirin" probability="0.5"/>
+        </objects>
+      </place>
+      <place>
+        <name>dock</name>
+        <type>docking_base_point</type>
+        <pose y="-1.606" x="-0.092" theta="-1.55"/>
+        <objects/>
+      </place>
+    </places>
+  </room>
+  <room>
+    <name>schlafzimmer</name>
+    <vertices>
+      <vertex y="5.0" x="0.9"/>
+      <vertex y="5.2" x="2.799999"/>
+      <vertex y="9.599999" x="3.0"/>
+      <vertex y="9.8" x="1.0"/>
+    </vertices>
+    <places>
+      <place>
+        <name>call4</name>
+        <type>call_button_4</type>
+        <pose y="6.365016" x="2.222406" theta="2.254954"/>
+        <objects/>
+      </place>
+      <place>
+        <name>mitte</name>
+        <type>goTo</type>
+        <pose y="6.649496" x="2.031232" theta="1.569437"/>
+        <objects/>
+      </place>
+      <place>
+        <name>default</name>
+        <type>default</type>
+        <pose y="6.649496" x="2.031232" theta="1.569437"/>
+        <objects/>
+      </place>
+    </places>
+  </room>
+  <room>
+    <name>gang</name>
+    <vertices>
+      <vertex y="5.099999" x="0.6"/>
+      <vertex y="5.2" x="-1.0"/>
+      <vertex y="4.4" x="-0.9"/>
+      <vertex y="4.099999" x="0.700001"/>
+      <vertex y="3.0" x="0.6"/>
+      <vertex y="2.9" x="1.799999"/>
+      <vertex y="4.2" x="1.700001"/>
+      <vertex y="4.2" x="3.0"/>
+      <vertex y="5.2" x="3.200001"/>
+    </vertices>
+    <places>
+      <place>
+        <name>mitte</name>
+        <type>goTo</type>
+        <pose y="4.166392" x="1.289948" theta="-1.57"/>
+        <objects/>
+      </place>
+    </places>
+  </room>
 </rooms>

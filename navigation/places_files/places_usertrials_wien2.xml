@@ -16,6 +16,12 @@
         <objects/>
       </place>
       <place>
+        <name>default</name>
+        <type>default</type>
+        <pose y="-0.751198" x="-0.878858" theta="-2.701646"/>
+        <objects/>
+      </place>
+      <place>
         <name>call2</name>
         <type>call_button_2</type>
         <pose y="-2.12" x="-1.78" theta="-2.507"/>
@@ -53,6 +59,12 @@
       <place>
         <name>aufhebeposition</name>
         <type>goTo</type>
+        <pose y="3.696067" x="3.004988" theta="0.779273"/>
+        <objects/>
+      </place>
+      <place>
+        <name>default</name>
+        <type>default</type>
         <pose y="3.696067" x="3.004988" theta="0.779273"/>
         <objects/>
       </place>
