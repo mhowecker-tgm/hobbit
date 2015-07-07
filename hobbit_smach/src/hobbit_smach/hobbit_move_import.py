@@ -24,6 +24,7 @@ from uashh_smach.util import SleepState, WaitForMsgState
 from actionlib import SimpleActionClient
 import uashh_smach.platform.move_base as move_base
 import head_move_import as head_move
+import hobbit_smach.record_data_import as record_data
 import speech_output_import as speech_output
 import arm_move_import as arm_move
 from math import pi
@@ -124,6 +125,29 @@ def get_dock_action():
             transitions={'succeeded': 'DOCK_ACTION',
                          'preempted': 'preempted',
                          'aborted': 'aborted'}
+        )
+        smach.StateMachine.add(
+            'STORE_DATA_TOP',
+            record_data.GrabAndSendData(topic_in='/headcam/depth_registered/points',
+                                        topic_out='/predock/top/points'),
+            transitions={'succeeded': 'STORE_DATA_BOTTOM',
+                         'aborted': 'STORE_DATA_BOTTOM',
+                         'preempted': 'preempted'}
+        )
+        smach.StateMachine.add(
+            'STORE_DATA_BOTTOM',
+            record_data.GrabAndSendData(topic_in='/basecam/depth_registered/points',
+                                        topic_out='/predock/bottom/points'),
+            transitions={'succeeded': 'STORE_SCREENSHOT',
+                         'aborted': 'STORE_SCREENSHOT',
+                         'preempted': 'preempted'}
+        )
+        smach.StateMachine.add(
+            'STORE_SCREENSHOT',
+            record_data.GrabScreenContent(),
+            transitions={'succeeded': 'DOCK_ACTION',
+                         'aborted': 'DOCK_ACTION',
+                         'preempted': 'preempted'}
         )
         StateMachine.add(
             'DOCK_ACTION',
@@ -751,7 +775,7 @@ def goToPosition(frame='/map', room='None', place='dock'):
         Sequence.add(
             'MMUI_SAY_WayBlocked',
             speech_output.sayText(info='T_GT_WayBlocked'),
-            transitions={'failed': 'aborted'})
+            transitions={'failed': 'STORE_DATA_TOP'})
         Sequence.add(
             'PREPARE_STOP_1',
             ServiceState(
@@ -765,6 +789,21 @@ def goToPosition(frame='/map', room='None', place='dock'):
             speech_output.sayText(info='My arm is not in the home position. Will not move.'),
             transitions={'succeeded': 'aborted',
                          'failed': 'aborted'}
+        )
+        Sequence.add(
+            'STORE_DATA_TOP',
+            record_data.GrabAndSendData(topic_in='/headcam/depth_registered/points',
+                                        topic_out='navigation/top_failure/points')
+        )
+        Sequence.add(
+            'STORE_DATA_BOTTOM',
+            record_data.GrabAndSendData(topic_in='/basecam/depth_registered/points',
+                                        topic_out='/navigation/bottom_failure/points')
+        )
+        Sequence.add(
+            'STORE_SCREENSHOT',
+            record_data.GrabScreenContent(),
+            transitions={'succeeded': 'aborted'}
         )
     return seq
 
@@ -922,13 +961,28 @@ def goToPose():
         Sequence.add(
             'MMUI_SAY_WayBlocked',
             speech_output.sayText(info='T_GT_WayBlocked'),
-            transitions={'failed': 'aborted',
-                         'succeeded': 'aborted'})
+            transitions={'failed': 'STORE_DATA_TOP',
+                         'succeeded': 'STORE_DATA_TOP'})
         Sequence.add(
             'SAY_ARM',
             speech_output.sayText(info='My arm is not in the home position. Will not move.'),
             transitions={'succeeded': 'aborted',
                          'failed': 'aborted'}
+        )
+        Sequence.add(
+            'STORE_DATA_TOP',
+            record_data.GrabAndSendData(topic_in='/headcam/depth_registered/points',
+                                        topic_out='navigation/top_failure/points')
+        )
+        Sequence.add(
+            'STORE_DATA_BOTTOM',
+            record_data.GrabAndSendData(topic_in='/basecam/depth_registered/points',
+                                        topic_out='/navigation/bottom_failure/points')
+        )
+        Sequence.add(
+            'STORE_SCREENSHOT',
+            record_data.GrabScreenContent(),
+            transitions={'succeeded': 'aborted'}
         )
     return seq
 
@@ -1040,26 +1094,35 @@ def goToPoseSilent():
         Sequence.add(
             'MMUI_SAY_WayBlocked',
             speech_output.sayText(info='T_GT_WayBlocked'),
-            transitions={'failed': 'aborted'})
+            transitions={'failed': 'STORE_DATA_TOP'})
         Sequence.add(
             'PREPARE_STOP_1',
             ServiceState(
                 '/user_nav_mode',
                 UserNavMode
             ),
-            transitions={'succeeded': 'aborted'}
+            transitions={'succeeded': 'STORE_DATA_TOP'}
         )
-        # Sequence.add(
-        #     'SHOW_MENU_MAIN_1',
-        #     HobbitMMUI.ShowMenu(menu='MAIN'),
-        #     transitions={'succeeded': 'aborted',
-        #                  'failed': 'aborted'}
-        # )
         Sequence.add(
             'SAY_ARM',
             speech_output.sayText(info='My arm is not in the home position. Will not move.'),
             transitions={'succeeded': 'aborted',
                          'failed': 'aborted'}
+        )
+        Sequence.add(
+            'STORE_DATA_TOP',
+            record_data.GrabAndSendData(topic_in='/headcam/depth_registered/points',
+                                        topic_out='navigation/top_failure/points')
+        )
+        Sequence.add(
+            'STORE_DATA_BOTTOM',
+            record_data.GrabAndSendData(topic_in='/basecam/depth_registered/points',
+                                        topic_out='/navigation/bottom_failure/points')
+        )
+        Sequence.add(
+            'STORE_SCREENSHOT',
+            record_data.GrabScreenContent(),
+            transitions={'succeeded': 'aborted'}
         )
     return seq
 
