@@ -8,6 +8,7 @@ __author__ = 'Markus Bajones'
 
 
 import rospy
+import subprocess
 from sensor_msgs.msg import PointCloud2
 from smach import State
 
@@ -45,3 +46,23 @@ class GrabAndSendData(State):
         except rospy.ROSInterruptException as e:
             rospy.loginfo('Shutdown initiated while waiting for data: ', e)
         return 'aborted'
+
+
+
+class GrabScreenContent(State):
+    """
+    execute screenshot utility
+    """
+
+    def __init__(self):
+        State.__init__(
+            self,
+            outcomes=['succeeded', 'aborted', 'preempted']
+        )
+
+    def execute(self, ud):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+        subprocess.call(['/opt/ros/hobbit_hydro/src/hobbit_launch/scripts/miracenter_screenshot.sh'])
+        return 'succeeded'
