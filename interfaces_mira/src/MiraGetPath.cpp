@@ -59,9 +59,9 @@ bool MiraGetPath::get_path(nav_msgs::GetPlan::Request &req, nav_msgs::GetPlan::R
 
  //std::cout << "before waiting" << std::endl;
   
-  // wait for new data on the "navigation/Path" channel  for a given duration (40 secs)
+  // wait for new data on the "navigation/Path" channel  for a given duration (10 secs)
 
-  ros::Time timeout = ros::Time::now() + ros::Duration(40);
+  ros::Time timeout = ros::Time::now() + ros::Duration(10);
   while(!new_plan)
   {
 	ros::Duration time_left = timeout - ros::Time::now();
