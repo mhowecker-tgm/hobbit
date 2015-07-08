@@ -158,9 +158,7 @@ void cLocalizationMonitor::open(ros::NodeHandle & n)
         int negate;
         double occ_th, free_th;
         bool trinary = true;
-        std::string frame_id;
-        ros::NodeHandle private_nh("~");
-        private_nh.param("frame_id", frame_id, std::string("map"));
+        std::string frame_id = "map";
 
         std::ifstream fin(fname.c_str());
         if (fin.fail()) 
@@ -350,13 +348,8 @@ bool cLocalizationMonitor::checkScan()
 		if (static_map_modified.data[index] == occupancy_grid_utils::UNOCCUPIED)
 		{
 			//point_ok = -1;
-			//score--;
 		}
 
-		/*std::cout << "range " << r << std::endl;
-		std::cout << "global point " << global_x << " " << global_y << std::endl;
-		std::cout << "point_ok " << point_ok << std::endl;
-		std::cout << "********************* " << std::endl;*/
 
 		valid_points++;
 
