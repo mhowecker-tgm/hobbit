@@ -126,6 +126,10 @@ private:
 	ros::ServiceServer apply_rotation_service;
 	bool applyRotation(hobbit_msgs::SendValue::Request  &req, hobbit_msgs::SendValue::Response &res);
 
+	ros::ServiceServer miracenter_screenshot_service;
+	bool takeMiracenterScreenshot(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res);
+
+
 };
 
 
