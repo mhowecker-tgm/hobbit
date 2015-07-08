@@ -64,5 +64,6 @@ class GrabScreenContent(State):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
-        subprocess.call(['/opt/ros/hobbit_hydro/src/hobbit_launch/scripts/miracenter_screenshot.sh'])
+        ret = subprocess.call(['/opt/ros/hobbit_hydro/src/hobbit_launch/scripts/miracenter_screenshot.sh'])
+        rospy.loginfo('SCREENSHOT call returned: ',ret)
         return 'succeeded'
