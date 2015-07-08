@@ -478,7 +478,7 @@ def get_bring_object():
         smach.StateMachine.add(
             'GET_ALL_POSITIONS',
             ServiceState(
-                '/Hobbit/place_handler/get_object_locations',
+                '/Hobbit/places_object/get_object_locations',
                 GetObjectLocations,
                 request_key='object_name',
                 response_key='response'),
