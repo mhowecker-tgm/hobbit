@@ -297,7 +297,7 @@ class CleanPositions(smach.State):
         self.getCoordinates = rospy.ServiceProxy(
             '/get_coordinates',
             GetCoordinates,
-            persistent=True)
+            persistent=False)
 
     def execute(self, ud):
         if self.preempt_requested():
