@@ -156,9 +156,9 @@ def detect_object():
                 recognize,
                 request_slots=['cloud'],
                 response_slots=['ids', 'transforms']),
-            transitions={'succeeded': 'STORE_DATA_SUCCESS',
+            transitions={'succeeded': 'OBJECT_DETECTED',
                          'preempted': 'preempted',
-                         'aborted': 'STORE_DATA_FAILURE'})
+                         'aborted': 'continue'})
         smach.StateMachine.add(
             'STORE_DATA_FAILURE',
             record_data.GrabAndSendData(topic_in='/headcam/depth_registered/points',
@@ -171,15 +171,15 @@ def detect_object():
             'STORE_DATA_SUCCESS',
             record_data.GrabAndSendData(topic_in='/headcam/depth_registered/points',
                                         topic_out='/bringobject/top_success/points'),
-            transitions={'succeeded': 'OBJECT_DETECTED',
-                         'aborted': 'OBJECT_DETECTED',
+            transitions={'succeeded': 'succeeded',
+                         'aborted': 'succeeded',
                          'preempted': 'preempted'}
         )
         smach.StateMachine.add(
             'OBJECT_DETECTED',
             ObjectDetected(),
-            transitions={'succeeded': 'succeeded',
-                         'aborted': 'continue',
+            transitions={'succeeded': 'STORE_DATA_SUCCESS',
+                         'aborted': 'STORE_DATA_FAILURE',
                          'preempted': 'preempted'})
 
     with counter_it:
