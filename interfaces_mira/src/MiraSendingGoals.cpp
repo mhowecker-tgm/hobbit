@@ -83,6 +83,8 @@ void MiraSendingGoals::initialize() {
 
 apply_rotation_service = robot_->getRosNode().advertiseService("/apply_rotation", &MiraSendingGoals::applyRotation, this);
 
+    miracenter_screenshot_service = robot_->getRosNode().advertiseService("/miracenter_screenshot", &MiraSendingGoals::takeMiracenterScreenshot, this);
+
 }
 
 void MiraSendingGoals::spin() 
@@ -95,6 +97,13 @@ void MiraSendingGoals::spin()
 		r.sleep();
 		goal_status_pub.publish(goal_status);
 	}
+}
+
+
+bool MiraSendingGoals::takeMiracenterScreenshot(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res)
+{
+	system("/opt/ros/hobbit_hydro/src/hobbit_launch/scripts/miracenter_screenshot.sh");
+	return true;
 }
 
 bool MiraSendingGoals::user_nav_mode(mira_msgs::UserNavMode::Request &req, mira_msgs::UserNavMode::Response &res)
