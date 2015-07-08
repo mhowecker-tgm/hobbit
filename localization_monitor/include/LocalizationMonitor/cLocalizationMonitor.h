@@ -148,6 +148,7 @@ private:
   ros::CallbackQueue my_queue;
 
   std::string fname;
+  std::string log_file_name;
 
 };
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

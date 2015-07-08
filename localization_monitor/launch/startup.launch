@@ -18,6 +18,8 @@
 
 	<param name="activate_recovery" value="false"/>
 
+	<param name="map_file" value="/opt/ros/hobbit_hydro/src/navigation/share/map.yaml"/>
+
   </node>
 </launch>
 

@@ -61,6 +61,7 @@ cLocalizationMonitor::cLocalizationMonitor(int argc, char **argv) : init_argc(ar
 	check_updated = false;
 
 	nh.param<std::string>("map_file", fname, "/opt/ros/hobbit_hydro/src/navigation/share/map.yaml");
+	nh.param<std::string>("log_file", log_file_name, "/opt/ros/hobbit_hydro/src/localization_monitor/localization_log_");
 
 
 }
@@ -133,7 +134,6 @@ void cLocalizationMonitor::open(ros::NodeHandle & n)
   	strftime(buffer,80,"%d-%m-%Y %I:%M:%S",timeinfo);
   	std::string str(buffer);
 
-	std::string log_file_name("/opt/ros/hobbit_hydro/src/localization_monitor/localization_log_");
 	log_file_name += str;
 	log_file_name += ".txt";
 
@@ -148,7 +148,7 @@ void cLocalizationMonitor::open(ros::NodeHandle & n)
 /////////////////////////////////////////////////////////////////////////////////////////////////
 	//load static global map, we don't want to run the map server
 /////////////////////////////////////////////////////////////////////////////////////////////////
-  	//std::string fname("/opt/ros/hobbit_hydro/src/navigation/share/map.yaml"); //FIXME
+
 	double res;
 
      	nav_msgs::GetMap::Response map_resp_;
