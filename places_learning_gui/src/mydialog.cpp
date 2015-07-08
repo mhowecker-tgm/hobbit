@@ -10,8 +10,7 @@ MyDialog::MyDialog(QWidget *parent) :
     ui(new Ui::MyDialog)
 {
     ui->setupUi(this);
-    
-    n=1; //default, has to be updated for each dialog from the main window
+
 }
 
 MyDialog::~MyDialog()
@@ -34,9 +33,7 @@ MyDialog::~MyDialog()
 
 	current_place_type = "call_button_";
 	current_place_type+= utf8_button_number;
-        //std::ostringstream oss;
-        //oss<<n;
-	//current_place_type += oss.str();
+
     }
     if (ui->floor_clearing->isChecked()) current_place_type = "floor_clearing";
     if (ui->fitness->isChecked()) current_place_type = "fitness";
