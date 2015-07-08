@@ -338,7 +338,7 @@ def main():
     global rooms
     try:
         rooms = readXml(FILE)
-        addObject(String('aspirin'), rooms)
+        #addObject(String('aspirin'), rooms)
         writeXml(FILE, rooms)
         #update_object_list(rooms)
         mug = GetObjectLocationsRequest()
