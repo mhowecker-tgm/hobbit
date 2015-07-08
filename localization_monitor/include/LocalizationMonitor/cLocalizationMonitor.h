@@ -147,6 +147,8 @@ private:
   void QueueThread();
   ros::CallbackQueue my_queue;
 
+  std::string fname;
+
 };
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #endif
