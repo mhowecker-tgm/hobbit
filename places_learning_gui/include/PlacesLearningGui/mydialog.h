@@ -22,8 +22,6 @@ public:
     std::string current_place_type;
 
     QNode* qnode;
-
-    int n;
     
 //private:
     Ui::MyDialog *ui;
