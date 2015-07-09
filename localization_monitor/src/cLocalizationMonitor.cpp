@@ -450,7 +450,19 @@ bool cLocalizationMonitor::getOccupancyState(hobbit_msgs::GetOccupancyState::Req
 	geometry_msgs::Point glob_point;
 	glob_point.x = global_x;
 	glob_point.y = global_y;
-	int index = occupancy_grid_utils::pointIndex(static_map.info,glob_point);
+	int index;
+
+	try{
+		index = occupancy_grid_utils::pointIndex(static_map.info,glob_point);
+	}
+	catch( const std::exception& e ) 
+	{ 
+		std::cout << "out of map bounds!! " << std::endl;
+		res.is_occupied = true;
+		return false;
+		
+
+	}
 
 	if (static_map.data[index] == occupancy_grid_utils::OCCUPIED)
 		res.is_occupied = true;
