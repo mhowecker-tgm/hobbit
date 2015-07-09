@@ -33,7 +33,7 @@ class GrabAndSendData(State):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
-        if not all(self.input, self.output):
+        if not all([self.input, self.output]):
             rospy.loginfo('No input/output topic set')
             return 'aborted'
         try:
