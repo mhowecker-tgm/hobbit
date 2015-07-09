@@ -55,7 +55,6 @@ cComeCloser::cComeCloser(int argc, char **argv) : init_argc(argc), init_argv(arg
 
 	current_motion_state.data = "Idle";
 
-	event_sub = n.subscribe("/Event", 2, &cComeCloser::event_callback, this);
 	emergency_stop_client = n.serviceClient<mira_msgs::EmergencyStop>("/emergency_stop");
   	reset_motorstop_client = n.serviceClient<mira_msgs::ResetMotorStop>("/reset_motorstop");
 
@@ -188,7 +187,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 	double init_ang = scan->angle_min;
 	double min_dis = scanner_info.range_max; 
 
-	if (angles::shortest_angular_distance(init_ang, orientation) < 0)
+	if (user_rel_x < 0)
 	{
 		std::cout << "user pose out of field of view, aborting " << std::endl;
 		ROS_INFO ("user pose out of field of view, aborting ");
@@ -269,17 +268,16 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 		
 		}
 		
-		{
+		
+		std_msgs::String rotate_cmd;
+		std::ostringstream s;
+		s << "Turn " << angle2turn*180/M_PI;
+		rotate_cmd.data = s.str();
 
-			std_msgs::String rotate_cmd;
-			std::ostringstream s;
-			s << "Turn " << angle2turn*180/M_PI;
-			rotate_cmd.data = s.str();
+		discrete_motion_cmd_pub.publish(rotate_cmd);
 
-			discrete_motion_cmd_pub.publish(rotate_cmd);
-
-			std::cout << "rotation command sent " << std::endl;
-		}
+		std::cout << "rotation command sent " << std::endl;
+		
 
 	}
 	
@@ -395,20 +393,5 @@ void cComeCloser::stop_callback(const std_msgs::String::ConstPtr& msg)
 
 }
 
-void cComeCloser::event_callback(const hobbit_msgs::Event::ConstPtr& msg)
-{
-	if (msg->event.compare("E_RELEASEBUTTON")==0)
-	{
-		//std::cout << "Release button pressed" << std::endl;
-		//call service 
-		mira_msgs::ResetMotorStop srv;
-	        if (!reset_motorstop_client.call(srv))
-	        {
-	          ROS_DEBUG("Failed to call service reset_motorstop");
-	        }
-		
-	}
-
-}
 
 
