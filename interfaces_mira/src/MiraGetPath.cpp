@@ -69,6 +69,8 @@ bool MiraGetPath::get_path(nav_msgs::GetPlan::Request &req, nav_msgs::GetPlan::R
 		break;
   }
 
+  if (new_plan)
+	std::cout << "new plan was received " << std::endl;
 
   // Extract the planned path, copy the path into the response
   resp.plan.poses.resize(global_plan.size());
