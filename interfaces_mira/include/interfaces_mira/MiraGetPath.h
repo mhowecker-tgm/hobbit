@@ -43,9 +43,6 @@ private:
 
         void path_channel_callback(mira::ChannelRead<std::vector<mira::Point2f>> data);
 
-	boost::thread callback_queue_thread_;
-	void QueueThread();
-
 };
 
 
