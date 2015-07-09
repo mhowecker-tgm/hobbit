@@ -5,7 +5,7 @@
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 
-MiraRobot::MiraRobot(std::vector<std::string> modules) : authority_("/", "interfaces_ros", mira::Authority::ANONYMOUS),node_() {
+MiraRobot::MiraRobot(std::vector<std::string> modules) : authority_("/", "interfaces_ros", mira::Authority::INDEPENDENT_SUBSCRIBER_THREAD),node_() {
     ROS_INFO("Creating MiraRobot instance.");
 
     ModuleFactory *factory = ModuleFactory::Get();

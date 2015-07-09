@@ -19,8 +19,6 @@ void MiraGetPath::initialize() {
 
   global_plan.clear();
 
-  this->callback_queue_thread_ = boost::thread(boost::bind(&MiraGetPath::QueueThread, this));
-
 
 }
 
@@ -110,15 +108,7 @@ bool MiraGetPath::get_path(nav_msgs::GetPlan::Request &req, nav_msgs::GetPlan::R
   return true;
 }
 
-void MiraGetPath::QueueThread() 
-{
-     ros::Rate r(5);
-     while ((&robot_->getRosNode())->ok()) 
-     {
-       (robot_->getMyQueue()).callAvailable(ros::WallDuration());
-        r.sleep();
-     }
-}
+
 
 
 
