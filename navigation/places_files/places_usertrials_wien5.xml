@@ -12,7 +12,7 @@
       <place>
         <name>mitte</name>
         <type>goTo</type>
-        <pose y="0.255453" x="0.730677" theta="-1.551312"/>
+        <pose y="0.4" x="0.3" theta="-1.551312"/>
         <objects/>
       </place>
       <place>
@@ -85,7 +85,7 @@
       <place>
         <name>mitte</name>
         <type>goTo</type>
-        <pose y="6.649496" x="2.031232" theta="1.569437"/>
+        <pose y="6.65" x="2.031232" theta="1.569437"/>
         <objects/>
       </place>
       <place>
