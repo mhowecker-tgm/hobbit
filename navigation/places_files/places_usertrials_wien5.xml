@@ -27,6 +27,8 @@
         <pose y="-0.333233" x="-0.181485" theta="2.429473"/>
         <objects>
           <object name="Aspirin" probability="0.5"/>
+          <object name="Brille" probability="0.5"/>
+          <object name="Schachtel" probability="0.5"/>
         </objects>
       </place>
       <place>
@@ -53,6 +55,8 @@
         <pose y="-0.442797" x="0.890954" theta="-0.044137"/>
         <objects>
           <object name="Aspirin" probability="0.5"/>
+          <object name="Brille" probability="0.5"/>
+          <object name="Schachtel" probability="0.5"/>
         </objects>
       </place>
       <place>
@@ -87,7 +91,7 @@
       <place>
         <name>default</name>
         <type>default</type>
-        <pose y="6.649496" x="2.031232" theta="1.569437"/>
+        <pose y="7.4" x="2.031232" theta="1.569437"/>
         <objects/>
       </place>
     </places>
