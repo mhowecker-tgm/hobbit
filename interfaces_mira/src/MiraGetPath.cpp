@@ -4,6 +4,7 @@
 #include <navigation/tasks/PreferredDirectionTask.h>
 #include <navigation/tasks/PositionTask.h>
 #include <navigation/tasks/IgnoreObstaclesTask.h>
+#include <mira_msgs/ObsNavMode.h>
 
 using namespace mira::navigation;
 
@@ -15,6 +16,8 @@ void MiraGetPath::initialize() {
   get_path_service = robot_->getRosNode().advertiseService("/make_plan", &MiraGetPath::get_path, this);
 
   robot_->getMiraAuthority().subscribe<std::vector<mira::Point2f>>("/navigation/Path", &MiraGetPath::path_channel_callback, this);
+
+  obs_nav_mode_client = robot_->getRosNode().serviceClient<mira_msgs::ObsNavMode>("/obs_nav_mode");
 
   new_plan = false;
 
@@ -36,6 +39,9 @@ bool MiraGetPath::get_path(nav_msgs::GetPlan::Request &req, nav_msgs::GetPlan::R
   new_plan = false;
   global_plan.clear();
 
+  //mira_msgs::ObsNavMode obs_srv;
+  //obs_nav_mode_client.call(obs_srv);
+
   // convert target pose to Mira format
   mira::Point2f goal_pose_mira(req.goal.pose.position.x, req.goal.pose.position.y);
 
@@ -52,19 +58,25 @@ bool MiraGetPath::get_path(nav_msgs::GetPlan::Request &req, nav_msgs::GetPlan::R
   //Set the task for the target pose
   TaskPtr task(new Task());
   //task->addSubTask(SubTaskPtr(new PreferredDirectionTask(mira::navigation::PreferredDirectionTask::FORWARD, 1.0f)));
+  
   task->addSubTask(SubTaskPtr(new mira::navigation::PositionTask(mira::Point2f(goal_pose_mira), 0.1f, 0.1f)));
    task->addSubTask(SubTaskPtr(new mira::navigation::IgnoreObstaclesTask()));
 
   mira::RPCFuture<void> r1 = robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
-  r1.timedWait(mira::Duration::seconds(1));
-  r1.get();
+
+
+  /*mira::Pose2 new_goal_target(req.goal.pose.position.x, req.goal.pose.position.y, 0.0);
+	  robot_->getMiraAuthority().callService<void>(navService, "setGoal", new_goal_target, 0.1f, mira::deg2rad(5.0f));*/
+
+  /*r1.timedWait(mira::Duration::seconds(1));
+  r1.get();*/
 
  //std::cout << "before waiting" << std::endl;
   
   // wait for new data on the "navigation/Path" channel  for a given duration (10 secs)
 
   ros::Time timeout = ros::Time::now() + ros::Duration(10);
-  while(!new_plan)
+  while(!new_plan || global_plan.size()==0)
   {
 	ros::Duration time_left = timeout - ros::Time::now();
 	if (time_left <= ros::Duration(0,0))  //the timeout has been reached
@@ -93,17 +105,18 @@ bool MiraGetPath::get_path(nav_msgs::GetPlan::Request &req, nav_msgs::GetPlan::R
   //cancel the task
   TaskPtr empty_task(new Task());
   mira::RPCFuture<void> r2 = robot_->getMiraAuthority().callService<void>(navService, "setTask", empty_task);
-  r2.timedWait(mira::Duration::seconds(1));
-  r2.get();
+  /*r2.timedWait(mira::Duration::seconds(1));
+  r2.get();*/
 
   //std::cout << "task cancelled" << std::endl;
 
   // unmute the pilot
+
   mira::RPCFuture<void> r3 = robot_->getMiraAuthority().callService<void>(navService,"setMute", false);
   r3.timedWait(mira::Duration::seconds(1));
   r3.get();
 
-  sleep (2);
+  //sleep (2);
 
   std::cout << "pilot is back" << std::endl;
 
