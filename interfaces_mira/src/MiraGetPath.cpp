@@ -3,6 +3,7 @@
 #include <navigation/Task.h>
 #include <navigation/tasks/PreferredDirectionTask.h>
 #include <navigation/tasks/PositionTask.h>
+#include <navigation/tasks/IgnoreObstaclesTask.h>
 
 using namespace mira::navigation;
 
@@ -50,8 +51,9 @@ bool MiraGetPath::get_path(nav_msgs::GetPlan::Request &req, nav_msgs::GetPlan::R
 
   //Set the task for the target pose
   TaskPtr task(new Task());
-  task->addSubTask(SubTaskPtr(new PreferredDirectionTask(mira::navigation::PreferredDirectionTask::FORWARD, 1.0f)));
+  //task->addSubTask(SubTaskPtr(new PreferredDirectionTask(mira::navigation::PreferredDirectionTask::FORWARD, 1.0f)));
   task->addSubTask(SubTaskPtr(new mira::navigation::PositionTask(mira::Point2f(goal_pose_mira), 0.1f, 0.1f)));
+   task->addSubTask(SubTaskPtr(new mira::navigation::IgnoreObstaclesTask()));
 
   mira::RPCFuture<void> r1 = robot_->getMiraAuthority().callService<void>(navService, "setTask", task);
   r1.timedWait(mira::Duration::seconds(1));
