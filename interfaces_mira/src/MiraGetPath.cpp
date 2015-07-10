@@ -39,9 +39,6 @@ bool MiraGetPath::get_path(nav_msgs::GetPlan::Request &req, nav_msgs::GetPlan::R
   new_plan = false;
   global_plan.clear();
 
-  //mira_msgs::ObsNavMode obs_srv;
-  //obs_nav_mode_client.call(obs_srv);
-
   // convert target pose to Mira format
   mira::Point2f goal_pose_mira(req.goal.pose.position.x, req.goal.pose.position.y);
 
@@ -116,7 +113,6 @@ bool MiraGetPath::get_path(nav_msgs::GetPlan::Request &req, nav_msgs::GetPlan::R
   r3.timedWait(mira::Duration::seconds(1));
   r3.get();
 
-  //sleep (2);
 
   std::cout << "pilot is back" << std::endl;
 
