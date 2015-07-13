@@ -11,6 +11,7 @@ import smach
 import uashh_smach.util as util
 import math
 
+import std_srvs.srv
 from smach import State, Sequence, StateMachine
 from smach_ros import ServiceState, SimpleActionState
 from mira_msgs.srv import UserNavMode, ObsNavMode, EmergencyStop, ResetMotorStop
@@ -144,7 +145,8 @@ def get_dock_action():
         )
         smach.StateMachine.add(
             'STORE_SCREENSHOT',
-            record_data.GrabScreenContent(),
+            ServiceState('/miracenter_screenshot',
+                         std_srvs.srv.Empty),
             transitions={'succeeded': 'DOCK_ACTION',
                          'aborted': 'DOCK_ACTION',
                          'preempted': 'preempted'}
@@ -802,7 +804,8 @@ def goToPosition(frame='/map', room='None', place='dock'):
         )
         Sequence.add(
             'STORE_SCREENSHOT',
-            record_data.GrabScreenContent(),
+            ServiceState('/miracenter_screenshot',
+                         std_srvs.srv.Empty),
             transitions={'succeeded': 'aborted'}
         )
     return seq
@@ -981,7 +984,8 @@ def goToPose():
         )
         Sequence.add(
             'STORE_SCREENSHOT',
-            record_data.GrabScreenContent(),
+            ServiceState('/miracenter_screenshot',
+                         std_srvs.srv.Empty),
             transitions={'succeeded': 'aborted'}
         )
     return seq
@@ -1121,7 +1125,8 @@ def goToPoseSilent():
         )
         Sequence.add(
             'STORE_SCREENSHOT',
-            record_data.GrabScreenContent(),
+            ServiceState('/miracenter_screenshot',
+                         std_srvs.srv.Empty),
             transitions={'succeeded': 'aborted'}
         )
     return seq
