@@ -17,8 +17,6 @@ void MiraGetPath::initialize() {
 
   robot_->getMiraAuthority().subscribe<std::vector<mira::Point2f>>("/navigation/Path", &MiraGetPath::path_channel_callback, this);
 
-  obs_nav_mode_client = robot_->getRosNode().serviceClient<mira_msgs::ObsNavMode>("/obs_nav_mode");
-
   new_plan = false;
 
   global_plan.clear();
