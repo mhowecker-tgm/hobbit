@@ -301,7 +301,7 @@ class CleanPositions(smach.State):
         if self.preempt_requested():
             self.service_preempt()
             return 'preempted'
-        self.getCoordinates = rospy.ServiceProxy(
+        getCoordinates = rospy.ServiceProxy(
             '/get_coordinates',
             GetCoordinates,
             persistent=False)
@@ -310,7 +310,7 @@ class CleanPositions(smach.State):
             req = GetCoordinatesRequest(String(location.room), String(location.location))
             rospy.loginfo(str(req))
             try:
-                resp = self.getCoordinates(req)
+                resp = getCoordinates(req)
                 ud.positions.append(
                     {'x': resp.pose.x,
                      'y': resp.pose.y,
