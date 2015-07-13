@@ -296,19 +296,19 @@ class CleanPositions(smach.State):
             outcomes=['succeeded', 'preempted', 'aborted'],
             input_keys=['response', 'positions'],
             output_keys=['positions', 'plan'])
-        self.getCoordinates = rospy.ServiceProxy(
-            '/get_coordinates',
-            GetCoordinates,
-            persistent=False)
 
     def execute(self, ud):
         if self.preempt_requested():
             self.service_preempt()
-            self.getCoordinates.close()
             return 'preempted'
+        self.getCoordinates = rospy.ServiceProxy(
+            '/get_coordinates',
+            GetCoordinates,
+            persistent=False)
         ud.positions = []
         for location in ud.response.object_locations.locations:
             req = GetCoordinatesRequest(String(location.room), String(location.location))
+            rospy.loginfo(str(req))
             try:
                 resp = self.getCoordinates(req)
                 ud.positions.append(
@@ -318,9 +318,13 @@ class CleanPositions(smach.State):
                      'distance': 'None',
                      'room': location.room,
                      'place_name': location.location})
-            except rospy.ServiceException:
-                self.getCoordinates.close()
+            except rospy.ServiceException as e:
+                rospy.loginfo('caught exception', e)
                 return 'aborted'
+            except:
+                rospy.loginfo('caught exception')
+                return 'aborted'
+
         ud.plan = None
         rospy.loginfo('CleanPositions: ' + str(len(ud.positions)))
         return 'succeeded'
