@@ -102,8 +102,8 @@ bool cPersonFollowing::startFollowing()
 	std_srvs::Empty srv;
         if (!resume_following_client.call(srv))
         	ROS_INFO("Failed to call service resume following");
-
-	std::cout << "service was resumed " << std::endl;
+	else
+		std::cout << "service was resumed " << std::endl;
 
 	goal_status.data = "started";
 	status_pub.publish(goal_status);
@@ -112,7 +112,8 @@ bool cPersonFollowing::startFollowing()
 	if (!deactivate_recovery_client.call(srv2))
 		ROS_INFO("Failed to call service deactivate recovery"); //This would be a problem
 
-	std::cout << "service was deactivated " << std::endl;
+	else 
+		std::cout << "service was deactivated " << std::endl;
 
 	return true;
 
