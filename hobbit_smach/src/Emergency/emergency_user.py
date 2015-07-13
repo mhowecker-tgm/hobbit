@@ -255,7 +255,7 @@ def main():
             'MMUI_CONFIRM_DoYouNeedHelp',
             HobbitMMUI.AskYesNo(question='T_HM_DoYouNeedHelp'),
             transitions={'yes': 'MMUI_CONFIRM_ShallICallHelp',
-                         'no': 'succeeded',
+                         'no': 'LOG_ABORT',
                          'timeout': 'MMUI_CONFIRM_DoYouNeedHelp',
                          '3times': 'EMERGENCY_CALL',
                          'failed': 'SET_FAILURE'}
