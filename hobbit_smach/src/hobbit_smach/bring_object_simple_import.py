@@ -26,6 +26,8 @@ import hobbit_smach.call_hobbit_2_import as call_hobbit
 import hobbit_smach.record_data_import as record_data
 from hobbit_user_interaction import HobbitMMUI
 from rospy.exceptions import TransportTerminated
+from mira_msgs.srv import ObsNavMode
+
 
 bring_origin = None
 bring_destination = None
@@ -377,34 +379,34 @@ class PlanPath(smach.State):
             rospy.loginfo('index of positions: '+str(index))
             end_pose = get_pose_from_xytheta(
                 position['x'], position['y'], position['theta'])
-#            req = GetPlanRequest(robot_pose, end_pose, 0.01)
-#
-#            try:
-#                resp = self.getPlan(req)
-#            except (rospy.ServiceException, TransportTerminated):
-#                self.getPlan.close()
-#                return 'aborted'
-#
-#            if resp.plan.poses:
-#                distance = calc_path_length(end_pose, resp.plan.poses)
-#                rospy.loginfo('Path length: ' + str(distance))
-#                if (distance < self.shortest_path):
-#                    self.index = index
-#                    self.shortest_path = distance
-#                    ud.goal_position_x = position['x']
-#                    ud.goal_position_y = position['y']
-#                    ud.goal_position_yaw = position['theta']
-#                    rospy.loginfo('Found shorter path')
-#                else:
-#                    rospy.loginfo('Another path is shorter')
-#                    pass
-#            else:
-            rospy.loginfo('We did not receive a plan.')
-            self.index = index
-            ud.goal_position_x = position['x']
-            ud.goal_position_y = position['y']
-            ud.goal_position_yaw = position['theta']
-            rospy.loginfo('Select random goal')
+            req = GetPlanRequest(robot_pose, end_pose, 0.01)
+
+            try:
+                resp = self.getPlan(req)
+            except (rospy.ServiceException, TransportTerminated):
+                self.getPlan.close()
+                return 'aborted'
+
+            if resp.plan.poses:
+                distance = calc_path_length(end_pose, resp.plan.poses)
+                rospy.loginfo('Path length: ' + str(distance))
+                if (distance < self.shortest_path):
+                    self.index = index
+                    self.shortest_path = distance
+                    ud.goal_position_x = position['x']
+                    ud.goal_position_y = position['y']
+                    ud.goal_position_yaw = position['theta']
+                    rospy.loginfo('Found shorter path')
+                else:
+                    rospy.loginfo('Another path is shorter')
+                    pass
+            else:
+                rospy.loginfo('We did not receive a plan.')
+                self.index = index
+                ud.goal_position_x = position['x']
+                ud.goal_position_y = position['y']
+                ud.goal_position_yaw = position['theta']
+                rospy.loginfo('Select random goal')
         try:
             rospy.loginfo('Trying to remove the position#: ' + str(self.index))
             del self.positions[self.index]
@@ -510,8 +512,18 @@ def get_bring_object():
         smach.StateMachine.add(
             'CLEAN_POSITIONS',
             CleanPositions(),
-            transitions={'succeeded': 'PLAN_PATH',
+            transitions={'succeeded': 'PREPARE_FOR_PLAN_PATH',
                          'aborted' : 'BACK_TO_USER_ABORT'}
+        )
+        smach.StateMachine.add(
+            'PREPARE_FOR_PLAN_PATH',
+            ServiceState(
+                '/obs_nav_mode',
+                ObsNavMode
+            ),
+            transitions={'succeeded': 'PLAN_PATH',
+                         'preempted': 'LOG_PREEMPT',
+                         'aborted': 'PLAN_PATH'}
         )
         smach.StateMachine.add(
             'PLAN_PATH',
@@ -557,7 +569,7 @@ def get_bring_object():
             detect_object(),
             transitions={'succeeded': 'BACK_TO_USER_SUCCESS',
                          'preempted': 'LOG_PREEMPT',
-                         'aborted': 'PLAN_PATH'}
+                         'aborted': 'PREPARE_FOR_PLAN_PATH'}
         )
         smach.StateMachine.add(
             'BACK_TO_USER_SUCCESS',
