@@ -1,71 +1,84 @@
-<?xml version="1.0"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <rooms>
-	<room>
-		<name>tvrummet</name>
-		<vertices>
-			<vertex x="1.200001" y="0.299999" />
-			<vertex x="1.200001" y="-4.600000" />
-			<vertex x="5.000000" y="-4.500000" />
-			<vertex x="4.600000" y="0.799999" />
-		</vertices>
-		<places>
-			<place>
-				<name>mitten</name>
-				<type>goTo</type>
-				<pose x="2.679784" y="-1.310372" theta="1.698594" />
-			</place>
-			<place>
-				<name>call2</name>
-				<type>call_button_2</type>
-				<pose x="3.424505" y="-1.794756" theta="-0.526356" />
-			</place>
-			<place>
-				<name>call3</name>
-				<type>call_button_3</type>
-				<pose x="2.250612" y="-3.021723" theta="-2.184116" />
-			</place>
-			<place>
-				<name>fitness</name>
-				<type>fitness</type>
-				<pose x="2.833196" y="-2.083176" theta="-1.854073" />
-			</place>
-		</places>
-	</room>
-	<room>
-		<name>köket</name>
-		<vertices>
-			<vertex x="-2.699999" y="3.500000" />
-			<vertex x="0.900000" y="3.299999" />
-			<vertex x="0.799999" y="1.600000" />
-			<vertex x="-2.799999" y="1.699999" />
-		</vertices>
-		<places>
-			<place>
-				<name>call1</name>
-				<type>call_button_1</type>
-				<pose x="-0.145685" y="1.890118" theta="-0.612104" />
-			</place>
-			<place>
-				<name>mitten</name>
-				<type>goTo</type>
-				<pose x="-0.170444" y="1.884628" theta="-1.521546" />
-			</place>
-		</places>
-	</room>
-	<room>
-		<name>matplatsen</name>
-		<vertices>
-			<vertex x="-1.600000" y="1.600000" />
-			<vertex x="-1.900000" y="-1.500000" />
-			<vertex x="0.799999" y="-1.400000" />
-			<vertex x="0.799999" y="1.600000" />
-		</vertices>
-		<places>
-			<place>
-				<name>mitten</name>
-				<type>goTo</type>
-				<pose x="-0.115487" y="-0.697384" theta="-0.174215" />
-			</place>
-		</places>
-	</room>
+  <room>
+    <name>tvrummet</name>
+    <vertices>
+      <vertex y="0.299999" x="1.200001"/>
+      <vertex y="-4.6" x="1.200001"/>
+      <vertex y="-4.5" x="5.0"/>
+      <vertex y="0.799999" x="4.6"/>
+    </vertices>
+    <places>
+      <place>
+        <name>mitten</name>
+        <type>goTo</type>
+        <pose y="-1.310372" x="2.679784" theta="1.698594"/>
+        <objects/>
+      </place>
+      <place>
+        <name>call2</name>
+        <type>call_button_2</type>
+        <pose y="-1.794756" x="3.624505" theta="-0.526356"/>
+        <objects/>
+      </place>
+      <place>
+        <name>call3</name>
+        <type>call_button_3</type>
+        <pose y="-3.021723" x="2.450612" theta="-2.184116"/>
+        <objects/>
+      </place>
+      <place>
+        <name>fitness</name>
+        <type>fitness</type>
+        <pose y="-2.083176" x="3.033196" theta="-1.854073"/>
+        <objects/>
+      </place>
+      <place>
+        <name>dock</name>
+        <type>docking_base_point</type>
+        <pose y="0.0017" x="-0.07" theta="1.11"/>
+        <objects/>
+      </place>
+    </places>
+  </room>
+  <room>
+    <name>köket</name>
+    <vertices>
+      <vertex y="3.5" x="-2.699999"/>
+      <vertex y="3.299999" x="0.9"/>
+      <vertex y="1.6" x="0.799999"/>
+      <vertex y="1.699999" x="-2.799999"/>
+    </vertices>
+    <places>
+      <place>
+        <name>call1</name>
+        <type>call_button_1</type>
+        <pose y="1.890118" x="-0.145685" theta="-0.612104"/>
+        <objects/>
+      </place>
+      <place>
+        <name>mitten</name>
+        <type>goTo</type>
+        <pose y="1.884628" x="-0.170444" theta="-1.521546"/>
+        <objects/>
+      </place>
+    </places>
+  </room>
+  <room>
+    <name>matplatsen</name>
+    <vertices>
+      <vertex y="1.6" x="-1.6"/>
+      <vertex y="-1.5" x="-1.9"/>
+      <vertex y="-1.4" x="0.799999"/>
+      <vertex y="1.6" x="0.799999"/>
+    </vertices>
+    <places>
+      <place>
+        <name>mitten</name>
+        <type>goTo</type>
+        <pose y="-0.697384" x="-0.115487" theta="-0.174215"/>
+        <objects/>
+      </place>
+    </places>
+  </room>
 </rooms>
