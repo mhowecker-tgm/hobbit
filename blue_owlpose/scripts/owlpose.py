@@ -294,12 +294,17 @@ def sleepCallback(msg):
 def driveServosToSleep():
     global motorsAreOn
 
-    print "putting servos to sleep"
-    set_angles(pitch=max_ud_angle_deg, yaw=0)
-    rospy.sleep(5.0)
-    turnPanMotorOnOff(False)
-    turnTiltMotorOnOff(False)
-    motorsAreOn = False
+    if motorsAreOn:
+        print "putting servos to sleep"
+        set_angles(pitch=max_ud_angle_deg, yaw=0)
+        print "before sleep"
+        rospy.sleep(5.0)
+        print "after 5 s sleep"
+        turnPanMotorOnOff(False)
+        turnTiltMotorOnOff(False)
+        motorsAreOn = False
+    else:
+        print "servos are already asleep"
 
 # Set torque limit for dynamixel servos
 def setTorqueLimit(torque):
