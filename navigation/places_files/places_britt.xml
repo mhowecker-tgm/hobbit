@@ -36,7 +36,7 @@
       <place>
         <name>dock</name>
         <type>docking_base_point</type>
-        <pose y="0.0017" x="-0.07" theta="1.11"/>
+        <pose y="0.0017" x="-0.07" theta="0.019363"/>
         <objects/>
       </place>
     </places>
