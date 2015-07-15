@@ -3,8 +3,6 @@
 # Also can take IMU pitch angles to replace the angles returned by the pitch servo,
 # if these should not be accurate.
 # NOTE: the Dynamixel RX-28 servos used in Hobbit have a resolution of 0.29 deg
-# NOTE: This uses a lot of global variables which are being accessed from different parts
-# of the code WITHOUT a mutex or something. So there could be race conditions lurking.
 #
 # @author Tobias Ferner (some), Andreas Baldinger (some more), Michael Zillich (final)
 # @date April 2015
@@ -17,6 +15,7 @@ import tf
 import math
 from time import sleep
 import numpy as np
+import threading
 from sensor_msgs.msg import *
 from geometry_msgs.msg import Quaternion
 from dynamixel_msgs.msg import *
@@ -79,6 +78,9 @@ whenLastCommandSent = 0
 # duration (in seconds) after which the head is sent to sleep if no command was sent
 idleDuration = 26000
 
+# locks access to any internal structure by any external message or service
+commandLock = threading.Lock()
+
 # This sets angles for a pan/tilt neck. Angles are in degrees.
 # There are 2 angles to set: pitch (=up/down) and yaw (= left/right).
 def set_angles(pitch, yaw):
@@ -86,6 +88,7 @@ def set_angles(pitch, yaw):
 	global pitch_offset
 	global pan_pub
 	global tilt_pub
+
 	print "moving to yaw [deg] ", yaw
 	print "moving to pitch [yaw] ", pitch
 	# add the calibration offsets
@@ -120,6 +123,8 @@ def set_head_orientation(msg):
 	global current_pitch_as_set
 	global motorsAreOn
 	global whenLastCommandSent
+
+	commandLock.acquire()
 
 	whenLastCommandSent = rospy.get_time()
 
@@ -244,6 +249,8 @@ def set_head_orientation(msg):
 
 	rospy.sleep(0.1)
 
+	commandLock.release()
+
 # This is called periodically and checks if the head is idle.
 # If there has not been any command in some time the head is put to sleep.
 def checkHeadIdle(event):
@@ -287,7 +294,9 @@ def turnPanMotorOnOff(on):
 
 # callback for sleep service
 def sleepCallback(msg):
+    commandLock.acquire()
     driveServosToSleep()
+    commandLock.release()
     return std_msgs.msg.Empty
 
 # Drive the servos to a resting position and turn torque off
@@ -321,8 +330,8 @@ def setTorqueLimit(torque):
 def command(msg):
 	global whenLastCommandSent
 
+	commandLock.acquire()
 	whenLastCommandSent = rospy.get_time()
-
 	if msg.data == "restart":
 	        print "Restarting servos. Setting torque limit to: ", torque_limit
 		setTorqueLimit(torque_limit)
@@ -332,6 +341,7 @@ def command(msg):
 	if msg.data == "startup":
 		print "Moving to center_center"
 		set_angles(pitch=0, yaw=0)
+	commandLock.release()
 
 # get an IMU message and store pitch angle
 # NOTE: this assumes a specific mounting of the IMU inside the head:
@@ -342,8 +352,8 @@ def imuUpdate(msg):
     global robotMoving
     global imu_pitch_offset
 
-    # HACK: this actually needs a mutex or something. No idea how that works
-    # in python. I hate python. I also hate HOBBIT.
+    commandLock.acquire()
+
     if robotMoving == False:
         x = msg.linear_acceleration.x
         y = msg.linear_acceleration.y
@@ -352,18 +362,21 @@ def imuUpdate(msg):
         x = x/m
         y = y/m
         z = z/m
-        # HACK: this also needs a mutex or something.
         imuPitch = -math.asin(x)*180.0/math.pi - imu_pitch_offset
     # else: do not update angle
+
+    commandLock.release()
 
 # store whether the robot is currently moving
 def movementUpdate(msg):
 	global robotMoving
-	# HACK: this also needs a mutex or something.
+
+	commandLock.acquire()
 	if msg.data == "Idle":
 		robotMoving = False
 	else:
 		robotMoving = True
+	commandLock.release()
 
 # get current pan (yaw) angle from dynamixel joint state topic
 def panJointStateUpdate(msg):
@@ -371,7 +384,8 @@ def panJointStateUpdate(msg):
 	global yaw_offset
 	global current_yaw_as_set
 	global yaw_temperature
-	# HACK: this also needs a mutex or something.
+
+	commandLock.acquire()
 	current_yaw = msg.current_pos
 	current_yaw_as_set = msg.goal_pos
 	yaw_temperature = msg.motor_temps[0]
@@ -381,6 +395,7 @@ def panJointStateUpdate(msg):
 	# subtract offset
 	current_yaw = current_yaw - yaw_offset
 	current_yaw_as_set = current_yaw_as_set - yaw_offset
+	commandLock.release()
 
 # get current pitch (tilt) angle from dynamixel joint state topic
 def tiltJointStateUpdate(msg):
@@ -388,7 +403,8 @@ def tiltJointStateUpdate(msg):
 	global pitch_offset
 	global current_pitch_as_set
 	global pitch_temperature
-	# HACK: this also needs a mutex or something.
+
+	commandLock.acquire()
 	current_pitch = msg.current_pos
 	current_pitch_as_set = msg.goal_pos
 	pitch_temperature = msg.motor_temps[0]
@@ -401,6 +417,7 @@ def tiltJointStateUpdate(msg):
 	# subtract offet
 	current_pitch = current_pitch - pitch_offset
 	current_pitch_as_set = current_pitch_as_set - pitch_offset
+	commandLock.release()
 
 # read offsets from parameter server and set them
 def read_and_set_offsets():
@@ -416,7 +433,9 @@ def read_and_set_offsets():
     print "set IMU pitch offset of: ", float(imu_pitch_offset)
 
 def trigger_read_and_set_offsets(msg):
+    commandLock.acquire()
     read_and_set_offsets()
+    commandLock.release()
 
 # check if servos are alive or have shut off due to torque or temperature
 # thresholds
@@ -434,6 +453,8 @@ def init():
     global pan_pub
     global tilt_pub
     
+    commandLock.acquire()
+
     # Initialize Rosnode:
     rospy.init_node('owlpose')
     print "Initialized"
@@ -472,10 +493,13 @@ def init():
     # Set timer for putting idle head to sleep
     #rospy.Timer(rospy.Duration(idleDuration), checkHeadIdle)
 
+    commandLock.release()
+
     # Send geometry/tf constantly with 5hz
-    r = rospy.Rate(5) # 5 Hz
+    r = rospy.Rate(5)
     #i = 0
     while not rospy.is_shutdown():
+        commandLock.acquire()
         if haveImu:
             # ignore the servo pitch angle (0) and use pitch from IMU instead
             br.sendTransform( (0,0,0), tf.transformations.quaternion_from_euler(0, imuPitch/180.0*math.pi, current_yaw/180.0*math.pi), rospy.Time.now(), base_tf, head_tf)
@@ -492,12 +516,15 @@ def init():
         #if (i == 5):
         #    #setTorqueLimit(torque_limit)
         #    i = 0
+        commandLock.release()
         r.sleep()
 
 # NOTE: Apparently this is not sent anymore. It seems ROS connections are already terminated at that point.
 def shutdown():
+	commandLock.acquire()
 	print "Moving to center_center"
 	set_angles(pitch=0, yaw=0)
+	commandLock.release()
 
 if __name__ == '__main__':
 	try:
