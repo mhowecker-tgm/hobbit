@@ -257,10 +257,12 @@ def checkHeadIdle(event):
     global whenLastCommandSent
     global motorsAreOn
 
+    commandLock.acquire()
     if (motorsAreOn):
         now = rospy.get_time()
         if (now - whenLastCommandSent > idleDuration):
             driveServosToSleep()
+    commandLock.release()
 
 # Wait until dynamixel manager node has come up
 def waitForServosReady():
@@ -353,7 +355,6 @@ def imuUpdate(msg):
     global imu_pitch_offset
 
     commandLock.acquire()
-
     if robotMoving == False:
         x = msg.linear_acceleration.x
         y = msg.linear_acceleration.y
@@ -364,7 +365,6 @@ def imuUpdate(msg):
         z = z/m
         imuPitch = -math.asin(x)*180.0/math.pi - imu_pitch_offset
     # else: do not update angle
-
     commandLock.release()
 
 # store whether the robot is currently moving
