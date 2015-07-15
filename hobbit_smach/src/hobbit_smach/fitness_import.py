@@ -95,7 +95,7 @@ class SetSuccess(State):
 
 def event_cb(msg, userdata):
     rospy.loginfo('Got message with event: '+str(msg.event))
-    if msg.event.upper() in ['E_FITNESS_CLOSED', 'E_HELP', 'P_E_BACK', 'E_CANCEL']:
+    if msg.event.upper() in ['E_FITNESS_CLOSED', 'E_HELP', 'E_CANCEL']:
         return True
     else:
         return False

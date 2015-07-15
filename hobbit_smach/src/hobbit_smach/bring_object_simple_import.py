@@ -346,10 +346,10 @@ class PlanPath(smach.State):
             '/headcam/active',
             String,
             queue_size=50)
-        self.getPlan = rospy.ServiceProxy(
-            'make_plan',
-            GetPlan,
-            persistent=True)
+        #self.getPlan = rospy.ServiceProxy(
+        #    'make_plan',
+        #    GetPlan,
+        #    persistent=True)
         self.shortest_path = 99999.99
         self.index = 0
         self.first = True
@@ -365,7 +365,7 @@ class PlanPath(smach.State):
         if self.preempt_requested():
             print 'Preempt requested:'
             self.service_preempt()
-            self.getPlan.close()
+            #self.getPlan.close()
             return 'preempted'
         if self.first:
             self.positions = ud.positions
@@ -383,34 +383,38 @@ class PlanPath(smach.State):
             rospy.loginfo('index of positions: '+str(index))
             end_pose = get_pose_from_xytheta(
                 position['x'], position['y'], position['theta'])
+            getPlan = rospy.ServiceProxy('make_plan', GetPlan, persistent=False)
             req = GetPlanRequest(robot_pose, end_pose, 0.01)
 
             try:
                 resp = self.getPlan(req)
             except (rospy.ServiceException, TransportTerminated):
-                self.getPlan.close()
+                #self.getPlan.close()
                 return 'aborted'
+            except:
+                rospy.loginfo("did not execute service")
+                resp = None
 
-            if resp.plan.poses:
-                distance = calc_path_length(end_pose, resp.plan.poses)
-                rospy.loginfo('Path length: ' + str(distance))
-                if (distance < self.shortest_path):
-                    self.index = index
-                    self.shortest_path = distance
-                    ud.goal_position_x = position['x']
-                    ud.goal_position_y = position['y']
-                    ud.goal_position_yaw = position['theta']
-                    rospy.loginfo('Found shorter path')
-                else:
-                    rospy.loginfo('Another path is shorter')
-                    pass
-            else:
-                rospy.loginfo('We did not receive a plan.')
-                self.index = index
-                ud.goal_position_x = position['x']
-                ud.goal_position_y = position['y']
-                ud.goal_position_yaw = position['theta']
-                rospy.loginfo('Select random goal')
+            #if resp.plan.poses:
+            #    distance = calc_path_length(end_pose, resp.plan.poses)
+            #    rospy.loginfo('Path length: ' + str(distance))
+            #    if (distance < self.shortest_path):
+            #        self.index = index
+            #        self.shortest_path = distance
+            #        ud.goal_position_x = position['x']
+            #        ud.goal_position_y = position['y']
+            #        ud.goal_position_yaw = position['theta']
+            #        rospy.loginfo('Found shorter path')
+            #    else:
+            #        rospy.loginfo('Another path is shorter')
+            #        pass
+            #else:
+            rospy.loginfo('We did not receive a plan.')
+            self.index = index
+            ud.goal_position_x = position['x']
+            ud.goal_position_y = position['y']
+            ud.goal_position_yaw = position['theta']
+            rospy.loginfo('Select random goal')
         try:
             rospy.loginfo('Trying to remove the position#: ' + str(self.index))
             del self.positions[self.index]
