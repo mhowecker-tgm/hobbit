@@ -342,6 +342,7 @@ class CleanPositions(State):
             self.service_preempt()
             return 'preempted'
         ud.positions = []
+        rospy.loginfo('CleanPositions before cleaning: ' + str(len(ud.response.rooms.rooms_vector)))
         for room in ud.response.rooms.rooms_vector:
             for position in room.places_vector:
                 if 'default' in position.place_type:
@@ -692,7 +693,7 @@ def get_detect_user():
             gesture_sm(),
             transitions={'succeeded': 'LOG_SUCCESS',
                          'preempted': 'LOG_PREEMPT',
-                         'aborted': 'LOG_ABORT'}
+                         'aborted': 'LOG_SUCCESS'}
         )
         StateMachine.add(
             'CALL_FOR_THE_USER',
