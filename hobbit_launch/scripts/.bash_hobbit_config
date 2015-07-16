@@ -62,6 +62,15 @@ alias callb="rostopic pub -1 /Event hobbit_msgs/Event '{header: auto, event: E_C
 #short cut to stop arm
 alias arms="rosrun hobbit_smach ArmStop.py"
 
+#short cut to open gripper and move it to home position
+alias dfarmhome="rostopic pub /arm/commands std_msgs/String 'SetMoveToHomePos' -1"
+alias dfgripperopen="rostopic pub /arm/commands std_msgs/String 'SetOpenGripper' -1"
+alias dfgripperclose="rostopic pub /arm/commands std_msgs/String 'SetCloseGripper' -1"
+alias dfarmcandle="rostopic pub /arm/commands std_msgs/String 'SetMoveToCandlePos' -1"
+alias dfarmlearning="rostopic pub /arm/commands std_msgs/String 'SetMoveToLearningPos' -1"
+alias dfarmpregrasp="rostopic pub /arm/commands std_msgs/String 'SetMoveToPreGraspFromFloorPos' -1"
+alias dfarmpregrasptable="rostopic pub /arm/commands std_msgs/String 'SetMoveToPreGraspFromTablePos' -1"
+
 # trigger pointing gesture
 alias pntges="rostopic pub /pointEvents rgbd_acquisition/PointEvents '{x: 0, y: 0, z: 2000, vectorX: 0, vectorY: 1, vectorZ: 0, leftHand: 1, rightHand: 0,  timestamp: 0}' -1"
 
