@@ -24,7 +24,7 @@
 #include <std_msgs/String.h>
 
 #include <actionlib/server/simple_action_server.h>
-#include <interfaces_mira/MiraDockingAction.h>
+#include <hobbit_msgs/MiraDockingAction.h>
 
 #include <mira_msgs/BatteryState.h>
 
@@ -51,8 +51,8 @@ private:
 
 	std_msgs::String status;
 
-	void executeCb(const interfaces_mira::MiraDockingGoalConstPtr& docking_task);
-	actionlib::SimpleActionServer<interfaces_mira::MiraDockingAction>* as_;
+	void executeCb(const hobbit_msgs::MiraDockingGoalConstPtr& docking_task);
+	actionlib::SimpleActionServer<hobbit_msgs::MiraDockingAction>* as_;
 
 	bool status_updated;
 
