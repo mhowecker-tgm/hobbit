@@ -1,7 +1,7 @@
 <launch>
 
 <node pkg="sqlitedb" type="sqlitedb.py" name="sqlitedb" cwd="node" output="log" args=
-""></node>
+"" respawn="true"></node>
 
 </launch>
 
