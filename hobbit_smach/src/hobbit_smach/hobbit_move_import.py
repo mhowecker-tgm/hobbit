@@ -113,10 +113,13 @@ def get_dock_action():
     Return a StateMachine to start the dock procedure
     """
     def resp_cb(userdata, response):
-        if response.result:
+        if response.result == 'preempted':
+            return 'preempted'
+        elif response.result:
             return 'succeeded'
         else:
             return 'aborted'
+
     sm = StateMachine(outcomes=['succeeded', 'preempted', 'aborted'])
     docking_goal = MiraDockingGoal(docking_task=0)
     with sm:
