@@ -2,7 +2,7 @@
 uint32 docking_task
 ---
 #result definition
-bool res
+string res
 ---
 #feedback
 string feedback
