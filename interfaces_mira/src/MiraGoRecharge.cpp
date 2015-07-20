@@ -276,9 +276,10 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 
 				//notify the ActionServer that we've successfully preempted
 				ROS_DEBUG_NAMED("interfaces_mira","preempting the current docking task");
-				interfaces_mira::MiraDockingResult mira_dock_result;
-				mira_dock_result.res = "preempted";
-				as_->setPreempted(mira_dock_result, "Task preempted");
+				//interfaces_mira::MiraDockingResult mira_dock_result;
+				//mira_dock_result.res = "preempted";
+				//as_->setPreempted(mira_dock_result, "Task preempted");
+				as_->setPreempted();
 				std::cout << "docking task preempted, preemt received" << std::endl;
 
 				//we'll actually return from execute after preempting
