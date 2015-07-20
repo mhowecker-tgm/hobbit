@@ -255,6 +255,9 @@ class FirstSecondThird(State):
         )
 
     def execute(self, ud):
+        if self.preempt_requested():
+            ud.counter = 0
+            return 'preempted'
         if not ud.counter:
             ud.counter = 0
         if ud.counter == 0:
