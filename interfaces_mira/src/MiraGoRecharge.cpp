@@ -23,7 +23,7 @@ void MiraGoRecharge::initialize()
 
   status.data = "idle";
 
-  as_ = new actionlib::SimpleActionServer<interfaces_mira::MiraDockingAction>(robot_->getRosNode(), "docking_task", boost::bind(&MiraGoRecharge::executeCb, this, _1), false);
+  as_ = new actionlib::SimpleActionServer<hobbit_msgs::MiraDockingAction>(robot_->getRosNode(), "docking_task", boost::bind(&MiraGoRecharge::executeCb, this, _1), false);
   as_->start();
 
   status_updated = false;
@@ -87,7 +87,7 @@ void MiraGoRecharge::status_channel_callback(mira::ChannelRead<std::string> data
 	status_updated = true;
 }
 
-void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& docking_action)
+void MiraGoRecharge::executeCb(const hobbit_msgs::MiraDockingGoalConstPtr& docking_action)
 {
 
         //std_msgs::String task = docking_action->docking_task;
@@ -194,7 +194,7 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 			if(as_->isNewGoalAvailable())
 			{
 			  //if we're active and a new docking task is available, we'll accept it, but this should not happen 
-			  interfaces_mira::MiraDockingGoal new_task = *as_->acceptNewGoal();
+			  hobbit_msgs::MiraDockingGoal new_task = *as_->acceptNewGoal();
 			  std::cout << "new task available, THIS SHOULD NOT HAPPEN? " << new_task.docking_task << std::endl;
 
 			  if(new_task.docking_task != 0 && new_task.docking_task != 1)
@@ -291,7 +291,7 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 
 		if (!status_updated) continue;
 
-		interfaces_mira::MiraDockingFeedback feedback;
+		hobbit_msgs::MiraDockingFeedback feedback;
 		feedback.feedback = status.data.c_str();
 		as_->publishFeedback(feedback);
 
@@ -304,7 +304,7 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 	
 			std::cout << "task succeeded, template found and robot stoppped moving forwards " << std::endl;
 			ROS_INFO("task succeeded, template found and robot stoppped moving forwards ");
-			as_->setSucceeded(interfaces_mira::MiraDockingResult(), "Task succeeded, robot stoppped moving forwards");
+			as_->setSucceeded(hobbit_msgs::MiraDockingResult(), "Task succeeded, robot stoppped moving forwards");
 			status_updated = false;
 			return;
 		}
@@ -327,7 +327,7 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 	
 			std::cout << "task succeeded, robot is charging " << std::endl;
 			ROS_INFO("task succeeded, robot is charging ");
-			as_->setSucceeded(interfaces_mira::MiraDockingResult(), "Task succeeded, robot is charging");
+			as_->setSucceeded(hobbit_msgs::MiraDockingResult(), "Task succeeded, robot is charging");
 			status_updated = false;
 			return;
 
@@ -337,7 +337,7 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 		{
 			std::cout << "task succeeded, robot undocked " << std::endl;
 			ROS_INFO("task succeeded, robot undocked ");
-			as_->setSucceeded(interfaces_mira::MiraDockingResult(), "Task succeeded, robot stopped moving backwards");
+			as_->setSucceeded(hobbit_msgs::MiraDockingResult(), "Task succeeded, robot stopped moving backwards");
 			status_updated = false;
 			return;
 		}
@@ -355,7 +355,7 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 
 				std::cout << "task succeeded, template found but no feedback received" << std::endl;
 				ROS_INFO("task succeeded, template found but no feedback received");
-				as_->setSucceeded(interfaces_mira::MiraDockingResult(), "Task succeeded, template found but no feedback received");
+				as_->setSucceeded(hobbit_msgs::MiraDockingResult(), "Task succeeded, template found but no feedback received");
 				status_updated = false;
 				return;
 				
@@ -374,7 +374,7 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 			//as_->setPreempted();
 			std::cout << "task aborted, template not foundd " << std::endl;
 			ROS_INFO("task aborted, template not found");
-			as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting, template not found");
+			as_->setAborted(hobbit_msgs::MiraDockingResult(), "Aborting, template not found");
 			status_updated = false;
 			return;
 		}  
@@ -389,14 +389,14 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 			{
 				std::cout << "task succeeded, template found and robot stoppped moving forwards after failure" << std::endl;
 				ROS_INFO("task succeeded, template found and robot stoppped moving forwards after failure");
-				as_->setSucceeded(interfaces_mira::MiraDockingResult(), "Task succeeded, robot stoppped moving forwards after failure");
+				as_->setSucceeded(hobbit_msgs::MiraDockingResult(), "Task succeeded, robot stoppped moving forwards after failure");
 
 			}
 			else
 			{
 				std::cout << "task aborted, failure " << std::endl;
 				ROS_INFO("task aborted, failure");
-				as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting because task failed");
+				as_->setAborted(hobbit_msgs::MiraDockingResult(), "Aborting because task failed");
 			}
 
 			status_updated = false;
@@ -406,7 +406,7 @@ void MiraGoRecharge::executeCb(const interfaces_mira::MiraDockingGoalConstPtr& d
 	} // end of while
 
 	//if the node is killed then we'll abort and return
-	as_->setAborted(interfaces_mira::MiraDockingResult(), "Aborting because the node is killed");
+	as_->setAborted(hobbit_msgs::MiraDockingResult(), "Aborting because the node is killed");
 
 
 
