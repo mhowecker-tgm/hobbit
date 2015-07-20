@@ -16,7 +16,7 @@
 <node name="locate_user" pkg="hobbit_smach" type="locate_user_simple.py" output="log" />
 <node name="arm_action_server" pkg="hobbit_smach" type="ArmActionServer.py" output="log" />
 <node name="bring_object" pkg="hobbit_smach" type="bring_object_simple.py" output="log" />
-<node name="helper_node" pkg="hobbit_smach" type="helper_tools.py" output="log" />
+<node name="helper_node" pkg="hobbit_smach" type="helper_tools.py" output="log" respawn="true" />
 <node name="safety_check" pkg="hobbit_smach" type="safety_check.py" output="log" />
 <node name="reminder" pkg="hobbit_smach" type="reminder.py" output="log" />
 <include file="$(find hobbit_smach)/launch/puppetmaster.launch" />
