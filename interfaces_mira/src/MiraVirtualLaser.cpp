@@ -77,7 +77,7 @@ void MiraVirtualLaser::virtual_laser_obs_callback(const sensor_msgs::LaserScan::
 	scan.range.resize(msg->ranges.size());
 	scan.valid.resize(msg->ranges.size());
 
-	scan.minimumRange = msg->range_min;
+	scan.minimumRange = 0.35;
 	//scan.maximumRange = msg->range_max; //ok for localization
 	//scan.maximumRange = 0.99; //FIXME //value for temporary obstacle avoidance
 	scan.maximumRange = 1.49;
