@@ -18,7 +18,7 @@
           <!--Rectangular nogo areas.-->
           <RectAreas/>
           <!--Polygonal nogo areas.-->
-          <PolygonAreas>
+          <PolygonAreas/>
         </NoGoAreas>
         <!--Descriptive primitives to represent the speed areas.-->
         <SpeedAreas>
