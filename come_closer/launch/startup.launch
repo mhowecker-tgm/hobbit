@@ -7,7 +7,7 @@
 	<param name="time_limit_secs" value="120.0"/>
 	<param name="ang_margin" value="22"/>
 
-	<param name="x_offset" value="-0.24"/>
+	<param name="x_offset" value="-0.24"/> <!-- no longer needed -->
 
 	<param name="dis_thres" value="0.1"/>
 	<param name="ang_thres" value="10"/>
