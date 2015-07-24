@@ -1,18 +1,18 @@
 <launch>
   <node pkg="come_closer" type="come_closer" name="come_closer" output="screen">
 
-  	<param name="margin" value="0.10"/>
-	<param name="front_dis" value="0.18"/>
-	<param name="x_sensor" value="0.135"/>
-	<param name="time_limit_secs" value="120.0"/>
-	<param name="ang_margin" value="22"/>
+  	<param name="margin" value="0.10"/>	<!-- margin distance to keep to closest detected obstacle -->
+	<param name="front_dis" value="0.18"/>   <!-- x distance from robot center to front limit -->
+	<param name="x_sensor" value="0.135"/>   <!-- x distance of sensor for ray-tracing -->
+	<param name="time_limit_secs" value="120.0"/>   <!-- maximum timeout to return in case something goes wrong -->
+	<param name="ang_margin" value="22"/> <!-- lateral angle to consider towards left and towards right of detected target -->
 
 	<param name="x_offset" value="-0.24"/> <!-- no longer needed -->
 
-	<param name="dis_thres" value="0.1"/>
-	<param name="ang_thres" value="10"/>
+	<param name="dis_thres" value="0.1"/>  <!-- minimum distance the robot can move with a discrete motion command -->
+	<param name="ang_thres" value="10"/>   <!-- minimum angle the robot can turn with a discrete motion command -->
 
-	<param name="range_max" value="2.0"/>
+	<param name="range_max" value="1.5"/>  <!-- maximum range considered for ray-tracing/maximum distance to move -->
 
 
   </node>
