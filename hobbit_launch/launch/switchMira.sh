@@ -58,6 +58,8 @@ sleep $DELAY_BETWEEN_STEPS
 rosnode kill places_objects&
 sleep $DELAY_BETWEEN_STEPS
 rosnode kill places_object&
+sleep $DELAY_BETWEEN_STEPS
+rosnode kill localization_monitor&
 
 
  sleep $DELAY_BETWEEN_STEPS
