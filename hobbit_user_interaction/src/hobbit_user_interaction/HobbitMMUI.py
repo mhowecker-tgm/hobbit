@@ -15,6 +15,36 @@ from hobbit_msgs import MMUIInterface as MMUI
 import uashh_smach.util as util
 
 
+class WaitforSoundEnd2(smach.State):
+    """Sleep for a time duration, given either on initialization or via userdata.
+
+    duration: of type rospy Duration or float in seconds. If not given or None,
+                duration is read from userdata key 'duration'.
+
+    userdata input duration: of type rospy Duration or float in seconds (not
+                registered as input key if given on initialization)
+    """
+    def __init__(self, duration=5):
+        smach.State.__init__(self, outcomes=['succeeded', 'preempted', 'aborted'],
+                             input_keys=['duration'] if duration is None else [])
+        self.duration = duration
+
+    def execute(self, userdata):
+        duration = userdata.duration if self.duration is None else self.duration
+        rospy.loginfo("SleepState sleeping for %d seconds" % duration)
+        # sleep in steps to handle state preemption
+        SLEEP_STEP = 1 # maximum to sleep per step
+        while duration > 0:
+            sleeptime = SLEEP_STEP if duration > SLEEP_STEP else duration
+            duration -= sleeptime
+            rospy.sleep(sleeptime)
+            if self.preempt_requested():
+                self.service_preempt()
+                rospy.loginfo('SleepState was preempted while sleeping!')
+                return 'preempted'
+        return 'succeeded'
+
+
 class WaitforSoundEnd(util.WaitForMsgState):
     """
     Inherit from util.WaitForMsgState to wait
