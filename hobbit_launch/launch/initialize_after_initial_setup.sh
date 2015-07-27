@@ -3,6 +3,8 @@
 DELAY_BETWEEN_STEPS="5"
 
 sleep $DELAY_BETWEEN_STEPS
+rosnode kill /localization_monitor&
+sleep $DELAY_BETWEEN_STEPS
 roslaunch localization_monitor startup.launch&
 sleep $DELAY_BETWEEN_STEPS
 rosrun hobbit_smach places_objects.py&
