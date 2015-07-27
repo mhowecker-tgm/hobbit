@@ -24,6 +24,8 @@
 #include <mira_msgs/EnableMotors.h>
 #include <mira_msgs/MotorStatus.h>
 
+#include <mira_msgs/GetBoolValue.h>
+
 #include <interfaces_mira/MiraRobotModule.h>
 
 class MiraRobotDriveRos: public MiraRobotModule {
@@ -48,6 +50,8 @@ bool reset_odometry(mira_msgs::ResetOdometry::Request &req, mira_msgs::ResetOdom
 bool emergency_stop(mira_msgs::EmergencyStop::Request &req, mira_msgs::EmergencyStop::Response &res);
 bool enable_motors(mira_msgs::EnableMotors::Request &req, mira_msgs::EnableMotors::Response &res);
 
+bool get_nav_mode(mira_msgs::GetBoolValue::Request &req, mira_msgs::GetBoolValue::Response &res);
+
 private:
 MiraRobotDriveRos();
 ros::Subscriber cmd_vel_subscriber_;
@@ -61,6 +65,8 @@ ros::ServiceServer reset_motor_stop_service_;
 ros::ServiceServer reset_odometry_service_;
 ros::ServiceServer emergency_stop_service_;
 ros::ServiceServer enable_motors_service_;
+
+ros::ServiceServer get_nav_mode_service_;
 
 ros::Publisher state_pub;
 
