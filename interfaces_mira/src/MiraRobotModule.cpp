@@ -3,6 +3,8 @@
 #include <interfaces_mira/MiraRobot.h>
 #include <rpc/RPCError.h>
 
+//Based on code from the Strands project
+
 MiraRobotModule::MiraRobotModule(std::string name) : name_(name), module_handle_(name_) {
   ROS_INFO("Initialising %s module..",name_.c_str());
 }

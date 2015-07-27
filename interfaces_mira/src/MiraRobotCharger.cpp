@@ -5,6 +5,8 @@
 
 #include <interfaces_mira/MiraRobot.h>
 
+//Based on code from the Strands project
+
 
 MiraRobotCharger::MiraRobotCharger() : MiraRobotModule(std::string ("Charger")){
 }

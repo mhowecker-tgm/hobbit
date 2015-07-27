@@ -100,7 +100,7 @@ void MiraSendingGoals::spin()
 }
 
 
-bool MiraSendingGoals::takeMiracenterScreenshot(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res)
+bool MiraSendingGoals::takeMiracenterScreenshot(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res) //for analysis purposes
 {
 	system("/opt/ros/hobbit_hydro/src/hobbit_launch/scripts/miracenter_screenshot.sh");
 	return true;
@@ -110,7 +110,7 @@ bool MiraSendingGoals::user_nav_mode(mira_msgs::UserNavMode::Request &req, mira_
 {
 
 	std::cout << "user_mode_received, should only be used for small distances and simple motions " << std::endl;
-	ROS_INFO("user_mode_received, should only be used for small distances and simple motions ");
+	//ROS_INFO("user_mode_received, should only be used for small distances and simple motions ");
 
 	mira::RPCFuture<void> r1 = robot_->getMiraAuthority().callService<void>("/navigation/laser/GridMapperLaser#builtin", std::string("setProperty"), std::string("MaxRange"), std::string("0.1"));
         r1.timedWait(mira::Duration::seconds(1));
@@ -127,7 +127,7 @@ bool MiraSendingGoals::obs_nav_mode(mira_msgs::ObsNavMode::Request &req, mira_ms
 {
 
 	std::cout << "obs_mode_received " << std::endl;
-	ROS_INFO("obs_mode_received");
+	//ROS_INFO("obs_mode_received");
 
 	mira::RPCFuture<void> r1 = robot_->getMiraAuthority().callService<void>("/navigation/laser/GridMapperLaser#builtin", std::string("setProperty"), std::string("MaxRange"), std::string(max_range_value));
         r1.timedWait(mira::Duration::seconds(1));
@@ -139,7 +139,7 @@ bool MiraSendingGoals::obs_nav_mode(mira_msgs::ObsNavMode::Request &req, mira_ms
 	return true;
 
 }
-bool MiraSendingGoals::applyRotation(hobbit_msgs::SendValue::Request  &req, hobbit_msgs::SendValue::Response &res)
+bool MiraSendingGoals::applyRotation(hobbit_msgs::SendValue::Request  &req, hobbit_msgs::SendValue::Response &res) //apply rotation as a task, no DiscreteMotion
 {
 	ROS_INFO("apply rotation request received");
 
@@ -412,7 +412,7 @@ void MiraSendingGoals::executeCb2(const move_base_msgs::MoveBaseGoalConstPtr& go
 	  std::string navService = robot_->getMiraAuthority().waitForServiceInterface("INavigation");
 	  //robot_->getMiraAuthority().callService<void>(navService, "setTask", new_goal_task);
 	  mira::Pose2 new_goal_target(goal.pose.position.x, goal.pose.position.y, tf::getYaw(goal.pose.orientation));
-	  robot_->getMiraAuthority().callService<void>(navService, "setGoal", new_goal_target, 0.1f, mira::deg2rad(5.0f));
+	  robot_->getMiraAuthority().callService<void>(navService, "setGoal", new_goal_target, 0.1f, mira::deg2rad(5.0f)); //allows for faster replanning, without a stop
 	  last_goal = goal;
 
 	  std::cout << "The new goal task has been set " << std::endl;
@@ -572,7 +572,7 @@ bool MiraSendingGoals::isRotationSafe()
 		for(int j=0; j<local_map.height();j++)
 	 	{
 			mira::Point2i grid_point(i,j);
-			mira::Point2f rel_point = local_map.map2world(grid_point); //FIXME check, local coord?
+			mira::Point2f rel_point = local_map.map2world(grid_point); 
 			//std::cout << "grid point " << grid_point.x() << " " << grid_point.y() << std::endl;
 			//std::cout << "rel point " << rel_point.x() << " " << rel_point.y() << std::endl;
 

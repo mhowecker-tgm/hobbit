@@ -5,6 +5,8 @@
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 
+//Based on code from the Strands project
+
 MiraRobot::MiraRobot(std::vector<std::string> modules) : authority_("/", "interfaces_ros", mira::Authority::INDEPENDENT_SUBSCRIBER_THREAD),node_() {
     ROS_INFO("Creating MiraRobot instance.");
 
