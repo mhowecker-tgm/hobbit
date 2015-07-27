@@ -10,6 +10,8 @@
 #include "interfaces_mira/MiraRobotCharger.h"
 #include "interfaces_mira/MiraRobotDriveRos.h"
 
+//based on code from the Strands project
+
 ModuleFactory::ModuleFactory() {
         Register("VirtualLaser", &MiraVirtualLaser::Create);
 	Register("SendingGoals", &MiraSendingGoals::Create);
