@@ -55,6 +55,7 @@ cComeCloser::cComeCloser(int argc, char **argv) : init_argc(argc), init_argv(arg
 
 	current_motion_state.data = "Idle";
 
+	event_sub = n.subscribe("/Event", 2, &cComeCloser::event_callback, this);
 	emergency_stop_client = n.serviceClient<mira_msgs::EmergencyStop>("/emergency_stop");
   	reset_motorstop_client = n.serviceClient<mira_msgs::ResetMotorStop>("/reset_motorstop");
 
@@ -89,7 +90,7 @@ void cComeCloser::motion_state_callback(const std_msgs::String::ConstPtr& msg)
 {
   current_motion_state = (*msg);  
 
-  if (!started_rotation && current_motion_state.data == "Turning")
+  if (!started_rotation && current_motion_state.data == "Turning") //based on odometry
   	started_rotation = true;
   if (started_rotation && !finished_rotation && current_motion_state.data == "Idle")
 	finished_rotation = true;
@@ -106,7 +107,7 @@ void cComeCloser::motion_state_callback(const std_msgs::String::ConstPtr& msg)
 	else
 		ROS_INFO("Failed to call service get_nav_mode");
 		
-	if (!dist_mode)
+	if (!dist_mode) //ends later but is safer to check if the robot really stopped
 	{
 		finished_movement = true;
 		std::cout << "finished movement " << std::endl;
@@ -138,7 +139,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 	if (get_local_map_client.call(srv))
         {
           //ROS_INFO("Sum: %ld", (long int)srv.response.sum);
-	   local_grid = srv.response.occupancy_grid; //we should get the latest map, with the remembered obstacles
+	   local_grid = srv.response.occupancy_grid; //we should get the latest map, with the remembered obstacles, in the proper format
 	   std::cout << "********************* " << std::endl;
 	   std::cout << "local_grid received " << std::endl;
         }
@@ -177,7 +178,7 @@ void cComeCloser::executeCb(const hobbit_msgs::GeneralHobbitGoalConstPtr& goal)
 	sensor_msgs::LaserScan scanner_info;
 	scanner_info.angle_min = -M_PI/2;
 	scanner_info.angle_max = M_PI/2;
-	scanner_info.angle_increment = 1*M_PI/180; //FIXME add params
+	scanner_info.angle_increment = 1*M_PI/180; //FIXME add param
 	scanner_info.range_max = range_max;
 
 	const geometry_msgs::Pose sensor_pose_ = sensor_pose;
@@ -393,5 +394,20 @@ void cComeCloser::stop_callback(const std_msgs::String::ConstPtr& msg)
 
 }
 
+void cComeCloser::event_callback(const hobbit_msgs::Event::ConstPtr& msg)
+{
+	if (msg->event.compare("E_RELEASEBUTTON")==0)
+	{
+		//std::cout << "Release button pressed" << std::endl;
+		//call service 
+		mira_msgs::ResetMotorStop srv;
+	        if (!reset_motorstop_client.call(srv))
+	        {
+	          ROS_DEBUG("Failed to call service reset_motorstop");
+	        }
+		
+	}
+
+}
 
 
