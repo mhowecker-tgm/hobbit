@@ -15,6 +15,8 @@
 #include <ros/subscribe_options.h>
 #include <ros/callback_queue.h>
 
+//Based on code from the Strands project
+
 MiraRobotDrive::MiraRobotDrive() : MiraRobotModule(std::string ("Drive")) {
 }
 
@@ -39,8 +41,8 @@ void MiraRobotDrive::initialize()
 
   cmd_vel_subscriber_ = robot_->getRosNode().subscribe("/cmd_vel", 1000, &MiraRobotDrive::velocity_command_callback,this);
 
+  //in order to avoid blocking when in distance mode
   ros::SubscribeOptions ops = ros::SubscribeOptions::create<std_msgs::String>("/DiscreteMotionCmd",1, boost::bind(&MiraRobotDrive::discrete_motion_cmd_callback, this, _1),ros::VoidPtr(),&robot_->getMyQueue());
-
   discrete_sub = robot_->getRosNode().subscribe(ops);
 
   //discrete_sub = robot_->getRosNode().subscribe("/DiscreteMotionCmd", 1, &MiraRobotDrive::discrete_motion_cmd_callback, this);

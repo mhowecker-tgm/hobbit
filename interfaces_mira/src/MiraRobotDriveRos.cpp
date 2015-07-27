@@ -15,6 +15,8 @@
 #include <ros/subscribe_options.h>
 #include <ros/callback_queue.h>
 
+//Based on code from the Strands project
+
 MiraRobotDriveRos::MiraRobotDriveRos() : MiraRobotModule(std::string ("DriveRos")) {
 }
 
@@ -26,7 +28,7 @@ void MiraRobotDriveRos::initialize()
   mileage_pub_ = robot_->getRosNode().advertise<std_msgs::Float32>("/mileage", 20);
   motorstatus_pub_ = robot_->getRosNode().advertise<mira_msgs::MotorStatus>("/motor_status", 20);
 
-  //state_pub = robot_->getRosNode().advertise<std_msgs::String>("/DiscreteMotionState", 1);
+  state_pub = robot_->getRosNode().advertise<std_msgs::String>("/DiscreteMotionState", 1);
   
   robot_->getMiraAuthority().subscribe<mira::robot::Odometry2>("/robot/Odometry", //&ScitosBase::odometry_cb);
 &MiraRobotDriveRos::odometry_data_callback, this);
@@ -39,8 +41,8 @@ void MiraRobotDriveRos::initialize()
 
   cmd_vel_subscriber_ = robot_->getRosNode().subscribe("/cmd_vel", 1000, &MiraRobotDriveRos::velocity_command_callback,this);
 
+  //in order to avoid blocking when in distance mode
   ros::SubscribeOptions ops = ros::SubscribeOptions::create<std_msgs::String>("/DiscreteMotionCmd",1, boost::bind(&MiraRobotDriveRos::discrete_motion_cmd_callback, this, _1),ros::VoidPtr(),&robot_->getMyQueue());
-
   discrete_sub = robot_->getRosNode().subscribe(ops);
 
   //discrete_sub = robot_->getRosNode().subscribe("/DiscreteMotionCmd", 1, &MiraRobotDriveRos::discrete_motion_cmd_callback, this);
@@ -49,6 +51,8 @@ void MiraRobotDriveRos::initialize()
   reset_odometry_service_ = robot_->getRosNode().advertiseService("/reset_odometry", &MiraRobotDriveRos::reset_odometry, this);
   emergency_stop_service_ = robot_->getRosNode().advertiseService("/emergency_stop", &MiraRobotDriveRos::emergency_stop, this);
   enable_motors_service_ = robot_->getRosNode().advertiseService("/enable_motors", &MiraRobotDriveRos::enable_motors, this);
+
+  get_nav_mode_service_ = robot_->getRosNode().advertiseService("/get_nav_mode", &MiraRobotDriveRos::get_nav_mode, this);
 
 
    this->callback_queue_thread_ = boost::thread(boost::bind(&MiraRobotDriveRos::QueueThread, this));
@@ -85,6 +89,7 @@ void MiraRobotDriveRos::discrete_motion_cmd_callback(const std_msgs::String::Con
   {
 
 	std::cout << "cmd Move " << std::endl;
+	ROS_INFO("cmd Move");
 	// Get the desired distance 
         float MotionValue = atof(&CmdBuf[5]);
 
@@ -92,7 +97,7 @@ void MiraRobotDriveRos::discrete_motion_cmd_callback(const std_msgs::String::Con
 	if (MotionValue < 0) sign = -1;
 
 	float x_speed = sign*0.1; //FIXME
-	float vMax = 0.1; //FIXME
+	float vMax = 0.2; //FIXME //A value of 0.1 does not allow to move more than 50 cm
         float t= MotionValue/x_speed;
 
         // send the command
@@ -103,7 +108,7 @@ void MiraRobotDriveRos::discrete_motion_cmd_callback(const std_msgs::String::Con
         mira::RPCFuture<void> r = robot_->getMiraAuthority().callService<void>("/robot/Robot","driveDistance", v, t, vMax);
 	r.wait();
 
-        std::cout << "sleep " << std::endl;
+        //std::cout << "sleep " << std::endl;
 	sleep (t);
 	std::cout << "done " << std::endl;
 	set_mira_param_("MainControlUnit.DriveMode", "0");
@@ -115,13 +120,14 @@ void MiraRobotDriveRos::discrete_motion_cmd_callback(const std_msgs::String::Con
    else if (strncmp((const char *)(&CmdBuf[0]), "Turn", 4) == 0)
   {
 	std::cout << "cmd Turn " << std::endl;
+	ROS_INFO("cmd Turn");
 	// Get the desired angle and check if it's within the allowed limits - if not ignore command.
         float MotionValue = atof(&CmdBuf[5]);
 
 	int sign = 1;
 	if (MotionValue < 0) sign = -1;
 
-	float rot_speed = sign*25*M_PI/180; //FIXME
+	float rot_speed = sign*10*M_PI/180; //FIXME
 	float vMax = 0.1; //FIXME
         float t= MotionValue*M_PI/(180*rot_speed);
 
@@ -132,9 +138,9 @@ void MiraRobotDriveRos::discrete_motion_cmd_callback(const std_msgs::String::Con
         mira::RPCFuture<void> r = robot_->getMiraAuthority().callService<void>("/robot/Robot","driveDistance", v, t, vMax);
 
 	r.wait();
-	std::cout << "sleep " << std::endl;
+	//std::cout << "sleep " << std::endl;
 	sleep (t);
-	std::cout << "done " << std::endl;
+	//std::cout << "done " << std::endl;
 	set_mira_param_("MainControlUnit.DriveMode", "0");
 
   }
@@ -146,6 +152,12 @@ void MiraRobotDriveRos::discrete_motion_cmd_callback(const std_msgs::String::Con
 	mira::RPCFuture<void> r = robot_->getMiraAuthority().callService<void>("/robot/Robot", std::string("emergencyStop"));
         r.timedWait(mira::Duration::seconds(1));
         r.get();
+
+	sleep(1);
+	// reset motorstop
+  	mira::RPCFuture<void> r2 = robot_->getMiraAuthority().callService<void>("/robot/Robot", std::string("resetMotorStop"));
+  	r2.timedWait(mira::Duration::seconds(1));
+  	r2.get();
   }	
 
 // ***** Unsupported command *****
@@ -208,11 +220,11 @@ void MiraRobotDriveRos::odometry_data_callback(mira::ChannelRead<mira::robot::Od
 	odom_msg.twist.twist.linear.x = data->value().velocity.x();
 	odom_msg.twist.twist.angular.z = data->value().velocity.phi();
 
-	/*std_msgs::String stateString;
+	std_msgs::String stateString;
         if (fabs(odom_msg.twist.twist.linear.x) > 0) stateString.data = "Moving";
 	else if (fabs(odom_msg.twist.twist.angular.z) > 0) stateString.data = "Turning";
         else stateString.data = "Idle";
-        state_pub.publish (stateString);*/
+        state_pub.publish (stateString);
 
 	odometry_pub_.publish(odom_msg);
 
@@ -221,10 +233,10 @@ void MiraRobotDriveRos::odometry_data_callback(mira::ChannelRead<mira::robot::Od
 	odom_tf.header.stamp = odom_time;
 	odom_tf.header.frame_id = "/odom";
        // correct tf mira etc
-       //odom_tf.child_frame_id = "/base_footprint";
+       odom_tf.child_frame_id = "/base_footprint";
 
        //ROS navigation requires //FIXME
-       odom_tf.child_frame_id = "/base_link"; //originally it was "/base_footprint", did not work for amcl
+       //odom_tf.child_frame_id = "/base_link"; //originally it was "/base_footprint", did not work for amcl
 
 	odom_tf.transform.translation.x = data->value().pose.x();
 	odom_tf.transform.translation.y = data->value().pose.y();
@@ -276,10 +288,24 @@ bool MiraRobotDriveRos::enable_motors(mira_msgs::EnableMotors::Request &req, mir
   return true;
 }
 
+bool MiraRobotDriveRos::get_nav_mode(mira_msgs::GetBoolValue::Request &req, mira_msgs::GetBoolValue::Response &res) 
+{
+  std::string s = get_mira_param_("MainControlUnit.DriveMode");
+
+  bool value;
+  std::istringstream(s) >> value;
+
+  res.value = value;
+
+  return true;
+}
+
 void MiraRobotDriveRos::QueueThread() 
 {
+     ros::Rate r(5);
      while ((&robot_->getRosNode())->ok()) 
      {
        (robot_->getMyQueue()).callAvailable(ros::WallDuration());
+        r.sleep();
      }
 }
