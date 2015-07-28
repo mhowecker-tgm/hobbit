@@ -111,7 +111,7 @@ void cVirtualLaser::FillGrids(float *pCloud)
 //debugging, the original vesion only included points above the sensor's height
        /*pcl::PointCloud<pcl::PointXYZ> pcl_cloud;
 	
-	for (int x = (init_row-1)*num_elements_row; x < (end_row*num_elements_row-2); x+=4)
+	for (int x = (init_row-1)*num_elements_row; x < (end_row*num_elements_row); x+=4)
   	{
 		{
 			pcl::PointXYZ point(pCloud[x], pCloud[x+1], pCloud[x+2]);
@@ -125,7 +125,7 @@ void cVirtualLaser::FillGrids(float *pCloud)
         viewer.showCloud(mycloudPtr);
 	sleep (50);*/
   ////////////////////////////////////////////////////////////////////////////////////////
-    for (int x = (init_row-1)*num_elements_row; x < (end_row*num_elements_row-2); x+=4)
+    for (int x = (init_row-1)*num_elements_row; x < (end_row*num_elements_row); x+=4)
     {
 
 // Only process valid points, i.e. with depth > 0.0f and finite value.
