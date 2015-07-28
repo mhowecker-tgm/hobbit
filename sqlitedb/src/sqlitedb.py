@@ -90,7 +90,7 @@ class sqlitedb:
           txt = entries[0]
           evt = evt[7:]
         print "INSERTED",yourdate, txt, evt, val
-        evtcur.execute("INSERT INTO Hobbit VALUES(?,?,?,?,?)",(yourdate,txt,val,evt,0))
+        evtcur.execute("INSERT INTO Hobbit VALUES(?,?,?,?,?)",(yourdate,txt,val,evt.decode('utf8'),0))
         d2=int(time.time()*1000)
         evtcon.commit()
         #evtcur.execute("SELECT * FROM Hobbit")
@@ -112,6 +112,7 @@ class sqlitedb:
         self.putInDB("CMD",msg.command,1,msg.params)
     
     def eventCallback(self,msg):
+       rospy.loginfo("/Event received, save to log if not E_WATCHDOG")
        if msg.event not in ["SAPIEND", "E_WATCHDOG"]:
         self.putInDB("EVT",msg.event,msg.confidence,msg.params)
 
