@@ -209,7 +209,8 @@ void MiraRobotDriveRos::odometry_data_callback(mira::ChannelRead<mira::robot::Od
 	nav_msgs::Odometry odom_msg;
 	odom_msg.header.stamp = odom_time;
 	odom_msg.header.frame_id = "/odom";
-	odom_msg.child_frame_id = "/base_footprint";
+	//odom_msg.child_frame_id = "/base_footprint";
+	odom_msg.child_frame_id = "/base_link";
 
 	// set the position
 	odom_msg.pose.pose.position.x = data->value().pose.x();
@@ -233,10 +234,10 @@ void MiraRobotDriveRos::odometry_data_callback(mira::ChannelRead<mira::robot::Od
 	odom_tf.header.stamp = odom_time;
 	odom_tf.header.frame_id = "/odom";
        // correct tf mira etc
-       odom_tf.child_frame_id = "/base_footprint";
+       //odom_tf.child_frame_id = "/base_footprint";
 
        //ROS navigation requires //FIXME
-       //odom_tf.child_frame_id = "/base_link"; //originally it was "/base_footprint", did not work for amcl
+       odom_tf.child_frame_id = "/base_link"; //originally it was "/base_footprint", did not work for amcl
 
 	odom_tf.transform.translation.x = data->value().pose.x();
 	odom_tf.transform.translation.y = data->value().pose.y();
