@@ -131,9 +131,7 @@ void MiraGetPose::loc_pose_callback(mira::ChannelRead<mira::Pose2> data)
 
    robot_trans.header.stamp = pose_msg.header.stamp;
 
-   tf::TransformBroadcaster broadcaster;
-   p_robot_broadcaster = &broadcaster;
-   (*p_robot_broadcaster).sendTransform(robot_trans);
+   broadcaster.sendTransform(robot_trans);
 
         
 }
