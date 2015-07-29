@@ -4,7 +4,7 @@
   	<param name="margin" value="0.10"/>	<!-- margin distance to keep to closest detected obstacle -->
 	<param name="front_dis" value="0.18"/>   <!-- x distance from robot center to front limit -->
 	<param name="x_sensor" value="0.135"/>   <!-- x distance of sensor for ray-tracing -->
-	<param name="time_limit_secs" value="120.0"/>   <!-- maximum timeout to return in case something goes wrong -->
+	<param name="time_limit_secs" value="20.0"/>   <!-- maximum timeout to return in case something goes wrong -->
 	<param name="ang_margin" value="22"/> <!-- lateral angle to consider towards left and towards right of detected target -->
 
 	<param name="x_offset" value="-0.24"/> <!-- no longer needed -->
