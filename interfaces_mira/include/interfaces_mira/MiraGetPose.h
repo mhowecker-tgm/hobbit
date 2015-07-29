@@ -55,6 +55,8 @@ private:
 
         bool atDockingStation(hobbit_msgs::GetState::Request  &req, hobbit_msgs::GetState::Response &res);
 
+	tf::TransformBroadcaster broadcaster;
+
 };
 
 
