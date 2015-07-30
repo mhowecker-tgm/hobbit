@@ -121,13 +121,26 @@ void MiraGetPose::loc_pose_callback(mira::ChannelRead<mira::Pose2> data)
   //publish the pose
   current_pose_pub.publish(pose_msg);
 
+  //get odom->base_link
+  const mira::PoseCov2 odom = robot_->getMiraAuthority().getTransform<mira::PoseCov2>("/robot/RobotFrame", "/robot/OdometryFrame", Time::now());
+  tf::Transform transform1;
+  transform1.setOrigin(tf::Vector3(odom.x(), odom.y(), 0));
+  transform1.setRotation(tf::createQuaternionFromYaw(odom.phi()));
 
+  //map->base_link
+   tf::Transform transform2;
+   transform2.setOrigin(tf::Vector3(pose_msg.pose.pose.position.x, pose_msg.pose.pose.position.y, 0));
+   transform2.setRotation(tf::createQuaternionFromYaw(robotPose.phi()));
+
+   tf::Transform transform3 = transform2*transform1.inverse();
+
+   //map->odom
    robot_trans.header.frame_id = "map";
-   robot_trans.child_frame_id = "base_link";
-   robot_trans.transform.translation.x = pose_msg.pose.pose.position.x;
-   robot_trans.transform.translation.y = pose_msg.pose.pose.position.y;
+   robot_trans.child_frame_id = "odom";
+   robot_trans.transform.translation.x = transform3.getOrigin().getX();
+   robot_trans.transform.translation.y = transform3.getOrigin().getY();
    robot_trans.transform.translation.z = 0;
-   robot_trans.transform.rotation = pose_msg.pose.pose.orientation;
+   robot_trans.transform.rotation = tf::createQuaternionMsgFromYaw(tf::getYaw(transform3.getRotation()));
 
    robot_trans.header.stamp = pose_msg.header.stamp;
 
