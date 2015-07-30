@@ -208,9 +208,9 @@ void MiraRobotDriveRos::odometry_data_callback(mira::ChannelRead<mira::robot::Od
 	// Publish as a nav_msgs::Odometry
 	nav_msgs::Odometry odom_msg;
 	odom_msg.header.stamp = odom_time;
-	odom_msg.header.frame_id = "/base_link";
+	odom_msg.header.frame_id = "/odom";
 	//odom_msg.child_frame_id = "/base_footprint";
-	odom_msg.child_frame_id = "/odom";
+	odom_msg.child_frame_id = "/base_link"; 
 
 	// set the position
 	odom_msg.pose.pose.position.x = data->value().pose.x();
