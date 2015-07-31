@@ -557,14 +557,6 @@ bool MiraSendingGoals::isRotationSafe()
 	//call service to get MergedMap
 	//local_map should be updated...
 
-	mira::Point2f loc_offset = local_map.getWorldOffset();
-	/*std::cout << "loc_offset " << loc_offset.x() << " " << loc_offset.y() << std::endl;
-
-	std::cout << "local_map.width() " << local_map.width() << std::endl;
-	std::cout << "local_map.height() " << local_map.height() << std::endl;
-
-	std::cout << "local_map.channels() " << local_map.channels() << std::endl;*/
-
 
 	int ind = 0;
 	for(int i=0; i<local_map.width();i++)
@@ -572,22 +564,9 @@ bool MiraSendingGoals::isRotationSafe()
 		for(int j=0; j<local_map.height();j++)
 	 	{
 			mira::Point2i grid_point(i,j);
-			mira::Point2f rel_point = local_map.map2world(grid_point); 
-			//std::cout << "grid point " << grid_point.x() << " " << grid_point.y() << std::endl;
-			//std::cout << "rel point " << rel_point.x() << " " << rel_point.y() << std::endl;
+			mira::Point2f rel_point = local_map.map2world(grid_point); //
 
-			const mira::PoseCov2 global_pose = robot_->getMiraAuthority().getTransform<mira::PoseCov2>("/robot/RobotFrame", "/maps/MapFrame", Time::now());
-			double current_x = global_pose.x();
-			double current_y = global_pose.y();
-
-			const mira::Pose2 global_point = robot_->getMiraAuthority().getTransform<mira::Pose2>("/robot/OdometryFrame", "/maps/MapFrame", Time::now()) * mira::Pose2(rel_point(0), rel_point(1), 0.0f);
-
-			double global_x = global_point.x();
-		        double global_y = global_point.y();
-
-			//std::cout << "glob point " << global_x << " " << global_y << std::endl;
-
-			if ((global_x-current_x)*(global_x-current_x) + (global_y-current_y)*(global_y-current_y) < outer_dis*outer_dis)
+			if ((rel_point(0))*(rel_point(0)) + (rel_point(1))*(rel_point(1)) < outer_dis*outer_dis)
 			{
 				double cost = local_map.data()[ind];
 				if (cost > COST_LIMIT) //FIXME, check costs
