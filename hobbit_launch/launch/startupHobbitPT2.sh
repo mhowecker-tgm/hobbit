@@ -26,6 +26,7 @@ roscore&
 #ros core takes ages to start
 sleep $DELAY_BETWEEN_STEPS
 sleep $DELAY_BETWEEN_STEPS
+sleep $DELAY_BETWEEN_STEPS
 
 /opt/ros/hobbit_hydro/src/rgbd_acquisition/scripts/workAroundUSB.sh
 sleep $DELAY_BETWEEN_STEPS
@@ -78,7 +79,7 @@ cp params"$ROBOTNUMBER".yaml params.yaml
 # # Start SMACH handling of rooms, places, objects.
 #roslaunch hobbit_smach startup.launch&
 #sleep $DELAY_BETWEEN_STEPS
-#roslaunch recognition_service startup.launch&
+roslaunch recognition_service startup.launch&
 #sleep $DELAY_BETWEEN_STEPS
 # roslaunch hobbit_smach startup_master.launch&
 

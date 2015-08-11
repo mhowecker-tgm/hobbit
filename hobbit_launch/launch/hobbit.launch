@@ -11,7 +11,7 @@
 <include file="$(find hobbit_smach)/launch/startup.launch" />
 <include file="$(find recognition_service)/launch/startup.launch" />
 <include file="$(find joy2twist)/launch/startup.launch" />
-<!--
+
 <include file="$(find blue_owlpose)/launch/startup.launch" />
--->
+
 </launch>
