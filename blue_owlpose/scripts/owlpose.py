@@ -307,7 +307,7 @@ def driveServosToSleep():
 
     if motorsAreOn:
         print "putting servos to sleep"
-        set_angles(pitch=max_ud_angle_deg, yaw=0)
+        set_angles(pitch=max_ud_angle_deg-pitch_offset, yaw=0)
         print "before sleep"
         rospy.sleep(5.0)
         print "after 5 s sleep"
