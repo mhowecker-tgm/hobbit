@@ -524,8 +524,8 @@ bool MiraSendingGoals::getLocalMap(hobbit_msgs::GetOccupancyGrid::Request  &req,
 			if (local_map.data()[index] > 127)
 				local_grid.data[index] = occupancy_grid_utils::OCCUPIED;
 			else if (local_map.data()[index] < 127)
-				local_map.data()[index] = occupancy_grid_utils::UNOCCUPIED;
-			else local_map.data()[index] = occupancy_grid_utils::UNKNOWN;
+				local_grid.data()[index] = occupancy_grid_utils::UNOCCUPIED;
+			else local_grid.data()[index] = occupancy_grid_utils::UNKNOWN;
 
 			index++;
 		}
