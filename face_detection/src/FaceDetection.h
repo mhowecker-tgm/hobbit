@@ -21,6 +21,10 @@ extern int useDepthHeadMinMaxSizeHeuristic;
 //Leverage Depth Shape Classifier , experimental
 extern int useDepthClassifier;
 
+
+//Switch save results
+extern int saveResults;
+
 //Leverage Skin Color heuristic , this doesnt work very good for people of different skin color
 extern int useHistogramHeuristic;
 

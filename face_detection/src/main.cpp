@@ -114,6 +114,22 @@ bool resume(std_srvs::Empty::Request& request, std_srvs::Empty::Response& respon
 
 
 
+bool startRecording(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    ROS_INFO("Face Detector is now recording");
+    saveResults=1;
+    return true;
+}
+
+bool stopRecording(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    ROS_INFO("Face Detector has now stopped recording");
+    saveResults=1;
+    return true;
+}
+
+
+
 bool setQuality( face_detection::SetQuality::Request  &request,
                  face_detection::SetQuality::Response &response )
 {
@@ -254,7 +270,9 @@ int main(int argc, char **argv)
      ros::ServiceServer terminateService        = nh.advertiseService(name+"/terminate"    , terminate);
      ros::ServiceServer resumeService           = nh.advertiseService(name+"/pause"        , pause);
      ros::ServiceServer pauseService            = nh.advertiseService(name+"/resume"       , resume);
-     ros::ServiceServer setQualityService       = nh.advertiseService(name+"/set_quality"  , setQuality);
+     ros::ServiceServer setQualityService       = nh.advertiseService(name+"/set_quality"  , setQuality); 
+     ros::ServiceServer startRecordingService   = nh.advertiseService(name+"/startRecording"        , startRecording);
+     ros::ServiceServer stopRecordingService    = nh.advertiseService(name+"/stopRecording"        , stopRecording);
 
      //Make our rostopic cmaera grabber
      message_filters::Synchronizer<RgbdSyncPolicy> *sync;
