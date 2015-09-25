@@ -824,6 +824,8 @@ void execute(char * command,char * param)
     if (strcmp(param,"faceTrigger")==0)      {  rosservice_call(cR,cRLen,(char *) "/face_detection/trigger");  } else
     if (strcmp(param,"facePause")==0)        {  rosservice_call(cR,cRLen,(char *) "/face_detection/pause");    } else
     if (strcmp(param,"faceResume")==0)       {  rosservice_call(cR,cRLen,(char *) "/face_detection/resume");   } else
+    if (strcmp(param,"faceStartRecording")==0)    {  rosservice_call(cR,cRLen,(char *) "/face_detection/startRecording");  } else
+    if (strcmp(param,"faceStopRecording")==0)     {  rosservice_call(cR,cRLen,(char *) "/face_detection/stopRecording");   } else
 
     if (strcmp(param,"fitnessTrigger")==0)      {  rosservice_call(cR,cRLen,(char *) "/fitness_coordinator/trigger");  } else
     if (strcmp(param,"fitnessPause")==0)        {  rosservice_call(cR,cRLen,(char *) "/fitness_coordinator/pause");    } else
