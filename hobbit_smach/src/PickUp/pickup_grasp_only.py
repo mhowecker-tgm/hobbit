@@ -5,30 +5,17 @@ PKG = 'hobbit_smach'
 PROJECT = 'Hobbit'
 NAME = 'pickup_object_grasp_only'
 
-import roslib
-roslib.load_manifest(PKG)
 import rospy
 import smach
-import uashh_smach.util as util
-from uashh_smach.util import SleepState  # df 30.7.2014
-# import tf
-# import math
+from uashh_smach.util import SleepState
 from smach import StateMachine
 from smach_ros import ActionServerWrapper, IntrospectionServer, ServiceState,\
     MonitorState
 from std_msgs.msg import String
 from hobbit_msgs.msg import GeneralHobbitAction
-from hobbit_msgs.srv import SwitchVision, SwitchVisionRequest
-from sensor_msgs.msg import PointCloud2
-from geometry_msgs.msg import PoseStamped
-from rgbd_acquisition.msg import PointEvents
-import hobbit_smach.hobbit_move_import as hobbit_move
 import hobbit_smach.head_move_import as head_move
-import hobbit_smach.arm_move_import as arm_move
-import hobbit_smach.speech_output_import as speech_output
 import hobbit_smach.pickup_import as pickup
 import hobbit_smach.logging_import as log
-# from hobbit_smach.helper_import import WaitForMsgState
 
 
 def switch_vision_cb(ud, response):
@@ -55,23 +42,6 @@ class bcolors:
         self.ENDC = ''
 
 
-#def pointevents_cb(msg, ud):
-def pointevents_cb(ud, msg):
-    print('pointevents_cb')
-    print(msg)
-    ud.pointing_msg = msg
-    return False
-
-#def point_cloud_cb(msg, ud):
-def point_cloud_cb(ud, msg):
-    print('point cloud received')
-    ud.cloud = msg
-    return False
-
-
-
-
-
 class Init(smach.State):
     """Class to initialize certain parameters"""
     def __init__(self):
@@ -87,8 +57,6 @@ class Init(smach.State):
         if rospy.has_param('/hobbit/social_role'):
             ud.social_role = rospy.get_param('/hobbit/social_role')
         return 'succeeded'
-
-
 
 
 def main():
@@ -115,58 +83,15 @@ def main():
             transitions={'succeeded': 'GRASP_OBJECT',
                          'preempted': 'LOG_ABORT'}
         )
-        
-        
-        
-        #================> NEW 10.12.2014
-        """       
-        smach.StateMachine.add(
-            'GET_POINT_CLOUD_FOR_GRASP',
-            MonitorState(
-                '/headcam/depth_registered/points',
-                PointCloud2,
-                cond_cb=point_cloud_cb,
-                max_checks=20,
-                output_keys=['cloud']
-            ),
-            transitions={'valid': 'GET_POINT_CLOUD_FOR_GRASP',
-                         'invalid': 'GRASP_OBJECT', #'MOVE_ARM_TO_PRE_GRASP_POSITION',
-                         'preempted': 'LOG_ABORT'}
-        )        
-        """    
-        
-        #smach.StateMachine.add(
-        #    'MOVE_ARM_TO_PRE_GRASP_POSITION',
-        #    arm_move.goToPreGraspPosition(),
-        #    transitions={'succeeded': 'GRASP_OBJECT', 
-        #                 'preempted': 'LOG_ABORT',
-        #                 'failed': 'MOVE_ARM_TO_PRE_GRASP_POSITION'}    # better failure handling appreciated
-        #)       
         StateMachine.add(
             'GRASP_OBJECT',
-            pickup.getPickupSeq(), #
-            #pickup.DavidPickingUp(),
+            pickup.getPickupSeq(),
             transitions={'succeeded': 'LOG_ABORT',
                          'preempted': 'LOG_ABORT',
                          'failed': 'LOG_ABORT',
-                         'failed_arm_not_moved': 'LOG_ABORT' #not moved away from home position
-                        }
-                         
-        #================> NEW 10.12.2014  ENDE                         
-        )        
-        
-        
-        
-        
-        
-        #StateMachine.add(
-        #    'GRASP_OBJECT',
-        #    pickup.getPickupSeq(),
-        #    # pickup.DavidPickingUp(),
-        #    transitions={'aborted': 'CHECK_GRASP',
-        #                 'succeeded': 'LOG_ABORT',
-        #                 'preempted': 'LOG_ABORT'}
-        #)
+                         'failed_arm_not_moved': 'LOG_ABORT'
+                         }
+        )
         StateMachine.add(
             'LOG_ABORT',
             log.DoLogAborted(scenario='Pickup'),

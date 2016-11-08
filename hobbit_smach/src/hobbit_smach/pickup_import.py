@@ -53,8 +53,6 @@ _DATATYPES[PointField.FLOAT32] = ('f', 4)
 _DATATYPES[PointField.FLOAT64] = ('d', 8)
 
 
-
-
 class DavidLookForObject(State):
     """
     This state is called after the robot moved to a position from where it
@@ -1208,7 +1206,7 @@ class DavidPickingUp(State):
             narr.append(p[0:3])
             
 
-        df = narr.__len__(); #length of point cloud
+        df = narr.__len__(); #len   gth of point cloud
         print "===> pickup_import.py: DavidPickingUp.getCenterOfCluster(): LENGTH OF POINTCLOUD:", df
         a = numpy.asarray(narr)
         pcmean = numpy.mean(a, axis=0)
@@ -1796,17 +1794,13 @@ def getEndPickupSeq():
 
 def getPickupSeq():
     """
-    Return a SMACH Sequence
+    Return a SMACH Statemachine
     """
-    #seq = Sequence(
-    #    outcomes=['succeeded', 'preempted', 'failed'],
-    #    connector_outcome='succeeded'
-    #)
+
     sm = StateMachine(
         outcomes=['succeeded', 'preempted', 'failed', 'failed_arm_not_moved']
     )
 
-    #with seq:
     with sm:
         if not DEBUG:
             StateMachine.add(
@@ -1822,13 +1816,6 @@ def getPickupSeq():
                          'invalid': 'GRASP_OBJECT',#'MOVE_ARM_TO_PRE_GRASP_POSITION',
                          'preempted': 'preempted'}
             )
-            #StateMachine.add(
-            #    'MOVE_ARM_TO_PRE_GRASP_POSITION',
-            #    arm_move.goToPreGraspPosition(),
-            #transitions={'succeeded': 'GRASP_OBJECT',
-            #             'preempted': 'preempted',
-            #             'failed': 'failed'}
-            #)
         StateMachine.add(
             'GRASP_OBJECT',
             DavidPickingUp(),
@@ -1869,4 +1856,3 @@ def getPickupSeq():
                          'aborted': 'failed',}
         )
         return sm
-        #return seq
