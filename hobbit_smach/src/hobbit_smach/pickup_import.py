@@ -1529,28 +1529,6 @@ def sayObjectNotDetected():
         )
     return cc
 
-
-#def sayObjectNotDetected2():
-#    cc = Concurrence(
-#        outcomes=['succeeded', 'preempted', 'failed'],
-#        default_outcome='failed',
-#        child_termination_cb=child_term_cb,
-#        outcome_map={'succeeded': {'EMO_SAD': 'succeeded',
-#                                   'SAY_OBJECT_NOT_DETECTED': 'succeeded'}}
-#    )
-#
-#    with cc:
-#        Concurrence.add(
-#            'EMO_SAD',
-#            HobbitEmotions.ShowEmotions(emotion='SAD', emo_time=4)
-#        )
-#        Concurrence.add(
-#            'SAY_OBJECT_NOT_DETECTED',
-#            speech_output.sayText(info='T_PU_ObjectNotDetected2')
-#        )
-#    return cc
-
-
 def sayObjectFoundRepositioning():
     cc = Concurrence(
         outcomes=['succeeded', 'preempted', 'failed'],
