@@ -257,6 +257,7 @@ def main():
     goto_sm.userdata.emo_time = 1
 
     with goto_sm:
+        # Entry point of state machine
         StateMachine.add(
             'INIT',
             Init(),
@@ -264,6 +265,7 @@ def main():
             # TODO: Do we get touch info from MMUI?
             # If yes, do EMO_WONDERING + T_GT_SelectPlace
         )
+        # Check if the state machine was called from the user or not. hardcoded to touch input
         StateMachine.add(
             'CALL_CHECK',
             CallCheck(),
@@ -271,14 +273,15 @@ def main():
                          'voice': 'EMO_WONDERING',
                          'preempted': 'LOG_PREEMPT'}
         )
+        # Show the emotion "wondering" for one second
         StateMachine.add(
             'EMO_WONDERING',
-            #HobbitEmotions.ShowEmotions(emotion='EMO_WONDERING', emo_time=4),
             HobbitEmotions.ShowEmotions(emotion='EMO_WONDERING', emo_time=1),
             transitions={'preempted': 'LOG_PREEMPT',
                          'succeeded': 'MMUI_ConfirmPlace',
                          'failed': 'SET_FAILURE'}
         )
+        # Ask the user to confirm that the robot shall go to the defined location
         StateMachine.add(
             'MMUI_ConfirmPlace',
             HobbitMMUI.AskYesNo(question='T_GT_ConfirmGoToPlace'),
@@ -289,31 +292,32 @@ def main():
                          'timeout': 'MMUI_ConfirmPlace',
                          '3times': 'SET_FAILURE'}
         )
+        # For now we only show the emotion "happy" for one second
         StateMachine.add(
             'MMUI_REPEAT_CMD',
-            #HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=4),
             HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=1),
             transitions={'preempted': 'LOG_PREEMPT',
                          'succeeded': 'failure',
                          'failed': 'SET_FAILURE'}
         )
+        # Show the emotion "happy" for one second
         StateMachine.add(
             'EMO_HAPPY',
-            #HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=4),
             HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=1),
             transitions={'preempted': 'LOG_PREEMPT',
                          'succeeded': 'VIEW_BLOCKED',
                          'failed': 'SET_FAILURE'}
         )
+
         StateMachine.add(
             'VIEW_BLOCKED',
             DummyNo(),
             transitions={'yes': 'EMO_SAD',
                          'no': 'SEQ'}
         )
+        # Show the emotion "sad" for one second
         StateMachine.add(
             'EMO_SAD',
-            #HobbitEmotions.ShowEmotions(emotion='EMO_SAD', emo_time=4),
             HobbitEmotions.ShowEmotions(emotion='EMO_SAD', emo_time=1),
             transitions={'preempted': 'LOG_PREEMPT',
                          'succeeded': 'COUNT_CHECK',
@@ -347,6 +351,7 @@ def main():
                          'preempted': 'LOG_PREEMPT'}
         )
         with seq:
+            # Show the emotion "happy" for one second
             Sequence.add(
                 'EMO_HAPPY',
                 HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=1))
@@ -388,6 +393,7 @@ def main():
                 'SHOW_MENU_MAIN',
                 HobbitMMUI.ShowMenu(menu='MAIN'),
                 transitions={'succeeded': 'failed'})
+            # Show the emotion "happy" for one second
             Sequence.add(
                 'EMO_HAPPY_1',
                 #HobbitEmotions.ShowEmotions(emotion='EMO_HAPPY', emo_time=4))
@@ -410,25 +416,32 @@ def main():
             transitions={'succeeded': 'LOG_ABORT',
                          'preempted': 'LOG_PREEMPT'}
         )
+        # cleanup if we need to
         StateMachine.add(
             'CLEAN_UP',
             CleanUp(),
             transitions={'succeeded': 'LOG_PREEMPT'})
+        # send success to the logging facility
         StateMachine.add(
             'LOG_SUCCESS',
             log.DoLogSuccess(scenario='Goto'),
             transitions={'succeeded': 'succeeded'}
         )
+        # send preempt to the logging facility
         StateMachine.add(
             'LOG_PREEMPT',
             log.DoLogPreempt(scenario='Goto'),
             transitions={'succeeded': 'preempted'}
         )
+        # send abort to the logging facility
         StateMachine.add(
             'LOG_ABORT',
             log.DoLogAborted(scenario='Goto'),
             transitions={'succeeded': 'failure'}
         )
+
+    # wrap the whole scenario in a ROS Actionserver
+    # This makes it easy to start it
 
     asw = ActionServerWrapper(
         'goto',
