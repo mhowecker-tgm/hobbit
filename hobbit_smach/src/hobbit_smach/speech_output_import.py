@@ -57,7 +57,7 @@ def askYesNo(question='Text is missing'):
             )
             Sequence.add(
                 'WAIT_FOR_MMUI',
-                HobbitMMUI.WaitforSoundEnd('/Event', Event),
+                HobbitMMUI.WaitforSoundEnd('/Event', Event, timeout=5),
                 transitions={'aborted': 'WAIT_FOR_MMUI',
                              'succeeded': 'succeeded'})
     return seq
@@ -82,7 +82,7 @@ def say_text_found_object():
         )
         Sequence.add(
             'WAIT_FOR_MMUI',
-            HobbitMMUI.WaitforSoundEnd('/Event', Event),
+            HobbitMMUI.WaitforSoundEnd('/Event', Event, timeout=5),
             transitions={'aborted': 'WAIT_FOR_MMUI',
                          'succeeded': 'succeeded'})
     return seq
@@ -105,7 +105,7 @@ def say_object_not_found():
         )
         Sequence.add(
             'WAIT_FOR_MMUI',
-            HobbitMMUI.WaitforSoundEnd('/Event', Event),
+            HobbitMMUI.WaitforSoundEnd('/Event', Event, timeout=5),
             transitions={'aborted': 'WAIT_FOR_MMUI',
                          'succeeded': 'succeeded'})
     return seq
@@ -188,7 +188,7 @@ def sayTextObject(info='Text is missing'):
         )
         Sequence.add(
             'WAIT_FOR_MMUI',
-            HobbitMMUI.WaitforSoundEnd('/Event', Event),
+            HobbitMMUI.WaitforSoundEnd('/Event', Event, timeout=5),
             transitions={'aborted': 'WAIT_FOR_MMUI',
                          'succeeded': 'succeeded'})
     return seq
@@ -268,7 +268,7 @@ def sayTextRoom(info='Text is missing'):
         )
         Sequence.add(
             'WAIT_FOR_MMUI',
-            HobbitMMUI.WaitforSoundEnd('/Event', Event),
+            HobbitMMUI.WaitforSoundEnd('/Event', Event, timeout=5),
             transitions={'aborted': 'WAIT_FOR_MMUI',
                          'succeeded': 'succeeded'})
     return seq
@@ -299,7 +299,7 @@ def sayText(info='Text is missing'):
         )
         Sequence.add(
             'WAIT_FOR_MMUI',
-            HobbitMMUI.WaitforSoundEnd('/Event', Event),
+            HobbitMMUI.WaitforSoundEnd('/Event', Event, timeout=5),
             transitions={'aborted': 'WAIT_FOR_MMUI',
                          'succeeded': 'succeeded'})
     return seq
@@ -384,7 +384,7 @@ def playMoveOut():
         )
         Sequence.add(
             'WAIT_FOR_MMUI',
-            HobbitMMUI.WaitforSoundEnd('/Event', Event),
+            HobbitMMUI.WaitforSoundEnd('/Event', Event, timeout=5),
             transitions={'aborted': 'WAIT_FOR_MMUI'}
         )
         Sequence.add(
