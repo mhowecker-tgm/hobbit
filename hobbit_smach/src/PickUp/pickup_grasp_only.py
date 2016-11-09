@@ -93,9 +93,27 @@ def main():
                          }
         )
         StateMachine.add(
+            'FINISH_GRASP',
+            pickup.getEndPickupSeq(),
+            transitions={'succeeded': 'LOG_SUCCESS',
+                         'preempted': 'LOG_PREEMPT',
+                         'failed': 'LOG_ABORT'
+                         }
+        )
+        StateMachine.add(
             'LOG_ABORT',
             log.DoLogAborted(scenario='Pickup'),
             transitions={'succeeded': 'aborted'}
+        )
+        StateMachine.add(
+            'LOG_SUCCESS',
+            log.DoLogSuccess(scenario='Pickup'),
+            transitions={'succeeded': 'succeeded'}
+        )
+        StateMachine.add(
+            'LOG_PREEMPT',
+            log.DoLogPreempt(scenario='Pickup'),
+            transitions={'succeeded': 'preempted'}
         )
 
     asw = ActionServerWrapper(
