@@ -144,7 +144,7 @@ class DavidPickingUp(State):
                 logging.do_log_data("6219NFSG No Free Space to grasp")
                 logging.do_log_data("5214RORGP Reason why Object(s) not accepted (grasppos): " + "No Free Space to grasp")
                 print "===> DavidPickingUp.execute: arm not able to move savely for picking up => PICKING UP WAS STOPPED"
-                return 'failed_no_space_to_move_arm'
+                #return 'failed_no_space_to_move_arm'
             else:
                 logging.do_log_data("6118FSG   Free Space to grasp")
 
@@ -278,7 +278,6 @@ class DavidPickingUp(State):
         p.point.z = m[2]
 
         pnt_rcs = self.listener.transformPoint('/base_link', p)     #center of cluster in robot coordinate system
-        pnt_wcs = self.listener.transformPoint('/map', p)           #center of cluster in world coordinate system
 
         #print "============== center of cluster in camera coordinate system: ", p
         print "===> pickup_import.py: DavidPickingUp.isGraspableObject(): center of cluster in RCS:                    : ", pnt_rcs
