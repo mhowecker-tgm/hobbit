@@ -1,305 +1,293 @@
 <!DOCTYPE html>
 <html> 
   <head> 
-        <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>  
-	<title>Hobbit Facilitator Initialization ControlPanel</title>
-        <link rel="stylesheet" type="text/css" href="hobbit.css">
-	     <script type="text/javascript" src="jscolor/jscolor.js"></script>
-        <script type="text/javascript" src="controlpanel.js"> </script>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>  
+	  <title>Hobbit Facilitator Initialization ControlPanel</title>
+    <link rel="stylesheet" type="text/css" href="hobbit.css">
+	  <script type="text/javascript" src="jscolor/jscolor.js"></script>
+    <script type="text/javascript" src="controlpanel.js"> </script>
+  </head>
 
 
-
-       <body onload="makeUniqueURLs(); changeLanguage(speakLanguage); ">  
-  <center> 
-         <a href="controlpanel.html?nothing=true">  
-          <img src="banner.png" width=800 border=0 />
-         </a><br/> 
-	<hr />
-	  <center> <a href="controlpanel.html"><h2>Back to Main Menu</h2></a> </center>
-	<hr />
-   <table id="content">
-    <tr>
-      <td> 
+  <body onload="makeUniqueURLs(); changeLanguage(speakLanguage); ">  
+    <center> 
+    <a href="controlpanel.html?nothing=true"><img src="images/banner.png" width="800" border=0 /></a><br />
+    <hr />
+	  <center><a href="controlpanel.html"><h2>Back to Main Menu</h2></a></center>
+	  <hr />
+    <table id="content">
+      <tr>
+        <td>
 
        <!-- NESTED BOX START -->
-       <table>
-        <tr>
-         <td>
 
-	<div class="rtd">
-          <strong>FACILITATOR ROBOT INITIALIZATION</strong><br/>
-            <table>
-              <tr>
-                <td>
-                  <form action="settings.html" accept-charset="utf-8"  method="get" >  
+          <table>
+            <tr>
+              <td>
 
-             <table>
-              <tr>
-               <td>
-                  <input type="hidden" name="fullSetOperation" value="true"> 
-
-                  User Name :   
-                  <input type="text" name="userName"  style="width: 40%;"> <br/>
-
-                  Robot Name :  
-                  <input type="text" name="robotName"  style="width: 40%;"> <br/>
-                 
-                  <!-- As stated in an E-mail by Denise , Social Roles Implementation (initialisaiton menu & general) , sent @ 25/08/2014  
-                  Robot Social Role : 
-                      <select name="socialRole"  > 
-                        <!-- 
-                        <option value="0">Device</option> 
-                        <option value="1">Butler</option>
-                        <option value="2">Friend</option>  
-                      </select>   <br/>
-                    -->
-                  ( Social role is automatically set to default ) <br/> 
-                  <input name="askForSocialRole" value="1" type="hidden">      
-                    
- 
-                  Current Emotion : 
-                      <select name="currentEmotion"  >
-                        <option value="EMO_HAPPY">Happy</option> 
-                      </select>   <br/>
- 
-                  User Away  : 
-                      <select name="userAway"  >
-                        <option value="false">false</option>  
-                        <option value="true">true</option> 
-                      </select>   <br/>
- 
-                  
-                  <table> 
-                    <tr> 
+	              <div class="rtd">
+                  <strong>FACILITATOR ROBOT INITIALIZATION</strong><br />
+                  <table>
+                    <tr>
                       <td>
-                       <a href="javascript:command('say='+speakString);">
-                         <img src="volume.png" height=35 style="-moz-transform: scaleX(-1);
-                                                                -o-transform: scaleX(-1);
-                                                                -webkit-transform: scaleX(-1);
-                                                                transform: scaleX(-1);
-                                                                filter: FlipH;
-                                                                -ms-filter: "FlipH"; ">
-                       </a> 
+                        <form action="settings.html" accept-charset="utf-8"  method="get" >  
+
+                          <table>
+                            <tr>
+                              <td>
+                                <input type="hidden" name="fullSetOperation" value="true"> 
+
+                                User Name:   
+                                <input type="text" name="userName"  style="width: 40%;"><br />
+
+                                Robot Name:  
+                                <input type="text" name="robotName"  style="width: 40%;"><br />
+                              
+                                <!-- As stated in an E-mail by Denise , Social Roles Implementation (initialisaiton menu & general) , sent @ 25/08/2014  
+                                Robot Social Role : 
+                                    <select name="socialRole"  >
+                                      <option value="0">Device</option>
+                                      <option value="1">Butler</option>
+                                      <option value="2">Friend</option>
+                                    </select><br/>
+                                  -->
+
+                                ( Social role is automatically set to default )<br />
+                                <input name="askForSocialRole" value="1" type="hidden">
+              
+                                Current Emotion:
+                                <select name="currentEmotion">
+                                  <option value="EMO_HAPPY">Happy</option>
+                                </select><br />
+              
+                                User Away:
+                                <select name="userAway">
+                                  <option value="false">false</option>
+                                  <option value="true">true</option>
+                                </select><br />
+      
+                        
+                                <table> 
+                                  <tr> 
+                                    <td>
+                                      <a href="javascript:command('say='+speakString);">
+                                        <img src="images/volume.png" height=35 style="-moz-transform: scaleX(-1);
+                                                                                      -o-transform: scaleX(-1);
+                                                                                      -webkit-transform: scaleX(-1);
+                                                                                      transform: scaleX(-1);
+                                                                                      filter: FlipH;
+                                                                                      -ms-filter: FlipH">
+                                      </a> 
+                                    </td>
+                                    <td><a href="javascript:command('say='+speakString);">Test Voice</a></td>
+                                    <td><a href="javascript:command('say='+speakString);"><img src="images/volume.png" height=35></a></td>
+                                  </tr>
+                                </table>
+
+                                Language:
+                                <select name="language" onchange="javascript:changeLanguage(this.value);">
+                                  <option value="english">English</option>
+                                  <option value="greek">Greek</option>
+                                  <option value="german">German</option>
+                                  <option value="swedish">Swedish</option>
+                                </select><br />
+
+                                Gender:
+                                <select name="gender" onchange="javascript:changeGender(this.value);" >
+                                  <option value="FEMALE">Female</option> 
+                                  <option value="MALE">Male</option> 
+                                </select><br />
+      
+                                Talking Speed:
+                                <select name="talkingSpeed" onchange="javascript:settingsCommand('talkingSpeed='+this.value);">
+                                  <option value="5">Normal</option>
+                                  <option value="0">Too Slow</option>
+                                  <option value="1">Very Slow</option>
+                                  <option value="3">Slow</option>
+                                  <option value="7">Fast</option>
+                                  <option value="9">Very Fast</option>
+                                </select><br />
+                            
+                                Volume:
+                                <select name="volume"  onchange="javascript:settingsCommand('volume='+this.value);">
+                                  <option value="30">30%</option>
+                                  <option value="0">0%</option>
+                                  <option value="1">10%</option>
+                                  <option value="2">20%</option>
+                                  <option value="3">30%</option>
+                                  <option value="4">40%</option>
+                                  <option value="5">50%</option>
+                                  <option value="6">60%</option>
+                                  <option value="7">70%</option>
+                                  <option value="8">80%</option>
+                                  <option value="9">90%</option>
+                                  <option value="10">100%</option>
+                                </select><br />
+                        
+                        
+                                <strong>Daily Routines</strong><br/>
+                                Latest Waking Up Time:
+                                <input type="text" name="latestWakingUpTime" value="09:00" style="width: 20%;" /><br />
+                                Latest Sleeping Time:
+                                <input type="text" name="latestSleepingTime" value="21:00" style="width: 20%;" /><br />
+                                <hr />
+
+                                <label><input id="voiceAdvancedSwitch" type="checkbox" onchange='handleVoiceAdvancedSwitch(this);'>Manual Voice Selection</label> 
+                                <br />
+
+                                <div id="voiceAdvanced" style="visibility:hidden;">
+                                  Female Voice :
+                                  <select id="voiceFemale" name="voiceFemale" onchange="javascript:settingsCommand('voiceFemale='+this.value);">
+                                    <optgroup label="English Language">
+                                      <option value="Susan">Susan</option>
+                                      <option value="Kate">Kate</option>
+                                      <option value="Allison P">Allison P</option>
+                                    </optgroup>
+                                    <optgroup label="German Language">
+                                      <option value="Katrin">Katrin</option>
+                                      <option value="Anna P">Anna P</option>
+                                    </optgroup>
+                                    <optgroup label="Greek Language">
+                                      <option value="Afroditi">Afroditi</option>
+                                      <option value="Melina P">Melina P</option>
+                                    </optgroup>
+                                    <optgroup label="Swedish Language">
+                                      <option value="Annika">Annika</option>
+                                      <option value="Alva P">Alva P</option>
+                                    </optgroup>
+                                  </select>
+                                  <a href="javascript:command('say='+speakString);"><img src="images/volume.png" height=18></a>
+                                  <br />
+                            
+                                  Male Voice:
+                                  <select id="voiceMale"  name="voiceMale" onchange="javascript:settingsCommand('voiceMale='+this.value);">
+                                    <optgroup label="English Language">
+                                      <option value="Dave">Dave</option>
+                                      <option value="Simon">Simon</option>
+                                      <option value="Tom P">Tom P</option>
+                                    </optgroup>
+                                    <optgroup label="German Language">
+                                      <option value="Stefan">Stefan</option>
+                                      <option value="Yannik P">Yannik P</option>
+                                    </optgroup>
+                                    <optgroup label="Greek Language">
+                                      <option value="Nikos">Nikos</option>
+                                      <option value="Nikos P">Nikos P</option>
+                                    </optgroup>
+                                    <optgroup label="Swedish Language">
+                                      <option value="Sven">Sven</option>
+                                      <option value="Oskar P">Oskar P</option>
+                                    </optgroup>
+                                  </select>
+                                  <a href="javascript:command('say='+speakString);"><img src="images/volume.png" height=18></a>
+                                  <br />
+                                </div>  
+      
+                        <!--City Of Operation :   
+                        <input type="text" name="city"  style="width: 40%;" value="Herakleion,Greece"> <br/> -->
+        
+                              </td>
+                              <td>
+                                <div id="LuiBackground" style="background-color:#FFE4E1;clear:both;text-align:center;">
+                                  <img src="images/lui.png" width=300><br />
+                                </div>
+
+                                UI color:    
+                                <select id="LuiBackgroundSelector" name="LuiBackgroundSelector"  onchange="javascript:changeUIColor(this.value);">
+                                  <option value="#FFE4E1">Misty Rose</option>
+                                  <option value="#FFEFD5">Papaya Whip</option>
+                                  <option value="#FFFFE0">Light Yellow</option>
+                                  <option value="#F0FFF0">Honeydew</option>
+                                  <option value="#F0F8FF">Alice Blue</option>
+                                  <option value="#E6E6FA">Lavender</option>
+                                  <option value="#F5F5F5">White Smoke</option>
+                                  <option value="#32CD32">Lime Green</option>
+                                </select>
+                            
+                          <!-- input id="LuiBackgroundSelector" name="LuiBackgroundSelector" type="color" value="#66ff00" 
+                                    onchange="changeUIColor(this.value);" -->
+
+                                <br /><br /> 
+                                Gestures
+                                <a href="videos/Hobbit_gestures_Elderly2014b.mp4" target="_new">Demo Video</a><br />
+                                Good Practice of Gestures
+                                <a href="videos/PT2-Gestures-Good_practice_robotview.mp4" target="_new">Robot View</a> -
+                                <a href="videos/PT2-Gestures-Good_practice_sideview.mp4" target="_new">Side View</a><br />
+                                <br />
+                                Bad Practice  of Gestures
+                                <a href="videos/PT2-Gestures-Bad_practice_robotview.mp4" target="_new">Robot View</a> -
+                                <a href="videos/PT2-Gestures-Bad_practice_sideview.mp4" target="_new">Side View</a>
+                                <br />                                     
+                              </td>
+                            </tr>
+                          </table>
+
+                          <hr />
+
+                        <!--
+                        <strong>Emergencies</strong><br/>
+
+                          #1 :  Name : <input type="text" name="emergencyContactName1"  style="width: 20%;"> 
+                                Tel : <input type="text" name="emergencyContactTel1"  style="width: 20%;"> <br/> 
+
+                          #2 :  Name : <input type="text" name="emergencyContactName2"  style="width: 20%;"> 
+                                Tel : <input type="text" name="emergencyContactTel2"  style="width: 20%;"> <br/> 
+
+                          #3 :  Name : <input type="text" name="emergencyContactName3"  style="width: 20%;"> 
+                                Tel : <input type="text" name="emergencyContactTel3"  style="width: 20%;"> <br/> 
+                        <hr />  
+                        <strong>Relatives And Friends</strong><br/>
+                          #1 - Name : <input type="text" name="contactName1"  style="width: 20%;"> 
+                                      Tel : <input type="text" name="contactTel1"  style="width: 20%;"> <br/>
+                          #2 - Name : <input type="text" name="contactName2"  style="width: 20%;"> 
+                                      Tel : <input type="text" name="contactTel2"  style="width: 20%;"> <br/>
+                          #3 - Name : <input type="text" name="contactName3"  style="width: 20%;"> 
+                                      Tel : <input type="text" name="contactTel3"  style="width: 20%;"> <br/>
+                          #4 - Name : <input type="text" name="contactName4"  style="width: 20%;"> 
+                                      Tel : <input type="text" name="contactTel4"  style="width: 20%;"> <br/>
+                          #5 - Name : <input type="text" name="contactName5"  style="width: 20%;"> 
+                                      Tel : <input type="text" name="contactTel5"  style="width: 20%;"> <br/>
+                          #6 - Name : <input type="text" name="contactName6"  style="width: 20%;"> 
+                                      Tel : <input type="text" name="contactTel6"  style="width: 20%;"> <br/> 
+                        <hr /> 
+
+
+                        <strong>Reminders</strong><br/>
+                          <input type="checkbox" name="medicationReminders" value="medicationReminders">Use Medication Reminders<br/> 
+                          <input type="checkbox" name="waterReminders" value="waterReminders">Use Water Reminders<br/> <br/>
+
+
+                          Reminder #1 : <input type="text" name="reminderLabel"  style="width: 20%;"> 
+                                      Date : <input type="datetime" name="reminderDate"  style="width: 20%;"> <br/>  <br/>
+                        <hr /> 
+                        Facebook Username :  
+                        <input type="text" name="fbUser"  style="width: 20%;">   Password :  
+                        <input type="text" name="fbPass"  style="width: 20%;"> <br/>
+
+                        Twitter Username :  
+                        <input type="text" name="twitterUser"  style="width: 20%;">   Password :  
+                        <input type="text" name="twitterPass"  style="width: 20%;"> <br/>
+                        -->
+
+                          <input type="submit" value="Set" onclick="updateFormRandomNumber()" style="float: right">
+                          <input id="FormRandomField" type="hidden" name="t" value="somethingRandomHere"> 
+                        </form>
                       </td>
-                      <td><a href="javascript:command('say='+speakString);">Test Voice</a></td>
-                      <td>
-                       <a href="javascript:command('say='+speakString);"><img src="volume.png" height=35></a> 
-                      </td>
-                      
                     </tr>
                   </table>
- 
- 
-                  Language  : 
-                      <select name="language" onchange="javascript:changeLanguage(this.value);" >
-                        <option value="english">English</option>  
-                        <option value="greek">Greek</option>  
-                        <option value="german">German</option>  
-                        <option value="swedish">Swedish</option>   
-                      </select>    
-                      <br/>
-
-                  Gender : 
-                      <select name="gender" onchange="javascript:changeGender(this.value);" >
-                        <option value="FEMALE">Female</option> 
-                        <option value="MALE">Male</option> 
-                      </select>  
-                      <br/>
- 
-                  Talking Speed : 
-                      <select name="talkingSpeed" onchange="javascript:settingsCommand('talkingSpeed='+this.value);" >
-                        <option value="5">Normal</option> 
-                        <option value="0">Too Slow</option>
-                        <option value="1">Very Slow</option>
-                        <option value="3">Slow</option>
-                        <option value="7">Fast</option>
-                        <option value="9">Very Fast</option>  
-                      </select>   
-                      <br/>
-                       
-                  Volume : 
-                      <select name="volume"  onchange="javascript:settingsCommand('volume='+this.value);" >
-                        <option value="30">30%</option> 
-                        <option value="0">0%</option>
-                        <option value="1">10%</option>
-                        <option value="2">20%</option>
-                        <option value="3">30%</option>
-                        <option value="4">40%</option> 
-                        <option value="5">50%</option> 
-                        <option value="6">60%</option> 
-                        <option value="7">70%</option> 
-                        <option value="8">80%</option> 
-                        <option value="9">90%</option> 
-                        <option value="10">100%</option> 
-                      </select>  
-                  <br/> 
-                  
-                  
-                   <strong>Daily Routines</strong><br/>
-                     Latest Waking Up Time: 
-                   <input type="text" name="latestWakingUpTime" value="09:00" style="width: 20%;"> <br/>
-                     Latest Sleeping Time: 
-                   <input type="text" name="latestSleepingTime" value="21:00" style="width: 20%;">  <br/> 
-                  <hr /> 
-                      
-                  <label><input id="voiceAdvancedSwitch" type="checkbox" onchange='handleVoiceAdvancedSwitch(this);' >Manual Voice Selection</label> 
-                   <br>
-                   
-                  <div id="voiceAdvanced" style="visibility:hidden;"> 
-                  Female Voice : 
-                      <select id="voiceFemale" name="voiceFemale" onchange="javascript:settingsCommand('voiceFemale='+this.value);"  >
-                        <optgroup label="English Language" >
-                          <option value="Susan">Susan</option>  
-                          <option value="Kate">Kate</option>  
-                          <option value="Allison P">Allison P</option>  
-                        </optgroup>  
-                        <optgroup label="German Language" >
-                          <option value="Katrin">Katrin</option>  
-                          <option value="Anna P">Anna P</option>  
-                        </optgroup>  
-                        <optgroup label="Greek Language" >
-                          <option value="Afroditi">Afroditi</option>  
-                          <option value="Melina P">Melina P</option>     
-                        </optgroup>  
-                        <optgroup label="Swedish Language" >
-                          <option value="Annika">Annika</option>  
-                          <option value="Alva P">Alva P</option>     
-                        </optgroup>                         
-                      </select>     <a href="javascript:command('say='+speakString);"><img src="volume.png" height=18></a>  
-                      <br/>
-                      
-                  Male Voice :   
-                      <select id="voiceMale"  name="voiceMale" onchange="javascript:settingsCommand('voiceMale='+this.value);" >
-                        <optgroup label="English Language" >
-                          <option value="Dave">Dave</option>  
-                          <option value="Simon">Simon</option>  
-                          <option value="Tom P">Tom P</option>  
-                        </optgroup>  
-                        <optgroup label="German Language" >
-                          <option value="Stefan">Stefan</option>  
-                          <option value="Yannik P">Yannik P</option>  
-                        </optgroup>  
-                        <optgroup label="Greek Language" >
-                          <option value="Nikos">Nikos</option>  
-                          <option value="Nikos P">Nikos P</option>     
-                        </optgroup>  
-                        <optgroup label="Swedish Language" >
-                          <option value="Sven">Sven</option>  
-                          <option value="Oskar P">Oskar P</option>     
-                        </optgroup>                         
-                      </select>    <a href="javascript:command('say='+speakString);"><img src="volume.png" height=18></a>  
-                      <br/>
-                     </div>  
- 
-                  <!--City Of Operation :   
-                  <input type="text" name="city"  style="width: 40%;" value="Herakleion,Greece"> <br/> -->
-  
-                  </td>
-                  <td>
-                      <div id="LuiBackground" style="background-color:#FFE4E1;clear:both;text-align:center;" >
-                       <img src="lui.png" width=300><br/> 
-                      </div>  
-                      
-                   UI color :    
-                    <select id="LuiBackgroundSelector" name="LuiBackgroundSelector"  onchange="javascript:changeUIColor(this.value);" >
-                        <option value="#FFE4E1">Misty Rose</option> 
-                        <option value="#FFEFD5">Papaya Whip</option>
-                        <option value="#FFFFE0">Light Yellow</option>
-                        <option value="#F0FFF0">Honeydew</option>
-                        <option value="#F0F8FF">Alice Blue</option>
-                        <option value="#E6E6FA">Lavender</option> 
-                        <option value="#F5F5F5">White Smoke</option> 
-                        <option value="#32CD32">Lime Green</option>   
-                      </select>                        
-                      
-                    <!-- input id="LuiBackgroundSelector" name="LuiBackgroundSelector" type="color" value="#66ff00" 
-                               onchange="changeUIColor(this.value);" --> <br/>  
-                               
-                               
-                       <br/> 
-                         Gestures <a href="videos/Hobbit_gestures_Elderly2014b.mp4"  target="_new" > Demo Video </a>  <br/>  
-                         Good Practice of Gestures
-                          <a href="videos/PT2-Gestures-Good_practice_robotview.mp4" target="_new" >Robot View</a>  - 
-                          <a href="videos/PT2-Gestures-Good_practice_sideview.mp4"  target="_new" >Side View</a>  <br/>  
-                          <br/>                                     
-                         Bad Practice  of Gestures 
-                          <a href="videos/PT2-Gestures-Bad_practice_robotview.mp4"  target="_new" >Robot View</a> -
-                          <a href="videos/PT2-Gestures-Bad_practice_sideview.mp4"  target="_new" >Side View</a>
-                          <br/>                                     
-                  </td>
+                </div>
+              </td>
             </tr>
           </table>
- 
-
-                  <hr /> <!--
-                   <strong>Emergencies</strong><br/>
-
-                    #1 :  Name : <input type="text" name="emergencyContactName1"  style="width: 20%;"> 
-                          Tel : <input type="text" name="emergencyContactTel1"  style="width: 20%;"> <br/> 
-
-                    #2 :  Name : <input type="text" name="emergencyContactName2"  style="width: 20%;"> 
-                          Tel : <input type="text" name="emergencyContactTel2"  style="width: 20%;"> <br/> 
-
-                    #3 :  Name : <input type="text" name="emergencyContactName3"  style="width: 20%;"> 
-                          Tel : <input type="text" name="emergencyContactTel3"  style="width: 20%;"> <br/> 
-                  <hr />  
-                   <strong>Relatives And Friends</strong><br/>
-                    #1 - Name : <input type="text" name="contactName1"  style="width: 20%;"> 
-                                Tel : <input type="text" name="contactTel1"  style="width: 20%;"> <br/>
-                    #2 - Name : <input type="text" name="contactName2"  style="width: 20%;"> 
-                                Tel : <input type="text" name="contactTel2"  style="width: 20%;"> <br/>
-                    #3 - Name : <input type="text" name="contactName3"  style="width: 20%;"> 
-                                Tel : <input type="text" name="contactTel3"  style="width: 20%;"> <br/>
-                    #4 - Name : <input type="text" name="contactName4"  style="width: 20%;"> 
-                                Tel : <input type="text" name="contactTel4"  style="width: 20%;"> <br/>
-                    #5 - Name : <input type="text" name="contactName5"  style="width: 20%;"> 
-                                Tel : <input type="text" name="contactTel5"  style="width: 20%;"> <br/>
-                    #6 - Name : <input type="text" name="contactName6"  style="width: 20%;"> 
-                                Tel : <input type="text" name="contactTel6"  style="width: 20%;"> <br/> 
-                  <hr /> 
+        </td>
+      </tr>
+    </table>
 
 
-                   <strong>Reminders</strong><br/>
-                     <input type="checkbox" name="medicationReminders" value="medicationReminders">Use Medication Reminders<br/> 
-                     <input type="checkbox" name="waterReminders" value="waterReminders">Use Water Reminders<br/> <br/>
-
-
-                     Reminder #1 : <input type="text" name="reminderLabel"  style="width: 20%;"> 
-                                 Date : <input type="datetime" name="reminderDate"  style="width: 20%;"> <br/>  <br/>
-                  <hr /> 
-                  Facebook Username :  
-                  <input type="text" name="fbUser"  style="width: 20%;">   Password :  
-                  <input type="text" name="fbPass"  style="width: 20%;"> <br/>
-
-                  Twitter Username :  
-                  <input type="text" name="twitterUser"  style="width: 20%;">   Password :  
-                  <input type="text" name="twitterPass"  style="width: 20%;"> <br/>
-                   -->
-
-                      <input type="submit" value="Set" onclick="updateFormRandomNumber()" style="float: right">
-                     </div> 
-                     <input id="FormRandomField" type="hidden" name="t" value="somethingRandomHere"> 
-                   </form>
-                </td>
-              </tr>
-              </table>
-           </div>
- 
-
-                </td>
-              </tr>
-              </table>
-
-                </td>
-              </tr>
-              </table>
-
-
-	<br/>
-	<hr/><br/>
+	  <br /><hr /><br />
 
 	<!-- a href="controlpanel.html?nothing=true"> <h3>Click here to refresh neutral url</h3></a -->
  
-  </center> 
- </body>
+    </center> 
+  </body>
 </html>

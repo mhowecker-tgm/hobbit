@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html> 
   <head> 
-        <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>  
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>  
 	<title>Hobbinterface</title>
-        <link rel="stylesheet" type="text/css" href="hobbit.css">
+    <link rel="stylesheet" type="text/css" href="hobbit.css">
    <script type="text/javascript" src="controlpanel.js">   
    </script>
 
@@ -11,366 +11,344 @@
  <body onload="makeUniqueURLs(); setInterval('updateStatusMonitor()', statusMonitorUpdateDelay );">  
 
 
-
 <!-- POPUP WINDOWS -->
-
  
 
- <div class="rtdFloating" id="settingsTab" draggable="true" ondrop="drop(event)" ondragover="allowDrop(event)" ondragstart="drag(event)" >
-            <table>
-              <tr>
-                <td width=350 ></td><td><a href="javascript:makeFeedInvisible('settingsTab');" class="xbutton" >X</a></td>
-              </tr>
-              <tr>
-                <td colspan=2> 
-                  <form action="settings.html" accept-charset="utf-8" >  
-                     <div style="overflow: hidden; padding-right: .5em;">
-                      Robot Name :  <br/>
-                      <input type="text" name="name"  style="width: 60%;"> <br/>
-                      
-                      Talking Speed : 
-                      <select id="talkingSpeed"  >
-                        <option value="ltired">Normal</option> 
-                        <option value="happy">Very Slow</option>
-                        <option value="vhappy">Slow</option>
-                        <option value="vtired">Fast</option>
-                        <option value="concerned">Very Fast</option> 
-                      </select>   <br/>
+  <div class="rtdFloating" id="settingsTab" draggable="true" ondrop="drop(event)" ondragover="allowDrop(event)" ondragstart="drag(event)" >
+    <table>
+      <tr>
+        <td width=350 ></td><td><a href="javascript:makeFeedInvisible('settingsTab');" class="xbutton" >X</a></td>
+      </tr>
+      <tr>
+        <td colspan=2> 
+          <form action="settings.html" accept-charset="utf-8" >  
+            <div style="overflow: hidden; padding-right: .5em;">
+            Robot Name :  <br/>
+            <input type="text" name="name"  style="width: 60%;"> <br/>
+            
+            Talking Speed : 
+            <select id="talkingSpeed"  >
+              <option value="ltired">Normal</option> 
+              <option value="happy">Very Slow</option>
+              <option value="vhappy">Slow</option>
+              <option value="vtired">Fast</option>
+              <option value="concerned">Very Fast</option> 
+            </select>   <br/>
 
-                      Gender : 
-                      <select id="gender"  >
-                        <option value="male">Male</option> 
-                        <option value="fale">Female</option> 
-                      </select>   <br/>
-                      
-                      <br/>
-                      <input type="submit" value="Set" onclick="updateFormRandomNumber()" style="float: right">
-                     </div> 
-                     <input id="FormRandomField" type="hidden" name="t" value="somethingRandomHere"> 
-                   </form> <br/>
-
-                   <i>Please note that Set overwrites all settings listed here</i>
-                </td>
-              </tr> 
-           </table>
-</div> 
-
+            Gender : 
+            <select id="gender"  >
+              <option value="male">Male</option> 
+              <option value="fale">Female</option> 
+            </select>
+            <br/><br/>
+            <input type="submit" value="Set" onclick="updateFormRandomNumber()" style="float: right">
+            </div> 
+            <input id="FormRandomField" type="hidden" name="t" value="somethingRandomHere"> 
+          </form>
+          <br/>
+          <i>Please note that Set overwrites all settings listed here</i>
+        </td>
+      </tr> 
+    </table>
+  </div>
 
 
 <!-- MAIN WINDOW -->
 
  
   <center>
-	<!--a href="controlpanel.html?nothing=true"> <img src="header.png" border=0/> </a--> 
-         <a href="controlpanel.html?nothing=true">  
-          <img src="banner.png" width=800 border=0 />
-         </a><br/> 
+	<!--a href="controlpanel.html?nothing=true"> <img src="images/header.png" border=0/> </a--> 
+  <a href="controlpanel.html?nothing=true">  
+  <img src="images/banner.png" width="800" />
+  </a><br/>
          
-<ul><li><a href="controlpanel.html" target="_new">Home</a></li>
-  <li> <a href="facilitator_panel.html" target="_new">Facilitator Menu</a> </li>
-  <li>
-    <a href="#">Scenarios</a>
-    <ul>
-      <li><a href="#">Call to Room</a></li>
-      <li><a href="#">Follow me</a></li>
-      <li><a href="#">Clear Floor</a></li>
-      <li><a href="#">Learn Object</a></li>
-      <li><a href="#">Help Me</a></li>
-      <li><a href="#">Sleep</a></li>
-      <li><a href="#">Wake-up</a></li>
-       
-    </ul>
-  </li>   
+  <ul>
+    <li><a href="controlpanel.html" target="_new">Home</a></li>
+    <li><a href="facilitator_panel.html" target="_new">Facilitator Menu</a></li>
+    <li><a href="#">Scenarios</a>
+      <ul>
+        <li><a href="#">Call to Room</a></li>
+        <li><a href="#">Follow me</a></li>
+        <li><a href="#">Clear Floor</a></li>
+        <li><a href="#">Learn Object</a></li>
+        <li><a href="#">Help Me</a></li>
+        <li><a href="#">Sleep</a></li>
+        <li><a href="#">Wake-up</a></li>
+      </ul>
+    </li>
   
-  
-  <li>
-    <a href="#">View</a>
-    <ul>
-      <li><a href="javascript:makeFeedVisible('videoFeedTop');">Top Camera</a></li>
-      <li><a href="javascript:makeFeedVisible('videoFeedBottom');">Botom Camera</a></li>
-      <li><a href="javascript:makeFeedVisible('mapFeed');">Map Overview</a> </li>
-      <li><a href="javascript:makeFeedVisible('tfTree');">TF-Tree</a> </li>
-    </ul>
-  </li> 
-  <li> <a href="#">System</a>
-    <ul>
-      <li><a href="recordings/" target="_new">View Recordings</a></li>
-      <li><a href="emergencies/" target="_new">View Emergency Recordings</a></li>
-      <li><a href="controlpanel.html?node=startRecording">Start Recording</a></li>
-      <li><a href="controlpanel.html?node=stopRecording">Stop Recording</a></li>
+    <li><a href="#">View</a>
+      <ul>
+        <li><a href="javascript:makeFeedVisible('videoFeedTop');">Top Camera</a></li>
+        <li><a href="javascript:makeFeedVisible('videoFeedBottom');">Botom Camera</a></li>
+        <li><a href="javascript:makeFeedVisible('mapFeed');">Map Overview</a> </li>
+        <li><a href="javascript:makeFeedVisible('tfTree');">TF-Tree</a> </li>
+      </ul>
+    </li>
+    <li><a href="#">System</a>
+      <ul>
+        <li><a href="recordings/" target="_new">View Recordings</a></li>
+        <li><a href="emergencies/" target="_new">View Emergency Recordings</a></li>
+        <li><a href="controlpanel.html?node=startRecording">Start Recording</a></li>
+        <li><a href="controlpanel.html?node=stopRecording">Stop Recording</a></li>
 
-      <li><a href="controlpanel.html?robot=systemUpdate">Software Update</a></li>
-      <li><a href="controlpanel.html?robot=systemRestart">System Restart</a></li>
-      <li><a href="controlpanel.html?robot=systemShutdown">System Shutdown</a></li>
-    </ul>   
-  </li>
-  <li><a href="http://hobbit.acin.tuwien.ac.at/">Hobbit Website</a></li>
-  <li><a href="mailto:hob-impl@fortec.tuwien.ac.at">Report a problem</a></li>
-</ul>         
-         
+        <li><a href="controlpanel.html?robot=systemUpdate">Software Update</a></li>
+        <li><a href="controlpanel.html?robot=systemRestart">System Restart</a></li>
+        <li><a href="controlpanel.html?robot=systemShutdown">System Shutdown</a></li>
+      </ul>   
+    </li>
+    <li><a href="http://hobbit.acin.tuwien.ac.at/">Hobbit Website</a></li>
+    <li><a href="mailto:hob-impl@fortec.tuwien.ac.at">Report a problem</a></li>
+  </ul>
+
 	<hr />
 	
 
 
-        <div class="rtdFloating" id="mapFeed" draggable="true" ondrop="drop(event)" ondragover="allowDrop(event)" ondragstart="drag(event)" >
-            <table>
-              <tr>
-                <td width=300 >Map Overview</td><td><a href="javascript:makeFeedInvisible('mapFeed');" class="xbutton" >X</a></td>
-              </tr>
-              <tr>
-                <td colspan=2> 
-                 <img src="map.png" id="mapFeedImage"> <br/>
-                </td>
-              </tr>
-              <tr>
-               <td colspan=2>
-                 <a href="controlpanel.html?node=switchToNavigation">Switch MIRA to Navigation</a> <br>
-                 <a href="controlpanel.html?node=switchToLearning">Switch MIRA to Learning Places Mode</a> <br>
-                 <a href="controlpanel.html?node=switchToMapping">Switch MIRA to Mapping Mode</a> <br> 
-                 <br>
-                 <a href="javascript:refreshBottomFeed('mapFeed','mapFeedImage');">Refresh</a>   
-               </td>
-              </tr>
-           </table>
-	     </div> 
+  <div class="rtdFloating" id="mapFeed" draggable="true" ondrop="drop(event)" ondragover="allowDrop(event)" ondragstart="drag(event)" >
+    <table>
+      <tr>
+        <td width=300 >Map Overview</td>
+        <td><a href="javascript:makeFeedInvisible('mapFeed');" class="xbutton" >X</a></td>
+      </tr>
+      <tr>
+        <td colspan=2> 
+          <img src="images/map.png" id="mapFeedImage"><br />
+        </td>
+      </tr>
+      <tr>
+        <td colspan=2>
+          <a href="controlpanel.html?node=switchToNavigation">Switch MIRA to Navigation</a><br />
+          <a href="controlpanel.html?node=switchToLearning">Switch MIRA to Learning Places Mode</a><br />
+          <a href="controlpanel.html?node=switchToMapping">Switch MIRA to Mapping Mode</a><br /> 
+          <br />
+          <a href="javascript:refreshBottomFeed('mapFeed','mapFeedImage');">Refresh</a>   
+        </td>
+      </tr>
+    </table>
+  </div>
 
 
 
-        <div class="rtdFloating" id="videoFeedBottom" draggable="true" ondrop="drop(event)" ondragover="allowDrop(event)" ondragstart="drag(event)" >
-            <table>
-              <tr>
-                <td width=300 >Bottom Camera Feed</td><td><a href="javascript:makeFeedInvisible('videoFeedBottom');" class="xbutton" >X</a></td>
-              </tr>
-              <tr>
-                <td colspan=2> 
-                 <img src="feedNotReady.jpg" id="videoFeedBottomImage"> <br/>
-                </td>
-              </tr>
-              <tr>
-               <td colspan=2>
-                 <a href="javascript:refreshBottomFeed('videoFeedBottom','videoFeedBottomImage');">Refresh</a>   
-               </td>
-              </tr>
-           </table>
-	     </div> 
+  <div class="rtdFloating" id="videoFeedBottom" draggable="true" ondrop="drop(event)" ondragover="allowDrop(event)" ondragstart="drag(event)" >
+    <table>
+      <tr>
+        <td width=300 >Bottom Camera Feed</td>
+        <td><a href="javascript:makeFeedInvisible('videoFeedBottom');" class="xbutton" >X</a></td>
+      </tr>
+      <tr>
+        <td colspan=2> 
+          <img src="images/feedNotReady.jpg" id="videoFeedBottomImage"> <br/>
+        </td>
+      </tr>
+      <tr>
+        <td colspan=2>
+          <a href="javascript:refreshBottomFeed('videoFeedBottom','videoFeedBottomImage');">Refresh</a>   
+        </td>
+      </tr>
+    </table>
+  </div>
 
  
 
 
    <div class="rtdFloating" id="videoFeedTop" draggable="true" ondrop="drop(event)" ondragover="allowDrop(event)" ondragstart="drag(event)" >
-            <table>
-              <tr>
-                <td width=300 >Top Camera Feed</td><td><a href="javascript:makeFeedInvisible('videoFeedTop');" class="xbutton" >X</a></td>
-              </tr>
-              <tr>
-                <td colspan=2> 
-                 <img src="feedNotReady.jpg" id="videoFeedTopImage"> <br/>
-                </td>
-              </tr>
-              <tr>
-               <td colspan=2>
-                 <a href="javascript:refreshTopFeed('videoFeedTop','videoFeedTopImage');">Refresh</a>   
-               </td>
-              </tr>
-           </table>
+    <table>
+      <tr>
+        <td width=300 >Top Camera Feed</td>
+        <td><a href="javascript:makeFeedInvisible('videoFeedTop');" class="xbutton" >X</a></td>
+      </tr>
+      <tr>
+        <td colspan=2> 
+          <img src="images/feedNotReady.jpg" id="videoFeedTopImage"><br />
+        </td>
+      </tr>
+      <tr>
+        <td colspan=2>
+          <a href="javascript:refreshTopFeed('videoFeedTop','videoFeedTopImage');">Refresh</a>   
+        </td>
+      </tr>
+    </table>
 	</div> 
 
 
  
    <div class="rtdFloating" id="tfTree" draggable="true" ondrop="drop(event)" ondragover="allowDrop(event)" ondragstart="drag(event)" >
-            <table>
-              <tr>
-                <td width=300 >TF Tree Overview</td><td><a href="javascript:makeFeedInvisible('tfTree');" class="xbutton" >X</a></td>
-              </tr>
-              <tr>
-                <td colspan=2> 
-                 <img src="tf.png" id="tfTreeImage"> <br/>
-                </td>
-              </tr>
-              <tr>
-               <td colspan=2>
-                 <a href="javascript:refreshTFFeed('tfTree','tfTreeImage');">Refresh</a>   
-               </td>
-              </tr>
-           </table>
+    <table>
+      <tr>
+        <td width=300 >TF Tree Overview</td>
+        <td><a href="javascript:makeFeedInvisible('tfTree');" class="xbutton" >X</a></td>
+      </tr>
+      <tr>
+        <td colspan=2> 
+          <img src="images/tf.png" id="tfTreeImage"><br />
+        </td>
+      </tr>
+      <tr>
+        <td colspan=2>
+          <a href="javascript:refreshTFFeed('tfTree','tfTreeImage');">Refresh</a>   
+        </td>
+      </tr>
+    </table>
 	</div> 
 	
 	
 	
    <table id="content">
     <tr>
-      <td> 
-
+      <td>
        <!-- NESTED BOX START -->
-       <table>
-        <tr>
-         <td>
+        <table>
+          <tr>
+            <td>
+              <div class="rtd">
+                <strong>HEAD CONTROL</strong><br/>
+                <table>
+                  <tr> 
+                    <td align="center"><a href="controlpanel.html?head=up_left"><img src="images/head_up_left.png"></a></td> 
+                    <td align="center"><a href="controlpanel.html?head=up_center"><img src="images/head_up.png"></a></td> 
+                    <td align="center"><a href="controlpanel.html?head=up_right"><img src="images/head_up_right.png"></a></td> 
+                  <tr>
+                    <td align="center"><br><a href="controlpanel.html?head=center_left"><img src="images/head_left.png"></a></td> 
+                    <td><a href="controlpanel.html?head=center_center"><img src="images/head.png"></a></td>
+                    <td align="center"><br><a href="controlpanel.html?head=center_right"><img src="images/head_right.png"></a></td> 
+                  </tr>
+                  <tr>
+                    <td align="center" colspan=3><br><a href="controlpanel.html?head=littledown_center"><img src="images/head_down.png" width=40 height=10></a></td>  
+                  </tr>
+                  <tr>
+                    <td align="center"><a href="controlpanel.html?head=down_left"><img src="images/head_down_left.png"></a></td> 
+                    <td align="center"><a href="controlpanel.html?head=down_center"><img src="images/head_down.png"></a></td> 
+                    <td align="center"><a href="controlpanel.html?head=down_right"><img src="images/head_down_right.png"></a></td> 
+                  </tr> 
+                  <tr>
+                    <td colspan=3 align="center" >  
+                      <a href="controlpanel.html?head=start">Start</a> /
+                      <a href="controlpanel.html?head=restart">Restart</a> Head Motors 
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan=3 align="center" > Head Emotion   : 
+                      <select id="emotionSelector" onchange="javascript:command('emotion='+this.value);" > 
+                        <option value="happy">Happy</option>
+                        <option value="vhappy">Very Happy</option>
+                        <option value="ltired">Little Tired</option>
+                        <option value="vtired">Very Tired</option>
+                        <option value="concerned">Concerned</option>
+                        <option value="sad">Sad</option>
+                        <option value="wondering">Wondering</option>
+                        <option value="neutral">Neutral</option>
+                        <option value="sleeping">Sleeping</option>
+                      </select>  
+                    </td>
+                  </tr>
 
-	<div class="rtd">
-          <strong>HEAD CONTROL</strong><br/>
-           <table>
-              <tr> 
-                 <td align="center"><a href="controlpanel.html?head=up_left"><img src="head_up_left.png"></a></td> 
-                 <td align="center"><a href="controlpanel.html?head=up_center"><img src="head_up.png"></a></td> 
-                 <td align="center"><a href="controlpanel.html?head=up_right"><img src="head_up_right.png"></a></td> 
-               <tr>
-                 <td align="center"><br><a href="controlpanel.html?head=center_left"><img src="head_left.png"></a></td> 
-                 <td><a href="controlpanel.html?head=center_center"><img src="head.png"></a></td>
-                 <td align="center"><br><a href="controlpanel.html?head=center_right"><img src="head_right.png"></a></td> 
-               </tr>
-                <tr>
-                 <td align="center" colspan=3><br><a href="controlpanel.html?head=littledown_center"><img src="head_down.png" width=40 height=10></a></td>  
-               </tr>
-              <tr>
-                 <td align="center"><a href="controlpanel.html?head=down_left"><img src="head_down_left.png"></a></td> 
-                 <td align="center"><a href="controlpanel.html?head=down_center"><img src="head_down.png"></a></td> 
-                 <td align="center"><a href="controlpanel.html?head=down_right"><img src="head_down_right.png"></a></td> 
-              </tr> 
-              
-              <tr>
-                <td colspan=3 align="center" >  
-                   <a href="controlpanel.html?head=start">Start</a> /
-                   <a href="controlpanel.html?head=restart">Restart</a> Head Motors 
-                </td>
-              </tr>
-              
-              <tr>
-                <td colspan=3 align="center" > Head Emotion   : 
-                  <select id="emotionSelector" onchange="javascript:command('emotion='+this.value);" > 
-                    <option value="happy">Happy</option>
-                    <option value="vhappy">Very Happy</option>
-                    <option value="ltired">Little Tired</option>
-                    <option value="vtired">Very Tired</option>
-                    <option value="concerned">Concerned</option>
-                    <option value="sad">Sad</option>
-                    <option value="wondering">Wondering</option>
-                    <option value="neutral">Neutral</option>
-                    <option value="sleeping">Sleeping</option>
-                  </select>  
-                </td>
-              </tr>
-
- 
-              <tr>
-                <td colspan=3>
-                  <form action="controlpanel.html" accept-charset="utf-8" > 
-                   TTS : 
-                     <div style="overflow: hidden; padding-right: .5em;">
-                      <input type="text" name="say"  style="width: 60%;">
-                      <input type="submit" value="Speak" onclick="updateFormRandomNumber()" style="float: right">
-                     </div> 
-                     <input id="FormRandomField" type="hidden" name="t" value="somethingRandomHere"> 
-                   </form>
-                </td>
-              </tr>
-
-
-           </table>  
-	</div> 
-        </td>
-        <td> 
-	<div class="rtd">
-        <strong>STATUS</strong><br/>
-         <iframe id="statusMonitor" src="stats.html" frameBorder="0" scrolling="no" height="400" > 
-         </iframe>
-        <br><br>    
-	</div> 
-        </td>
-
-
-
-
+                  <tr>
+                    <td colspan=3>
+                      <form action="controlpanel.html" accept-charset="utf-8" > 
+                        TTS : 
+                        <div style="overflow: hidden; padding-right: .5em;">
+                          <input type="text" name="say"  style="width: 60%;" />
+                          <input type="submit" value="Speak" onclick="updateFormRandomNumber()" style="float: right" />
+                        </div> 
+                        <input id="FormRandomField" type="hidden" name="t" value="somethingRandomHere" /> 
+                      </form>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </td>
+            <td> 
+              <div class="rtd">
+                <strong>STATUS</strong><br/>
+                <iframe id="statusMonitor" src="stats.html" frameBorder="0" scrolling="no" height="400"></iframe>
+                <br><br>
+              </div> 
+            </td>
      
-      <td> 
-	<div class="rtd">
+            <td> 
+	            <div class="rtd">
 
-        <strong>NODE CONTROL</strong><br/>
-           <select id="NodeControls" onchange="javascript:command('node='+this.value);" > 
-               <option value="nothing0">Click to control nodes</option>  
-                
-                 <optgroup label="Web Interface" >
-                    <option value="webintfEnableBattery">Enable Battery Information</option> 
-                    <option value="webintfDisableBattery">Disable Battery Information</option>  
-                 </optgroup> 
+                <strong>NODE CONTROL</strong><br />
+                <select id="NodeControls" onchange="javascript:command('node='+this.value);">
+                  <option value="nothing0">Click to control nodes</option>
+                  <optgroup label="Web Interface">
+                      <option value="webintfEnableBattery">Enable Battery Information</option>
+                      <option value="webintfDisableBattery">Disable Battery Information</option>
+                  </optgroup>
                   
-                 <optgroup label="Vision System Switching" >
-                    <option value="vsPause">Pause Entire Vision System</option> 
-                    <option value="vsResume">Resume Entire Vision System</option> 
-                    <option value="vsFollowUser">Vision System to Follow User</option> 
-                    <option value="vsLocateUser">Vision System to Locate User</option> 
-                    <option value="vsFitnessFunction">Vision System to Fitness Function</option> 
-                    <option value="vsWhereIsUserPointing">Vision System to See User Pointing</option> 
-                    <option value="vsNavigating">Vision System to Navigation</option> 
-                    <option value="vsIdle">Vision System to Idle</option> 
-                    <option value="vsStartScanning3DObject">Vision System to start 3D Scan</option> 
-                    <option value="vsStopScanning3DObject">Vision System to stop 3D Scan</option>  
-                 </optgroup> 
-       
-                 <optgroup label="FORTH Person/Skeleton Detector" > 
-                    <option value="forthSKAdvanced">Switch to Advanced Mode</option> 
-                    <option value="forthSKSimple">Switch to Simple Mode</option> 
-                    <option value="forthSKStartVisualization">Start Visualizing Person Tracker</option> 
+                  <optgroup label="Vision System Switching">
+                    <option value="vsPause">Pause Entire Vision System</option>
+                    <option value="vsResume">Resume Entire Vision System</option>
+                    <option value="vsFollowUser">Vision System to Follow User</option>
+                    <option value="vsLocateUser">Vision System to Locate User</option>
+                    <option value="vsFitnessFunction">Vision System to Fitness Function</option>
+                    <option value="vsWhereIsUserPointing">Vision System to See User Pointing</option>
+                    <option value="vsNavigating">Vision System to Navigation</option>
+                    <option value="vsIdle">Vision System to Idle</option>
+                    <option value="vsStartScanning3DObject">Vision System to start 3D Scan</option>
+                    <option value="vsStopScanning3DObject">Vision System to stop 3D Scan</option>
+                  </optgroup>
+
+                  <optgroup label="FORTH Person/Skeleton Detector">
+                    <option value="forthSKAdvanced">Switch to Advanced Mode</option>
+                    <option value="forthSKSimple">Switch to Simple Mode</option>
+                    <option value="forthSKStartVisualization">Start Visualizing Person Tracker</option>
                     <option value="forthSKStopVisualization">Stop Visualizing Person Tracker</option>
-                    <option value="forthSKPause">Pause FORTH Person Tracker</option> 
-                    <option value="forthSKResume">Resume FORTH Person Tracker</option> 
-                    
-                    <option value ="startRecording">Start Recording</option>
-                    <option value ="stopRecording">Stop Recording</option>
-                    <option value ="clearRecording">Clear All Recordings</option> 
-                 </optgroup>       
-  
-                 <optgroup label="Follow User" >
-                    <option value="followUserStartVisualization">Start Visualizing Follow User</option> 
+                    <option value="forthSKPause">Pause FORTH Person Tracker</option>
+                    <option value="forthSKResume">Resume FORTH Person Tracker</option>
+                    <option value="startRecording">Start Recording</option>
+                    <option value="stopRecording">Stop Recording</option>
+                    <option value="clearRecording">Clear All Recordings</option>
+                  </optgroup>
+
+                  <optgroup label="Follow User">
+                    <option value="followUserStartVisualization">Start Visualizing Follow User</option>
                     <option value="followUserStopVisualization">Stop Visualizing Follow User</option>
-                    <option value="followUserPause">Pause Follow User</option> 
+                    <option value="followUserPause">Pause Follow User</option>
                     <option value="followUserResume">Resume Follow User</option>
-                 </optgroup>   
+                  </optgroup>
 
+                  <optgroup label="Recovery">
+                    <option value="activateRecovery">Active Recovery</option>
+                    <option value="deactivateRecovery">Deactivate Recovery</option>
+                  </optgroup>
 
-                 <optgroup label="Recovery" >
-                    <option value="activateRecovery">Active Recovery</option> 
-                    <option value="deactivateRecovery">Deactivate Recovery</option> 
-                 </optgroup>   
-
-
-                   
-                 <optgroup label="Emergency Detector" >
-                    <option value="emergencyStartVisualization">Start Visualizing Emergency Detector</option> 
+                  <optgroup label="Emergency Detector">
+                    <option value="emergencyStartVisualization">Start Visualizing Emergency Detector</option>
                     <option value="emergencyStopVisualization">Stop Visualizing Emergency Detector</option>
-                    <option value="emergencyTrigger">Trigger Emergency Detector</option> 
-                    <option value="emergencyPause">Pause Emergency Detector</option> 
+                    <option value="emergencyTrigger">Trigger Emergency Detector</option>
+                    <option value="emergencyPause">Pause Emergency Detector</option>
                     <option value="emergencyResume">Resume Emergency Detector</option>
-                    <option value="emergencyMute">Mute Emergency Detector</option> 
+                    <option value="emergencyMute">Mute Emergency Detector</option>
                     <option value="emergencyUnmute">Unmute Emergency Detector</option>
-                    <option value ="emergencyClearRecording">Clear All Recordings</option> 
-                 </optgroup>
+                    <option value ="emergencyClearRecording">Clear All Recordings</option>
+                  </optgroup>
                  
-                 <optgroup label="Person Aggregator" >
-                    <option value="aggregatorPrecise">Set Person Messages to Precise Mode</option> 
-                    <option value="aggregatorRaw">Set Person Messages to Raw Mode</option> 
-                    <option value="aggregatorPause">Pause Person Aggregator</option> 
+                  <optgroup label="Person Aggregator">
+                    <option value="aggregatorPrecise">Set Person Messages to Precise Mode</option>
+                    <option value="aggregatorRaw">Set Person Messages to Raw Mode</option>
+                    <option value="aggregatorPause">Pause Person Aggregator</option>
                     <option value="aggregatorResume">Resume Person Aggregator</option>
-                 </optgroup>   
-                 
+                  </optgroup>
 
-                 <optgroup label="Nite Skeleton Tracker" >
-                    <option value="niteTrigger">Trigger Nite Person Message</option> 
-                    <option value="nitePause">Pause Nite Tracking</option> 
+                  <optgroup label="Nite Skeleton Tracker">
+                    <option value="niteTrigger">Trigger Nite Person Message</option>
+                    <option value="nitePause">Pause Nite Tracking</option>
                     <option value="niteResume">Resume Nite Tracking</option>
-                    <option value="nitePausePoint">Pause Nite Point Events</option> 
+                    <option value="nitePausePoint">Pause Nite Point Events</option>
                     <option value="niteResumePoint">Resume Nite Point Events</option>
-                 </optgroup>
+                  </optgroup>
 
-                 <optgroup label="Face Detector" >
-                    <option value="faceTrigger">Trigger Face Detector</option> 
-                    <option value="facePause">Pause Face Detector</option> 
+                  <optgroup label="Face Detector">
+                    <option value="faceTrigger">Trigger Face Detector</option>
+                    <option value="facePause">Pause Face Detector</option>
                     <option value="faceResume">Resume Face Detector</option>
                     <option value="faceStartRecording">Start Recording Faces</option>
                     <option value="faceStopRecording">Stop Recording Faces</option>
-                 </optgroup>   
-<!-- OLD nodes , not used any more
-                      
+                  </optgroup>
 
+<!-- OLD nodes , not used any more
                  <optgroup label="Gesture Detector" >
                     <option value="gestureStartVisualization">Start Visualizing Gesture Detector</option> 
                     <option value="gestureStopVisualization">Stop Visualizing Gesture Detector</option>
@@ -384,179 +362,176 @@
                     <option value="fitnessResume">Resume Fitness Function</option> 
                  </optgroup>
 -->
-                 <optgroup label="MIRA Control" >
-                    <option value="switchToNavigation">Switch to Navigation</option> 
-                    <option value="switchToLearning">Switch to Learning</option> 
+
+                  <optgroup label="MIRA Control">
+                    <option value="switchToNavigation">Switch to Navigation</option>
+                    <option value="switchToLearning">Switch to Learning</option>
                     <option value="switchToMapping">Switch to Mapping</option>
-                 </optgroup>   
+                  </optgroup>
                   
-                 <optgroup label="ROS Control" >
-                    <option value="systemCleanROS">Cleanup ROS</option>  
-                 </optgroup>   
+                  <optgroup label="ROS Control">
+                    <option value="systemCleanROS">Cleanup ROS</option>
+                  </optgroup>
                  
-         </select>       <br/>
+                </select><br />
 
-        <strong>READY TO DRINK POSES</strong><br/>
-                  <select id="RTDSelector" onchange="javascript:command('rtd='+this.value);" > 
-                    <option value="nothing">Click to manipulate Arm</option>  
-                    <option value="calibrate">Calibrate Hand</option>
-                    <option value="home">Pose Home</option>
-                    <option value="almosthome">Pose Almost Home</option>
-                    <option value="armatside">Pose Arm At Side</option>
-                    <option value="lowerlearn">Pose Lower Learn</option>
-                    <option value="tablepregrasp">Pose Table Pregrasp</option>
-                    <option value="tablefinalgrasp">Pose Table Final Grasp</option>
-                    <option value="trayprerelease">Pose Tray Pre Release</option>
-                    <option value="trayrelease">Pose Tray Release</option>
-                    <option value="clearfloorpregrasp">Pose Clear Floor Pregrasp</option>
-                    <option value="clearfloorfinalgrasp">Pose Clear Floor Final Grasp</option>
-                    <option value="cfaftergrasp">Pose Clear Floor After Grasp</option> 
-                    <option value="graspfromtable">Grasp From the Table</option>
-                    <option value="graspfromfloor">Grasp From the Floor</option> 
-                  </select>    <br/>
+                <strong>READY TO DRINK POSES</strong><br />
+                <select id="RTDSelector" onchange="javascript:command('rtd='+this.value);">
+                  <option value="nothing">Click to manipulate Arm</option>
+                  <option value="calibrate">Calibrate Hand</option>
+                  <option value="home">Pose Home</option>
+                  <option value="almosthome">Pose Almost Home</option>
+                  <option value="armatside">Pose Arm At Side</option>
+                  <option value="lowerlearn">Pose Lower Learn</option>
+                  <option value="tablepregrasp">Pose Table Pregrasp</option>
+                  <option value="tablefinalgrasp">Pose Table Final Grasp</option>
+                  <option value="trayprerelease">Pose Tray Pre Release</option>
+                  <option value="trayrelease">Pose Tray Release</option>
+                  <option value="clearfloorpregrasp">Pose Clear Floor Pregrasp</option>
+                  <option value="clearfloorfinalgrasp">Pose Clear Floor Final Grasp</option>
+                  <option value="cfaftergrasp">Pose Clear Floor After Grasp</option>
+                  <option value="graspfromtable">Grasp From the Table</option>
+                  <option value="graspfromfloor">Grasp From the Floor</option>
+                </select><br />
 
-        <strong>GRIPPER STATE</strong><br/>
-                  <select id="RTDGripperSelector" onchange="javascript:command('rtd='+this.value);" > 
-                    <option value="nothing">Click To Change Gripper State</option> 
-                    <option value="opengripper">Open Gripper</option>
-                    <option value="closegripper">Close Gripper</option>
-                    <option value="closegripper">Disable All Axis</option> 
-                  </select>       <br/>
+                <strong>GRIPPER STATE</strong><br />
+                <select id="RTDGripperSelector" onchange="javascript:command('rtd='+this.value);">
+                  <option value="nothing">Click To Change Gripper State</option>
+                  <option value="opengripper">Open Gripper</option>
+                  <option value="closegripper">Close Gripper</option>
+                  <option value="closegripper">Disable All Axis</option>
+                </select><br />
+
+                <strong>EVENTS</strong><br />
+                <select id="EventSelector" onchange="javascript:command('robot='+this.value);">
+                  <option value="nothing">Click to activate an event</option>
+                  <option value="cancel">Tablet Goto Main Menu/Cancel</option>
+                  <option value="yes">Hear Yes</option>
+                  <option value="no">Hear No</option>
+                  <option value="reward">Reward</option>
+                  <option value="call">Call to Room</option>
+                  <option value="clearfloor">Clear Floor</option>
+                  <option value="learnobject">Learn Object</option>
+                  <option value="settings">Settings</option>
+                  <option value="wake">Hear My Name (C_WAKEUP)</option>
+                  <option value="stop">Wake Up (C_STOP)</option>
+                  <option value="helpme">Help Me/Emergency</option>
+                  <option value="sleep">Sleep</option>
+                  <option value="openmic">Enable Microphone</option>
+                  <option value="closemic">Mute Microphone</option>
+                </select><br />
  
-
-        <strong>EVENTS</strong><br/>
-                  <select id="EventSelector" onchange="javascript:command('robot='+this.value);" > 
-                    <option value="nothing">Click to activate an event</option> 
-                    <option value="cancel">Tablet Goto Main Menu/Cancel</option>
-                    <option value="yes">Hear Yes</option> 
-                    <option value="no">Hear No</option> 
-                    <option value="reward">Reward</option>
-                    <option value="call">Call to Room</option> 
-                    <option value="clearfloor">Clear Floor</option> 
-                    <option value="learnobject">Learn Object</option> 
-                    <option value="settings">Settings</option> 
-                    <option value="wake">Hear My Name (C_WAKEUP)</option> 
-                    <option value="stop">Wake Up (C_STOP)</option> 
-                    <option value="helpme">Help Me/Emergency</option> 
-                    <option value="sleep">Sleep</option> 
-                    <option value="openmic">Enable Microphone</option> 
-                    <option value="closemic">Mute Microphone</option> 
-                  </select>       <br/>
- 
-        <strong>BRING</strong><br/>
-                  <select id="bringSelector" onchange="javascript:command('bring='+this.value);" > 
-                    <option value="nothing">Click to Select an item</option> 
-                    <option value="aspirin">Aspirin</option> 
-                    <option value="sugar">Sugar</option> 
-                  </select>        <br/> 
+                <strong>BRING</strong><br/>
+                <select id="bringSelector" onchange="javascript:command('bring='+this.value);">
+                  <option value="nothing">Click to Select an item</option>
+                  <option value="aspirin">Aspirin</option>
+                  <option value="sugar">Sugar</option>
+                </select><br />
     
 
-        <strong>MOVE</strong><br/>
-                  <select id="moveSelector" onchange="javascript:command('move='+this.value);" > 
-                    <option value="nowhere"> Click to Select a movement to </option> 
-                    <option value="charging">Move To Charging</option> 
-                    <option value="kitchen">Kitchen</option> 
-                    <option value="livingroom">Living Room</option> 
-                    <option value="bedroom">Bed Room</option>  
-                  </select>        <br/> 
+                <strong>MOVE</strong><br />
+                <select id="moveSelector" onchange="javascript:command('move='+this.value);">
+                  <option value="nowhere"> Click to Select a movement to </option>
+                  <option value="charging">Move To Charging</option>
+                  <option value="kitchen">Kitchen</option>
+                  <option value="livingroom">Living Room</option>
+                  <option value="bedroom">Bed Room</option>
+                </select><br />
            
-          <br/>  
-          <br/> 
+                <br/><br/>
 
-	</div><br/>
-      </td>
+	            </div><br/>
+            </td>
  
-       </tr>
-       <tr>
-        <td colspan=3>
-           <div class="rtd">
-              <strong>MOVEMENT</strong><br/> 
-            <center>
+          </tr>
+          <tr>
+            <td colspan=3>
+              <div class="rtd">
+                <strong>MOVEMENT</strong><br /> 
+                <center>
 
-<table>
- <tr> 
-   <td>         
+                <table>
+                  <tr> 
+                    <td>         
       <!-- Movement has 2 parts , First is the Joystick -->
 
-              <a href="javascript:joystickExecute(0.5,0);"><img class="turnControls" src="turnLeft.png" id="turnLeft" ></a>
+                      <a href="javascript:joystickExecute(0.5,0);"><img class="turnControls" src="images/turnLeft.png" id="turnLeft"></a>
 <!--  ------------------------------------------------------------------------------
       START OF:         THE HTML5 CANVAS CODE FOR MAKING THE JOYSTICK WORK 
       ------------------------------------------------------------------------------   -->
-    <canvas id="joypadCanvas" width="160" height="160"></canvas>
-    <script src="joystick.js"> </script> 
+                      <canvas id="joypadCanvas" width="160" height="160"></canvas>
+                      <script src="joystick.js"></script> 
 <!--  ------------------------------------------------------------------------------
       END OF:           THE HTML5 CANVAS CODE FOR MAKING THE JOYSTICK WORK 
       ------------------------------------------------------------------------------   --> 
-                <a href="javascript:joystickExecute(-0.5,0);"><img class="turnControls" src="turnRight.png" id="turnRight"></a>
-                <br/> 
-                 <center>
-                  <select id="joystickSpeed"> 
-                    <option value="0.04">Normal Speed</option>  
-                    <option value="0.01">Slow</option>    
-                    <option value="0.07">Fast</option> 
-                    <option value="0.09">Turbo</option> 
-                  </select> 
-                 <br/> 
-                 <label><input id="joystickActiveSwitch" type="checkbox" onchange='handleJoystickActiveSwitch(this);' >Joystick Active</label> <br/>
-                 <a href="javascript:joystickExecute(0,0);">STOP ALL MOVEMENT</a>
-                 </center>     
+                      <a href="javascript:joystickExecute(-0.5,0);"><img class="turnControls" src="images/turnRight.png" id="turnRight"></a>
+                      <br />
+                      <center>
+                        <select id="joystickSpeed">
+                          <option value="0.04">Normal Speed</option>
+                          <option value="0.01">Slow</option>
+                          <option value="0.07">Fast</option>
+                          <option value="0.09">Turbo</option>
+                        </select> 
+                        <br/> 
+                        <label><input id="joystickActiveSwitch" type="checkbox" onchange='handleJoystickActiveSwitch(this);' >Joystick Active</label> <br/>
+                        <a href="javascript:joystickExecute(0,0);">STOP ALL MOVEMENT</a>
+                      </center>
 
 
 
-</td>
-<td>
-</td>
-<td>
+                    </td>
+                    <td></td>
+                    <td>
         <!-- Movement has 2 parts , Second is the Discrete Movement -->
-        <table>
-          <tr>
-           <td></td>
-           <td>
-               <a href="controlpanel.html?body=forward"><img src="head_up.png" width=40></a><br/>
-           </td>
-           <td></td>
-          </tr>
-          <tr>
-           <td>
-              <a href="controlpanel.html?body=left"><img src="head_left.png" width=40></a><br/> 
-           </td>
-           <td>
-              <a href="controlpanel.html?body=stop"><img src="head_stop.png" width=40></a><br/> 
-           </td>
-           <td>
-              <a href="controlpanel.html?body=right"><img src="head_right.png" width=40></a><br/>
-           </td>
-          </tr>
-          <tr>
-           <td>
-              <a href="controlpanel.html?body=360ccw"><img src="head_ccw.png" width=40></a><br/>
-           </td>
-           <td>
-               <a href="controlpanel.html?body=back"><img src="head_down.png" width=40></a><br/>
-           </td>
-           <td>
-               <a href="controlpanel.html?body=360cw"><img src="head_cw.png" width=40></a><br/>
-           </td>
-          </tr>
+                      <table>
+                        <tr>
+                          <td></td>
+                          <td>
+                            <a href="controlpanel.html?body=forward"><img src="images/head_up.png" width=40></a><br/>
+                          </td>
+                          <td></td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <a href="controlpanel.html?body=left"><img src="images/head_left.png" width=40></a><br/> 
+                          </td>
+                          <td>
+                            <a href="controlpanel.html?body=stop"><img src="images/head_stop.png" width=40></a><br/> 
+                          </td>
+                          <td>
+                              <a href="controlpanel.html?body=right"><img src="images/head_right.png" width=40></a><br/>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <a href="controlpanel.html?body=360ccw"><img src="images/head_ccw.png" width=40></a><br/>
+                          </td>
+                          <td>
+                            <a href="controlpanel.html?body=back"><img src="images/head_down.png" width=40></a><br/>
+                          </td>
+                          <td>
+                            <a href="controlpanel.html?body=360cw"><img src="images/head_cw.png" width=40></a><br/>
+                          </td>
+                        </tr>
 
-          <tr>
-            <td colspan=3>
-               <center>
-                 <a href="controlpanel.html?body=reset">Reset Motors/Brakes</a>
-               </center>
+                        <tr>
+                          <td colspan=3>
+                            <center>
+                              <a href="controlpanel.html?body=reset">Reset Motors/Brakes</a>
+                            </center>
+                          </td>
+                        </tr>
+                      </table>   
+
+                    </td>
+                  </tr>
+                </table>
+                </center>
+              </div> 
             </td>
           </tr>
-        </table>   
-        
-        
-</td>
-</tr>
-</table>
-            </center>
-           </div> 
-        </td>
-       </tr>
-       </table> 
+        </table> 
        <!-- NESTED BOX END -->
       </td>
 
@@ -568,21 +543,18 @@
  
 
     <tr>
-      <td colspan=10><center>
-     </center>
+      <td colspan=10>
+      <center></center>
       </td>
     </tr>
-
-
-
-
-   </table>
+  </table>
 	<br/>
-	<hr/><br/>
+	<hr/>
+  <br/>
 
 	<!-- a href="controlpanel.html?nothing=true"> <h3>Click here to refresh neutral url</h3></a -->
  
   </center> 
- </body>
+  </body>
 </html>
 
