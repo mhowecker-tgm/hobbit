@@ -165,3 +165,39 @@ a:hover {
 a:active {
   color: #0000FF;
 }
+
+/* centering content of tables */
+
+.center_content > td {
+  text-align: center;
+}
+
+
+/* TTS - Section */
+
+.tts_div {
+  overflow: hidden;
+  padding-right: 0.5em;
+}
+
+.tts_text {
+  width: 60%;
+}
+
+.tts_submit {
+  float: right;
+}
+
+/* Banner */
+
+.banner {
+  width: 800px;
+  border: 0;
+}
+
+
+/* View - pop ups */
+
+.panel_width {
+  width: 300px;
+}

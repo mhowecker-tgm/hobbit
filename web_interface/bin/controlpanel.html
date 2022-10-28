@@ -17,31 +17,32 @@
   <div class="rtdFloating" id="settingsTab" draggable="true" ondrop="drop(event)" ondragover="allowDrop(event)" ondragstart="drag(event)" >
     <table>
       <tr>
-        <td width=350 ></td><td><a href="javascript:makeFeedInvisible('settingsTab');" class="xbutton" >X</a></td>
+        <td width=350></td><td><a href="javascript:makeFeedInvisible('settingsTab');" class="xbutton">X</a></td>
       </tr>
       <tr>
         <td colspan=2> 
           <form action="settings.html" accept-charset="utf-8" >  
-            <div style="overflow: hidden; padding-right: .5em;">
-            Robot Name :  <br/>
-            <input type="text" name="name"  style="width: 60%;"> <br/>
+            <div class="tts_div">
+            Robot Name:
+            <br />
+            <input type="text" name="name"  class="tts_text" /><br />
             
-            Talking Speed : 
-            <select id="talkingSpeed"  >
+            Talking Speed:
+            <select id="talkingSpeed">
               <option value="ltired">Normal</option> 
               <option value="happy">Very Slow</option>
               <option value="vhappy">Slow</option>
               <option value="vtired">Fast</option>
               <option value="concerned">Very Fast</option> 
-            </select>   <br/>
+            </select><br />
 
-            Gender : 
+            Gender:
             <select id="gender"  >
               <option value="male">Male</option> 
               <option value="fale">Female</option> 
             </select>
             <br/><br/>
-            <input type="submit" value="Set" onclick="updateFormRandomNumber()" style="float: right">
+            <input type="submit" value="Set" onclick="updateFormRandomNumber()" class="tts_submit">
             </div> 
             <input id="FormRandomField" type="hidden" name="t" value="somethingRandomHere"> 
           </form>
@@ -59,7 +60,7 @@
   <center>
 	<!--a href="controlpanel.html?nothing=true"> <img src="images/header.png" border=0/> </a--> 
   <a href="controlpanel.html?nothing=true">  
-  <img src="images/banner.png" width="800" />
+  <img src="images/banner.png" class="banner" />
   </a><br/>
          
   <ul>
@@ -108,7 +109,7 @@
   <div class="rtdFloating" id="mapFeed" draggable="true" ondrop="drop(event)" ondragover="allowDrop(event)" ondragstart="drag(event)" >
     <table>
       <tr>
-        <td width=300 >Map Overview</td>
+        <td class="panel_width">Map Overview</td>
         <td><a href="javascript:makeFeedInvisible('mapFeed');" class="xbutton" >X</a></td>
       </tr>
       <tr>
@@ -129,11 +130,10 @@
   </div>
 
 
-
   <div class="rtdFloating" id="videoFeedBottom" draggable="true" ondrop="drop(event)" ondragover="allowDrop(event)" ondragstart="drag(event)" >
     <table>
       <tr>
-        <td width=300 >Bottom Camera Feed</td>
+        <td class="panel_width">Bottom Camera Feed</td>
         <td><a href="javascript:makeFeedInvisible('videoFeedBottom');" class="xbutton" >X</a></td>
       </tr>
       <tr>
@@ -149,13 +149,11 @@
     </table>
   </div>
 
- 
 
-
-   <div class="rtdFloating" id="videoFeedTop" draggable="true" ondrop="drop(event)" ondragover="allowDrop(event)" ondragstart="drag(event)" >
+  <div class="rtdFloating" id="videoFeedTop" draggable="true" ondrop="drop(event)" ondragover="allowDrop(event)" ondragstart="drag(event)" >
     <table>
       <tr>
-        <td width=300 >Top Camera Feed</td>
+        <td class="panel_width">Top Camera Feed</td>
         <td><a href="javascript:makeFeedInvisible('videoFeedTop');" class="xbutton" >X</a></td>
       </tr>
       <tr>
@@ -171,12 +169,11 @@
     </table>
 	</div> 
 
-
  
-   <div class="rtdFloating" id="tfTree" draggable="true" ondrop="drop(event)" ondragover="allowDrop(event)" ondragstart="drag(event)" >
+  <div class="rtdFloating" id="tfTree" draggable="true" ondrop="drop(event)" ondragover="allowDrop(event)" ondragstart="drag(event)" >
     <table>
       <tr>
-        <td width=300 >TF Tree Overview</td>
+        <td class="panel_width">TF Tree Overview</td>
         <td><a href="javascript:makeFeedInvisible('tfTree');" class="xbutton" >X</a></td>
       </tr>
       <tr>
@@ -194,7 +191,7 @@
 	
 	
 	
-   <table id="content">
+  <table id="content">
     <tr>
       <td>
        <!-- NESTED BOX START -->
@@ -203,32 +200,32 @@
             <td>
               <div class="rtd">
                 <strong>HEAD CONTROL</strong><br/>
-                <table>
-                  <tr> 
-                    <td align="center"><a href="controlpanel.html?head=up_left"><img src="images/head_up_left.png"></a></td> 
-                    <td align="center"><a href="controlpanel.html?head=up_center"><img src="images/head_up.png"></a></td> 
-                    <td align="center"><a href="controlpanel.html?head=up_right"><img src="images/head_up_right.png"></a></td> 
-                  <tr>
-                    <td align="center"><br><a href="controlpanel.html?head=center_left"><img src="images/head_left.png"></a></td> 
+                <table class="head_controll">
+                  <tr class="center_content"> 
+                    <td><a href="controlpanel.html?head=up_left"><img src="images/head_up_left.png"></a></td> 
+                    <td><a href="controlpanel.html?head=up_center"><img src="images/head_up.png"></a></td> 
+                    <td><a href="controlpanel.html?head=up_right"><img src="images/head_up_right.png"></a></td> 
+                  <tr class="center_content">
+                    <td><br><a href="controlpanel.html?head=center_left"><img src="images/head_left.png"></a></td> 
                     <td><a href="controlpanel.html?head=center_center"><img src="images/head.png"></a></td>
-                    <td align="center"><br><a href="controlpanel.html?head=center_right"><img src="images/head_right.png"></a></td> 
+                    <td><br><a href="controlpanel.html?head=center_right"><img src="images/head_right.png"></a></td> 
                   </tr>
-                  <tr>
-                    <td align="center" colspan=3><br><a href="controlpanel.html?head=littledown_center"><img src="images/head_down.png" width=40 height=10></a></td>  
+                  <tr class="center_content">
+                    <td colspan=3><br><a href="controlpanel.html?head=littledown_center"><img src="images/head_down.png" width=40 height=10></a></td>  
                   </tr>
-                  <tr>
-                    <td align="center"><a href="controlpanel.html?head=down_left"><img src="images/head_down_left.png"></a></td> 
-                    <td align="center"><a href="controlpanel.html?head=down_center"><img src="images/head_down.png"></a></td> 
-                    <td align="center"><a href="controlpanel.html?head=down_right"><img src="images/head_down_right.png"></a></td> 
+                  <tr class="center_content">
+                    <td><a href="controlpanel.html?head=down_left"><img src="images/head_down_left.png"></a></td> 
+                    <td><a href="controlpanel.html?head=down_center"><img src="images/head_down.png"></a></td> 
+                    <td><a href="controlpanel.html?head=down_right"><img src="images/head_down_right.png"></a></td> 
                   </tr> 
                   <tr>
-                    <td colspan=3 align="center" >  
+                    <td class="center_content" colspan=3>  
                       <a href="controlpanel.html?head=start">Start</a> /
                       <a href="controlpanel.html?head=restart">Restart</a> Head Motors 
                     </td>
                   </tr>
-                  <tr>
-                    <td colspan=3 align="center" > Head Emotion   : 
+                  <tr class="center_content">
+                    <td colspan=3>Head Emotion:
                       <select id="emotionSelector" onchange="javascript:command('emotion='+this.value);" > 
                         <option value="happy">Happy</option>
                         <option value="vhappy">Very Happy</option>
@@ -247,9 +244,9 @@
                     <td colspan=3>
                       <form action="controlpanel.html" accept-charset="utf-8" > 
                         TTS : 
-                        <div style="overflow: hidden; padding-right: .5em;">
-                          <input type="text" name="say"  style="width: 60%;" />
-                          <input type="submit" value="Speak" onclick="updateFormRandomNumber()" style="float: right" />
+                        <div class="tts_div">
+                          <input type="text" name="say" class="tts_text" />
+                          <input type="submit" value="Speak" onclick="updateFormRandomNumber()" class="tts_submit" />
                         </div> 
                         <input id="FormRandomField" type="hidden" name="t" value="somethingRandomHere" /> 
                       </form>

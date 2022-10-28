@@ -118,7 +118,7 @@ function refreshMapFeed(name,imageName)
   //command('camera=refreshMap');
   document.getElementById(name).style.visibility='visible';
   var randomnumber=Math.floor(Math.random()*100000);
-  document.getElementById("mapImage").src="map.png?t="+randomnumber;
+  document.getElementById("mapImage").src="images/map.png?t="+randomnumber;
 }
 
 
@@ -127,7 +127,7 @@ function refreshTFFeed(name,imageName)
   //command('camera=refreshTF');
   document.getElementById(name).style.visibility='visible';
   var randomnumber=Math.floor(Math.random()*100000);
-  document.getElementById("tfTreeImage").src="tf.png?t="+randomnumber;
+  document.getElementById("tfTreeImage").src="images/tf.png?t="+randomnumber;
 }
 
 
@@ -136,7 +136,7 @@ function refreshTopFeed(name,imageName)
   command('camera=refreshTop');
   document.getElementById(name).style.visibility='visible';
   var randomnumber=Math.floor(Math.random()*100000);
-  document.getElementById("videoFeedTopImage").src="top_image.jpg?t="+randomnumber;
+  document.getElementById("videoFeedTopImage").src="images/top_image.jpg?t="+randomnumber;
 }
 
 
@@ -145,7 +145,7 @@ function refreshBottomFeed(name,imageName)
   command('camera=refreshBottom');
   document.getElementById(name).style.visibility='visible';
   var randomnumber=Math.floor(Math.random()*100000);
-  document.getElementById("videoFeedBottomImage").src="base_image.jpg?t="+randomnumber;
+  document.getElementById("videoFeedBottomImage").src="images/base_image.jpg?t="+randomnumber;
 }
 
 
